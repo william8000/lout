@@ -1,6 +1,6 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -480,6 +480,8 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
     case PLAIN_GRAPHIC:
     case GRAPHIC:
     case KERN_SHRINK:
+    case BEGIN_HEADER:
+    case SET_HEADER:
     case ONE_COL:
     case ONE_ROW:
     case HCONTRACT:

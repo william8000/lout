@@ -5,9 +5,9 @@
 @PP
 There is a @Code "rule" option for drawing a rule around a cell:
 @ID @OneRow @Code "@Cell rule { yes }"
-The other possible values are {@Code no} (the default),
-{@Code single} (the same as {@Code yes}), and {@Code double}, which
-draws a double rule.
+Other values are {@Code no} (the default),
+{@Code single} (the same as {@Code yes}), and {@Code double} (for a
+double rule).
 @PP
 There are @Code "rulehorizontal" and @Code "rulevertical" options which
 draw only horizontal or vertical rules, and also {@Code "ruleabove"},
@@ -83,7 +83,7 @@ above, below, left, and right rules:
     B { rulerightgap }
     C { rulerightcolour }
 }
-As usual, all these options have abbreviated names; and @Code { colour }
+All these options have alternative, abbreviated names; and @Code { colour }
 may be spelt @Code { color } wherever it appears.  Section
 {@NumberOf tbl_summ} has a complete summary of all spellings of all
 options.
@@ -91,19 +91,22 @@ options.
 To clarify exactly where the rules are drawn, let's start with
 a cell with no rules at all:
 @CD @Tbl
-    aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+    mv { 0i }
+    aformat { @Cell width { 3c } height { 1.2c } paint { lightgrey } A }
 {
 @Rowa
 }
 Above rules and left rules are drawn within the cell boundary, just
 touching it, with any above rule overstriking any left rule:
 @CD { @Tbl
-    aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+    mv { 0i }
+    aformat { @Cell width { 3c } height { 1.2c } paint { lightgrey } A }
 {
 @Rowa
 }
 @Background @Tbl
-    aformat { @Cell width { 3c } height { 1.5c } A }
+    mv { 0i }
+    aformat { @Cell width { 3c } height { 1.2c } A }
     ruleleft { yes }
     ruleabove { yes }
     rulehorizontalwidth { 0.8v }
@@ -116,18 +119,20 @@ touching it, with any above rule overstriking any left rule:
 }
 Below and right rules are drawn just outside the boundary of the
 cell, also touching it:
-@CD @Tbl aformat { @Cell A | @Cell | @Cell B }
+@CD @Tbl mv { 0i } aformat { @Cell A | @Cell | @Cell B }
 {
 @Rowa
     A {
         @Tbl
-            aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+            mv { 0i }
+            aformat { @Cell width { 3c } height { 1.2c } paint { lightgrey } A }
         {
         @Rowa
         }
         @Background
         @Tbl
-            aformat { @Cell width { 3c } height { 1.5c } A }
+            mv { 0i }
+            aformat { @Cell width { 3c } height { 1.2c } A }
             rulebelow { yes }
 	    rulehorizontalwidth { 0.8v }
 	    ruleverticalwidth { 0.5v }
@@ -139,13 +144,15 @@ cell, also touching it:
       }
     B {
         @Tbl
-            aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+            mv { 0i }
+            aformat { @Cell width { 3c } height { 1.2c } paint { lightgrey } A }
         {
         @Rowa
         }
         @Background
         @Tbl
-            aformat { @Cell width { 3c } height { 1.5c } A }
+            mv { 0i }
+            aformat { @Cell width { 3c } height { 1.2c } A }
             ruleright { yes }
 	    rulehorizontalwidth { 0.8v }
 	    ruleverticalwidth { 0.5v }
@@ -161,13 +168,15 @@ When a right rule is present, any above and below rules are extended
 by the width of the right rule, and they overstrike it:
 @CD {
 @Tbl
-    aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+    mv { 0i }
+    aformat { @Cell width { 3c } height { 1.2c } paint { lightgrey } A }
 {
 @Rowa
 }
 @Background
 @Tbl
-    aformat { @Cell width { 3c } height { 1.5c } A }
+    mv { 0i }
+    aformat { @Cell width { 3c } height { 1.2c } A }
     ruleabove { yes }
     ruleright { yes }
     rulebelow { yes }
@@ -186,7 +195,7 @@ rules of width @Code 0.8v drawn in black, and vertical rules of width
 rules produce clean corners, and also that a right rule and a neighbouring
 left rule exactly overstrike each other, as do a below rule and its
 neighbouring above rule.
-@PP
-For information about rules in plain text tables, consult Section
-{@NumberOf tbl_plai}.
+# @PP
+# For information about rules in plain text tables, consult Section
+# {@NumberOf tbl_plai}.
 @End @Section

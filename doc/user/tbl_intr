@@ -50,23 +50,23 @@ tbl. @Index @Code "@Tbl"
     C { Homer }
 }
 is produced by the following input:
-@ID @OneRow @Code {
-"@Tbl"
-"    aformat { @Cell A  |  @Cell B  |  @Cell C }"
-"{"
-"@Rowa"
-"    A { Austen }"
-"    B { Chaucer }"
-"    C { Donne }"
-"@Rowa"
-"    A { Balzac }"
-"    B { Darwin }"
-"    C { Goethe }"
-"@Rowa"
-"    A { Byron }"
-"    B { Dickens }"
-"    C { Homer }"
-"}"
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    aformat { @Cell A  |  @Cell B  |  @Cell C }
+{
+@Rowa
+    A { Austen }
+    B { Chaucer }
+    C { Donne }
+@Rowa
+    A { Balzac }
+    B { Darwin }
+    C { Goethe }
+@Rowa
+    A { Byron }
+    B { Dickens }
+    C { Homer }
+}
 }
 Immediately after the @Code "@Tbl" symbol, which introduces the table,
 comes a @I { format option }, {@Code "aformat"}, describing the format of

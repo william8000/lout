@@ -21,7 +21,7 @@ This manual presents Version 3 of Basser Lout, publicly released in
 September 1994 @Cite { $kingston1995lout.program }.  This manual was
 rendered into PostScript
 postscript @Index { PostScript }
-by Version 3.18 of the Basser Lout interpreter, using the symbols
+by Version 3.19 of the Basser Lout interpreter, using the symbols
 described in the User's Guide @Cite { $kingston1995lout.user }.
 @DP
 @Heading { Acknowledgment. }  Version 3 has benefited from hundreds of

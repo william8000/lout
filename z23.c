@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -128,11 +128,11 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 { OBJECT y, link, prev, g, uplink, z, face, thr;
   FULL_LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
   int i; float scale_factor;  BOOLEAN jn;
-  debug7(DGP, DD, "[ FixAndPrintObject(%s %s, %s, %s,%s, %s, %s, pg )",
+  debug8(DGP, DD, "[ FixAndPrintObject(%s %s, %s, %s,%s, %s, %s, pg, %d)",
     Image(type(x)),
     ((type(x) == WORD || type(x) == QWORD) ? string(x) : STR_EMPTY),
     EchoLength(xmk), EchoLength(xb), EchoLength(xf),dimen(dim),
-    (suppress == SUPPRESS ? "suppress" : "no_suppress"));
+    (suppress == SUPPRESS ? "suppress" : "no_suppress"), count);
   debug2(DGP, DD, "  size(x) = %s,%s;  x =",
     EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
   ifdebug(DGP, DD, DebugObject(x));
@@ -169,27 +169,19 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       {
         Child(z, Down(y));
 	Parent(thr, UpDim(x, dim));
-        debug7(DGP, DD, "  calling SPAN %s(xmk %s, x %s,%s, cons %s, z %s,%s)",
-	    dimen(dim), EchoLength(xmk),
-	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
-	    EchoConstraint(&constraint(y)),
-	    EchoLength(back(z, dim)), EchoLength(fwd(z, dim)));
-	/* ***
-	f = find_max(xf, fwd(z,dim));
-        FixAndPrintObject(z, xmk - back(thr, dim) + back(z, dim), back(z, dim),
-	  find_max(f, bfc(constraint(y)) - back(z, dim)),
-	  dim, FALSE, pg, 1);
-	*** */
-	debug5(DGP, DD, "  calling FAPO from %s (y = %s, bfc = %s, z = %s,%s",
-	  Image(type(x)), Image(type(y)), EchoLength(bfc(constraint(y))),
-	  EchoLength(back(z, dim)), EchoLength(fwd(z, dim)));
-	/* ***
-        FixAndPrintObject(z, xmk - back(thr, dim) + back(z, dim), back(z, dim),
-	  bfc(constraint(y)) - back(z, dim), dim, FALSE, pg, 1);
-	*** */
-        FixAndPrintObject(z, xmk - back(thr, dim) + back(z, dim), back(z, dim),
-	  find_max(fwd(z, dim), bfc(constraint(y)) - back(z, dim)),
-	  dim, FALSE, pg, 1);
+	save_mark(y) = xmk - back(thr, dim) + back(z, dim);
+
+        /* do the fix now if the first column is also the last one */
+	if( ++spanner_fixed(y) == spanner_count(y) )
+	{
+	  debug6(DGP, DD, "  f+last SPAN: yf = max(%s + %s - %s, %s, %s - %s)",
+	    EchoLength(xmk), EchoLength(xf), EchoLength(save_mark(y)),
+	    EchoLength(fwd(z, dim)),
+	    EchoLength(bfc(constraint(y))), EchoLength(back(z, dim)));
+	  yf = find_max(xmk + xf - save_mark(y), fwd(z, dim));
+	  yf = find_max(yf, bfc(constraint(y)) - back(z, dim));
+          FixAndPrintObject(z, save_mark(y), back(z, dim), yf, dim,FALSE,pg,1);
+	}
       }
       else
       {
@@ -202,7 +194,22 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case HSPAN:
     case VSPAN:
 
-      /* nothing to print, spanner beneath is already done */
+      /* do the fix on the last one */
+      CountChild(y, DownDim(x, dim), count);
+      if( type(y) == HSPANNER || type(y) == VSPANNER )
+      {
+	if( ++spanner_fixed(y) == spanner_count(y) )
+	{
+          Child(z, Down(y));
+	  debug6(DGP, DD, "  last SPAN: yf = max(%s + %s - %s, %s, %s - %s)",
+	    EchoLength(xmk), EchoLength(xf), EchoLength(save_mark(y)),
+	    EchoLength(fwd(z, dim)),
+	    EchoLength(bfc(constraint(y))), EchoLength(back(z, dim)));
+	  yf = find_max(xmk + xf - save_mark(y), fwd(z, dim));
+	  yf = find_max(yf, bfc(constraint(y)) - back(z, dim));
+          FixAndPrintObject(z, save_mark(y), back(z, dim), yf, dim,FALSE,pg,1);
+	}
+      }
       break;
 
 
@@ -1226,10 +1233,22 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       break;
 
 
+    case BEGIN_HEADER:
+    case END_HEADER:
+    case SET_HEADER:
+    case CLEAR_HEADER:
+
+      if( dim == COLM )
+        Error(23, 8, "%s symbol ignored (out of place)", WARN, &fpos(x),
+	  Image(type(x)));
+      break;
+
+
     default:
     
       assert1(FALSE, "FixAndPrintObject:", Image(type(x)));
       break;
+
 
   } /* end switch */
   debug2(DGP, DD, "] FixAndPrintObject returning (size now %s,%s).",

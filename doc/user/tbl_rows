@@ -5,11 +5,11 @@
 @PP
 We've seen that the @Code aformat option of @Code "@Tbl" determines the
 format of the rows introduced by the @Code "@Rowa" symbol.  There are
-eight of these row format options: {@Code aformat},
+eight row format options: {@Code aformat},
 row.formats @Index { row formats in tables }
 {@Code bformat}, and so on up to {@Code hformat}, and for each there
 is a corresponding {@Code "@Row"} symbol:  {@Code "@Rowa"}, {@Code "@Rowb"},
-and so on up to {@Code "@Rowh"}:
+and so on:
 @ID @OneRow @Code @Verbatim {
 @Tbl
     aformat { @Cell @I A  |  @Cell @I B }

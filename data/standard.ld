@@ -676,6 +676,27 @@
   }
 }
 
+{ continued @Word @CurrLang @Case {
+    Czech	@Yield { ?? }
+    Danish	@Yield { ?? }
+    Dutch       @Yield { ?? }
+    English	@Yield { ctd. }
+    EnglishUK	@Yield { ctd. }
+    Finnish	@Yield { ?? }
+    French	@Yield { suite }
+    German	@Yield { ?? }
+    Hungarian	@Yield { folyt. }
+    Italian	@Yield { cont. }
+    Norwegian   @Yield { ?? }
+    Polish	@Yield { ?? }
+    Portuguese  @Yield { cont. }
+    Russian	@Yield { ?? }
+    Slovenian   @Yield { ?? }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { ?? }
+  }
+}
+
 { am @Word @CurrLang @Case {
     Czech	@Yield { a.m. }
     Danish	@Yield { a.m. }

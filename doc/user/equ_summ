@@ -516,6 +516,8 @@ ragged @Break {
 "ddots"		@Dbl @Eq {  ddots		}
 "del"		@Dbl @Eq {  del			}
 "grad"		@Dbl @Eq {  grad		}
+"triangleup"	@Dbl @Eq {  triangleup		}
+"triangledown"	@Dbl @Eq {  triangledown	}
 "..."		@Dbl @Eq {  ...			}
 ",...,"		@Dbl @Eq {  ,...,		}
 "half"		@Dbl @Eq {  half		}

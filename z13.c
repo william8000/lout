@@ -1,6 +1,6 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -604,8 +604,8 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
     case VLIMITED:
     case HEXPAND: 
     case VEXPAND:
-    case ONE_ROW:
     case ONE_COL:
+    case ONE_ROW:
     case HSPANNER:
     
       assert( Down(x) == LastDown(x), "BreakObject: downs!" );
@@ -668,6 +668,15 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
       break;
 
 
+    case END_HEADER:
+    case CLEAR_HEADER:
+
+      /* these have size zero anyway, so not likely to reach this point */
+      break;
+
+
+    case BEGIN_HEADER:
+    case SET_HEADER:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
     

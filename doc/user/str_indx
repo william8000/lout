@@ -161,20 +161,13 @@ trial of, 205--211
 trial of, 242
 trial of, 395
 }
-must be merged, what does Lout do?  It takes the second entry, discards
-any initial part that is the same as the first entry ({@Code "trial of,"}
-in this case), and, if anything remains, it adds a comma, a space, and
-the remainder to the first entry, producing
-@ID { trial of, 205--211, 242 }
-in this case.  This process is repeated on this and the third entry,
-producing
-@ID { trial of, 205--211, 242, 395 }
-in this case, and so on.  The entries are merged in the order in which
-their points of origin appear in the final printed document.
+must be merged, what does Lout do?  Without being too formal, it
+finds the shortest larger entry that contains everything in the
+given entries, more or less, preserving the order in which
+the entries' points of origin appear in the final printed document.
 @PP
-If nothing remains after discarding the common initial part, nothing is
-added to the growing merged entry; in effect, the entry that could
-contribute nothing new is deleted.  With this in mind, let us return to
+If the entries are not different at all, then the result will be
+the same as each of them.  With this in mind, let us return to
 our initial, ambitious example:
 @ID @OneRow lines @Break {
 Galileo Galilei
@@ -260,14 +253,17 @@ The remainder of this section describes how to change the appearance of
 the index by setting options in the setup file.  For setup files and
 their options in general, consult Section {@NumberOf setup}.
 @PP
-There are five setup file options for the index.  Here they are with
+There are eight setup file options for the index.  Here they are with
 their default values:
-@ID @OneRow @Code {
-"@MakeIndex { No }"
-"@IndexFont { }"
-"@IndexBreak { oragged 1.2fx }"
-"@IndexColumnNumber { 2 }"
-"@IndexColumnGap { 1.00c }"
+@ID @OneRow @Code @Verbatim {
+@MakeIndex { No }
+@IndexFont { }
+@IndexBreak { oragged 1.2fx }
+@IndexColumnNumber { 2 }
+@IndexColumnGap { 1.00c }
+@IndexCtd { Yes }
+@IndexCtdWord { continued }
+@IndexCtdFormat { @Body @I (@CtdWord) }
 }
 The @Code "@MakeIndex" option, which may be @Code Yes or {@Code No},
 makeindex. @Index @Code "@MakeIndex"
@@ -290,6 +286,31 @@ indexcolumngap. @Index @Code "@IndexColumnGap"
 number of index columns per page, and the gap between them, and are
 exactly analogous to the @Code "@ColumnNumber" and @Code "@ColumnGap"
 options described in Section {@NumberOf columns}.
+@PP
+The last three options work together to control the appearance of
+running headers
+@FootNote {
+Index running headers are new in Version 3.19 of Lout.
+}
+in the index.  If an @Code "@Index" entry has @Code "@SubIndex" entries
+that run over to the next column, Lout will print an unobtrusive running
+header at the top of that column, something like this in English:
+@ID { procrastination @I (ctd.) }
+It will print two running headers if a @Code "@SubIndex" entry has
+@Code "@SubSubIndex" entries that run over, one for the main entry and an
+indented one for the sub-entry.  You can turn off these running headers by
+setting @Code "@IndexCtd" to {@Code No}.  A particular word is associated
+with index running headers; by default it is @Code "ctd." in English and
+its equivalent in other languages.  This is what the default value,
+{@Code "continued"}, of the @Code "@IndexCtdWord" option gives you; if you
+want some other word, change that option to the word you want.  Finally,
+you can control the format of the running headers using
+{@Code "@IndexCtdFormat"}.  Within this option, the symbol @Code "@Body"
+stands for the value of the index entry that is running over (minus any
+page numbers), and @Code "@CtdWord" stands for the word produced by the
+@Code "@IndexCtdWord" option.  The default value of {@Code "@IndexCtdFormat"},
+shown above, yields the index entry followed by @Code "@IndexCtdWord" in
+italics and parentheses.
 @PP
 Lout offers the possibility of having up to three independent indexes
 (useful for glossaries, author indexes, etc.).  The other two are called

@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -766,6 +766,10 @@ int main(int argc, char *argv[])
   load(KW_HIGH,         HIGH,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HSHIFT,       HSHIFT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_VSHIFT,       VSHIFT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_BEGIN_HEADER, BEGIN_HEADER,   TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_END_HEADER,   END_HEADER,     FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_SET_HEADER,   SET_HEADER,     TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_CLEAR_HEADER, CLEAR_HEADER,   FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_ONE_COL,      ONE_COL,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_ONE_ROW,      ONE_ROW,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HSCALE,       HSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);

@@ -1,6 +1,6 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -128,6 +128,7 @@ void FlushGalley(OBJECT hd)
   FULL_LENGTH stop_perp_fwd;    /* fwd(dest_encl) in other direction         */
   BOOLEAN prnt_flush;		/* TRUE when the parent of hd needs a flush  */
   BOOLEAN target_is_internal;   /* TRUE if flushing into an internal target  */
+  BOOLEAN headers_seen;		/* TRUE if a header is seen at all           */
   OBJECT zlink, z, tmp, prnt;  int attach_status;  BOOLEAN remove_target;
   OBJECT why;
   FULL_LENGTH perp_back, perp_fwd;  /* current perp size of dest_encl        */
@@ -313,6 +314,7 @@ void FlushGalley(OBJECT hd)
   if( underline(dest) == UNDER_UNDEF )  underline(dest) = UNDER_OFF;
   target_is_internal =
     (dim==ROWM && !external_ver(dest)) || (dim==COLM && !external_hor(dest));
+  headers_seen = FALSE;
   debug1(DGF, DD, "  dest_index: %s", EchoObject(dest_index));
 
 
@@ -403,8 +405,11 @@ void FlushGalley(OBJECT hd)
 	underline(y) = underline(dest);
 	prec_gap = y;
 	if( target_is_internal )
-	{ assert( dest_encl != nilobj, "FlushGalley/GAP_OBJ: dest_encl!" );
-	  if( !nobreak(gap(prec_gap)) )
+	{
+	  /* *** not necessarily true
+	  assert( dest_encl != nilobj, "FlushGalley/GAP_OBJ: dest_encl!" );
+	  *** */
+	  if( dest_encl != nilobj && !nobreak(gap(prec_gap)) )
 	  {
 	    stop_link = link;
 	    stop_back = dest_back;
@@ -479,6 +484,16 @@ void FlushGalley(OBJECT hd)
 			debug1(DGF, D, "  reject (a) %s", EchoObject(y));
 			goto REJECT;
 	}
+	break;
+
+
+      case BEGIN_HEADER:
+      case END_HEADER:
+      case SET_HEADER:
+      case CLEAR_HEADER:
+
+	/* do nothing except take note, until actually promoted out of here */
+	headers_seen = TRUE;
 	break;
 
 
@@ -776,7 +791,12 @@ void FlushGalley(OBJECT hd)
 
   REJECT:
   
-    /* reject this component and move to a new dest */
+    /* reject this component and move to a new dest; at this point, link is */
+    /* the link to the rejected component; its child is either y or else it */
+    /* is a SPLIT whose child is y                                          */
+    debug3(DGF, D, "at REJECT now (stop_link %s); headers(%s) = %s",
+      stop_link != nilobj ? "non-nil" : "nil",
+      SymName(actual(hd)), EchoObject(headers(hd)));
     assert(actual(dest) != PrintSym, "FlushGalley: reject print!");
     if( inners != nilobj )  DisposeObject(inners);
     if( stop_link != nilobj )
@@ -787,6 +807,40 @@ void FlushGalley(OBJECT hd)
 	AdjustSize(dest_encl, stop_perp_back, stop_perp_fwd, 1-dim);
       }
     }
+
+    /* if headers_seen, handle any headers not already handled by Promote() */
+    if( target_is_internal && headers_seen )
+    { OBJECT z, zlink;
+      for( zlink = hd;  NextDown(zlink) != link;  )
+      {
+	Child(z, NextDown(zlink));
+	debug2(DGF, D, "FlushGalley(%s)/REJECT header-examining %s",
+	  SymName(actual(hd)), EchoObject(z));
+	if( type(z) == SPLIT )
+	  Child(z, DownDim(z, dim));
+	if( is_header(type(z)) )
+	  HandleHeader(hd, NextDown(zlink), z);
+	else
+	  zlink = NextDown(zlink);
+      }
+    }
+
+    /* now, if there are headers, dump them into the galley */
+    if( headers(hd) != nilobj )
+    {
+      /* dump new copy of headers into top of galley */
+      assert(Down(headers(hd))!=headers(hd), "FlushGalley/REJECT: headers!");
+      tmp = Down(hd);
+      assert( tmp != hd, "FlushGalley/REJECT: first_link!" );
+      for( link=Down(headers(hd)); link != headers(hd); link=NextDown(link) )
+      { Child(y, link);
+        debug2(DGF, D, "FlushGalley(%s)/REJECT linking %s",
+	  SymName(actual(hd)), EchoObject(y));
+	Link(tmp, y);
+      }
+    }
+
+    /* now detach and resume */
     DetachGalley(hd);
     assert( type(dest_index) == RECEIVING, "FlushGalley/REJECT: dest_index!" );
     prnt_flush = prnt_flush || blocked(dest_index);
@@ -838,6 +892,7 @@ void FlushGalley(OBJECT hd)
       SetTarget(hd2);
       foll_or_prec(hd2) = GALL_FOLL;
       enclose_obj(hd2) = (has_enclose(actual(hd2)) ? BuildEnclose(hd2) : nilobj);
+      headers(hd2) = nilobj;
       Link(Up(y), index2);
 
       /* set up the next ready galley for reading next time */

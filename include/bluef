@@ -213,7 +213,6 @@ def @BlueSetup
 	}
 
 	def @O		# for formatting operators
-	    named symb {}
 	    right x
 	{
 	    operators @Test

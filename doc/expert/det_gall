@@ -353,6 +353,15 @@ of any symbol that is available at that point, in the usual way.  The
 of the galley symbol, rather than an inner definition as shown above,
 if desired.
 @PP
+It makes sense for sorted galleys containing a @Code "@Merge" symbol
+(Section {@NumberOf sorted}) to also have an @Code "@Enclose" symbol.  The
+meaning is that after all merging is done, each resulting galley has
+an @Code "@Enclose" symbol which is applied in the usual way.  The value
+of this @Code "@Enclose" symbol will be the value of an @Code "@Enclose"
+symbol from one of the contributing galleys, but exactly which one
+is not defined.  So it is safest if all such @Code "@Enclose" symbols
+produce the same result.
+@PP
 A @Code "following" galley may fail to find a first target lying in a
 following component of the same galley as its invocation point.  This is
 a deficiency of Basser Lout, which occurs if the target has not been

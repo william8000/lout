@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -121,7 +121,7 @@ static void newline(void)
 
 static void echo(OBJECT x, unsigned outer_prec, int count)
 { OBJECT link, y, tmp, sym, z;
-  char *op;  int prec, i, childcount;
+  char *op;  int prec, i, childcount, ycount;
   BOOLEAN npar_seen, name_printed, lbr_printed, braces_needed;
 
   switch( type(x) )
@@ -234,6 +234,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	break;
 
 
+    /* ***
     case COL_THR:
 
 	aprint("{C ");
@@ -241,7 +242,25 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	if( link != x )
 	{ CountChild(y, link, count);
 	  echo(y, HCAT_PREC, count);
-	  /* newline(); */
+	}
+	aprint(" C}");
+	break;
+    *** */
+
+
+    case COL_THR:
+
+	aprint("{C ");
+	newline();
+	for( i=1, link = Down(x);  link != x;  link = NextDown(link), i++ )
+	{
+	  if( i == count )
+	    aprint("C@ ");
+	  else
+	    aprint("C: ");
+	  CountChild(y, link, ycount);
+	  echo(y, HCAT_PREC, ycount);
+	  newline();
 	}
 	aprint(" C}");
 	break;
@@ -665,6 +684,8 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	break;
 
 
+    case BEGIN_HEADER:
+    case SET_HEADER:
     case ONE_COL:
     case ONE_ROW:
     case HCONTRACT:
@@ -774,6 +795,8 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case PAGE_LABEL:
     case HSPAN:
     case VSPAN:
+    case END_HEADER:
+    case CLEAR_HEADER:
 
 	/* predefined symbols that have (or may have) no parameters */
 	cprint(Image(type(x)));

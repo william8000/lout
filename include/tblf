@@ -177,6 +177,18 @@ def @TblSetup
 	@NoBreakRowg
 	@NoBreakRowh
 
+	@HeaderRow
+	@HeaderRowa
+	@HeaderRowb
+	@HeaderRowc
+	@HeaderRowd
+	@HeaderRowe
+	@HeaderRowf
+	@HeaderRowg
+	@HeaderRowh
+
+	@EndHeaderRow
+
 	@NP
 
     def @Tbl
@@ -1253,7 +1265,7 @@ def @TblSetup
 		named gap {}
 		right thick
 	    {
-		@OneRow { col @VRule thick /gap col @VRule thick }
+		@OneRow { col @VRule thick |gap col @VRule thick }
 	    }
 
 	    def @MakeHRule
@@ -3122,6 +3134,18 @@ def @TblSetup
 	macro @NoBreakRowf	{ /0iu @DoRowf }
 	macro @NoBreakRowg	{ /0iu @DoRowg }
 	macro @NoBreakRowh	{ /0iu @DoRowh }
+
+	macro @HeaderRow	{ /  @BeginHeaderComponent @DoRow  }
+	macro @HeaderRowa	{ /  @BeginHeaderComponent @DoRowa }
+	macro @HeaderRowb	{ /  @BeginHeaderComponent @DoRowb }
+	macro @HeaderRowc	{ /  @BeginHeaderComponent @DoRowc }
+	macro @HeaderRowd	{ /  @BeginHeaderComponent @DoRowd }
+	macro @HeaderRowe	{ /  @BeginHeaderComponent @DoRowe }
+	macro @HeaderRowf	{ /  @BeginHeaderComponent @DoRowf }
+	macro @HeaderRowg	{ /  @BeginHeaderComponent @DoRowg }
+	macro @HeaderRowh	{ /  @BeginHeaderComponent @DoRowh }
+
+	macro @EndHeaderRow	{ / @EndHeaderComponent }
 
 	macro @NP               { /"1.1b" }
 

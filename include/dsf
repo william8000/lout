@@ -234,16 +234,34 @@ def @DocumentSetup
     named @IndexBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index entries break
     named @IndexColumnNumber	{  2			} # index columns (1 to 10)
     named @IndexColumnGap	{  1.00c @OrIfPlain 6s	} # index column gap
+    named @IndexCtd		{  Yes			} # include (ctd.) lines
+    named @IndexCtdWord		{  continued		} # "ctd." in current lang
+    named @IndexCtdFormat
+	left @Body
+	right @CtdWord
+				{  @Body @I (@CtdWord)	} # (ctd.) format
     named @MakeIndexA		{  No			} # make index A? Yes or No
     named @IndexAFont		{			} # index A entries font
     named @IndexABreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index A entries break
     named @IndexAColumnNumber	{  2			} # index A columns (1 to 10)
     named @IndexAColumnGap	{  1.00c @OrIfPlain 6s	} # index A column gap
+    named @IndexACtd		{  Yes			} # include (ctd.) lines
+    named @IndexACtdWord	{  continued		} # "ctd." in current lang
+    named @IndexACtdFormat
+	left @Body
+	right @CtdWord
+				{  @Body @I (@CtdWord)	} # (ctd.) format
     named @MakeIndexB		{  No			} # make index B? Yes or No
     named @IndexBFont		{			} # index B entries font
     named @IndexBBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index B entries break
     named @IndexBColumnNumber	{  2			} # index B columns (1 to 10)
     named @IndexBColumnGap	{  1.00c @OrIfPlain 6s	} # index B column gap
+    named @IndexBCtd		{  Yes			} # include (ctd.) lines
+    named @IndexBCtdWord	{  continued		} # "ctd." in current lang
+    named @IndexBCtdFormat
+	left @Body
+	right @CtdWord
+				{  @Body @I (@CtdWord)	} # (ctd.) format
     named @TopGap		{  0.75c @OrIfPlain 2f	} # gap between figures
     named @MidGap		{  0.75c @OrIfPlain 2f	} # gap above/below body text
 
@@ -3961,14 +3979,51 @@ def @DocumentSetup
 	right etc
     {
 	// @IndexBreak @Break @IndexList
-	// @IndexBreak @Break @BypassIndexList // etc
+	// @IndexBreak @Break @BypassIndexList
+	# //1vx --- "@Clear"
+	// @ClearHeaderComponent
+	// etc
     }
 
     def @DoIndex into { @IndexList&&following }
 	left @Key
 	named indent { 0f }
+	named stem {}
 	right @Body
     {
+	def @Enclose right x
+	{
+	    @IndexCtd.indent @Case {
+
+		Yes.0f @Yield {
+		    @ClearHeaderComponent
+		    //1vx
+		    x
+		    //1vx
+		    1vx @SetHeaderComponent {
+			indent @Wide &
+			stem @IndexCtdFormat {continued @WordVal @IndexCtdWord}
+		    }
+		    //1vx
+		    1vx @BeginHeaderComponent (unused)
+		}
+
+		Yes.1f @Yield {
+		    @EndHeaderComponent
+		    //1vx
+		    x
+		    //1vx
+		    1vx @BeginHeaderComponent {
+			indent @Wide &
+			stem @IndexCtdFormat {continued @WordVal @IndexCtdWord}
+		    }
+		}
+
+		else @Yield x
+
+	    }
+	}
+
 	def @Merge left x right y
 	{
 	    {x @Rump y} @Case
@@ -3977,19 +4032,6 @@ def @DocumentSetup
 		else    @Yield  { { x &"0.03fu" , } @Meld y }
 	    }
 
-################################ obsolete ###################################
-#	    {x @Rump y} @Case
-#	    {
-#		""	@Yield	x
-#		else	@Yield	{
-#				 { {x @Rump y} @Common "," } @Case
-#				 {
-#				   ","	@Yield { x &"0.03fu" x @Rump y }
-#				   else	@Yield { x &"0.03fu" , x @Rump y }
-#				 }
-#				}
-#	    }
-#############################################################################
 	}
 
 	@IndexFont @Font @IndexBreak @Break { indent @Wide & @Body }
@@ -4002,7 +4044,7 @@ def @DocumentSetup
 	right y
     {
 	@MakeIndex @Case {
-	    Yes  @Yield { {@PageMark @Tag} x @DoIndex indent { indent } y }
+	    Yes  @Yield { {@PageMark @Tag} x @DoIndex stem { y } indent { indent } y }
 	    else @Yield @Null
 	}
     }
@@ -4017,21 +4059,8 @@ def @DocumentSetup
 	named to {}
 	right y
     {
-	def numval
+	def pagerange
 	{
-#	    to @Case
-#	    {
-#		""    @Yield @PageOf @Tag
-#		else  @Yield {
-#		    { @PageOf @Tag } @Case
-#		    {
-#			{ @PageOf to } @Yield { @PageOf @Tag }
-#			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
-#		    }
-#		}
-#	    }
-	 @BackEnd @Case {
-	  { PlainText PostScript } @Yield {
 	    to @Case
 	    {
 		""    @Yield @PageOf @Tag
@@ -4043,47 +4072,26 @@ def @DocumentSetup
 		    }
 		}
 	    }
-	  }
-#
-#	PDF: Index entries produce a blue underlined hyperlink for the page number
-#
-	  PDF @Yield {
-	    { "__link_source=<<"@Tag">>" }
-	    @Graphic { blue @Colour @Underline {
-	    to @Case
-	    {
-		""    @Yield @PageOf @Tag
-		else  @Yield {
-		    { @PageOf @Tag } @Case
-		    {
-			{ @PageOf to } @Yield { @PageOf @Tag }
-			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
-		    }
-		}
-	    }
-	    }
-	    }
-	  }
-	 }
 	}
 
+
 	@MakeIndex @Case {
-	    Yes  @Yield {
-		     @BackEnd @Case {
-			 { PostScript PlainText } @Yield {
-			   @PageMark @Tag
-			   x @DoIndex indent { indent } { y &"0.03fu" , numval }
-			 }
-			 PDF @Yield {
-			   {"__link_target=<<"@Tag">>"} @Graphic {""}
-			   @PageMark @Tag
-			   x @DoIndex indent { indent } { y &"0.03fu" , numval }
-			 }
-		     }
-		   }
-#	    Yes  @Yield { @PageMark @Tag
-#			  x @DoIndex indent { indent } { y &"0.03fu" , numval }
-#			}
+	    Yes @Yield { @BackEnd @Case {
+
+		{ PostScript PlainText } @Yield {
+		    @PageMark @Tag
+		    x @DoIndex stem { y } indent { indent } { y &"0.03fu" , pagerange }
+		}
+
+		PDF @Yield {
+		    {"__link_target=<<"@Tag">>"} @Graphic {""}
+		    @PageMark @Tag
+		    x @DoIndex stem { y } indent { indent } {
+			y &"0.03fu" , { "__link_source=<<"@Tag">>" }
+			@Graphic { blue @Colour @Underline pagerange }
+		    }
+		}
+	    } }
 	    else @Yield @Null
 	}
     }
@@ -4171,21 +4179,8 @@ def @DocumentSetup
 	named to {}
 	right y
     {
-	def numval
+	def pagerange
 	{
-#	    to @Case
-#	    {
-#		""    @Yield @PageOf @Tag
-#		else  @Yield {
-#		    { @PageOf @Tag } @Case
-#		    {
-#			{ @PageOf to } @Yield { @PageOf @Tag }
-#			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
-#		    }
-#		}
-#	    }
-	 @BackEnd @Case {
-	  { PostScript PlainText } @Yield {
 	    to @Case
 	    {
 		""    @Yield @PageOf @Tag
@@ -4197,34 +4192,26 @@ def @DocumentSetup
 		    }
 		}
 	    }
-	  }
-#
-#	PDF: Index entries produce a blue underlined hyperlink for the page number
-#
-	  PDF @Yield {
-	    { "__link_source=<<"@Tag">>" }
-	    @Graphic { blue @Colour @Underline {
-	    to @Case
-	    {
-		""    @Yield @PageOf @Tag
-		else  @Yield {
-		    { @PageOf @Tag } @Case
-		    {
-			{ @PageOf to } @Yield { @PageOf @Tag }
-			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
-		    }
-		}
-	    }
-	    }
-	    }
-	  }
-	 }
 	}
 
+
 	@MakeIndexA @Case {
-	    Yes  @Yield { @PageMark @Tag
-			  x @DoIndexA indent { indent } { y &"0.03fu" , numval }
-			}
+	    Yes @Yield { @BackEnd @Case {
+
+		{ PostScript PlainText } @Yield {
+		    @PageMark @Tag
+		    x @DoIndexA indent { indent } { y &"0.03fu" , pagerange }
+		}
+
+		PDF @Yield {
+		    {"__link_target=<<"@Tag">>"} @Graphic {""}
+		    @PageMark @Tag
+		    x @DoIndexA indent { indent } {
+			y &"0.03fu" , { "__link_source=<<"@Tag">>" }
+			@Graphic { blue @Colour @Underline pagerange }
+		    }
+		}
+	    } }
 	    else @Yield @Null
 	}
     }
@@ -4312,21 +4299,8 @@ def @DocumentSetup
 	named to {}
 	right y
     {
-	def numval
+	def pagerange
 	{
-#	    to @Case
-#	    {
-#		""    @Yield @PageOf @Tag
-#		else  @Yield {
-#		    { @PageOf @Tag } @Case
-#		    {
-#			{ @PageOf to } @Yield { @PageOf @Tag }
-#			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
-#		    }
-#		}
-#	    }
-	 @BackEnd @Case {
-	  { PostScript PlainText } @Yield {
 	    to @Case
 	    {
 		""    @Yield @PageOf @Tag
@@ -4338,34 +4312,26 @@ def @DocumentSetup
 		    }
 		}
 	    }
-	  }
-#
-#	PDF: Index entries produce a blue underlined hyperlink for the page number
-#
-	  PDF @Yield {
-	    { "__link_source=<<"@Tag">>" }
-	    @Graphic { blue @Colour @Underline {
-	    to @Case
-	    {
-		""    @Yield @PageOf @Tag
-		else  @Yield {
-		    { @PageOf @Tag } @Case
-		    {
-			{ @PageOf to } @Yield { @PageOf @Tag }
-			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
-		    }
-		}
-	    }
-	    }
-	    }
-	  }
-	 }
 	}
 
+
 	@MakeIndexB @Case {
-	    Yes  @Yield { @PageMark @Tag
-			  x @DoIndexB indent { indent } { y &"0.03fu" , numval }
-			}
+	    Yes @Yield { @BackEnd @Case {
+
+		{ PostScript PlainText } @Yield {
+		    @PageMark @Tag
+		    x @DoIndexB indent { indent } { y &"0.03fu" , pagerange }
+		}
+
+		PDF @Yield {
+		    {"__link_target=<<"@Tag">>"} @Graphic {""}
+		    @PageMark @Tag
+		    x @DoIndexB indent { indent } {
+			y &"0.03fu" , { "__link_source=<<"@Tag">>" }
+			@Graphic { blue @Colour @Underline pagerange }
+		    }
+		}
+	    } }
 	    else @Yield @Null
 	}
     }

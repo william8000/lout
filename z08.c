@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -753,6 +753,7 @@ OBJECT *enclose, BOOLEAN fcr)
     AttachEnv(env, x);
     SetTarget(hd);
     enclose_obj(hd) = (has_enclose(sym) ? BuildEnclose(hd) : nilobj);
+    headers(hd) = nilobj;
     x = hd;
     threaded(x) = bthr[COLM] != nilobj || fthr[COLM] != nilobj;
     ReplaceWithSplit(x, bthr, fthr);
@@ -1395,6 +1396,25 @@ OBJECT *enclose, BOOLEAN fcr)
       break;
 
 
+    case BEGIN_HEADER:
+    case SET_HEADER:
+
+      /* first manifest gap, which is left parameter */
+      Child(y, Down(x));
+      y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
+	&nenclose, fcr);
+      y = ReplaceWithTidy(y, FALSE);
+      GetGap(y, style, &line_gap(save_style(x)), &res_gap);
+
+      /* now the right parameter */
+      Child(y, LastDown(x));
+      y = Manifest(y, env, style, bthr, fthr, target, crs, ok, need_expand,
+	enclose, fcr);
+      break;
+
+
+    case END_HEADER:
+    case CLEAR_HEADER:
     case HSPAN:
     case VSPAN:
 

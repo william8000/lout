@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -180,6 +180,10 @@ FULL_CHAR *Image(unsigned int c)
     case PAGE_LABEL:		return  KW_PAGE_LABEL;
     case CROSS:			return  KW_CROSS;
     case FORCE_CROSS:		return  KW_FORCE_CROSS;
+    case BEGIN_HEADER:		return  KW_BEGIN_HEADER;
+    case END_HEADER:		return  KW_END_HEADER;
+    case SET_HEADER:		return  KW_SET_HEADER;
+    case CLEAR_HEADER:		return  KW_CLEAR_HEADER;
     case ONE_COL:		return  KW_ONE_COL;
     case ONE_ROW:		return  KW_ONE_ROW;
     case WIDE:			return  KW_WIDE;

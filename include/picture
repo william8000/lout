@@ -141,16 +141,25 @@
   # @IndexBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
   # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
   # @IndexColumnGap	{ 1.00c	@OrIfPlain 6s	} # index column gap
+  # @IndexCtd		{ Yes			} # include (ctd.) lines
+  # @IndexCtdWord	{ continued		} # "ctd." in current lang.
+  # @IndexCtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
   # @MakeIndexA		{ No 			} # make index A? Yes or No
   # @IndexAFont		{			} # index A entries font
   # @IndexABreak	{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
   # @IndexAColumnNumber	{ 2			} # index A columns (1 to 10)
   # @IndexAColumnGap	{ 1.00c	@OrIfPlain 6s	} # index A column gap
+  # @IndexACtd		{ Yes			} # include (ctd.) lines
+  # @IndexACtdWord	{ continued		} # "ctd." in current lang.
+  # @IndexACtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
   # @MakeIndexB		{ No 			} # make index B? Yes or No
   # @IndexBFont		{			} # index B entries font
   # @IndexBBreak	{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
   # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)
   # @IndexBColumnGap	{ 1.00c	@OrIfPlain 6s	} # index B column gap
+  # @IndexBCtd		{ Yes			} # include (ctd.) lines
+  # @IndexBCtdWord	{ continued		} # "ctd." in current lang.
+  # @IndexBCtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
   # @TopGap		{ 0.75c	@OrIfPlain 2f	} # gap between figures
   # @MidGap		{ 0.75c	@OrIfPlain 2f	} # gap above/below body text
   # @FootNoteNumbers	{ Arabic		} # footnote numbers

@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.18                          #
+#  Make file for installing Basser Lout Version 3.19                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
 #  14 February 2000                                                           #
@@ -252,10 +252,10 @@ DBFIX   = 0
 USESTAT = 1
 SAFEDFT = 0
 
-BINDIR	= /usr/staff/jeff/bin
-LIBDIR	= /usr/staff/jeff/lout.lib
-DOCDIR	= /usr/staff/jeff/lout.doc
-MANDIR	= /usr/staff/jeff/lout.man
+BINDIR	= /export/home/6monthspace/jeff/bin
+LIBDIR	= /export/home/6monthspace/jeff/lout.lib
+DOCDIR	= /export/home/6monthspace/jeff/lout.doc
+MANDIR	= /export/home/6monthspace/jeff/lout.man
 
 LIBFONT = font
 LIBMAPS = maps
@@ -281,8 +281,8 @@ CC	= gcc
 
 RCOPY	= cp -r
 
-# COPTS	= -ansi -pedantic -Wall -O3
-COPTS	= -ansi -pedantic -Wall
+COPTS	= -ansi -pedantic -Wall -O3
+# COPTS	= -ansi -pedantic -Wall
 
 CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
 	  -DOS_DOS=$(OSDOS)					\

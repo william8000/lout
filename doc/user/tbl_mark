@@ -9,21 +9,21 @@ and right becomes an issue.  Examples are hard to find, but let's say
 that we need to construct a symbol
 @ID @AmberLight
 and include it in running text.  The obvious first attempt at a table
-with three rows produces
-#@ID @OneRow @Code @Verbatim {
-#@Tbl
-#   aformat { @Cell A }
-#   margin { 0i }
-#   strut { no }
-#{
-#@Rowa A { @OpenCircle }
-#@Rowa A { @ClosedCircle }
-#@Rowa A { @OpenCircle }
-#}
-#}
-#where @Code "@OpenCircle" and @Code "@ClosedCircle" produce open and
-#closed circles (they may be defined using the @Code "@Diag" package);
-#but this produces
+with three rows is
+@ID @OneRow @Code @Verbatim {
+@Tbl
+   aformat { @Cell A }
+   margin { 0i }
+   strut { no }
+{
+@Rowa A { @OpenCircle }
+@Rowa A { @ClosedCircle }
+@Rowa A { @OpenCircle }
+}
+}
+where @Code "@OpenCircle" and @Code "@ClosedCircle" produce open and
+closed circles (they may be defined using the @Code "@Diag" package);
+but this produces
 @Tbl
    aformat { @Cell A }
    margin { 0i }
@@ -47,7 +47,8 @@ def @AmberLight
          aformat { @Cell indentvertical { align } A }
          margin { 0i }
          strut { no }
-         paint { no }  rule { no }
+         paint { no }
+         rule { no }
      {
          @Rowa A { @OpenCircle }
          @MarkRowa A { @ClosedCircle }

@@ -229,12 +229,19 @@ Changes and new features introduced in Version 3.18 [26 February 2000]
     @Outline symbol for printing words in outline rather than filled
     A few extra @Eq symbols:  filledcircle, small, trieq
 
+Changes and new features introduced in Version 3.19 [9 March 2000]
+
+    Bug fixes
+    Four @HeaderComponent symbols for running headers (expert users)
+    Running headers in multi-page tables
+    Running headers in indexes
+    Two extra @Eq symbols:  triangleup, triangledown
+
 Things that ought to be done but haven't been done yet
 
     PDF-like features in PostScript output
     Various improvements/bug fixes for PDF output
     Review Uwe's proposal for moving word row marks to the baseline
-    Running headers for tables [much more feasible than previously thought]
 
 Jeff Kingston
-23 February 2000
+9 March 2000

@@ -37,6 +37,14 @@ PS, PDF }
 plain text }
     D { Allowed values }
     rulebelow { yes }
+@HeaderRowd
+    A { Option names (ctd.) }
+    B { Default in
+PS, PDF }
+    C { Default in
+plain text }
+    D { Allowed values }
+    rulebelow { yes }
 @Rowa
     A { paint  p }
     B { nopaint }
@@ -75,7 +83,7 @@ plain text }
     C { no }
     D { {@Code no}, {@Code yes}, or any length }
 @Rowa
-@Rowa
+    ma { 1v }
     A { margin  m }
     B { }
     C { }
@@ -103,7 +111,7 @@ plain text }
     A { marginbelow  mb }
     D { any length }
 @Rowa
-@Rowa
+    ma { 1v }
     A { rule  r }
     B { no }
     C { no }
@@ -127,7 +135,7 @@ plain text }
     A { ruleright  rr }
     D { {@Code no}, {@Code yes}, {@Code single}, or {@Code double} }
 @Rowa
-@Rowa
+    ma { 1v }
     A { rulewidth  rw }
     B { 0.05f }
     D { any length }
@@ -152,7 +160,7 @@ plain text }
     A { rulerightwidth  rrw }
     D { any length }
 @Rowa
-@Rowa
+    ma { 1v }
     A { rulegap  rg }
     B { 0.15f }
     D { any length }
@@ -177,7 +185,7 @@ plain text }
     A { rulerightgap  rrg }
     D { any length }
 @Rowa
-@Rowa
+    ma { 1v }
     A { rulecolour  rulecolor  rc }
     B { black }
     D { any colour from Section {@NumberOf colour} }
@@ -200,11 +208,12 @@ plain text }
     A { rulerightcolour  rulerightcolor  rrc }
     D { any colour from Section {@NumberOf colour} }
 @Rowa
-@Rowa
+    ma { 1v }
     A { ruleplainchar  rpc }
     C { . }
     D { any simple word e.g. @Code + }
     rulebelow { yes }
+@EndHeaderRow
 }
 @DP
 There are seven places where these options may be given, counting the

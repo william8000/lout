@@ -1,6 +1,6 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -487,6 +487,10 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
 
     case NULL_CLOS:	name = KW_NULL;		goto SETC;
     case PAGE_LABEL:	name = KW_PAGE_LABEL;	goto SETC;
+    case BEGIN_HEADER:	name = KW_BEGIN_HEADER;	goto SETC;
+    case END_HEADER:	name = KW_END_HEADER;	goto SETC;
+    case SET_HEADER:	name = KW_SET_HEADER;	goto SETC;
+    case CLEAR_HEADER:	name = KW_CLEAR_HEADER;	goto SETC;
     case ONE_COL:	name = KW_ONE_COL;	goto SETC;
     case ONE_ROW:	name = KW_ONE_ROW;	goto SETC;
     case WIDE:		name = KW_WIDE;		goto SETC;

@@ -9,6 +9,7 @@ tables. @Index { tables }
    aindent { ctr }
    arulebelow { double }
    aformat { @StartHSpan @Cell @B X | | @HSpan }
+   bindent { align }
    bformat { @Cell rr { no } @I A | @Cell rl { no } B | @Cell C }
    rule { yes }
 {
@@ -39,14 +40,14 @@ Section {@NumberOf tbl_alig} for the details.
 @Include { tbl_intr } # introduction
 @Include { tbl_cell } # basic cell formatting: font, break, width, paint
 @Include { tbl_rows } # row formats and the @Row symbol
+@Include { tbl_rule } # rules
 @Include { tbl_marg } # margins
 @Include { tbl_widt } # width and height
 @Include { tbl_inde } # indenting and struts
-@Include { tbl_rule } # rules
-@Include { tbl_span } # spanning columns and rows
-@Include { tbl_mult } # multi-page tables
 @Include { tbl_alig } # aligned columns and headings over them
+@Include { tbl_span } # spanning columns and rows
 @Include { tbl_mark } # @MarkRow
+@Include { tbl_mult } # multi-page tables
 @Include { tbl_plai } # plain text tables
 @Include { tbl_setu } # setup file options
 @Include { tbl_summ } # summary

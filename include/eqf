@@ -88,6 +88,8 @@ export	"`" "``" "```" bin rel punct non vctr big small
 	gcd hom inf ker lg lim liminf limsup ln log max min Pr sec sin
 	sinh supr tan tanh mod ldots cdots vdots ddots del grad
 	"..." ",...," "'" "''" "'''" "''''" empty
+
+	triangleup triangledown
 	
 	leftarrow longleftarrow dblleftarrow dbllongleftarrow
 	rightarrow longrightarrow dblrightarrow dbllongrightarrow
@@ -584,7 +586,6 @@ def @Eq
       }
     }
 
-    def triangledown { 180d @Rotate triangle }
 
     ###################################################################
     #                                                                 #
@@ -1206,6 +1207,9 @@ def @Eq
     #   Miscellaneous                                                 #
     #                                                                 #
     ###################################################################
+
+    def triangleup	{ 0.8f @Font triangle	}
+    def triangledown	{ 180d @Rotate 0.8f @Font triangle	}
 
     ###################################################################
     #                                                                 #

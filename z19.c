@@ -1,6 +1,6 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -323,6 +323,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     New(target_galley, HEAD);
     force_gall(target_galley) = FALSE;
     enclose_obj(target_galley) = limiter(target_galley) = nilobj;
+    headers(target_galley) = nilobj;
     opt_components(target_galley) = opt_constraints(target_galley) = nilobj;
     gall_dir(target_galley) = external_hor(target) ? COLM : ROWM;
     FposCopy(fpos(target_galley), fpos(target));
@@ -508,6 +509,16 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	  underline(y) = underline(dest);
 	  if( !join(gap(y)) )  seen_nojoin(hd) = TRUE;
+	  break;
+
+
+	case BEGIN_HEADER:
+	case END_HEADER:
+	case SET_HEADER:
+	case CLEAR_HEADER:
+
+	  /* do nothing until actually promoted out of here */
+	  underline(y) = underline(dest);
 	  break;
 
 

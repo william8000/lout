@@ -1,6 +1,6 @@
 /*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -150,6 +150,10 @@ FULL_CHAR *EchoToken(OBJECT x)
     case PAGE_LABEL:
     case CROSS:
     case FORCE_CROSS:
+    case BEGIN_HEADER:
+    case END_HEADER:
+    case SET_HEADER:
+    case CLEAR_HEADER:
     case ONE_COL:
     case ONE_ROW:
     case WIDE:

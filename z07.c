@@ -1,6 +1,6 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -177,6 +177,10 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case PAGE_LABEL:
     case CROSS:
     case FORCE_CROSS:
+    case BEGIN_HEADER:
+    case END_HEADER:
+    case SET_HEADER:
+    case CLEAR_HEADER:
     case ONE_COL:
     case ONE_ROW:
     case WIDE:
@@ -338,6 +342,10 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
 
 
     case NULL_CLOS:
+    case BEGIN_HEADER:
+    case END_HEADER:
+    case SET_HEADER:
+    case CLEAR_HEADER:
     case HEAD:
     case CROSS:
     case FORCE_CROSS:

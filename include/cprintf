@@ -15,8 +15,8 @@
 export @CP
 def @CPSetup
     named style
-        named @OrIfPlain left x right y
-        { @BackEnd @Case { PlainText @Yield y else @Yield x } }
+    named @OrIfPlain left x right y
+    { @BackEnd @Case { PlainText @Yield y else @Yield x } }
                              { fixed	 }  # print style
 
     named pipe               {           }  # pipe through this first
@@ -214,7 +214,6 @@ def @CPSetup
 	}
 
 	def @O		# for formatting operators
-	    named symb {}
 	    right x
 	{
 	    operators @Test

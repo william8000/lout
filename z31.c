@@ -1,6 +1,6 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -186,6 +186,10 @@ void MemInit(void)
   zz_lengths[ ACAT         ] =
   zz_lengths[ HCAT         ] =
   zz_lengths[ VCAT         ] =
+  zz_lengths[ BEGIN_HEADER ] =
+  zz_lengths[ END_HEADER   ] =
+  zz_lengths[ SET_HEADER   ] =
+  zz_lengths[ CLEAR_HEADER ] =
   zz_lengths[ ONE_COL      ] =
   zz_lengths[ ONE_ROW      ] =
   zz_lengths[ WIDE         ] =

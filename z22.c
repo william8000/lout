@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -206,7 +206,7 @@ void ExpandRecursives(OBJECT recs)
     /* expand body of target, convert to galley, and check size */
     New(hd, HEAD);  actual(hd) = actual(target);  must_expand(hd) = TRUE;
     force_gall(hd) = FALSE;
-    enclose_obj(hd) = limiter(hd) = nilobj;
+    enclose_obj(hd) = limiter(hd) = headers(hd) = nilobj;
     opt_components(hd) = opt_constraints(hd) = nilobj;
     gall_dir(hd) = horiz_galley(actual(target));
     whereto(hd) = ready_galls(hd) = nilobj;
@@ -308,8 +308,17 @@ static OBJECT FindSplitInGalley(OBJECT hd)
       break;
 
 
+    case BEGIN_HEADER:
+    case SET_HEADER:
+
+      Child(y, LastDown(y));
+      break;
+
+
     case CLOSURE:
     case NULL_CLOS:
+    case END_HEADER:
+    case CLEAR_HEADER:
     case PAGE_LABEL:
     case HCAT:
     case WORD:
@@ -355,6 +364,99 @@ static OBJECT FindSplitInGalley(OBJECT hd)
   return y;
 } /* end FindSplitInGalley */
 
+
+/*@::HandleHeader()@**********************************************************/
+/*                                                                           */
+/*  HandleHeader(hd, link, header)                                           */
+/*                                                                           */
+/*  Given galley hd containing header object header, this routine handles    */
+/*  the header, i.e. it updates headers(hd) to reflect the effect of the     */
+/*  header, then deletes the header and its following gap object.            */
+/*                                                                           */
+/*  Link is the link from hd to the header (it may actually link to a        */
+/*  split object which then links to the header, but no matter).             */
+/*                                                                           */
+/*****************************************************************************/
+
+void HandleHeader(OBJECT hd, OBJECT link, OBJECT header)
+{ OBJECT g, y, z;
+  debug3(DGS, D, "HandleHeader(%s, link, %s); headers = %s",
+    SymName(actual(hd)), EchoObject(header), EchoObject(headers(hd)));
+  assert(is_header(type(header)), "HandleHeader: type(header)!");
+  switch( type(header) )
+  {
+
+    case CLEAR_HEADER:
+
+      /* clear out old headers, if any */
+      if( headers(hd) != nilobj )
+      {
+	DisposeObject(headers(hd));
+	headers(hd) = nilobj;
+      }
+      break;
+
+
+    case SET_HEADER:
+
+      /* clear out old headers, if any */
+      if( headers(hd) != nilobj )
+      {
+	DisposeObject(headers(hd));
+	headers(hd) = nilobj;
+      }
+      /* NB NO BREAK! */
+
+
+    case BEGIN_HEADER:
+
+      /* make new headers if required */
+      if( headers(hd) == nilobj )
+	New(headers(hd), gall_dir(hd) == ROWM ? VCAT : ACAT);
+
+      /* construct a gap object from the left parameter */
+      New(g, GAP_OBJ);
+      underline(g) = FALSE;
+      MoveLink(Down(header), g, PARENT);
+      Child(z, Down(g));
+      GapCopy(gap(g), line_gap(save_style(header)));
+
+      /* move header and gap into headers() */
+      MoveLink(LastDown(header), headers(hd), PARENT);
+      Link(headers(hd), g);
+      break;
+
+
+    case END_HEADER:
+
+      if( headers(hd) == nilobj )
+	Error(22, 11, "no header for %s to remove", WARN, &fpos(hd),
+	  KW_END_HEADER);
+      else
+      {
+	DisposeChild(LastDown(headers(hd)));
+	assert(LastDown(headers(hd))!=headers(hd), "Promote/END_HEADER!");
+	DisposeChild(LastDown(headers(hd)));
+	if( Down(headers(hd)) == headers(hd) )
+	{ DisposeObject(headers(hd));
+	  headers(hd) = nilobj;
+	}
+      }
+      break;
+	
+  }
+
+  /* get rid of header object and following gap now */
+  Child(y, NextDown(link));
+  assert(type(y) == GAP_OBJ, "Promote/HEADER: type(y) != GAP_OBJ!");
+  DisposeChild(NextDown(link));
+  DisposeChild(link);
+  debug2(DGS, D, "HandleHeader returning; headers(%s) now %s",
+    SymName(actual(hd)), EchoObject(headers(hd)));
+
+} /* end HandleHeader */
+
+
 /*@::Promote()@***************************************************************/
 /*                                                                           */
 /*  Promote(hd, stop_link, dest_index, join_after)                           */
@@ -367,6 +469,10 @@ static OBJECT FindSplitInGalley(OBJECT hd)
 /*  If the galley is ending here, Promote inserts a gap at the end of it.    */
 /*  Whether to make this a joining gap or not is a tricky question which     */
 /*  Promote answers by referring to join_after.                              */
+/*                                                                           */
+/*  Any BEGIN_HEADER, END_HEADER, SET_HEADER, or CLEAR_HEADER objects in     */
+/*  the promoted components are diverted to headers(hd), if the target       */
+/*  is internal.                                                             */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -470,14 +576,6 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
       else if( is_indefinite(type(y)) )
       {
 	/* indefinite, always skip these */
-	/* ***
-	New(z, NULL_CLOS);
-	FposCopy(fpos(z), fpos(y));
-	back(z, COLM) = 0;
-	fwd(z, COLM) = 0;
-	Link(opt_components(hd), z);
-	debug1(DOG, DD, "  adding %s", KW_NULL);
-	*** */
       }
       else if( is_definite(type(y)) )
       {
@@ -626,6 +724,17 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	  break;
 
 
+	case BEGIN_HEADER:
+	case END_HEADER:
+	case SET_HEADER:
+	case CLEAR_HEADER:
+
+	  Error(22, 10, "%s symbol ignored (out of place)", WARN, &fpos(y),
+	    Image(type(y)));
+	  DisposeChild(NextDown(link));
+	  break;
+
+
 	case WORD:
 	case QWORD:
 	case ONE_COL:
@@ -750,9 +859,16 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
   { link = Up(dest_index);
   }
   else
-  { for( link = hd;  NextDown(link) != stop_link;  )
+  {
+    dim = gall_dir(hd);
+    for( link = hd;  NextDown(link) != stop_link;  )
     { Child(y, NextDown(link));
-      if( is_index(type(y)) )
+      debug1(DGS, D, "ordinary promote examining %s", EchoObject(y));
+      if( type(y) == SPLIT )
+	Child(y, DownDim(y, dim));
+      if( is_header(type(y)) )
+	HandleHeader(hd, NextDown(link), y);
+      else if( is_index(type(y)) )
 	MoveLink(NextDown(link), Up(dest_index), PARENT);
       else link = NextDown(link);
     }

@@ -7,11 +7,11 @@
 #  Adapted from the original @CPrint package.                                 #
 #                                                                             #
 #  This package uses a filtered body parameter to convert program source      #
-#  code into Lout source.  The filter program is prog2lout, which is          #
+#  code into Lout source.  The filter program is prg2lout, which is           #
 #  distributed with Lout and should be compiled and installed wherever        #
 #  Lout itself is.                                                            #
 #                                                                             #
-#  This package is intended for use by prog2lout's stand-alone mode.          #
+#  This package is intended for use by prg2lout's stand-alone mode.           #
 #  If you are adding a new language, a better place to start would be         #
 #  files eiffelf and eiffel rather than progf.                                #
 #                                                                             #
@@ -66,7 +66,7 @@ def @ProgSetup
 
     export
     
-	"$>" @S @D @C @K @N @O @A @M
+	"$>" @S @D @C @K @N @O @A @ST @ED @M
 
     def @Prog
 	named language     { language      }  # language
@@ -124,12 +124,12 @@ def @ProgSetup
 	{
 	    pipe @Case {
 		"" @Yield {
-	    	    "prog2lout -r -l" language -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
+	    	    "prg2lout -r -l" language -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
 			-t{@InitTab} -T{@InitTabWidth}
 		}
 		else @Yield {
 	    	    "cat" @FilterIn "|" pipe "|"
-		    "prog2lout -r -l" language -o{@FilterOut}
+		    "prg2lout -r -l" language -o{@FilterOut}
 		    -e{@FilterErr} -t{@InitTab} -T{@InitTabWidth}
 		}
 	    }
@@ -220,7 +220,6 @@ def @ProgSetup
 	}
 
 	def @O		# for formatting operators
-	    named symb {}
 	    right x
 	{
 	    operators @Test
@@ -237,6 +236,29 @@ def @ProgSetup
 	    style @Case {
 		symbol	@Yield { { Symbol Base } @Font @Char sym }
 		else	@Yield { x			}
+	    }
+	}
+
+	def @ST		# for formatting asterisks
+	    right x
+	{
+	    operators @Test
+	      iffixed   { fixedoperators   }
+	      ifvarying { varyingoperators }
+	      ifsymbol  { symboloperators  }
+	    @Font "0.5w" @VShift x
+	}
+
+	def @ED		# for formatting larger dots
+	    right x
+	{
+	    operators @Test
+	      iffixed   { fixedoperators   }
+	      ifvarying { varyingoperators }
+	      ifsymbol  { symboloperators  }
+	    @Font @BackEnd @Case {
+		PlainText @Yield x
+		else @Yield { "1.2f" @Font "+0.05f" @VShift @O x &"0.05f" }
 	    }
 	}
 

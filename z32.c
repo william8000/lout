@@ -1,6 +1,6 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -83,10 +83,14 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     case START_VSPAN:
     case HSPAN:
     case VSPAN:
+    case END_HEADER:
+    case CLEAR_HEADER:
     
       break;
 
 
+    case BEGIN_HEADER:
+    case SET_HEADER:
     case ONE_COL:
     case ONE_ROW:
     case WIDE:

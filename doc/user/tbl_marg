@@ -61,7 +61,7 @@ We've used abbreviated versions of the options' names:  @Code "ml" for
 has such an abbreviated name, made from the first letters of the parts of
 its full name (Section {@NumberOf tbl_summ} lists all these names).  The
 result is
-@CD @Tbl
+@DP @RCD @Tbl
     paint { lightgrey }
     aformat { @Cell ml { 0i } A  |  @Cell B  |  @Cell mr { 0i } C }
 {
@@ -70,5 +70,5 @@ result is
     B { Column B }
     C { Column C }
 }
-with the painting showing the reduced margins.
+# with the painting showing the reduced margins.
 @End @Section

@@ -8,7 +8,7 @@
 .SH NAME
 lout - prepare Lout document for printing
 .SH SYNOPSIS
-\fBlout\fR [ \fIoption\fR ] \fIfile\fR...
+\fBlout\fR [ \fIoptions\fR ] \fIfile\fR...
 .SH DESCRIPTION
 Invoke the Basser Lout interpreter on the concatenation of the named
 files, producing a PostScript file on standard output suitable for
@@ -16,7 +16,7 @@ printing on PostScript printers using
 .IR lpr (1).
 If no files are named, stdin is used instead.  The special file name
 .RB ` \|\-\| '
-may be used to denote standard input.  There white space between flags
+may be used to denote standard input.  White space between flags
 and their associated option values is optional.
 .LP
 An optional
@@ -42,8 +42,8 @@ Use "\c
 .IR linenum :\c
 .IR colnum :\c
 .I message\c
-\&" alternative error message format useful with Emacs compilation
-mode and other tools.
+\&" alternative error message format (useful with Emacs compilation
+mode and other tools).
 .SS Output format
 .TP \" \n(oi
 .B \-EPS
@@ -244,7 +244,7 @@ can be changed by setting environment variable
 to an alternative directory name.
 .SH SEE ALSO
 .LP
-.BR c2lout (1),
+.BR prg2lout (1),
 .BR lpr (1),
 .BR ghostview (1)
 .SH MAILING LIST

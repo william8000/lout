@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -107,12 +107,12 @@ static BOOLEAN BuildSpanner(OBJECT x)
       Error(12, 11, "%s symbol out of place", FATAL, &fpos(x), Image(type(x)));
     }
     assert(type(prnt) == ROW_THR, "BuildSpanner: type(prnt)!");
-    spanner_sized(hspanner) = 0;
+    spanner_sized(hspanner) = spanner_fixed(hspanner) = 0;
     spanner_count(hspanner) = 1;
     end_link = NextDown(UpDim(x, ROWM));
     for( link = NextDown(UpDim(x, ROWM)); link != prnt; link = NextDown(link) )
     { Child(y, link);
-      debug2(DSF, DD, "  examining ver %s %s", Image(type(y)), y);
+      debug2(DSF, DD, "  examining ver %s %s", Image(type(y)), EchoObject(y));
       if( type(y) == HSPAN )
         end_link = NextDown(link);
       else if( type(y) == START_HVSPAN || type(y) == START_HSPAN ||
@@ -156,7 +156,7 @@ static BOOLEAN BuildSpanner(OBJECT x)
     /* @StartHVSpan or @StartHSpan or @StartVSpan or @HSpan or end of column */
     Parent(prnt, UpDim(x, COLM));
     assert(type(prnt) == COL_THR, "BuildSpanner: type(prnt)!");
-    spanner_sized(vspanner) = 0;
+    spanner_sized(vspanner) = spanner_fixed(vspanner) = 0;
     spanner_count(vspanner) = 1;
     end_link = NextDown(UpDim(x, COLM));
     for( link = NextDown(UpDim(x, COLM)); link != prnt; link = NextDown(link) )
@@ -586,6 +586,15 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       break;
 
 
+    case END_HEADER:
+    case CLEAR_HEADER:
+
+      back(x, dim) = fwd(x, dim) = 0;
+      break;
+
+
+    case BEGIN_HEADER:
+    case SET_HEADER:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
     

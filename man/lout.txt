@@ -9,7 +9,7 @@ NAME
      lout - prepare Lout document for printing
 
 SYNOPSIS
-     lout [ option ] file...
+     lout [ options ] file...
 
 DESCRIPTION
      Invoke the Basser Lout interpreter on the  concatenation  of
@@ -17,8 +17,8 @@ DESCRIPTION
      output suitable for printing on  PostScript  printers  using
      lpr(1).   If no files are named, stdin is used instead.  The
      special file name `-' may be used to denote standard  input.
-     There  white space between flags and their associated option
-     values is optional.
+     White space between flags and their associated option values
+     is optional.
 
      An optional .lt suffix may  be  used  for  Lout  source  and
      include  files.   When  invoking files ending in this suffix
@@ -33,8 +33,8 @@ OPTIONS
           Direct error messages to filename instead of to stderr.
 
      -a   Use "filename:linenum:colnum:message" alternative error
-          message  format  useful with Emacs compilation mode and
-          other tools.
+          message  format (useful with Emacs compilation mode and
+          other tools).
 
   Output format
      -EPS Produce output in the  form  of  an  EPS  (Encapsulated
@@ -170,7 +170,7 @@ FILES AND ENVIRONMENT VARIABLE
      alternative directory name.
 
 SEE ALSO
-     c2lout(1), lpr(1), ghostview(1)
+     prg2lout(1), lpr(1), ghostview(1)
 
 MAILING LIST
      A public mailing list for discussion  of  Lout  exists.   To

@@ -34,10 +34,95 @@ rightmost column to the full page width; one way to prevent this is to add
 a @Code "|" after the last cell within each {@Code format} option, creating
 an empty extra column.
 @PP
-The simplest way to get rules right in multi-page tables is to set
-@Code "rulehorizontal" to {@Code yes}.  This places a rule above every
-row including the first on each page, and a rule below every row including
-the last on each page.
+One practical problem with multi-page tables is that of getting a
+heading over every page after the first.  This is easy if you know where
+the page breaks are going to fall (if you are using {@Code "@NP"}, for
+example), but you usually don't.  To solve this problem, @Code {"@Tbl"}
+offers the @Code "@HeaderRowa" ... @Code "@HeaderRowh" and
+@Code "@EndHeaderRow" symbols.  For example, the multi-page table in
+Section {@NumberOf tbl_summ} is arranged like this:
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    ...
+{
+@Rowd
+    A { Option names }
+    B { Default in PS, PDF }
+    C { Default in plain text }
+    D { Allowed values }
+    rulebelow { yes }
+@HeaderRowd
+    A { Option names (ctd.) }
+    B { Default in PS, PDF }
+    C { Default in plain text }
+    D { Allowed values }
+    rulebelow { yes }
+@Rowa
+    A { paint  p }
+    B { nopaint }
+    D { any colour from Section {@NumberOf colour} }
+...
+@Rowa
+    A { ruleplainchar  rpc }
+    C { . }
+    D { any simple word e.g. @Code + }
+    rulebelow { yes }
+@EndHeaderRow
+}
+}
+where we have omitted a lot of irrelevant things.  @Code "@HeaderRowd"
+is exactly like {@Code "@Rowd"}, except that the row is not printed at
+all where it occurs; instead, it is saved up and used as a running header
+on subsequent pages.
+@PP
+The @Code "@EndHeaderRow" symbol goes where a @Code "@Row" symbol might
+go.  Notice that it does not end with a letter between {@Code a} and
+{@Code h}, and that it has no options.  Its meaning is that the most
+recent running header is not wanted on pages after this point:  in other
+words, it cancels the previous @Code "@HeaderRowa" ... @Code "@HeaderRowh"
+symbol.  Forgetting @Code "@EndHeaderRow" is disastrous, because every page
+from this point on will then have the running header, even though the table
+ended long before.
+@PP
+There may be any number of header rows saved up at any moment, all to be
+printed at the top of subsequent pages.  Having @Code "@EndHeaderRow"
+allows them to be `nested.'  For example, just schematically,
+@ID @OneRow @Code @Verbatim {
+@HeaderRowa ...
+@HeaderRowb ...
+@EndHeaderRow
+@HeaderRowb ...
+@EndHeaderRow
+@EndHeaderRow
+}
+could be used in a table to say that the entire table has the first
+header row; and that the first part also has the second header row,
+but the second part of the table has a different second header row,
+but still the same first header row.
+@PP
+These header symbols have some peculiarities not likely to trouble the
+ordinary user, but worth pointing out.  Each copy of a running header
+will be identical to every other copy, so any attempt to use cross
+references to add (say) page numbers to the running header is doomed to
+disappointment.  (If you want to change the header, use
+@Code "@EndHeaderRow" followed by a new header row.)  Basser Lout
+copies running header rows into the table after each page break,
+with no check on whether the next page has enough space to
+accommodate them, so if your running headers are so high that
+there is no room for ordinary rows on the page after they are
+inserted, then the document will never end.  Finally, header
+rows are taken account of by Lout when deciding column widths,
+whether they are actually printed or not.
+@PP
+Another practical problem in multi-page tables is getting the rules
+right.  The simplest way to do this is to set @Code "rulehorizontal"
+to {@Code yes}.  This places a rule above every row including the
+first on each page, and a rule below every row including the last
+on each page.  There is nothing equivalent to running headers
+at the bottom of the page -- nothing that would allow you to
+insert a rule after the last line of each page, but not
+elsewhere.  (However, if you are using the @Code "@Table"
+symbol, its @Code "@Enclose" option can be used to do this.)
 @PP
 To prevent page breaks within a table, precede the @Code "@Tbl"
 symbol by {@Code "@OneRow"}:
@@ -46,7 +131,7 @@ symbol by {@Code "@OneRow"}:
 object into a single, unbreakable row.  Make sure your table is
 small enough to fit on one page when you do this, otherwise an error
 message will be printed and it will be scaled to fit.  Of course, we
-have just said that display symbols like @Code "@CD" do this anyway,
+said earlier that display symbols like @Code "@CD" do this anyway,
 but that might change some day.
 @PP
 To prevent a page break between two particular rows, but not in

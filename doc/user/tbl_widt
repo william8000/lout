@@ -21,8 +21,8 @@ Distributed widely throughout Australia except in the most arid
 parts; many varieties.
 }
 }
-This usually looks good, but if you need something else, the @Code width
-option may be used to give a particular width to a cell:
+This usually looks good, but if you need something else, there is
+the @Code width option:
 @ID @OneRow @Code "@Cell width { 3c }"
 Here we have asked for a cell width of three centimetres; this includes
 the cell margins.  When using @Code width to fine-tune the appearance of

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*  PROG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT (VERSION 1.0)  */
+/*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT (VERSION 1.0)   */
 /*  COPYRIGHT (C) 2000 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -483,7 +483,7 @@ LANGUAGE *languages[] = {
 #define DEBUG_EMIT	0
 #define DEBUG_MAIN	0
 
-#define PROG2LOUT_VERSION "prg2lout Version 1.0 (February 2000)"
+#define PRG2LOUT_VERSION "prg2lout Version 1.0 (February 2000)"
 #define	BOOLEAN		unsigned
 #define	FALSE		0
 #define	TRUE		1
@@ -1604,7 +1604,7 @@ int main(int argc, char *argv[])
 	{ fprintf(err_fp, "%s: -V illegal with -r option\n", ErrorHeader());
 	  exit(1);
 	}
-	fprintf(err_fp, "%s\n", PROG2LOUT_VERSION);
+	fprintf(err_fp, "%s\n", PRG2LOUT_VERSION);
 	exit(0);
 	break;
 
