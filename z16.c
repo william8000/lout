@@ -1,7 +1,7 @@
 /*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -406,6 +406,17 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
       case BACKGROUND:
 
 	back(x, dim) = b;  fwd(x, dim) = f;
+	break;
+
+
+      case HMIRROR:
+      case VMIRROR:
+
+	back(x, dim) = b;  fwd(x, dim) = f;
+	if( (dim == COLM) == (type(y) == HMIRROR) )
+	{
+	  tb = b; b = f; f = tb;
+	}
 	break;
 
 

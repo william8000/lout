@@ -1,7 +1,7 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -171,6 +171,8 @@ FULL_CHAR *Image(unsigned int c)
     case HIGH:			return  KW_HIGH;
     case HSHIFT:		return  KW_HSHIFT;
     case VSHIFT:		return  KW_VSHIFT;
+    case HMIRROR:		return  KW_HMIRROR;
+    case VMIRROR:		return  KW_VMIRROR;
     case HSCALE:		return  KW_HSCALE;
     case VSCALE:		return  KW_VSCALE;
     case HCOVER:		return  KW_HCOVER;

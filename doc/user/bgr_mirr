@@ -1,0 +1,38 @@
+@Section
+   @Title { Mirror reflections }
+   @Tag { mirroring }
+@Begin
+@PP
+The @Code "@HMirror" symbol produces a horizontal mirror reflection
+reflect. @Index { Reflected objects }
+mirror. @Index { Mirror images }
+hmirror. @Index @Code "@HMirror"
+of the following object:
+@ID @Code {
+"@HMirror AMBULANCE"
+}
+produces
+@ID @HMirror AMBULANCE
+The @Code "@VMirror" symbol produces a vertical mirror reflection
+vmirror. @Index @Code "@VMirror"
+of the following object:
+@ID @Code {
+"@VMirror 5c @Wide @Box {"
+"@B { Pond life. }  Pond life includes"
+"frogs, tadpoles, newts, salamanders,"
+"eels, and mosquito larvae."
+"}"
+}
+produces
+@ID @VMirror 5c @Wide @Box {
+@B { Pond life. }  Pond life includes
+frogs, tadpoles, newts, salamanders,
+eels, and mosquito larvae.
+}
+As this example shows, the object to be mirror reflected may be
+arbitrary.  We have used a @Code "@Wide" symbol in this example
+to restrict the width of the result to be five centimetres wide.
+See the description of the @Code "@VShift" symbol in
+Section {@NumberOf include} for what to do if your reflected
+object is not aligned properly with adjacent objects.
+@End @Section

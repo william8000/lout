@@ -1,7 +1,7 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -311,6 +311,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 	word_font(tmp) = word_colour(tmp) = word_language(tmp) = 0;
 	word_texture(tmp) = 1;
 	word_baselinemark(tmp) = FALSE;
+	word_ligatures(tmp) = TRUE;
 	word_outline(tmp) = FALSE;
 	word_hyph(tmp) = FALSE;
 	ReplaceNode(tmp, t);

@@ -329,6 +329,7 @@ their default values:
 @IndexTypeOrdinary { @PageNum }
 @IndexTypeMain { @B @PageNum }
 @IndexTypeSpecial { @I @PageNum }
+@IndexRangeFormat { @From--@To }
 @IndexColumnNumber { 2 }
 @IndexColumnGap { 1.00c }
 @IndexCtd { Yes }
@@ -386,6 +387,15 @@ If the value of a @Code pnformat option is not {@Code Ordinary},
 {@Code Main}, or {@Code Special}, then the @Code pnformat option
 itself is printed; it too may contain a @Code "@PageNum" symbol,
 as explained earlier.
+@PP
+{@Code "@IndexRangeFormat"} gives the format to use when a page
+number range, such as 5--8, is to be included in an index entry.
+Within it the symbols @Code "@From" and @Code "To" stand for
+the first and last page numbers respectively.  These will always
+be different when {@Code "@IndexRangeFormat"} is used; Lout knows
+never to insert a range when the two end points are equal.  The
+default value just separates the two numbers by an en-dash with
+no space.
 @PP
 @Code "@IndexColumnNumber" and @Code "@IndexColumnGap" determine the
 indexcolumnnumber. @Index @Code "@IndexColumnNumber"

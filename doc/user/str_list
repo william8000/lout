@@ -68,7 +68,8 @@ has result
 swathe of destruction through the State of Georgia? }
 @RawEndList
 }
-The generated labels are added at the left margin.  Here is the full set
+The generated labels are added at the left margin.
+Here is the full set
 of label-generating list symbols, showing the first label produced by each:
 parennumberedlist. @Index @Code "@ParenNumberedList"
 pnl. @Index @Code "@PNL"
@@ -260,6 +261,53 @@ produces
 Although @Code "@ListInterruptItem" is written like a list item, the
 result appears to be an interruption to the list.  It may be used
 in any kind of list.
+@PP
+Yet another kind of list item symbol is
+paragraph.item. @Index @Code "@ParagraphItem"
+pi. @Index @Code "@PI"
+{@Code "@ParagraphItem"}, which introduces a list item
+whose labels are integrated into a paragraph:
+@ID @OneRow @Code @Verbatim {
+@Heading { Extract from GNU General Public License }
+@LeftList
+@ParagraphItem {
+You may copy and distribute verbatim copies of the Program's
+source code as you receive it, in any medium, provided that you
+conspicuously and appropriately publish on each copy an appropriate
+copyright notice and disclaimer of warranty ...
+}
+@ParagraphItem {
+You may modify your copy or copies of the Program or any portion
+of it, thus forming a work based on the Program, and copy and
+distribute such modifications or work under the terms of Section 1
+above, provided that you ...
+}
+@EndList
+}
+has result
+@ID @OneRow {
+@Heading { Extract from GNU General Public License }
+@LeftList
+@ParagraphItem {
+You may copy and distribute verbatim copies of the Program's
+source code as you receive it, in any medium, provided that you
+conspicuously and appropriately publish on each copy an appropriate
+copyright notice and disclaimer of warranty ...
+}
+@ParagraphItem {
+You may modify your copy or copies of the Program or any portion
+of it, thus forming a work based on the Program, and copy and
+distribute such modifications or work under the terms of Section 1
+above, provided that you ...
+}
+@RawEndList
+}
+Since the numbers are part of the item, the kind of list to use
+is just {@Code "@LeftList"} rather than {@Code "@NumberedList"}.
+It would be better if @Code "@ListItem" could be used, but problems
+behind the scenes prevent this.  @Code "@ParagraphItem" has a
+@Code "style" option that works much like the @Code "style" option
+of {@Code "@List"} described just below.
 @PP
 Every symbol introduced in this section has an abbreviated form
 consisting of @Code "@" followed by its capital letters only.  For

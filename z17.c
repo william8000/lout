@@ -1,7 +1,7 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -28,6 +28,142 @@
 /*                                                                           */
 /*****************************************************************************/
 #include "externs.h"
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  int GetWidth(OBJECT x, STYLE *style)                                     */
+/*                                                                           */
+/*  Get a width from object x, according to the grammar                      */
+/*                                                                           */
+/*      <width>  ::=  <unsigned number> <units>                              */
+/*      <units>  ::=  c  |  i  |  p  |  m  |  f  |  s  |  v  |  y  |  z      */
+/*                                                                           */
+/*****************************************************************************/
+
+int GetWidth(OBJECT x, STYLE *style)
+{ int res;  float num; 
+  FULL_CHAR *str;
+
+  debug2(DGW, D, "GetWidth(%s, %s)", EchoObject(x), EchoStyle(style));
+
+  /* make sure we have a WORD or QWORD argument */
+  if( !is_word(type(x)) )
+  { Error(17, 11, "width is not a simple word (replacing with 5c)",
+      WARN, &fpos(x));
+    debug1(DGW, D, "GetWidth failing (x = %s)", EchoObject(x));
+    return 5 * CM;
+  }
+  str = string(x);
+
+  /* ignore initial + or - */
+  if( *str == '+' || *str == '-' )
+  {
+    Error(17, 12, "ignoring initial %c character in width", WARN, &fpos(x), *str);
+    str++;
+  }
+
+  /* if word is empty, error */
+  if( *str == '\0' )
+  {
+    Error(17, 13, "width is empty (replacing with 5c)", WARN, &fpos(x));
+    debug0(DGW, D, "GetWidth failing (null word)");
+    return 5 * CM;
+  }
+
+  /* read the width */
+  if( sscanf((char *) str, "%f", &num) != 1 )
+  { Error(17, 14, "width missing from %s (replacing with 5c)", WARN,
+      &fpos(x), str);
+    debug0(DGW, D, "GetWidth failing (width missing)");
+    return 5 * CM;
+  }
+  while( numericchar(*str) )  str++;
+
+  /* make sure there is a units letter */
+  if( *str == '\0' )
+  {
+    Error(17, 15, "unit missing from width %s (5c substituted)", WARN,
+      &fpos(x), string(x));
+    res = 5 * CM;
+  }
+
+  /* make sure there is nothing after the units letter */
+  else if( *(str + 1) != '\0' )
+  {
+    Error(17, 16, "extra character(s) at end of width %s (5c substituted)",
+      WARN, &fpos(x), string(x));
+    res = 5 * CM;
+  }
+
+  /* read the compulsory unit and calculate length */
+  else switch( *str )
+  {
+    case CH_UNIT_CM:
+      
+      res = num * CM;
+      break;
+
+    case CH_UNIT_IN:
+      
+      res = num * IN;
+      break;
+
+    case CH_UNIT_PT:
+
+      res = num * PT;
+      break;
+
+    case CH_UNIT_EM:
+      
+      res = num * EM;
+      break;
+
+    case CH_UNIT_FT:
+      
+      res = num * FontSize(font(*style), x);
+      break;
+
+    case CH_UNIT_SP:
+      
+      res = num * width(space_gap(*style));
+      break;
+
+    case CH_UNIT_VS:
+      
+      res = num * width(line_gap(*style));
+      break;
+
+    case CH_UNIT_YU:
+      
+      res = num * yunit(*style);
+      break;
+
+    case CH_UNIT_ZU:
+      
+      res = num * zunit(*style);
+      break;
+
+    case CH_UNIT_WD:
+    case CH_UNIT_BD:
+    case CH_UNIT_RL:
+    case CH_UNIT_DG:
+			
+      Error(17, 17, "'%c' unit not allowed in width (5c substituted)",
+	WARN, &fpos(x), *--str);
+      res = 5 * CM;
+      break;
+
+    default:
+      
+      Error(17, 18, "unknown unit in width %s (5c substituted)", WARN,
+	&fpos(x), string(x));
+      res = 5 * CM;
+      break;
+  }
+  debug1(DGW, D, "GetWidth returning %d", res);
+  return res;
+}
 
 
 /*****************************************************************************/
@@ -126,6 +262,9 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   { Error(17, 5, "%.1fr too large (1.0r substituted)", WARN, &fpos(x), num);
     w = FR;
   }
+  if( w > MAX_SHORT_LENGTH )
+    Error(17, 5, "%s exceeds maximum allowed gap size", FATAL, &fpos(x),
+      string(x));
   width(*res_gap) = w;
 
   /* read the optional gap mode */

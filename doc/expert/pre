@@ -21,6 +21,7 @@
 @Include { pre_hlim }
 @Include { pre_hadj }
 @Include { pre_hsca }
+@Include { pre_hmir }
 @Include { pre_cove }
 @Include { pre_span }
 @Include { pre_scal }

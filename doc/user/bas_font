@@ -662,5 +662,10 @@ kerning. @Index { kerning }
 letters closer together, for example in `VA.'  Lout considers
 ligatures and kerning to be integral parts of each font; you can prevent
 them from happening only by enclosing one of the letters in a
-@Code "@OneCol" symbol, as in {@Code "@OneCol { V }A" }.
+@Code "@OneCol" symbol, as in {@Code "@OneCol { V }A" }.  Alternatively,
+to turn off ligatures you can write
+@ID @Code "nolig @Font { ... }"
+and then ligatures will not be used within the object following
+{@Code "@Font"}.  Should you ever need to turn ligatures on
+within a region where they are turned off, use {@Code "lig @Font"}.
 @End @Section

@@ -170,6 +170,7 @@
   # @IndexTypeOrdinary	{ @PageNum		} # Ordinary pagenum format
   # @IndexTypeMain	{ @B @PageNum		} # Main pagenum format
   # @IndexTypeSpecial	{ @I @PageNum		} # Special pagenum format
+  # @IndexRangeFormat	{ @From--@To		} # index page range format
   # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
   # @IndexColumnGap	{ 1.00c	@OrIfPlain 6s	} # index column gap
   # @IndexCtd		{ Yes			} # include (ctd.) lines
@@ -189,6 +190,7 @@
   # @IndexATypeOrdinary	{ @PageNum		} # Ordinary pagenum format
   # @IndexATypeMain	{ @B @PageNum		} # Main pagenum format
   # @IndexATypeSpecial	{ @I @PageNum		} # Special pagenum format
+  # @IndexARangeFormat	{ @From--@To		} # index page range format
   # @IndexAColumnNumber	{ 2			} # index A columns (1 to 10)
   # @IndexAColumnGap	{ 1.00c	@OrIfPlain 6s	} # index A column gap
   # @IndexACtd		{ Yes			} # include (ctd.) lines
@@ -208,6 +210,7 @@
   # @IndexBTypeOrdinary	{ @PageNum		} # Ordinary pagenum format
   # @IndexBTypeMain	{ @B @PageNum		} # Main pagenum format
   # @IndexBTypeSpecial	{ @I @PageNum		} # Special pagenum format
+  # @IndexBRangeFormat	{ @From--@To		} # index page range format
   # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)
   # @IndexBColumnGap	{ 1.00c	@OrIfPlain 6s	} # index B column gap
   # @IndexBCtd		{ Yes			} # include (ctd.) lines

@@ -1,7 +1,7 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -409,6 +409,8 @@ static BOOLEAN Reduce(void)
     case HIGH:
     case HSHIFT:
     case VSHIFT:
+    case HMIRROR:
+    case VMIRROR:
     case HSCALE:
     case VSCALE:
     case HCOVER:
@@ -1002,6 +1004,8 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case HIGH:
       case HSHIFT:
       case VSHIFT:
+      case HMIRROR:
+      case VMIRROR:
       case HSCALE:
       case VSCALE:
       case HCOVER:

@@ -809,7 +809,6 @@ def @Graph
     {
 	style @Case {
 	    frame    @Yield { "framestyle" }
-	    grid     @Yield { "gridstyle"  }
 	    none     @Yield { "nonestyle"  }
 	    axes     @Yield { "axesstyle"  }
 	}
@@ -821,7 +820,6 @@ def @Graph
 	    "none" @Yield {
 		style @Case {
 	            frame    @Yield { "0.5 cm" }
-	            grid     @Yield { "0" }
 	            none     @Yield { "0"  }
 	            axes     @Yield { "0"  }
 		}
@@ -836,7 +834,6 @@ def @Graph
 	    "none" @Yield {
 		style @Case {
 	            frame @Yield { "0.5 cm" }
-	            grid     @Yield { "0" }
 	            none  @Yield { "0"  }
 	            axes  @Yield { "0"  }
 		}

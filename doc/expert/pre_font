@@ -33,8 +33,13 @@ Basser Lout to be an integral part of the font:  if the font definition
 adjustment of the space between adjacent characters to improve the
 appearance) is done whenever indicated in the font definition.  Enclosing
 one of the letters in @@OneCol is one sure way to disable a ligature or kern.
+You can also turn off ligatures using
+@ID @Code "nolig @Font { ... }"
+and turn them on with
+@ID @Code "lig @Font { ... }"
+Since they are on initially this second option is rarely needed.
 @PP
-The @@Font symbol
+More generally, the @@Font symbol
 font.sym @Index { @@Font symbol }
 returns its right parameter in a font and size specified by its left:
 @ID {

@@ -273,6 +273,9 @@ def @DocumentSetup
 	right @PageNum		{  @B @PageNum		} # main page numbers
     named @IndexTypeSpecial
 	right @PageNum		{  @I @PageNum		} # special page numbers
+    named @IndexRangeFormat
+	left @From
+	right @To		{  @From--@To		}
     named @IndexColumnNumber	{  2			} # index columns (1 to 10)
     named @IndexColumnGap	{  1.00c @OrIfPlain 6s	} # index column gap
     named @IndexCtd		{  Yes			} # include (ctd.) lines
@@ -302,6 +305,9 @@ def @DocumentSetup
 	right @PageNum		{  @B @PageNum		} # main page numbers
     named @IndexATypeSpecial
 	right @PageNum		{  @I @PageNum		} # special page numbers
+    named @IndexARangeFormat
+	left @From
+	right @To		{  @From--@To		}
     named @IndexAColumnNumber	{  2			} # index A columns (1 to 10)
     named @IndexAColumnGap	{  1.00c @OrIfPlain 6s	} # index A column gap
     named @IndexACtd		{  Yes			} # include (ctd.) lines
@@ -331,6 +337,9 @@ def @DocumentSetup
 	right @PageNum		{  @B @PageNum		} # main page numbers
     named @IndexBTypeSpecial
 	right @PageNum		{  @I @PageNum		} # special page numbers
+    named @IndexBRangeFormat
+	left @From
+	right @To		{  @From--@To		}
     named @IndexBColumnNumber	{  2			} # index B columns (1 to 10)
     named @IndexBColumnGap	{  1.00c @OrIfPlain 6s	} # index B column gap
     named @IndexBCtd		{  Yes			} # include (ctd.) lines
@@ -725,6 +734,7 @@ def @DocumentSetup
 	    Legal       @Yield  612p
 	    Statement   @Yield  396p
 	    Executive   @Yield  540p
+	    A2          @Yield 1190p
 	    A3          @Yield  842p
 	    A4          @Yield  595p
 	    A5          @Yield  420p
@@ -746,6 +756,7 @@ def @DocumentSetup
 	    Legal       @Yield 1008p
 	    Statement   @Yield  612p
 	    Executive   @Yield  720p
+	    A2          @Yield 1684p
 	    A3          @Yield 1190p
 	    A4          @Yield  842p
 	    A5          @Yield  595p
@@ -4274,7 +4285,7 @@ def @DocumentSetup
 		    { @PageOf @Tag } @Case
 		    {
 			{ @PageOf to } @Yield { @PgMk @Tag }
-			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
+			else	       @Yield { {@PgMk @Tag} @IndexRangeFormat {@PgMk to} }
 		    }
 		}
 	    }
@@ -4483,7 +4494,7 @@ def @DocumentSetup
 		    { @PageOf @Tag } @Case
 		    {
 			{ @PageOf to } @Yield { @PgMk @Tag }
-			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
+			else	       @Yield { {@PgMk @Tag} @IndexARangeFormat {@PgMk to} }
 		    }
 		}
 	    }
@@ -4692,7 +4703,7 @@ def @DocumentSetup
 		    { @PageOf @Tag } @Case
 		    {
 			{ @PageOf to } @Yield { @PgMk @Tag }
-			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
+			else	       @Yield { {@PgMk @Tag} @IndexBRangeFormat {@PgMk to} }
 		    }
 		}
 	    }

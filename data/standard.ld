@@ -565,7 +565,7 @@
     Italian	@Yield { ?? }
     Norwegian   @Yield { Ordforklaringer }
     Polish	@Yield { ?? }
-    Portuguese  @Yield { ?? }
+    Portuguese  @Yield { Gloss{@Char aacute}rio }
     Russian	@Yield { ?? }
     Slovak	@Yield { Vecn{@Char yacute} register }
     Slovenian   @Yield { ?? }

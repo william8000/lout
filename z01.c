@@ -1,7 +1,7 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -565,6 +565,7 @@ int main(int argc, char *argv[])
 	  StringLength(oname) == 0 || StringLength(oval) == 0 )
 	  Error(1, 24, "error in command-line option %s", FATAL, no_fpos,
 	    argv[i]+2);
+	debug2(DSP, D, "  command line option [%s] [%s]", oname, oval);
 	y = MakeWord(WORD, oname, no_fpos);
 	Link(CommandOptions, y);
 	New(y, ACAT);
@@ -602,6 +603,13 @@ int main(int argc, char *argv[])
 	}
 	if( bp > 0 )
 	{ buff[bp++] = '\0';
+	  if( Down(y) != y ) 
+	  { OBJECT g;
+	    New(g, GAP_OBJ);
+	    hspace(g) = 1;  vspace(g) = 0;
+	    FposCopy(fpos(g), *no_fpos);
+	    Link(y, g);
+	  }
 	  z = MakeWord(WORD, buff, no_fpos);
 	  Link(y, z);
 	}
@@ -770,6 +778,8 @@ int main(int argc, char *argv[])
   load(KW_CLEAR_HEADER, CLEAR_HEADER,   FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_ONE_COL,      ONE_COL,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_ONE_ROW,      ONE_ROW,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HMIRROR,      HMIRROR,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VMIRROR,      VMIRROR,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HSCALE,       HSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_VSCALE,       VSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HCOVER,       HCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
@@ -796,7 +806,7 @@ int main(int argc, char *argv[])
   load(KW_SINCGRAPHIC,  SINCGRAPHIC,    FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_PLAINGRAPHIC, PLAIN_GRAPHIC,  TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_GRAPHIC,      GRAPHIC,        TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_LINK_SOURCE,   LINK_SOURCE,     TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_LINK_SOURCE,  LINK_SOURCE,    TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_LINK_DEST,    LINK_DEST,      TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_LINK_URL,     LINK_URL,       TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_CROSS,        CROSS,          TRUE,   TRUE,   FALSE, CROSSOP_PREC);

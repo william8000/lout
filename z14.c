@@ -1,7 +1,7 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -224,6 +224,7 @@ typedef struct {
 	    word_outline(hyph_word) = outline(save_style(x));		\
 	    word_language(hyph_word) = language(save_style(x));		\
 	    word_baselinemark(hyph_word) = baselinemark(save_style(x));	\
+	    word_ligatures(hyph_word) = ligatures(save_style(x));	\
 	    word_hyph(hyph_word) = hyph_style(save_style(x))==HYPH_ON;	\
 	  }								\
 	  if( word_font(hyph_word) != word_font(right) )		\
@@ -559,6 +560,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       word_outline(res) = outline(save_style(x));
       word_language(res) = language(save_style(x));
       word_baselinemark(res) = baselinemark(save_style(x));
+      word_ligatures(res) = ligatures(save_style(x));
       word_hyph(res) = hyph_style(save_style(x)) == HYPH_ON;
       back(res, COLM) = fwd(res, COLM) = 0;
       ReplaceNode(res, x);
@@ -581,6 +583,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   word_outline(tmp) = 0;
   word_language(tmp) = 0;
   word_baselinemark(tmp) = FALSE;
+  word_ligatures(tmp) = TRUE;
   word_hyph(tmp) = 0;
   underline(tmp) = UNDER_OFF;
   Link(x, tmp);
@@ -758,6 +761,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	word_outline(t1) = 0;
 	word_language(t1) = 0;
 	word_baselinemark(t1) = FALSE;
+	word_ligatures(t1) = TRUE;
 	word_hyph(t1) = 0;
 	underline(t1) = UNDER_OFF;
 	New(t2, WIDE);
@@ -803,6 +807,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	word_outline(z) = word_outline(tmp);
 	word_language(z) = word_language(tmp);
 	word_baselinemark(z) = word_baselinemark(tmp);
+	word_ligatures(z) = word_ligatures(tmp);
 	word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
 	underline(z) = underline(tmp);
 	FontWordSize(z);
@@ -899,6 +904,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	        word_outline(prev) == word_outline(next) &&
 	        word_language(prev) == word_language(next) &&
 	        word_baselinemark(prev) == word_baselinemark(next) &&
+	        word_ligatures(prev) == word_ligatures(next) &&
 	        underline(prev) == underline(next) )
 	    { 
 	      debug2(DOF, DD, "joining %s with %s", EchoObject(prev),
@@ -911,6 +917,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	      word_outline(tmp) = word_outline(prev);
 	      word_language(tmp) = word_language(prev);
 	      word_baselinemark(tmp) = word_baselinemark(prev);
+	      word_ligatures(tmp) = word_ligatures(prev);
 	      word_hyph(tmp) = word_hyph(prev);
 	      FontWordSize(tmp);
 	      underline(tmp) = underline(prev);

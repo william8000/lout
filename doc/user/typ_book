@@ -150,10 +150,19 @@ preface. @Index @Code "@Preface"
 "@End @Preface"
 }
 Since the title of most prefaces is simply Preface, that is the default
-value in English of the @Code "@Title" option.  After the preface there
-will automatically appear a table of contents listing the introduction,
-chapters, sections, subsections, appendices, sub-appendices, bibliography,
-and index as appropriate.
+value in English of the @Code "@Title" option.  Within the preface,
+just before {@Code "@End @Preface"}, there may optionally be a sequence
+of sub-prefaces enclosed in @Code "@BeginSubPrefaces" and
+{@Code "@EndSubPrefaces"}, like this:
+@ID @OneRow @Code @Verbatim {
+@BeginSubPrefaces
+@SubPreface ... @End @SubPreface
+@SubPreface ... @End @SubPreface
+@EndSubPrefaces
+}
+After the preface there will automatically appear a table of contents
+listing the introduction, chapters, sections, subsections, appendices,
+sub-appendices, bibliography, and index as appropriate.
 @PP
 The pages up to this point will be numbered in lower case Roman
 numerals; subsequent pages will be numbered in Arabic starting from
@@ -164,9 +173,9 @@ a setup file option for changing this to a single numbering sequence
 Next comes an optional abbreviations sections, exactly like the
 preface except that its name is @Code "@Abbreviations" and the
 abbreviations. @Index @Code "@Abbreviations"
-default title in English is Abbreviation.  There is no support for
-what goes inside; you need to use a list or table to lay out the
-abbreviations, in the usual way.
+default title in English is Abbreviation.  There are no
+sub-abbreviations, and no support for what goes inside; you need to
+use a list or table to lay out the abbreviations, in the usual way.
 @PP
 Next comes an optional introduction, exactly like the preface except that
 its name is @Code "@Introduction" and the default title in English is
@@ -179,7 +188,14 @@ Introduction:
 "..."
 "@End @Introduction"
 }
-After that comes a sequence of chapters in the usual style:
+It may have sub-introductions, exactly like sub-prefaces:
+@ID @OneRow @Code @Verbatim {
+@BeginSubIntroductions
+@SubIntroduction ... @End @SubIntroduction
+@SubIntroduction ... @End @SubIntroduction
+@EndSubIntroductions
+}
+After the introduction comes a sequence of chapters in the usual style:
 chapter. @Index @Code "@Chapter"
 @ID @OneRow @Code {
 "@Chapter"

@@ -1,7 +1,7 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -332,6 +332,8 @@ static OBJECT FindSplitInGalley(OBJECT hd)
     case ONE_COL:
     case SCALE:
     case KERN_SHRINK:
+    case HMIRROR:
+    case VMIRROR:
     case HSCALE:
     case VSCALE:
     case HCOVER:
@@ -649,6 +651,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	word_outline(last) = word_outline(y);
 	word_language(last) = word_language(y);
 	word_baselinemark(last) = word_baselinemark(y);
+	word_ligatures(last) = word_ligatures(y);
 	word_hyph(last) = word_hyph(y);
 	Link(opt_components(hd), last);
 	debug2(DOG, DD, "  adding %s \"%s\"", Image(type(last)), string(last));
@@ -827,6 +830,8 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	case HIGH:
 	case HSHIFT:
 	case VSHIFT:
+	case HMIRROR:
+	case VMIRROR:
 	case HSCALE:
 	case VSCALE:
 	case HCOVER:

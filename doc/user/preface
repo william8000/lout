@@ -18,17 +18,16 @@ gnu. @Index { GNU Public License }
 primary source is directory
 @ID @Code "ftp://ftp.it.usyd.edu.au/jeff/lout"
 containing a gzipped tar file of the current version
-(currently {@Code "lout-3.29.tar.gz"}), and various other things including
+(currently {@Code "lout-3.30.tar.gz"}), and various other things including
 a PostScript version of this guide.  The distribution contains source code,
 libraries, documentation, license, and installation instructions.
 @PP
 A mailing list has been set up for discussion of all topics related to
-Lout.  To subscribe, send email to @Code "lout-request@ptc.spbu.ru"
-containing the word @Code "subscribe" in the Subject line.  To post an
-item, send email to {@Code "lout@ptc.spbu.ru"}; it will be forwarded to
-all subscribers via email.  To unsubscribe, send email to
-@Code "lout-request@ptc.spbu.ru" containing the word @Code "unsubscribe"
-in the Subject line.
+Lout.  To subscribe (or unsubscribe), visit
+@ID @Code "http://lists.planix.com/mailman/options.cgi/lout-users/"
+After subscribing, to post an item send email to
+{@Code "lout-users@lists.planix.com"}; it will be forwarded to all
+subscribers via email.
 @PP
 Lout began in 1984 as a research project into the design of a high-level
 language for document formatting.  At that time my name for the subject
@@ -56,8 +55,9 @@ page breaking were by my student Gabor Inokai.  Vincent Tan contributed
 the PDF back end.  Valeriy E. Ushakov smoothed the path for many
 people, by his contributions to improving Lout's robustness, and his
 tireless management of and responses to the Lout mailing list.  The
-number of other people who have offered comments and suggestions to me is so
-great that it is quite out of my power to acknowledge them individually.  I
+current mailing list maintainer is Greg Woods.  The number of other
+people who have offered comments and suggestions to me is so great
+that it is quite out of my power to acknowledge them individually.  I
 hope that seeing their ideas adopted will be thanks enough.
 @DP
 @RLD lines @Break {

@@ -1,7 +1,7 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -1025,6 +1025,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	word_outline(x) = outline(*style);
 	word_language(x) = language(*style);
 	word_baselinemark(x) = baselinemark(*style);
+	word_ligatures(x) = ligatures(*style);
 	word_hyph(x) = hyph_style(*style) == HYPH_ON;
 	debug3(DOM, DDD, "  manfifest/WORD underline() := %s for %s %s",
 	  "UNDER_OFF", Image(type(x)), EchoObject(x));
@@ -1059,6 +1060,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	word_outline(y) = outline(*style);
 	word_language(y) = language(*style);
 	word_baselinemark(y) = baselinemark(*style);
+	word_ligatures(y) = ligatures(*style);
 	word_hyph(y) = hyph_style(*style) == HYPH_ON;
 	if( small_caps(*style) && ok )  y = MapSmallCaps(y, style);
       }
@@ -1098,6 +1100,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  word_outline(y) = outline(*style);
 	  word_language(y) = language(*style);
 	  word_baselinemark(y) = baselinemark(*style);
+	  word_ligatures(y) = ligatures(*style);
 	  word_hyph(y) = hyph_style(*style) == HYPH_ON;
 	  if( small_caps(*style) && ok )  y = MapSmallCaps(y, style);
 	}
@@ -1230,7 +1233,8 @@ OBJECT *enclose, BOOLEAN fcr)
 	    word_texture(prev) == word_texture(y) &&
 	    word_outline(prev) == word_outline(y) &&
 	    word_language(prev) == word_language(y) &&
-	    word_baselinemark(prev) == word_baselinemark(y) )
+	    word_baselinemark(prev) == word_baselinemark(y) &&
+	    word_ligatures(prev) == word_ligatures(y) )
 	    /* no need to compare underline() since both are false */
 	{ unsigned typ;
 	  assert( underline(prev) == UNDER_OFF, "Manifest/ACAT: underline(prev)!" );
@@ -1247,6 +1251,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  word_outline(y) = word_outline(prev);
 	  word_language(y) = word_language(prev);
 	  word_baselinemark(y) = word_baselinemark(prev);
+	  word_ligatures(y) = word_ligatures(prev);
 	  word_hyph(y) = word_hyph(prev);
 	  underline(y) = UNDER_OFF;
           debug3(DOM, DDD, "  manifest/ACAT4 underline() := %s for %s %s",
@@ -1283,17 +1288,11 @@ OBJECT *enclose, BOOLEAN fcr)
     case HIGH:
     
       Child(y, Down(x));
-      y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
+      y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
+	&nenclose, fcr);
       y = ReplaceWithTidy(y, ACAT_TIDY);
-      GetGap(y, style, &res_gap, &res_inc);
-      if( res_inc != GAP_ABS || mode(res_gap) != EDGE_MODE ||
-	units(res_gap) != FIXED_UNIT )
-      {	Error(8, 26, "replacing invalid left parameter of %s by 2i",
-	  WARN, &fpos(y), Image(type(x)) );
-	units(res_gap) = FIXED_UNIT;
-	width(res_gap) = 2*IN;
-      }
-      SetConstraint(constraint(x), MAX_FULL_LENGTH, width(res_gap), MAX_FULL_LENGTH);
+      num1 = GetWidth(y, style);
+      SetConstraint(constraint(x), MAX_FULL_LENGTH, num1, MAX_FULL_LENGTH);
       DisposeChild(Down(x));
       goto ETC;		/* two cases down from here */
 
@@ -1451,6 +1450,8 @@ OBJECT *enclose, BOOLEAN fcr)
     case START_HVSPAN:
     case START_HSPAN:
     case START_VSPAN:
+    case HMIRROR:
+    case VMIRROR:
     case HSCALE:
     case VSCALE:
     case HCOVER:

@@ -97,7 +97,7 @@ def @PythonSetup
     export
     
 	@PI @PK @PO @PN @PS @PC @PL @PA @PM @PD
-	@A "$>"
+	@A "$>" "''"
 
     def @Python
 	named style        { style         }  # style
@@ -384,6 +384,7 @@ def @PythonSetup
 
 	macro "$>" { {} & }
 
+        def "''" { "''" }
 
 	{ @InitFontFamily Base @InitSize } @Font
 	{ @InitLine lines nohyphen } @Break @Body

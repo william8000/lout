@@ -183,6 +183,7 @@ export
     @RawRightAlignedNumberedDisplay
 
     @ListItem
+    @ParagraphItem
     @ListInterruptItem
     @ListNewPage
     @DropListItem
@@ -1427,6 +1428,7 @@ def @BasicSetup
 
 
     def @ItemPlace          { @Galley }
+    def @ParagraphItemPlace { @Galley }
     def @InterruptItemPlace { @Galley }
     def @NewPageItemPlace   { @Galley }
     def @TagPlace           { @Galley }
@@ -1455,6 +1457,13 @@ def @BasicSetup
 	        //gap  @MakeList @NotRevealed @Next num
 	    }
 
+	    def @ParagraphItem
+	    {
+		@NumberMarker @Value {num} {style type num} &0io
+	        |indent  @ParagraphItemPlace  |rightindent
+	        //gap  @MakeList @NotRevealed @Next num
+	    }
+
 	    def @InterruptItem
 	    {
 		@InterruptItemPlace
@@ -1470,6 +1479,7 @@ def @BasicSetup
 	    @OneOf
 	    {
 		@NormalItem
+		@ParagraphItem
 		@InterruptItem
 		@NewPageItem
 	    }
@@ -1494,6 +1504,23 @@ def @BasicSetup
 	   @NumberMarker&&preceding @Tagged @Tag
 	// x
 	// @PageMark @Tag   # weird placement, but @PageMark is definite now
+    }
+
+    def paragraphitem
+        named @Tag {}
+	named style right tag { @ParaIndent @Wide & tag. &2s }
+	right x
+    {
+
+	def sendparagraphitem into { @ParagraphItemPlace&&preceding }
+	   named tag { @Tag }
+	{
+	  @NumberMarker&&preceding @Tagged @Tag
+	  // { style @NumberMarker&&@Tag @Open { @Value } } @Insert x
+	  // @PageMark @Tag
+	}
+
+	sendparagraphitem
     }
 
     def droplistitem into { @ItemPlace&&preceding }
@@ -1535,6 +1562,7 @@ def @BasicSetup
 
 
     macro @LI   @ListItem		{ // listitem			}
+    macro @PI   @ParagraphItem		{ // paragraphitem			}
     macro @LII  @ListInterruptItem	{ // listinterruptitem		}
     macro @LNP  @ListNewPage		{ // listnewpage		}
     macro @DLI  @DropListItem		{ // droplistitem		}

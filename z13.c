@@ -1,7 +1,7 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -549,6 +549,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	outline(save_style(y)) = word_outline(x);
 	language(save_style(y)) = word_language(x);
 	baselinemark(save_style(y)) = word_baselinemark(x);
+	ligatures(save_style(y)) = word_ligatures(x);
 	debug3(DOF, DD, "  in BreakObject y %s %s %s",
 	  EchoStyle(&save_style(y)), Image(type(y)), EchoObject(y));
 
@@ -612,7 +613,18 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
       break;
 
 
+    case HMIRROR:
+
+      FlipConstraint(yc, *c);
+      Child(y, Down(x));
+      y = BreakObject(y, &yc);
+      back(x, COLM) = fwd(y, COLM);
+      fwd(x, COLM) = back(y, COLM);
+      break;
+
+
     case HIGH:
+    case VMIRROR:
     case VSCALE:
     case VCOVER:
     case VSHIFT:

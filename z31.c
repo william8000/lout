@@ -1,7 +1,7 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -197,6 +197,8 @@ void MemInit(void)
   zz_lengths[ HIGH         ] =
   zz_lengths[ HSHIFT       ] =
   zz_lengths[ VSHIFT       ] =
+  zz_lengths[ HMIRROR      ] =
+  zz_lengths[ VMIRROR      ] =
   zz_lengths[ HSCALE       ] =
   zz_lengths[ VSCALE       ] =
   zz_lengths[ HCOVER       ] =

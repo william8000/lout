@@ -1,7 +1,7 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -229,11 +229,18 @@ static LINK_DEST_TABLE ltab_new(int newsize)
 static void ltab_insert(OBJECT x, LINK_DEST_TABLE *S);
 
 static LINK_DEST_TABLE ltab_rehash(LINK_DEST_TABLE S, int newsize)
-{ LINK_DEST_TABLE NewS;  int i;
+{ LINK_DEST_TABLE NewS;  int i;  OBJECT z, link, y;
   NewS = ltab_new(newsize);
-  for( i = 1;  i <= ltab_size(S);  i++ )
-  { if( ltab_item(S, i) != nilobj )
-      ltab_insert(ltab_item(S, i), &NewS);
+  for( i = 0;  i < ltab_size(S);  i++ )
+  { z = ltab_item(S, i);
+    if( z != nilobj )
+    {
+      for( link = Down(z);  link != z;  link = NextDown(link) )
+      {
+	Child(y, link);
+	ltab_insert(y, &NewS);
+      }
+    }
   }
   free(S);
   return NewS;
@@ -241,7 +248,7 @@ static LINK_DEST_TABLE ltab_rehash(LINK_DEST_TABLE S, int newsize)
 
 static void ltab_insert(OBJECT x, LINK_DEST_TABLE *S)
 { int pos;  OBJECT z, link, y;
-  if( ltab_count(*S) == ltab_size(*S) - 1 )	/* one less since 0 unused */
+  if( ltab_count(*S) >= ltab_size(*S) - 1 )	/* one less since 0 unused */
     *S = ltab_rehash(*S, 2*ltab_size(*S));
   hash(pos, string(x), *S);
   if( ltab_item(*S, pos) == nilobj )  New(ltab_item(*S, pos), ACAT);
@@ -254,6 +261,7 @@ static void ltab_insert(OBJECT x, LINK_DEST_TABLE *S)
     }
   }
   Link(ltab_item(*S, pos), x);
+  ltab_count(*S)++;
 } /* end ltab_insert */
 
 static OBJECT ltab_retrieve(FULL_CHAR *str, LINK_DEST_TABLE S)
@@ -1134,30 +1142,6 @@ static void PS_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  KernLength(fnum, ch1, ch2, res)                                          */
-/*                                                                           */
-/*  Set res to the kern length between ch1 and ch2 in font fnum, or 0 if     */
-/*  none.                                                                    */
-/*                                                                           */
-/*****************************************************************************/
-
-#define KernLength(fnum, mp, ch1, ch2, res)				\
-{ int ua_ch1 = mp[ch1];							\
-  int ua_ch2 = mp[ch2];							\
-  int i, j;								\
-  i = finfo[fnum].kern_table[ua_ch1], j;				\
-  if( i == 0 )  res = 0;						\
-  else									\
-  { FULL_CHAR *kc = finfo[fnum].kern_chars;				\
-    for( j = i;  kc[j] > ua_ch2;  j++ );				\
-    res = (kc[j] == ua_ch2) ?						\
-      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;		\
-  }									\
-} /* end KernLength */
-
-
-/*****************************************************************************/
-/*                                                                           */
 /*  static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)     */
 /*                                                                           */
 /*  Print composite character cp, assuming that the current point is         */
@@ -1208,7 +1192,7 @@ static void PS_PrintWord(OBJECT x, int hpos, int vpos)
     /* check for missing glyph (lig[] == 1) or ligatures (lig[] > 1) */
     if( lig[*q++ = *p++] )
     {
-      if( lig[*(q-1)] == 1 ) continue;
+      if( lig[*(q-1)] == 1 || !word_ligatures(x) ) continue;
       else
       {	a = &lig[ lig[*(p-1)] + MAX_CHARS ];
 	while( *a++ == *(p-1) )
@@ -1266,7 +1250,7 @@ static void PS_PrintWord(OBJECT x, int hpos, int vpos)
   unacc = MapTable[m]->map[MAP_UNACCENTED];
   /* acc   = MapTable[m]->map[MAP_ACCENT]; */
   for( p++;  *p;  p++ )
-  { KernLength(word_font(x), unacc, *(p-1), *p, ksize);
+  { ksize = FontKernLength(word_font(x), unacc, *(p-1), *p);
     if( ksize != 0 )
     { fprintf(out_fp, ")%s %d(", command, -ksize);
       ++wordcount;
@@ -1384,6 +1368,40 @@ static void PS_CoordScale(float hfactor, float vfactor)
   cpexists = FALSE;
   debug0(DPO, D, "CoordScale returning.");
 } /* end PS_CoordScale */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void PS_CoordHMirror()                                                   */
+/*                                                                           */
+/*  Reflect coordinate system about y axis.                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PS_CoordHMirror()
+{
+  debug0(DPO, D, "CoordHMirror()");
+  cpexists = FALSE;
+  p0("[-1 0 0 1 0 0] concat");
+  debug0(DPO, D, "CoordHMirror returning.");
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void PS_CoordVMirror()                                                   */
+/*                                                                           */
+/*  Reflect coordinate system about x axis.                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PS_CoordVMirror()
+{
+  debug0(DPO, D, "CoordVMirror()");
+  cpexists = FALSE;
+  p0("[1 0 0 -1 0 0] concat");
+  debug0(DPO, D, "CoordVMirror returning.");
+}
 
 
 /*****************************************************************************/
@@ -1896,6 +1914,7 @@ static struct back_end_rec ps_back = {
   STR_POSTSCRIPT,			/* string name of the back end       */
   TRUE,					/* TRUE if @Scale is available       */
   TRUE,					/* TRUE if @Rotate is available      */
+  TRUE,					/* TRUE if @HMirror, @VMirror avail  */
   TRUE,					/* TRUE if @Graphic is available     */
   TRUE,					/* TRUE if @IncludeGraphic is avail. */
   FALSE,				/* TRUE if @PlainGraphic is avail.   */
@@ -1916,6 +1935,8 @@ static struct back_end_rec ps_back = {
   PS_CoordTranslate,
   PS_CoordRotate,
   PS_CoordScale,
+  PS_CoordHMirror,
+  PS_CoordVMirror,
   PS_SaveGraphicState,
   PS_RestoreGraphicState,
   PS_PrintGraphicObject,

@@ -17,9 +17,11 @@ axes. @Index { axes in graphs }
 graph, whose value may be either {@Code "frame"}, {@Code "none"},
 or {@Code "axes"}.  The default value is {@Code "frame"}, and it produces
 a frame around the graph with ticks and labels along its left and bottom
-edges, as in previous examples.  The {@Code "none"} style prints
-nothing (no frame, no ticks, no labels), which is useful for producing
-graphs that don't look like graphs, as it were.
+edges, as in previous examples.  Value @Code "grid" is similar except
+that the ticks are converted into grid lines crossing the entire
+frame.  The {@Code "none"} style prints nothing (no frame, no ticks,
+no labels), which is useful for producing graphs that don't look like
+graphs, as it were.
 @PP
 If the other value, {@Code "axes"}, is chosen, two other options called
 {@Code xorigin} and {@Code yorigin} become compulsory:

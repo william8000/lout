@@ -363,10 +363,40 @@ Changes and new features introduced in Version 3.29 [August 2003]
     New pairs options for @Graph: dotdashed, dotdotdashed, dotdotdotdashed;
       plus @GraphDotDashed, @GraphDotDotDashed, @GraphDotDotDotDashed syms
 
-Things to do (or not)
+    Things not done
 
-    I may have promised to add dashed, dotted etc. options to @Tbl's
-      rules, but existing code does not lend itself to it, so I haven't.
-    Bug in placement of Index/Glossary headings (awaiting example of bug).
+      I may have promised to add dashed, dotted etc. options to @Tbl's
+	rules, but existing code does not lend itself to it, so I haven't.
+
+Changes and new features introduced in Version 3.30 [October 2004]
+
+   Bug fixes (H. K. Man's fix for PDF links, '' in Python, crashing
+     for some cases of "lout --option{value}")
+   Fixed bug with large page sizes.  Lout stores object sizes in 32-bit
+     integers, but smaller numbers (gap widths, shifts, character metrics
+     etc.) in 16-bit integers.  The left parameter of @Wide and @High was
+     erroneously being passed through a 16-bit variable.
+   Added A2 to list of page types (it works, too)
+   Reference new mailing list address
+   @HMirror and @VMirror symbols for reflecting objects
+   @IndexRangeFormat option for changing "from--to" format in indexes
+   "nolig @Font" for turning off ligatures in following object
+   @BeginSubPrefaces, @SubPreface, and @EndSubPrefaces symbols
+   @BeginSubIntroductions, @SubIntroduction, and @EndSubIntroductions symbols
+   @ParagraphItem symbol (like @ListItem but label integrated into paragraph)
+   Documented the danger of keeping valuable .ld files in source directories
+   Kerning now tries original characters before their unaccented versions
+   "@Graph style { grid }" replaces ticks in graphs with grid lines
+
+   Things not done
+
+      @CaptionGap not implementable since some gaps between figures and
+	captions are not accessible.  Try @FigureCaptionFormat.
+      Brazilian Portuguese declined on the grounds that it turned out
+        virtually identical to Portuguese Portuguese (convince me...)
+      I may have promised to add an "incontents" option to large-scale
+        structure symbols, which would allow them to opt out of the table
+	of contents.  On second thoughts I'm unwilling to do this.  I need
+	to be convinced that Lout should encourage this strange thing.
 
 Jeff Kingston

@@ -534,14 +534,6 @@ lgraphdict begin
   0 xticklength neg rlineto [] 0 setdash stroke
 } def
 
-% printxgrid: print one x grid line
-% xpos printxgrid -
-/printxgrid
-{ dup newpath
-  yleft trpoint moveto 0 yextra neg rmoveto
-  yright trpoint lineto 0 yextra rlineto [] 0 setdash stroke
-} def
-
 % printxlabel: print one x label
 % (xlabel) xpos printxlabel -
 /printxlabel
@@ -557,14 +549,6 @@ lgraphdict begin
 { newpath
   xleft exch trpoint moveto xextra neg 0 rmoveto
   yticklength neg 0 rlineto [] 0 setdash stroke
-} def
-
-% printygrid: print one y grid line
-% ypos printygrid -
-/printygrid
-{ dup newpath
-  xleft exch trpoint moveto xextra neg 0 rmoveto
-  xright exch trpoint lineto xextra 0 rlineto [] 0 setdash stroke
 } def
 
 % printylabel: print one y label
@@ -838,15 +822,6 @@ lgraphdict begin
   0 ysize lineto closepath stroke
   /printxtick /printxlabel xticks xleft printticks
   /printytick /printylabel yticks ymin printticks
-  /printrtick /printrlabel rticks ymin printticks
-} def
-
-% gridstyle: print a frame around the graph, plus a grid
-/gridstyle
-{ 0 0 moveto xsize 0 lineto xsize ysize lineto
-  0 ysize lineto closepath stroke
-  /printxgrid /printxlabel xticks xleft printticks
-  /printygrid /printylabel yticks ymin printticks
   /printrtick /printrlabel rticks ymin printticks
 } def
 

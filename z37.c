@@ -1,7 +1,7 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -898,7 +898,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 
 	      /* check that ch1 is contiguous with previous occurrences */
 	      if( ch1 != last_ch1 && kt[ch1] != 0 )
-	      { Error(37, 35, "non-contiguous kerning pair %s %s in font file %s (line %d)",
+	      { Error(37, 35, "ignoring out-of-order kerning pair %s %s in font file %s (line %d)",
 		  WARN, &fpos(AFMfilename), name1, name2, FileName(fnum), lnum);
 		continue;
 	      }
@@ -1067,9 +1067,9 @@ void FontChange(STYLE *style, OBJECT x)
 
   /***************************************************************************/
   /*                                                                         */
-  /*  Analyse x, doing any small-caps and baselinemark changes immediately,  */
-  /*  and putting all the other words of x into par[0 .. num-1] for further  */
-  /*  analysis.                                                              */
+  /*  Analyse x, doing any small-caps, baselinemark and ligatures changes    */
+  /*  immediately, and putting all the other words of x into par[0 .. num-1] */
+  /*  for further analysis.                                                  */
   /*                                                                         */
   /***************************************************************************/
 
@@ -1093,6 +1093,10 @@ void FontChange(STYLE *style, OBJECT x)
         baselinemark(*style) = TRUE;
       else if( StringEqual(string(x), STR_XHEIGHT2_MARK) )
         baselinemark(*style) = FALSE;
+      else if( StringEqual(string(x), STR_LIG) )
+        ligatures(*style) = TRUE;
+      else if( StringEqual(string(x), STR_NOLIG) )
+        ligatures(*style) = FALSE;
       else if( StringEqual(string(x), STR_SMALL_CAPS_SET) )
         Error(37, 65, "%s in left parameter of %s must be followed by a value",
           WARN, &fpos(x), STR_SMALL_CAPS_SET, KW_FONT);
@@ -1117,6 +1121,10 @@ void FontChange(STYLE *style, OBJECT x)
 	    baselinemark(*style) = TRUE;
 	  else if( StringEqual(string(y), STR_XHEIGHT2_MARK) )
 	    baselinemark(*style) = FALSE;
+	  else if( StringEqual(string(y), STR_LIG) )
+	    ligatures(*style) = TRUE;
+	  else if( StringEqual(string(y), STR_NOLIG) )
+	    ligatures(*style) = FALSE;
 	  else if( StringEqual(string(y), STR_SMALL_CAPS_SET) )
 	  {
 	    if( NextDown(link) == x || NextDown(NextDown(link)) == x )
@@ -1479,27 +1487,69 @@ void FontChange(STYLE *style, OBJECT x)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  KernLength(fnum, ch1, ch2, res)                                          */
+/*  FULL_LENGTH FontKernLength(FONT_NUM fnum, FULL_CHAR *unacc_map,          */
+/*    FULL_CHAR ch1, FULL_CHAR ch2)                                          */
 /*                                                                           */
 /*  Set res to the kern length between ch1 and ch2 in font fnum, or 0 if     */
-/*  none.  Actually we first convert ch1 and ch2 to corresponding unaccented */
-/*  characters, because metrics files don't seem to contain kerning pairs    */
-/*  for accented characters.                                                 */
+/*  none.                                                                    */
+/*                                                                           */
+/*  Parameter unacc_map is the mapping from characters to their unaccented   */
+/*  versions.  If no kerning data is available for ch1 and ch2, then their   */
+/*  unaccented versions are used instead.                                    */
 /*                                                                           */
 /*****************************************************************************/
 
-#define KernLength(fnum, mp, ch1, ch2, res)				\
-{ int ua_ch1 = mp[ch1];							\
-  int ua_ch2 = mp[ch2];							\
-  int i = finfo[fnum].kern_table[ua_ch1], j;				\
-  if( i == 0 )  res = 0;						\
-  else									\
-  { FULL_CHAR *kc = finfo[fnum].kern_chars;				\
-    for( j = i;  kc[j] > ua_ch2;  j++ );				\
-    res = (kc[j] == ua_ch2) ?						\
-      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;		\
-  }									\
-} /* end KernLength */
+/* *** old version which just used the unaccented characters 
+FULL_LENGTH FontKernLength(FONT_NUM fnum, FULL_CHAR *unacc_map,
+  FULL_CHAR ch1, FULL_CHAR ch2)
+{
+  FULL_LENGTH res;  int ua_ch1, ua_ch2, i, j;
+  ua_ch1 = unacc_map[ch1];
+  ua_ch2 = unacc_map[ch2];
+  i = finfo[fnum].kern_table[ua_ch1];
+  if( i == 0 )  res = 0;
+  else
+  { FULL_CHAR *kc = finfo[fnum].kern_chars;
+    for( j = i;  kc[j] > ua_ch2;  j++ );
+    res = (kc[j] == ua_ch2) ?
+      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;
+  }
+  return res;
+}
+*** */
+
+FULL_LENGTH FontKernLength(FONT_NUM fnum, FULL_CHAR *unacc_map,
+  FULL_CHAR ch1, FULL_CHAR ch2)
+{
+  int ua_ch1, ua_ch2, i, j;
+  FULL_CHAR *kc = finfo[fnum].kern_chars;
+
+  /* search for a kern pair of the original characters */
+  i = finfo[fnum].kern_table[ch1];
+  if( i > 0 )
+  {
+    for( j = i;  kc[j] > ch2;  j++ );
+    if( kc[j] == ch2 )
+      return finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]];
+  }
+
+  /* no luck, so search for a kern pair of their unaccented versions */
+  ua_ch1 = unacc_map[ch1];
+  ua_ch2 = unacc_map[ch2];
+  if( ua_ch1 != ch1 || ua_ch2 != ch2 )
+  {
+    i = finfo[fnum].kern_table[ua_ch1];
+    if( i > 0 )
+    {
+      for( j = i;  kc[j] > ua_ch2;  j++ );
+      if( kc[j] == ua_ch2 )
+	return finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]];
+    }
+  }
+
+  /* no luck again, so return 0 */
+  return 0;
+} /* end FontKernLength */
 
 
 /*@::FontWordSize()@**********************************************************/
@@ -1563,7 +1613,7 @@ void FontWordSize(OBJECT x)
 	  }
 	  Dispose(tmp);
 	}
-	else
+	else if( word_ligatures(x) )
 	{
 	  debug1(DFT, D, "  processing ligature beginning at %c", *q);
 	  a = &lig[ lig[*(p-1)] + MAX_CHARS ];
@@ -1581,6 +1631,8 @@ void FontWordSize(OBJECT x)
 	    }
 	  }
 	}
+	else
+	  debug1(DFT, D, "  ignoring ligature beginning at %c", *q);
       }
 
       /* accumulate size of *q */
@@ -1595,8 +1647,8 @@ void FontWordSize(OBJECT x)
 
     /* add kern lengths to r */
     for( p = buff, q = p+1;  *q;  p++, q++ )
-    { KernLength(word_font(x), unacc, *p, *q, ksize);
-      debugcond3(DFT, D, ksize != 0, "  KernLength(fnum, %c, %c) = %d",
+    { ksize = FontKernLength(word_font(x), unacc, *p, *q);
+      debugcond3(DFT, D, ksize != 0, "  FontKernLength(fnum, %c, %c) = %d",
 	*p, *q, ksize);
       r += ksize;
     }

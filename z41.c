@@ -1,7 +1,7 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -497,6 +497,8 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case HIGH:		name = KW_HIGH;		goto SETC;
     case HSHIFT:	name = KW_HSHIFT;	goto SETC;
     case VSHIFT:	name = KW_VSHIFT;	goto SETC;
+    case HMIRROR:	name = KW_HMIRROR;	goto SETC;
+    case VMIRROR:	name = KW_VMIRROR;	goto SETC;
     case HSCALE:	name = KW_HSCALE;	goto SETC;
     case VSCALE:	name = KW_VSCALE;	goto SETC;
     case HCOVER:	name = KW_HCOVER;	goto SETC;

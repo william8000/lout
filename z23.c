@@ -1,7 +1,7 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -385,6 +385,52 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       {	y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
 	      actual_back, actual_fwd);
       }
+      break;
+
+
+    case HMIRROR:
+
+      if( BackEnd->mirror_avail )
+      {
+	CountChild(y, Down(x), count);
+	if( dim == COLM )
+	{
+	  save_mark(x) = xmk;
+	  y = FixAndPrintObject(y, 0, back(y, COLM), fwd(y, COLM), dim,
+	    NO_SUPPRESS, pg, count, &aback, &afwd);
+	}
+	else
+	{ BackEnd->SaveGraphicState(y);
+	  BackEnd->CoordTranslate(save_mark(x), pg - xmk);
+	  BackEnd->CoordHMirror();
+	  y = FixAndPrintObject(y, 0, back(y, ROWM), fwd(y, ROWM), dim,
+	    NO_SUPPRESS, 0, count, &aback, &afwd);
+	  BackEnd->RestoreGraphicState();
+	}
+      }
+      *actual_back = xb;  *actual_fwd = xf;
+      break;
+
+
+    case VMIRROR:
+
+      debug0(DRS, DD, "FixAndPrintObject at VMIRROR");
+      if( BackEnd->mirror_avail )
+      {
+	CountChild(y, Down(x), count);
+	if( dim == COLM )
+	  y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
+		&aback, &afwd);
+	else
+	{ BackEnd->SaveGraphicState(y);
+	  BackEnd->CoordTranslate(0, pg - xmk);
+	  BackEnd->CoordVMirror();
+	  y = FixAndPrintObject(y, 0, back(y, ROWM), fwd(y, ROWM), dim,
+	    NO_SUPPRESS, 0, count, &aback, &afwd);
+	  BackEnd->RestoreGraphicState();
+	}
+      }
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 

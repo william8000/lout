@@ -1,7 +1,7 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -246,6 +246,8 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case HIGH:
     case HSHIFT:
     case VSHIFT:
+    case HMIRROR:
+    case VMIRROR:
     case HSCALE:
     case VSCALE:
     case HCOVER:
@@ -389,7 +391,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 
 OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
 { OBJECT link, y, g, res;
-  debug2(DOS, DDD, "InsertObject(%s, %s)", EchoObject(x), EchoObject(*ins));
+  debug2(DOS, D, "InsertObject(%s, %s)", EchoObject(x), EchoObject(*ins));
   switch( type(x) )
   {
     case WORD:
@@ -449,6 +451,8 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
     case VLIMITED:
     case HEXPAND:
     case VEXPAND:
+    case HMIRROR:
+    case VMIRROR:
     case HSCALE:
     case VSCALE:
     case HCOVER:
@@ -498,7 +502,7 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
       break;
 
   }
-  debug2(DOS, DDD, "InsertObject returning (%s) %s",
+  debug2(DOS, D, "InsertObject returning (%s) %s",
     *ins == nilobj ? "success" : "failure", EchoObject(res));
   return res;
 } /* end InsertObject */
@@ -797,6 +801,8 @@ BOOLEAN EqualManifested(OBJECT x, OBJECT y)
     case ACAT:
     case HCAT:
     case VCAT:
+    case HMIRROR:
+    case VMIRROR:
     case HSCALE:
     case VSCALE:
     case BEGIN_HEADER:

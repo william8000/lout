@@ -1,7 +1,7 @@
 /*@z46.c:Optimal Galleys:FindOptimize()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -247,6 +247,7 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
     word_outline(tmp) = FALSE;
     word_language(tmp) = word_hyph(tmp) = 0;
     word_baselinemark(tmp) = FALSE;
+    word_ligatures(tmp) = TRUE;
     Link(opt_components(hd), tmp);
 
     /* finally we add &1c */

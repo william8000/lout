@@ -65,6 +65,13 @@ won't want it in the same directory as any one of them.  A Unix
 pathname will be more appropriate:
 @ID @Code "@Database @Reference { \"/usr/jeff/lib/refs\" }"
 or whatever.  Quotes are needed because of the @Code "/" characters.
+A separate directory is probably safest anyway, since Lout creates
+files ending in @Code ".ld" in the document directory when sorting out
+cross references (Section {@NumberOf cross}), and clearing these out
+using the Unix command
+@ID @Code "rm lout.li *.ld"
+will destroy your valuable database file if it is kept in the same
+directory.
 @PP
 With the database file created and the @Code "@Database" line in place,
 you are ready to start citing references.  The first time that the

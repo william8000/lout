@@ -33,6 +33,10 @@ def @BookSetup
     named @IndexBWord			{  index			}
     named @ColophonWord			{  colophon			}
 
+    named @SubPrefaceNumbers		{  None				}
+    named @FirstSubPrefaceNumber	{  1				}
+    named @SubIntroductionNumbers	{  None				}
+    named @FirstSubIntroductionNumber	{  1				}
     named @ChapterNumbers		{  Arabic			}
     named @FirstChapterNumber		{  1				}
     named @SectionNumbers		{  Arabic			}
@@ -56,6 +60,16 @@ def @BookSetup
     named @ChapterHeadingFont		{  Bold 2.00f			}
     named @ChapterHeadingBreak		{  ragged 1.2fx nohyphen   	}
     named @ChapterHeadingFormat
+	left number right title		{  number @DotSep title    	}
+
+    named @SubPrefaceHeadingFont	{  Bold				}
+    named @SubPrefaceHeadingBreak	{  ragged 1.2fx nohyphen	}
+    named @SubPrefaceHeadingFormat
+	left number right title		{  number @DotSep title    	}
+
+    named @SubIntroductionHeadingFont	{  Bold				}
+    named @SubIntroductionHeadingBreak	{  ragged 1.2fx nohyphen	}
+    named @SubIntroductionHeadingFormat
 	left number right title		{  number @DotSep title    	}
 
     named @SectionHeadingFont		{  Bold				}
@@ -90,6 +104,8 @@ def @BookSetup
 
     named @AbovePartGap			{  4.00f			}
     named @AboveChapterGap		{  3.00f			}
+    named @SubPrefaceGap		{  2.0v  @OrIfPlain 3f		}
+    named @SubIntroductionGap		{  2.0v  @OrIfPlain 3f		}
     named @SectionGap			{  2.0v  @OrIfPlain 3f		}
     named @SubSectionGap		{  1.5v  @OrIfPlain 2f		}
     named @SubSubSectionGap		{  1.5v  @OrIfPlain 2f		}
@@ -97,8 +113,10 @@ def @BookSetup
     named @SubSubAppendixGap		{  1.5v  @OrIfPlain 2f		}
 
     named @PrefaceInContents		{  Yes 				}
+    named @SubPrefaceInContents		{  No 				}
     named @AbbreviationsInContents	{  Yes				}
     named @IntroductionInContents	{  Yes				}
+    named @SubIntroductionInContents	{  No				}
     named @PartInContents		{  Yes				}
     named @ChapterInContents		{  Yes				}
     named @SectionInContents		{  Yes				}
@@ -115,6 +133,8 @@ def @BookSetup
     named @ColophonInContents		{  Yes				}
     named @PartContentsIndent		{  0.5rt			}
 
+    named @SubPrefaceNumInTheorems	{  No				}
+    named @SubIntroductionNumInTheorems	{  No				}
     named @ChapterNumInTheorems		{  Yes				}
     named @SectionNumInTheorems		{  No				}
     named @SubSectionNumInTheorems	{  No				}
@@ -123,6 +143,8 @@ def @BookSetup
     named @SubAppendixNumInTheorems	{  No				}
     named @SubSubAppendixNumInTheorems	{  No				}
 
+    named @SubPrefaceNumInDisplays	{  No				}
+    named @SubIntroductionNumInDisplays	{  No				}
     named @ChapterNumInDisplays		{  Yes				}
     named @SectionNumInDisplays		{  Yes				}
     named @SubSectionNumInDisplays	{  No				}
@@ -131,6 +153,8 @@ def @BookSetup
     named @SubAppendixNumInDisplays	{  Yes				}
     named @SubSubAppendixNumInDisplays	{  No				}
 
+    named @SubPrefaceNumInFigures	{  No				}
+    named @SubIntroductionNumInFigures	{  No				}
     named @ChapterNumInFigures		{  Yes				}
     named @SectionNumInFigures		{  No				}
     named @SubSectionNumInFigures	{  No				}
@@ -139,6 +163,8 @@ def @BookSetup
     named @SubAppendixNumInFigures	{  No				}
     named @SubSubAppendixNumInFigures	{  No				}
 
+    named @SubPrefaceNumInTables	{  No				}
+    named @SubIntroductionNumInTables	{  No				}
     named @ChapterNumInTables		{  Yes				}
     named @SectionNumInTables		{  No				}
     named @SubSectionNumInTables	{  No				}
@@ -147,6 +173,8 @@ def @BookSetup
     named @SubAppendixNumInTables	{  No				}
     named @SubSubAppendixNumInTables	{  No				}
 
+    named @SubPrefaceNumInRunners	{  No				}
+    named @SubIntroductionNumInRunners	{  No				}
     named @SectionNumInRunners		{  Yes				}
     named @SubSectionNumInRunners	{  No				}
     named @SubSubSectionNumInRunners	{  No				}
@@ -181,6 +209,20 @@ def @BookSetup
     {
 	    @Galley
         //  @ChapterList @Next num
+    }
+
+    export num
+    def @SubPrefaceList named @Tag {} right num
+    {
+	@Galley
+        //@SubPrefaceGap	@SubPrefaceList @Next num
+    }
+
+    export num
+    def @SubIntroductionList named @Tag {} right num
+    {
+	@Galley
+        //@SubIntroductionGap	@SubIntroductionList @Next num
     }
 
     export num
@@ -797,6 +839,7 @@ def @BookSetup
     #                                                                     #
     #######################################################################
 
+    export @BeginSubPrefaces @EndSubPrefaces @SubPreface
     def @Preface force into { @PrefacePlace&&preceding }
         named @Tag {}
         named @Title { preface @WordVal @PrefaceWord }
@@ -804,6 +847,60 @@ def @BookSetup
 	named @InitialLanguage {}
         body @Body
     {
+        def @EndSubPrefacesPlace { @Galley }
+
+        def @EndSubPrefaces force into { @EndSubPrefacesPlace&&preceding }
+	{}
+
+        macro @BeginSubPrefaces
+	{   //@SubPrefaceGap @SubPrefaceList @FirstSubPrefaceNumber
+	    // @EndSubPrefacesPlace //
+	}
+
+        def @SubPreface force into { @SubPrefaceList&&preceding }
+            named @Tag {}
+            named @Title {}
+            named @RunningTitle { dft }
+	    named @InitialLanguage { @InitialLanguage }
+	    named @BypassNumber { dft }
+            body @Body
+        {
+
+	    def @SubPrefaceShortNum
+	    {
+		@SubPrefaceNumbers @Then {
+		    @BypassNumber @Dft {
+			@SubPrefaceNumbers @Num
+			{ @SectionList&&@Tag @Open { num } }
+		    }
+		}
+	    }
+
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Minor }
+		initiallanguage { @InitialLanguage }
+		title { @Title }
+		runningtitle { @RunningTitle }
+		headingfont { @SubPrefaceHeadingFont }
+		headingbreak { @SubPrefaceHeadingBreak }
+		headingformat { @Num @SubPrefaceHeadingFormat @Body }
+		incontents { @SubPrefaceInContents }
+		contentsindent { 3f }
+		numbers { @SubPrefaceNumbers }
+		attachnum { @SubPrefaceList&&preceding @Tagged @Tag }
+		retrievenum { @SubPrefaceList&&@Tag @Open { num } }
+		bypassnumber { @BypassNumber }
+		prefix { @Null }
+		majornum { @Null }
+		majortitle { @Null }
+		intheorems { @SubPrefaceNumInTheorems }
+		indisplays { @SubPrefaceNumInDisplays }
+		infigures { @SubPrefaceNumInFigures }
+		intables { @SubPrefaceNumInTables }
+		inrunners { @SubPrefaceNumInRunners }
+		@Body
+        }
 
 	@LargeScaleStructure
 	    tag { @Tag }
@@ -865,6 +962,7 @@ def @BookSetup
     #                                                                     #
     #######################################################################
 
+    export @BeginSubIntroductions @EndSubIntroductions @SubIntroduction
     def @Introduction force into { @IntroductionPlace&&preceding }
         named @Tag {}
         named @Title { introduction @WordVal @IntroductionWord }
@@ -872,6 +970,61 @@ def @BookSetup
 	named @InitialLanguage {}
         body @Body
     {
+
+        def @EndSubIntroductionsPlace { @Galley }
+
+        def @EndSubIntroductions force into { @EndSubIntroductionsPlace&&preceding }
+	{}
+
+        macro @BeginSubIntroductions
+	{   //@SubIntroductionGap @SubIntroductionList @FirstSubIntroductionNumber
+	    // @EndSubIntroductionsPlace //
+	}
+
+        def @SubIntroduction force into { @SubIntroductionList&&preceding }
+            named @Tag {}
+            named @Title {}
+            named @RunningTitle { dft }
+	    named @InitialLanguage { @InitialLanguage }
+	    named @BypassNumber { dft }
+            body @Body
+        {
+
+	    def @SubIntroductionShortNum
+	    {
+		@SubIntroductionNumbers @Then {
+		    @BypassNumber @Dft {
+			@SubIntroductionNumbers @Num
+			{ @SectionList&&@Tag @Open { num } }
+		    }
+		}
+	    }
+
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Minor }
+		initiallanguage { @InitialLanguage }
+		title { @Title }
+		runningtitle { @RunningTitle }
+		headingfont { @SubIntroductionHeadingFont }
+		headingbreak { @SubIntroductionHeadingBreak }
+		headingformat { @Num @SubIntroductionHeadingFormat @Body }
+		incontents { @SubIntroductionInContents }
+		contentsindent { 3f }
+		numbers { @SubIntroductionNumbers }
+		attachnum { @SubIntroductionList&&preceding @Tagged @Tag }
+		retrievenum { @SubIntroductionList&&@Tag @Open { num } }
+		bypassnumber { @BypassNumber }
+		prefix { @Null }
+		majornum { @Null }
+		majortitle { @Null }
+		intheorems { @SubIntroductionNumInTheorems }
+		indisplays { @SubIntroductionNumInDisplays }
+		infigures { @SubIntroductionNumInFigures }
+		intables { @SubIntroductionNumInTables }
+		inrunners { @SubIntroductionNumInRunners }
+		@Body
+        }
 
 	@LargeScaleStructure
 	    tag { @Tag }
@@ -889,7 +1042,6 @@ def @BookSetup
 	    innergap { @SectionGap }
 	    inrunners { Yes }
 	    @Body
-
     }
 
 

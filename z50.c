@@ -1,7 +1,7 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -250,30 +250,6 @@ static void PDF_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v,
 
 /*****************************************************************************/
 /*                                                                           */
-/*  KernLength(fnum, ch1, ch2, res)                                          */
-/*                                                                           */
-/*  Set res to the kern length between ch1 and ch2 in font fnum, or 0 if     */
-/*  none.                                                                    */
-/*                                                                           */
-/*****************************************************************************/
-
-#define KernLength(fnum, mp, ch1, ch2, res)				\
-{ int ua_ch1 = mp[ch1];							\
-  int ua_ch2 = mp[ch2];							\
-  int i, j;								\
-  i = finfo[fnum].kern_table[ua_ch1], j;				\
-  if( i == 0 )  res = 0;						\
-  else									\
-  { FULL_CHAR *kc = finfo[fnum].kern_chars;				\
-    for( j = i;  kc[j] > ua_ch2;  j++ );				\
-    res = (kc[j] == ua_ch2) ?						\
-      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;		\
-  }									\
-} /* end KernLength */
-
-
-/*****************************************************************************/
-/*                                                                           */
 /*  static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)     */
 /*                                                                           */
 /*  This routine is unused in this module because it is the PostScript       */
@@ -384,7 +360,7 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
     /* check for missing glyph (lig[] == 1) or ligatures (lig[] > 1) */
     if( lig[*q++ = *p++] )
     {
-      if( lig[*(q-1)] == 1 ) continue;
+      if( lig[*(q-1)] == 1 || !word_ligatures(x) ) continue;
       else
       {	a = &lig[ lig[*(p-1)] + MAX_CHARS ];
 	while( *a++ == *(p-1) )
@@ -453,10 +429,10 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
   {
     /* *** this seems right but is actually wrong for PDF,
     which according to Uwe uses original units for kerning
-    KernLength(word_font(x), unacc, *(p-1), *p, ksize);
+    ksize = FontKernLength(word_font(x), unacc, *(p-1), *p);
     *** */
-    KernLength(font_num(finfo[word_font(x)].original_face),
-      unacc, *(p-1), *p, ksize);
+    ksize = FontKernLength(font_num(finfo[word_font(x)].original_face),
+      unacc, *(p-1), *p);
     if ( ksize != 0 )
     {
       PDFText_Kern(out_fp, ksize);
@@ -901,6 +877,7 @@ static struct back_end_rec pdf_back = {
   STR_PDF,				/* string name of the back end       */
   TRUE,					/* TRUE if @Scale is available       */
   TRUE,					/* TRUE if @Rotate is available      */
+  FALSE,				/* TRUE if @VMirror, @HMirror avail. */
   TRUE,					/* TRUE if @Graphic is available     */
   TRUE,					/* TRUE if @IncludeGraphic is avail. */
   FALSE,				/* TRUE if @PlainGraphic is avail.   */
@@ -921,6 +898,8 @@ static struct back_end_rec pdf_back = {
   PDF_CoordTranslate,
   PDF_CoordRotate,
   PDF_CoordScale,
+  NULL,
+  NULL,
   PDF_SaveGraphicState,
   PDF_RestoreGraphicState,
   PDF_PrintGraphicObject,

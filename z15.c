@@ -1,7 +1,7 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -502,6 +502,19 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
       break;
 
 
+    case HMIRROR:
+    case VMIRROR:
+    
+      if( (dim == COLM) == (type(y) == HMIRROR) )
+      {
+        Constrained(y, &yc, dim, why);
+	FlipConstraint(*xc, yc);
+      }
+      else
+        Constrained(y, xc, dim, why);
+      break;
+
+
     case HSCALE:
     case VSCALE:
     
@@ -812,6 +825,8 @@ void DebugConstrained(OBJECT x)
     case VLIMITED:
     case HEXPAND:
     case VEXPAND:
+    case HMIRROR:
+    case VMIRROR:
     case HSCALE:
     case VSCALE:
     case HCOVER:

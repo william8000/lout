@@ -1,7 +1,7 @@
 /*@z51.c:Plain Text Back End:Plain_BackEnd@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -630,6 +630,7 @@ static struct back_end_rec plain_back = {
   STR_PLAINTEXT,			/* string name of the back end       */
   FALSE,				/* TRUE if @Scale is available       */
   FALSE,				/* TRUE if @Rotate is available      */
+  FALSE,				/* TRUE if @VMirror, @HMirror avail  */
   FALSE,				/* TRUE if @Graphic is available     */
   FALSE,				/* TRUE if @IncludeGraphic is avail. */
   TRUE,					/* TRUE if @PlainGraphic is avail.   */
@@ -650,6 +651,8 @@ static struct back_end_rec plain_back = {
   Plain_CoordTranslate,
   Plain_CoordRotate,
   Plain_CoordScale,
+  NULL,
+  NULL,
   Plain_SaveGraphicState,
   Plain_RestoreGraphicState,
   Plain_PrintGraphicObject,

@@ -41,6 +41,7 @@
    def @@HContract            { @Code "@HContract"            }
    def @@HExpand              { @Code "@HExpand"              }
    def @@HLimited             { @Code "@HLimited"             }
+   def @@HMirror              { @Code "@HMirror"              }
    def @@High                 { @Code "@High"                 }
    def @@HScale               { @Code "@HScale"               }
    def @@HShift               { @Code "@HShift"               }
@@ -102,6 +103,7 @@
    def @@VExpand              { @Code "@VExpand"              }
    def @@Verbatim             { @Code "@Verbatim"             }
    def @@VLimited             { @Code "@VLimited"             }
+   def @@VMirror              { @Code "@VMirror"              }
    def @@VScale               { @Code "@VScale"               }
    def @@VShift               { @Code "@VShift"               }
    def @@VSpan                { @Code "@VSpan"                }

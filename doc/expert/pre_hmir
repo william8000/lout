@@ -1,0 +1,30 @@
+@Section
+   @Title { "@HMirror" and "@VMirror" }
+   @Tag { hmirror }
+@Begin
+@PP
+hmirro. @Index { @@HMirror symbol }
+vmirro. @Index { @@VMirror symbol }
+mirroring @Index { Mirroring an object }
+reflecting @Index { Reflecting an object }
+@@HMirror and @@VMirror cause their right parameter to be reflected,
+either horizontally or vertically.  For example,
+@ID @Code {
+"@HMirror AMBULANCE"
+}
+has result
+@ID @HMirror AMBULANCE
+and
+@ID @Code {
+"@VMirror AMBULANCE"
+}
+has result
+@ID @VMirror AMBULANCE
+The parameters of these symbols may be arbitrary Lout objects as usual.
+Both symbols have both a @@OneCol and a @@OneRow effect.
+@PP
+In each case the reflection is about the mark of the object (that is,
+the reflected objects have the same marks as the originals), so that,
+for example, when used within a line of text the results are
+@HMirror AMBULANCE and @VMirror AMBULANCE respectively.
+@End @Section

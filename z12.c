@@ -1,7 +1,7 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
-/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
+/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -40,32 +40,6 @@
 static int debug_depth = 1;
 static int debug_depth_max = 7;
 #endif
-
-/*****************************************************************************/
-/*                                                                           */
-/*  KernLength(fnum, ch1, ch2, res)                                          */
-/*                                                                           */
-/*  Set res to the kern length between ch1 and ch2 in font fnum, or 0 if     */
-/*  none.                                                                    */
-/*                                                                           */
-/*****************************************************************************/
-
-static FULL_LENGTH KernLength(FONT_NUM fnum, FULL_CHAR ch1, FULL_CHAR ch2)
-{ FULL_LENGTH res;
-  MAPPING m         = font_mapping(finfo[fnum].font_table);
-  FULL_CHAR *unacc  = MapTable[m]->map[MAP_UNACCENTED];
-  int ua_ch1        = unacc[ch1];
-  int ua_ch2        = unacc[ch2];
-  int i = finfo[fnum].kern_table[ua_ch1], j;
-  if( i == 0 )  res = 0;
-  else
-  { FULL_CHAR *kc = finfo[fnum].kern_chars;
-    for( j = i;  kc[j] > ua_ch2;  j++ );
-    res = (kc[j] == ua_ch2) ?
-      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;
-  }
-  return res;
-} /* end KernLength */
 
 
 /*****************************************************************************/
@@ -732,6 +706,22 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       break;
 
 
+    case HMIRROR:
+    case VMIRROR:
+
+      Child(y, Down(x));
+      y = MinSize(y, dim, extras);
+      if( (dim == COLM) == (type(x) == HMIRROR) )
+      {	back(x, dim) = fwd(y, dim);
+	fwd(x, dim)  = back(y, dim);
+      }
+      else
+      {	back(x, dim) = back(y, dim);
+	fwd(x, dim)  = fwd(y, dim);
+      }
+      break;
+
+
     case HSCALE:
     case VSCALE:
 
@@ -821,8 +811,10 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	/* adjust if successful */
 	if( ch_left != (FULL_CHAR) '\0' && ch_right != (FULL_CHAR) '\0' )
 	{
-	  ksize = KernLength(word_font(y), ch_left, ch_right);
-	  debug4(DSF, DD, "  KernLength(%s, %c, %c) = %s",
+	  MAPPING m = font_mapping(finfo[word_font(y)].font_table);
+  	  FULL_CHAR *unacc = MapTable[m]->map[MAP_UNACCENTED];
+	  ksize = FontKernLength(word_font(y), unacc, ch_left, ch_right);
+	  debug4(DSF, DD, "  FontKernLength(%s, %c, %c) = %s",
 	    FontName(word_font(y)), (char) ch_left, (char) ch_right,
 	    EchoLength(ksize));
 	  fwd(x, dim) += ksize;
@@ -960,6 +952,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		word_outline(z) = outline(save_style(x));
 		word_language(z) = language(save_style(x));
 		word_baselinemark(z) = baselinemark(save_style(x));
+		word_ligatures(z) = ligatures(save_style(x));
 		word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
 		underline(z) = UNDER_OFF;
 		back(z, COLM) = fwd(z, COLM) = 0;
@@ -1051,6 +1044,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		    word_outline(prev) == word_outline(y) &&
 		    word_language(prev) == word_language(y) &&
 		    word_baselinemark(prev) == word_baselinemark(y) &&
+		    word_ligatures(prev) == word_ligatures(y) &&
 		    underline(prev) == underline(y) &&
 		    NextDown(NextDown(Up(prev))) == link
 		    )
@@ -1070,6 +1064,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		  word_outline(y) = word_outline(prev);
 		  word_language(y) = word_language(prev);
 		  word_baselinemark(y) = word_baselinemark(prev);
+		  word_ligatures(y) = word_ligatures(prev);
 		  word_hyph(y) = word_hyph(prev);
 		  underline(y) = underline(prev);
 		  FontWordSize(y);
