@@ -15,6 +15,8 @@
 /*  Perl and Pod by Jeff Kingston and Mark Summerfield                       */
 /*  Python by Mark Summerfield                                               */
 /*  Ruby by Michael Piotrowski                                               */
+/*  Haskell by Thorsten Seitz (Nov 2002)                                     */
+/*  RSL by Darren Bane (February 2003)                                       */
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
@@ -128,7 +130,7 @@
 /*  Feel free to email me for advice as you go along.                        */
 /*                                                                           */
 /*  Jeff Kingston                                                            */
-/*  jeff@cs.usyd.edu.au                                                      */
+/*  jeff@it.usyd.edu.au                                                      */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -224,22 +226,35 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t\f" G1_Characters ;
 
 unsigned char Letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ;
 
+unsigned char lowercaseLetters[] = "abcdefghijklmnopqrstuvwxyz" ;
+
+unsigned char uppercaseLetters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ;
+
 unsigned char Letter_Digit[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789" ;
 
-unsigned char NonpareilOperatorPunct[] = "!@$%^&*=+|;<>/?";
+unsigned char Letter_Digit_Quotes[] =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789`'" ;
+
+unsigned char HaskellOpCharacters[] = "!#$%&*+./<=>?^|:-~";
+
+unsigned char NonpareilOperatorPunct[] = "@$%^&*=+|;<>/?`";
 
 unsigned char Ruby_Methodname[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789?!=" ;
 
 
-#define SepLetters 							\
+#define UppercaseSepLetters 						\
 U "A", U "B", U "C", U "D", U "E", U "F", U "G", U "H", U "I", U "J",	\
 U "K", U "L", U "M", U "N", U "O", U "P", U "Q", U "R", U "S", U "T",	\
-U "U", U "V", U "W", U "X", U "Y", U "Z",				\
+U "U", U "V", U "W", U "X", U "Y", U "Z"
+
+#define LowercaseSepLetters 						\
 U "a", U "b", U "c", U "d", U "e", U "f", U "g", U "h", U "i", U "j",	\
 U "k", U "l", U "m", U "n", U "o", U "p", U "q", U "r", U "s", U "t",	\
 U "u", U "v", U "w", U "x", U "y", U "z"
+
+#define SepLetters UppercaseSepLetters, LowercaseSepLetters
 
 #define SepDigits							\
 U "0", U "1", U "2", U "3", U "4", U "5", U "6", U "7", U "8", U "9"
@@ -264,8 +279,16 @@ U ":", U ";", U "$", U "\"", U "^", U "&", U "*", U "-", U "=", U "+",	\
 U "~", U "'", U "@", U "?",  U ".", U "`"
 
 #define SepNonpareilOperatorPunct					\
-U "!", U "@", U "$", U "%",  U "^", U "&", U "*", U "=", U "+",	U "|",	\
-U ";", U "<", U ">",  U "/", U "?"
+U "@", U "$", U "%",  U "^", U "&", U "*", U "=", U "+", U "|",		\
+U ";", U "<", U ">",  U "/", U "?", U "`"
+
+#define HaskellOpChars 							\
+U "!", U "#", U "$", U "%", U "&", U "*", U "+", U ".", U "/",		\
+U "<", U "=", U ">", U "?", U "^", U "|", U ":", U "-", U "~"
+
+#define HaskellParenOpChars						\
+U "(!", U "(#", U "($", U "(%", U "(&", U "(*", U "(+", U "(.", U "(/",	\
+U "(<", U "(=", U "(>", U "(?", U "(^", U "(|", U "(:", U "(-", U "(~"
 
 #define	PercentLetters							\
 U "%A", U "%B", U "%C", U "%D", U "%E", U "%F", U "%G", U "%H", U "%I",	\
@@ -716,6 +739,50 @@ TOKEN PythonTriDblStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
+TOKEN HaskellStringToken = {
+  U "string",		/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { U "\"" },		/* strings begin with a " character                 */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintable,		/* inside, any printable except " is OK             */
+  U "\\",		/* within strings, \ is the escape character        */
+  AllPrintable,		/* after escape char, any printable char is OK      */ 
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "\"",		/* strings end with a " character                   */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN HaskellCharacterToken = {
+  U "character",	/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  U "@PC",		/* Lout command for formatting characters           */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { U "'" },		/* characters begin with a ' character              */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintable,		/* inside, any printable except ' is OK             */
+  U "\\",		/* within characters, \ is the escape character     */
+  AllPrintable,		/* after escape char, any printable char is OK      */
+  U "",			/* characters do not permit "inner escapes"         */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "'",		/* characters end with a ' character                */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
 
 
 
@@ -737,6 +804,28 @@ TOKEN IdentifierToken = {
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   Letter_Digit,		/* inside, letters, underscores, digits are OK      */
+  U "",			/* no escape character within identifiers           */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* identifiers do not permit "inner escapes"        */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* identifiers do not end with a delimiter          */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN HaskellIdentifierToken = {
+  U "identifier",	/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  U "@PI",		/* Lout command for formatting identifiers          */
+  U "@PK",		/* Alternate command (for keywords)                 */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { SepLetters, U "_", U "`" },	/* identifiers begin with any letter or _   */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  Letter_Digit_Quotes,	/* inside, letters, underscores, digits are OK      */
   U "",			/* no escape character within identifiers           */
   U "",			/* so nothing legal after escape char either        */
   U "",			/* identifiers do not permit "inner escapes"        */
@@ -806,6 +895,9 @@ TOKEN NumberToken = {
 
 TOKEN NonpareilOperatorToken =
   OperatorToken(SepNonpareilOperatorPunct, NonpareilOperatorPunct);
+
+TOKEN HaskellOperatorToken =
+  OperatorToken(HaskellOpChars, HaskellOpCharacters);
 
 
 /*****************************************************************************/
@@ -947,6 +1039,51 @@ TOKEN PythonCommentToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
+TOKEN HaskellLineCommentToken = {
+  U "line comment",	/* used by error messages involving this token      */
+  PRINT_NODELIMS_QUOTED,/* print this token in quotes without delimiters    */
+  U "@PCL",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { U "--" },		/* comments begin with this character pair          */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintablePlusTab,	/* inside, any printable char is OK                 */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "`",		/* start of "inner escape" in Haskell comment       */
+  U "'",		/* end of "inner escape" in Haskell comment         */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no ending delimiter; end of line will end it     */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN HaskellCommentToken = {
+  U "comment",		/* used by error messages involving this token      */
+  PRINT_NODELIMS_QUOTED,/* print this token in quotes without delimiters    */
+  U "@PC",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { U "{-" },		/* comments begin with this character pair          */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintableTabNLFF,	/* inside, any printable char, tab, nl, ff is OK    */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* C comments do not permit "inner escapes"         */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "-}",		/* comments end with this character pair            */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -1066,6 +1203,51 @@ TOKEN PythonCommentEscapeToken = {
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
+
+TOKEN HaskellCommentEscapeToken = {
+	U "Lout escape",
+	PRINT_NODELIMS_UNQUOTED,
+	U "",
+	U "",
+	U "",
+	FALSE,
+	{ U "{-@" },
+	{ NULL },
+	{ NULL },
+	{ NULL },
+	AllPrintablePlusTab,
+	U "",
+	U "",
+	U "",
+	U "",
+	U "",
+	U "-}",
+	FALSE,
+	FALSE,
+};
+
+TOKEN HaskellLineCommentEscapeToken = {
+  U "Lout escape",	/* used by error messages involving this token      */
+  PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
+  U "",			/* no Lout command since we are printing raw        */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { U "--@" },		/* escape comments begin with this delimiter        */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintablePlusTab,	/* inside, any printable char is OK                 */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* no "inner escape" in escape comments             */
+  U "",			/* so no end of "inner escape" either               */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no ending delimiter; end of line will end it     */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
 
 
 
@@ -1121,7 +1303,8 @@ TOKEN GreaterToken		= FixedToken(">",  "greater @A @PO");
 TOKEN QuestionToken		= FixedToken("?",  "@PO");
 TOKEN CommaToken		= FixedToken(",",  "@PO");
 TOKEN DotToken			= FixedToken(".",  "@PO");
-TOKEN DotDotToken		= FixedToken("..",  "@PO");
+TOKEN DotDotToken		= FixedToken("..", "@PO");
+TOKEN DotDotDotToken		= FixedToken("...","@PO");
 TOKEN LessEqualToken		= FixedToken("<=", "lessequal @A @PO");
 TOKEN GreaterEqualToken		= FixedToken(">=", "greaterequal @A @PO");
 TOKEN CNotEqualToken		= FixedToken("!=", "notequal @A @PO");
@@ -1130,7 +1313,21 @@ TOKEN BlueNotEqualToken		= FixedToken("<>", "notequal @A @PO");
 TOKEN AssignToken		= FixedToken(":=", "@PO");
 TOKEN QuestionAssignToken	= FixedToken("?=", "@PO");
 TOKEN DollarToken		= FixedToken("$",  "@PO");
-TOKEN ImpliesToken		= FixedToken("=>", "implies @A @PO");
+TOKEN ImpliesToken		= FixedToken("=>", "arrowdblright @A @PO");
+TOKEN LeftArrowToken		= FixedToken("<-", "arrowleft @A @PO");
+TOKEN HaskellLambdaToken	= FixedToken("\\", "@PLAMBDA");
+TOKEN DoubleColonToken		= FixedToken("::",  "@PDOUBLECOLON");
+TOKEN FunctionCompositionToken	= FixedToken(" . ",  "@PCIRC");
+TOKEN HaskellEquivalenceToken	= FixedToken("==",  "equivalence @A @PO");
+TOKEN HaskellConcatenationToken = FixedToken("++", "@PPLUSPLUS");
+TOKEN EqvToken			= FixedToken("<=>", "arrowdblboth @A @PO");
+TOKEN HaskellOrToken		= FixedToken("||", "@PO");
+TOKEN HaskellAndToken		= FixedToken("&&", "@PO");
+TOKEN HaskellBacktickToken	= FixedToken("`", "@PO");
+TOKEN PythonPowerToken          = FixedToken( "**",  "@PO" ) ;
+TOKEN PythonBitLeftShiftToken   = FixedToken( "<<",  "@PO" ) ;
+TOKEN PythonBitRightShiftToken  = FixedToken( ">>",  "@PO" ) ;
+TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" ) ;
 
 
 /*****************************************************************************/
@@ -1139,13 +1336,13 @@ TOKEN ImpliesToken		= FixedToken("=>", "implies @A @PO");
 /*                                                                           */
 /*****************************************************************************/
 
-#define NoParameterToken(str, command) /* define fixed-string token */	\
+#define NoParameterToken(str, command) /* fixed-string token */	\
 {									\
   U str,		/* name used for debugging only       */	\
   PRINT_COMMAND_ONLY,	/* print only the command             */	\
   U command,		/* Lout command for formatting this   */	\
   U "",			/* no alternate command               */	\
-  U "",			/* no following command               */	\
+  U "",			/* following command                  */	\
   FALSE,		/* token not just start of line       */	\
   { U str },		/* token begins (and ends!) with this */	\
   { NULL },		/* no start2 needed		      */	\
@@ -1163,10 +1360,8 @@ TOKEN ImpliesToken		= FixedToken("=>", "implies @A @PO");
 TOKEN StarToken			= NoParameterToken("*",  "{@PA}");
 TOKEN MinusToken		= NoParameterToken("-",  "{@PM}");
 TOKEN EiffelDotToken		= NoParameterToken(".",  "{@PD}");
-TOKEN PythonPowerToken          = FixedToken( "**",  "@PO" ) ;
-TOKEN PythonBitLeftShiftToken   = FixedToken( "<<",  "@PO" ) ;
-TOKEN PythonBitRightShiftToken  = FixedToken( ">>",  "@PO" ) ;
-TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" ) ;
+TOKEN NonpareilExclamationToken	= NoParameterToken("!",  "@PO{\"!\" &0.1f}");
+TOKEN HaskellColonToken		= NoParameterToken(":", "{@PCOLON}");
 
 
 /*****************************************************************************/
@@ -1221,6 +1416,73 @@ TOKEN RubyGenDelimStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
+
+/*****************************************************************************/
+/*                                                                           */
+/*  RSL Sepcifics                                                            */
+/*                                                                           */
+/*****************************************************************************/
+
+TOKEN RSLIdentifierToken = {
+  U "identifier",	/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  U "@PI",		/* Lout command for formatting identifiers          */
+  U "@PK",		/* Alternate command (for keywords)                 */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { SepLetters, U "_", U "`" }, /* identifiers begin with any letter or _   */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  Letter_Digit,		/* inside, letters, underscores, digits are OK      */
+  U "",			/* no escape character within identifiers           */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* identifiers do not permit "inner escapes"        */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* identifiers do not end with a delimiter          */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN RSLProductToken           = FixedToken( "><",  "multiply @A @PO" ) ;
+TOKEN RSLPartialMapToken        = FixedToken( "-~m->",  "@PartialMap @FA @PO" ) ;
+TOKEN RSLAndToken               = FixedToken( "/\\",  "logicaland @A @PO" ) ;
+TOKEN RSLAlwaysToken            = FixedToken( "always",  "@Eq { square } @FA @PO" ) ;
+TOKEN RSLIsInToken              = FixedToken( "isin",  "element @A @PO" ) ;
+TOKEN RSLSubsetToken            = FixedToken( "<<=",  "reflexsubset @A @PO" ) ;
+TOKEN RSLUnionToken             = FixedToken( "union", "union @A @PO" ) ;
+TOKEN RSLListStartToken         = FixedToken( "<.",  "angleleft @A @PO" ) ;
+TOKEN RSLParToken               = FixedToken( "@Eq { dbar } @FA @PO",  "@PO" ) ;
+TOKEN RSLIntChoiceToken         = FixedToken( "|^|",  "@IntChoice @FA @PO" ) ;
+TOKEN RSLTurnstileToken         = FixedToken( "|-",  "@Eq { vdash } @FA @PO" ) ;
+TOKEN RSLListToken              = NoParameterToken( "-list",  "{*}" ) ;
+TOKEN RSLPartialFnToken         = FixedToken( "-~->",  "@PartialFn @FA @PO" ) ;
+TOKEN RSLRelationToken          = FixedToken( "<->",  "arrowboth @A @PO" ) ;
+TOKEN RSLOrToken                = FixedToken( "\\/",  "logicalor @A @PO" ) ;
+TOKEN RSLNotIsInToken           = FixedToken( "~isin",  "notelement @A @PO" ) ;
+TOKEN RSLProperSupersetToken	= FixedToken( ">>",  "propersuperset @A @PO" ) ;
+TOKEN RSLInterToken             = FixedToken( "inter",  "intersection @A @PO" ) ;
+TOKEN RSLListEndToken           = FixedToken( ".>",  "angleright @A @PO" ) ;
+TOKEN RSLInterlockToken         = FixedToken( "++",  "@Interlock @FA @PO" ) ;
+TOKEN RSLLambdaToken            = FixedToken( "-\\",  "lambda @A @PO" ) ;
+TOKEN RSLImplementsRelToken     = FixedToken( "{=",  "@Eq { preceq } @FA @PO" ) ;
+TOKEN RSLInfListToken           = FixedToken( "-inflist",  "@InfList @FA @PO" ) ;
+TOKEN RSLMapToken               = FixedToken( "-m->",  "@Map @FA @PO" ) ;
+TOKEN RSLSTToken                = FixedToken( ":-",  "dotmath @A @PO" ) ;
+TOKEN RSLNotEqualToken          = FixedToken( "~=",  "notequal @A @PO" ) ;
+TOKEN RSLPowerToken             = FixedToken( "**",  "arrowup @A @PO" ) ;
+TOKEN RSLProperSubsetToken      = FixedToken( "<<",  "propersubset @A @PO" ) ;
+TOKEN RSLSupersetToken          = FixedToken( ">>=",  "reflexsuperset @A @PO" ) ;
+TOKEN RSLOverrideToken          = FixedToken( "!!",  "@Dagger @FA @PO" ) ;
+TOKEN RSLMapletToken            = FixedToken( "+>",  "@Eq { mapsto } @FA @PO" ) ;
+TOKEN RSLExtChoiceToken         = FixedToken( "|=|",  "@ExtChoice @FA @PO" ) ;
+TOKEN RSLApplyToken             = FixedToken( "#",  "degree @A @PO" ) ;
+TOKEN RSLImplementsExprToken    = FixedToken( "[=",  "@Eq { sqsubseteq } @FA @PO" ) ;
+TOKEN RSLPrimeToken             = NoParameterToken( "'", "{'}" ) ;
+TOKEN RSLExistsOneToken         = FixedToken( "exists!",  "{@Sym existential}! @FA @PO" );
+
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -1421,7 +1683,7 @@ TOKEN PerlSTypeStringToken = {
 }
 
 
-TOKEN PerlRegExpLPar    = PerlREToken("(",      "@PO{\"(\"} @PS{\"/\"}@PS");
+TOKEN PerlRegExpLPar    = PerlREToken("(",      "@PO{\"(\"}@PS{\"/\"}@PS");
 TOKEN PerlRegExpEq      = PerlREToken("=",      "@PO{\"=\"} @PS{\"/\"}@PS");
 TOKEN PerlRegExpMatch   = PerlREToken("=~",     "@PO{\"=~\"} @PS{\"/\"}@PS");
 TOKEN PerlRegExpNoMatch = PerlREToken("!~",     "@PO{\"!~\"} @PS{\"/\"}@PS");
@@ -2695,9 +2957,7 @@ LANGUAGE RubyLanguage = {
   NO_MATCH_ERROR,
   {
     &BackSlashToken,
-    /* &PerlRegExpLPar, */ /* This produces extra space between the paren and
-			      the slash */
-    &PerlRegExpEq, &PerlRegExpMatch, &PerlRegExpNoMatch,
+    &PerlRegExpLPar, &PerlRegExpEq, &PerlRegExpMatch, &PerlRegExpNoMatch,
     &PerlRegExpSplit, &PerlRegExpIf, &PerlRegExpAnd, &PerlRegExpAnd2,
     &PerlRegExpOr, &PerlRegExpOr2, &PerlRegExpXor, &PerlRegExpNot,
     &PerlRegExpNot2, &PerlRegExpUnless,
@@ -2826,30 +3086,121 @@ LANGUAGE NonpareilLanguage = {
   "nonpareil", "@Nonpareil",
   NO_MATCH_ERROR,
   {
-    &CStringToken, &IdentifierToken, &NumberToken,
+    &CStringToken, &CCharacterToken, &IdentifierToken, &NumberToken,
     &NonpareilCommentToken, &PythonCommentEscapeToken,
-    /* overlaps with NonpareilOperatorToken so omitted: &PlusToken, */
     &MinusToken,
+    &LeftBraceToken,
+    &RightBraceToken,
     &LeftBracketToken,
     &RightBracketToken,
     &CommaToken,
-    &ArrowToken,
     &ColonToken,
     &AssignToken,
     &LeftParenToken,
     &RightParenToken,
     &EiffelDotToken,
+    &NonpareilExclamationToken,
     &DotDotToken,
+    &DotDotDotToken,
     &NonpareilOperatorToken,
   },
   {
-    "cvt", "invariant", "pre", "noncreation", "postfix",
-    "and", "or", "not", "false", "true",
-    "class", "else", "elsif", "end", "extension", "if", "in", "infix",
-    "inherit", "inspect", "is", "let", "prefix", "private", "public",
-    "then", "when", "yield",
+    "builtin", "case", "class", "creation", "coerce", "else", "elsif", "end",
+    "extend", "extension", "false", "from", "fun", "if", "in", "infix",
+    "inherit", "introduce", "invariant", "is", "let", "local", "meet",
+    "module", "noncreation", "norename", "prefix", "private", "postfix",
+    "rename", "require", "self", "system", "then", "to", "true", "use",
+    "when", "yield",
+
+    /* not reserved words strictly speaking, but conventionally set like them */
+    "and", "or", "not"
   }
 };
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Haskell                                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+LANGUAGE HaskellLanguage = {
+  { "Haskell", "haskell" },
+  "haskell", "@Haskell",
+  NO_MATCH_ERROR,
+  {
+	/*&EqualToken, &PlusToken, &MinusToken, &DotToken,
+	  &StarToken, &HaskellColonToken, 
+	  &LessToken, &GreaterToken,
+	  these overlap with HaskellOperatorToken */
+    &HaskellStringToken, &HaskellCharacterToken,
+    &HaskellIdentifierToken, &NumberToken,
+    &HaskellLineCommentToken, &HaskellCommentToken, 
+    &HaskellCommentEscapeToken, &HaskellLineCommentEscapeToken,
+    &SemicolonToken, &CommaToken, &DoubleColonToken,
+    &HaskellEquivalenceToken, &FunctionCompositionToken,
+    &ArrowToken, &LeftArrowToken, &HaskellLambdaToken,
+    &LeftParenToken, &RightParenToken, &LeftBracketToken, &RightBracketToken,
+    &LeftBraceToken, &RightBraceToken, &EiffelNotEqualToken, &LessEqualToken,
+    &ImpliesToken, &GreaterEqualToken, &HaskellConcatenationToken,
+    &HaskellOperatorToken, &HaskellOrToken, &HaskellAndToken 
+  },
+  {
+    "case", "class", "data", "default", "deriving", "do",
+    "else", "if", "import", "in", "infix", "infixl", "infixr", "instance",
+    "let", "module", "newtype", "of", "then", "type", "where",
+
+    "as", "hiding", "qualified",
+
+    "True", "False"
+  }
+};
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  RSL                                                                      */
+/*                                                                           */
+/*****************************************************************************/
+/* Tokens, keywords taken from UNU/IIST Report No. 249 */
+
+LANGUAGE RSLLanguage = {
+  { "RSL", "rsl" },
+  "rsl", "@RSL",
+  NO_MATCH_ERROR,
+  {
+    &RSLIdentifierToken, &CommaToken, &EqualToken, &ColonToken,
+    &LeftParenToken, &RightParenToken, &LeftBraceToken,
+    &RightBraceToken, &EiffelDotToken, &CircumToken, &NumberToken,
+    &SemicolonToken, &MinusToken, &LeftBracketToken,
+    &RightBracketToken, &PlusToken, &BarToken, &CCommentToken, &HatToken,
+    &SlashToken, &LessToken, &GreaterToken, &RSLPrimeToken,
+    &RSLProductToken, &ArrowToken, &RSLPartialMapToken, &RSLAndToken,
+    &RSLAlwaysToken, &LessEqualToken, &RSLIsInToken,
+    &RSLSubsetToken, &RSLUnionToken, &RSLListStartToken, &RSLParToken,
+    &RSLIntChoiceToken, &RSLTurnstileToken, &RSLListToken,
+    &RSLPartialFnToken, &RSLRelationToken, &RSLOrToken,
+    &GreaterEqualToken,
+    &RSLNotIsInToken, &RSLProperSupersetToken, &RSLInterToken,
+    &RSLListEndToken, &RSLInterlockToken, &RSLLambdaToken,
+    &RSLImplementsRelToken, &RSLInfListToken, &RSLMapToken, &ImpliesToken,
+    &RSLSTToken, &RSLNotEqualToken, &RSLPowerToken,
+    &RSLProperSubsetToken, &RSLSupersetToken, &RSLOverrideToken,
+    &RSLMapletToken, &RSLExtChoiceToken, &RSLApplyToken,
+    &RSLImplementsExprToken, &CCommentEscapeToken, &EiffelCommentToken,
+    &EiffelCommentEscapeToken, &BackSlashToken, &RSLExistsOneToken, &StarToken
+  },
+  { "Bool", "Char", "Int", "Nat", "Real", "Text", "Unit", "abs", "any",
+    "as", "axiom", "card", "case", "channel", "chaos", "class", "do",
+    "dom", "elems", "else", "elsif", "end", "extend", "false", "for",
+    "hd", "hide", "if", "in", "inds", "initialise", "int", "len", "let",
+    "local", "object", "of", "out", "post", "pre", "read", "real",
+    "rng", "scheme", "skip", "stop", "swap", "test_case", "then", "tl",
+    "true", "type", "until", "use", "value", "variable", "while", "with",
+    "write", "is", "exists", "all"
+  }
+};
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -3041,11 +3392,13 @@ LANGUAGE *languages[] = {
   & BlueLanguage,
   & CLanguage,
   & EiffelLanguage,
+  & HaskellLanguage,
   & JavaLanguage,
   & NonpareilLanguage,
   & PerlLanguage,
   & PodLanguage,
   & PythonLanguage,
+  & RSLLanguage,
   & RubyLanguage,
   NO_LANGUAGE
 };

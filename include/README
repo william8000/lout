@@ -38,6 +38,7 @@ Setup files (containing mainly lists of options settable by the user)
        perl             Perl + Pod
        pod              Pod
        python           Python
+       rsl              RSL
        ruby             Ruby
 
 Source files containing Lout and PostScript source code for the packages
@@ -74,6 +75,7 @@ Source files containing Lout and PostScript source code for the packages
        perlf            Perl
        podf             Pod
        pythonf          Python
+       rslf             RSL
        rubyf            Ruby
 
 Obsolete source files retained for backward compatibility

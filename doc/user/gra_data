@@ -65,21 +65,22 @@ graphs.pairs @SubIndex { @Code pairs option }
 pairs.graph @Index { @Code "pairs" option (graphs) }
 determines how each pair of points is connected.  The choices are
 @Code none (not connected, the default), @Code solid (a solid line),
-@Code dashed (a dashed line), or @Code dotted (a dotted line).  For
-example,
-@ID @OneRow @Code {
-"@Graph"
-"    abovecaption { Estimated population of Boston, New York, and Philadelphia }"
-"{"
-"    @Data  points { plus }  pairs { solid }"
-"    { 1720 12000  1730 13000  1740 15601  1760 15631  1770 15877 }"
-""
-"    @Data  points { plus }  pairs { dashed }"
-"    { 1720 7000  1730 8622  1740 10451  1750 14255  1760 18000  1770 22667 }"
-""
-"    @Data  points { plus }  pairs { dotted }"
-"    { 1720 10000  1730 11500  1740 12654  1750 18202  1760 23750  1770 34583 }"
-"}"
+@Code dashed (a dashed line), @Code dotted (a dotted line), or
+@Code { dotdashed }, @Code { dotdotdashed }, and @Code { dotdotdotdashed }
+for mixing dots and dashes.  For example,
+@ID @OneRow @Code @Verbatim {
+@Graph
+    abovecaption { Estimated population of Boston, New York, and Philadelphia }
+{
+    @Data  points { plus }  pairs { solid }
+    { 1720 12000  1730 13000  1740 15601  1760 15631  1770 15877 }
+
+    @Data  points { plus }  pairs { dashed }
+    { 1720 7000  1730 8622  1740 10451  1750 14255  1760 18000  1770 22667 }
+
+    @Data  points { plus }  pairs { dotdashed }
+    { 1720 10000  1730 11500  1740 12654  1750 18202  1760 23750  1770 34583 }
+}
 }
 produces
 @CD @Graph
@@ -92,7 +93,7 @@ produces
     @Data  points { plus }  pairs { dashed }
     { 1720 7000  1730 8622  1740 10451  1750 14255  1760 18000  1770 22667 }
 
-    @Data  points { plus }  pairs { dotted }
+    @Data  points { plus }  pairs { dotdashed }
     { 1720 10000  1730 11500  1740 12654  1750 18202  1760 23750  1770 34583 }
 
 }
@@ -113,13 +114,13 @@ graphs. @RawIndex { graphs (statistical) }
 graphs.linewidth @SubIndex { @Code linewidth option }
 linewidth.graph @Index { @Code "linewidth" option (graphs) }
 width (thickness) of the lines and dots:
-@ID @OneRow @Code {
-"@Data"
-"    dashlength { 0.2f }"
-"    linewidth { 0.5p }"
-"{"
-"    ..."
-"}"
+@ID @OneRow @Code @Verbatim {
+@Data
+    dashlength { 0.2f }
+    linewidth { 0.5p }
+{
+    ...
+}
 }
 This shows the default values, {@Code "0.2f"} for @Code "dashlength"
 and {@Code "0.5p"} (half a point) for {@Code "linewidth"}.  Actually

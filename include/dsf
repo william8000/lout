@@ -267,6 +267,12 @@ def @DocumentSetup
 	right @Body		{  {1f @Wide}@Body	} # @SubIndex format
     named @SubSubIndexFormat
 	right @Body		{  {2f @Wide}@Body	} # @SubSubIndex format
+    named @IndexTypeOrdinary
+	right @PageNum		{  @PageNum		} # ordinary page numbers
+    named @IndexTypeMain
+	right @PageNum		{  @B @PageNum		} # main page numbers
+    named @IndexTypeSpecial
+	right @PageNum		{  @I @PageNum		} # special page numbers
     named @IndexColumnNumber	{  2			} # index columns (1 to 10)
     named @IndexColumnGap	{  1.00c @OrIfPlain 6s	} # index column gap
     named @IndexCtd		{  Yes			} # include (ctd.) lines
@@ -290,6 +296,12 @@ def @DocumentSetup
 	right @Body		{  {1f @Wide}@Body	} # @SubIndexA format
     named @SubSubIndexAFormat
 	right @Body		{  {2f @Wide}@Body	} # @SubSubIndexA format
+    named @IndexATypeOrdinary
+	right @PageNum		{  @PageNum		} # ordinary page numbers
+    named @IndexATypeMain
+	right @PageNum		{  @B @PageNum		} # main page numbers
+    named @IndexATypeSpecial
+	right @PageNum		{  @I @PageNum		} # special page numbers
     named @IndexAColumnNumber	{  2			} # index A columns (1 to 10)
     named @IndexAColumnGap	{  1.00c @OrIfPlain 6s	} # index A column gap
     named @IndexACtd		{  Yes			} # include (ctd.) lines
@@ -313,6 +325,12 @@ def @DocumentSetup
 	right @Body		{  {1f @Wide}@Body	} # @SubIndexB format
     named @SubSubIndexBFormat
 	right @Body		{  {2f @Wide}@Body	} # @SubSubIndexB format
+    named @IndexBTypeOrdinary
+	right @PageNum		{  @PageNum		} # ordinary page numbers
+    named @IndexBTypeMain
+	right @PageNum		{  @B @PageNum		} # main page numbers
+    named @IndexBTypeSpecial
+	right @PageNum		{  @I @PageNum		} # special page numbers
     named @IndexBColumnNumber	{  2			} # index B columns (1 to 10)
     named @IndexBColumnGap	{  1.00c @OrIfPlain 6s	} # index B column gap
     named @IndexBCtd		{  Yes			} # include (ctd.) lines
@@ -4226,6 +4244,7 @@ def @DocumentSetup
     def @Index
 	left lpart
 	named @Tag {}
+	named pnformat right @PageNum { Ordinary }
 	named depth { 0 }
 	named to {}
 	right rpart
@@ -4233,6 +4252,17 @@ def @DocumentSetup
 	def @PgMk right tag
 	{
 	  tag @CrossLink @PageOf tag
+	}
+
+	def @Fmt right x
+	{
+	    {pnformat x} @Case
+	    {
+	        Ordinary @Yield @IndexTypeOrdinary x
+	        Main     @Yield @IndexTypeMain x
+	        Special  @Yield @IndexTypeSpecial x
+		else	 @Yield {pnformat x}
+	    }
 	}
 
 	def @PgRange
@@ -4253,7 +4283,7 @@ def @DocumentSetup
 	@MakeIndex @Case {
 	    Yes @Yield {
 		@PageMark @Tag &
-		lpart @DoIndex depth { depth } pgrange { @PgRange } rpart }
+		lpart @DoIndex depth { depth } pgrange { @Fmt @PgRange } rpart }
 	    else @Yield @Null
 	}
     }
@@ -4423,6 +4453,7 @@ def @DocumentSetup
     def @IndexA
 	left lpart
 	named @Tag {}
+	named pnformat right @PageNum { Ordinary }
 	named depth { 0 }
 	named to {}
 	right rpart
@@ -4430,6 +4461,17 @@ def @DocumentSetup
 	def @PgMk right tag
 	{
 	  tag @CrossLink @PageOf tag
+	}
+
+	def @Fmt right x
+	{
+	    {pnformat x} @Case
+	    {
+	        Ordinary @Yield @IndexATypeOrdinary x
+	        Main     @Yield @IndexATypeMain x
+	        Special  @Yield @IndexATypeSpecial x
+		else	 @Yield {pnformat x}
+	    }
 	}
 
 	def @PgRange
@@ -4450,7 +4492,7 @@ def @DocumentSetup
 	@MakeIndexA @Case {
 	    Yes @Yield {
 		@PageMark @Tag &
-		lpart @DoIndexA depth { depth } pgrange { @PgRange } rpart }
+		lpart @DoIndexA depth { depth } pgrange { @Fmt @PgRange } rpart }
 	    else @Yield @Null
 	}
     }
@@ -4620,6 +4662,7 @@ def @DocumentSetup
     def @IndexB
 	left lpart
 	named @Tag {}
+	named pnformat right @PageNum { Ordinary }
 	named depth { 0 }
 	named to {}
 	right rpart
@@ -4627,6 +4670,17 @@ def @DocumentSetup
 	def @PgMk right tag
 	{
 	  tag @CrossLink @PageOf tag
+	}
+
+	def @Fmt right x
+	{
+	    {pnformat x} @Case
+	    {
+	        Ordinary @Yield @IndexBTypeOrdinary x
+	        Main     @Yield @IndexBTypeMain x
+	        Special  @Yield @IndexBTypeSpecial x
+		else	 @Yield {pnformat x}
+	    }
 	}
 
 	def @PgRange
@@ -4647,7 +4701,7 @@ def @DocumentSetup
 	@MakeIndexB @Case {
 	    Yes @Yield {
 		@PageMark @Tag &
-		lpart @DoIndexB depth { depth } pgrange { @PgRange } rpart }
+		lpart @DoIndexB depth { depth } pgrange { @Fmt @PgRange } rpart }
 	    else @Yield @Null
 	}
     }

@@ -1,10 +1,10 @@
 /*@z52.c:Texture Service:TextureChange, TextureCommand@***********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
-/*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
+/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
-/*  Basser Department of Computer Science                                    */
+/*  School of Information Technologies                                       */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
 /*                                                                           */
@@ -152,7 +152,7 @@ static void ptab_debug(TEXTURE_TABLE S, FILE *fp)
       fprintf(fp, " %s",
 	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
     }
-    fprintf(fp, STR_NEWLINE);
+    fprintf(fp, "%s", STR_NEWLINE);
   }
 } /* end ptab_debug */
 #endif

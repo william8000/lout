@@ -254,6 +254,8 @@ any outline }
   A { "   outlinestyle" }
   B { solid }
   C { {@Code solid}, {@Code dashed}, {@Code cdashed}, {@Code dotted},
+{@Code dotdashed}, {@Code dotcdashed}, {@Code dotdotdashed},
+{@Code dotdotcdashed}, {@Code dotdotdotdashed}, {@Code dotdotdotcdashed},
 {@Code noline}, or any sequence of one or more of these values }
 @Rowa
   A { "   outlinedashlength"}
@@ -1186,6 +1188,8 @@ have been omitted where they are the same as the {@Code linklabel} options.
   A { "   pathstyle" }
   B { solid }
   C { {@Code solid}, {@Code dashed}, {@Code cdashed}, {@Code dotted},
+{@Code dotdashed}, {@Code dotcdashed}, {@Code dotdotdashed},
+{@Code dotdotcdashed}, {@Code dotdotdotdashed}, {@Code dotdotdotcdashed},
 {@Code noline}, or any sequence of one or more of these values }
 @Rowa
   A { "   pathdashlength"}
@@ -1470,6 +1474,12 @@ have up to twelve options, {@Code "A"} to {@Code "L"}.
 	@OptionalDiverted @ACell "..." }
 
 @LI @SyntaxDiag { @Four code { "@Diverted ..." } @Diverted @ACell "..." }
+
+@LI @SyntaxDiag { @Four code {
+"@OneOrBoth"
+      "A { ... }"
+      "B { ... }"
+} @OneOrBoth A { @ACell A } B { @ACell B } }
 
 @LI @SyntaxDiag { @Four code {
 "@Loop"

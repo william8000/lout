@@ -79,14 +79,9 @@ end
 /ldiagdebugposy 432 def
 /ldiagdebugposx 72 def
 
-% <string> <int> ldiagdebugprint -
-% must be defined outside ldiagdict since used in arbitrary places
-% print <string> plus count or <int> stack entries, whichever is the smaller
-/ldiagdebugprint
+% - ldiagdebugnextline -
+/ldiagdebugnextline
 {
-  exch
-  gsave
-  initgraphics
   ldiagdebugposy 72 lt
   { /ldiagdebugposx ldiagdebugposx 144 add store
     /ldiagdebugposy 432 store
@@ -95,30 +90,68 @@ end
     /ldiagdebugposy ldiagdebugposy 12 sub store
   } ifelse
   ldiagdebugposx ldiagdebugposy moveto
+} def
+
+% - ldiagdebugbeginindent -
+/ldiagdebugbeginindent
+{
+  /ldiagdebugposx ldiagdebugposx 12 add store
+} def
+
+% - ldiagdebugendindent -
+/ldiagdebugendindent
+{
+  /ldiagdebugposx ldiagdebugposx 12 sub store
+} def
+
+% <string> <int> ldiagdebugprint -
+% must be defined outside ldiagdict since used in arbitrary places
+% print <string> plus count or <int> stack entries, whichever is the smaller
+/ldiagdebugprint
+{
+  exch
+  gsave
+  initgraphics
+  ldiagdebugnextline
   /Times-Roman findfont 10 scalefont setfont
   0 setgray show
+  ldiagdebugbeginindent
   count 1 sub 2 copy lt { pop } { exch pop } ifelse 1 sub
   0 exch 1 exch
   {
-    /ldiagdebugposy ldiagdebugposy 12 sub store
-    ldiagdebugposx 12 add ldiagdebugposy moveto
+    ldiagdebugnextline
     index
     dup type (dicttype) eq
     {
       (begin dict) show
+      ldiagdebugbeginindent
       {
-        /ldiagdebugposy ldiagdebugposy 12 sub store
-        ldiagdebugposx 12 add ldiagdebugposy moveto
+	ldiagdebugnextline
 	pop 100 string cvs show
       } forall
-      /ldiagdebugposy ldiagdebugposy 12 sub store
-      ldiagdebugposx 12 add ldiagdebugposy moveto
+      ldiagdebugendindent
+      ldiagdebugnextline
       (end dict) show
     }
     {
-      100 string cvs show
+      dup type (arraytype) eq
+      {
+        (begin array) show
+        ldiagdebugbeginindent
+	{
+	  ldiagdebugnextline
+	  100 string cvs show
+	} forall
+	ldiagdebugendindent
+	ldiagdebugnextline
+        (end array) show
+      }
+      {
+        100 string cvs show
+      } ifelse
     } ifelse
   } for
+  ldiagdebugendindent
   grestore
 } def
 
@@ -186,6 +219,11 @@ ldiagdict begin
 % distance between two points:  <point> <point> ldiagdistance <length>
 /ldiagdistance { ldiagpsub dup mul exch dup mul add sqrt } def
 
+% stroke a noline line:  <length> <dashlength> ldiagnoline -
+/ldiagnoline
+{ pop pop
+} def
+
 % stroke a solid line:  <length> <dashlength> ldiagsolid -
 /ldiagsolid
 {  pop pop [] 0 setdash 1 setlinecap stroke
@@ -222,9 +260,104 @@ ldiagdict begin
    } ifelse 1 setlinecap stroke
 } def
 
-% stroke a noline line:  <length> <dashlength> ldiagnoline -
-/ldiagnoline
-{ pop pop
+% scale array elements by factor:  <array> <factor> ldiagscalearray <array>
+/ldiagscalearray
+{
+  [ exch 3 2 roll
+  { exch dup 3 1 roll mul exch } forall
+  pop ]
+} def
+
+% sum array elements:  <array> ldiagsumarray <number>
+/ldiagsumarray
+{
+  0 exch { add } forall
+} def
+
+% begin a more complex line: <length> <dashlength> ldiaglinebegin -
+/ldiaglinebegin
+{
+  % (Entering ldiaglinebegin) 2 ldiagdebugprint
+  20 dict begin
+  /dashlen exch 1 pt ldiagmax def
+  /len exch def
+  /gap dashlen def
+  /halfgap dashlen 2 div def
+  /dash dashlen def
+  /halfdash dashlen 2 div def
+  /dot 0 def
+  % (Leaving ldiaglinebegin) 0 ldiagdebugprint
+} def
+
+% end a more complex line: <linecap> <cycle> <startpos> <stoppos> ldiaglineend -
+/ldiaglineend
+{
+  % (Entering ldiaglineend) 3 ldiagdebugprint
+  /stoppos exch def
+  /startpos exch def
+  /cycle exch def
+  /linecap exch def
+  /stopposlen stoppos ldiagsumarray def
+  /startposlen startpos ldiagsumarray def
+  /cyclelen cycle ldiagsumarray def
+  /effectivelen len startposlen add stopposlen sub def
+  effectivelen 0 gt cyclelen 0 gt and
+  {
+    /repeats effectivelen cyclelen div ceiling def
+    /factor len repeats cyclelen mul startposlen sub stopposlen add div def
+    cycle factor ldiagscalearray startposlen factor mul setdash
+    linecap setlinecap stroke
+  } if
+  end
+  % (Leaving ldiaglineend) 0 ldiagdebugprint
+} def
+
+% stroke a dotdashed line: <length> <dashlength> ldiagdotdashed -
+/ldiagdotdashed
+{
+  ldiaglinebegin
+  1 [dash gap dot gap] [] [dash]
+  ldiaglineend
+} def
+
+% stroke a dotcdashed line: <length> <dashlength> ldiagdotcdashed -
+/ldiagdotcdashed
+{
+  ldiaglinebegin
+  1 [dash gap dot gap] [halfdash] [halfdash]
+  ldiaglineend
+} def
+
+% stroke a dotdotdashed line: <length> <dashlength> ldiagdotdotdashed -
+/ldiagdotdotdashed
+{
+  ldiaglinebegin
+  1 [dash gap dot gap dot gap] [] [dash]
+  ldiaglineend
+} def
+
+% stroke a dotdotcdashed line: <length> <dashlength> ldiagdotdotcdashed -
+/ldiagdotdotcdashed
+{
+  ldiaglinebegin
+  1 [dash gap dot gap dot gap] [halfdash] [halfdash]
+  ldiaglineend
+} def
+
+% stroke a dotdotdotdashed line: <length> <dashlength> ldiagdotdotdotdashed -
+/ldiagdotdotdotdashed
+{
+  ldiaglinebegin
+  1 [dash gap dot gap dot gap dot gap] [] [dash]
+  ldiaglineend
+} def
+
+% stroke a dotdotdotcdashed line: <length> <dashlength> ldiagdotdotdotcdashed -
+/ldiagdotdotdotcdashed
+{
+  ldiaglinebegin
+  1 [dash gap dot gap dot gap dot gap] [halfdash] [halfdash]
+  ldiaglineend
 } def
 
 % shape and labels of the @Box symbol

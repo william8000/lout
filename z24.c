@@ -1,10 +1,10 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
-/*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
+/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
-/*  Basser Department of Computer Science                                    */
+/*  School of Information Technologies                                       */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
 /*                                                                           */

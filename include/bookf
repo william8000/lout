@@ -651,7 +651,7 @@ def @BookSetup
 	    # its flushing is delayed until we reach the body galleys, either
 	    # @Introduction or @Chapter.  If not, @BookBody will free up
 	    # @PrefacePlace etc. too soon, producing a "no @PrefacePlace
-	    # precedes this @PrefacePLace&&preceding" error message.
+	    # precedes this @PrefacePlace&&preceding" error message.
 
 	        @AbbreviationsPlace
 	    //  @IntroductionPlace
@@ -659,11 +659,11 @@ def @BookSetup
 	    //	@ReferencesBeforeAppendices @Do {
 		    @MakeReferences @Do @ReferencesPart
 		}
-	    //	@MakeGlossary @Do @GlossaryPart
             //	@AppendixList @FirstAppendixNumber
 	    //	@ReferencesBeforeAppendices @NoDo {
 		    @MakeReferences @Do @ReferencesPart
 		}
+	    //	@MakeGlossary @Do @GlossaryPart
 	    //	@MakeIndexA @Do @IndexAPart
 	    //  @MakeIndexA @Case {
 		  Bypass  @Yield @BypassBeginIndexAPlace
@@ -710,11 +710,11 @@ def @BookSetup
 	    //	@ReferencesBeforeAppendices @Do {
 		    @MakeReferences @Do @ReferencesPart
 		}
-	    //	@MakeGlossary @Do @GlossaryPart
             //	@AppendixList @FirstAppendixNumber
 	    //	@ReferencesBeforeAppendices @NoDo {
 		    @MakeReferences @Do @ReferencesPart
 		}
+	    //	@MakeGlossary @Do @GlossaryPart
 	    //	@MakeIndexA @Do @IndexAPart
 	    //  @MakeIndexA @Case {
 		  Bypass  @Yield @BypassBeginIndexAPlace

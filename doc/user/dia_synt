@@ -292,6 +292,27 @@ Here is the same example in the other three directions:
 This symbol is a great aid to packing a big syntax diagram into a
 compact shape.
 @PP
+A variant of the basic selection idea is when you want one thing
+or another, or alternatively both in a particular order.  You can get
+this with the @Code "@OneOrBoth" symbol, which takes exactly two
+options, @Code "A" and {@Code "B"}:
+@ID @OneRow {
+@Code @Verbatim {
+@StartRight @OneOrBoth
+    A { @ACell type }
+    B { @ACell body }
+}
+||7ct
+@SyntaxDiag {
+@StartRight @OneOrBoth
+    A { @ACell type }
+    B { @ACell body }
+}
+}
+Although the concept extends to more than two options, the symnbol
+doesn't.  The summary at the end of this chapter shows the other
+three directions.
+@PP
 That covers sequencing and selection; now for looping.  The @Code "@Loop"
 symbol produces a loop, with option @Code A going forwards and option
 @Code B centred and going backwards:

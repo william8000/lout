@@ -102,12 +102,11 @@ decorations introducted by the list's @Code "style" option.
 To work cross references out, Lout has to process your document more
 multiple.runs @Index { multiple runs, why needed }
 than once, storing information between runs in special files it
-creates whose names end in @Code ".li" and {@Code ".ld"}.  A complex
-document like this Guide requires five runs, but since every run
-produces a perfectly good PostScript file suitable for proof reading,
-in fact you need two runs to start with and one run per cycle of
-revision thereafter, only one more than would have been necessary
-in any case.
+creates whose names end in @Code ".li" and {@Code ".ld"}.
+A complex document like this Guide requires five runs, but since every
+run produces a perfectly good PostScript file suitable for proof reading,
+in fact you need two runs to start with and one run per cycle of revision
+thereafter, only one more than would have been necessary in any case.
 @PP
 The cross referencing system assumes that each Unix directory contains
 directories @Index { directories, Lout files and }
@@ -122,6 +121,22 @@ when switching from one document to another, by removing file
 lout.li @Index { @Code lout.li file }
 {@Code "lout.li"}.  You should also remove this file if your document
 changes radically -- from a report to a book, say.
+@FootNote {
+An unfortunate and long-standing bug causes Lout to crash occasionally
+when reading from a cross-reference database
+file that it wrote on the preceding run.  The problem has to do with
+mistakenly taking a literal word, or part of such a word, as an invocation
+of a symbol.  The crash will occur on the @I second run (because the
+database file is written, not read, on the first run), and might be
+accompanied by an error message mentioning routine @I { AttachEnv } or
+@I { SetTarget }.  You can make it happen, for example, by including
+@ID @Code "pnformat @Index { watch me crash! }"
+in your document -- the @Code pnformat tag, a literal word, will be
+mistaken for the @Code pnformat option of @Code "@Index" by the
+database reader.  If this problem appears, try enclosing tags that you
+entered recently in double quotes.  Enclosing @Code pnformat above
+in double quotes fixes the example problem.
+}
 @PP
 PDF viewers and recent versions of PostScript viewers offer a high-tech
 version of cross references called {@I links}, which allow the user to

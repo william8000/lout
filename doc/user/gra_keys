@@ -64,6 +64,19 @@ graphs.graphdashed @SubIndex { @Code "@GraphDashed" symbol }
 graphs. @RawIndex { graphs (statistical) }
 graphs.graphdotted @SubIndex { @Code "@GraphDotted" symbol }
 { graphadotted } @Index { @Code "@GraphDotted" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphdotdashed @SubIndex { @Code "@GraphDotDashed" symbol }
+{ graphadotdashed } @Index { @Code "@GraphDotDashed" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphdotdotdashed @SubIndex { @Code "@GraphDotDotDashed" symbol }
+{ graphadotdotdashed } @Index { @Code "@GraphDotDotDashed" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphdotdotdotdashed @SubIndex { @Code "@GraphDotDotDotDashed" symbol }
+{ graphadotdotdotdashed } @Index { @Code "@GraphDotDotDotDashed" symbol (graphs) }
+
 @ID @Tab
     @Fmta { @Col @Code A ! @Col B ! @Col @Code C ! @Col D }
 {
@@ -105,6 +118,15 @@ graphs.graphdotted @SubIndex { @Code "@GraphDotted" symbol }
 @Rowa
     A { "@GraphDotted" }
     B { @GraphDotted }
+@Rowa
+    A { "@GraphDotDashed" }
+    B { @GraphDotDashed }
+@Rowa
+    A { "@GraphDotDotDashed" }
+    B { @GraphDotDotDashed }
+@Rowa
+    A { "@GraphDotDotDotDashed" }
+    B { @GraphDotDotDotDashed }
 }
 These extra symbols may be used anywhere in your document except within
 the right parameter of {@Code "@Graph"}; they are commonly used within
@@ -114,7 +136,7 @@ the caption options of {@Code "@Graph"}:
     rightcaption {
 @GraphPlus @GraphSolid @GraphPlus  Boston
 @GraphPlus @GraphDashed @GraphPlus  New York
-@GraphPlus @GraphDotted @GraphPlus  Philadelphia
+@GraphPlus @GraphDotDashed @GraphPlus  Philadelphia
 }
 }
 (You can also use them within the @Code objects option, which
@@ -127,7 +149,7 @@ from Section {@NumberOf data}, the complete result is
     rightcaption {
 @GraphPlus @GraphSolid @GraphPlus  Boston
 @GraphPlus @GraphDashed @GraphPlus  New York
-@GraphPlus @GraphDotted @GraphPlus  Philadelphia
+@GraphPlus @GraphDotDashed @GraphPlus  Philadelphia
 }
 {
     @Data  points { plus }  pairs { solid }
@@ -136,7 +158,7 @@ from Section {@NumberOf data}, the complete result is
     @Data  points { plus }  pairs { dashed }
     { 1720 7000  1730 8622  1740 10451  1750 14255  1760 18000  1770 22667 }
 
-    @Data  points { plus }  pairs { dotted }
+    @Data  points { plus }  pairs { dotdashed }
     { 1720 10000  1730 11500  1740 12654  1750 18202  1760 23750  1770 34583 }
 
 }

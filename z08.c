@@ -1,10 +1,10 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
-/*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
+/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
-/*  Basser Department of Computer Science                                    */
+/*  School of Information Technologies                                       */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
 /*                                                                           */
@@ -894,9 +894,10 @@ OBJECT *enclose, BOOLEAN fcr)
 OBJECT Manifest(OBJECT x, OBJECT env, STYLE *style, OBJECT bthr[2],
 OBJECT fthr[2], OBJECT *target, OBJECT *crs, BOOLEAN ok, BOOLEAN need_expand,
 OBJECT *enclose, BOOLEAN fcr)
-{ OBJECT bt[2], ft[2], y, link, nextlink, gaplink, g;  register FULL_CHAR *p;
+{ OBJECT bt[2], ft[2], y, link, nextlink, gaplink, g, gword;
+  register FULL_CHAR *p;
   OBJECT res = nilobj, res_env, res_env2, hold_env, hold_env2, z, prev;
-  OBJECT link1, link2, x1, x2, y1, y2;
+  OBJECT link1, link2, x1, x2, y1, y2, vc;
   int i, par, num1, num2;  GAP res_gap;  unsigned res_inc;  STYLE new_style;
   BOOLEAN done, multiline;  FULL_CHAR ch;  float scale_factor;
   static int depth = 0;
@@ -1355,24 +1356,44 @@ OBJECT *enclose, BOOLEAN fcr)
       y = ReplaceWithTidy(y, ACAT_TIDY);
       GetGap(y, style, &line_gap(save_style(x)), &res_inc);
 
-      /* attach MAX_HCOPIES-1 new copies of the right parameter as children */
+      /* make vc, a joined VCAT of MAX_HCOPIES copies of the header */
       Child(y, LastDown(x));
+      DeleteLink(Up(y));
+      New(vc, VCAT);
+      Link(vc, y);
       for( i = 1;  i < MAX_HCOPIES;  i++ )
       {
+	/* make new gap object and link to vc */
+	New(g, GAP_OBJ);
+	mark(gap(g)) = FALSE;
+	join(gap(g)) = TRUE;
+	FposCopy(fpos(g), fpos(y));
+	gword = MakeWord(WORD, STR_EMPTY, &fpos(g));
+	Link(g, gword);
+	Link(vc, g);
+
+	/* copy y and link to vc */
 	z = CopyObject(y, &fpos(y));
-	Link(x, z);
+	Link(vc, z);
       }
       ifdebug(DGS, D, DebugObject(x));
       
-      /* manifest all MAX_HCOPIES copies of the right parameter */
-      for( link = NextDown(Down(x));  link != x;  link = nextlink )
+      /* manifest vc */
+      vc = Manifest(vc, env, style, bthr, fthr, target, crs, ok, need_expand,
+	enclose, fcr);
+
+      /* make the MAX_HCOPIES children of vc into children of header */
+      assert(type(vc) == VCAT, "Manifest/BEGIN_HEADER: vc!");
+      for( link = Down(vc);  link != vc;  link = nextlink )
       {
 	nextlink = NextDown(link);
-	Child(y, link);
-        y = Manifest(y, env, style, bthr, fthr, target, crs, ok, need_expand,
-	  enclose, fcr);
+	Child(z, link);
+	if( type(z) != GAP_OBJ )
+	  MoveLink(link, x, PARENT);
       }
-      debug0(DGS, D, "] Manifest returning.");
+      /* DisposeObject(vc); */
+      debug0(DGS, D, "] Manifest returning");
+      /* ifdebug(DGS, D, DebugObject(x)); */
       break;
 
 

@@ -567,7 +567,7 @@
     Polish	@Yield { ?? }
     Portuguese  @Yield { ?? }
     Russian	@Yield { ?? }
-    Slovak	@Yield { ?? }
+    Slovak	@Yield { Vecn{@Char yacute} register }
     Slovenian   @Yield { ?? }
     Spanish	@Yield { Glosario }
     Swedish	@Yield { Ordf{@Char odieresis}rklaringar }

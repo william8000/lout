@@ -350,4 +350,23 @@ Changes and new features introduced in Version 3.28 [December 2002]
     @Ding symbol (like @Sym) for dingbats
     Dingbats fully documented in Chapter 1 of the User's Guide
 
+Changes and new features introduced in Version 3.29 [August 2003]
+
+    Fixed latest table running headers bug
+    @PageLabel value "?" usually now replaced by a guess at a page number
+    Index entry types (Ordinary, Main, Special) for index pagenum format
+    Haskell programming language support in prg2lout (ack Thorsten Seitz)
+    RSL programming language support in prg2lout (ack Darren Bane)
+    @OneOrBoth symbol added to syntax diagrams, for "X | Y | XY" grammar
+    New outlinestyle/pathstyle options for @Diag:  dotdashed, dotcdashed,
+      dotdotdashed, dotdotcdashed, dotdotdotdashed, and dotdotdotcdashed
+    New pairs options for @Graph: dotdashed, dotdotdashed, dotdotdotdashed;
+      plus @GraphDotDashed, @GraphDotDotDashed, @GraphDotDotDotDashed syms
+
+Things to do (or not)
+
+    I may have promised to add dashed, dotted etc. options to @Tbl's
+      rules, but existing code does not lend itself to it, so I haven't.
+    Bug in placement of Index/Glossary headings (awaiting example of bug).
+
 Jeff Kingston

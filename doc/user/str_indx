@@ -19,13 +19,14 @@ something like this:
 Galileo Galilei
     life of, 201
     telescope, his use of, 201--203
-    trial of, 205--211, 242, 395
+    trial of, 205--211, @I 242, 395
 }
 Each line shows off one of Lout's four tricks:  the first is a
 @I { raw entry } (no page number attached); the second is a
 @I sub-entry (indented); the third has a @I { page number range }
 instead of a single page number; and the fourth is a @I { merged entry }
-(several page numbers or ranges within one entry).
+(several page numbers or ranges within one entry) with a
+@I { special element } (the page number in italics).
 @PP
 We'll take each of them in turn in a moment, but first, let's see how
 to get a basic entry, like this one:
@@ -58,11 +59,6 @@ collation.order @Index { collation order }
 sorting.order @Index { sorting order }
 if @Code "strcoll()" gets the sorting right for one language, there still
 remains the problem of sorting multilingual indexes.
-@PP
-Older versions of Lout assumed that the @I tab character was collated
-before any character that could appear in a sorting key, causing
-problems when this was not so.  Recent versions of Lout no longer
-make this assumption.
 }
 but which is not itself printed anywhere.  It is best to construct these
 sorting keys from lower-case letters and the . character only, beginning
@@ -218,11 +214,40 @@ entries will be
 The first five entries have the same sorting key, and will be merged
 as required.
 @PP
+Each index entry symbol has a @Code { pnformat } option, which affects the
+way the page number of the entry is printed in the index.  For example,
+@ID @Code "galileo.trial @SubIndex pnformat { Main } { trial of }"
+indicates that this is an entry of format {@Code Main}.  By default the
+format is {@Code Ordinary}; it may be {@Code Main}, producing a
+bold page number in the index, or {@Code Special}, producing an
+italic page number.
+@PP
+As the name suggests, the @Code pnformat option is actually a format
+option, within which the @Code "@PageNum" symbol stands for the index
+page number, so you could even write
+@ID @Code "galileo.trial @SubIndex pnformat { @Underline @PageNum } { trial of }"
+to get an underlined page number.  However, it is rarely a good
+idea to use the @Code { pnformat } option in this way.  Better to
+decide once and for all what variants on the basic format you are
+going to have, call one variant {@Code Main} and the other {@Code Special},
+use the setup file options described later in this section to redefine
+the appearance of page numbers for these two index entry formats, and
+explain in the @Code "@IndexText" what the formats mean.
+@PP
+When index entries with different formats are merged, naturally each page
+number preserves its own format.  If there are two merged entries with
+the same page number but different formats, the result is plausible but
+indeterminate.  A page number range is formatted according to the format
+of the index entry which is its starting point.  To change the format
+of the @I stem of the index entry, just do the usual thing.  For example,
+@ID @Code "galileo @Index @I { Galileo Galilei }"
+will cause the stem of the entry to appear in an italic font.
+@PP
 The language of the index entry will be the initial language of the
 document as a whole, which is not necessarily the language at the point
 where the index entry occurs.  To get the correct language you will need a
 @Code "@Language" symbol following the @Code "@Index" symbol:
-@ID @Code "galileo. @Index French @Language { Galileo Galilei }"
+@ID @Code "galileo. @Index Italian @Language { Galileo Galilei }"
 or whatever.  If you don't do this your index entry might be hyphenated
 incorrectly.
 @PP
@@ -301,6 +326,9 @@ their default values:
 @IndexFormat { @Body }
 @SubIndexFormat { {1f @Wide}@Body }
 @SubSubIndexFormat { {2f @Wide}@Body }
+@IndexTypeOrdinary { @PageNum }
+@IndexTypeMain { @B @PageNum }
+@IndexTypeSpecial { @I @PageNum }
 @IndexColumnNumber { 2 }
 @IndexColumnGap { 1.00c }
 @IndexCtd { Yes }
@@ -348,6 +376,17 @@ possible format is
 which causes the subindex to begin with an en-dash and two spaces
 instead of an indent.
 @PP
+{@Code "@IndexTypeOrdinary"}, {@Code "@IndexTypeMain"}, and
+{@Code "@IndexTypeSpecial"} give the page number format to use
+when the index entry type is {@Code Ordinary}, {@Code Main}, and
+{@Code Special} respectively.  Within them the @Code "@PageNum"
+symbol stands for the page number or page number range being
+printed.  The value of these options can be an arbitrary object. 
+If the value of a @Code pnformat option is not {@Code Ordinary},
+{@Code Main}, or {@Code Special}, then the @Code pnformat option
+itself is printed; it too may contain a @Code "@PageNum" symbol,
+as explained earlier.
+@PP
 @Code "@IndexColumnNumber" and @Code "@IndexColumnGap" determine the
 indexcolumnnumber. @Index @Code "@IndexColumnNumber"
 indexcolumngap. @Index @Code "@IndexColumnGap"
@@ -358,13 +397,12 @@ options described in Section {@NumberOf columns}.
 The next three options work together to control the appearance of
 running headers
 @FootNote {
-Index running headers are new in Version 3.19 of Lout.  Owing to problems
-behind the scenes, if more than three copies of the same running header
-appear on the same page, their horizontal positions will become confused,
-probably resulting in the apparent disappearance of all but the last
-three.  Of course, this is highly unlikely to happen, since it means there
-must be a four-column index with a page on which all four columns have
-the same running header.
+Owing to problems behind the scenes, if more than three copies of the
+same running header appear on the same page, their horizontal positions
+will become confused, probably resulting in the apparent disappearance of
+all but the last three.  Of course, this is highly unlikely to happen,
+since it means there must be a four-column index with a page on which
+all four columns have the same running header.
 }
 in the index:
 indexctd. @Index { @Code "@IndexCtd" }

@@ -165,6 +165,7 @@ automatic }
     A { pairs }
     B { none }
     C { {@Code none}, {@Code solid}, {@Code dashed}, {@Code dotted},
+{@Code dotdashed}, {@Code dotdotdashed}, {@Code dotdotdotdashed}, 
 {@Code yhisto}, {@Code xhisto}, {@Code filledyhisto}, {@Code filledxhisto},
 {@Code surfaceyhisto}, {@Code surfacexhisto} }
 @Rowa
@@ -248,6 +249,7 @@ their possible values are:
 @Rowa
     A { pairs }
     C { {@Code none}, {@Code solid}, {@Code dashed}, {@Code dotted},
+{@Code dotdashed}, {@Code dotdotdashed}, {@Code dotdotdotdashed}, 
 {@Code yhisto}, {@Code xhisto}, {@Code filledyhisto}, {@Code filledxhisto},
 {@Code surfaceyhisto}, {@Code surfacexhisto} }
 @Rowa

@@ -123,6 +123,106 @@ lgraphdict begin
 { pop pop
 } def
 
+% scale array elements by factor:  <array> <factor> scalearray <array>
+/scalearray
+{
+  [ exch 3 2 roll
+  { exch dup 3 1 roll mul exch } forall
+  pop ]
+} def
+
+% sum array elements:  <array> sumarray <number>
+/sumarray
+{
+  0 exch { add } forall
+} def
+
+% begin a more complex line: <length> <dashlength> linebegin -
+/linebegin
+{
+  % (Entering linebegin) 2 debugprint
+  20 dict begin
+  /dashlen exch 1 pt max def
+  /len exch def
+  /gap dashlen def
+  /halfgap dashlen 2 div def
+  /dash dashlen def
+  /halfdash dashlen 2 div def
+  /dot 0 def
+  % (Leaving linebegin) 0 debugprint
+} def
+% end a more complex line: <linecap> <cycle> <startpos> <stoppos> lineend -
+/lineend
+{
+  % (Entering lineend) 3 debugprint
+  /stoppos exch def
+  /startpos exch def
+  /cycle exch def
+  /linecap exch def
+  /stopposlen stoppos sumarray def
+  /startposlen startpos sumarray def
+  /cyclelen cycle sumarray def
+  /effectivelen len startposlen add stopposlen sub def
+  effectivelen 0 gt cyclelen 0 gt and
+  {
+    /repeats effectivelen cyclelen div ceiling def
+    /factor len repeats cyclelen mul startposlen sub stopposlen add div def
+    cycle factor scalearray startposlen factor mul setdash
+    linecap setlinecap stroke
+  } if
+  end
+  % (Leaving lineend) 0 debugprint
+} def
+
+% stroke a dotdashed line: <length> <dashlength> dotdashed -
+/dotdashed
+{
+  linebegin
+  1 [dash gap dot gap] [] [dash]
+  lineend
+} def
+
+% stroke a dotcdashed line: <length> <dashlength> dotcdashed -
+/dotcdashed
+{
+  linebegin
+  1 [dash gap dot gap] [halfdash] [halfdash]
+  lineend
+} def
+
+% stroke a dotdotdashed line: <length> <dashlength> dotdotdashed -
+/dotdotdashed
+{
+  linebegin
+  1 [dash gap dot gap dot gap] [] [dash]
+  lineend
+} def
+
+% stroke a dotdotcdashed line: <length> <dashlength> dotdotcdashed -
+/dotdotcdashed
+{
+  linebegin
+  1 [dash gap dot gap dot gap] [halfdash] [halfdash]
+  lineend
+} def
+
+% stroke a dotdotdotdashed line: <length> <dashlength> dotdotdotdashed -
+/dotdotdotdashed
+{
+  linebegin
+  1 [dash gap dot gap dot gap dot gap] [] [dash]
+  lineend
+} def
+
+% stroke a dotdotdotcdashed line: <length> <dashlength> dotdotdotcdashed -
+/dotdotdotcdashed
+{
+  linebegin
+  1 [dash gap dot gap dot gap dot gap] [halfdash] [halfdash]
+  lineend
+} def
+
+
 % stroke a y histogram: - yhisto -
 /yhisto
 { xprev yleft trpoint yextra sub moveto

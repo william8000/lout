@@ -285,14 +285,15 @@ options apply to any node and affect the appearance of the outline:
 }
 }
 This example shows the default values of these options.  The
-{@Code outlinestyle} option may be {@Code solid}, {@Code dashed},
+{@Code outlinestyle} option's allowed values include {@Code solid},
+{@Code dashed},
 diagrams. @RawIndex { diagrams }
 diagrams.solid @SubIndex { @Code "solid" outlines }
 solid.diagrams @Index { @Code "solid" outlines (diagrams) }
 diagrams. @RawIndex { diagrams }
 diagrams.dashed @SubIndex { @Code "dashed" outlines }
 dashed.diagrams @Index { dashed outlines (diagrams) }
-{@Code cdashed}, {@Code dotted}, or {@Code noline}:
+{@Code cdashed}, {@Code dotted}, and {@Code noline}.
 diagrams. @RawIndex { diagrams }
 diagrams.cdashed @SubIndex { @Code "cdashed" outlines }
 cdashed.diagrams @Index { cdashed outlines (diagrams) }
@@ -302,6 +303,12 @@ dotted.diagrams @Index { dotted outlines (diagrams) }
 diagrams. @RawIndex { diagrams }
 diagrams.noline @SubIndex { @Code "noline" outlines }
 noline.diagrams @Index { noline outlines (diagrams) }
+There are also six values for mixing dots and dashes
+(Section {@NumberOf dia_summ}).
+@PP
+The @Code dashed option makes all dashes the same length, whereas
+@Code cdashed halves the length of the first and last dash on each
+segment, which usually looks better:
 @ID @OneRow {
 @Code @Verbatim {
 @CurveBox
@@ -315,10 +322,8 @@ noline.diagrams @Index { noline outlines (diagrams) }
 { Hello, world }
 }
 }
-The @Code dashed option makes all dashes the same length, whereas
-@Code cdashed halves the length of the first and last dash on each segment,
-which usually looks better.  The length of dashes is {@Code outlinedashlength},
-and the distance between dashes or dots is at most {@Code outlinedashlength},
+The length of dashes is {@Code outlinedashlength}, and the distance
+between dashes or dots is at most {@Code outlinedashlength},
 reduced to make the dashes or dots fit evenly.  The @Code outlinewidth
 option determines the width of the line, dashes, or dots, and may be
 {@Code thin}, {@Code medium}, {@Code thick}, or any length.  The values

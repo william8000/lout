@@ -49,11 +49,17 @@ def @DiagSetup
     import @Geometry named angle	{ "dup 180 exch div"	}
     named translate			{			}
     named outlinestyle
-	named solid   { "/ldiagsolid"   }
-	named dashed  { "/ldiagdashed"  }
-	named cdashed { "/ldiagcdashed" }
-	named dotted  { "/ldiagdotted"  }
-	named noline  { "/ldiagnoline"  }
+	named solid             { "/ldiagsolid"			}
+	named dashed            { "/ldiagdashed"		}
+	named cdashed           { "/ldiagcdashed"		}
+	named dotdashed         { "/ldiagdotdashed"		}
+	named dotcdashed        { "/ldiagdotcdashed"		}
+	named dotdotdashed      { "/ldiagdotdotdashed"		}
+	named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+	named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	named dotted            { "/ldiagdotted"		}
+	named noline            { "/ldiagnoline"		}
 					{ solid         	}
     import @Geometry named outlinedashlength	{ 0.2f		}
     import @Geometry named outlinewidth
@@ -162,11 +168,17 @@ def @DiagSetup
     import @Geometry named aangle	{ "dup 180 exch div"	}
     named atranslate			{			}
     named aoutlinestyle
-	named solid   { "/ldiagsolid"   }
-	named dashed  { "/ldiagdashed"  }
-	named cdashed { "/ldiagcdashed" }
-	named dotted  { "/ldiagdotted"  }
-	named noline  { "/ldiagnoline"  }
+	named solid             { "/ldiagsolid"			}
+	named dashed            { "/ldiagdashed"		}
+	named cdashed           { "/ldiagcdashed"		}
+	named dotdashed         { "/ldiagdotdashed"		}
+	named dotcdashed        { "/ldiagdotcdashed"		}
+	named dotdotdashed      { "/ldiagdotdotdashed"		}
+	named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+	named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	named dotted            { "/ldiagdotted"		}
+	named noline            { "/ldiagnoline"		}
 					{ solid         	}
     import @Geometry named aoutlinedashlength	{ 0.2f		}
     import @Geometry named aoutlinewidth
@@ -275,11 +287,17 @@ def @DiagSetup
     import @Geometry named bangle	{ "dup 180 exch div"	}
     named btranslate			{			}
     named boutlinestyle
-	named solid   { "/ldiagsolid"   }
-	named dashed  { "/ldiagdashed"  }
-	named cdashed { "/ldiagcdashed" }
-	named dotted  { "/ldiagdotted"  }
-	named noline  { "/ldiagnoline"  }
+	named solid             { "/ldiagsolid"			}
+	named dashed            { "/ldiagdashed"		}
+	named cdashed           { "/ldiagcdashed"		}
+	named dotdashed         { "/ldiagdotdashed"		}
+	named dotcdashed        { "/ldiagdotcdashed"		}
+	named dotdotdashed      { "/ldiagdotdotdashed"		}
+	named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+	named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	named dotted            { "/ldiagdotted"		}
+	named noline            { "/ldiagnoline"		}
 					{ solid         	}
     import @Geometry named boutlinedashlength	{ 0.2f		}
     import @Geometry named boutlinewidth
@@ -388,11 +406,17 @@ def @DiagSetup
     import @Geometry named cangle	{ "dup 180 exch div"	}
     named ctranslate			{			}
     named coutlinestyle
-	named solid   { "/ldiagsolid"   }
-	named dashed  { "/ldiagdashed"  }
-	named cdashed { "/ldiagcdashed" }
-	named dotted  { "/ldiagdotted"  }
-	named noline  { "/ldiagnoline"  }
+	named solid             { "/ldiagsolid"			}
+	named dashed            { "/ldiagdashed"		}
+	named cdashed           { "/ldiagcdashed"		}
+	named dotdashed         { "/ldiagdotdashed"		}
+	named dotcdashed        { "/ldiagdotcdashed"		}
+	named dotdotdashed      { "/ldiagdotdotdashed"		}
+	named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+	named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	named dotted            { "/ldiagdotted"		}
+	named noline            { "/ldiagnoline"		}
 					{ solid         	}
     import @Geometry named coutlinedashlength	{ 0.2f		}
     import @Geometry named coutlinewidth
@@ -519,11 +543,17 @@ def @DiagSetup
     import @Geometry named frompt	{ 0 0			}
     import @Geometry named topt		{ 0 0			}
     named pathstyle
-	named solid   { "/ldiagsolid"   }
-	named dashed  { "/ldiagdashed"  }
-	named cdashed { "/ldiagcdashed" }
-	named dotted  { "/ldiagdotted"  }
-	named noline  { "/ldiagnoline"  }
+	named solid             { "/ldiagsolid"			}
+	named dashed            { "/ldiagdashed"		}
+	named cdashed           { "/ldiagcdashed"		}
+	named dotdashed         { "/ldiagdotdashed"		}
+	named dotcdashed        { "/ldiagdotcdashed"		}
+	named dotdotdashed      { "/ldiagdotdotdashed"		}
+	named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+	named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	named dotted            { "/ldiagdotted"		}
+	named noline            { "/ldiagnoline"		}
 					{ solid         	}
     import @Geometry named pathdashlength { 0.2f		}
     import @Geometry named pathwidth
@@ -666,9 +696,9 @@ def @DiagSetup
 	   @Tree @HTree
 
 	   @StartRight @StartUp @StartLeft @StartDown
-	   @StartRightRight @StartRightDown
+	   @StartRightRight @StartRightRightRight @StartRightDown
 	   @Skip @XCell @ACell @BCell @CCell
-	   @Sequence @Select @Optional @OptionalDiverted @Diverted
+	   @Sequence @OneOrBoth @Select @Optional @OptionalDiverted @Diverted
 	   @Loop @LoopOpposite @Repeat @RepeatOpposite @RepeatDiverted
 
     def @Diag
@@ -704,11 +734,17 @@ def @DiagSetup
 	named translate				{ translate		}
 	named nodetag				{			}
         named outlinestyle
-	    named solid   { "/ldiagsolid"   }
-	    named dashed  { "/ldiagdashed"  }
-	    named cdashed { "/ldiagcdashed" }
-	    named dotted  { "/ldiagdotted"  }
-	    named noline  { "/ldiagnoline"  }
+	    named solid             { "/ldiagsolid"		}
+	    named dashed            { "/ldiagdashed"		}
+	    named cdashed           { "/ldiagcdashed"		}
+	    named dotdashed         { "/ldiagdotdashed"		}
+	    named dotcdashed        { "/ldiagdotcdashed"	}
+	    named dotdotdashed      { "/ldiagdotdotdashed"	}
+	    named dotdotcdashed     { "/ldiagdotdotcdashed"	}
+	    named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	    named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	    named dotted            { "/ldiagdotted"		}
+	    named noline            { "/ldiagnoline"		}
 						{ outlinestyle     	}
         import @Geometry named outlinedashlength{ outlinedashlength    	}
         import @Geometry named outlinewidth
@@ -766,11 +802,17 @@ def @DiagSetup
 	named atranslate			{ atranslate		}
 	named anodetag				{			}
         named aoutlinestyle
-	    named solid   { "/ldiagsolid"   }
-	    named dashed  { "/ldiagdashed"  }
-	    named cdashed { "/ldiagcdashed" }
-	    named dotted  { "/ldiagdotted"  }
-	    named noline  { "/ldiagnoline"  }
+	    named solid             { "/ldiagsolid"		}
+	    named dashed            { "/ldiagdashed"		}
+	    named cdashed           { "/ldiagcdashed"		}
+	    named dotdashed         { "/ldiagdotdashed"		}
+	    named dotcdashed        { "/ldiagdotcdashed"	}
+	    named dotdotdashed      { "/ldiagdotdotdashed"	}
+	    named dotdotcdashed     { "/ldiagdotdotcdashed"	}
+	    named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	    named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	    named dotted            { "/ldiagdotted"		}
+	    named noline            { "/ldiagnoline"		}
 						{ aoutlinestyle     	}
         import @Geometry named aoutlinedashlength{ aoutlinedashlength  	}
         import @Geometry named aoutlinewidth
@@ -828,11 +870,17 @@ def @DiagSetup
 	named btranslate			{ btranslate		}
 	named bnodetag				{			}
         named boutlinestyle
-	    named solid   { "/ldiagsolid"   }
-	    named dashed  { "/ldiagdashed"  }
-	    named cdashed { "/ldiagcdashed" }
-	    named dotted  { "/ldiagdotted"  }
-	    named noline  { "/ldiagnoline"  }
+	    named solid             { "/ldiagsolid"		}
+	    named dashed            { "/ldiagdashed"		}
+	    named cdashed           { "/ldiagcdashed"		}
+	    named dotdashed         { "/ldiagdotdashed"		}
+	    named dotcdashed        { "/ldiagdotcdashed"	}
+	    named dotdotdashed      { "/ldiagdotdotdashed"	}
+	    named dotdotcdashed     { "/ldiagdotdotcdashed"	}
+	    named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	    named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	    named dotted            { "/ldiagdotted"		}
+	    named noline            { "/ldiagnoline"		}
 						{ boutlinestyle     	}
         import @Geometry named boutlinedashlength{ boutlinedashlength  	}
         import @Geometry named boutlinewidth
@@ -890,11 +938,17 @@ def @DiagSetup
 	named ctranslate			{ ctranslate		}
 	named cnodetag				{			}
         named coutlinestyle
-	    named solid   { "/ldiagsolid"   }
-	    named dashed  { "/ldiagdashed"  }
-	    named cdashed { "/ldiagcdashed" }
-	    named dotted  { "/ldiagdotted"  }
-	    named noline  { "/ldiagnoline"  }
+	    named solid             { "/ldiagsolid"		}
+	    named dashed            { "/ldiagdashed"		}
+	    named cdashed           { "/ldiagcdashed"		}
+	    named dotdashed         { "/ldiagdotdashed"		}
+	    named dotcdashed        { "/ldiagdotcdashed"	}
+	    named dotdotdashed      { "/ldiagdotdotdashed"	}
+	    named dotdotcdashed     { "/ldiagdotdotcdashed"	}
+	    named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	    named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	    named dotted            { "/ldiagdotted"		}
+	    named noline            { "/ldiagnoline"		}
 						{ coutlinestyle     	}
         import @Geometry named coutlinedashlength{ coutlinedashlength  	}
         import @Geometry named coutlinewidth
@@ -980,11 +1034,17 @@ def @DiagSetup
 	import @Geometry named frompt		{ frompt		}
 	import @Geometry named topt		{ topt			}
         named pathstyle
-	    named solid   { "/ldiagsolid"   }
-	    named dashed  { "/ldiagdashed"  }
-	    named cdashed { "/ldiagcdashed" }
-	    named dotted  { "/ldiagdotted"  }
-	    named noline  { "/ldiagnoline"  }
+	    named solid             { "/ldiagsolid"		}
+	    named dashed            { "/ldiagdashed"		}
+	    named cdashed           { "/ldiagcdashed"		}
+	    named dotdashed         { "/ldiagdotdashed"		}
+	    named dotcdashed        { "/ldiagdotcdashed"	}
+	    named dotdotdashed      { "/ldiagdotdotdashed"	}
+	    named dotdotcdashed     { "/ldiagdotdotcdashed"	}
+	    named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	    named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	    named dotted            { "/ldiagdotted"		}
+	    named noline            { "/ldiagnoline"		}
 						{ pathstyle     	}
         import @Geometry named pathdashlength	{ pathdashlength    	}
         import @Geometry named pathwidth
@@ -2267,11 +2327,17 @@ def @DiagSetup
 	    import @Geometry named angle	{ angle			}
 	    named nodetag			{ nodetag		}
             named outlinestyle
-		named solid   { "/ldiagsolid"   }
-		named dashed  { "/ldiagdashed"  }
-		named cdashed { "/ldiagcdashed" }
-		named dotted  { "/ldiagdotted"  }
-		named noline  { "/ldiagnoline"  }
+		named solid             { "/ldiagsolid"			}
+		named dashed            { "/ldiagdashed"		}
+		named cdashed           { "/ldiagcdashed"		}
+		named dotdashed         { "/ldiagdotdashed"		}
+		named dotcdashed        { "/ldiagdotcdashed"		}
+		named dotdotdashed      { "/ldiagdotdotdashed"		}
+		named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+		named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+		named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+		named dotted            { "/ldiagdotted"		}
+		named noline            { "/ldiagnoline"		}
 						{ outlinestyle     	}
             import @Geometry named outlinedashlength { outlinedashlength}
             import @Geometry named outlinewidth
@@ -2611,11 +2677,17 @@ def @DiagSetup
 	    import @Geometry named angle	{ aangle		}
 	    named nodetag			{ anodetag		}
             named outlinestyle
-		named solid   { "/ldiagsolid"   }
-		named dashed  { "/ldiagdashed"  }
-		named cdashed { "/ldiagcdashed" }
-		named dotted  { "/ldiagdotted"  }
-		named noline  { "/ldiagnoline"  }
+		named solid             { "/ldiagsolid"			}
+		named dashed            { "/ldiagdashed"		}
+		named cdashed           { "/ldiagcdashed"		}
+		named dotdashed         { "/ldiagdotdashed"		}
+		named dotcdashed        { "/ldiagdotcdashed"		}
+		named dotdotdashed      { "/ldiagdotdotdashed"		}
+		named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+		named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+		named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+		named dotted            { "/ldiagdotted"		}
+		named noline            { "/ldiagnoline"		}
 						{ aoutlinestyle     	}
             import @Geometry named outlinedashlength { aoutlinedashlength}
             import @Geometry named outlinewidth
@@ -2955,11 +3027,17 @@ def @DiagSetup
 	    import @Geometry named angle	{ bangle		}
 	    named nodetag			{ bnodetag		}
             named outlinestyle
-		named solid   { "/ldiagsolid"   }
-		named dashed  { "/ldiagdashed"  }
-		named cdashed { "/ldiagcdashed" }
-		named dotted  { "/ldiagdotted"  }
-		named noline  { "/ldiagnoline"  }
+		named solid             { "/ldiagsolid"			}
+		named dashed            { "/ldiagdashed"		}
+		named cdashed           { "/ldiagcdashed"		}
+		named dotdashed         { "/ldiagdotdashed"		}
+		named dotcdashed        { "/ldiagdotcdashed"		}
+		named dotdotdashed      { "/ldiagdotdotdashed"		}
+		named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+		named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+		named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+		named dotted            { "/ldiagdotted"		}
+		named noline            { "/ldiagnoline"		}
 						{ boutlinestyle     	}
             import @Geometry named outlinedashlength { boutlinedashlength}
             import @Geometry named outlinewidth
@@ -3299,11 +3377,17 @@ def @DiagSetup
 	    import @Geometry named angle	{ cangle		}
 	    named nodetag			{ cnodetag		}
             named outlinestyle
-		named solid   { "/ldiagsolid"   }
-		named dashed  { "/ldiagdashed"  }
-		named cdashed { "/ldiagcdashed" }
-		named dotted  { "/ldiagdotted"  }
-		named noline  { "/ldiagnoline"  }
+		named solid             { "/ldiagsolid"			}
+		named dashed            { "/ldiagdashed"		}
+		named cdashed           { "/ldiagcdashed"		}
+		named dotdashed         { "/ldiagdotdashed"		}
+		named dotcdashed        { "/ldiagdotcdashed"		}
+		named dotdotdashed      { "/ldiagdotdotdashed"		}
+		named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+		named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+		named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+		named dotted            { "/ldiagdotted"		}
+		named noline            { "/ldiagnoline"		}
 						{ coutlinestyle     	}
             import @Geometry named outlinedashlength { coutlinedashlength}
             import @Geometry named outlinewidth
@@ -3977,11 +4061,17 @@ def @DiagSetup
             import @Geometry named frompt	{ frompt		}
             import @Geometry named topt		{ topt			}
             named pathstyle
-		named solid   { "/ldiagsolid"   }
-		named dashed  { "/ldiagdashed"  }
-		named cdashed { "/ldiagcdashed" }
-		named dotted  { "/ldiagdotted"  }
-		named noline  { "/ldiagnoline"  }
+		named solid             { "/ldiagsolid"			}
+		named dashed            { "/ldiagdashed"		}
+		named cdashed           { "/ldiagcdashed"		}
+		named dotdashed         { "/ldiagdotdashed"		}
+		named dotcdashed        { "/ldiagdotcdashed"		}
+		named dotdotdashed      { "/ldiagdotdotdashed"		}
+		named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+		named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+		named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+		named dotted            { "/ldiagdotted"		}
+		named noline            { "/ldiagnoline"		}
 						{ pathstyle		}
             import @Geometry named pathdashlength { pathdashlength	}
             import @Geometry named pathwidth
@@ -5209,8 +5299,19 @@ def @DiagSetup
 	    def @Direct
 	    {
 		pathstyle @Case {
-		    { "/ldiagsolid" "/ldiagdashed" "/ldiagcdashed"
-		      "/ldiagdotted" "/ldiagnoline" } @Yield 1
+		    {
+		      "/ldiagsolid"
+		      "/ldiagdashed"
+		      "/ldiagdotted"
+		      "/ldiagnoline"
+		      "/ldiagcdashed"
+		      "/ldiagdotdashed"
+		      "/ldiagdotcdashed"
+		      "/ldiagdotdotdashed"
+		      "/ldiagdotdotcdashed"
+		      "/ldiagdotdotdotdashed"
+		      "/ldiagdotdotdotcdashed"
+		    } @Yield 1
 		    else @Yield 0
 		}
 	    }
@@ -5299,11 +5400,17 @@ def @DiagSetup
             import @Geometry named frompt	{ frompt		}
             import @Geometry named topt		{ topt			}
             named pathstyle
-		named solid   { "/ldiagsolid"   }
-		named dashed  { "/ldiagdashed"  }
-		named cdashed { "/ldiagcdashed" }
-		named dotted  { "/ldiagdotted"  }
-		named noline  { "/ldiagnoline"  }
+		named solid             { "/ldiagsolid"			}
+		named dashed            { "/ldiagdashed"		}
+		named cdashed           { "/ldiagcdashed"		}
+		named dotdashed         { "/ldiagdotdashed"		}
+		named dotcdashed        { "/ldiagdotcdashed"		}
+		named dotdotdashed      { "/ldiagdotdotdashed"		}
+		named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+		named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+		named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+		named dotted            { "/ldiagdotted"		}
+		named noline            { "/ldiagnoline"		}
 						{ pathstyle		}
             import @Geometry named pathdashlength { pathdashlength	}
             import @Geometry named pathwidth
@@ -5992,6 +6099,41 @@ def @DiagSetup
 	    back @ArrowLeftFrom BB@EMK
 	}
 
+	def @StartRightRightRight
+	    named A {}
+	    named B {}
+	    named C {}
+	{
+	    AA:: @LabelMarks { @HSkip & @GoRight A }
+	    //syntaxgap
+	    //syntaxgap
+	    |syntaxgap |syntaxgap |syntaxgap |syntaxgap |syntaxgap |syntaxgap
+	    XX:: @LabelMarks {}
+	    //syntaxgap
+	    //syntaxgap
+	    |syntaxgap |syntaxgap |syntaxgap |syntaxgap |syntaxgap |syntaxgap
+	    BB:: @LabelMarks { @GoRight B & @HSkip }
+	    //syntaxgap
+	    //syntaxgap
+	    |syntaxgap |syntaxgap |syntaxgap |syntaxgap |syntaxgap |syntaxgap
+	    YY:: @LabelMarks {}
+	    //syntaxgap
+	    //syntaxgap
+	    |syntaxgap |syntaxgap |syntaxgap |syntaxgap |syntaxgap |syntaxgap
+	    CC:: @LabelMarks { @GoRight C & @HSkip }
+	    //syntaxgap
+	    //syntaxgap
+	    // @RVLCurve from { AA@EMK } to { XX@WMK }
+		bias { pssyntaxbias } radius { pssyntaxradius }
+	    // @LVRCurve from { XX@WMK } to { BB@WMK }
+		bias { pssyntaxbias } radius { pssyntaxradius }
+	    // @RVLCurve from { BB@EMK } to { YY@WMK }
+		bias { pssyntaxbias } radius { pssyntaxradius }
+	    // @LVRCurve from { YY@WMK } to { CC@WMK }
+		bias { pssyntaxbias } radius { pssyntaxradius }
+	    back @ArrowLeftFrom CC@EMK
+	}
+
 	def @StartRightDown
 	    named A {}
 	    named B {}
@@ -6111,6 +6253,149 @@ def @DiagSetup
 	    }
 	}
 
+
+        #######################################################################
+        #                                                                     #
+        #  @OneOrBoth                                                         #
+        #                                                                     #
+        #######################################################################
+
+	def @OneOrBoth
+	    named A {}
+	    named B {}
+	{
+
+            def @ALH {
+               @HContract {
+                   |syntaxgap
+                   "AX":: restrict { "(WMK) (EMK)" } @LabelMarks A 
+                   |syntaxgap
+               }
+            }
+
+            def @BLH {
+               @HContract {
+                   |syntaxgap
+                   "BX":: restrict { "(WMK) (EMK)" } @LabelMarks B 
+                   |syntaxgap
+               }
+            }
+
+            def @ALV {
+               @VContract {
+                   /syntaxgap
+                   "AX":: restrict { "(NMK) (SMK)" } @LabelMarks A 
+                   /syntaxgap
+               }
+            }
+
+            def @BLV {
+               @VContract {
+                   /syntaxgap
+                   "BX":: restrict { "(NMK) (SMK)" } @LabelMarks B 
+                   /syntaxgap
+               }
+            }
+
+            def @RightOneOrBoth
+            {
+	      @LRLine {
+		@HContract @VContract { @ALH | /syntaxgap | @BLH }
+		//
+		@HVCurve from { "BX@WMK" } to { 0 ycoord "AX@WMK" }
+		 arrow { no } bias { pssyntaxbias } radius { pssyntaxradius }
+		//
+		@HVCurve from { "BX@EMK" } to { xsize ycoord "AX@WMK" }
+		 arrow { yes } bias { pssyntaxbias } radius { pssyntaxradius }
+		//
+		@Line from { 0 ycoord "AX@WMK" } to { "AX@WMK" }
+		//
+		@Line from { "AX@EMK" } to { xsize ycoord "AX@WMK" }
+		//
+		@Arrow
+		  from { {xcoord "AX@EMK" * 0.5 + xcoord "BX@WMK" * 0.5}
+		      ycoord "AX@EMK" }
+		  to { {xcoord "AX@EMK" * 0.5 + xcoord "BX@WMK" * 0.5}
+		      ycoord "BX@WMK" }
+	      }
+            }
+
+            def @LeftOneOrBoth
+            {
+	      @LRLine {
+		@HContract @VContract { | @ALH /syntaxgap @BLH | }
+		//
+		@HVCurve from { "BX@WMK" } to { 0 ycoord "AX@WMK" }
+		 arrow { yes } bias { pssyntaxbias } radius { pssyntaxradius }
+		//
+		@HVCurve from { "BX@EMK" } to { xsize ycoord "AX@WMK" }
+		 arrow { no } bias { pssyntaxbias } radius { pssyntaxradius }
+		//
+		@Line from { 0 ycoord "AX@WMK" } to { "AX@WMK" }
+		//
+		@Line from { "AX@EMK" } to { xsize ycoord "AX@WMK" }
+		//
+		@Arrow
+		  from { {xcoord "AX@WMK" * 0.5 + xcoord "BX@EMK" * 0.5}
+		      ycoord "AX@WMK" }
+		  to { {xcoord "AX@WMK" * 0.5 + xcoord "BX@EMK" * 0.5}
+		      ycoord "BX@EMK" }
+	      }
+            }
+
+            def @DownOneOrBoth
+            {
+	      @UDLine {
+		@HContract @VContract { @ALV |syntaxgap / | @BLV }
+		||
+		@VHCurve from { "BX@NMK" } to { xcoord "AX@NMK" ysize }
+		 arrow { no } bias { pssyntaxbias } radius { pssyntaxradius }
+		||
+		@VHCurve from { "BX@SMK" } to { xcoord "AX@NMK" 0 }
+		 arrow { yes } bias { pssyntaxbias } radius { pssyntaxradius }
+		||
+		@Line from { xcoord "AX@NMK" ysize } to { "AX@NMK" }
+		||
+		@Line from { "AX@SMK" } to { xcoord "AX@SMK" 0 }
+		||
+		@Arrow
+		  from { xcoord "AX@SMK"
+		        {ycoord "AX@SMK" * 0.5 + ycoord "BX@NMK" * 0.5} }
+		  to { xcoord "BX@NMK"
+		        {ycoord "AX@SMK" * 0.5 + ycoord "BX@NMK" * 0.5} }
+	      }
+            }
+
+            def @UpOneOrBoth
+            {
+	      @UDLine {
+		@HContract @VContract { |syntaxgap @BLV / @ALV | }
+		||
+		@VHCurve from { "BX@NMK" } to { xcoord "AX@NMK" ysize }
+		 arrow { yes } bias { pssyntaxbias } radius { pssyntaxradius }
+		||
+		@VHCurve from { "BX@SMK" } to { xcoord "AX@NMK" 0 }
+		 arrow { no } bias { pssyntaxbias } radius { pssyntaxradius }
+		||
+		@Line from { xcoord "AX@NMK" ysize } to { "AX@NMK" }
+		||
+		@Line from { "AX@SMK" } to { xcoord "AX@SMK" 0 }
+		||
+		@Arrow
+		  from { xcoord "AX@NMK"
+		        {ycoord "AX@NMK" * 0.5 + ycoord "BX@SMK" * 0.5} }
+		  to { xcoord "BX@SMK"
+		        {ycoord "AX@NMK" * 0.5 + ycoord "BX@SMK" * 0.5} }
+	      }
+            }
+
+	    @CurrDirection @Case {
+		@Right @Yield @RightOneOrBoth
+		@Up    @Yield @UpOneOrBoth
+		@Left  @Yield @LeftOneOrBoth
+		@Down  @Yield @DownOneOrBoth
+	    }
+	}
 
         #######################################################################
         #                                                                     #

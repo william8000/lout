@@ -169,6 +169,9 @@
   # @IndexFormat	{ @Body			} # @Index format
   # @SubIndexFormat	{ {1f @Wide}@Body	} # @SubIndex format
   # @SubSubIndexFormat	{ {2f @Wide}@Body	} # @SubSubIndex format
+  # @IndexTypeOrdinary	{ @PageNum		} # Ordinary pagenum format
+  # @IndexTypeMain	{ @B @PageNum		} # Main pagenum format
+  # @IndexTypeSpecial	{ @I @PageNum		} # Special pagenum format
   # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
   # @IndexColumnGap	{ 1.00c	@OrIfPlain 6s	} # index column gap
   # @IndexCtd		{ Yes			} # include (ctd.) lines
@@ -185,6 +188,9 @@
   # @IndexAFormat	{ @Body			} # @IndexA format
   # @SubIndexAFormat	{ {1f @Wide}@Body	} # @SubIndexA format
   # @SubSubIndexAFormat	{ {2f @Wide}@Body	} # @SubSubIndexA format
+  # @IndexATypeOrdinary	{ @PageNum		} # Ordinary pagenum format
+  # @IndexATypeMain	{ @B @PageNum		} # Main pagenum format
+  # @IndexATypeSpecial	{ @I @PageNum		} # Special pagenum format
   # @IndexAColumnNumber	{ 2			} # index A columns (1 to 10)
   # @IndexAColumnGap	{ 1.00c	@OrIfPlain 6s	} # index A column gap
   # @IndexACtd		{ Yes			} # include (ctd.) lines
@@ -201,6 +207,9 @@
   # @IndexBFormat	{ @Body			} # @IndexB format
   # @SubIndexBFormat	{ {1f @Wide}@Body	} # @SubIndexB format
   # @SubSubIndexBFormat	{ {2f @Wide}@Body	} # @SubSubIndexB format
+  # @IndexBTypeOrdinary	{ @PageNum		} # Ordinary pagenum format
+  # @IndexBTypeMain	{ @B @PageNum		} # Main pagenum format
+  # @IndexBTypeSpecial	{ @I @PageNum		} # Special pagenum format
   # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)
   # @IndexBColumnGap	{ 1.00c	@OrIfPlain 6s	} # index B column gap
   # @IndexBCtd		{ Yes			} # include (ctd.) lines

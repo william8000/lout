@@ -32,11 +32,13 @@ At the time of writing, the available programming languages are:
 blue. @Index { Blue program printing }
 c. @Index { C and C++ program printing }
 eiffel. @Index { Eiffel program printing }
+haskell. @Index { Haskell program printing }
 java. @Index { Java program printing }
 nonpareil. @Index { Nonpareil program printing }
 perl. @Index { Perl program printing }
 pod. @Index { Pod (for Perl) printing }
 python. @Index { Python program printing }
+rsl. @Index { RSL program printing }
 ruby. @Index { Ruby program printing }
 @CD @Tbl
     mv { 0.5vx }
@@ -70,6 +72,12 @@ ruby. @Index { Ruby program printing }
     D { varying }
     E { Yes }
 @Rowb
+    A { Haskell }
+    B { haskell }
+    C { "@Haskell" }
+    D { symbol }
+    E { Yes }
+@Rowb
     A { Java }
     B { java }
     C { "@Java" }
@@ -99,6 +107,12 @@ ruby. @Index { Ruby program printing }
     C { "@Python" }
     D { varying }
     E { No }
+@Rowb
+    A { RSL }
+    B { rsl }
+    C { "@RSL" }
+    D { symbol }
+    E { Yes }
 @Rowb
     A { Ruby }
     B { ruby }

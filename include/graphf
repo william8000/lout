@@ -411,6 +411,66 @@ def @GraphDotted
   }
 }
 
+def @GraphDotDashed
+    import @PSLengths named dashlength { 0.2f }
+    import @PSLengths named linewidth  { "currentlinewidth" }
+    import @LoutLengths named length { 1.0f }
+{
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "dotdashed end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphDotDashed UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
+}
+
+def @GraphDotDotDashed
+    import @PSLengths named dashlength { 0.2f }
+    import @PSLengths named linewidth  { "currentlinewidth" }
+    import @LoutLengths named length { 1.0f }
+{
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "dotdotdashed end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphDotDotDashed UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
+}
+
+def @GraphDotDotDotDashed
+    import @PSLengths named dashlength { 0.2f }
+    import @PSLengths named linewidth  { "currentlinewidth" }
+    import @LoutLengths named length { 1.0f }
+{
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "dotdotdotdashed end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphDotDotDotDashed UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
+}
+
 
 export @Data
 def @Graph
@@ -701,6 +761,12 @@ def @Graph
 	    solid      @Yield { "linesetup solid"   @IfPt "ilinesetup solid"  }
 	    dashed     @Yield { "linesetup cdashed" @IfPt "ilinesetup dashed" }
 	    dotted     @Yield { "linesetup dotted"  @IfPt "ilinesetup dotted" }
+	    dotdashed  @Yield { "linesetup dotcdashed" @IfPt
+				"ilinesetup dotdashed" }
+	    dotdotdashed  @Yield { "linesetup dotdotcdashed" @IfPt
+				"ilinesetup dotdotdashed" }
+	    dotdotdotdashed  @Yield { "linesetup dotdotdotcdashed" @IfPt
+				"ilinesetup dotdotdotdashed" }
 	    surfacexhisto @Yield { "surfacexhisto" }
 	    surfaceyhisto @Yield { "surfaceyhisto" }
 	    xhisto        @Yield { "xhisto" }

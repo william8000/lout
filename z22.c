@@ -1,10 +1,10 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
-/*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.29)                       */
+/*  COPYRIGHT (C) 1991, 2003 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
-/*  Basser Department of Computer Science                                    */
+/*  School of Information Technologies                                       */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
 /*                                                                           */
@@ -549,13 +549,15 @@ void HandleHeader(OBJECT hd, OBJECT header)
 
 void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 {
-  /* these two variables refer to the root galley only */
-  static BOOLEAN first = TRUE;		/* TRUE if first component unwritten */
-  static OBJECT page_label=nilobj;	/* current page label object         */
+  /* these three variables refer to the root galley only */
+  static BOOLEAN first = TRUE;		  /* if first component unwritten    */
+  static OBJECT page_label = nilobj;	  /* current page label object       */
+  static OBJECT prev_page_label = nilobj; /* previous page label object      */
 
-  OBJECT dest, link, y, z, tmp1, tmp2, why, top_y;  FULL_CHAR *label_string;
+  OBJECT dest, link, y, z, tmp1, tmp2, why, top_y;
+  FULL_CHAR *label_string, buff[MAX_LINE];
   FULL_LENGTH aback, afwd;
-  int dim;
+  int dim, pnval;
   debug1(DGS, DD, "[ Promote(%s, stop_link):", SymName(actual(hd)));
   ifdebug(DGS, DD, DebugGalley(hd, stop_link, 2));
 
@@ -871,9 +873,19 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	    FixAndPrintObject(y, back(y, COLM), back(y, COLM), fwd(y, COLM),
 	      COLM, FALSE, 0, 0, &aback, &afwd);
 
+	    /* get label string from page_label, or prev_page_label + 1 */
+	    if( page_label != nilobj && is_word(type(page_label)) )
+	      label_string = string(page_label);
+	    else if( prev_page_label!=nilobj && is_word(type(prev_page_label))
+		&& sscanf( (char *) string(prev_page_label), "%d", &pnval)==1 )
+	    {
+	      sprintf( (char *) buff, "%d", pnval + 1);
+	      label_string = buff;
+	    }
+	    else
+	      label_string = AsciiToFull("?");
+
 	    /* print prefatory or page separating material, including fonts */
-	    label_string = page_label != nilobj && is_word(type(page_label)) ?
-	      string(page_label) : AsciiToFull("?");
 	    debug1(DGS, DD, "root promote definite; label_string = %s",
 	      label_string);
 	    debug1(DCR, DD, "label_string = %s", label_string);
@@ -885,10 +897,12 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	    else
 	      BackEnd->PrintBetweenPages(size(hd, COLM), size(y, ROWM),
 		label_string);
-	    if( page_label != nilobj )
-	    { DisposeObject(page_label);
-	      page_label = nilobj;
-	    }
+
+	    /* dispose prev_page_label and move page_label to prev_page_label */
+	    if( prev_page_label != nilobj )
+	      DisposeObject(prev_page_label);
+	    prev_page_label = page_label;
+	    page_label = nilobj;
 
 	    /* fix and print vertically */
 	    debug1(DGF,D, "  Promote calling FixAndPrint %s", Image(type(y)));
