@@ -1212,6 +1212,93 @@ The @Code "@HTree" option has a similar @Code "treevindent" option,
 which may be {@Code "top"}, {@Code ctr}, {@Code foot}, or any length
 from Section {@NumberOf objects}.
 @PP
+Here are all the syntax diagrams symbols, used within {@Code "@SyntaxDiag"}
+usually but also available within {@Code "@Diag"}.  To begin with we have
+the six starter symbols:
+@CD @SyntaxDiag {
+@Tbl
+    aformat { @Cell @Code A | @Cell B | @Cell | @Cell @Code C |
+	      @Cell D | @Cell | @Cell @Code E | @Cell F }
+{
+@Rowa
+    A { "@StartRight ..." }
+    B { @StartRight @ACell "..." }
+    C { "@StartUp ..." }
+    D { @StartUp @ACell "..." }
+    E {
+"@StartRightRight"
+      "A { ... }"
+      "B { ... }"
+}
+    F { @StartRightRight A { @ACell A } B { @ACell B } }
+@Rowa
+    A { "@StartLeft ..." }
+    B { @StartLeft @ACell "..." }
+    C { "@StartDown ..." }
+    D { @StartDown @ACell "..." }
+    E {
+"@StartRightDown"
+      "A { ... }"
+      "B { ... }"
+}
+    F { @StartRightDown A { @ACell A } B { @ACell B } }
+}
+}
+And here are all the syntax diagram types, shown in all four directions
+(right, up, left, and down).  @Code "@Sequence" and @Code "@Select" may
+have up to twelve options, {@Code "A"} to {@Code "L"}.
+@IndentedList
+
+@LI @SyntaxDiag { @Four code { "@ACell ..." } @ACell "..." }
+
+@LI @SyntaxDiag { @Four code { "@BCell ..." } @BCell "..." }
+
+@LI @SyntaxDiag { @Four code { "@CCell ..." } @CCell "..." }
+
+@LI @SyntaxDiag { @Four code { "@Skip"      } @Skip        }
+
+@LI @SyntaxDiag { @Four code {
+"@Sequence"
+      "A { ... }"
+      "B { ... }"
+      "C { ... }"
+} @Sequence A { @ACell A } B { @ACell B } C { @ACell C } }
+
+@LI @SyntaxDiag { @Four code {
+"@Select"
+      "A { ... }"
+      "B { ... }"
+      "C { ... }"
+} @Select A { @ACell A } B { @ACell B } C { @ACell C } }
+
+@LI @SyntaxDiag { @Four code { "@Optional ..." } @Optional @ACell "..." }
+
+@LI @SyntaxDiag { @Four code { "@OptionalDiverted ..." }
+	@OptionalDiverted @ACell "..." }
+
+@LI @SyntaxDiag { @Four code { "@Diverted ..." } @Diverted @ACell "..." }
+
+@LI @SyntaxDiag { @Four code {
+"@Loop"
+      "A { ... }"
+      "B { ... }"
+} @Loop A { @ACell A } B { @ACell B } }
+
+@LI @SyntaxDiag { @Four code { "@Repeat ..." } @Repeat @ACell "..." }
+
+@LI @SyntaxDiag { @Four code {
+"@LoopOpposite"
+      "A { ... }"
+      "B { ... }"
+} @LoopOpposite A { @ACell A } B { @ACell B } }
+
+@LI @SyntaxDiag { @Four code { "@RepeatOpposite ..." }
+	@RepeatOpposite @ACell "..." }
+
+@LI @SyntaxDiag { @Four code { "@RepeatDiverted ..." }
+	@RepeatDiverted @ACell "..." }
+
+@EndList
 The @Code "@Diag" symbol and to the {@Code "@DiagSetup"} setup
 file symbol have all of the options of {@Code "@Node"}, {@Code "@Link"},
 {@Code "@Tree"}, and {@Code "@HTree"}.  They also have the following
@@ -1240,8 +1327,16 @@ options:
   B { 0.5f }
   C { any length from Section {@NumberOf objects} }
 @Rowa
-  A { "   treevsep" }
-  B { 0.5f }
+  A { "   syntaxgap" }
+  B { 0.35f }
+  C { any length from Section {@NumberOf objects} }
+@Rowa
+  A { "   syntaxbias" }
+  B { 1.0f }
+  C { any length from Section {@NumberOf objects} }
+@Rowa
+  A { "   syntaxradius" }
+  B { 0.3f }
   C { any length from Section {@NumberOf objects} }
 }
 @DP

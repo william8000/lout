@@ -58,10 +58,12 @@ plain text }
     D { any length e.g. @Code 3c }
 @Rowa
     A { indent  i }
-    D { {@Code left}, {@Code ctr}, {@Code mctr}, {@Code right}, or any length }
+    B { @Code left }
+    D { {@Code left}, {@Code ctr}, {@Code align}, {@Code mctr}, {@Code right}, or any length }
 @Rowa
     A { indentvertical  iv }
-    D { {@Code top}, {@Code ctr}, {@Code mctr}, {@Code foot}, or any length }
+    B { @Code top }
+    D { {@Code top}, {@Code ctr}, {@Code align}, {@Code mctr}, {@Code foot}, or any length }
 @Rowa
     A { strut  s }
     B { yes }

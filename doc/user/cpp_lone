@@ -1,21 +1,22 @@
 @Section
-   @Title { Stand-alone mode }
+   @Title { Typesetting computer programs independently of any document }
    @Tag { alone }
 @Begin
 @PP
-Printing of C files in stand-alone mode is accomplished by the following
-c2lout @Index { @Code "c2lout" filter }
-Unix pipeline:
-@ID @Code "c2lout  options  C-files  |  lout  -s  >  out.ps"
-As usual with Lout, the output will be a PostScript file.  Each input
-file will begin on a new page of the output, starting with its name
-in bold type.  The options provide control over the final appearance,
-as follows:
+Printing of program files independently of any document is accomplished by
+the following Unix pipeline:
+@ID @Code "prg2lout  -l language  options  files  |  lout  -s  >  out.ps"
+where @Code language stands for any one of the programming language
+names in the first column of the table above.  As usual with Lout, the
+output will be a PostScript file.  Each input file will begin on a new
+page of the output, starting with its name in bold type.  The options
+provide control over the final appearance, as follows:
 @WideTaggedList
 @TI { {@Code-p}{@I style} } {
 Select a printing style.  Your choices are {@Code -pfixed},
-{@Code -pvarying}, and {@Code -psymbol}, with the default being
-{@Code -pfixed}.  Consult Section {@NumberOf embedded} for examples
+{@Code -pvarying}, and {@Code -psymbol}, with the default value
+varying with the language as given in the fourth column of the
+table above.  Consult Section {@NumberOf embedded} for examples
 of these styles.
 }
 @TI { @Code -n } {

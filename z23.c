@@ -1,7 +1,7 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -668,6 +668,10 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
       if( (type(x) == VCAT) == (dim == ROWM) )
       { 
+	debug6(DGP, DD, "[ FAPO-CAT %s (%s,%s): xmk %s, xb %s, xf %s",
+	    Image(type(x)), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
+	    EchoLength(xmk), EchoLength(xb), EchoLength(xf));
+
 	FirstDefinite(x, link, prev, jn);
 	if( link != x )
 	{
@@ -698,10 +702,6 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  if( adjust_cat(x) && !suppress )
 	    inc = FindAdjustIncrement(x, frame_size, dim);
 	  else inc = 0;
-
-	  debug6(DGP, DD, "[ FAPO-CAT %s (%s,%s): xmk %s, xb %s, xf %s",
-	    Image(type(x)), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
-	    EchoLength(xmk), EchoLength(xb), EchoLength(xf));
 
 	  mk = back_edge + back(prev, dim);
 	  debug4(DGP, DD, "  FAPO-CAT back_edge %s, mk %s, framesize %s, inc %s",

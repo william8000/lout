@@ -1,27 +1,28 @@
 @Section
-   @Title { Changing the default values }
+   @Title { Changing the appearance of all programs simultaneously }
    @Tag { cpsetup }
 @Begin
 @PP
-We have just seen that the @Code "@CP" symbol has many options for
-changing the appearance of the C text.  However, most people would
-not want to have a different style for every C text in their document;
-they want to define the style once at the start, and have all their
-C texts come out in that style without laboriously setting options
-on every @Code "@CP" symbol.  This is done by copying the setup file
-and changing it.
+We have just seen that the {@Code "@CP"}, {@Code "@Eiffel"} etc. symbols
+have many options for changing the appearance of the program text.  However,
+most people would not want to have a different style for every program text
+in their document; they want to define the style once at the start, and have
+all their program texts come out in that style without laboriously setting
+options on every symbol.  You do this by copying the setup file and
+changing it.
 @PP
 For general information about how to make your own setup file, consult
 Section {@NumberOf setup}.  The options that determine the default
-values are in the @Code "@CPSetup" @Code "@Use" clause near the end of
+values are in the @Code "@Use" clause which occupies most of the setup
+file.  Here is the @Code "@Use" clause from {@Code cprint}:
 cprint. @Index @Code "@CPSetup"
-the @Code "cpsetup." setup file:
-@ID @Code @Tab
-   vmargin { 0.5vx }
-   @Fmta { @Col A ! @Col B ! @Col C}
-   @Fmtb { @Col { "    #" A } ! @Col { "{" B } ! @Col "}" }
+@ID @Code @Tbl
+   mv { 0.5vx }
+   aformat { @Cell A | @Cell B | @Cell C }
+   bformat { @Cell { "    #" A } | @Cell { "{" B } | @Cell "}" }
 {
 @Rowa A { "@Use {  @CPSetup" }
+@Rowb A { "pipe" } B {          }
 @Rowb A { "style" } B { fixed         }
 
 @Rowa 
@@ -65,13 +66,13 @@ the @Code "cpsetup." setup file:
 
 @Rowa A { "}" }
 }
-These show the default font families, font faces, font sizes, line
+This shows the default font families, font faces, font sizes, line
 spacings, and tab settings in force for the three styles, and also that
 the default style is {@Code "fixed"}.  Notice that the font family name
 for @Code "fixed" style is {@Code "Courier"}, but for the other styles is
 empty.  This causes the @Code "fixed" style to always switch to Courier,
 and the other styles to use the same font family as in the surrounding
-document.
+document.  The @Code pipe option will be explained in Section {@NumberOf pipes}.
 @PP
 To change a default value, delete the preceding @Code "#" and change the
 part between braces.  For example, suppose you are happy with @Code "fixed"
@@ -80,4 +81,11 @@ except that you want bold keywords.  Then one line needs to be changed, to
 Or suppose you like @Code "varying" as it stands, but would like it to be
 the default style rather than {@Code "fixed"}.  Again, only one line needs
 to be changed, to {@Code "style { varying }"}.
+@PP
+The setup files for the other languages are identical to this one, except
+that the symbol after @Code "@Use" is different, and some of the
+default values may be different.  Changing an option affects only the
+language of that setup file; if you have multiple languages you can
+have multiple setup files and change their options quite independently
+of each other.
 @End @Section

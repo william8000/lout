@@ -1,7 +1,7 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -745,10 +745,13 @@ int main(int argc, char *argv[])
   load(KW_UNDERLINE,    UNDERLINE,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_COLOUR,       COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_COLOR,        COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_OUTLINE,      OUTLINE,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_LANGUAGE,     LANGUAGE,       TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_CURR_LANG,    CURR_LANG,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_CURR_FAMILY,  CURR_FAMILY,    FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_CURR_FACE,    CURR_FACE,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_CURR_YUNIT,   CURR_YUNIT,     FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_CURR_ZUNIT,   CURR_ZUNIT,     FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_COMMON,       COMMON,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_RUMP,         RUMP,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_MELD,         MELD,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);

@@ -22,7 +22,7 @@
 #                                                                             #
 ###############################################################################
 
-export	"`" "``" "```" bin rel punct non vctr big
+export	"`" "``" "```" bin rel punct non vctr big small
 
 	space exclam universal numbersign existential percent
 	ampersand suchthat parenleft parenright asteriskmath
@@ -56,7 +56,8 @@ export	"`" "``" "```" bin rel punct non vctr big
 	bracerightbt
 
 	hbar Re Im partial infty prime nabla surd top bot dbar
-	triangle backslash forall exists neg circle square
+	triangle backslash forall exists neg
+	circle filledcircle square
 
 	"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
 
@@ -64,14 +65,14 @@ export	"`" "``" "```" bin rel punct non vctr big
 	boplus buplus
 
 	"+" "-" "+-" "-+" setminus cdot times "*" circ div cap cup uplus
-	sqcap sqcup triangleleft triangleright wr bigcirc bigtriangleup
-	bigtriangledown vee wedge oplus ominus otimes oslash odot dagger
-	daggerdbl amalg
+	sqcap sqcup triangleleft triangleright
+	wr bigcirc bigtriangleup bigtriangledown vee wedge oplus ominus
+	otimes oslash odot dagger daggerdbl amalg
 
 	"<" ">" "=" "<=" prec preceq "<<" subset subseteq sqsubseteq
 	in vdash smile frown ">=" succ succeq ">>" supset supseteq
 	sqsupseteq ni dashv mid parallel "==" "~" "-~" asymp "~~"
-	"=~" bowtie propto models doteq perp notsub notin "!=" not
+	"=~" bowtie propto models doteq trieq perp notsub notin "!=" not
 	"<->" "<--" "-->" up down "<=>" "<==" "==>" dblup dbldown
 	":" "::" ":="
 
@@ -98,7 +99,7 @@ export	"`" "``" "```" bin rel punct non vctr big
 	nearrow searrow swarrow nwarrow
 
 	sup sub tsub supp on ton frac half third over from to widefrom wideto
-	dot dotdot hat tilde vec dyad overbar underbar sqrt root
+	dot dotdot hat tilde vec dyad overbar underbar sqrt root zroot
 	nextcol above labove cabove rabove mabove
 	matrix pmatrix bmatrix brmatrix fmatrix cmatrix amatrix
 
@@ -164,6 +165,7 @@ def @Eq
     def punct	right x {     x `   }
     def non	right x { 0c @YUnit x }
     def big	right x { 1.3f @Font @SpaceGap @Space x }
+    def small	right x { 0.6f @Font @SpaceGap @Space x }
 
     def @Base   right x { Base @Font x }
     def @Sym    right x { {Symbol Base} @Font x }
@@ -460,93 +462,129 @@ def @Eq
     def exists       { existential				}
     def neg          { logicalnot				}
 
-    def circle       { @HContract @VContract
-				@BackEnd @Case {
-				  PostScript @Yield {
-				      { "xsize ysize 2 div moveto"
-					"xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
-					"0.04 ft setlinewidth stroke"
-				      }
-				      @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
-				  }
-				  PDF @Yield {
-#
-# VT: draws a counterclockwise 360 degree arc from 0 to +360 degree positions
-#     (straight right to straight right) with centre = (xsize/2, ysize/2)
-#     and radius = xsize/2
-#
-# implemented as two counterclockwise 180 degree arcs:
-#
-				      {
-	"__mul(0.04, __loutf) w"
-#
-#   start at (xsize, ysize/2)
-#   the control points are:
-#     pt1 = (xsize, ysize/2 + (4/3 * xsize/2)) and pt2 = (0, ysize/2 + (4/3 * xsize/2))
-#   end at (0, ysize/2)
-#
-	"__xsize __div(__ysize, 2) m"
-	"__xsize __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"	# pt1
-	"0 __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"		# pt2
-	"0 __div(__ysize, 2) c"								# pt3
-#
-#   start at (0, ysize/2)
-#   the control points are:
-#     pt1 = (0, ysize/2 - (4/3 * xsize/2)) and pt2 = (xsize, ysize/2 - (4/3 * xsize/2))
-#   end at (xsize, ysize/2)
-#
-	"0 __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"		# pt1
-	"__xsize __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"	# pt2
-	"__xsize __div(__ysize, 2) c S"						# pt3
-				      }
-				      @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
-				  }
-				}
-		     }
+    def circle
+    { @HContract @VContract @BackEnd @Case {
+	PostScript @Yield {
+	  {
+	    "xsize ysize 2 div moveto"
+	    "xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
+	    "0.04 ft setlinewidth stroke"
+	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+	PDF @Yield {
+	  #
+	  # VT: draws a counterclockwise 360 degree arc from 0 to +360
+	  # degree positions (straight right to straight right) with
+	  # centre = (xsize/2, ysize/2) and radius = xsize/2, 
+	  # implemented as two counterclockwise 180 degree arcs.
+	  # start at (xsize, ysize/2); the control points are:
+	  #
+	  #     pt1 = (xsize, ysize/2 + (4/3 * xsize/2))
+	  #     pt2 = (0, ysize/2 + (4/3 * xsize/2))
+	  #
+	  # end at (0, ysize/2).  Then start at (0, ysize/2); control points
+	  #
+	  #     pt1 = (0, ysize/2 - (4/3 * xsize/2))
+	  #     pt2 = (xsize, ysize/2 - (4/3 * xsize/2))
+	  #
+	  # and end at (xsize, ysize/2).
 
-    def square       { @HContract @VContract
-				@BackEnd @Case {
-				  PostScript @Yield {
-				      { "0 0 moveto xsize 0 lineto xsize ysize lineto"
-					"0 ysize lineto closepath"
-					"0.04 ft setlinewidth stroke"
-				      }
-				      @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
-				  }
-				  PDF @Yield {
-				      { "__mul(__loutf, 0.04) w"
-				        "0 0 m __xsize 0 l __xsize __ysize l"
-				        "0 __ysize l s"
-				      }
-				      @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
-				  }
-				}
-		     }
+	  {
+	    "__mul(0.04, __loutf) w"
+	    "__xsize __div(__ysize, 2) m"
+	    "__xsize __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "0 __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "0 __div(__ysize, 2) c"
+	    "0 __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "__xsize __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "__xsize __div(__ysize, 2) c S"
+	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+      }
+    }
 
-    def triangle     { @HContract @VContract
-				@BackEnd @Case {
-				  PostScript @Yield {
-				      { "0 0 moveto xsize 0 lineto"
-				        "xsize 2 div ysize lineto closepath"
-					"0.04 ft setlinewidth stroke"
-				      }
-				      @Graphic
-				      { 0.3f @Wide 0.3f @High ^| ^/
-				        0.3f @Wide 0.3f @High
-				      }
-				  }
-				  PDF @Yield {
-				      { "__mul(__loutf, 0.04) w"
-				        "0 0 m __xsize 0 l"
-				        "__div(__xsize, 2) __ysize l s"
-				      }
-				      @Graphic
-				      { 0.3f @Wide 0.3f @High ^| ^/
-				        0.3f @Wide 0.3f @High
-				      }
-				  }
-				}
-		     }
+    def filledcircle
+    { @HContract @VContract @BackEnd @Case {
+	PostScript @Yield {
+	  {
+	    "xsize ysize 2 div moveto"
+	    "xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
+	    "0.04 ft setlinewidth fill"
+	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+	PDF @Yield {
+	  #
+	  # JK: I don't know how to fill in PDF, so this doesn't!
+	  #
+	  # VT: draws a counterclockwise 360 degree arc from 0 to +360
+	  # degree positions (straight right to straight right) with
+	  # centre = (xsize/2, ysize/2) and radius = xsize/2, 
+	  # implemented as two counterclockwise 180 degree arcs.
+	  # start at (xsize, ysize/2); the control points are:
+	  #
+	  #     pt1 = (xsize, ysize/2 + (4/3 * xsize/2))
+	  #     pt2 = (0, ysize/2 + (4/3 * xsize/2))
+	  #
+	  # end at (0, ysize/2).  Then start at (0, ysize/2); control points
+	  #
+	  #     pt1 = (0, ysize/2 - (4/3 * xsize/2))
+	  #     pt2 = (xsize, ysize/2 - (4/3 * xsize/2))
+	  #
+	  # and end at (xsize, ysize/2).
+
+	  {
+	    "__mul(0.04, __loutf) w"
+	    "__xsize __div(__ysize, 2) m"
+	    "__xsize __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "0 __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "0 __div(__ysize, 2) c"
+	    "0 __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "__xsize __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "__xsize __div(__ysize, 2) c S"
+	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+      }
+    }
+
+    def square
+    { @HContract @VContract @BackEnd @Case {
+	PostScript @Yield {
+	  {
+	    "0 0 moveto xsize 0 lineto xsize ysize lineto"
+	    "0 ysize lineto closepath"
+	    "0.04 ft setlinewidth stroke"
+	  } @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+	PDF @Yield {
+	  {
+	    "__mul(__loutf, 0.04) w"
+	    "0 0 m __xsize 0 l __xsize __ysize l"
+	    "0 __ysize l s"
+	  } @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+      }
+    }
+
+    def triangle
+    { @HContract @VContract @BackEnd @Case {
+	PostScript @Yield {
+	  {
+	    "0 0 moveto xsize 0 lineto"
+	    "xsize 2 div ysize lineto closepath"
+	    "0.04 ft setlinewidth stroke"
+	  } @Graphic { 0.3f @Wide 0.3f @High ^| ^/ 0.3f @Wide 0.3f @High }
+	}
+	PDF @Yield {
+	  {
+	    "__mul(__loutf, 0.04) w"
+	    "0 0 m __xsize 0 l"
+	    "__div(__xsize, 2) __ysize l s"
+	  } @Graphic { 0.3f @Wide 0.3f @High ^| ^/ 0.3f @Wide 0.3f @High }
+	}
+      }
+    }
+
+    def triangledown { 180d @Rotate triangle }
 
     ###################################################################
     #                                                                 #
@@ -774,6 +812,7 @@ def @Eq
     def bowtie		{ rel{non triangleright non triangleleft}}
     def propto		{ rel proportional			}
     def models		{ rel{@Base vctr "|" &0.05fo vctr equal}}
+    def trieq		{ rel @OneRow @HContract {&0.5rt small triangle^/0.15f equal}}
     def doteq		{ rel @OneRow @HContract {&0.5rt dotmath^/0.15f equal}}
     def perp		{ rel perpendicular			}
 
@@ -1444,6 +1483,16 @@ def @Eq
 	right y
     {
 	"" sup x &0io sqrt y
+    }
+
+    def zroot
+	precedence 56
+	left x
+	right y
+    {
+	def zsup right x { "+0.3f" @VShift 0.5f @Font @Space x }
+
+	"-0.4f" @HShift { 1w @HShift { zsup x } }  &0co sqrt y
     }
 
     def above

@@ -1,7 +1,7 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -218,10 +218,13 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case BREAK:
     case UNDERLINE:
     case COLOUR:
+    case OUTLINE:
     case LANGUAGE:
     case CURR_LANG:
     case CURR_FAMILY:
     case CURR_FACE:
+    case CURR_YUNIT:
+    case CURR_ZUNIT:
     case COMMON:
     case RUMP:
     case MELD:
@@ -296,6 +299,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     default:
     
       assert1(FALSE, "CopyObject:", Image(type(x)));
+      res = nilobj;
       break;
 
   } /* end switch */

@@ -1,5 +1,5 @@
-THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)
-BASSER LOUT VERSION 3 COPYRIGHT (C) 1994, 1999 Jeffrey H. Kingston
+THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)
+BASSER LOUT VERSION 3 COPYRIGHT (C) 1994, 2000 Jeffrey H. Kingston
 
 Jeffrey H. Kingston
 Basser Department of Computer Science
@@ -34,7 +34,7 @@ formatting system.  It contains the following directories:
     hyph            Lout hyphenation files (see hyph/README for info)
     include         Lout packages (in Lout)
     locale          Locale-specific error messages
-    man             Lout and c2lout manual entries
+    man             Lout and prg2lout manual entries
     maps            Lout Character Mapping (LCM) files
     setup           Lout setup files (in Lout)
     software        Information about Lout-related software from elsewhere
@@ -44,7 +44,7 @@ and the following files:
     READMEPDF       A description of the PDF back end
     blurb           A news blurb describing Lout
     blurb.short     A short news blurb describing Lout
-    c2lout.c        c2lout source code (all in one file)
+    prg2lout.c      prg2lout source code (all in one file)
     externs.h z*.c  Lout source code
     gnu.gpl         A copy of the GNU General Public License
     makefile        A makefile for installing Lout

@@ -10,19 +10,18 @@ horizontally.  For example,
 horizontally centres the entry within the cell.  The other possible values
 centred.entries @Index { centred entries in tables }
 right.justified.entries @Index { right justified entries in tables }
-of this option are {@Code "left"}, {@Code "right"}, or any length (for
+of this option are {@Code "left"} (the default value), {@Code "right"},
+{@Code "align"} (Section {@NumberOf tbl_alig}), or any length (for
 example, {@Code 2f}) meaning that much indent.
 @PP
 There is a corresponding @Code "indentvertical" option for vertical indenting
 within the cell.  It takes the same values except that @Code "left" is
-renamed {@Code "top"}, and @Code "right" is renamed {@Code foot}.
-A common problem with vertical placement is that words that lack
-ascenders (parts of letters that rise up) or descenders (parts that
-sink down) can easily become misaligned with words that
-don't.  Looking at
+renamed {@Code "top"}, @Code "right" is renamed {@Code foot}.  A common
+problem with vertical placement is that words that lack ascenders (parts
+of letters that rise up) or descenders (parts that sink down) can easily
+become misaligned with words that don't.  Looking at
 @CD @Tbl
     aformat { @Cell A | @Cell B | @Cell C }
-    marginvertical { 0i }
 {
 @Rowa
     A { resume }

@@ -1,11 +1,11 @@
 @Section
-   @Title { Embedded mode }
+   @Title { Typesetting computer programs as part of a larger document }
    @Tag { embedded }
 @Begin
 @PP
-When the C program texts are to be embedded in a larger Lout document,
-the procedure is somewhat different.  You need to include the
-@Code "cprint" setup file, like this:
+When the program texts are to be part of a larger Lout document,
+the procedure is somewhat different.  You need to include the setup file
+appropriate to your language, like this:
 @ID @OneRow @Code {
 "@SysInclude { cprint }"
 "@SysInclude { doc }"
@@ -13,9 +13,13 @@ the procedure is somewhat different.  You need to include the
 "..."
 "@End @Text"
 }
-This file includes everything needed to set up for C program formatting.
+The @Code cprint setup file includes everything needed to set up for C
+program formatting; for the other languages, consult the second column
+of the table at the start of this chapter.
 @PP
-The C parts of the document are enclosed in @Code "@CP { ... }" like this:
+The program texts within the Lout document are enclosed in braces
+preceded by the Lout symbol from the third column of the table, like
+this for the C language:
 @ID @OneRow @Code {
 "@IndentedDisplay @CP {"
 "#include <stdio.h>"
@@ -31,9 +35,10 @@ The C parts of the document are enclosed in @Code "@CP { ... }" like this:
 "}"
 "}"
 }
-Although C programs violate the rules of legal Lout input in many ways,
-these rules are suspended by the @Code "@CP" symbol, allowing the C
-text to be incorporated with absolutely no modifications.  The result is
+Although computer programs violate the rules of legal Lout input in many ways,
+these rules are suspended by the {@Code "@CP"}, {@Code "@Eiffel"} etc. symbols,
+allowing the program text to be incorporated with absolutely no
+modifications.  The result is
 @ID @OneRow @CP {
 #include <stdio.h>
 
@@ -49,104 +54,29 @@ struct tnode *p;
 }
 We have chosen to use the @Code "@IndentedDisplay" symbol from Section
 {@NumberOf displays} to obtain an indented display, but in fact
-@Code "@CP" may appear anywhere at all.  When including a C text within
-a paragraph, use @Code "@OneCol @CP { ... }" to prevent it being broken
-across two lines, if desired.
+{@Code "@CP"}, {@Code "@Eiffel"} and the rest may appear anywhere at
+all:  the result is an object in the usual way, which may go
+anywhere.  When including a program text within a paragraph, use
+@Code "@OneCol @CP { ... }" (or @Code "@OneCol @Eiffel { ... }" etc. for
+other languages) to prevent it being broken across two lines, if desired.
 @PP
-In cases where the C text has unbalanced braces, it is necessary to
-use the alternative form @Code "@CP @Begin ... @End @CP" so that
-Lout does not confuse C braces with Lout braces.
+In cases where the program text has unbalanced braces, it is necessary to
+use the alternative form @Code "@CP @Begin ... @End @CP" (or the
+equivalent for other languages), so that Lout does not confuse program
+braces with Lout braces.  In that case the program text must not
+contain {@Code "@End"}; and in either case the program text must not
+include @Code "@Include" or @Code "@SysInclude" unless you are really
+including a file at that point (which is allowed, and follows the
+rules given for @Code "@Verbatim" in Section {@NumberOf verbatim}).
 @PP
-The @Code "@CP" symbol has a @Code "style" option for changing the
-printing style.  The default value of @Code "style" is {@Code "fixed"},
-which produces the style shown above.  To obtain a varying-width font
-style, use @Code "style { varying }" like this:
-@ID @OneRow @Code {
-"@CP"
-"    style { varying }"
-"{"
-"#include <stdio.h>"
-""
-"treeprint(p)        /* print tree p recursively */"
-"struct tnode *p;"
-"{"
-"        if (p != NULL) {"
-"                treeprint(p->left);"
-"                printf(\"%4d %s\\n\", p->count, p->word);"
-"                treeprint(p->right);"
-"        }"
-"}"
-"}"
-}
-The result in this case will be
-@ID @OneRow @CP style { varying }
-{
-#include <stdio.h>
-
-treeprint(p)        /* print tree p recursively */
-struct tnode *p;
-{
-        if (p != NULL) {
-                treeprint(p->left);
-                printf("%4d %s\n", p->count, p->word);
-                treeprint(p->right);
-        }
-}
-}
-There is also a third style called @Code "style { symbol }" which is
-similar to @Code "varying" except that it uses characters from the
-Adobe Symbol font to produce a more mathematical-looking result:
-@ID @OneRow @CP style { symbol }
-{
-#include <stdio.h>
-
-treeprint(p)        /* print tree p recursively */
-struct tnode *p;
-{
-        if (p != NULL) {
-                treeprint(p->left);
-                printf("%4d %s\n", p->count, p->word);
-                treeprint(p->right);
-        }
-}
-}
-The @Code "@CP" symbol has additional options which allow a finer
-control over the style.  Here they all are, with their default values:
-@ID @OneRow @Code {
-"@CP"
-"    style { fixed }"
-"    font { Courier }"
-"    strings { Base }"
-"    identifiers { Base }"
-"    comments { Base }"
-"    keywords { Base }"
-"    numbers { Base }"
-"    operators { Base }"
-"    size { -1.0p }"
-"    line { 1.0vx }"
-"    tabin { 8 }"
-"    tabout { 8s }"
-"{"
-"    ..."
-"}"
-}
-We are already familiar with {@Code "style"}.  After that comes
-{@Code "font"}, which determines the font family to use, followed
-by six options giving the particular faces within that family in which to
-print C strings, identifiers, comments, keywords, numbers, and
-operators.  {@Code "Base"} means the basic face; other commonly available
-choices are {@Code "Slope"} and {@Code "Bold"}.  These options may all be
-set to different faces if desired.  The default values shown are correct
-for @Code "style { fixed }" only; the other styles have other defaults
-(Section {@NumberOf cpsetup}).
-@PP
-The @Code "size" option is the font size to use, and @Code "line" is the
-inter-line spacing.  The default values specify that @Code "size" is
-to be one point smaller than in the surrounding document; this was done
-to compensate for Courier's relatively large appearance compared
-to other fonts of the same nominal size.  Again, these defaults are
-different for different values of {@Code "style"}.
-@PP
-The @Code "tabin" and @Code "tabout" options are the subject of
-Section {@NumberOf tabs}.
+If your Lout document contains program texts in several languages,
+simply add one @Code "@SysInclude" line for each of them and proceed
+as before.  If your programming language is not currently supported,
+a viable alternative is
+@ID @Code "@F @Verbatim { ... }"
+These symbols cause the text between braces to be set verbatim in
+a fixed-width font, as explained elsewhere in this guide.  This fallback
+method will not handle tab and formfeed characters very well.  Again,
+use @Code "@Begin" and @Code "@End @Verbatim" instead of braces if
+your program text contains unbalanced braces.
 @End @Section

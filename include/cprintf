@@ -1,22 +1,25 @@
 
 ###############################################################################
 #                                                                             #
-#  Lout @CPSetup package for formatting C and C++ programs (Version 1.1)      #
+#  Lout @CPSetup package for formatting C programs                            #
 #                                                                             #
-#  Version 1.0 by Jeffrey H. Kingston, March 1994.                            #
-#  Version 1.1 by Jeffrey H. Kingston, November 1998 (name change only)       #
+#  Version 2.0 by Jeffrey H. Kingston, February 2000.                         #
 #                                                                             #
-#  This package uses a filtered body parameter to convert C and C++ source    #
-#  code into Lout source.  The filter program is c2lout which is distributed  #
-#  with Basser Lout Version 3.  The list of keywords and tokens is from       #
-#  Stroustrup, 2nd Edition.  See "User's Guide to the Lout Document           #
-#  Formatting System" for user information.                                   #
+#  This package uses a filtered body parameter to convert C source            #
+#  code into Lout source.  The filter program is prg2lout, which is           #
+#  distributed with Lout and should be compiled and installed wherever        #
+#  Lout itself is.                                                            #
 #                                                                             #
 ###############################################################################
 
 export @CP
 def @CPSetup
-    named style              { fixed     }  # print style
+    named style
+        named @OrIfPlain left x right y
+        { @BackEnd @Case { PlainText @Yield y else @Yield x } }
+                             { fixed	 }  # print style
+
+    named pipe               {           }  # pipe through this first
 
     named fixedfont          { Courier   }  # font family if fixed
     named fixedstrings       { Base      }  # string face if fixed
@@ -58,29 +61,11 @@ def @CPSetup
 
     export
     
-	"$$" "$>" "`" @L @S @C
-
-	"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
-
-	"!" "%" "^" "&" "*" "(" ")" "-" "+" "=" "${" "$}" "|" "~"
-	"[" "]"     ";" "'" ":" "<" ">" "?" "," "."  "/"
-
-	"->" "++" "--" ".*" "->*" "<<" ">>"  "<="  ">=" "==" "!=" "&&"
-	"||" "*=" "/=" "%=" "+="  "-=" "<<=" ">>=" "&=" "^=" "|=" "::"
-
-	asm       continue  float     new       signed    try
-	auto      default   for       operator  sizeof    typedef
-	break     delete    friend    private   static    union
-	case      do        goto      protected struct    unsigned
-	catch     double    if        public    switch    virtual
-	char      else      inline    register  template  void
-	class     enum      int       return    this      volatile
-	const     extern    long      short     throw     while
-
-	@EvaluateCp
+	"$>" @S @D @C @K @N @O @A @ST @ED @M
 
     def @CP
 	named style        { style         }  # style
+	named pipe         { pipe          }  # pipe through this first
 	named font         { dft           }  # font family
 	named strings      { dft           }  # string font
 	named identifiers  { dft           }  # ident. font
@@ -131,8 +116,17 @@ def @CPSetup
 
 	def @Filter
 	{
-	    c2lout -r -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
-	      -t{@InitTab} -T{@InitTabWidth}
+	    pipe @Case {
+		"" @Yield {
+	    	    "prg2lout -r -lC" -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
+			-t{@InitTab} -T{@InitTabWidth}
+		}
+		else @Yield {
+	    	    "cat" @FilterIn "|" pipe "|"
+		    "prg2lout -r -lC" -o{@FilterOut}
+		    -e{@FilterErr} -t{@InitTab} -T{@InitTabWidth}
+		}
+	    }
 	}
 
 	def @InitFontFamily
@@ -159,47 +153,37 @@ def @CPSetup
 	      ifsymbol  { symbolline  }
 	}
 
-	def @S		# for formatting C strings
+	def @S		# for formatting strings
 	    right x
 	{
-	    "\"" &
+	    # "\"" &
 	    strings @Test
 	      iffixed   { fixedstrings   }
 	      ifvarying { varyingstrings }
 	      ifsymbol  { symbolstrings  }
 	    @Font x
-	    & "\""
+	    # & "\""
 	}
 
-	def "`"
-	{
-	    style @Case {
-		symbol	@Yield { "`" }
-		else	@Yield { "'" }
-	    }
-	}
+#	def "`"
+#	{
+#	    style @Case {
+#		symbol	@Yield { "`" }
+#		else	@Yield { "'" }
+#	    }
+#	}
 
-	def @L		# for formatting C character literals
+	def @D	# for formatting identifiers
 	    right x
-	{
-	    ` &
-	    strings @Test
-	      iffixed   { fixedstrings   }
-	      ifvarying { varyingstrings }
-	      ifsymbol  { symbolstrings  }
-	    @Font x
-	    & '
-	}
-
-	def @Ident	# for formatting C identifiers
 	{
 	    identifiers @Test
 	      iffixed   { fixedidentifiers   }
 	      ifvarying { varyingidentifiers }
 	      ifsymbol  { symbolidentifiers  }
+	    @Font x
 	}
 
-	def @C		# for formatting C comments
+	def @C		# for formatting comments
 	    right x
 	{
 	    comments @Test
@@ -209,7 +193,7 @@ def @CPSetup
 	    @Font x
 	}
 
-	def @K		# for formatting C keywords
+	def @K		# for formatting keywords
 	    right x
 	{
 	    keywords @Test
@@ -219,7 +203,7 @@ def @CPSetup
 	    @Font x
 	}
 
-	def @N		# for formatting C numbers
+	def @N		# for formatting numbers
 	    right x
 	{
 	    numbers @Test
@@ -229,7 +213,8 @@ def @CPSetup
 	    @Font x
 	}
 
-	def @O		# for formatting C operators
+	def @O		# for formatting operators
+	    named symb {}
 	    right x
 	{
 	    operators @Test
@@ -249,133 +234,41 @@ def @CPSetup
 	    }
 	}
 
-	macro "$>" { {} & }
-
-	def "$$" { "#" }
-
-	def "0"		{ @N "0"			}
-	def "1"		{ @N "1"			}
-	def "2"		{ @N "2"			}
-	def "3"		{ @N "3"			}
-	def "4"		{ @N "4"			}
-	def "5"		{ @N "5"			}
-	def "6"		{ @N "6"			}
-	def "7"		{ @N "7"			}
-	def "8"		{ @N "8"			}
-	def "9"		{ @N "9"			}
-
-	def "!"		{ 		  @O "!"	}
-	def "%"		{		  @O "%"	}
-	def "^"		{		  @O "^"	}
-	def "&"		{		  @O "&"	}
-	def "*"		{ asteriskmath @A @O "*"	}
-	def "("		{		  @O "("	}
-	def ")"		{		  @O ")"	}
-	def "-"		{ minus @A	  @O "-"	}
-	def "+"		{ plus  @A	  @O "+"	}
-	def "="		{ equal @A	  @O "="	}
-	def "${"	{		  @O "{"	}
-	def "$}"	{		  @O "}"	}
-	def "|"		{		  @O "|"	}
-	def "~"		{		  @O "~"	}
-	def "["		{		  @O "["	}
-	def "]"		{		  @O "]"	}
-	def ";"		{		  @O ";"	}
-	def "'"		{		  @O "'"	}
-	def ":"		{		  @O ":"	}
-	def "<"		{ less @A	  @O "<"	}
-	def ">"		{ greater @A	  @O ">"	}
-	def "?"		{		  @O "?"	}
-	def ","		{		  @O ","	}
-	def "."		{		  @O "."	}
-	def "/"		{		  @O "/"	}
-	def "->"	{ arrowright @A	  @O "->"	}
-	def "++"	{		     { + }{ + }	}
-	def "--"	{		     { - }{ - }	}
-	def ".*"	{		     { . }{ * } }
-	def "->*"	{		     { ->}{ * }	}
-	def "<<"	{		     { < }{ < }	}
-	def ">>"	{		     { > }{ > }	}
-	def "<="	{ lessequal @A	  @O "<="	}
-	def ">="	{ greaterequal @A @O ">="	}
-	def "=="	{		     { = }{ = } }
-	def "!="	{ notequal @A	  @O "!="	}
-	def "&&"	{		     { & }{ & }	}
-	def "||"	{		     { | }{ | }	}
-	def "*="	{		     { * }{ = }	}
-	def "/="	{		     { / }{ = } }
-	def "%="	{		     { % }{ = } }
-	def "+="	{		     { + }{ = }	}
-	def "-="	{		     { - }{ = }	}
-	def "<<="	{		     { <<}{ = }	}
-	def ">>="	{		     { >>}{ = }	}
-	def "&="	{		     { & }{ = }	}
-	def "^="	{		     { ^ }{ = } }
-	def "|="	{		     { | }{ = }	}
-	def "::"	{		     { : }{ : }	}
-
-	def asm		{ @K "asm"			}
-	def auto	{ @K "auto"			}
-	def break	{ @K "break"			}
-	def case	{ @K "case"			}
-	def catch	{ @K "catch"			}
-	def char	{ @K "char"			}
-	def class	{ @K "class"			}
-	def const	{ @K "const"			}
-
-	def continue	{ @K "continue"			}
-	def default	{ @K "default"			}
-	def delete	{ @K "delete"			}
-	def do		{ @K "do"			}
-	def double	{ @K "double"			}
-	def else	{ @K "else"			}
-	def enum	{ @K "enum"			}
-	def extern 	{ @K "extern"			}
-
-	def float	{ @K "float"			}
-	def for		{ @K "for"			}
-	def friend	{ @K "friend"			}
-	def goto	{ @K "goto"			}
-	def if		{ @K "if"			}
-	def inline	{ @K "inline"			}
-	def int		{ @K "int"			}
-	def long	{ @K "long"			}
-
-	def new		{ @K "new"			}
-	def operator	{ @K "operator"			}
-	def private	{ @K "private"			}
-	def protected	{ @K "protected"		}
-	def public	{ @K "public"			}
-	def register	{ @K "register"			}
-	def return	{ @K "return"			}
-	def short	{ @K "short"			}
-
-	def signed	{ @K "signed"			}
-	def sizeof	{ @K "sizeof"			}
-	def static	{ @K "static"			}
-	def struct	{ @K "struct"			}
-	def switch	{ @K "switch"			}
-	def template	{ @K "template"			}
-	def this	{ @K "this"			}
-	def throw	{ @K "throw"			}
-
-	def try		{ @K "try"			}
-	def typedef	{ @K "typedef"			}
-	def union	{ @K "union"			}
-	def unsigned	{ @K "unsigned"			}
-	def virtual	{ @K "virtual"			}
-	def void	{ @K "void"			}
-	def volatile	{ @K "volatile"			}
-	def while	{ @K "while"			}
-
-	def @EvaluateCp right x
+	def @ST		# for formatting asterisks
+	    right x
 	{
-	  { @InitFontFamily Base } @Font
-	  { @Ident @InitSize } @Font
-	  { @InitLine lines } @Break x
+	    operators @Test
+	      iffixed   { fixedoperators   }
+	      ifvarying { varyingoperators }
+	      ifsymbol  { symboloperators  }
+	    @Font "0.5w" @VShift x
+	}
+ 
+	def @ED		# for formatting larger dots (not used in C)
+	    right x
+	{
+	    operators @Test
+	      iffixed   { fixedoperators   }
+	      ifvarying { varyingoperators }
+	      ifsymbol  { symboloperators  }
+	    @Font @BackEnd @Case {
+		PlainText @Yield x
+		else @Yield { "1.2f" @Font "+0.05f" @VShift @O x &"0.05f" }
+	    }
 	}
 
-	{ @InitFontFamily Base } @Font { @Ident @InitSize } @Font
+	macro "$>" { {} & }
+
+	def @M right x
+	{
+	    style @Case {
+		fixed	@Yield "-"
+		varying @Yield { { Symbol Base } @Font @Char minus }
+		symbol  @Yield { { Symbol Base } @Font @Char minus }
+	    }
+	}
+
+	{ @InitFontFamily Base @InitSize } @Font
 	{ @InitLine lines } @Break @Body
 
     @End @CP

@@ -1,7 +1,7 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -68,7 +68,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   /* make sure we have a WORD or QWORD argument */
   if( !is_word(type(x)) )
   { Error(17, 1, "gap is not a simple word", WARN, &fpos(x));
-    debug1(DGW, DD, "GetGap failing (type(x) = %s)", Image(type(x)));
+    debug1(DGW, DD, "GetGap failing (x = %s)", EchoObject(x));
     return;
   }
   str = string(x);
@@ -369,11 +369,11 @@ FULL_LENGTH ActualGap(FULL_LENGTH prevf, FULL_LENGTH b, FULL_LENGTH f,
 #if DEBUG_ON
 
 FULL_CHAR *EchoGap(GAP *xgap)
-{ char *letter = "?ehxokt";  char c;  FULL_CHAR *res;
+{ char *letter = "?ehxoktH";  char c;  FULL_CHAR *res;
   char *u;
   static int i = 0;
   static char buff[3][20];
-  assert( mode(*xgap) <= 6, "EchoGap: mode(*xgap)" );
+  c = mode(*xgap) <= 7 ? letter[mode(*xgap)] : '?';
   c = letter[mode(*xgap)];
   u = nobreak(*xgap) ? "u" : "";
   switch( units(*xgap) )

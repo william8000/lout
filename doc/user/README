@@ -16,9 +16,9 @@ nearly all beginning with "unresolved cross reference".  These
 should gradually go away on later runs.  The following shows the
 error message output on the fifth run for A4 size printing:
 
-lout file "cpp_tabs" (from "cpp" line 24, from "all" line 38):
-   53,23: c2lout: C text ended inside a comment
-   55,35: c2lout: C text ended inside a comment
+lout file "cpp_tabs" (from "cpp" line 80, from "all" line 45):
+   56,23: prg2lout 2,1: program text ended within comment
+   58,35: prg2lout 2,1: program text ended within comment
 
 These two warnings point to two places where a C program text ended
 inside a comment, which in these cases was deliberate so is no problem.
@@ -31,7 +31,7 @@ repeated failure to converge, caused by footnotes and floating figures
 close to large unbreakable displays.
 
 A copy of the final PostScript output file (A4 paper size) is
-stored at "ftp://ftp.cs.su.oz.au/jeff/lout/lout.3.17.user.ps.gz".
+stored at "ftp://ftp.cs.su.oz.au/jeff/lout/lout-3.18.user.ps.gz".
 
 Jeffrey H. Kingston
-17 September 1999
+23 February 2000

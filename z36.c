@@ -1,7 +1,7 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -1080,6 +1080,7 @@ OBJECT Hyphenate(OBJECT x)
       z = MakeWord(WORD, &key[stop+1], &fpos(y));
       word_font(z) = word_font(y);
       word_colour(z) = word_colour(y);
+      word_outline(z) = word_outline(y);
       word_language(z) = word_language(y);
       word_hyph(z) = word_hyph(y);
       underline(z) = underline(y);
@@ -1194,6 +1195,7 @@ OBJECT Hyphenate(OBJECT x)
       {	z = MakeWord(WORD, &key[start+i-1], &fpos(y));
 	word_font(z) = word_font(y);
 	word_colour(z) = word_colour(y);
+	word_outline(z) = word_outline(y);
 	word_language(z) = word_language(y);
 	word_hyph(z) = word_hyph(y);
 	underline(z) = underline(y);

@@ -1,7 +1,7 @@
 /*@z09.c:Closure Expansion:SearchEnv()@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -180,12 +180,12 @@ OBJECT *crs, OBJECT *res_env)
         if( type(par) == PAR && actual(par) == actual(x) )
         { assert( Down(par) != par, "ExpandCLosure: Down(par)!");
 	  Child(res, Down(par));
-	  if( dirty(enclosing(actual(par))) )
-	  { debug2(DSU, DD, "c %s %s", SymName(actual(par)), EchoObject(res));
+	  if( dirty(enclosing(actual(par))) || is_enclose(actual(par)) )
+	  { debug2(DCE, DD, "copy %s %s", SymName(actual(par)), EchoObject(res));
 	    res = CopyObject(res, no_fpos);
 	  }
 	  else
-	  { debug2(DCE, DDD, "l %s %s",
+	  { debug2(DCE, DD, "link %s %s",
 	      FullSymName(actual(par), AsciiToFull(".")), EchoObject(res));
 	    DeleteLink(Down(par));
 	    y = MakeWord(WORD, STR_NOCROSS, &fpos(res));

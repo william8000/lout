@@ -1,0 +1,274 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @EiffelSetup package for formatting Eiffel programs                   #
+#                                                                             #
+#  Version 2.0 by Jeffrey H. Kingston, February 2000.                         #
+#                                                                             #
+#  This package uses a filtered body parameter to convert Eiffel source       #
+#  code into Lout source.  The filter program is prg2lout, which is           #
+#  distributed with Lout and should be compiled and installed wherever        #
+#  Lout itself is.                                                            #
+#                                                                             #
+###############################################################################
+
+export @Eiffel
+def @EiffelSetup
+    named style
+	named @OrIfPlain left x right y
+	{ @BackEnd @Case { PlainText @Yield y else @Yield x } }
+			     { varying @OrIfPlain fixed }  # print style
+    named pipe               {           }  # pipe through this first
+
+    named fixedfont          { Courier   }  # font family if fixed
+    named fixedstrings       { Base      }  # string face if fixed
+    named fixedidentifiers   { Base      }  # identifier face if fixed
+    named fixedcomments      { Base      }  # comment face if fixed
+    named fixedkeywords      { Base      }  # keyword face if fixed
+    named fixednumbers       { Base      }  # number face if fixed
+    named fixedoperators     { Base      }  # operator face if fixed
+    named fixedsize          { -1.0p     }  # font size if fixed
+    named fixedline          { 1.0vx     }  # line-space if fixed
+    named fixedtabin	     { 8	 }  # tab interval if fixed
+    named fixedtabout	     { 8s	 }  # tab width if fixed
+
+    named varyingfont        {           }  # font family if varying
+    named varyingstrings     { Slope     }  # string face if varying
+    named varyingidentifiers { Slope     }  # identifier face if varying
+    named varyingcomments    { Base      }  # comment face if varying
+    named varyingkeywords    { Bold      }  # keyword face if varying
+    named varyingnumbers     { Base      }  # number face if varying
+    named varyingoperators   { Base      }  # operator face if varying
+    named varyingsize        { 1.0f      }  # font size if varying
+    named varyingline        { 1.0vx     }  # line-space if varying
+    named varyingtabin       { 8	 }  # tab interval if varying
+    named varyingtabout      { 3f	 }  # tab width if varying
+
+    named symbolfont         {           }  # font family if symbol
+    named symbolstrings      { Slope     }  # string face if symbol
+    named symbolidentifiers  { Slope     }  # identifier face if symbol
+    named symbolcomments     { Base      }  # comment face if symbol
+    named symbolkeywords     { Bold      }  # keyword face if symbol
+    named symbolnumbers      { Base      }  # number face if symbol
+    named symboloperators    { Base      }  # operator face if symbol
+    named symbolsize         { 1.0f      }  # font size if symbol
+    named symbolline         { 1.0vx     }  # line-space if symbol
+    named symboltabin        { 8	 }  # tab interval if symbol
+    named symboltabout       { 3f	 }  # tab width if symbol
+
+@Begin
+
+    export
+    
+	"$>" @S @D @C @K @N @O @A @ST @ED @M
+
+    def @Eiffel
+	named style        { style         }  # style
+	named pipe         { pipe          }  # pipe through this first
+	named font         { dft           }  # font family
+	named strings      { dft           }  # string font
+	named identifiers  { dft           }  # ident. font
+	named comments     { dft           }  # comment font
+	named keywords     { dft           }  # keyword font
+	named numbers      { dft           }  # number font
+	named operators    { dft           }  # operator font
+	named size         { dft           }  # font size
+	named line         { dft           }  # line-space
+	named tabin        { dft           }  # tab interval
+	named tabout       { dft           }  # tab width
+	body @Body			      # filtered, see below
+    @Begin
+
+	def @Test	# returns x unless x is dft
+	    left x
+	    named iffixed {}
+	    named ifvarying {}
+	    named ifsymbol {}
+	{
+	    x @Case {
+		dft @Yield {
+		    style @Case {
+			fixed   @Yield { iffixed   }
+			varying @Yield { ifvarying }
+			symbol  @Yield { ifsymbol  }
+		    }
+		}
+		else @Yield x
+	    }
+	}
+
+	def @InitTab
+	{
+	  tabin @Test
+	      iffixed   { fixedtabin   }
+	      ifvarying { varyingtabin }
+	      ifsymbol  { symboltabin  }
+	}
+
+	def @InitTabWidth
+	{
+	  tabout @Test
+	      iffixed   { fixedtabout   }
+	      ifvarying { varyingtabout }
+	      ifsymbol  { symboltabout  }
+	}
+
+	def @Filter
+	{
+	    pipe @Case {
+		"" @Yield {
+	    	    "prg2lout -r -lEiffel" -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
+			-t{@InitTab} -T{@InitTabWidth}
+		}
+		else @Yield {
+	    	    "cat" @FilterIn "|" pipe "|"
+		    "prg2lout -r -lEiffel" -o{@FilterOut}
+		    -e{@FilterErr} -t{@InitTab} -T{@InitTabWidth}
+		}
+	    }
+	}
+
+	def @InitFontFamily
+	{
+	  font @Test
+	      iffixed   { fixedfont   }
+	      ifvarying { varyingfont }
+	      ifsymbol  { symbolfont  }
+	}
+
+	def @InitSize
+	{
+	  size @Test
+	      iffixed   { fixedsize   }
+	      ifvarying { varyingsize }
+	      ifsymbol  { symbolsize  }
+	}
+
+	def @InitLine
+	{
+	  line @Test
+	      iffixed   { fixedline   }
+	      ifvarying { varyingline }
+	      ifsymbol  { symbolline  }
+	}
+
+	def @S		# for formatting strings
+	    right x
+	{
+	    # "\"" &
+	    strings @Test
+	      iffixed   { fixedstrings   }
+	      ifvarying { varyingstrings }
+	      ifsymbol  { symbolstrings  }
+	    @Font x
+	    # & "\""
+	}
+
+#	def "`"
+#	{
+#	    style @Case {
+#		symbol	@Yield { "`" }
+#		else	@Yield { "'" }
+#	    }
+#	}
+
+	def @D	# for formatting identifiers
+	    right x
+	{
+	    identifiers @Test
+	      iffixed   { fixedidentifiers   }
+	      ifvarying { varyingidentifiers }
+	      ifsymbol  { symbolidentifiers  }
+	    @Font x
+	}
+
+	def @C		# for formatting comments
+	    right x
+	{
+	    comments @Test
+	      iffixed   { fixedcomments   }
+	      ifvarying { varyingcomments }
+	      ifsymbol  { symbolcomments  }
+	    @Font x
+	}
+
+	def @K		# for formatting keywords
+	    right x
+	{
+	    keywords @Test
+	      iffixed   { fixedkeywords   }
+	      ifvarying { varyingkeywords }
+	      ifsymbol  { symbolkeywords  }
+	    @Font x
+	}
+
+	def @N		# for formatting numbers
+	    right x
+	{
+	    numbers @Test
+	      iffixed   { fixednumbers   }
+	      ifvarying { varyingnumbers }
+	      ifsymbol  { symbolnumbers  }
+	    @Font x
+	}
+
+	def @O		# for formatting operators
+	    right x
+	{
+	    operators @Test
+	      iffixed   { fixedoperators   }
+	      ifvarying { varyingoperators }
+	      ifsymbol  { symboloperators  }
+	    @Font x
+	}
+
+	def @A		# get characters from the Adobe Symbol font
+	    left sym
+	    right x
+	{
+	    style @Case {
+		symbol	@Yield { { Symbol Base } @Font @Char sym }
+		else	@Yield { x			}
+	    }
+	}
+
+	def @ST		# for formatting asterisks
+	    right x
+	{
+	    operators @Test
+	      iffixed   { fixedoperators   }
+	      ifvarying { varyingoperators }
+	      ifsymbol  { symboloperators  }
+	    @Font "0.5w" @VShift x
+	}
+
+	def @ED		# for formatting larger dots
+	    right x
+	{
+	    operators @Test
+	      iffixed   { fixedoperators   }
+	      ifvarying { varyingoperators }
+	      ifsymbol  { symboloperators  }
+	    @Font @BackEnd @Case {
+		PlainText @Yield x
+		else @Yield { "1.2f" @Font "+0.05f" @VShift @O x &"0.05f" }
+	    }
+	}
+
+	macro "$>" { {} & }
+
+	def @M right x
+	{
+	    style @Case {
+		fixed	@Yield "-"
+		varying @Yield { { Symbol Base } @Font @Char minus }
+		symbol  @Yield { { Symbol Base } @Font @Char minus }
+	    }
+	}
+
+	{ @InitFontFamily Base @InitSize } @Font
+	{ @InitLine lines } @Break @Body
+
+    @End @Eiffel
+
+@End @EiffelSetup

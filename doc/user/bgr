@@ -10,6 +10,7 @@ get them.
 @BeginSections
 @Include { bgr_colo }
 @Include { bgr_boxs }
+@Include { bgr_outl }
 @Include { bgr_rota }
 @Include { bgr_scal }
 @Include { bgr_incl }

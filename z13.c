@@ -1,7 +1,7 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -437,8 +437,9 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 
 OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 { OBJECT link, y;  CONSTRAINT yc;  FULL_LENGTH f;  BOOLEAN junk;
-  debug3(DOB, DD,  "[ BreakObject(x (%s,%s),  %s), x =",
-	EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)), EchoConstraint(c));
+  debug4(DOB, DD,  "[ BreakObject(%s (%s,%s),  %s), x =",
+    Image(type(x)), EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)),
+    EchoConstraint(c));
   ifdebug(DOB, DD, DebugObject(x));
 
   /* if constraint is negative (should really be never), replace with empty */
@@ -528,6 +529,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	small_caps(save_style(y)) = FALSE;
 	font(save_style(y)) = word_font(x);
 	colour(save_style(y)) = word_colour(x);
+	outline(save_style(y)) = word_outline(x);
 	language(save_style(y)) = word_language(x);
 	debug3(DOF, DD, "  in BreakObject y %s %s %s",
 	  EchoStyle(&save_style(y)), Image(type(y)), EchoObject(y));

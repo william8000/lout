@@ -16,9 +16,9 @@ with the software.
 Lout is distributed free of charge under the GNU Public License.  The
 gnu. @Index { GNU Public License }
 primary source is directory
-@ID @Code "ftp://ftp.cs.su.oz.au/jeff/lout"
+@ID @Code "ftp://ftp.cs.usyd.edu.au/jeff/lout"
 in which may be found a gzipped tar file containing the main distribution
-(currently {@Code "lout-3.17.tar.gz"}), and various other things including
+(currently {@Code "lout-3.18.tar.gz"}), and various other things including
 a PostScript version of this guide.  The distribution contains source code,
 libraries, documentation, license, and installation instructions.
 @PP

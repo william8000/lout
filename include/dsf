@@ -96,14 +96,14 @@ def @DocumentSetup
     named @TableNumbers		{  Arabic		} # method of numbering tables
     named @FigureCaptionPos	{  Below		} # Above or Below
     named @TableCaptionPos	{  Below		} # Above or Below
-    named @FigureCaptionFont    {			} # figure caption font
-    named @FigureCaptionBreak   {			} # figure caption break
+    named @FigureCaptionFont    {  -2p 			} # figure caption font
+    named @FigureCaptionBreak   {  adjust hyphen 1.2fx	} # figure caption break
     named @FigureCaptionFormat named word {} named number {} named caption {}
-				{  @B { word @NumSep number. &2s } @Insert caption }
-    named @TableCaptionFont    {			} # figure caption font
-    named @TableCaptionBreak   {			} # figure caption break
+				{  {@B { word @NumSep number. &2s }} @Insert caption }
+    named @TableCaptionFont     {  -2p			} # figure caption font
+    named @TableCaptionBreak    {  adjust hyphen 1.2fx	} # figure caption break
     named @TableCaptionFormat named word {} named number {} named caption {}
-				{  @B { word @NumSep number. &2s } @Insert caption }
+				{  {@B { word @NumSep number. &2s }} @Insert caption }
     named @MakeFigureContents   {  No			} # list of figures at start
     named @MakeTableContents    {  No			} # list of tables at start
     named @MakeContents		{  No			} # make contents? Yes or No
@@ -3425,7 +3425,7 @@ def @DocumentSetup
     def @NoCite body cite
     {
 	macro "$" { @NoRef }
-	def "," precedence 90 left x { x }
+	def "," precedence 90 left x { x"," }
 	def ";" precedence 90 left x { x";" }
 
 	@MakeReferences @Case {

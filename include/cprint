@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#   Lout setup file for C and C++ program printing                            #
+#   Lout setup file for C program printing                                    #
 #                                                                             #
 #   Jeffrey H. Kingston                                                       #
-#   5 February 1999                                                           #
+#   23 February 2000                                                          #
 #                                                                             #
 ###############################################################################
 
@@ -12,7 +12,7 @@
 #                                                                             #
 #  The @SysInclude { cprintf } line                                           #
 #                                                                             #
-#  This line causes Lout to read the definitions for C printing, and should   #
+#  This line causes Lout to read the definitions for C, and should            #
 #  not be touched.                                                            #
 #                                                                             #
 ###############################################################################
@@ -31,6 +31,7 @@
 
 @Use { @CPSetup
   # style		{ fixed			} # fixed, varying, or symbol
+  # pipe                {                       } # pipe source through this
 
   # fixedfont		{ Courier		} # font family if fixed
   # fixedstrings	{ Base			} # string face if fixed

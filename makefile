@@ -1,14 +1,14 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.17                          #
+#  Make file for installing Basser Lout Version 3.18                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  17 September 1999                                                          #
+#  14 February 2000                                                           #
 #                                                                             #
+#     make prg2lout     Compile a small auxiliary program called prg2lout     #
 #     make lout         Compile the Lout source                               #
-#     make c2lout       Compile a small auxiliary program called c2lout       #
-#     make install      Install the Lout and c2lout binaries and libraries    #
-#     make installman   Install the Lout and c2lout manual entries            #
+#     make install      Install the Lout and prg2lout binaries and libraries  #
+#     make installman   Install the Lout and prg2lout manual entries          #
 #     make installdoc   Install the Lout documentation                        #
 #     make installfr    Install French error messages (optional)              #
 #     make installde    Install German error messages (optional)              #
@@ -60,7 +60,7 @@
 #      can always specify safe or unsafe execution by means of the -S and     #
 #      -U options to lout when processing a document; SAFEDFT means that      #
 #      -S rather than -U is the default behaviour.  Unsafe execution is       #
-#      required when formatting C programs and verbatim text, so if in        #
+#      required when formatting programs and verbatim text, so if in          #
 #      doubt, do not change the value of SAFEDFT.                             #
 #                                                                             #
 #  (5) Set the following four macros defined below to appropriate values:     #
@@ -75,7 +75,7 @@
 #                (written in Lout) go.  This directory will be created (but   #
 #                its parent must exist already).                              #
 #                                                                             #
-#      MANDIR    Directory where the lout and c2lout online manual entries    #
+#      MANDIR    Directory where the lout and prg2lout online manual entries  #
 #                (in nroff -man) go.  This directory is assumed to exist.     #
 #                                                                             #
 #  (6) Set the following two macros defined below to appropriate values.      #
@@ -145,8 +145,8 @@
 #      based on the ISO codes of the characters.  This defaul setting may     #
 #      be changed during individual runs of Lout by the -l and -L flags.      #
 #                                                                             #
-#  (9) Execute "make c2lout".  This will compile the c2lout program, leaving  #
-#      its binary in this directory.  No changes to other directories.        #
+#  (9) Execute "make prg2lout".  This will compile the prg2lout program,      #
+#      leaving its binary in this directory.  Other directories unchanged.    #
 #                                                                             #
 # (10) If you want to be able to produce compressed PDF files, as opposed to  #
 #      uncompressed ones, you need to:                                        #
@@ -183,7 +183,7 @@
 #                                                                             #
 # (13) Execute "make install".  This will do the following things:            #
 #                                                                             #
-#      (a) It will copy the lout and c2lout binaries into $(BINDIR);          #
+#      (a) It will copy the lout and prg2lout binaries into $(BINDIR);        #
 #                                                                             #
 #      (b) It will create $(LIBDIR) and copy all the library files into it;   #
 #                                                                             #
@@ -208,8 +208,8 @@
 #      It is good to build the various files during installation because      #
 #      later runs will not have write permission in the library directories.  #
 #                                                                             #
-# (14) Execute "make installman".  This installs the manual entries for       #
-#      lout and c2lout into directory $(MANDIR), which is assumed to exist.   #
+# (14) Execute "make installman".  This installs the manual entries for lout  #
+#      and prg2lout into directory $(MANDIR), which is assumed to exist.      #
 #      These entries are troff files; plain text versions are also available  #
 #      in directory ./man if you need them (install them yourself).           #
 #                                                                             #
@@ -252,8 +252,6 @@ DBFIX   = 0
 USESTAT = 1
 SAFEDFT = 0
 
-COLLATE	= 1
-
 BINDIR	= /usr/staff/jeff/bin
 LIBDIR	= /usr/staff/jeff/lout.lib
 DOCDIR	= /usr/staff/jeff/lout.doc
@@ -273,6 +271,8 @@ USELOC	= 1
 LOC_FR	= fr
 LOC_DE	= de
 
+COLLATE	= 1
+
 PDF_COMPRESSION	= 0
 ZLIB		=
 ZLIBPATH	=
@@ -281,6 +281,7 @@ CC	= gcc
 
 RCOPY	= cp -r
 
+# COPTS	= -ansi -pedantic -Wall -O3
 COPTS	= -ansi -pedantic -Wall
 
 CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
@@ -320,17 +321,17 @@ $(OBJS): externs.h
 
 externs.h:
 
-c2lout:	c2lout.c
-	$(CC) $(COPTS) -o c2lout c2lout.c
-	chmod a+x c2lout
+prg2lout:	prg2lout.c
+	$(CC) $(COPTS) -o prg2lout prg2lout.c
+	chmod a+x prg2lout
 
-install: lout c2lout
+install: lout prg2lout
 	@echo ""
-	@echo "(a) Installing lout and c2lout binaries into BINDIR $(BINDIR)"
+	@echo "(a) Installing lout and prg2lout binaries into BINDIR $(BINDIR)"
 	cp lout $(BINDIR)/lout
 	chmod 755 $(BINDIR)/lout
-	cp c2lout $(BINDIR)/c2lout
-	chmod 755 $(BINDIR)/c2lout
+	cp prg2lout $(BINDIR)/prg2lout
+	chmod 755 $(BINDIR)/prg2lout
 	@echo ""
 	@echo "(b) Installing library files into LIBDIR $(LIBDIR)"
 	mkdir $(LIBDIR)
@@ -378,8 +379,8 @@ installman:
 	    -e "s@<DOCDIR>@$(DOCDIR)@" -e "s@<MANDIR>@$(MANDIR)@"	\
 	man/lout.1 > $(MANDIR)/lout.1
 	chmod 644 $(MANDIR)/lout.1
-	cp man/c2lout.1 $(MANDIR)/c2lout.1
-	chmod 644 $(MANDIR)/c2lout.1
+	cp man/prg2lout.1 $(MANDIR)/prg2lout.1
+	chmod 644 $(MANDIR)/prg2lout.1
 
 installdoc:
 	@echo ""
@@ -414,12 +415,12 @@ installde:
 	chmod 644 $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/*
 
 uninstall:
-	-rm -f  $(BINDIR)/lout $(BINDIR)/c2lout
+	-rm -f  $(BINDIR)/lout $(BINDIR)/prg2lout
 	-rm -fr $(LIBDIR)
 	-rm -fr $(DOCDIR)
-	-rm -f  $(MANDIR)/lout.1 $(MANDIR)/c2lout.1
+	-rm -f  $(MANDIR)/lout.1 $(MANDIR)/prg2lout.1
 
 clean:	
-	-rm -f lout c2lout *.o
+	-rm -f lout prg2lout *.o
 
 restart:	clean uninstall

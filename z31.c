@@ -1,7 +1,7 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -228,10 +228,13 @@ void MemInit(void)
   zz_lengths[ BREAK        ] =
   zz_lengths[ UNDERLINE    ] =
   zz_lengths[ COLOUR       ] =
+  zz_lengths[ OUTLINE      ] =
   zz_lengths[ LANGUAGE     ] =
   zz_lengths[ CURR_LANG    ] =
   zz_lengths[ CURR_FAMILY  ] =
   zz_lengths[ CURR_FACE    ] =
+  zz_lengths[ CURR_YUNIT   ] =
+  zz_lengths[ CURR_ZUNIT   ] =
   zz_lengths[ COMMON       ] =
   zz_lengths[ RUMP         ] =
   zz_lengths[ MELD         ] =

@@ -39,6 +39,7 @@
    def @@OneCol            { @Code "@OneCol"            }
    def @@OneRow            { @Code "@OneRow"            }
    def @@Open              { @Code "@Open"              }
+   def @@Outline           { @Code "@Outline"             }
    def @@PAdjust           { @Code "@PAdjust"           }
    def @@PrependGraphic    { @Code "@PrependGraphic"    }
    def @@Rotate            { @Code "@Rotate"            }
@@ -189,7 +190,7 @@ which many will start:  `Patriotism is the last refuge of a scoundrel.'
    def @AmberLight
    {
        @OneRow @Tbl
-           aformat { @Cell A }
+           aformat { @Cell indentvertical { align } A }
            marginhorizontal { 0i }
            marginvertical { 0i }
            strut { no }
@@ -200,4 +201,14 @@ which many will start:  `Patriotism is the last refuge of a scoundrel.'
             @MarkRowa A { @ClosedCircle }
             @Rowa A { @OpenCircle }
         }
+   }
+
+   import @DiagSetup @Diag
+   def @Four named code { } right x
+   {
+       3.8c @Wide @Code code    ||0.3c
+       2.7c @Wide @StartRight x ||0.3c
+       2.7c @Wide @StartUp    x ||0.3c
+       2.7c @Wide @StartLeft  x ||0.3c
+       2.2c @Wide @StartDown  x
    }

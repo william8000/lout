@@ -1,7 +1,7 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -301,7 +301,7 @@ void MapPrintEncodings(FILE *fp)
     {
       case POSTSCRIPT:
 
-        fprintf(fp, "%%%%BeginResource encoding %s\n", string(map->name));
+        fprintf(fp, "%%%%BeginResource: encoding %s\n", string(map->name));
         fprintf(fp, "/%s [\n", string(map->name));
         for( i = 0;  i < MAX_CHARS;  i++ )
           fprintf(fp, "/%s%c", string(map->vector[i]), (i+1) % 8 != 0 ? ' ' : '\n');
@@ -353,6 +353,7 @@ static OBJECT DoWord(FULL_CHAR *buff, FULL_CHAR *q, OBJECT x, FONT_NUM fnum)
   res = MakeWord(type(x), buff, &fpos(x));
   word_font(res) = fnum;
   word_colour(res) = word_colour(x);
+  word_outline(res) = word_outline(x);
   word_language(res) = word_language(x);
   word_hyph(res) = word_hyph(x);
   underline(res) = UNDER_OFF;

@@ -325,24 +325,33 @@ enclose.sym @Index @@Enclose
 meaning:  when components of the galley replace a @@Galley or @@ForceGalley
 symbol, that symbol is first replaced by @@Enclose @@Galley or
 @@Enclose @@ForceGalley.  For example,
-@ID @Code {
-"def @Enclose"
-"    right x"
-"{"
-"    @Box x"
-"}"
+@ID @Code @Verbatim {
+def @Figure into @FigurePlace&&following
+    right @Body
+{
+    def @Enclose
+        right x
+    {
+        @Box x
+    }
+
+    @Body
 }
-within some galley definition causes each @@Galley or @@ForceGalley
-symbol that receives components of the galley to be replaced by
-{@Code "@Box @Galley"} or {@Code "@Box @ForceGalley"}, assuming an
-appropriate definition of @Code "@Box".  This is useful, for example,
-when producing multi-page boxed displays, figures, and tables.
+}
+causes each @@Galley or @@ForceGalley symbol that receives components of
+galley @Code "@Figure" to be replaced by {@Code "@Box @Galley"} or
+{@Code "@Box @ForceGalley"}, assuming an appropriate definition of
+@Code "@Box".  This is useful, for example, when producing multi-page
+boxed displays, figures, and tables.
 @PP
 An @@Enclose symbol may have only one parameter, which must be a
 right parameter.  It would not make sense to allow more parameters,
 since there is no suitable value to assign to them.  However, the
 @@Enclose symbol may contain inner definitions, and it may make use
-of any symbol that is available at that point, in the usual way.
+of any symbol that is available at that point, in the usual way.  The
+@@Enclose symbol may be a named parameter (itself with a right parameter)
+of the galley symbol, rather than an inner definition as shown above,
+if desired.
 @PP
 A @Code "following" galley may fail to find a first target lying in a
 following component of the same galley as its invocation point.  This is

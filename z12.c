@@ -1,7 +1,7 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -322,7 +322,7 @@ void SpannerAvailableSpace(OBJECT y, int dim, FULL_LENGTH *resb,
 
 OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 { OBJECT y, z, link, prev, t, g, full_name;
-  FULL_LENGTH b, f, dble_fwd, llx, lly, urx, ury; int status;
+  FULL_LENGTH b, f, dble_fwd, llx, lly, urx, ury; int status, read_status;
   float fllx, flly, furx, fury;
   BOOLEAN dble_found, found, will_expand, first_line, cp;
   FILE *fp;  FULL_CHAR buff[MAX_BUFF];
@@ -842,6 +842,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		    mode(gap(g)) == EDGE_MODE && !mark(gap(g)) &&
 		    word_font(prev) == word_font(y) &&
 		    word_colour(prev) == word_colour(y) &&
+		    word_outline(prev) == word_outline(y) &&
 		    word_language(prev) == word_language(y) &&
 		    underline(prev) == underline(y) &&
 		    NextDown(NextDown(Up(prev))) == link
@@ -858,6 +859,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		  y = MakeWordTwo(typ, string(prev), string(y), &fpos(prev));
 		  word_font(y) = word_font(prev);
 		  word_colour(y) = word_colour(prev);
+		  word_outline(y) = word_outline(prev);
 		  word_language(y) = word_language(prev);
 		  word_hyph(y) = word_hyph(prev);
 		  underline(y) = underline(prev);
@@ -1123,8 +1125,17 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y), &cp);
       if( fp == NULL )  status = IG_NOFILE;
       first_line = TRUE;
+      /* ***
       while( status == IG_LOOKING && StringFGets(buff, MAX_BUFF, fp) != NULL )
+      *** */
+      while( status == IG_LOOKING )
       {
+	read_status = fscanf(fp, "%[^\n\r]%*c", (char *) buff);
+	if( read_status == 0 || read_status == EOF )
+	{
+	  /* end of input and no luck */
+	  break;
+	}
 	if( first_line && !StringBeginsWith(buff, AsciiToFull("%!")) )
 	  status = IG_BADFILE;
 	else

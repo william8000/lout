@@ -27,6 +27,13 @@ matrix atleft { ( } atright { ) } { n above k } a sup k b sup n-k
 }
 As the example shows, the tables may contain spanning columns, aligned
 columns, and rules, and the cells may contain arbitrary objects.
+@FootNote {
+There has been a slight change to {@Code "@Tbl"}, starting with Version
+3.18:  if you want columns whose entries are aligned (on decimal points,
+equals signs, etc.), or the analogous thing with rows, you have to ask
+for it now, whereas before it happened automatically.  See
+Section {@NumberOf tbl_alig} for the details.
+}
 @BeginSections
 
 @Include { tbl_intr } # introduction

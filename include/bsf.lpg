@@ -2,7 +2,6 @@
 
 % width height linethickness louteuro -
 % draw a Euro symbol of this width and height with this line thickness
-% Author: Jeff Kingston, based on code from Andrew Beardsley
 /louteuro {
   20 dict begin
     /eurothick exch def

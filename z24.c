@@ -1,7 +1,7 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -174,6 +174,61 @@ If you are trying to compile this you have the wrong CHAR_OUT value!
 #endif
 };
 
+/*****************************************************************************/
+/*                                                                           */
+/*  char *MediaName(int h, int v)                                            */
+/*                                                                           */
+/*  Return the PostScript MediaName attribute appropriate to a page of       */
+/*  width h and height v.                                                    */
+/*                                                                           */
+/*  Communicated by Valeriy E. Ushakov, who wrote:                           */
+/*                                                                           */
+/*  "Attached is a patch to recognize known paper sizes and emit them as     */
+/*  media name in DocumentMedia comment.  GhostView and other PostScript     */
+/*  viewers recognize these names and display them to the user.  Thus user   */
+/*  knows what paper size document uses without having to know the magic     */
+/*  numbers."                                                                */
+/*                                                                           */
+/*****************************************************************************/
+
+static const char *MediaName(int h, int v)
+{
+    struct paper {
+       const char *name;
+       FULL_LENGTH width, height;
+    };
+
+    /* names for known paper sizes */
+    static const struct paper paper_map[] = {
+       { "Letter",     612*PT,  792*PT },
+       { "Tabloid",    792*PT, 1224*PT },
+       { "Ledger",    1224*PT,  792*PT },
+       { "Legal",      612*PT, 1008*PT },
+       { "Statement",  396*PT,  612*PT },
+       { "Executive",  540*PT,  720*PT },
+       { "A3",         842*PT, 1190*PT },
+       { "A4",         595*PT,  842*PT },
+       { "A5",         420*PT,  595*PT },
+       { "B4",         729*PT, 1032*PT },
+       { "B5",         516*PT,  729*PT },
+       { "Folio",      612*PT,  936*PT },
+       { "Quarto",     610*PT,  780*PT },
+       { "10x14",      720*PT, 1008*PT },
+       { NULL,              0,       0 }
+    };
+
+    /* default media name */
+    static const char *user_defined = "Plain";
+
+    const struct paper *p;
+    for (p = paper_map; p->name; ++p) {
+       if ((h == p->width) && (v == p->height)) {
+           return p->name;
+       }
+    }
+    return user_defined;
+}
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -267,8 +322,10 @@ void PrintBeforeFirst(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
       fprintf(out_fp, "%%%%CreationDate: %s", TimeString());
       fprintf(out_fp, "%%%%DocumentData: Binary\n");
       fprintf(out_fp, "%%%%DocumentNeededResources: (atend)\n");
-      fprintf(out_fp, "%%%%DocumentMedia: Plain %d %d 0 white ()\n", h/PT, v/PT);
       fprintf(out_fp, "%%%%DocumentSuppliedResources: (atend)\n");
+      fprintf(out_fp, "%%%%DocumentMedia: %s %d %d 0 white ()\n",
+	MediaName(h, v), h/PT, v/PT);
+      fprintf(out_fp, "%%%%PageOrder: Ascend\n");
       fprintf(out_fp, "%%%%Pages: (atend)\n");
       fprintf(out_fp, "%%%%BoundingBox: 0 0 %d %d\n", h/PT, v/PT);
       fprintf(out_fp, "%%%%EndComments\n\n");
@@ -277,8 +334,11 @@ void PrintBeforeFirst(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
       fprintf(out_fp, "%%%%BeginProlog\n");
       fprintf(out_fp, "%%%%BeginResource: procset %s\n", StartUpResource);
       fprintf(out_fp, "/m  { 3 1 roll moveto show } bind def\n");
+      fprintf(out_fp, "/mo { 3 1 roll moveto true charpath stroke } bind def\n");
       fprintf(out_fp, "/s  { exch currentpoint exch pop moveto show } bind def\n");
+      fprintf(out_fp, "/so { exch currentpoint exch pop moveto true charpath stroke } bind def\n");
       fprintf(out_fp, "/k  { exch neg 0 rmoveto show } bind def\n");
+      fprintf(out_fp, "/ko { exch neg 0 rmoveto true charpath stroke } bind def\n");
       fprintf(out_fp, "/ul { gsave setlinewidth dup 3 1 roll\n");
       fprintf(out_fp, "      moveto lineto stroke grestore } bind def\n");
       fprintf(out_fp, "/in { %d mul } def\n", IN);
@@ -554,10 +614,11 @@ void PrintBetween(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
 
 void PrintWord(OBJECT x, int hpos, int vpos)
 { FULL_CHAR *p, *q, *a, *b, *lig, *unacc;
-  int i, h, v, ksize;  char command;  MAPPING m;
+  int i, h, v, ksize;  char *command;  MAPPING m;
 
-  debug5(DGP, DD, "PrintWord( %s, %d, %d ) font %d colour %d", string(x),
-	hpos, vpos, word_font(x), word_colour(x));
+  debug6(DGP, DD, "PrintWord( %s, %d, %d ) font %d colour %d%s", string(x),
+	hpos, vpos, word_font(x), word_colour(x),
+	word_outline(x) ? " outline" : "");
   TotalWordCount++;
 
   switch( BackEnd )
@@ -618,14 +679,14 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       vpos = vpos - currentxheight2;
       if( cpexists && currenty == vpos )
       { printnum(hpos, out_fp);
-        command = 's';
+        command = word_outline(x) ? "so" : "s";
       }
       else
       { currenty = vpos;
         printnum(hpos, out_fp);
         fputs(" ", out_fp);
         printnum(currenty, out_fp);
-        command = 'm';
+        command = word_outline(x) ? "mo" : "m";
         cpexists = TRUE;
       }
 
@@ -668,17 +729,21 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       for( p++;  *p;  p++ )
       { KernLength(word_font(x), unacc, *(p-1), *p, ksize);
         if( ksize != 0 )
-        { fprintf(out_fp, ")%c %d(", command, -ksize);
+        { fprintf(out_fp, ")%s %d(", command, -ksize);
           ++wordcount;
-          command = 'k';
+          command = word_outline(x) ? "ko" : "k";
         }
 	fputs(EightBitToPrintForm[*p], out_fp);
       }
       if( ++wordcount >= 5 )
-      { fprintf(out_fp, ")%c\n", command);
+      { fprintf(out_fp, ")%s\n", command);
         wordcount = 0;
       }
-      else fprintf(out_fp, ")%c ", command);
+      else fprintf(out_fp, ")%s ", command);
+
+      /* ordinary printing moves current point; outlining destroys it */
+      if( word_outline(x) )
+	cpexists = FALSE;
       break;
 
 
@@ -716,7 +781,7 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       vpos = vpos - currentxheight2;
       if( cpexists && (currenty == vpos) && PDFHasValidTextMatrix() )
       { /* printnum(hpos, out_fp); */
-        command = 's';
+        command = "s";
 /*
 	Note: I calculate the width of the space char here in case the font has
 	changed. This prevents subtle spacing errors from occurring.
@@ -725,7 +790,7 @@ void PrintWord(OBJECT x, int hpos, int vpos)
         fnt = finfo[currentfont].size_table;
 
         if ( (next_hpos + fnt[' '].right /* width of space char */ ) == hpos )
-          command = ' ';
+          command = " ";
 #endif
       }
       else
@@ -733,7 +798,7 @@ void PrintWord(OBJECT x, int hpos, int vpos)
         /* printnum(hpos, out_fp);
         fputs(" ", out_fp);
         printnum(currenty, out_fp); */
-        command = 'm';
+        command = "m";
         cpexists = TRUE;
       }
 
@@ -769,7 +834,7 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       /* show string(x) */
       /* FontWordSize(x); - this should not be necessary	*/
 
-      switch (command)
+      switch (command[0])
       {
 	case 'm':
 
@@ -811,7 +876,7 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       /* acc   = MapTable[m]->map[MAP_ACCENT]; */
       for( p++;  *p;  p++ )
       {
-	KernLength(word_font(x), unacc, *(p-1), *p, ksize);
+	/* KernLength(word_font(x), unacc, *(p-1), *p, ksize); */
         KernLength(font_num(finfo[word_font(x)].original_font),
 	  unacc, *(p-1), *p, ksize);
 	if ( ksize != 0 )

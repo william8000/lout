@@ -1,7 +1,7 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -526,10 +526,13 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case BREAK:		name = KW_BREAK;	goto SETC;
     case UNDERLINE:	name = KW_UNDERLINE;	goto SETC;
     case COLOUR:	name = KW_COLOUR;	goto SETC;
+    case OUTLINE:	name = KW_OUTLINE;	goto SETC;
     case LANGUAGE:	name = KW_LANGUAGE;	goto SETC;
     case CURR_LANG:	name = KW_CURR_LANG;	goto SETC;
     case CURR_FAMILY:	name = KW_CURR_FAMILY;	goto SETC;
     case CURR_FACE:	name = KW_CURR_FACE;	goto SETC;
+    case CURR_YUNIT:	name = KW_CURR_YUNIT;	goto SETC;
+    case CURR_ZUNIT:	name = KW_CURR_ZUNIT;	goto SETC;
     case COMMON:	name = KW_COMMON;	goto SETC;
     case RUMP:		name = KW_RUMP;		goto SETC;
     case MELD:		name = KW_MELD;		goto SETC;

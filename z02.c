@@ -1,7 +1,7 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -841,6 +841,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
 
       case CSPACE:
       case TAB:
+      case FORMFEED:
       
 	if( !skipping )  hold(*(p-1));
 	break;
@@ -861,7 +862,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
       
 	if( fp == NULL )
 	  Error(2, 22, "end of file reached while reading %s",
-	    FATAL, err_pos, lessskip ? KW_VERBATIM : KW_RAWVERBATIM);
+	    FATAL, err_pos, lessskip ? KW_RAWVERBATIM : KW_VERBATIM);
 	else
 	  Error(2, 17, "end of file reached while reading filter parameter",
 	    FATAL, err_pos);
@@ -945,6 +946,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
 
       default:
       
+	Error(2, 22, "unreadable character (octal %o)",INTERN,&file_pos,*(p-1));
 	assert(FALSE, "LexScanVerbatim: bad chtbl[]");
 	break;
 

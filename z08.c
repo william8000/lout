@@ -1,7 +1,7 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -626,6 +626,7 @@ OBJECT *enclose, BOOLEAN fcr)
     x = *enclose;
     *enclose = nilobj;
     debug1(DHY, DD, "  Manifest/enclose: %s", EchoObject(x));
+    debug1(DOM, DD, "  Manifest/enclose: %s", EchoObject(x));
     x = Manifest(x, env, style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);
     debug0(DOM, DD,  "  ] returning from manifesting closure (enclose)");
     return x;
@@ -870,7 +871,7 @@ OBJECT *enclose, BOOLEAN fcr)
 /*  UNDER_UNDEF.                                                             */
 /*                                                                           */
 /*****************************************************************************/
-#define MAX_DEPTH 500
+#define MAX_DEPTH 1000
 
 OBJECT Manifest(OBJECT x, OBJECT env, STYLE *style, OBJECT bthr[2],
 OBJECT fthr[2], OBJECT *target, OBJECT *crs, BOOLEAN ok, BOOLEAN need_expand,
@@ -1001,6 +1002,7 @@ OBJECT *enclose, BOOLEAN fcr)
       if( !ok || *crs == nilobj )
       {	word_font(x) = font(*style);
 	word_colour(x) = colour(*style);
+	word_outline(x) = outline(*style);
 	word_language(x) = language(*style);
 	word_hyph(x) = hyph_style(*style) == HYPH_ON;
 	debug3(DOM, DDD, "  manfifest/WORD underline() := %s for %s %s",
@@ -1032,6 +1034,7 @@ OBJECT *enclose, BOOLEAN fcr)
       if( is_word(type(y)) )
       { word_font(y) = font(*style);
 	word_colour(y) = colour(*style);
+	word_outline(y) = outline(*style);
 	word_language(y) = language(*style);
 	word_hyph(y) = hyph_style(*style) == HYPH_ON;
 	if( small_caps(*style) && ok )  y = MapSmallCaps(y, style);
@@ -1068,6 +1071,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	if( is_word(type(y)) )
 	{ word_font(y) = font(*style);
 	  word_colour(y) = colour(*style);
+	  word_outline(y) = outline(*style);
 	  word_language(y) = language(*style);
 	  word_hyph(y) = hyph_style(*style) == HYPH_ON;
 	  if( small_caps(*style) && ok )  y = MapSmallCaps(y, style);
@@ -1198,6 +1202,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	    prev != nilobj && is_word(type(prev)) && !mark(gap(g)) &&
 	    word_font(prev) == word_font(y) &&
 	    word_colour(prev) == word_colour(y) &&
+	    word_outline(prev) == word_outline(y) &&
 	    word_language(prev) == word_language(y) )
 	    /* no need to compare underline() since both are false */
 	{ unsigned typ;
@@ -1211,6 +1216,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  y = MakeWordTwo(typ, string(prev), string(y), &fpos(prev));
 	  word_font(y) = word_font(prev);
 	  word_colour(y) = word_colour(prev);
+	  word_outline(y) = word_outline(prev);
 	  word_language(y) = word_language(prev);
 	  word_hyph(y) = word_hyph(prev);
 	  underline(y) = UNDER_OFF;
@@ -1275,6 +1281,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	      { z = MakeWord(WORD, STR_EMPTY, &fpos(g));
 	        word_font(z) = font(*style);
 	        word_colour(z) = colour(*style);
+	        word_outline(z) = outline(*style);
 	        word_language(z) = language(*style);
 	        word_hyph(z) = hyph_style(*style) == HYPH_ON;
 		underline(z) = UNDER_OFF;
@@ -1583,6 +1590,22 @@ OBJECT *enclose, BOOLEAN fcr)
       break;
 
 
+    case CURR_YUNIT:
+    case CURR_ZUNIT:
+
+      { FULL_CHAR buff[20];
+        if( type(x) == CURR_YUNIT )
+          sprintf( (char *) buff, "%dp", yunit(*style) / PT);
+        else
+	  sprintf( (char *) buff, "%dp", zunit(*style) / PT);
+        res = MakeWord(WORD, buff, &fpos(x));
+      }
+      ReplaceNode(res, x);
+      DisposeObject(x);
+      x = Manifest(res, env, style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);
+      break;
+
+
     case FONT:
     case SPACE:
     case YUNIT:
@@ -1628,12 +1651,14 @@ OBJECT *enclose, BOOLEAN fcr)
       break;
 
 
+    case OUTLINE:
     case PADJUST:
     case HADJUST:
     case VADJUST:
 
       StyleCopy(new_style, *style);
-      if(      type(x) == VADJUST )  vadjust(new_style) = TRUE;
+      if(      type(x) == OUTLINE )  outline(new_style) = TRUE;
+      else if( type(x) == VADJUST )  vadjust(new_style) = TRUE;
       else if( type(x) == HADJUST )  hadjust(new_style) = TRUE;
       else                           padjust(new_style) = TRUE;
       Child(y, Down(x));
@@ -1652,8 +1677,9 @@ OBJECT *enclose, BOOLEAN fcr)
       padjust(*style) = FALSE;
       StyleCopy(save_style(x), *style);
       Child(y, Down(x));
-      y = Manifest(y, env, style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);
+      y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE, enclose, fcr);
       SetUnderline(x);
+      ReplaceWithSplit(x, bthr, fthr);
       break;
 
 

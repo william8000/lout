@@ -22,11 +22,16 @@ Setup files (containing mainly lists of options settable by the user)
        diag             The Diag diagram drawing package
        fig              The Fig advanced graphics package (OBSOLETE, use diag)
        graph            The Graph graph drawing package
-       cprint           The cprint C and C++ program printing package
        pas              The Pas Pascal progam printing package
        modula           The Modula Modula-2 progam printing package
        latin2           The Latin2 (Eastern European characters) package
        russian          The Russian language package
+
+   Setup files for program formatting packages (choose any combination):
+
+       cprint           C and C++
+       eiffel           Eiffel
+       blue             Blue
 
 Source files (containing Lout and PostScript source code for the packages)
 --------------------------------------------------------------------------
@@ -53,9 +58,12 @@ Source files (containing Lout and PostScript source code for the packages)
        graphf           The Graph graph drawing package
        graphf.etc       A file included by graphf
        graphf.lpg       A PostScript prepend file needed by graphf
-       cprintf          The cprint C and C++ program printing package
-       pasf             The Pas Pascal progam printing package
-       modulaf          The Modula Modula-2 progam printing package
+       progf            Programming language formatting (for use by prg2lout)
+       cprintf          C and C++
+       eiffelf          Eiffel
+       bluef            Blue
+       pasf             Pascal
+       modulaf          Modula-2
        latin2.fd        Latin2 font definitions file (placeholder file)
        russian.fd       Russian font definitions file (placeholder file)
 
@@ -70,4 +78,4 @@ Miscellaneous
 
 
 Jeffrey H. Kingston
-26 May 1999
+26 February 2000

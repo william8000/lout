@@ -24,6 +24,8 @@
    def @@CurrLang          { @Code "@CurrLang"          }
    def @@CurrFamily        { @Code "@CurrFamily"        }
    def @@CurrFace          { @Code "@CurrFace"          }
+   def @@CurrYUnit         { @Code "@CurrYUnit"         }
+   def @@CurrZUnit         { @Code "@CurrZUnit"         }
    def @@Database          { @Code "@Database"          }
    def @@End               { @Code "@End"               }
    def @@Enclose           { @Code "@Enclose"           }
@@ -60,9 +62,10 @@
    def @@OneOf             { @Code "@OneOf"             }
    def @@OneRow            { @Code "@OneRow"            }
    def @@Open              { @Code "@Open"              }
+   def @@Outline           { @Code "@Outline"           }
    def @@PAdjust           { @Code "@PAdjust"           }
    def @@PageLabel         { @Code "@PageLabel"         }
-   def @@PlainGraphic      { @Code "@PlainGraphic"    }
+   def @@PlainGraphic      { @Code "@PlainGraphic"      }
    def @@PrependGraphic    { @Code "@PrependGraphic"    }
    def @@RawVerbatim       { @Code "@RawVerbatim"       }
    def @@Rotate            { @Code "@Rotate"            }

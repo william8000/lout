@@ -79,10 +79,53 @@ document.  As the number of nodes increases, it becomes very tedious and
 error-prone to duplicate options at all the nodes.  Giving each option
 just once, at the @Code "@Diag" symbol or in the setup file, saves time
 and makes it easy to change all the nodes into squares or any other shape
-later on.  Any setup file option may be overridden in a diagram by
-giving the option to its @Code "@Diag" symbol; any @Code "@Diag" option
-or setup file option may be overridden at any node by giving the option
-again there.
+later on.  Any setup file option may be overridden in a diagram by giving
+the option to its @Code "@Diag" symbol; any @Code "@Diag" option or setup
+file option may be overridden at any node by giving the option again there.
+@PP
+Sometimes a diagram contains several different node types, each with
+its own combination of options (for example, the syntax diagrams of
+Section {@NumberOf dia_synt} have three node types).  To handle these
+cases there are three alternative versions of the @Code "@Node"
+symbol, called {@Code "@ANode"}, {@Code "@BNode"}, and
+anode.fig @Index { @Code "@ANode" in @Code "@Diag" }
+bnode.fig @Index { @Code "@BNode" in @Code "@Diag" }
+cnode.fig @Index { @Code "@CNode" in @Code "@Diag" }
+{@Code "@CNode"}.  These have exactly the same options as
+{@Code "@Node"}, but the @I default values of these options
+are different, in that they come from @Code "@Diag" options,
+or else setup file options, that have an extra letter in front
+of their name:  @Code { a }, @Code { b }, or @Code { c }.  Here is
+a small example (see later in this section for the @Code font option):
+@ID @OneRow {
+@Code @Verbatim {
+@Diag
+    aoutline { box }
+    afont { Italic }
+    boutline { curvebox }
+    bfont { Bold }
+{
+    @ANode identifier
+    @DP
+    @BNode keyword
+}
+}
+||7ct
+@Diag
+    aoutline { box }
+    afont { Italic }
+    boutline { curvebox }
+    bfont { Bold }
+{
+    @ANode identifier
+    @DP
+    @BNode keyword
+}
+}
+Note that when giving an option directly to {@Code "@ANode"},
+{@Code "@BNode"}, and {@Code "@CNode"}, the initial @Code { a },
+@Code { b }, or @Code { c } used with @Code "@Diag" and in the
+setup file is omitted.
 @PP
 To save time in simple cases, @Code "@Diag" provides nine other
 node symbols called

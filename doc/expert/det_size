@@ -26,6 +26,7 @@ measurement (Section {@NumberOf yunit}); }
 (also defining the @Code v unit); }
 @ListItem { Whether to permit hyphenation or not; }
 @ListItem { What colour the object is to appear in; }
+@ListItem { Whether @@Outline is in effect; }
 @ListItem { The language of the object; }
 @ListItem { Whether @@VAdjust, @@HAdjust and @@PAdjust are in effect. }
 @EndList
@@ -34,16 +35,16 @@ document.  For example, the style of a parameter depends on where it is
 used; the style of a galley is the style of the first target that it
 attempts to attach itself to.  Of course, the style of any object can be
 changed by using the @@Font, @@Break, @@Space, @@SetColour or
-@@SetColor, and @@Language symbols.
+@@SetColor, @@Outline, and @@Language symbols.
 @PP
 There are no standard default values for style, except that small capitals
-are initially off, the interpretation of white space is initially {@Code
-lout}, and the values of the @Code y and @Code z units are zero.  Therefore
-one must ensure that the root galley or each of its components is enclosed
-in @@Font, @@Break, @@SetColour or @@SetColor, and @@Language symbols.  From
-there the style is passed to incoming galleys and the objects within
-them.  Enclosure in @@Space is not required because the @Code "s" unit
-is also set by @@Font (Section {@NumberOf space}).
+and outlining are initially off, the interpretation of white space is
+initially {@Code lout}, and the values of the @Code y and @Code z units
+are zero.  Therefore one must ensure that the root galley or each of its
+components is enclosed in @@Font, @@Break, @@SetColour or @@SetColor, and
+@@Language symbols.  From there the style is passed to incoming galleys
+and the objects within them.  Enclosure in @@Space is not required because
+the @Code "s" unit is also set by @@Font (Section {@NumberOf space}).
 @PP
 width. @Index { Width of an object }
 height. @Index { Height of an object }

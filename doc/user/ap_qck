@@ -56,8 +56,8 @@
 "    @PageHeaders { Simple }"
 "    @FirstPageNumber { 1 }"
 "    @ColumnNumber { 1 }"
+"    @Abstract { ... }"
 "//"
-"@Abstract ... @End @Abstract"
 "@Section ... @End @Section"
 "@Appendix ... @End @Appendix"
 }

@@ -107,9 +107,12 @@
   # @TableNumbers	{ Arabic		} # method of numbering tables
   # @FigureCaptionPos	{ Below 		} # Above or Below
   # @TableCaptionPos	{ Below			} # Above or Below
-  # @CaptionFont        {                       } # figure, table caption font
-  # @CaptionBreak       {                       } # figure, table caption break
-  # @CaptionFormat      { @B { number @DotSep @OneCol }	} # figure, table caption format
+  # @FigureCaptionFont  { -2p                   } # figure caption font
+  # @FigureCaptionBreak { adjust hyphen 1.2fx   } # figure caption break
+  # @FigureCaptionFormat{ {@B { word @NumSep number. &2s }} @Insert caption }
+  # @TableCaptionFont   { -2p                   } # table caption font
+  # @TableCaptionBreak  { adjust hyphen 1.2fx   } # table caption break
+  # @TableCaptionFormat { {@B { word @NumSep number. &2s }} @Insert caption }
   # @MakeFigureContents { No                    } # list of figures at start
   # @MakeTableContents  { No                    } # list of tables at start
   # @MakeContents	{ No			} # make contents? Yes or No
@@ -248,9 +251,10 @@
 
 @Use { @ReportSetup
   # @CoverSheet			{ Yes		} # make cover sheet
-  # @DisplayAbstract		{ No		} # abstract full width display
   # @ContentsSeparate		{ No		} # contents on separate pages
   # @DateLine			{ No		} # Yes, No, or a date
+  # @AbstractDisplay		{ No		} # abstract full width display
+  # @AbstractTitle		{ dft		} # abstract title (dft is @AbstractWord)
   # @ReferencesBeforeAppendices	{ No		} # references before appendices
   # @AbstractWord		{ abstract	} # word for "Abstract"
   # @ContentsWord		{ contents	} # word for "Contents"

@@ -1,7 +1,7 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -434,10 +434,13 @@ static BOOLEAN Reduce(void)
     case BREAK:
     case UNDERLINE:
     case COLOUR:
+    case OUTLINE:
     case LANGUAGE:
     case CURR_LANG:
     case CURR_FAMILY:
     case CURR_FACE:
+    case CURR_YUNIT:
+    case CURR_ZUNIT:
     case COMMON:
     case RUMP:
     case MELD:
@@ -476,9 +479,9 @@ static BOOLEAN Reduce(void)
 	if( has_lpar(actual(op)) )
 	{ s1 = PopObj();
 	  Link(Down(op), s1);
-	}
-	if( type(s1) == BACKEND )
-	{ op = OptimizeCase(op);
+	  if( type(s1) == BACKEND )
+	  { op = OptimizeCase(op);
+	  }
 	}
 	PushObj(op);
 	break;
@@ -1011,10 +1014,13 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case BREAK:
       case UNDERLINE:
       case COLOUR:
+      case OUTLINE:
       case LANGUAGE:
       case CURR_LANG:
       case CURR_FAMILY:
       case CURR_FACE:
+      case CURR_YUNIT:
+      case CURR_ZUNIT:
       case COMMON:
       case RUMP:
       case MELD:

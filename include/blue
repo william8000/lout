@@ -1,0 +1,71 @@
+###############################################################################
+#                                                                             #
+#   Lout setup file for Blue program printing                                 #
+#                                                                             #
+#   Jeffrey H. Kingston                                                       #
+#   23 February 2000                                                          #
+#                                                                             #
+###############################################################################
+
+
+###############################################################################
+#                                                                             #
+#  The @SysInclude { bluef } line                                             #
+#                                                                             #
+#  This line causes Lout to read the definitions for Blue, and should         #
+#  not be touched.                                                            #
+#                                                                             #
+###############################################################################
+
+@SysInclude { bluef }
+
+
+###############################################################################
+#                                                                             #
+#  The @BlueSetup @Use clause                                                 #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
+#                                                                             #
+###############################################################################
+
+@Use { @BlueSetup
+  # style		{ varying @OrIfPlain fixed } # fixed, varying, or symbol
+  # pipe                {                       } # pipe source through this
+
+  # fixedfont		{ Courier		} # font family if fixed
+  # fixedstrings	{ Base			} # string face if fixed
+  # fixedidentifiers	{ Base			} # identifier face if fixed
+  # fixedcomments	{ Base			} # comment face if fixed
+  # fixedkeywords	{ Base			} # keyword face if fixed
+  # fixednumbers	{ Base			} # number face if fixed
+  # fixedoperators	{ Base			} # operator face if fixed
+  # fixedsize		{ -1.0p			} # font size if fixed
+  # fixedline		{ 1.0vx			} # line-space if fixed
+  # fixedtabin		{ 8			} # tab interval if fixed
+  # fixedtabout		{ 8s			} # tab width if fixed
+
+  # varyingfont		{			} # font family if varying
+  # varyingstrings	{ Slope			} # string face if varying
+  # varyingidentifiers	{ Slope			} # identifier face if varying
+  # varyingcomments	{ Base			} # comment face if varying
+  # varyingkeywords	{ Bold			} # keyword face if varying
+  # varyingnumbers	{ Base			} # number face if varying
+  # varyingoperators	{ Base			} # operator face if varying
+  # varyingsize		{ 1.0f			} # font size if varying
+  # varyingline		{ 1.0vx			} # line-space if varying
+  # varyingtabin	{ 8			} # tab interval if varying
+  # varyingtabout	{ 3f			} # tab width if varying
+
+  # symbolfont		{			} # font family if symbol
+  # symbolstrings	{ Slope			} # string face if symbol
+  # symbolidentifiers	{ Slope			} # identifier face if symbol
+  # symbolcomments	{ Base			} # comment face if symbol
+  # symbolkeywords	{ Bold			} # keyword face if symbol
+  # symbolnumbers	{ Base			} # number face if symbol
+  # symboloperators	{ Base			} # operator face if symbol
+  # symbolsize		{ 1.0f			} # font size if symbol
+  # symbolline		{ 1.0vx			} # line-space if symbol
+  # symboltabin		{ 8			} # tab interval if symbol
+  # symboltabout	{ 3f			} # tab width if symbol
+}

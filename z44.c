@@ -1,7 +1,7 @@
 /*@z44.c:Vertical Hyphenation:VerticalHyphenate()@****************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -506,7 +506,7 @@ OBJECT ConvertGalleyList(OBJECT x)
 
 OBJECT BuildEnclose(OBJECT hd)
 { OBJECT sym, parsym, x, y, link, par, val, env, res;
-  debug1(DHY, D, "BuildEnclose(%s)", SymName(actual(hd)));
+  debug1(DOM, D, "BuildEnclose(%s)", SymName(actual(hd)));
 
   /* find @Enclose symbol and check that it has just one parameter */
   for( link = Down(actual(hd));  link != actual(hd);  link = NextDown(link) )
@@ -567,6 +567,6 @@ OBJECT BuildEnclose(OBJECT hd)
   Link(res, x);
   Link(res, env);
 
-  debug1(DHY, D, "BuildEnclose returning %s", EchoObject(res));
+  debug1(DOM, D, "BuildEnclose returning %s", EchoObject(res));
   return res;
 } /* end BuildEnclose */

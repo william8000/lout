@@ -44,7 +44,7 @@ import @TblSetup
 def @AmberLight
 {
     @OneRow @Tbl
-         aformat { @Cell A }
+         aformat { @Cell indentvertical { align } A }
          margin { 0i }
          strut { no }
          paint { no }  rule { no }

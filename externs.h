@@ -1,7 +1,7 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.17 (September 1999)")
+#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.18 (February 2000)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -225,7 +225,7 @@ If you're compiling this, you've got the wrong settings in the makefile!
 /*                                                                           */
 /*  MAX_COLOUR          The maximum number of distinct left parameters of    */
 /*                      @SetColour and @SetColor symbols allowed (after      */
-/*                      evaluation).  This can be increased beyond 4096      */
+/*                      evaluation).  This can be increased beyond 1024      */
 /*                      only by setting aside a larger word_colour() field.  */
 /*                                                                           */
 /*  MAX_LANGUAGE        The maximum number of distinct languages allowed.    */
@@ -614,7 +614,8 @@ typedef struct
   SHORT_LENGTH	oyunit;			/* value of y unit of measurement    */
   SHORT_LENGTH	ozunit;			/* value of z unit of measurement    */
   FONT_NUM	ofont		: 12;	/* current font                      */
-  COLOUR_NUM	ocolour		: 12;	/* current colour		     */
+  COLOUR_NUM	ocolour		: 10;	/* current colour		     */
+  BOOLEAN	ooutline	: 2;	/* TRUE if outlining words           */
   LANGUAGE_NUM	olanguage	: 6;	/* current language		     */
   BOOLEAN	onobreakfirst	: 1;	/* no break after first line of para */
   BOOLEAN	onobreaklast	: 1;	/* no break after last line of para  */
@@ -632,6 +633,7 @@ typedef struct
 #define	display_style(x)(x).osu2.oss2.odisplay_style
 #define	font(x)		(x).ofont
 #define	colour(x)	(x).ocolour
+#define	outline(x)	(x).ooutline
 #define	language(x)	(x).olanguage
 #define	nobreakfirst(x)	(x).onobreaklast
 #define	nobreaklast(x)	(x).onobreakfirst
@@ -647,6 +649,7 @@ typedef struct
   GapCopy(space_gap(x), space_gap(y)),					\
   font(x) = font(y),							\
   colour(x) = colour(y),						\
+  outline(x) = outline(y),						\
   language(x) = language(y), 						\
   nobreakfirst(x) = nobreakfirst(y),					\
   nobreaklast(x) = nobreaklast(y),					\
@@ -768,7 +771,8 @@ typedef union
   struct /* used by WORD objects only, except underline used by all */
 	 /* objects, including GAP_OBJ                                  */
   {	FONT_NUM	oword_font     : 12;
-	COLOUR_NUM	oword_colour   : 11;
+	COLOUR_NUM	oword_colour   : 10;
+	BOOLEAN		oword_outline  : 1;
 	LANGUAGE_NUM	oword_language : 6;
 	unsigned	ounderline     : 2;
 	unsigned	oword_hyph     : 1;
@@ -962,6 +966,7 @@ typedef union
 /*      zunit           Value of z unit of measurement                       */
 /*      font            Which internal font (including size) to use          */
 /*      colour          Which internal colour to use                         */
+/*      outline         TRUE if outlining words rather than filling them     */
 /*      language        Which internal language to use                       */
 /*      nobreakfirst    TRUE if break not allowed after first line of para   */
 /*      nobreaklastt    TRUE if break not allowed before last line of para   */
@@ -1064,6 +1069,7 @@ typedef union
 /*      SIZED           The size of the word                                 */
 /*      word_font       Font to print this word in (from style)              */
 /*      word_colour     Colour to print this word in (from style)            */
+/*      word_outline    If TRUE, print this word in outline (from style)     */
 /*      word_language   Language (for hyphenation) of this word (from style) */
 /*      underline       TRUE if continuous underlining goes under this word  */
 /*      word_hyph       Hyphenation wanted for this word (from style)        */
@@ -1230,7 +1236,8 @@ typedef union
 /*      last child      The right parameter of this symbol                   */
 /*                                                                           */
 /*  FONT, SPACE, BREAK - @Font, @Space, @Break symbols                       */
-/*  YUNIT, ZUNIT, COLOUR, LANGUAGE - @YUnit, @ZUnit, @Colour, @Language syms */
+/*  YUNIT, ZUNIT - @YUnit, @ZUnit symbols                                    */
+/*  COLOUR, OUTLINE, LANGUAGE - @Colour, @Outline, @Language symbols         */
 /*  PLUS, MINUS, - @Plus, @Minus symbols                                     */
 /*  MELD, COMMON, RUMP, INSERT - @Meld, @Common, @Rump, @Insert symbols      */
 /*  OPEN, TAGGED - @Open, @Tagged symbols                                    */
@@ -1279,6 +1286,7 @@ typedef union
 /*  CENV, CLOS, LVIS, LUSE, LEO - @LCEnv, @LClos, @LVis, @LUse, @LEO tokens  */
 /*  BACKEND - @BackEnd symbol                                                */
 /*  CURR_LANG, CURR_FAMILY, CURR_FACE - @CurrLang, @CurrFamily, @CurrFace    */
+/*  CURR_YUNIT, CURR_ZUNIT - @CurrYUnit, @CurrZUnit                          */
 /*                                                                           */
 /*      TOKEN           While still being parsed                             */
 /*                                                                           */
@@ -1598,6 +1606,7 @@ typedef union rec
 #define spanner_count(x)	word_font(x)
 #define	word_colour(x)		(x)->os1.ou2.os22.oword_colour
 #define spanner_sized(x)	word_colour(x)
+#define	word_outline(x)		(x)->os1.ou2.os22.oword_outline
 #define	word_language(x)	(x)->os1.ou2.os22.oword_language
 #define	spanner_broken(x)	word_language(x)
 #define	underline(x)		(x)->os1.ou2.os22.ounderline
@@ -1886,85 +1895,88 @@ typedef struct mapvec {
 #define	BREAK		    59		/* to s   @Break                     */
 #define	UNDERLINE	    60		/* to s   @Underline                 */
 #define	COLOUR		    61		/* to s   @SetColour and @SetColor   */
-#define	LANGUAGE	    62		/* to s   @Language                  */
-#define	CURR_LANG	    63		/* to s   @CurrLang                  */
-#define	CURR_FAMILY	    64		/* to s   @CurrFamily                */
-#define	CURR_FACE	    65		/* to s   @CurrFace                  */
-#define	COMMON		    66		/* to s   @Common                    */
-#define	RUMP		    67		/* to s   @Rump                      */
-#define	MELD		    68		/* to s   @Meld                      */
-#define	INSERT		    69		/* to s   @Insert                    */
-#define	ONE_OF		    70		/* to s   @OneOf                      */
-#define	NEXT		    71		/* to s   @Next                      */
-#define	PLUS		    72		/* to s   @Plus                      */
-#define	MINUS		    73		/* to s   @Minus                     */
-#define	ENV_OBJ		    74		/* to s   object with envt (no name) */
-#define	ENV		    75		/* to s   @LEnv                      */
-#define	ENVA		    76		/* to s   @LEnvA                     */
-#define	ENVB		    77		/* to s   @LEnvB                     */
-#define	ENVC		    78		/* to s   @LEnvC                     */
-#define	ENVD		    79		/* to s   @LEnvD                     */
-#define	CENV		    80		/* to s   @LCEnv                     */
-#define	CLOS		    81		/* to s   @LClos                     */
-#define	LVIS		    82		/* to s   @LVis                      */
-#define	LUSE		    83		/* to s   @LUse                      */
-#define	LEO 		    84		/* to s   @LEO                       */
-#define	OPEN		    85		/* to s   @Open                      */
-#define	TAGGED		    86		/* to s   @Tagged                    */
-#define	INCGRAPHIC	    87		/* to s   @IncludeGraphic            */
-#define	SINCGRAPHIC	    88		/* to s   @SysIncludeGraphic         */
-#define	PLAIN_GRAPHIC	    89		/* to s   @PlainGraphic              */
-#define	GRAPHIC		    90		/* to s   @Graphic                   */
-#define	TSPACE		    91		/* t      a space token, parser only */
-#define	TJUXTA		    92		/* t      a juxta token, parser only */
-#define	LBR		    93		/* t  s   left brace token           */
-#define	RBR		    94		/* t  s   right brace token          */
-#define	BEGIN		    95		/* t  s   @Begin token               */
-#define	END		    96		/* t  s   @End token                 */
-#define	USE		    97		/* t  s   @Use                       */
-#define	NOT_REVEALED	    98		/* t  s   @NotRevealed               */
-#define	GSTUB_NONE	    99		/* t      a galley stub, no rpar     */
-#define	GSTUB_INT	   100		/* t      galley stub internal rpar  */
-#define	GSTUB_EXT	   101		/* t      galley stub external rpar  */
-#define	UNEXPECTED_EOF	   102		/* t      unexpected end of file     */
-#define	INCLUDE		   103		/*    s   @Include                   */
-#define	SYS_INCLUDE	   104		/*    s   @SysInclude                */
-#define	PREPEND		   105		/*    s   @Prepend                   */
-#define	SYS_PREPEND	   106		/*    s   @SysPrepend                */
-#define	DATABASE	   107		/*    s   @Database                  */
-#define	SYS_DATABASE	   108		/*    s   @SysDatabase               */
-/* #define	START		   109	*/	/*    s   \Start                     */
-#define	DEAD		   110		/*   i    a dead galley              */
-#define	UNATTACHED	   111		/*   i    an inner, unsized galley   */
-#define	RECEPTIVE	   112		/*   i    a receptive object index   */
-#define	RECEIVING	   113		/*   i    a receiving object index   */
-#define	RECURSIVE	   114		/*   i    a recursive definite obj.  */
-#define	PRECEDES	   115		/*   i    an ordering constraint     */
-#define	FOLLOWS		   116		/*   i    other end of ordering c.   */
-#define	CROSS_LIT	   117		/*   i    literal word cross-ref     */
-#define	CROSS_FOLL	   118		/*   i    following type cross-ref   */
-#define	CROSS_FOLL_OR_PREC 119		/*   i    follorprec type cross-ref  */
-#define	GALL_FOLL	   120		/*   i    galley with &&following    */
-#define	GALL_FOLL_OR_PREC  121		/*   i    galley with &&following    */
-#define	CROSS_TARG	   122		/*   i    value of cross-ref         */
-#define	GALL_TARG	   123		/*   i    target of these galleys    */
-#define	GALL_PREC	   124		/*   i    galley with &&preceding    */
-#define	CROSS_PREC	   125		/*   i    preceding type cross-ref   */
-#define	PAGE_LABEL_IND	   126		/*   i    index of PAGE_LABEL        */
-#define	SCALE_IND	   127		/*   i    index of auto SCALE        */
-#define	COVER_IND	   128		/*   i    index of HCOVER or VCOVER  */
-#define	EXPAND_IND	   129		/*   i    index of HEXPAND or VEXPD  */
-#define	THREAD		   130		/*        a sequence of threads      */
-#define	CROSS_SYM	   131		/*        cross-ref info             */
-#define	CR_ROOT		   132		/*        RootCross                  */
-#define	MACRO	           133		/*        a macro symbol             */
-#define	LOCAL	           134		/*        a local symbol             */
-#define	LPAR	           135		/*        a left parameter           */
-#define	NPAR	           136		/*        a named parameter          */
-#define	RPAR	           137		/*        a right parameter          */
-#define	EXT_GALL           138		/*        an external galley         */
-#define	CR_LIST	           139		/*        a list of cross references */
-#define	DISPOSED           140		/*        a disposed record          */
+#define	OUTLINE		    62		/* to s   @Outline                   */
+#define	LANGUAGE	    63		/* to s   @Language                  */
+#define	CURR_LANG	    64		/* to s   @CurrLang                  */
+#define	CURR_FAMILY	    65		/* to s   @CurrFamily                */
+#define	CURR_FACE	    66		/* to s   @CurrFace                  */
+#define	CURR_YUNIT	    67		/* to s   @CurrYUnit                 */
+#define	CURR_ZUNIT	    68		/* to s   @CurrZUnit                 */
+#define	COMMON		    69		/* to s   @Common                    */
+#define	RUMP		    70		/* to s   @Rump                      */
+#define	MELD		    71		/* to s   @Meld                      */
+#define	INSERT		    72		/* to s   @Insert                    */
+#define	ONE_OF		    73		/* to s   @OneOf                     */
+#define	NEXT		    74		/* to s   @Next                      */
+#define	PLUS		    75		/* to s   @Plus                      */
+#define	MINUS		    76		/* to s   @Minus                     */
+#define	ENV_OBJ		    77		/* to s   object with envt (no name) */
+#define	ENV		    78		/* to s   @LEnv                      */
+#define	ENVA		    79		/* to s   @LEnvA                     */
+#define	ENVB		    80		/* to s   @LEnvB                     */
+#define	ENVC		    81		/* to s   @LEnvC                     */
+#define	ENVD		    82		/* to s   @LEnvD                     */
+#define	CENV		    83		/* to s   @LCEnv                     */
+#define	CLOS		    84		/* to s   @LClos                     */
+#define	LVIS		    85		/* to s   @LVis                      */
+#define	LUSE		    86		/* to s   @LUse                      */
+#define	LEO 		    87		/* to s   @LEO                       */
+#define	OPEN		    88		/* to s   @Open                      */
+#define	TAGGED		    89		/* to s   @Tagged                    */
+#define	INCGRAPHIC	    90		/* to s   @IncludeGraphic            */
+#define	SINCGRAPHIC	    91		/* to s   @SysIncludeGraphic         */
+#define	PLAIN_GRAPHIC	    92		/* to s   @PlainGraphic              */
+#define	GRAPHIC		    93		/* to s   @Graphic                   */
+#define	TSPACE		    94		/* t      a space token, parser only */
+#define	TJUXTA		    95		/* t      a juxta token, parser only */
+#define	LBR		    96		/* t  s   left brace token           */
+#define	RBR		    97		/* t  s   right brace token          */
+#define	BEGIN		    98		/* t  s   @Begin token               */
+#define	END		    99		/* t  s   @End token                 */
+#define	USE		   100		/* t  s   @Use                       */
+#define	NOT_REVEALED	   101		/* t  s   @NotRevealed               */
+#define	GSTUB_NONE	   102		/* t      a galley stub, no rpar     */
+#define	GSTUB_INT	   103		/* t      galley stub internal rpar  */
+#define	GSTUB_EXT	   104		/* t      galley stub external rpar  */
+#define	UNEXPECTED_EOF	   105		/* t      unexpected end of file     */
+#define	INCLUDE		   106		/*    s   @Include                   */
+#define	SYS_INCLUDE	   107		/*    s   @SysInclude                */
+#define	PREPEND		   108		/*    s   @Prepend                   */
+#define	SYS_PREPEND	   109		/*    s   @SysPrepend                */
+#define	DATABASE	   110		/*    s   @Database                  */
+#define	SYS_DATABASE	   111		/*    s   @SysDatabase               */
+/* #define START	   112	*/	/*    s   \Start                     */
+#define	DEAD		   113		/*   i    a dead galley              */
+#define	UNATTACHED	   114		/*   i    an inner, unsized galley   */
+#define	RECEPTIVE	   115		/*   i    a receptive object index   */
+#define	RECEIVING	   116		/*   i    a receiving object index   */
+#define	RECURSIVE	   117		/*   i    a recursive definite obj.  */
+#define	PRECEDES	   118		/*   i    an ordering constraint     */
+#define	FOLLOWS		   119		/*   i    other end of ordering c.   */
+#define	CROSS_LIT	   120		/*   i    literal word cross-ref     */
+#define	CROSS_FOLL	   121		/*   i    following type cross-ref   */
+#define	CROSS_FOLL_OR_PREC 122		/*   i    follorprec type cross-ref  */
+#define	GALL_FOLL	   123		/*   i    galley with &&following    */
+#define	GALL_FOLL_OR_PREC  124		/*   i    galley with &&following    */
+#define	CROSS_TARG	   125		/*   i    value of cross-ref         */
+#define	GALL_TARG	   126		/*   i    target of these galleys    */
+#define	GALL_PREC	   127		/*   i    galley with &&preceding    */
+#define	CROSS_PREC	   128		/*   i    preceding type cross-ref   */
+#define	PAGE_LABEL_IND	   129		/*   i    index of PAGE_LABEL        */
+#define	SCALE_IND	   130		/*   i    index of auto SCALE        */
+#define	COVER_IND	   131		/*   i    index of HCOVER or VCOVER  */
+#define	EXPAND_IND	   132		/*   i    index of HEXPAND or VEXPD  */
+#define	THREAD		   133		/*        a sequence of threads      */
+#define	CROSS_SYM	   134		/*        cross-ref info             */
+#define	CR_ROOT		   135		/*        RootCross                  */
+#define	MACRO	           136		/*        a macro symbol             */
+#define	LOCAL	           137		/*        a local symbol             */
+#define	LPAR	           138		/*        a left parameter           */
+#define	NPAR	           139		/*        a named parameter          */
+#define	RPAR	           140		/*        a right parameter          */
+#define	EXT_GALL           141		/*        an external galley         */
+#define	CR_LIST	           142		/*        a list of cross references */
+#define	DISPOSED           143		/*        a disposed record          */
 
 #define is_indefinite(x)  ((x) >= CLOSURE && (x) <= HEAD)
 #define is_definite(x) 	 ((x) >= SPLIT && (x) <= GRAPHIC)
@@ -2029,9 +2041,9 @@ typedef struct mapvec {
 #define	SMALL_CAPS_ON	     1		/* small capitals                    */
 
 /* sides of a mark */
-#define	BACK	           141		/* means lies to left of mark        */
-#define	ON	           142		/* means lies on mark                */
-#define	FWD	           143		/* means lies to right of mark       */
+#define	BACK	           144		/* means lies to left of mark        */
+#define	ON	           145		/* means lies on mark                */
+#define	FWD	           146		/* means lies to right of mark       */
 
 /* statuses of thread objects */
 #define	NOTSIZED	 0		/* this thread object is not sized   */
@@ -2039,15 +2051,15 @@ typedef struct mapvec {
 #define	FINALSIZE	 2		/* thread object size is now final   */
 
 /* constraint statuses */
-#define	PROMOTE	           144		/* this component may be promoted    */
-#define	CLOSE	           145		/* must close dest before promoting  */
-#define	BLOCK	           146		/* cannot promote this component     */
-#define	CLEAR	           147		/* this constraint is now satisfied  */
+#define	PROMOTE	           147		/* this component may be promoted    */
+#define	CLOSE	           148		/* must close dest before promoting  */
+#define	BLOCK	           149		/* cannot promote this component     */
+#define	CLEAR	           150		/* this constraint is now satisfied  */
 
 /* gap increment types */
-#define	GAP_ABS	           148		/* absolute,  e.g.  3p               */
-#define	GAP_INC	           149		/* increment, e.g. +3p               */
-#define	GAP_DEC	           150		/* decrement, e.g. -3p               */
+#define	GAP_ABS	           151		/* absolute,  e.g.  3p               */
+#define	GAP_INC	           152		/* increment, e.g. +3p               */
+#define	GAP_DEC	           153		/* decrement, e.g. -3p               */
 
 /* file types */
 #define	SOURCE_FILE	 0		/* input file from command line      */
@@ -2231,10 +2243,13 @@ typedef struct mapvec {
 #define	KW_UNDERLINE		AsciiToFull("@Underline")
 #define	KW_COLOUR		AsciiToFull("@SetColour")
 #define	KW_COLOR		AsciiToFull("@SetColor")
+#define	KW_OUTLINE		AsciiToFull("@Outline")
 #define	KW_LANGUAGE		AsciiToFull("@Language")
 #define	KW_CURR_LANG		AsciiToFull("@CurrLang")
 #define	KW_CURR_FAMILY		AsciiToFull("@CurrFamily")
 #define	KW_CURR_FACE		AsciiToFull("@CurrFace")
+#define	KW_CURR_YUNIT		AsciiToFull("@CurrYUnit")
+#define	KW_CURR_ZUNIT		AsciiToFull("@CurrZUnit")
 #define	KW_ENV			AsciiToFull("@LEnv")
 #define	KW_ENVA			AsciiToFull("@@A")
 #define	KW_ENVB			AsciiToFull("@@B")

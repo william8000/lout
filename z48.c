@@ -1,7 +1,7 @@
 /*@z48.c:PDF back end@********************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
-/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.18)                       */
+/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -1135,7 +1135,8 @@ static void PDFPage_FlushRawBuffer(FILE* in_fp)
   /* always compress to the point where the raw buffer is empty */
   do {
     err = deflate(&g_comp_stream, Z_NO_FLUSH);
-    if (err != Z_OK)
+    /* bug fix from newman-andy@yale.edu Feb 23 2000 if (err != Z_OK) */
+    if ( err != Z_OK && g_comp_stream.avail_in != 0 )
       Error(48, 11, "PDFPage_FlushRawBuffer: zlib error occurred",FATAL,no_fpos);
 
     /* IF compressed output buffer is full THEN flush it to disk and reset it */

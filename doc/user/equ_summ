@@ -37,6 +37,9 @@ and full names.  The auxiliary symbols are:
 @Rowa
     A { @Code "big x" }
     B { Make @Code x larger }
+@Rowa
+    A { @Code "small x" }
+    B { Make @Code x smaller }
 }
 Here are all the parameterized symbols, shown in groups of equal
 precedence, with the precedence itself at right:
@@ -262,6 +265,7 @@ ragged @Break {
 "propto"	@Dbl @Eq {  propto		}
 "models"	@Dbl @Eq {  models		}
 "doteq"		@Dbl @Eq {  doteq		}
+"trieq"		@Dbl @Eq {  trieq		}
 "perp"		@Dbl @Eq {  perp		}
 "notsub"	@Dbl @Eq {  notsub		}
 "notin"		@Dbl @Eq {  notin		}
@@ -504,6 +508,7 @@ ragged @Break {
 "exists"	@Dbl @Eq {  exists		}
 "neg"		@Dbl @Eq {  neg			}
 "circle"	@Dbl @Eq {  circle		}
+"filledcircle"	@Dbl @Eq {  filledcircle	}
 "square"	@Dbl @Eq {  square		}
 "ldots"		@Dbl @Eq {  ldots		}
 "cdots"		@Dbl @Eq {  cdots		}

@@ -101,9 +101,12 @@
   # @TableNumbers	{ Arabic		} # method of numbering tables
   # @FigureCaptionPos	{ Below 		} # Above or Below
   # @TableCaptionPos	{ Below			} # Above or Below
-  # @CaptionFont        {                       } # figure, table caption font
-  # @CaptionBreak       {                       } # figure, table caption break
-  # @CaptionFormat      { @B { number @DotSep @OneCol }	} # figure, table caption format
+  # @FigureCaptionFont  { -2p                   } # figure caption font
+  # @FigureCaptionBreak { adjust hyphen 1.2fx   } # figure caption break
+  # @FigureCaptionFormat{ {@B { word @NumSep number. &2s }} @Insert caption }
+  # @TableCaptionFont   { -2p                   } # table caption font
+  # @TableCaptionBreak  { adjust hyphen 1.2fx   } # table caption break
+  # @TableCaptionFormat { {@B { word @NumSep number. &2s }} @Insert caption }
   # @MakeFigureContents { No                    } # list of figures at start
   # @MakeTableContents  { No                    } # list of tables at start
   # @MakeContents	{ No			} # make contents? Yes or No
@@ -254,6 +257,7 @@
   # @FigureListWord		{ figurelist	} # word for "List of Figures"
   # @TableListWord		{ tablelist	} # word for "List of Tables"
   # @IntroductionWord		{ introduction	} # word for "Introduction"
+  # @AbbreviationsWord		{ abbreviations	} # word for "Abbreviations"
   # @ChapterWord		{ chapter	} # word for "Chapter"
   # @AppendixWord		{ appendix	} # word for "Appendix"
   # @IndexWord			{ index		} # word for "Index"
@@ -304,6 +308,7 @@
   # @SubSubSectionGap		{ 1.5v	@OrIfPlain 2f	} # between sub-subs.
   # @SubAppendixGap		{ 2.0v	@OrIfPlain 3f	} # between subappendices
   # @SubSubAppendixGap		{ 1.5v	@OrIfPlain 2f	} # between sub-subapps
+  # @PrefaceInContents		{ Yes		} # add preface to contents
   # @AbbreviationsInContents	{ Yes		} # add abbreviations to contents
   # @IntroductionInContents	{ Yes		} # add introduction to contents
   # @PartInContents		{ Yes		} # add parts to contents

@@ -16,7 +16,7 @@ def @ReportSetup
     named @CoverSheet			{ Yes			}
     named @ContentsSeparate		{ No			}
     named @DateLine			{ No			}
-    named @AbstractDisplay		{ Yes			}
+    named @AbstractDisplay		{ No			}
     named @AbstractTitle		{ dft			}
     named @ReferencesBeforeAppendices	{ No			}
 
@@ -491,8 +491,8 @@ def @ReportSetup
         {
 
 	      	 		Start @Runner
-	    //@SectionGap	@ContentsPart
-	    //@SectionGap	@SectionList @FirstSectionNumber
+	    //@ContentsGap	@ContentsPart
+	    //@ContentsGap	@SectionList @FirstSectionNumber
 	    //@SectionGap	@ReferencesBeforeAppendices @Do {
 				    @MakeReferences @Do @ReferencesPart
 				}

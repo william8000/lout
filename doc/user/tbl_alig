@@ -7,19 +7,21 @@ Columns of numbers are often presented with decimal points aligned:
 aligned.columns @Index { aligned columns in tables }
 @CD @OneRow @Tbl
     marginvertical { 0.5vx }
-    aformat { @Cell A }
+    aformat { @Cell indent { align } A }
 {
 @Rowa A { 5^.46 } marginabove { 0i }
 @Rowa A { 3^.4159 }
 @Rowa A { 5772^ } marginbelow { 0i }
 }
-You can produce this by placing a @Code "^" symbol, which is used
-generally throughout Lout for alignment, just before the alignment point in
+To produce this you need two steps.  First, indicate that you want
+an aligned column, using @Code "indent { align }" on the relevant
+cell; and second, place a @Code "^" symbol, which is used generally
+throughout Lout for alignment, just before the alignment point in
 each entry:
 @ID @OneRow @Code @Verbatim {
 @Tbl
     marginvertical { 0.5vx }
-    aformat { @Cell A }
+    aformat { @Cell indent { align } A }
 {
 @Rowa A { 5^.46 }
 @Rowa A { 3^.4159 }
@@ -27,12 +29,17 @@ each entry:
 }
 }
 The equals signs of equations can be aligned in the same way (see the
-example at the start of this chapter).  Aligned cells should have no
-@Code indent option.
+example at the start of this chapter).
 @PP
-Owing to problems behind the scenes, getting a heading over the top
-of an aligned column is a problem with no ideal solution.  What most
-people want is for the heading to be centred in the column, and the
+Owing to problems behind the scenes, in a column in which one cell is
+labelled {@Code "indent { align }"}, all the other cells have to be
+so labelled, otherwise Lout make a mess of things.  This is a problem
+when we want to get a heading over the top of an aligned column:  if
+we follow the rule, the @I heading gets aligned, which is wrong; but
+if we don't, Lout makes a mess of things.  There is no ideal solution
+to this problem.
+@PP
+What most people want is for the heading to be centred in the column, and the
 aligned entries to be centred in the column as a block, but Lout cannot
 do this.  One approximation is to make the heading cell a spanning
 cell with centring, like this:
@@ -51,14 +58,14 @@ an empty second column. }
 @Rowb A { 5772^ }
 }
 }
-The spanning frees the heading from alignment, permitting
-@Code "indent { ctr }" to work:
+The spanning quarantines the centred cell from the aligned cells,
+permitting @Code "indent { ctr }" to work:
 @CD @OneRow @Tbl
     marginvertical { 0.5vx }
     aformat { @StartHSpan @Cell indent { ctr } @B A | }
     bformat { @Cell A | }
 {
-@Rowa A { Heading } marginabove { 0i }
+@Rowa A { V } marginabove { 0i }
 @Rowb A { 5^.46 }
 @Rowb A { 3^.4159 }
 @Rowb A { 5772^ } marginbelow { 0i }

@@ -1383,19 +1383,23 @@ def @TblSetup
 		    ctr   @Yield @OneCol { |"0.5rt" x }
 		    right @Yield @OneCol { |"1.0rt" x }
 		    mctr  @Yield @OneCol { |"0.5bx" x }
-		    ""    @Yield @OneCol x
+		    align @Yield @OneCol x
 		    else  @Yield @OneCol { |i x }
 		}
 	    }
 
 	    def @VIndent right x
 	    {
+		# note: the default value "" gives top alignment,
+		# but that is not a problem because we are by
+		# default putting in a vertical strut
+
 		iv @Case {
 		    top   @Yield @OneRow { / x }
 		    ctr   @Yield @OneRow { /"0.5rt" x }
 		    foot  @Yield @OneRow { /"1.0rt" x }
 		    mctr  @Yield @OneRow { /"0.5bx" x }
-		    ""    @Yield @OneRow x
+		    align @Yield @OneRow x
 		    else  @Yield @OneRow { /iv x }
 		}
 	    }

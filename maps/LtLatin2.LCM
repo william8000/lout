@@ -218,7 +218,7 @@
 172	254	Zacute		LC zacute;	UA Z;		AC acute;
 173	255	hyphen
 174	256	Zcaron		LC zcaron;	UA Z;		AC caron;
-175	257	Zdotabove	LC zdotabove;	UA Z;		AC dotaccent;
+175	257	Zdotaccent	LC zdotaccent;	UA Z;		AC dotaccent;
 176	260	degree
 177	261	aogonek		UC Aogonek;	UA a;		AC ogonek;
 178	262	ogonek
@@ -234,7 +234,7 @@
 188	274	zacute		UC Zacute;	UA z;		AC acute;
 189	275	hungarumlaut
 190	276	zcaron		UC Zcaron;	UA z;		AC caron;
-191	277	zdotabove	UC Zdotabove;	UA z;		AC dotaccent;
+191	277	zdotaccent	UC Zdotaccent;	UA z;		AC dotaccent;
 192	300	Racute		LC racute;	UA R;		AC acute;
 193	301	Aacute		LC aacute;	UA A;		AC acute;
 194	302	Acircumflex	LC acircumflex;	UA A;		AC circumflex;

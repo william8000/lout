@@ -134,12 +134,12 @@ The names given to the entries ({@Code "A"}, {@Code "B"}, {@Code "C"},
 etc.) are quite irrelevant:  having a @Code "@Cell D" in one row and a
 @Code "@Cell D" in another does not mean that the cells will appear in
 the same column.
-@PP
-There is an asymmetry in the spiral above:  the first column
-occupies slightly more space than the other two.  This arises
-because the left margin of the leftmost column is excluded from the
-calculation of how much space is available.  This anomaly might be
-corrected some day.
+# @PP
+# There is an asymmetry in the spiral above:  the first column
+# occupies slightly more space than the other two.  This arises
+# because the left margin of the leftmost column is excluded from the
+# calculation of how much space is available.  This anomaly might be
+# corrected some day.
 @PP
 There is a @Code "@StartHVSpan" symbol which combines the effects
 of @Code "@StartHSpan" and {@Code "@StartVSpan"}.  You need to

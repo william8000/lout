@@ -6,6 +6,13 @@
 This chapter describes how to use the @@Diag symbol
 diag. @Index { @@Diag }
 @FootNote {
+Starting with Version 3.18 of Lout, the @@Diag symbol was enhanced with
+the {@Code "@ANode"}, {@Code "@BNode"}, and {@Code "@CNode"} symbols
+described in Section {@NumberOf dia_node}, and with the symbols for
+syntax diagrams described in Section {@NumberOf dia_synt}.  These
+enhancements are upwardly compatible, unless the user has defined
+symbols with these same names and used them within diagrams.
+@LP
 Prior to Version 3.09 of Lout, this chapter described a symbol called
 fig. @Index @Code "@Fig"
 {@Code "@Fig"} which was similar to but more primitive than
@@ -29,7 +36,7 @@ diag. @Index @Code "@Diag"
 // @Arrow from { E } to { D }
 }
 @@Diag offers nodes and links, arrows, labels, positioning using coordinates,
-and tree diagrams.
+tree diagrams, and syntax diagrams.
 @BeginSections
 @Include { dia_intr }
 @Include { dia_node }
@@ -38,6 +45,7 @@ and tree diagrams.
 @Include { dia_labe }
 @Include { dia_posi }
 @Include { dia_tree }
+@Include { dia_synt }
 @Include { dia_erro }
 @Include { dia_defi }
 @Include { dia_geom }
