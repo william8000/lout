@@ -93,9 +93,17 @@
 
    def @FilledBox
    {
-     { "0 0 moveto xsize 0 lineto xsize ysize lineto 0 ysize lineto"
-       "closepath fill"
-     } @Graphic { 0.6f @High ^/ 0.4f @High 4f @Wide }
+     @BackEnd @Case {
+       PostScript @Yield {
+         { "0 0 moveto xsize 0 lineto xsize ysize lineto 0 ysize lineto"
+           "closepath fill"
+         } @Graphic { 0.6f @High ^/ 0.4f @High 4f @Wide }
+       }
+       PDF @Yield {
+         { "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h f"
+         } @Graphic { 0.6f @High ^/ 0.4f @High 4f @Wide }
+       }
+     }
    }
 
    import @Eq

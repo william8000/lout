@@ -25,6 +25,8 @@ $set 1
 26 unknown command line flag %s
 27 cannot open output file %s
 28 -o: output file name %s ends with %s
+29 total of all words printed: %d
+30 unable to initialize collation
 $set 2
 1 include file %s too deeply nested
 2 database file %s too deeply nested
@@ -191,6 +193,7 @@ $set 8
 35 invalid left parameter of %s
 36 invalid left parameter of %s
 37 %s deleted (invalid right parameter)
+38 no current font at this point, using %s
 $set 9
 1 symbol with import list misused
 2 no value for parameter %s of symbol %s:
@@ -248,6 +251,7 @@ $set 13
 8 %s deleted (too wide)
 9 column mark of unbroken paragraph moved left
 10 column mark of paragraph moved left before breaking
+11 replacing with empty object: negative size constraint %s,%s,%s
 $set 14
 1 word %s horizontally scaled by factor %.2f (too wide for %s paragraph)
 2 %s object horizontally scaled by factor %.2f (too wide for %s paragraph)
@@ -256,6 +260,7 @@ $set 14
 5 %s object deleted (too wide for %s paragraph)
 6 paragraph deleted (assigned width %s is too narrow)
 7 hyphen or nohyphen option missing
+8 phantom oversized object
 $set 16
 2 size constraint %s,%s,%s broken by %s,%s
 $set 17
@@ -313,16 +318,22 @@ $set 22
 $set 23
 1 object deleted (it cannot be scaled vertically)
 2 object deleted (it cannot be scaled horizontally)
+3 word %s horizontally scaled by factor %.2f (too wide for %s paragraph)
+4 %s object horizontally scaled by factor %.2f (too wide for %s paragraph)
+5 oversize object has size 0 or less
+6 word %s deleted (too wide for %s paragraph)
+7 %s object deleted (too wide for %s paragraph)
 $set 24
 1 cannot open %s file %s
 2 %s file %s is empty
 3 %s file %s lacks PostScript BeginResource comment
 4 truncating -EPS document at end of first page
-5 error in left parameter of %s
+5 rotations, graphics etc. too deeply nested (max is %d)
 6 error in left parameter of %s
-7 ignoring LanguageLevel comment in %s file %s
-8 ignoring Extensions comment in %s file %s
-9 rotations, graphics etc. too deeply nested (max is %d)
+7 error in left parameter of %s
+8 PrintGraphicInclude: cannot include EPSF in a PDF file. File ignored.
+9 ignoring LanguageLevel comment in %s file %s
+10 ignoring Extensions comment in %s file %s
 $set 26
 1 AppendString abort
 $set 27
@@ -445,6 +456,7 @@ $set 37
 53 no current font at this point
 54 no current font at this point
 55 family and face names %s %s are too long
+56 syntax error in font size %s; ignoring it
 $set 38
 1 too many character mappings
 2 run out of memory when loading character mapping
@@ -489,3 +501,45 @@ $set 44
 $set 46
 1 unable to evaluate %s parameter, assuming value is No
 2 value of %s operator is neither Yes nor No, assuming No
+$set 47
+28 PDFPage_ProcessDocInfoKeyword: no memory for __subject=
+$set 48
+1 PDFObject_New: run out of memory when trying to create an object list entry
+2 PDFFile_BeginFontEncoding: run out of memory when trying to create a font encoding list entry
+3 PDFFile_BeginFontEncoding: run out of memory when trying to create a font encoding string
+4 PDFFont_NewListEntry: run out of memory when trying to create a PDF font entry
+5 PDFFont_NewListEntry: run out of memory when trying to create a PDF font entry
+6 PDFFont_NewListEntry: run out of memory when trying to create a PDF font entry
+7 PDFFont_NewListEntry: run out of memory when trying to create a PDF font entry
+8 PDFFont_WriteFontResource: a font has no encoding
+9 PDFPage_FlushCompressedBuffer: zlib error occurred
+10 PDFPage_FlushCompressedBuffer: zlib error occurred
+11 PDFPage_FlushRawBuffer: zlib error occurred
+12 PDFPage_FlushRawBuffer: write error occurred
+13 PDFPage_Begin: zlib error occurred
+14 PDFPage_Push: run out of memory when trying to create a qsave_stack entry
+15 PDFPage_Push: run out of memory when trying to create a qsave_marking_stack entry
+16 PDFTargetAnnot_New: run out of memory when trying to create a link annotation entry
+17 PDFTargetAnnot_New: run out of memory when trying to create name field for a link annotation entry
+18 PDFSourceAnnot_Write: invalid link dest option specified
+19 PDFSourceAnnot_New: run out of memory when trying to create a page link annotation entry
+20 PDFSourceAnnot_New: run out of memory when trying to create name field for a page link annotation entry
+21 PDFPage_GetFloat: unable to evaluate number for Lout graphic keyword processing
+22 PDFPage_ProcessLinkKeyword: empty link-name / URI; ignored.
+24 PDFPage_ProcessLinkKeyword: empty file spec
+25 PDFPage_ProcessLinkKeyword: out of memory
+26 PDFPage_ProcessDocInfoKeyword: no memory for __author=
+27 PDFPage_ProcessDocInfoKeyword: no memory for __title=
+29 PDFPage_ProcessDocInfoKeyword: no memory for __keywords=
+30 PDFPage_EvalExpr: '(' expected
+31 PDFPage_EvalExpr: ',' expected
+32 PDFPage_EvalExpr: ')' expected
+33 PDFPage_EvalExpr: __add, __sub, __mul, __div, or a unit keyword was expected
+34 PDFPage_CollectExpr: expression too long (max. 512 chars)
+35 PDFPage_CollectLink: link too long (max. 512 chars)
+36 PDFPage_WriteGraphic: '(' expected
+37 PDFPage_WriteGraphic: '__' encountered while processing @Graphic
+38 PDFPage_Cleanup: run out of memory when trying to create an object list entry
+39 %s
+40 %s
+41 The largest page object is %u bytes long.

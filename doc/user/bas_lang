@@ -64,8 +64,21 @@ can change it there.  If not, you can change it at the start of your
 document, as explained in Section {@NumberOf ordinary}.
 @PP
 Czech, Polish, and Slovenian use the ISO-LATIN-2 character set, and
-Russian uses Cyrillic characters.  Consult directory @Code "software"
-in the Lout distribution to find out how to get the extra things you
-need for these languages.  Other left-to-right languages are easily
-added, so please consult the author if your language is not listed.
+users of these languages have to place
+@ID @Code "@SysInclude { latin2 }"
+at the very start of their documents in order to get access to the
+ISO-LATIN-2 versions of the fonts.  These have family names such as
+TimesCE, CourierCE, HelveticaCE, and so on, to distinguish them
+from the same fonts encoded in ISO-LATIN-1.  The face names are
+unchanged.  Consult file @Code "latin2.fd" in the standard include
+directory for a complete list of these fonts.
+@PP
+Russian uses Cyrillic characters.  In principle, users of Russian
+have to place
+@ID @Code "@SysInclude { russian }"
+at the very start of their documents in order to get access to the
+Cyrillic versions of the fonts.  However no such fonts are distributed
+with the current version of Lout, so this line does nothing at
+present.  Other left-to-right languages are easily added, so please
+consult the author if your language is not listed.
 @End @Section

@@ -73,6 +73,12 @@ The point is that the section title is rather long for a running
 title, and so we use @Code "@RunningTitle" to get an abbreviated
 version of it.
 @PP
+Section titles typically appear in Bold face in the section heading,
+but in Roman face in tables of contents and running page headers.  So
+if part of your title is in italics, enclose it in @Code "@II" rather
+than just @Code "@I" to ensure that you get the right kind of italics
+in both contexts.
+@PP
 All large-scale structure symbols also have an @Code "@InitialLanguage"
 option which sets the current language for the duration of that
 symbol.  However, footnotes, endnotes, figures, tables, references,

@@ -26,6 +26,7 @@ document. @Index @Code "@Document"
 "    @InitialBreak { adjust 1.2fx hyphen }"
 "    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
+"    @PageOrientation { Portrait }"
 "    @PageHeaders { Simple }"
 "    @FirstPageNumber { 1 }"
 "    @ColumnNumber { 1 }"
@@ -68,6 +69,11 @@ for turning hyphenation on or off.
 two objects, as described in Section
 {@NumberOf white}.  @Code "@InitialLanguage" determines the language
 of the bulk of the document.
+@PP
+@Code "@PageOrientation" determines the orientation of the page.  Its
+value may be {@Code Portrait} (the default), {@Code Landscape},
+{@Code ReversePortrait}, or {@Code ReverseLandscape}.  See
+Section {@NumberOf pagesize} for further details.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
 footers throughout the document, and may be {@Code None},

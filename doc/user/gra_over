@@ -86,7 +86,9 @@ separate graphs of equal size.  There is an @Code "@OverStrike"
 overstrike. @Index @Code "@OverStrike"
 symbol which overstrikes two objects, so
 @ID @Code "@Graph { ... } @OverStrike @Graph { ... }"
-will do the job.
+will do the job.  Typically one of the graphs would have y ticks,
+and the other would have r ticks (adjacent to the right-hand side of the
+frame).
 @PP
 There are @Code "xlog" and @Code "ylog" options which produce
 logarithmic.axes @Index { logarithmic axes in graphs }

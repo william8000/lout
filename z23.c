@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,14 +20,14 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z23.c                                                      */
 /*  MODULE:       Galley Printer                                             */
 /*  EXTERNS:      FixAndPrintObject()                                        */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 #define	NO_SUPPRESS	FALSE
 #define	SUPPRESS	TRUE
 #define word_equal(x, str)  (is_word(type(x)) && StringEqual(string(x), str))
@@ -283,6 +283,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 
 	case POSTSCRIPT:
+	case PDF:
 
           if( dim == COLM )
             FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
@@ -315,6 +316,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 
 	case POSTSCRIPT:
+	case PDF:
 
           if( dim == COLM )
           { save_mark(x) = xmk;
@@ -358,6 +360,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 
 	case POSTSCRIPT:
+	case PDF:
 
           if( dim == COLM )
           { assert( bc(constraint(x)) > 0, "FAPO: horizontal scale factor!" );
@@ -414,6 +417,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 
 	case POSTSCRIPT:
+	case PDF:
 
           if( dim == COLM )
           { CONSTRAINT colc, rowc, yc;
@@ -452,6 +456,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 
 	case POSTSCRIPT:
+	case PDF:
 
           if( dim == COLM )
           {
@@ -515,6 +520,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 
 	case POSTSCRIPT:
+	case PDF:
 
           if( dim == COLM )
 	  { save_mark(x) = xmk;
@@ -762,7 +768,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  fwd(x, dim) = actual_size;
 	  debug2(DGP, DD, "  oversize, actual_size = %s, frame_size = %s",
 	      EchoLength(actual_size), EchoLength(frame_size));
-	  if( BackEnd == POSTSCRIPT && InsertScale(x, &c) )
+	  if( BackEnd != PLAINTEXT && InsertScale(x, &c) )
 	  {
 	    /* the problem has just been fixed, by inserting a @Scale above x */
 	    OBJECT prnt;

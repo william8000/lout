@@ -21,6 +21,7 @@ book. @Index @Code "@Book"
 "    @InitialBreak { adjust 1.2fx hyphen }"
 "    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
+"    @PageOrientation { Portrait }"
 "    @PageHeaders { Titles }"
 "    @ColumnNumber { 1 }"
 "    @FirstPageNumber { 1 }"
@@ -75,6 +76,11 @@ double spacing, and so on), and either @Code "hyphen" or
 between two objects, as described in Section
 {@NumberOf white}.  @Code "@InitialLanguage" determines the
 language of the bulk of the book.
+@PP
+@Code "@PageOrientation" determines the orientation of the page.  Its
+value may be {@Code Portrait} (the default), {@Code Landscape},
+{@Code ReversePortrait}, or {@Code ReverseLandscape}.  See
+Section {@NumberOf pagesize} for further details.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
 footers throughout the book.  Its value may be {@Code None},

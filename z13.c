@@ -1,6 +1,6 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,14 +20,14 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z13.c                                                      */
 /*  MODULE:       Object Breaking                                            */
 /*  EXTERNS:      BreakObject()                                              */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 #define	broken(x)	back(x, ROWM)	/* OK since no vertical sizes yet    */
 
 
@@ -436,7 +436,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 
     case ROTATE:
     
-      if( BackEnd == POSTSCRIPT && InsertScale(x, c) )
+      if( BackEnd != PLAINTEXT && InsertScale(x, c) )
       {
 	Parent(x, Up(x));
 	Error(13, 3, "%s object scaled horizontally by factor %.2f (too wide)",
@@ -510,7 +510,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	  EchoStyle(&save_style(x)), Image(type(x)), EchoObject(x));
 	x = BreakObject(x, c);
       }
-      else if( BackEnd == POSTSCRIPT && InsertScale(x, c) )
+      else if( BackEnd != PLAINTEXT && InsertScale(x, c) )
       { OBJECT tmp;
 	tmp = x;
 	Parent(x, Up(x));
@@ -542,7 +542,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
     case INCGRAPHIC:
     case SINCGRAPHIC:
 
-      if( BackEnd == POSTSCRIPT && InsertScale(x, c) )
+      if( BackEnd != PLAINTEXT && InsertScale(x, c) )
       {
 	Parent(x, Up(x));
 	Error(13, 7, "%s scaled horizontally by factor %.2f (too wide)",

@@ -59,7 +59,7 @@ how far apart these objects are; the default value, {@Code "4s"}, is
 four times the width of a space character.  @Code "@ContentsLeaderGap"
 may be {@Code "0s"}, but only if @Code "@ContentsLeader" is non-empty.
 @PP
-@Code "@ContentsRightWidth" reserves a certain amount of horizontal
+@Code "@ContentsRightWidth" reserves some
 contentsrightwidth. @Index @Code "@ContentsRightWidth"
 space at the far right for page numbers.  Any entry wide enough to
 intrude into this space is broken into two or more lines to keep it

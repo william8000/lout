@@ -1,6 +1,6 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,7 +20,7 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z38.c                                                      */
 /*  MODULE:       Character Mappings                                         */
@@ -28,7 +28,7 @@
 /*                MapPrintEncodings(), MapPrintResources(), MapSmallCaps()   */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 #define MAX_MAP		 20		/* max number of lcm files           */
 
 /*****************************************************************************/
@@ -297,12 +297,28 @@ void MapPrintEncodings(FILE *fp)
 { MAPPING m;  MAP_VEC map;  int i;
   for( m = 1;  m < maptop;  m++ )  if( MapTable[m]->must_print )
   { map = MapTable[m];
-    fprintf(fp, "%%%%BeginResource encoding %s\n", string(map->name));
-    fprintf(fp, "/%s [\n", string(map->name));
-    for( i = 0;  i < MAX_CHARS;  i++ )
-      fprintf(fp, "/%s%c", string(map->vector[i]), (i+1) % 8 != 0 ? ' ' : '\n');
-    fprintf(fp, "] def\n");
-    fprintf(fp, "%%%%EndResource\n\n");
+    switch( BackEnd )
+    {
+      case POSTSCRIPT:
+
+        fprintf(fp, "%%%%BeginResource encoding %s\n", string(map->name));
+        fprintf(fp, "/%s [\n", string(map->name));
+        for( i = 0;  i < MAX_CHARS;  i++ )
+          fprintf(fp, "/%s%c", string(map->vector[i]), (i+1) % 8 != 0 ? ' ' : '\n');
+        fprintf(fp, "] def\n");
+        fprintf(fp, "%%%%EndResource\n\n");
+	break;
+
+
+      case PDF:
+
+	PDFFile_BeginFontEncoding(fp, (char*) string(map->name));
+	for( i = 0;  i < MAX_CHARS;  i++ )
+	  fprintf(fp, "/%s%c", string(map->vector[i]),
+	    (i+1) % 8 != 0 ? ' ' : '\n');
+	PDFFile_EndFontEncoding(fp);
+	break;
+    }
   }
 } /* end MapPrintEncodings */
 

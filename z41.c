@@ -1,6 +1,6 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,14 +20,14 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z41.c                                                      */
 /*  MODULE:       Object Input-Output                                        */
 /*  EXTERNS:      ReadFromFile(), AppendToFile(), CloseFiles()               */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 
 static FILE_NUM	last_write_fnum = NO_FILE;
 static FILE	*last_write_fp  = null;
@@ -514,6 +514,8 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case COLOUR:	name = KW_COLOUR;	goto SETC;
     case LANGUAGE:	name = KW_LANGUAGE;	goto SETC;
     case CURR_LANG:	name = KW_CURR_LANG;	goto SETC;
+    case CURR_FAMILY:	name = KW_CURR_FAMILY;	goto SETC;
+    case CURR_FACE:	name = KW_CURR_FACE;	goto SETC;
     case COMMON:	name = KW_COMMON;	goto SETC;
     case RUMP:		name = KW_RUMP;		goto SETC;
     case INSERT:	name = KW_INSERT;	goto SETC;

@@ -174,7 +174,9 @@ lgraphdict begin
 
 % stroke a filled y histogram: - filledyhisto -
 /filledyhisto
-{ xprev yleft trpoint exch currentlinewidth 2 div add exch yextra sub moveto
+{
+  linewidth setlinewidth
+  xprev yleft trpoint exch currentlinewidth 2 div add exch yextra sub moveto
   xprev yprev trpoint exch currentlinewidth 2 div add exch lineto
   xcurr yprev trpoint exch currentlinewidth 2 div sub exch lineto
   xcurr yleft trpoint exch currentlinewidth 2 div sub exch yextra sub lineto 
@@ -183,7 +185,9 @@ lgraphdict begin
 
 % stroke a filled x histogram: - filledxhisto -
 /filledxhisto
-{ xleft yprev trpoint currentlinewidth 2 div add exch xextra sub exch moveto
+{
+  linewidth setlinewidth
+  xleft yprev trpoint currentlinewidth 2 div add exch xextra sub exch moveto
   xcurr yprev trpoint currentlinewidth 2 div add lineto
   xcurr ycurr trpoint currentlinewidth 2 div sub lineto
   xleft ycurr trpoint currentlinewidth 2 div sub exch xextra sub exch lineto 
@@ -428,6 +432,22 @@ lgraphdict begin
   dup expstringwidth neg 0 rmoveto expstringshow
 } def
 
+% printrtick: print one r tick
+% ypos printrtick -
+/printrtick
+{ newpath
+  xright exch trpoint moveto xextra 0 rmoveto
+  rticklength 0 rlineto [] 0 setdash stroke
+} def
+
+% printrlabel: print one r label
+% (rlabel) ypos printrlabel -
+/printrlabel
+{ xright exch trpoint moveto xextra 0 rmoveto
+  rticklength 0 rmoveto  0.3 ft -0.3 ft rmoveto
+  expstringshow
+} def
+
 % printticks: print ticks and labels
 % /tickproc /labelproc [ tickandlabeldata ] min printticks -
 /printticks
@@ -632,7 +652,7 @@ lgraphdict begin
   /trxmin xmin xtr def /trxmax xmax xtr def
 } def
 
-% yset: set up all data for y axis, including limits and ticks
+% yset: set up all data for y axis, including limits and yticks
 % yticksep yticks 0 alldata ymin ymax ylog yextra ydecr yaxis yticklength yset -
 /yset
 { /yticklength exch def
@@ -647,12 +667,35 @@ lgraphdict begin
   /trymin ymin ytr def /trymax ymax ytr def
 } def
 
+% rset: set up all data for y axis (again), but including limits and rticks
+% rticksep rticks 0 alldata ymin ymax ylog yextra ydecr yaxis rticklength rset -
+/rset
+{ /rticklength exch def
+  /yaxis exch def
+  /ydecr exch def
+  /yextra exch def
+  yaxis exch ticksandlimits
+  /ylog exch def /ymax exch def /ymin exch def /rticks exch def
+  /yleft ydecr { ymax } { ymin } ifelse def
+  /yright ydecr { ymin } { ymax } ifelse def
+  /ywidth ysize yextra 2 mul sub def
+  /trymin ymin ytr def /trymax ymax ytr def
+} def
+
+% norset: set up data for no rticks
+% - norset -
+/norset
+{ /rticklength 0 def
+  /rticks [] def
+} def
+
 % framestyle: print a frame around the graph
 /framestyle
 { 0 0 moveto xsize 0 lineto xsize ysize lineto
   0 ysize lineto closepath stroke
   /printxtick /printxlabel xticks xleft printticks
   /printytick /printylabel yticks ymin printticks
+  /printrtick /printrlabel rticks ymin printticks
 } def
 
 % nonestyle: print nothing around the graph

@@ -1,6 +1,6 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,7 +20,7 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z45.c                                                      */
 /*  MODULE:       External Sort                                              */
@@ -52,8 +52,8 @@
    The author may be reached (Email) at the address mike@gnu.ai.mit.edu,
    or (US mail) as Mike Haertel c/o Free Software Foundation. */
 
-#include <sys/types.h>
-#include "externs"
+/* apparently not needed #include <sys/types.h> */
+#include "externs.h"
 
 #ifndef UCHAR_MAX
 #define UCHAR_MAX 255
@@ -144,7 +144,7 @@ struct buffer
 
 /* Allocate N bytes of memory dynamically, with error checking.  */
 
-char *
+static char *
 xmalloc (n)
      unsigned n;
 {
@@ -164,7 +164,7 @@ xmalloc (n)
    If P is NULL, run xmalloc.
    If N is 0, run free and return NULL.  */
 
-char *
+static char *
 xrealloc (p, n)
      char *p;
      unsigned n;

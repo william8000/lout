@@ -123,5 +123,15 @@ Changes and new features introduced in Version 3.11
     Italian language
     Fix for the long-standing bug in database file reading on DOS-like systems
 
+Changes and new features introduced in Version 3.12
+
+    Bug fixes
+    @CurrFamily and @CurrFace symbols similar to @CurrLang (for expert users)
+    @II symbol for getting italics right in headings and tables of contents
+    @Graph now has rticks option for ticks on right-hand side of frame
+    PDF (Adobe Portable Document Format) back end (command line flag -Z)
+    Latin2 and Russian are now part of the main Lout distribution
+    Changed license from GNU General Public License Version 1 to Version 2
+
 Jeff Kingston
-17 November 1997
+5 April 1998

@@ -21,6 +21,7 @@ symbol:
 "    @InitialBreak { ragged 1.2fx nohyphen }"
 "    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
+"    @PageOrientation { Portrait }"
 "    @PageHeaders { Titles }"
 "    @FirstPageNumber { 1 }"
 "    @FirstOverheadNumber { 1 }"
@@ -67,6 +68,11 @@ are difficult to read from overheads, so the default is not to have them.
 two objects, as described in Section
 {@NumberOf white}.  @Code "@InitialLanguage" determines the language
 of the overheads.
+@PP
+@Code "@PageOrientation" determines the orientation of the page.  Its
+value may be {@Code Portrait} (the default), {@Code Landscape},
+{@Code ReversePortrait}, or {@Code ReverseLandscape}.  See
+Section {@NumberOf pagesize} for further details.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
 footers.  Its value may be {@Code None}, {@Code Simple}, {@Code Titles},
@@ -231,11 +237,10 @@ around each overhead, and to change the page size, margins, and
 orientation.  These are described in Chapter {@NumberOf changes}.
 @PP
 Section {@NumberOf headers} describes the setup file options that
-control the appearance of page headers and footers.  With overhead
-transparencies, the values given to the {@Code "@MajorTitle"},
-{@Code "@MinorTitle"}, {@Code "@MajorNum"}, and {@Code "@MinorNum"}
-symbols used within those options are as follows.  If
-@Code "@Lecture" is being used:
+control the appearance of page headers and footers.  With overheads,
+the values given to the {@Code "@MajorTitle"}, {@Code "@MinorTitle"},
+{@Code "@MajorNum"}, and {@Code "@MinorNum"} symbols within those
+options are as follows.  If @Code "@Lecture" is being used:
 @ID @Tab
     @Fmta { @Col A ! @Col B }
 {

@@ -86,6 +86,8 @@ the basic ones:
     A { "@PageOrientation { ReverseLandscape }" }
     B { @Box 1.4c @Wide 1.0c @High { //1rt &1rt 180d @Rotate Hello } }
 }
-@Code ReverseLandscape might be useful when post-processing the
-PostScript output to print two landscape pages per sheet of paper.
+@Code ReverseLandscape might be useful when post-processing the PostScript output
+to print two landscape pages per sheet of paper.  In addition to being available
+in the setup file, the @Code "@PageOrientation" symbol is also available at the
+start of a document, like {@Code "@InitialFont"} and {@Code "@PageHeaders"}.
 @End @Section

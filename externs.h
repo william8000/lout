@@ -1,6 +1,6 @@
-/*@externs:External Declarations:Directories and file conventions@************/
+/*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,9 +20,9 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
-/*  FILE:         externs                                                    */
+/*  FILE:         externs.h                                                  */
 /*  MODULE:       External Declarations                                      */
 /*                                                                           */
 /*****************************************************************************/
@@ -98,7 +98,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.11 (November 1997)")
+#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.12 (April 1998)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -406,6 +406,7 @@ typedef void *POINTER;
 #define	CH_FLAG_SAFE		'S'	/* the -S command line flag          */
 #define	CH_FLAG_UNSAFE		'U'	/* the -U command line flag          */
 #define	CH_FLAG_WORDS		'w'	/* the -w command line flag          */
+#define	CH_FLAG_PDF		'Z'	/* the -Z command line flag	     */
 
 #define	CH_SPACE		' '	/* space character                   */
 #define	CH_NEWLINE		'\n'	/* the newline character             */
@@ -498,6 +499,7 @@ typedef void *POINTER;
 #define	STR_EPS			AsciiToFull("EPS")
 #define	STR_POSTSCRIPT		AsciiToFull("PostScript")
 #define	STR_PLAINTEXT		AsciiToFull("PlainText")
+#define	STR_PDF			AsciiToFull("PDF")
 #define	STR_ELSE		AsciiToFull("else")
 #define	STR_NOCROSS		AsciiToFull("??")
 #define	STR_BADKEY		AsciiToFull("badkey")
@@ -1308,80 +1310,82 @@ typedef struct mapvec {
 #define	COLOUR		   49		/* to s   @SetColour and @SetColor   */
 #define	LANGUAGE	   50		/* to s   @Language                  */
 #define	CURR_LANG	   51		/* to s   @CurrLang                  */
-#define	COMMON		   52		/* to s   @Common                    */
-#define	RUMP		   53		/* to s   @Rump                      */
-#define	INSERT		   54		/* to s   @Insert                    */
-#define	NEXT		   55		/* to s   @Next                      */
-#define	PLUS		   56		/* to s   @Plus                      */
-#define	MINUS		   57		/* to s   @Minus                     */
-#define	ENV_OBJ		   58		/* to s   object with envt (no name) */
-#define	ENV		   59		/* to s   @LEnv                      */
-#define	ENVA		   60		/* to s   @LEnvA                     */
-#define	ENVB		   61		/* to s   @LEnvB                     */
-#define	ENVC		   62		/* to s   @LEnvC                     */
-#define	ENVD		   63		/* to s   @LEnvD                     */
-#define	CENV		   64		/* to s   @LCEnv                     */
-#define	CLOS		   65		/* to s   @LClos                     */
-#define	LVIS		   66		/* to s   @LVis                      */
-#define	LUSE		   67		/* to s   @LUse                      */
-#define	LEO 		   68		/* to s   @LEO                       */
-#define	OPEN		   69		/* to s   @Open                      */
-#define	TAGGED		   70		/* to s   @Tagged                    */
-#define	INCGRAPHIC	   71		/* to s   @IncludeGraphic            */
-#define	SINCGRAPHIC	   72		/* to s   @SysIncludeGraphic         */
-#define	GRAPHIC		   73		/* to s   @Graphic                   */
+#define	CURR_FAMILY	   52		/* to s   @CurrFamily                */
+#define	CURR_FACE	   53		/* to s   @CurrFace                  */
+#define	COMMON		   54		/* to s   @Common                    */
+#define	RUMP		   55		/* to s   @Rump                      */
+#define	INSERT		   56		/* to s   @Insert                    */
+#define	NEXT		   57		/* to s   @Next                      */
+#define	PLUS		   58		/* to s   @Plus                      */
+#define	MINUS		   59		/* to s   @Minus                     */
+#define	ENV_OBJ		   60		/* to s   object with envt (no name) */
+#define	ENV		   61		/* to s   @LEnv                      */
+#define	ENVA		   62		/* to s   @LEnvA                     */
+#define	ENVB		   63		/* to s   @LEnvB                     */
+#define	ENVC		   64		/* to s   @LEnvC                     */
+#define	ENVD		   65		/* to s   @LEnvD                     */
+#define	CENV		   66		/* to s   @LCEnv                     */
+#define	CLOS		   67		/* to s   @LClos                     */
+#define	LVIS		   68		/* to s   @LVis                      */
+#define	LUSE		   69		/* to s   @LUse                      */
+#define	LEO 		   70		/* to s   @LEO                       */
+#define	OPEN		   71		/* to s   @Open                      */
+#define	TAGGED		   72		/* to s   @Tagged                    */
+#define	INCGRAPHIC	   73		/* to s   @IncludeGraphic            */
+#define	SINCGRAPHIC	   74		/* to s   @SysIncludeGraphic         */
+#define	GRAPHIC		   75		/* to s   @Graphic                   */
 
-#define	TSPACE		   74		/* t      a space token, parser only */
-#define	TJUXTA		   75		/* t      a juxta token, parser only */
-#define	LBR		   76		/* t  s   left brace token           */
-#define	RBR		   77		/* t  s   right brace token          */
-#define	BEGIN		   78		/* t  s   @Begin token               */
-#define	END		   79		/* t  s   @End token                 */
-#define	USE		   80		/* t  s   @Use                       */
-#define	NOT_REVEALED	   81		/* t  s   @NotRevealed               */
-#define	GSTUB_NONE	   82		/* t      a galley stub, no rpar     */
-#define	GSTUB_INT	   83		/* t      galley stub internal rpar  */
-#define	GSTUB_EXT	   84		/* t      galley stub external rpar  */
-#define	UNEXPECTED_EOF	   85		/* t      unexpected end of file     */
-#define	INCLUDE		   86		/*    s   @Include                   */
-#define	SYS_INCLUDE	   87		/*    s   @SysInclude                */
-#define	PREPEND		   88		/*    s   @Prepend                   */
-#define	SYS_PREPEND	   89		/*    s   @SysPrepend                */
-#define	DATABASE	   90		/*    s   @Database                  */
-#define	SYS_DATABASE	   91		/*    s   @SysDatabase               */
-#define	START		   92		/*    s   \Start                     */
+#define	TSPACE		   76		/* t      a space token, parser only */
+#define	TJUXTA		   77		/* t      a juxta token, parser only */
+#define	LBR		   78		/* t  s   left brace token           */
+#define	RBR		   79		/* t  s   right brace token          */
+#define	BEGIN		   80		/* t  s   @Begin token               */
+#define	END		   81		/* t  s   @End token                 */
+#define	USE		   82		/* t  s   @Use                       */
+#define	NOT_REVEALED	   83		/* t  s   @NotRevealed               */
+#define	GSTUB_NONE	   84		/* t      a galley stub, no rpar     */
+#define	GSTUB_INT	   85		/* t      galley stub internal rpar  */
+#define	GSTUB_EXT	   86		/* t      galley stub external rpar  */
+#define	UNEXPECTED_EOF	   87		/* t      unexpected end of file     */
+#define	INCLUDE		   88		/*    s   @Include                   */
+#define	SYS_INCLUDE	   89		/*    s   @SysInclude                */
+#define	PREPEND		   90		/*    s   @Prepend                   */
+#define	SYS_PREPEND	   91		/*    s   @SysPrepend                */
+#define	DATABASE	   92		/*    s   @Database                  */
+#define	SYS_DATABASE	   93		/*    s   @SysDatabase               */
+#define	START		   94		/*    s   \Start                     */
 
-#define	DEAD		   93		/*   i    a dead galley              */
-#define	UNATTACHED	   94		/*   i    an inner, unsized galley   */
-#define	RECEPTIVE	   95		/*   i    a receptive object index   */
-#define	RECEIVING	   96		/*   i    a receiving object index   */
-#define	RECURSIVE	   97		/*   i    a recursive definite obj.  */
-#define	PRECEDES	   98		/*   i    an ordering constraint     */
-#define	FOLLOWS		   99		/*   i    other end of ordering c.   */
-#define	CROSS_LIT	  100		/*   i    literal word cross-ref     */
-#define	CROSS_FOLL	  101		/*   i    following type cross-ref   */
-#define	CROSS_FOLL_OR_PREC 102		/*   i    follorprec type cross-ref  */
-#define	GALL_FOLL	  103		/*   i    galley with &&following    */
-#define	GALL_FOLL_OR_PREC 104		/*   i    galley with &&following    */
-#define	CROSS_TARG	  105		/*   i    value of cross-ref         */
-#define	GALL_TARG	  106		/*   i    target of these galleys    */
-#define	GALL_PREC	  107		/*   i    galley with &&preceding    */
-#define	CROSS_PREC	  108		/*   i    preceding type cross-ref   */
-#define	PAGE_LABEL_IND	  109		/*   i    index of PAGE_LABEL        */
-#define	SCALE_IND	  110		/*   i    index of auto SCALE        */
-#define	COVER_IND	  111		/*   i    index of HCOVER or VCOVER  */
-#define	EXPAND_IND	  112		/*   i    index of HEXPAND or VEXPD  */
-#define	THREAD		  113		/*        a sequence of threads      */
-#define	CROSS_SYM	  114		/*        cross-ref info             */
-#define	CR_ROOT		  115		/*        RootCross                  */
-#define	MACRO	          116		/*        a macro symbol             */
-#define	LOCAL	          117		/*        a local symbol             */
-#define	LPAR	          118		/*        a left parameter           */
-#define	NPAR	          119		/*        a named parameter          */
-#define	RPAR	          120		/*        a right parameter          */
-#define	EXT_GALL          121		/*        an external galley         */
-#define	CR_LIST	          122		/*        a list of cross references */
-#define	DISPOSED          123		/*        a disposed record          */
+#define	DEAD		   95		/*   i    a dead galley              */
+#define	UNATTACHED	   96		/*   i    an inner, unsized galley   */
+#define	RECEPTIVE	   97		/*   i    a receptive object index   */
+#define	RECEIVING	   98		/*   i    a receiving object index   */
+#define	RECURSIVE	   99		/*   i    a recursive definite obj.  */
+#define	PRECEDES	  100		/*   i    an ordering constraint     */
+#define	FOLLOWS		  101		/*   i    other end of ordering c.   */
+#define	CROSS_LIT	  102		/*   i    literal word cross-ref     */
+#define	CROSS_FOLL	  103		/*   i    following type cross-ref   */
+#define	CROSS_FOLL_OR_PREC 104		/*   i    follorprec type cross-ref  */
+#define	GALL_FOLL	  105		/*   i    galley with &&following    */
+#define	GALL_FOLL_OR_PREC 106		/*   i    galley with &&following    */
+#define	CROSS_TARG	  107		/*   i    value of cross-ref         */
+#define	GALL_TARG	  108		/*   i    target of these galleys    */
+#define	GALL_PREC	  109		/*   i    galley with &&preceding    */
+#define	CROSS_PREC	  110		/*   i    preceding type cross-ref   */
+#define	PAGE_LABEL_IND	  111		/*   i    index of PAGE_LABEL        */
+#define	SCALE_IND	  112		/*   i    index of auto SCALE        */
+#define	COVER_IND	  113		/*   i    index of HCOVER or VCOVER  */
+#define	EXPAND_IND	  114		/*   i    index of HEXPAND or VEXPD  */
+#define	THREAD		  115		/*        a sequence of threads      */
+#define	CROSS_SYM	  116		/*        cross-ref info             */
+#define	CR_ROOT		  117		/*        RootCross                  */
+#define	MACRO	          118		/*        a macro symbol             */
+#define	LOCAL	          119		/*        a local symbol             */
+#define	LPAR	          120		/*        a left parameter           */
+#define	NPAR	          121		/*        a named parameter          */
+#define	RPAR	          122		/*        a right parameter          */
+#define	EXT_GALL          123		/*        an external galley         */
+#define	CR_LIST	          124		/*        a list of cross references */
+#define	DISPOSED          125		/*        a disposed record          */
 
 #define is_indefinite(x)  ((x) >= CLOSURE && (x) <= HEAD)
 #define is_definite(x) 	 ((x) >= SPLIT && (x) <= GRAPHIC)
@@ -1441,9 +1445,9 @@ typedef struct mapvec {
 #define	SMALL_CAPS_ON	 1		/* small capitals                    */
 
 /* sides of a mark */
-#define	BACK	          124		/* means lies to left of mark        */
-#define	ON	          125		/* means lies on mark                */
-#define	FWD	          126		/* means lies to right of mark       */
+#define	BACK	          126		/* means lies to left of mark        */
+#define	ON	          127		/* means lies on mark                */
+#define	FWD	          128		/* means lies to right of mark       */
 
 /* statuses of thread objects */
 #define	NOTSIZED	 0		/* this thread object is not sized   */
@@ -1451,15 +1455,15 @@ typedef struct mapvec {
 #define	FINALSIZE	 2		/* thread object size is now final   */
 
 /* constraint statuses */
-#define	PROMOTE	          127		/* this component may be promoted    */
-#define	CLOSE	          128		/* must close dest before promoting  */
-#define	BLOCK	          129		/* cannot promote this component     */
-#define	CLEAR	          130		/* this constraint is now satisfied  */
+#define	PROMOTE	          129		/* this component may be promoted    */
+#define	CLOSE	          130		/* must close dest before promoting  */
+#define	BLOCK	          131		/* cannot promote this component     */
+#define	CLEAR	          132		/* this constraint is now satisfied  */
 
 /* gap increment types */
-#define	GAP_ABS	          131		/* absolute,  e.g.  3p               */
-#define	GAP_INC	          132		/* increment, e.g. +3p               */
-#define	GAP_DEC	          133		/* decrement, e.g. -3p               */
+#define	GAP_ABS	          133		/* absolute,  e.g.  3p               */
+#define	GAP_INC	          134		/* increment, e.g. +3p               */
+#define	GAP_DEC	          135		/* decrement, e.g. -3p               */
 
 /* file types */
 #define	SOURCE_FILE	 0		/* input file from command line      */
@@ -1527,6 +1531,7 @@ typedef struct mapvec {
 /* back ends */
 #define POSTSCRIPT       0		/* PostScript back end               */
 #define	PLAINTEXT	 1		/* plain text back end               */
+#define	PDF		 2
 
 /* error types */
 #define	INTERN	0			/* internal error (i.e. bug)         */
@@ -1629,6 +1634,8 @@ typedef struct mapvec {
 #define	KW_COLOR		AsciiToFull("@SetColor")
 #define	KW_LANGUAGE		AsciiToFull("@Language")
 #define	KW_CURR_LANG		AsciiToFull("@CurrLang")
+#define	KW_CURR_FAMILY		AsciiToFull("@CurrFamily")
+#define	KW_CURR_FACE		AsciiToFull("@CurrFace")
 #define	KW_ENV			AsciiToFull("@LEnv")
 #define	KW_ENVA			AsciiToFull("@@A")
 #define	KW_ENVB			AsciiToFull("@@B")
@@ -2495,6 +2502,8 @@ extern	FULL_LENGTH  FontSize(FONT_NUM fnum, OBJECT x);
 extern	FULL_LENGTH  FontHalfXHeight(FONT_NUM fnum);
 extern	MAPPING	  FontMapping(FONT_NUM fnum, FILE_POS *xfpos);
 extern	FULL_CHAR *FontName(FONT_NUM fnum);
+extern	FULL_CHAR *FontFamily(FONT_NUM fnum);
+extern	FULL_CHAR *FontFace(FONT_NUM fnum);
 extern	FULL_CHAR *FontFamilyAndFace(FONT_NUM fnum);
 extern	void	  FontPrintAll(FILE *fp);
 extern	void	  FontPrintPageSetup(FILE *fp);
@@ -2516,8 +2525,13 @@ extern	BOOLEAN	  MapIsLowerCase(FULL_CHAR ch, MAPPING m);
 
 /*****  z39.c	  String Handler        **************************************/
 #define		  AsciiToFull(x)	( (FULL_CHAR *) (x) )
+#if COLLATE
+#define		  StringEqual(a, b)	(strcoll((char *)(a), (char *)(b))==0)
+#define		  StringLessEqual(a, b) (strcoll((char*)(a),(char*)(b))<=0)
+#else
 #define		  StringEqual(a, b)	(strcmp((char *)(a), (char *)(b))==0)
 #define		  StringLessEqual(a, b) (strcmp((char*)(a),(char*)(b))<=0)
+#endif
 #define		  StringCat(a, b)	strcat((char *)(a),(char *)(b))
 #define		  StringCopy(a, b)	strcpy((char *)(a),(char *)(b))
 #define		  StringLength(a)	strlen((char *)(a))
@@ -2584,6 +2598,43 @@ extern	BOOLEAN	  EnvReadRetrieve(FILE_NUM fnum, int offset, OBJECT *env);
 extern	void	  EnvReadInsert(FILE_NUM fnum, int offset, OBJECT env);
 extern	void	  EnvDebug(void);
 
+/*****  z48.c	  PDF back end          **************************************/
+extern	void      PDFFile_Init(FILE* in_fp, int in_h_bound, int in_v_bound,
+				int in_IN, int in_CM, int in_PT, int in_EM);
+extern	void      PDFFile_BeginFontEncoding(FILE* in_fp,
+				const char* in_encoding_name);
+extern	void      PDFFile_EndFontEncoding(FILE* in_fp);
+extern	void      PDFFile_Cleanup(FILE* in_fp);
+extern	void      PDFPage_Init(FILE* in_fp, float in_scale_factor,
+				int in_line_width);
+extern	void      PDFPage_Cleanup(FILE* in_fp);
+extern	void	  PDFPage_Write(FILE* in_fp, char* in_str);
+extern	void      PDFPage_Push(FILE* in_fp);
+extern	void      PDFPage_Pop(FILE* in_fp);
+extern	void	  PDFPage_Scale(FILE* in_fp, float in_h_scale_factor,
+				float in_v_scale_factor);
+extern	void	  PDFPage_Translate(FILE* in_fp, float in_delta_h,
+				float in_delta_v);
+extern	void	  PDFPage_Rotate(FILE* in_fp, float in_angle_in_radians);
+extern	void	  PDFPage_SetVars(int xsize, int ysize, int xmark, int ymark,
+				int loutf, int loutv, int louts);
+extern	void	  PDFPage_WriteGraphic(FILE* in_fp, FULL_CHAR* in_str);
+extern	void	  PDFPage_PrintUnderline(FILE* in_fp, int in_x1, int in_x2,
+				int in_y, int in_thickness);
+
+extern	void      PDFFont_AddFont(
+				FILE* in_fp,
+				const FULL_CHAR* in_short_font_name,
+				const FULL_CHAR* in_real_font_name,
+				const FULL_CHAR* in_font_encoding_name);
+extern	void      PDFFont_Set(FILE* in_fp, FULL_LENGTH in_font_size,
+				FULL_CHAR * in_short_font_name);
+extern	void    PDFText_OpenXY(FILE* in_fp, int hpos, int vpos);
+extern	void    PDFText_OpenX(FILE* in_fp, int hpos);
+extern	void    PDFText_Open(FILE* in_fp);
+extern	void    PDFText_Kern(FILE* in_fp, int in_kern);
+extern	void    PDFText_Close(FILE* in_fp);
+extern	BOOLEAN PDFHasValidTextMatrix(void);
 
 
 /*@::assert(), debug(), debug flags@******************************************/
@@ -2702,8 +2753,9 @@ extern	struct dbs 	dbg[];
 #define	DEX	45		/*  z45.c   -dex   External Sort             */
 #define	DOG	46		/*  z46.c   -dex   Optimal Galleys           */
 #define	DET	47		/*  z47.c   -det   Environment Table         */
-#define	DPP	48		/*          -dpp   Profiling                 */
-#define	ANY	49		/*          -d     any                       */
+#define	DPD	48		/*  z48.c   -dpd   PDF Back End              */
+#define	DPP	49		/*          -dpp   Profiling                 */
+#define	ANY	50		/*          -d     any                       */
 
 #else
 #define ifdebug(cat, urg, x)

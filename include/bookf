@@ -294,6 +294,7 @@ def @BookLayout
         named @InitialBreak { @InitialBreak }
         named @InitialSpace { @InitialSpace }
         named @InitialLanguage { @InitialLanguage }
+        named @PageOrientation { @PageOrientation }
         named @PageHeaders { @PageHeaders }
         named @ColumnNumber { @ColumnNumber }
         named @FirstPageNumber { @FirstPageNumber }
@@ -581,12 +582,7 @@ def @BookLayout
 	{
 		    @PageMark @Tag
 	    //	    @Before
-            //1.1b  @TitlePageFont @Font @OnTitlePage
-		    # {	//1i    |0.5rt 2.5f @Font {1.2fx clines} @Break @Title |
-		    #	//2i    |0.5rt clines @Break @Author |
-		    #	//1i    |0.5rt clines @Break @Edition |
-		    #	//1rt   @OneRow @Publisher
-		    # }
+            //1.1b  @TitlePageFont @Font @On
             //1.1b  @After
             //	    Start @Runner @Owner { @Tag }
             //1.1b  @PrefaceAfterContents @NoDo @PrefacePlace
@@ -643,6 +639,7 @@ def @BookLayout
 		    //	@PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }
+			    @Orient { @PageOrientation }
 			    @FirstPageNumber
 		    //	@BookCombined
 		    //	NonStart @Runner @Owner { @Tag }
@@ -656,11 +653,13 @@ def @BookLayout
 		    //  @IntroPageList
 			    @ColumnNumber { 1 }
 			    @PageHeaders { @PageHeaders }
+			    @Orient { @PageOrientation }
 			    @IntroFirstPageNumber
 		    //	NonStart @Runner @Owner { @Tag }
 		    //	@PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }
+			    @Orient { @PageOrientation }
 			    extra { Yes }
 			    @FirstPageNumber
 		    //	@BookIntro
@@ -942,6 +941,30 @@ def @BookLayout
 
         }
 
+	def @Part
+	    named @Tag {}
+	{
+	    @LargeScaleStructure
+	        type { VeryMajor }
+		initiallanguage { @InitialLanguage }
+		title { @PartTitle }
+		aboveheadinggap { @AbovePartGap }
+		headingfont { @PartHeadingFont }
+		headingbreak { @PartHeadingBreak }
+		headingformat { @Num @PartHeadingFormat @Body }
+		bypassnumber { @PartNumber }
+		incontents { @PartInContents }
+		sendheader { @Full @Body }
+		inrunners { Yes }
+		tag { @Tag }
+		@PartText
+	}
+
+	@PartNumber @Case {
+	    ""   @Yield @Null
+	    else @Yield @Part
+	}
+	//
 	@LargeScaleStructure
 	    tag { @Tag }
 	    type { Major }
@@ -1117,6 +1140,30 @@ def @BookLayout
 
         }
 
+	def @Part
+	    named @Tag {}
+	{
+	    @LargeScaleStructure
+	        type { VeryMajor }
+		initiallanguage { @InitialLanguage }
+		title { @PartTitle }
+		aboveheadinggap { @AbovePartGap }
+		headingfont { @PartHeadingFont }
+		headingbreak { @PartHeadingBreak }
+		headingformat { @Num @PartHeadingFormat @Body }
+		bypassnumber { @PartNumber }
+		incontents { @PartInContents }
+		sendheader { @Full @Body }
+		inrunners { Yes }
+		tag { @Tag }
+		@PartText
+	}
+
+	@PartNumber @Case {
+	    ""   @Yield @Null
+	    else @Yield @Part
+	}
+	//
 	@LargeScaleStructure
 	    tag { @Tag }
 	    type { Major }

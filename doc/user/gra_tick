@@ -84,11 +84,122 @@ the length of ticks:
 }
 shows the default values, half the current font size in both cases.
 @PP
+There is also an {@Code "rticks"} option which is similar to
+{@Code "yticks"} except that the ticks it controls appear on the
+right-hand side of the frame (this option is relevant only when
+the @Code style option is {@Code frame}).  Unlike @Code "xticks" and
+{@Code "yticks"}, {@Code "rticks"} has empty default value, which is
+why you don't usually see r ticks.  They are most useful when overstriking
+two graphs using @Code "@OverStrike" as explained earlier; one graph will
+have y ticks in the usual way, the other will have r ticks and empty
+y ticks:
+@CD {
+
+@Graph
+    style { frame }
+    width { 6c }
+    height { 8c }
+    xextra { 0 cm }
+    yextra { 0 cm }
+    rightcaption { -90d @Rotate { Precipitation mm } }
+    rightgap { 3.0f }
+    hidecaptions { no }
+    xmin { 0 }
+    xmax { 12 }
+    ymin { 0 }
+    ymax { 450 }
+    xticks { }
+    xticklength { 0 cm }
+    rticks { 0@ 50@ 100@ 150@ 200@ 250@ 300@ 350@ 400@ 450@ }
+    yticks {}
+{
+    @Data
+	pairs { filledyhisto }
+	colour { blue }
+	linewidth { 1 pt }
+    {
+	0 340
+	1 410
+	2 430
+	3 340
+	4 290
+	5 175
+	6 140
+	7 125
+	8 110
+	9 100
+	10 85
+	11 175
+	12 0
+    }
+}
+
+@OverStrike
+
+@Graph
+    style { frame }
+    width { 6c }
+    height { 8c }
+    xextra { 0 cm }
+    yextra { 0 cm }
+    leftcaption { 90d @Rotate { Temperature {@Degree}C } }
+    leftgap { 2.5f }
+    hidecaptions { no }
+    xmin { 0 }
+    xmax { 12 }
+    ymin { -30 }
+    ymax { 50 }
+    xticks {
+        0.5 (J)
+        1.5 (F)
+        2.5 (M)
+        3.5 (A)
+        4.5 (M)
+        5.5 (J)
+        6.5 (J)
+        7.5 (A)
+        8.5 (S)
+        9.5 (O)
+       10.5 (N)
+       11.5 (D)
+    }
+    xticklength { 0 cm }
+    yticks { -30@ -20@ -10@ 0@ 10@ 20@ 30@ 40@ }
+{
+    @Data
+	pairs { solid }
+	colour { red }
+	linewidth { 1 pt }
+    {
+        0.0 24
+        1.0 24
+        2.0 25
+        3.0 26
+        4.0 26
+        5.0 26
+        6.0 26
+        7.0 27
+        8.0 26
+        9.0 27
+       10.0 28
+       11.0 28
+       12.0 26
+    }
+}
+
+}
+Here the first graph has
+@ID @Code {
+"rticks { 0@ 50@ 100@ 150@ 200@ 250@ 300@ 350@ 400@ 450@ }"
+"yticks {}"
+}
+for its ticks.
+@PP
 Lout has only a hazy idea of how much space is occupied by ticks and
 labels.  Unless @Code "xticks" is empty, Lout allows 1.7 times the
 current font size below the graph for x ticks and labels, which is
-usually about right; but it does not allow any space for y ticks and
+usually about right; but it does not allow any space for y and r ticks and
 labels since it has no idea how wide the labels will be.  The discussion
 of captions in Section {@NumberOf captions} explains how to use the
-@Code "leftgap" option to work around this deficiency.
+@Code "leftgap" and @Code "rightgap" options to work around this deficiency.
 @End @Section

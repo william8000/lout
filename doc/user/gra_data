@@ -111,6 +111,7 @@ This shows the default values, {@Code "0.2 ft"} for @Code "dashlength"
 and {@Code "0.5 pt"} (half a point) for {@Code "linewidth"}.  Actually
 the default value for @Code "linewidth" is whatever happens to be
 already in use, but Lout sets line widths to half a point initially.
+This option also controls the separation between bars in histograms.
 @PP
 The @Code "pairs" option is also used for producing histograms, like
 histograms. @Index { histograms }

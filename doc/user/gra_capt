@@ -45,7 +45,8 @@ default values:
 "    ..."
 "}"
 }
-This is particularly important in the case of {@Code "leftgap"}, because
+This is particularly important in the case of {@Code "leftgap"} (and
+@Code "rightgap" if @Code rticks is used), because
 Lout has no idea how wide the ticks and labels attached to the y axis
 are; 1.5 cm is just a wild guess and often needs adjustment.  On the
 other hand, Lout does know how high the ticks and labels on the x axis
@@ -66,6 +67,6 @@ making the left and right captions and gaps seem to Lout to have zero width:
 Actually @Code "yes" has been made the default value, since the vast
 majority of graphs are centred displays.  In the rare cases where
 this feature is not wanted (for example, if a graph appears as an entry
-in a table), use {@Code "hidecaptions { no }"}.  The y ticks and labels
+in a table), use {@Code "hidecaptions { no }"}.  The y and r ticks and labels
 seem to Lout to have zero width already, so do not need to be hidden.
 @End @Section

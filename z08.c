@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,14 +20,14 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z08.c                                                      */
 /*  MODULE:       Object Manifest                                            */
 /*  EXTERNS:      Manifest()                                                 */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 #define line_breaker(g)							\
   (vspace(g) > 0 || (units(gap(g)) == FRAME_UNIT && width(gap(g)) > FR))
 
@@ -1511,6 +1511,24 @@ OBJECT *enclose, BOOLEAN fcr)
 	res = MakeWord(WORD, STR_NONE, &fpos(x));
       }
       else res = MakeWord(WORD, LanguageString(language(*style)), &fpos(x));
+      ReplaceNode(res, x);
+      DisposeObject(x);
+      x = Manifest(res, env, style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);
+      break;
+
+
+    case CURR_FAMILY:
+    case CURR_FACE:
+
+      if( font(*style) == 0 )
+      { Error(8, 38, "no current font at this point, using %s",
+	  WARN, &fpos(x), STR_NONE);
+	res = MakeWord(WORD, STR_NONE, &fpos(x));
+      }
+      else if( type(x) == CURR_FAMILY )
+	res = MakeWord(WORD, FontFamily(font(*style)), &fpos(x));
+      else
+	res = MakeWord(WORD, FontFace(font(*style)), &fpos(x));
       ReplaceNode(res, x);
       DisposeObject(x);
       x = Manifest(res, env, style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);

@@ -442,10 +442,11 @@ get the unusual characters, see Section {@NumberOf characters}.
 Documents look best when they use just one font family, so the most
 common need is to change to a different face within the current
 family.  We have already seen {@Code "@I"}, which changes to the Italic
-face of the current family; there are five such symbols:
+face of the current family; there are six such symbols:
 b. @Index @Code "@B"
 i. @Index @Code "@I"
 bi. @Index @Code "@BI"
+ii. @Index @Code "@II"
 s. @Index @Code "@S"
 r. @Index @Code "@R"
 @ID @OneRow @Tab
@@ -461,16 +462,20 @@ r. @Index @Code "@R"
     A { "@BI { Hello World }" }
     B {  @BI { Hello World }  }
 @Rowa
+    A { "@II { Hello World }" }
+    B {  @II { Hello World }  }
+@Rowa
     A { "@S { Hello World }" }
     B {  @S { Hello World }  }
 @Rowa
     A { "@R { Hello World }" }
     B {  @R { Hello World }  }
 }
-The symbols' names stand for Bold, Italic, Bold-Italic, Small capitals,
-and Roman.  It is conventional to use Bold for headings; Italic for
-emphasis, terms being defined, and subsidiary headings; and Roman for
-the rest.  Small capitals are not really a different font; they are
+The symbols' names stand for Bold, Italic, Bold-Italic, Italic-Italic
+(see below), Small capitals, and Roman.  It is conventional to use Bold
+for headings; Italic for emphasis, terms being defined, and subsidiary
+headings; and Roman for the rest.  Small capitals are not really a
+different font; they are
 small.caps @Index { small capitals }
 made on demand from the current font.  So you can write, for example,
 @ID @Code "@I @S { Hello World }"
@@ -483,6 +488,13 @@ produces
 @ID @I { An Italic sentence with one @R Roman word }
 This illustrates the general principle that the effect of a font symbol
 on the following object is subject to font symbols within that object.
+@PP
+When part of a title is to be set in italic font, neither @Code "@I"
+nor @Code "@BI" is suitable because the part should appear in bold
+italics in the title itself, but in ordinary italics in running headers
+and the table of contents.  The @Code "@II" symbol is the one for this
+situation:  it produces bold italics when the current font is bold,
+and ordinary italics otherwise.
 @PP
 Changing families is a little more complicated.  Here is the complete
 list of font families and their faces available with Basser Lout Version 3:

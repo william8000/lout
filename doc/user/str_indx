@@ -54,6 +54,11 @@ first thing to try is the replacement of all accented letters in index
 keys by unaccented ones.  Sorting is quite an intractable problem:  even
 if @Code "strcoll()" gets the sorting right for one language, there still
 remains the problem of sorting multilingual indexes.
+@PP
+Lout's database mechanism assumes that the @I tab character is collated
+before any character that could appear in a sorting key.  It seems that
+there are a few collating sequences in existence which do not satisfy this
+condition, and in these cases Lout will fail to produce the correct index.
 }
 but which is not itself printed anywhere.  It is best to construct these
 sorting keys from lower-case letters and the . character only, beginning

@@ -5,7 +5,7 @@
 @PP
 The options to the @Code "@Graph" symbol, their default values, and
 their possible values are:
-@ID 0.79vx @Break @Tab
+@ID -2.1px @Break -1p @Font @Tab
    hmargin { 0.15c }
    @Fmta { @Col @Code { "    "A } ! @Col @Code "{" ! @Col @Code B !
 	   @Col @Code "}" ! @Col ! @Col ! @Col C }
@@ -118,21 +118,34 @@ their possible values are:
     B { none }
     C { {@Code none} or any @I number greater than 0 }
 @Rowa
+    A { rticksep }
+    B { none }
+    C { {@Code none} or any @I number greater than 0 }
+@Rowa
     A { xticks }
-    B { none  }
-    C { @I sequence (of numbers and strings), or @Code none meaning
-inserted automatically }
+    B { auto  }
+    C { @I sequence (of numbers and strings), or @Code auto meaning
+automatic }
 @Rowa
     A { yticks }
-    B { none }
-    C { @I sequence (of numbers and strings), or @Code none meaning
-inserted automatically }
+    B { auto }
+    C { @I sequence (of numbers and strings), or @Code auto meaning
+automatic }
+@Rowa
+    A { rticks }
+    B { }
+    C { @I sequence (of numbers and strings), or @Code auto meaning
+automatic }
 @Rowa
     A { xticklength }
     B { 0.5 ft }
     C { any @I distance }
 @Rowa
     A { yticklength }
+    B { 0.5 ft }
+    C { any @I distance }
+@Rowa
+    A { rticklength }
     B { 0.5 ft }
     C { any @I distance }
 @Rowa
@@ -284,11 +297,11 @@ their possible values are:
 @Code "@Graph" option with the same name.
 @PP
 The right parameter of @Code "@Data" contains a @I sequence of zero
-or more {@I expressions}.  The @Code xticks and @Code yticks options
-also are sequences, which may contain @Code "@" and labels as well
-as expressions.  An @I expression is any of the following (operators
-are shown in decreasing precedence order, with the precedence, if
-relevant, at right):
+or more {@I expressions}.  The {@Code xticks}, {@Code yticks}, and
+{@Code rticks} options also are sequences, which may contain @Code "@"
+and labels as well as expressions.  An @I expression is any of the
+following (operators are shown in decreasing precedence order, with
+the precedence, if relevant, at right):
 @ID @Tab
     vmargin { 0.5vx }
     @Fmta { @Col A ! @Col ! @Col B }
@@ -383,9 +396,9 @@ the following:
     @Fmta { @Col A }
 {
 @Rowa
-   A { 2c @Wide "@" (within @Code xticks and @Code yticks only) }
+   A { 2c @Wide "@" (within {@Code xticks}, {@Code yticks}, and {@Code rticks} only) }
 @Rowa
-   A { 2c @Wide { ({@I label}) } (within @Code xticks and @Code yticks only) }
+   A { 2c @Wide { ({@I label}) } (within {@Code xticks}, {@Code yticks}, and {@Code rticks} only) }
 @Rowa
    A { @I expression }
 @Rowa

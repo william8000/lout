@@ -169,14 +169,28 @@ def @Eq
     def @Sym    right x { {Symbol Base} @Font x }
 
     def @HLine
-	named line { "0.05 ft setlinewidth" }
-    {  
-	{ "0 0 moveto xsize 0 lineto" line "stroke" } @Graphic {}
+	named line { @BackEnd @Case { PostScript @Yield { "0.05 ft setlinewidth" } PDF @Yield { "__mul(__loutf, 0.05) w" } } }
+    {
+	@BackEnd @Case {
+	  PostScript @Yield {
+	    { "0 0 moveto xsize 0 lineto" line "stroke" } @Graphic {}
+	  }
+	  PDF @Yield {	# note re-arrangement of commands (setlinewidth (='w') not allowed in a path)
+	    { line "0 0 m __xsize 0 l s" } @Graphic {}
+	  }
+	}
     }
 
     def @VLine
     {
-	"0 0 moveto 0 ysize lineto 0.05 ft setlinewidth stroke" @Graphic {}
+	@BackEnd @Case {
+	  PostScript @Yield {
+	    "0 0 moveto 0 ysize lineto 0.05 ft setlinewidth stroke" @Graphic {}
+	  }
+	  PDF @Yield {
+	    "__mul(__loutf, 0.05) w 0 0 m 0 __ysize l s" @Graphic {}
+	  }
+	}
     }
 
     def vctr
@@ -447,30 +461,91 @@ def @Eq
     def neg          { logicalnot				}
 
     def circle       { @HContract @VContract
-		      { "xsize ysize 2 div moveto"
-			"xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
-			"0.04 ft setlinewidth stroke"
-		      }
-		      @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+				@BackEnd @Case {
+				  PostScript @Yield {
+				      { "xsize ysize 2 div moveto"
+					"xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
+					"0.04 ft setlinewidth stroke"
+				      }
+				      @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+				  }
+				  PDF @Yield {
+#
+# VT: draws a counterclockwise 360 degree arc from 0 to +360 degree positions
+#     (straight right to straight right) with centre = (xsize/2, ysize/2)
+#     and radius = xsize/2
+#
+# implemented as two counterclockwise 180 degree arcs:
+#
+				      {
+	"__mul(0.04, __loutf) w"
+#
+#   start at (xsize, ysize/2)
+#   the control points are:
+#     pt1 = (xsize, ysize/2 + (4/3 * xsize/2)) and pt2 = (0, ysize/2 + (4/3 * xsize/2))
+#   end at (0, ysize/2)
+#
+	"__xsize __div(__ysize, 2) m"
+	"__xsize __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"	# pt1
+	"0 __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"		# pt2
+	"0 __div(__ysize, 2) c"								# pt3
+#
+#   start at (0, ysize/2)
+#   the control points are:
+#     pt1 = (0, ysize/2 - (4/3 * xsize/2)) and pt2 = (xsize, ysize/2 - (4/3 * xsize/2))
+#   end at (xsize, ysize/2)
+#
+	"0 __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"		# pt1
+	"__xsize __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"	# pt2
+	"__xsize __div(__ysize, 2) c S"						# pt3
+				      }
+				      @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+				  }
+				}
 		     }
 
     def square       { @HContract @VContract
-		      { "0 0 moveto xsize 0 lineto xsize ysize lineto"
-			"0 ysize lineto closepath"
-			"0.04 ft setlinewidth stroke"
-		      }
-		      @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
+				@BackEnd @Case {
+				  PostScript @Yield {
+				      { "0 0 moveto xsize 0 lineto xsize ysize lineto"
+					"0 ysize lineto closepath"
+					"0.04 ft setlinewidth stroke"
+				      }
+				      @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
+				  }
+				  PDF @Yield {
+				      { "__mul(__loutf, 0.04) w"
+				        "0 0 m __xsize 0 l __xsize __ysize l"
+				        "0 __ysize l s"
+				      }
+				      @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
+				  }
+				}
 		     }
 
     def triangle     { @HContract @VContract
-		      { "0 0 moveto xsize 0 lineto"
-		        "xsize 2 div ysize lineto closepath"
-			"0.04 ft setlinewidth stroke"
-		      }
-		      @Graphic
-		      { 0.3f @Wide 0.3f @High ^| ^/
-		        0.3f @Wide 0.3f @High
-		      }
+				@BackEnd @Case {
+				  PostScript @Yield {
+				      { "0 0 moveto xsize 0 lineto"
+				        "xsize 2 div ysize lineto closepath"
+					"0.04 ft setlinewidth stroke"
+				      }
+				      @Graphic
+				      { 0.3f @Wide 0.3f @High ^| ^/
+				        0.3f @Wide 0.3f @High
+				      }
+				  }
+				  PDF @Yield {
+				      { "__mul(__loutf, 0.04) w"
+				        "0 0 m __xsize 0 l"
+				        "__div(__xsize, 2) __ysize l s"
+				      }
+				      @Graphic
+				      { 0.3f @Wide 0.3f @High ^| ^/
+				        0.3f @Wide 0.3f @High
+				      }
+				  }
+				}
 		     }
 
     ###################################################################
@@ -541,14 +616,28 @@ def @Eq
     def uplus		{ bin @OneRow @HContract { &0.5rt 0.7f @Font plus ^/0.2fo union}}
     def sqcap		{ bin
 			  { @HContract @VContract
-			    {	"0 0 moveto 0 ysize lineto xsize ysize lineto"
-				"xsize 0 lineto"
-				"0.04 ft setlinewidth stroke"
-			    }
-			    @Graphic
-			    {	0.3f @Wide 0.3f @High ^| ^/
-				0.3f @Wide 0.3f @High
-			    }
+				@BackEnd @Case {
+				  PostScript @Yield {
+				    {	"0 0 moveto 0 ysize lineto xsize ysize lineto"
+					"xsize 0 lineto"
+					"0.04 ft setlinewidth stroke"
+				    }
+				    @Graphic
+				    {	0.3f @Wide 0.3f @High ^| ^/
+					0.3f @Wide 0.3f @High
+				    }
+				  }
+				  PDF @Yield {
+				    {	"__mul(__loutf, 0.04) w"
+					"0 0 m 0 __ysize l __xsize __ysize l"
+					"__xsize 0 l s"
+				    }
+				    @Graphic
+				    {	0.3f @Wide 0.3f @High ^| ^/
+					0.3f @Wide 0.3f @High
+				    }
+				  }
+				}
 			  }
 			}
     def sqcup		{ 180d @Rotate sqcap			}
@@ -592,18 +681,36 @@ def @Eq
     def subset		{ rel propersubset			}
     def subseteq	{ rel reflexsubset			}
     def sqsubseteq	{ rel @HContract @VContract
-			  {	{ "xsize 0 moveto"
-				  "0 0 lineto"
-				  "0 ysize lineto"
-				  "xsize ysize lineto"
-				  "0.04 ft setlinewidth stroke"
-				}
-				@Graphic
-				{ 0.5f @Wide 0.25f @High ^/
-				  0.25f @High
-				}
-			    /0.1f minus
-			  }
+					@BackEnd @Case {
+					  PostScript @Yield {
+						{ { "xsize 0 moveto"
+						  "0 0 lineto"
+						  "0 ysize lineto"
+						  "xsize ysize lineto"
+						  "0.04 ft setlinewidth stroke"
+						  }
+						  @Graphic
+						  { 0.5f @Wide 0.25f @High ^/
+						    0.25f @High
+						  }
+						  /0.1f minus
+						}
+					  }
+					  PDF @Yield {
+						{ { "__mul(__loutf, 0.04) w"
+						    "__xsize 0 m"
+						    "0 0 l"
+						    "0 __ysize l"
+						    "__xsize __ysize l s"
+						  }
+						  @Graphic
+						  { 0.5f @Wide 0.25f @High ^/
+						    0.25f @High
+						  }
+						  /0.1f minus
+						}
+					  }
+					}
 			}
 
     def in		{ rel element				}
@@ -621,17 +728,34 @@ def @Eq
     def supset		{ rel propersuperset			}
     def supseteq	{ rel reflexsuperset			}
     def sqsupseteq	{ rel @HContract @VContract
-			  {	{ "0 0 moveto xsize 0 lineto"
-				  "xsize ysize lineto"
-				  "0 ysize lineto"
-				  "0.04 ft setlinewidth stroke"
-				}
-				@Graphic
-				{ 0.5f @Wide 0.25f @High ^/
-				  0.25f @High
-				}
-			    /0.1f minus
-			  }
+					@BackEnd @Case {
+					  PostScript @Yield {
+					    {	{ "0 0 moveto xsize 0 lineto"
+						  "xsize ysize lineto"
+						  "0 ysize lineto"
+						  "0.04 ft setlinewidth stroke"
+						}
+						@Graphic
+						{ 0.5f @Wide 0.25f @High ^/
+						  0.25f @High
+						}
+					      /0.1f minus
+					    }
+					  }
+					  PDF @Yield {
+					    {	{ "__mul(__loutf, 0.04) w"
+					      "0 0 m __xsize 0 l"
+						  "__xsize __ysize l"
+						  "0 __ysize l s"
+						}
+						@Graphic
+						{ 0.5f @Wide 0.25f @High ^/
+						  0.25f @High
+						}
+					      /0.1f minus
+					    }
+					  }
+					}
 			}
     def ni		{ rel 180d @Rotate element		}
     def dashv		{ rel vctr {90d @Rotate perpendicular}	}
@@ -705,20 +829,44 @@ def @Eq
     def blceil	{ @OneRow {bracketlefttp  ^/ bracketleftex  / bracketleftex } }
     def brceil	{ @OneRow {bracketrighttp ^/ bracketrightex / bracketrightex} }
     def blangle	{ @HContract @VContract
-		  { "xsize 0 moveto"
-		    "0 ysize 2 div lineto"
-		    "xsize ysize lineto"
-		    "0.04 ft setlinewidth stroke"
-	          }
-	          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+				@BackEnd @Case {
+				  PostScript @Yield {
+				    { "xsize 0 moveto"
+				      "0 ysize 2 div lineto"
+				      "xsize ysize lineto"
+				      "0.04 ft setlinewidth stroke"
+			          }
+			          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+				  }
+				  PDF @Yield {
+				    { "__mul(__loutf, 0.04) w"
+				      "__xsize 0 m"
+				      "0 __div(__ysize, 2) l"
+				      "__xsize __ysize l S"
+			          }
+			          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+				  }
+				}
 		}
     def brangle	{ @HContract @VContract
-		  { "0 0 moveto"
-		    "xsize ysize 2 div lineto"
-		    "0 ysize lineto"
-		    "0.04 ft setlinewidth stroke"
-	          }
-	          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+				@BackEnd @Case {
+				  PostScript @Yield {
+				    { "0 0 moveto"
+				      "xsize ysize 2 div lineto"
+				      "0 ysize lineto"
+				      "0.04 ft setlinewidth stroke"
+			          }
+			          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+				  }
+				  PDF @Yield {
+				    { "__mul(__loutf, 0.04) w"
+				      "0 0 m"
+				      "__xsize __div(__ysize, 2) l"
+				      "0 __ysize l S"
+			          }
+			          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+				  }
+				}
 		}
 
 
@@ -812,42 +960,113 @@ def @Eq
     def mapsto
     {
 	@HContract @VContract {
-	    "0 ymark 0.16 ft sub moveto 0 ymark 0.16 ft add lineto stroke"
-	    @Graphic arrowright
+	  @BackEnd @Case {
+	    PostScript @Yield {
+	      "0 ymark 0.16 ft sub moveto 0 ymark 0.16 ft add lineto stroke"
+	      @Graphic arrowright
+	    }
+	    PDF @Yield {
+		"0 __sub(__ymark, __mul(__loutf, 0.16)) m 0 __add(__ymark, __mul(__loutf, 0.16)) l S"
+		@Graphic arrowright
+	    }
+	  }
 	}
     }
 
     def longmapsto
     {
 	@HContract @VContract {
-	    "0 ymark 0.16 ft sub moveto 0 ymark 0.16 ft add lineto stroke"
-	    @Graphic { { 1.6 1 } @Scale arrowright }
+	  @BackEnd @Case {
+	    PostScript @Yield {
+		"0 ymark 0.16 ft sub moveto 0 ymark 0.16 ft add lineto stroke"
+		@Graphic { { 1.6 1 } @Scale arrowright }
+	    }
+	    PDF @Yield {
+		"0 __sub(__ymark, __mul(__loutf, 0.16)) m 0 __add(__ymark, __mul(__loutf, 0.16)) l S"
+		@Graphic { { 1.6 1 } @Scale arrowright }
+	    }
+	  }
 	}
     }
 
     def hookleftarrow
     {
 	@HContract @VContract {
-	    "xsize ymark moveto xsize ymark 0.1 ft add 0.1 ft -90 90 arc stroke"
-	    @Graphic leftarrow
+	  @BackEnd @Case {
+
+	    PostScript @Yield {
+		"xsize ymark moveto xsize ymark 0.1 ft add 0.1 ft -90 90 arc stroke"
+		@Graphic leftarrow
+	    }
+
+	    PDF @Yield {
+#
+# VT: draws a counterclockwise 180 degree arc from -90 to +90 degree positions
+#     (straight down to straight up) with centre = (xsize, ymark + 0.1 ft)
+#     and radius = 0.1 ft
+#
+# the control points therefore are:
+#   pt1 = (xsize + (4/3 * 0.1 ft), ymark) and pt2 = (xsize + (4/3 * 0.1 ft), ymark + 0.2 ft)
+#
+		{
+		  "__xsize __ymark m"											# pt0
+		  "__add(__xsize, __div(__mul(0.4, __loutf), 3)) __ymark"					# pt1
+		  "__add(__xsize, __div(__mul(0.4, __loutf), 3)) __add(__ymark, __mul(0.2, __loutf))"	# pt2
+		  "__xsize __add(__ymark, __mul(0.2, __loutf)) c S"						# pt3
+		}
+		@Graphic leftarrow
+	    }
+
+	  }
 	}
     }
 
     def hookrightarrow
     {
 	@HContract @VContract {
-	    "0 ymark moveto 0 0.1 ft ymark add 0.1 ft -90 90 arcn stroke"
-	    @Graphic rightarrow
+	  @BackEnd @Case {
+
+	    PostScript @Yield {
+		"0 ymark moveto 0 0.1 ft ymark add 0.1 ft -90 90 arcn stroke"
+		@Graphic rightarrow
+	    }
+
+	    PDF @Yield {
+#
+# VT: draws a clockwise 180 degree arc from -90 to +90 degree positions
+#     (straight down to straight up) with centre = (0, ymark + 0.1 ft)
+#     and radius = 0.1 ft
+#
+# the control points therefore are:
+#   pt1 = (-4/3 * 0.1 ft, ymark) and pt2 = (-4/3 * 0.1 ft, ymark + 0.2 ft)
+#
+		{
+		  "0 __ymark m"										# pt0
+		  "__div(__mul(-0.4, __loutf), 3) __ymark"					# pt1
+		  "__div(__mul(-0.4, __loutf), 3) __add(__ymark, __mul(0.2, __loutf))"	# pt2
+		  "0 __add(__ymark, __mul(0.2, __loutf)) c S"					# pt3
+		}
+		@Graphic rightarrow
+	    }
+
+	  }
 	}
     }
 
     def @ClipToSize right x
     {
 	@HContract @VContract
-	{
-	"grestore newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
-	"0 ysize lineto closepath clip gsave"
-	} @Graphic x
+	  @BackEnd @Case {
+	    PostScript @Yield {
+		{
+		"grestore newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
+		"0 ysize lineto closepath clip gsave"
+		} @Graphic x
+	    }
+	    PDF @Yield {
+		"Q n 0 0 __xsize __ysize re W n q" @Graphic x
+	    }
+	  }
     }
 
     def @ClipAboveMark
@@ -1187,13 +1406,35 @@ def @Eq
 	named gap { @ThinGap }
 	right x
     {
-	@HContract @VContract
-	{
-	    @VScale surd | @OneRow
-	    {
-		@HLine line { "0.03 ft setlinewidth 2 setlinecap" }
-		^//gap  |gap  @VSqueeze @Strut x # //gap
-	    }
+	@BackEnd @Case {
+	  PostScript @Yield {
+	    @HContract @VContract
+		{
+		    @VScale surd | @OneRow
+		    {
+			@HLine line { "0.03 ft setlinewidth 2 setlinecap" }
+			^//gap  |gap  @VSqueeze @Strut x # //gap
+		    }
+		}
+	  }
+	  PDF @Yield {
+		@HContract @VContract
+		{
+#
+#	VT: this PDF is correct but it renders badly in Acrobat (?problem
+#	    with scaling by fractional factors)
+#	In other words, the @VScale value comes through correctly but it
+#	    looks ugly; GhostScript's translation actually expands the
+#	    "draw surd" instruction into raw moveto's and lineto's which
+#	    it presumably gets from the font's definition of the glyph!
+#
+		    @VScale surd | @OneRow
+		    {
+			@HLine line { "__mul(__loutf, 0.03) w 2 J" }
+			^//gap  |gap  @VSqueeze @Strut x # //gap
+		    }
+		}
+	  }
 	}
     }
 

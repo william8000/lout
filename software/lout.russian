@@ -1,29 +1,5 @@
 LOUT.RUSSIAN - RUSSIAN LANGUAGE FORMATTING IN LOUT DOCUMENTS
 
-This software contains everything you need to format documents containing
-Russian text with Lout, using the koi8r encoding.  There is a makefile
-to assist you with installation (very simple).
-
-Lout.Russian was designed and implemented by Jeffrey H. Kingston
-(jeff@cs.su.oz.au) of the Basser Department of Computer Science at the
-University of Sydney, and was made possible by assistance received from
-Valeriy Ushakov.
-
-Lout.Russian was formerly kept in the Lout ftp directory but it is
-now being maintained by Valeriy Ushakov (uwe@ptc.spbu.ru).  His ftp
-site is ftp.ptc.spbu.ru.
-
-
-RUSSIAN LANGUAGE FORMATTING IN LOUT (VERSION 1.3)
-
-The version 1.3 is updated to match the LCM file syntax (formerly CEV
-and CMA files) that appeared in Lout v3.07. New russian keywords that
-are not in the distribution are provided as a patch to standard.ld
-
-The gzipped tarball can be obtained from
-
-	ftp://ftp.ptc.spbu.ru/pub/unix/text/lout/lout.russian-1.3.tgz
-
-Best regards!
-uwe@ptc.spbu.ru
-http://www.ptc.spbu.ru/~uwe/
+This software is now included in the main Lout distribution,
+except that there is a problem with the fonts, which are
+accordingly not being distrubuted.

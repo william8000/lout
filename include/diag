@@ -523,12 +523,24 @@ def @DiagramPrint
             left ps
             right x
         {
-            { ps gsave // grestore } @Graphic x
+          @BackEnd @Case {
+            PostScript @Yield {
+              { ps gsave // grestore } @Graphic x
+            }
+            PDF @Yield {
+              { ps q // Q } @Graphic x
+            }
+          }
         }
 
 	def @BoxLabels right x
 	{
-	    "[ ldiagbox ] pop" @Graphic x
+          @BackEnd @Case {
+            PostScript @Yield {
+	        "[ ldiagbox ] pop" @Graphic x
+	      }
+	      PDF @Yield {}
+	    }
 	}
 
 	def @IfNonEmpty
@@ -556,26 +568,41 @@ def @DiagramPrint
         def @ShowTags
 	    right x
         {
+          @BackEnd @Case {
+            PostScript @Yield {
             {
 	      "() ldiagpushtagdict"
               // "ldiagshowtags ldiagpopuptagdict"
 	      } @Graphic x
+	      }
+	      PDF @Yield {}
+	    }
         }
 
         def @ShowPoints
 	    right x
         {
+          @BackEnd @Case {
+            PostScript @Yield {
             {
 	      "() ldiagpushtagdict"
               // "ldiagshowpoints ldiagpopuptagdict"
 	      } @Graphic x
+	      }
+	      PDF @Yield {}
+	    }
         }
 
         def @ShowDirections
 	    right x
         {
+          @BackEnd @Case {
+            PostScript @Yield {
             { "() ldiagpushtagdict"
               // "ldiagshowangles ldiagpopuptagdict" } @Graphic x
+	      }
+	      PDF @Yield {}
+	    }
         }
 
         def "::"
@@ -584,8 +611,13 @@ def @DiagramPrint
             left name
             right x
         {
+          @BackEnd @Case {
+            PostScript @Yield {
             { "("name") ldiagpushtagdict"
               // "ldiagpopuptagdict" } @Graphic x
+	      }
+	      PDF @Yield {}
+	    }
         }
 
         def @CatchTags
@@ -593,11 +625,16 @@ def @DiagramPrint
 	    associativity right
             right x
         {
+          @BackEnd @Case {
+            PostScript @Yield {
             {
 	       "() ldiagpushtagdict"
                // "ldiagpoptagdict"
+	      }
+	      @Graphic x
+	      }
+	      PDF @Yield {}
 	    }
-	    @Graphic x
         }
 
         def @ZeroWidth right x
@@ -618,20 +655,30 @@ def @DiagramPrint
 	    left arrow
 	    right arrowlength
 	{
+        @BackEnd @Case {
+          PostScript @Yield {
 	    arrow @Case {
 		{ no yes forward }   @Yield 0
 		{ back both }	     @Yield {"("arrowlength") ldiagdecodelength"}
 	    }
+	    }
+	    PDF @Yield {}
+	  }
 	}
 
 	def @ToArrowLength
 	    left arrow
 	    right arrowlength
 	{
+        @BackEnd @Case {
+          PostScript @Yield {
 	    arrow @Case {
 		{ no back }	     @Yield 0
 		{ yes forward both } @Yield {"("arrowlength") ldiagdecodelength"}
 	    }
+	    }
+	    PDF @Yield {}
+	  }
 	}
 
 	def @AddMargins
@@ -652,12 +699,21 @@ def @DiagramPrint
         def @Transform
             precedence 32
             import @Geometry named translate
-                named to precedence 10 left x right y { x y "ldiagpsub" }
+#               named to precedence 10 left x right y { x y "ldiagpsub" }
+                named to precedence 10 left x right y {
+                  @BackEnd @Case {
+                    PostScript @Yield { x y "ldiagpsub" }
+                    PDF @Yield {""}
+                  }
+                }
             {}
             import @Geometry named rotate { 0d }
             named scale    { 1 1 }
             right x
         {
+          @BackEnd @Case {
+
+            PostScript @Yield {
             { rotate "rotate" scale "scale newpath clip" }
             @InnerGraphic
             {
@@ -670,6 +726,27 @@ def @DiagramPrint
             {
                 @ZeroSize x
             }
+	      }
+
+	      PDF @Yield { # presume that "rotate", "scale" and "translate" are not matrices
+            { "__cos("rotate") __sin("rotate") __sub(0, __sin("rotate")) __cos("rotate") 0 0 cm"
+              "__pick(1, "scale") 0 0 __pick(2, "scale") 0 0 cm n W" }
+            @InnerGraphic
+            {
+                @ZeroSize x
+            }
+            //
+            # { rotate "rotate" scale "scale" translate "translate" }
+            { "1 0 0 1 "translate" cm"
+              "__cos("rotate") __sin("rotate") __sub(0, __sin("rotate")) __cos("rotate") 0 0 cm"
+              "__pick(1, "scale") 0 0 __pick(2, "scale") 0 0 cm" }
+            @InnerGraphic
+            {
+                @ZeroSize x
+            }
+	      }
+
+	    }
         }
 
 	def @DoLabel
@@ -1486,7 +1563,13 @@ def @DiagramPrint
 
         def @Node
             import @Geometry named translate
-                named to precedence 10 left x right y { x y "ldiagpsub" }
+#               named to precedence 10 left x right y { x y "ldiagpsub" }
+                named to precedence 10 left x right y {
+                  @BackEnd @Case {
+                    PostScript @Yield { x y "ldiagpsub" }
+                    PDF @Yield {""}
+                  }
+                }
             {}
             import @Geometry named rotate	{ 0d			}
 	    import @Geometry named outline
@@ -1738,6 +1821,8 @@ def @DiagramPrint
 	    import @Geometry
 	    def @OutLine
 	    {
+	      @BackEnd @Case {
+	        PostScript @Yield {
 		outline @Case {
 		    box		@Yield { "ldiagbox"			}
 		    curvebox	@Yield { "("margin") ldiagcurvebox"	}
@@ -1756,10 +1841,15 @@ def @DiagramPrint
 					angle  { angle  }
 		    }
 		}
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    def @Value
             {
+              @BackEnd @Case {
+                PostScript @Yield {
 		@HContract @VContract
 		{
 		    {
@@ -1786,6 +1876,9 @@ def @DiagramPrint
 		    / {clabel @Else nodelabel} @IfNonEmpty @CLabel
 		    / {dlabel @Else nodelabel} @IfNonEmpty @DLabel
 		}
+                }
+                PDF @Yield {}
+              }
             }
 
 	    def @TValue
@@ -1843,8 +1936,13 @@ def @DiagramPrint
 		outlinestyle { noline }
 		outlinewidth { pathwidth }
 		outline {
+		  @BackEnd @Case {
+		    PostScript @Yield {
 		    "ldiagsolidarrowhead"
 		    # 0 0 xsize ysize * 0.5 0 ysize
+		    }
+		    PDF @Yield {}
+		  }
 		}
 	    {
 		length @Wide width @High
@@ -1861,6 +1959,8 @@ def @DiagramPrint
 		outlinestyle { noline }
 		paint { nochange }
 		outline {
+		  @BackEnd @Case {
+		    PostScript @Yield {
 		    pathwidth "ldiagopenarrowhead"
 
 		    # PSW := { 0 0 }
@@ -1876,6 +1976,9 @@ def @DiagramPrint
 		    # PSI := PNI -- { 0 pathwidth }
 		    #
 		    # PSW PE PNW PNI PNA PSA PSI PSW
+		    }
+		    PDF @Yield {}
+		  }
 		}
 	    {
 		length @Wide width @High
@@ -1892,6 +1995,8 @@ def @DiagramPrint
 		outlinestyle { noline }
 		outlinewidth { pathwidth }
 		outline {
+		  @BackEnd @Case {
+		    PostScript @Yield {
 		    pathwidth "ldiaghalfopenarrowhead"
 
 		    # 0 0
@@ -1902,6 +2007,9 @@ def @DiagramPrint
 		    # 0         ysize*0.5 - pathwidth*0.5
 		    # xsize*0.3 ysize*0.5 - pathwidth*0.5
 		    # 0 0
+		    }
+		    PDF @Yield {}
+		  }
 		}
 	    {
 		length @Wide width @High
@@ -1918,6 +2026,8 @@ def @DiagramPrint
 		paint { nochange }
 		outlinewidth { pathwidth }
 		outline {
+		  @BackEnd @Case {
+		    PostScript @Yield {
 		    "ldiagsolidcurvedarrowhead"
 		    # 0 0
 		    # [0 0 xsize ysize * 0.5 "ldiaglinebetween"
@@ -1926,6 +2036,9 @@ def @DiagramPrint
 		    # [xsize ysize * 0.5 0 ysize "ldiaglinebetween"
 		    #  xsize 0 xsize ysize "ldiaglineintersect" clockwise]
 		    # 0 ysize
+		    }
+		    PDF @Yield {}
+		  }
 		}
 	    {
 		length @Wide width @High
@@ -1942,6 +2055,8 @@ def @DiagramPrint
 		paint { nochange }
 		outlinewidth { pathwidth }
 		outline {
+		  @BackEnd @Case {
+		    PostScript @Yield {
 		    pathwidth "ldiagopencurvedarrowhead"
 		    # LR:= { 0 0 xsize ysize * 0.5 "ldiaglinebetween"
 		    #    xsize 0 xsize ysize "ldiaglineintersect" }
@@ -1964,6 +2079,9 @@ def @DiagramPrint
 		    # 0 ysize * 0.5 - PW2
 		    # LMID
 		    # 0 0
+		    }
+		    PDF @Yield {}
+		  }
 		}
 	    {
 		length @Wide width @High
@@ -1980,6 +2098,8 @@ def @DiagramPrint
 		paint { nochange }
 		outlinewidth { pathwidth }
 		outline {
+		  @BackEnd @Case {
+		    PostScript @Yield {
 		    pathwidth "ldiaghalfopencurvedarrowhead"
 		    # LR:= { 0 0 xsize ysize * 0.5 "ldiaglinebetween"
 		    #      xsize 0 xsize ysize "ldiaglineintersect" }
@@ -2003,6 +2123,9 @@ def @DiagramPrint
 		    # LMID
 		    # [BR clockwise ]
 		    # 0 0
+		    }
+		    PDF @Yield {}
+		  }
 		}
 	    {
 		length @Wide width @High
@@ -2272,6 +2395,8 @@ def @DiagramPrint
 	    import @Geometry
 	    def @LinePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	       {arrow @FromArrowLength arrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
@@ -2295,11 +2420,16 @@ def @DiagramPrint
                # if cond { direct }
                # then { FROM TO }
                # else { FROM LFROM LMID LTO TO }
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @ACurvePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	       {arrow @FromArrowLength arrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
@@ -2346,11 +2476,16 @@ def @DiagramPrint
                #  if cond { direct }
 	       #  then { FROM [CTR] TO }
                #  else { FROM [CTR] LFROM [CTR] LMID [CTR] LTO [CTR] TO }
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @CCurvePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	       {arrow @FromArrowLength arrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
@@ -2398,12 +2533,16 @@ def @DiagramPrint
               #  then { FROM [CTR clockwise] TO }
               #  else { FROM [CTR clockwise] LFROM [CTR clockwise]
               #         LMID [CTR clockwise] LTO   [CTR clockwise] TO }
-            }
+		  }
+		  PDF @Yield {}
+		}
+          }
 
 	    import @Geometry
 	    def @BezierPath
 	    {
-	      
+		@BackEnd @Case {
+		  PostScript @Yield {
 	       {arrow @FromArrowLength arrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
@@ -2420,11 +2559,16 @@ def @DiagramPrint
               # LTO       :< TO@ANGLE
               # LMID       :: { FROM ++ TO ++ frompt ++ topt } ** 0.25
               # FROM [frompt topt] TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @VHLinePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2450,11 +2594,16 @@ def @DiagramPrint
               # LMID    :< {1f atangle {FANG + 180d}} angleto
               #            {1f atangle {TANG + 180d}}
               # FROM LFROM LMID LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @VHCurvePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2494,11 +2643,16 @@ def @DiagramPrint
               #       270      {   }
               #       270-360  { [XCTR] }
               # TCTR LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @HVLinePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2524,11 +2678,16 @@ def @DiagramPrint
               # LMID    :< {1f atangle {FANG + 180d}} angleto
               #            {1f atangle {TANG + 180d}}
               # FROM LFROM LMID LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @HVCurvePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2568,11 +2727,16 @@ def @DiagramPrint
               #       270      {   }
               #       270-360  { [XCTR clockwise] }
               # TCTR LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @LVRLinePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2598,11 +2762,16 @@ def @DiagramPrint
               # LTO     :: TO -- { ZINDENT 0 }
               # LTO     :< 0d
               # FROM LFROM P1 LMID P2 LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @LVRCurvePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2645,11 +2814,16 @@ def @DiagramPrint
               #     90 { [XP2CTR clockwise] P2 [XP2CTR clockwise] }
               #     270 { [XP2CTR] P2 [XP2CTR] }
               # XP2POST LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @RVLLinePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2675,11 +2849,16 @@ def @DiagramPrint
               # LTO     :: TO ++ { ZINDENT 0 }
               # LTO     :< 180d
               # FROM LFROM P1 LMID P2 LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @RVLCurvePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2722,11 +2901,16 @@ def @DiagramPrint
               #     90 { [XP2CTR] P2 [XP2CTR] }
               #     270 { [XP2CTR clockwise] P2 [XP2CTR clockwise] }
               # XP2POST LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @DWrapLinePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2759,11 +2943,16 @@ def @DiagramPrint
               # LMID	:: P2 ** 0.5 ++ P3 ** 0.5
               # LMID	:< DIRN - 180d
               # FROM P1 P2 P3 P4 TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @DWrapCurvePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2837,11 +3026,16 @@ def @DiagramPrint
               # XP3PRE [XP3CTR CLOCK] XP3POST
               # XP4PRE [XP4CTR CLOCK] XP4POST
               # LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @UWrapLinePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2874,11 +3068,16 @@ def @DiagramPrint
               # LMID	:: P2 ** 0.5 ++ P3 ** 0.5
               # LMID	:< DIRN - 180d
               # FROM P1 P2 P3 P4 TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
 	    def @UWrapCurvePath
 	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
 	      {arrow @FromArrowLength arrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
@@ -2952,6 +3151,9 @@ def @DiagramPrint
               # XP3PRE [XP3CTR CLOCK] XP3POST
               # XP4PRE [XP4CTR CLOCK] XP4POST
               # LTO TO
+		  }
+		  PDF @Yield {}
+		}
 	    }
 
 	    import @Geometry
@@ -3033,6 +3235,9 @@ def @DiagramPrint
 		}
 	    }
 
+	  @BackEnd @Case {
+	    PostScript @Yield {
+
 	    @Null & # so that preceding space gets chewed up
             {
 	      @Direct "ldiaglinkbegin [" @Path "]" pathdashlength
@@ -3046,6 +3251,10 @@ def @DiagramPrint
 		/ { zlabel @Else linklabel }	@IfNonEmpty @ZLabel
 		/ { tolabel @Else @ToArrow }	@IfNonEmpty @ToLabel
 	    }
+
+	    }
+	    PDF @Yield {}
+	  }
 	}
 
 
@@ -3562,6 +3771,8 @@ def @DiagramPrint
 	    @HContract @VContract x
 	}
 
+	@BackEnd @Case {
+	  PostScript @Yield {
         {
 	  save @Case { { yes Yes } @Yield "grestore save gsave" else @Yield {} }
 	  maxlabels "ldiagbegin"
@@ -3569,7 +3780,9 @@ def @DiagramPrint
 	  "ldiagend"
 	  save @Case { { yes Yes } @Yield "restore" else @Yield {} }
         } @Graphic @Body
-
+	  }
+	  PDF @Yield {}
+	}
 
     @End @Diag
 }

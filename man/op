@@ -1,0 +1,178 @@
+
+
+
+LOUT(1)                   User Commands                   LOUT(1)
+
+
+
+NAME
+     lout - prepare Lout document for printing
+
+SYNOPSIS
+     lout [ -s ] files
+
+DESCRIPTION
+     Invoke the Basser Lout interpreter on the  concatenation  of
+     the  named  files,  producing  a PostScript file on standard
+     output suitable for printing on  PostScript  printers  using
+     lpr(1).   If no files are named, stdin is used instead.  The
+     special file name - may be used to  denote  standard  input.
+     There  may  be  white  space between flags like -i and their
+     associated <filename> or <dirname> values.
+
+     An optional .lt suffix may  be  used  for  Lout  source  and
+     include  files.   When  invoking files ending in this suffix
+     the suffix may be omitted.
+
+OPTIONS
+     -s              Suppress all  reading  and  writing  of  the
+                     cross  reference  database;  other databases
+                     are not affected.  Useful when  many  simple
+                     documents  that don't do any cross referenc-
+                     ing are stored in one directory.
+
+     -EPS            Produce output in the form of an EPS (Encap-
+                     sulated   PostScript)   file,  suitable  for
+                     inclusion in another document.
+
+     -p              Produce  plain  text   output   instead   of
+                     PostScript.
+
+     -P              Like  -p  but  with  a  form-feed  character
+                     between pages.
+
+     -Z              Produce Adobe Portable Document Format (PDF)
+                     output.   This  includes links, but the more
+                     advanced graphics packages of Lout  are  not
+                     supported.
+
+     -S              Safe execution:  disable all calls  to  sys-
+                     tem(3),  instead  echoing  the commands that
+                     would have  been  executed.   Although  this
+                     makes  the  Lout  run  certainly  safe,  the
+                     PostScript output file may not be.
+
+     -U              Unsafe execution:  allow calls to system(3).
+                     This  is  usually the default behaviour, but
+                     it is possible to make  safe  execution  the
+                     default  during installation (use lout -V to
+                     find out whether  this  was  done  or  not),
+                     hence the need for this flag.
+
+     -e<filename>    Direct error messages to <filename>  instead
+                     of to stderr.
+
+     -a              Use  alternative   error   message   format:
+                     filename:linenum:colnum: message
+
+     -o<filename>    Direct  PostScript  output   to   <filename>
+                     instead of to stdout.
+
+     -i<filename>    Search the directories of the  include  file
+                     path   (see   below)   for   <filename>   or
+                     <filename>.lt and include it.  There may  be
+                     multiple -i options.
+
+     -I<dirname>     Add <dirname> to  the  list  of  directories
+                     searched  for  @Include  files and -i option
+                     files.  There may be  multiple  -I  options.
+                     @Include  first  searches the current direc-
+                     tory, then searches the  -I  directories  in
+                     the  order  given,  and finally searches the
+                     default include file directory (see  below).
+                     @SysInclude  and  the  -i  option  omit  the
+                     search of the current directory.
+
+     -C<dirname>     Add <dirname> to  the  list  of  directories
+                     searched  for  Lout character mapping (.LCM)
+                     files.  There may be  multiple  -C  options;
+                     the  directories  are  searched in the order
+                     given, and  finally  the  default  character
+                     mappings directory is searched (see below).
+
+     -F<dirname>     Add <dirname> to  the  list  of  directories
+                     searched  for  font  metrics (formerly .AFM)
+                     files.  There may be  multiple  -F  options;
+                     the  directories  are  searched in the order
+                     given, and finally the default font  metrics
+                     directory is searched (see below).
+
+     -H<dirname>     Add <dirname> to  the  list  of  directories
+                     searched  for  hyphenation  patterns  files,
+                     both unpacked (.lh) and packed (.lp).  There
+                     may  be multiple -H options; the directories
+                     are searched in the order given, and finally
+                     the   default   hyphenation   directory   is
+                     searched (see below).
+
+     -D<dirname>     Add <dirname> to  the  list  of  directories
+                     searched for Lout database files.  There may
+                     be multiple -D options.  @Database  searches
+                     the   current   directory,   then   the   -D
+                     directories in the order given, and  finally
+                     searches  the  default  databases  directory
+                     (see below).  @SysDatabase omits the  search
+                     of the current directory.
+
+     --<opt>{<val>}  Set setup file <opt>  to  <val>,  overriding
+                     any  value  assigned  to  <opt> in the setup
+                     file.  For example, --@PageType{Letter} will
+                     set  the  @PageType  setup  file  option  to
+                     Letter.  The value  may  be  a  sequence  of
+                     words  but not an arbitrary Lout object.  If
+                     there are spaces you must ensure that it  is
+                     passed to Lout as a single option; the usual
+                     way to do this is to enclose it in quotes.
+
+     -x              Initializing run, not for ordinary use: read
+                     and  check  all font files mentioned in font
+                     definitions, read and check all  hyphenation
+                     files  mentioned in language definitions and
+                     build compressed versions,  read  and  check
+                     all  database  files  mentioned  in database
+                     clauses and build index files.
+
+     -u              Print usage information on stderr.
+
+     -V              Print version information on stderr.
+
+     -w              Show the total  number  of  non-empty  words
+                     printed  in  the output file.  This includes
+                     words  and  numbers  in  page  headers   and
+                     footers;  section numbers and other numbers;
+                     every punctuation character in a  font  dif-
+                     ferent  from  its  adjacent  word; and every
+                     little fragment of  every  equation;  so  it
+                     will  always  somewhat overestimate the true
+                     number.
+
+FILES AND ENVIRONMENT VARIABLE
+     Binary file:                     <BINDIR>/lout
+     Default include file directory:  <LIBDIR>/include
+     Default databases directory:     <LIBDIR>/data
+     Default font metrics directory:  <LIBDIR>/font
+     Default hyphenation directory:   <LIBDIR>/hyph
+     Default character mappings dir.: <LIBDIR>/maps
+     Default locales directory:       <LIBDIR>/locale
+     Lout documentation directory:    <DOCDIR>
+
+     The default library directory, <LIBDIR>, can be  changed  at
+     runtime by setting environment variable LOUTLIB to an alter-
+     native directory name.
+
+SEE ALSO
+     c2lout(1), lpr(1), ghostview(1)
+
+MAILING LIST
+     A public mailing list for discussion  of  Lout  exists.   To
+     subscribe,  mail lout-request@ptc.spbu.ru with the word sub-
+     scribe in the Subject line, then wait one working  day.   To
+     post an item, mail it to lout@ptc.spbu.ru.
+
+REFERENCES
+     Jeffrey H. Kingston, "A User's Guide to  the  Lout  Document
+     Formatting System," and "An Expert's Guide to the Lout Docu-
+     ment Formatting System."
+
+AUTHOR
+     Jeffrey H. Kingston

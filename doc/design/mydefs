@@ -409,31 +409,66 @@ def @ShowMarks
    }
 
    def @HLine {
-     { 0 0 moveto xsize 0 lineto stroke }
-     @Graphic {}
+     @BackEnd @Case {
+       PostScript @Yield {
+        { 0 0 moveto xsize 0 lineto stroke }
+        @Graphic {}
+       }
+       PDF @Yield {
+        { 0 0 m __xsize 0 l S }
+        @Graphic {}
+       }
+     }
    }
 
    def @VDashLine
       right length
    {
-      length @High
-      { 0 0 moveto 0 ysize lineto [ 3 pt ] 0 setdash stroke }
-      @Graphic {}
+     @BackEnd @Case {
+       PostScript @Yield {
+         length @High
+         { 0 0 moveto 0 ysize lineto [ 3 pt ] 0 setdash stroke }
+         @Graphic {}
+       }
+       PDF @Yield {
+         length @High
+         { [ __mul(3, __pt) ] 0 d   0 0 m 0 __ysize l stroke }
+         @Graphic {}
+       }
+     }
    }
 
    def @LBox
       right offset
-   {  @OneCol @OneRow
-      {
-        {  //0.2c
-           0.6c @High 1.2c @Wide
-           { 0 0 moveto xsize 0 lineto
-	     xsize ysize lineto 0 ysize lineto closepath
-	     gsave 0.9 setgray fill grestore stroke }
-           @Graphic {}
-        }
-        ||offset @VDashLine 1c
-      }
+   {
+     @BackEnd @Case {
+       PostScript @Yield {
+         @OneCol @OneRow
+         {
+         {  //0.2c
+            0.6c @High 1.2c @Wide
+            { 0 0 moveto xsize 0 lineto
+	          xsize ysize lineto 0 ysize lineto closepath
+	          gsave 0.9 setgray fill grestore stroke }
+            @Graphic {}
+         }
+         ||offset @VDashLine 1c
+         }
+       }
+       PDF @Yield {
+         @OneCol @OneRow
+         {
+         {  //0.2c
+            0.6c @High 1.2c @Wide
+            { 0 0 m __xsize 0 l
+	          __xsize __ysize l 0 __ysize l h
+	          q 0.9 g f Q S }
+            @Graphic {}
+         }
+         ||offset @VDashLine 1c
+         }
+       }
+     }
    }
 
    def @Arrow
@@ -501,14 +536,27 @@ def @ShowMarks
    def @LittlePage
       right x
    {
-      @HContract @VContract
-      { 0 0 moveto xsize 0 lineto xsize ysize lineto
-	0 ysize lineto closepath stroke } @Graphic
-      {  //0.3c ||0.3c
-         9px @Break 8p @Font
-         2.8c @Wide 3.8c @High x
-         ||0.3c //0.3c
-      }
+     @BackEnd @Case {
+       PostScript @Yield {
+         @HContract @VContract
+         { 0 0 moveto xsize 0 lineto xsize ysize lineto
+	       0 ysize lineto closepath stroke } @Graphic
+         {  //0.3c ||0.3c
+           9px @Break 8p @Font
+           2.8c @Wide 3.8c @High x
+           ||0.3c //0.3c
+         }
+       }
+       PDF @Yield {
+         @HContract @VContract
+         { 0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l s } @Graphic
+         {  //0.3c ||0.3c
+           9px @Break 8p @Font
+           2.8c @Wide 3.8c @High x
+           ||0.3c //0.3c
+         }
+       }
+     }
    }
 
    def @LittleFootSect

@@ -43,4 +43,9 @@ points within the @Code "@Data" symbol are.  Altogether it seems best
 to use the @Code "@Data" symbol for the bulk of the data points, and to
 use the @Code "objects" option for adding a small number of labels or
 other decorations.
+@PP
+The @Code "objects" option may contain @Code "@Graph" symbols, but in
+that case, owing to a deficiency in the implementation, those symbols
+will need to have their @Code save options (Section {@NumberOf grerrors})
+set to {@Code yes}.
 @End @Section

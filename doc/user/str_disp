@@ -64,11 +64,10 @@ broken in two between any two lines.  To force a display to keep
 together on one page or column, use the @Code "@OneRow" symbol like
 this:  @Code "@Display @OneRow { ... }".
 @PP
-There are other display symbols for producing more advanced kinds
-of displays:  aligned and numbered displays, and raw displays (i.e.
-without vertical space).  Although these symbols can display any
-object as usual, in practice they are used for displaying mathematics,
-so they are described in Section {@NumberOf mathdisplays}.
+Other display symbols produce aligned and numbered displays, and raw
+displays (i.e.  without vertical space).  Although these can display any
+object as usual, in practice they are used for mathematics, so they are
+described in Section {@NumberOf mathdisplays}.
 @PP
 Three setup file options control the appearance of displays.  (For a
 general introduction to setup files and their options, consult

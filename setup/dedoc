@@ -112,6 +112,8 @@
   # @ContentsGap	{ 0.20v	@OrIfPlain 0f	} # extra gap above minor entry
   # @ContentsGapAbove	{ 0.80v	@OrIfPlain 1f	} # extra gap above major entry
   # @ContentsGapBelow	{ 0.00v	@OrIfPlain 0f	} # extra gap below major entry
+  # @ContentsPartGapAbove { 1.00v @OrIfPlain 1f	} # extra gap above `part' entry
+  # @ContentsPartGapBelow { 0.00v @OrIfPlain 0f	} # extra gap below `part' entry
   # @ContentsFormat	{ number @DotSep title	} # contents entry format
   # @ContentsLeader	{ ..			} # leader symbol in contents
   # @ContentsLeaderGap	{ 4s	@OrIfPlain 2s	} # gap between leaders

@@ -21,6 +21,7 @@ file and the @Code "@Report" symbol:
 "    @InitialBreak { hyphen adjust 1.2fx }"
 "    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
+"    @PageOrientation { Portrait }"
 "    @PageHeaders { Simple }"
 "    @ColumnNumber { 1 }"
 "    @FirstPageNumber { 1 }"
@@ -64,8 +65,8 @@ authors might be necessary (Chapter {@NumberOf tables}).
 {@Code Yes}, meaning print the current date, or anything else, which is
 taken to be a date and printed:
 @ID @Code "@DateLine { 4 July, 1776 }"
-A good plan is to start off with @Code "@DateLine { Yes }" and
-introduce a final date when the report is finalized.
+A good plan is to use @Code "@DateLine { Yes }" until
+the report is finalized.
 @PP
 The remaining options are a selection of setup file options (Section
 {@NumberOf setup}) that frequently need to be changed.  If your changes
@@ -107,6 +108,11 @@ double spacing, and so on), and either @Code "hyphen" or
 two objects, as described in Section
 {@NumberOf white}.  @Code "@InitialLanguage" determines the language
 of the bulk of the report.
+@PP
+@Code "@PageOrientation" determines the orientation of the page.  Its
+value may be {@Code Portrait} (the default), {@Code Landscape},
+{@Code ReversePortrait}, or {@Code ReverseLandscape}.  See
+Section {@NumberOf pagesize} for further details.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
 footers throughout the report.  Its value may be {@Code None},
@@ -171,12 +177,12 @@ section.reports @SubIndex { in reports }
 No @Code "@BeginSections" or @Code "@EndSections" symbols are needed.  The
 beginsections.reports @SubIndex { in reports }
 endsections.reports @SubIndex { in reports }
-general rule is that you need these bracketing symbols when you are
-inside something else, but not when you aren't.  Sections lie inside
+general rule is that you need these bracketing symbols only when you are
+inside something else.  Sections lie inside
 @Code "@Text" in ordinary documents, but they don't lie inside anything
 else in technical reports.
 @PP
-Each section may contain subsections, bracketed by
+A section may have subsections, between
 subsection.reports @SubIndex { in reports }
 beginsubsections.reports @SubIndex { in reports }
 endsubsections.reports @SubIndex { in reports }

@@ -1,20 +1,21 @@
 @Section
    @Tag { backend }
-   @Title { "@BackEnd" and the PlainText back end }
+   @Title { "@BackEnd" and the PlainText and PDF back ends }
 @Begin
 @PP
 backend.sym @Index { @@BackEnd symbol }
 The @@BackEnd symbol, which takes no parameters, has for its result a
-string naming the back end currently in use.  Two back ends are available,
-PostScript and PlainText.  The symbol is generally used like this:
+string naming the back end currently in use.  Three back ends are available,
+PostScript, PDF and PlainText.  The symbol is generally used like this:
 @ID @Code {
 "@BackEnd @Case {"
 "    PlainText @Yield { ... }"
 "    PostScript @Yield { ... }"
+"    PDF @Yield { ... }"
 "}"
 }
 to obtain different objects depending on the back end.  No @Code else
-is required since these are the only two possible values.
+is required since these are the only possible values.
 @PP
 When a @Code "@Case" symbol has @Code "@BackEnd" for its left parameter
 and the left parameter of each @Code "@Yield" symbol within it consists
@@ -53,4 +54,8 @@ and not to change the character size in the command line.
 There is a @Code "-P" option which is identical with the @Code "-p"
 option except that it inserts a form-feed character between each two
 components of the output, but not before the first or after the last.
+@PP
+The PDF back end is obtained by typing {@Code "lout -Z"}.  It is similar
+to PostScript but much more limited in functionality.  Consult a separate
+document distributed with Lout for further information.
 @End @Section

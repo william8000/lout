@@ -19,13 +19,27 @@ def @GraphObj
     named adj { 0 0 }
     right x
 {
-    @Null &  # kills previous white space
-    @HContract @VContract {
-	//0io ||0io @HContract @VContract 
-	{ p "trpoint translate" adj "translate gsave" // "grestore" }
-	@Graphic { //margin ||margin x ||margin //margin }
-	||0io //0io
+  @BackEnd @Case {
+    PostScript @Yield {
+	@Null &  # kills previous white space
+	@HContract @VContract {
+	  //0io ||0io @HContract @VContract 
+	  { p "trpoint translate" adj "translate gsave" // "grestore" }
+	  @Graphic { //margin ||margin x ||margin //margin }
+	  ||0io //0io
+	}
     }
+# VT: PDF does nothing
+    PDF @Yield {
+	@Null &  # kills previous white space
+	@HContract @VContract {
+	  //0io ||0io @HContract @VContract 
+	  { "% @GraphObj UNIMPLEMENTED" }
+	  @Graphic { //margin ||margin x ||margin //margin }
+	  ||0io //0io
+	}
+    }
+  }
 }
 
 def @GraphCross
@@ -39,12 +53,25 @@ def @GraphCross
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath 0 0 moveto xsize ysize lineto 0 ysize moveto"
-      "xsize 0 lineto [] 0 setdash stroke"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize ysize lineto 0 ysize moveto"
+	  "xsize 0 lineto [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 m __xsize __ysize l 0 __ysize m __xsize 0 l S"}	# uses S because PostScript version does NOT use closepath
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphPlus
@@ -58,12 +85,25 @@ def @GraphPlus
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath xmark 0 moveto xmark ysize lineto 0 ymark moveto"
-      "xsize ymark lineto [] 0 setdash stroke"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath xmark 0 moveto xmark ysize lineto 0 ymark moveto"
+	  "xsize ymark lineto [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d __xmark 0 m __xmark __ysize l 0 __ymark m __xsize __ymark l S"}	# uses S because PostScript version does NOT use closepath
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphSquare
@@ -77,12 +117,25 @@ def @GraphSquare
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
-      "0 ysize lineto closepath [] 0 setdash stroke"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
+	  "0 ysize lineto closepath [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 __xsize __ysize re s"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphFilledSquare
@@ -96,12 +149,25 @@ def @GraphFilledSquare
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
-      "0 ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
+	  "0 ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 __xsize __ysize re b"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphDiamond
@@ -115,12 +181,25 @@ def @GraphDiamond
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
-      "xmark ysize lineto closepath [] 0 setdash stroke"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
+	  "xmark ysize lineto closepath [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 __ymark m __xmark 0 l __xsize __ymark l __xmark __ysize l s"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphFilledDiamond
@@ -134,12 +213,26 @@ def @GraphFilledDiamond
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
-      "xmark ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
+	  "xmark ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 __ymark m __xmark 0 l __xsize __ymark l __xmark __ysize l b"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphCircle
@@ -153,12 +246,51 @@ def @GraphCircle
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath xmark ymark xmark 0 360 arc"
-      "[] 0 setdash stroke"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath xmark ymark xmark 0 360 arc"
+	  "[] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+#
+# draw a circle whose centre is at (xmark, ymark) and whose radius is xmark units;
+#
+# for curveto to work, we need to calculate the control points of the Bezier curve
+# as well as move the pen to the correct initial point. The circle is drawn as two
+# arcs of 180 degrees
+#
+#   pt0 = (xmark + xmark, ymark)
+#   pt1 = (xmark + xmark, ymark + 4/3 * xmark)
+#   pt2 = (0, ymark + 4/3 * xmark)
+#   pt3 = (0, ymark)
+#
+#   pt0 = (0, ymark)
+#   pt1 = (0, ymark - 4/3 * xmark)
+#   pt2 = (xmark + xmark, ymark - 4/3 * xmark)
+#   pt3 = (xmark + xmark, ymark)
+#
+	{"n [] 0 d"
+	 "__mul(2, __xmark) __ymark m"
+	 "__mul(2, __xmark) __add(__ymark, __div(__mul(4, __xmark), 3))"	# pt1
+	 "0 __add(__ymark, __div(__mul(4, __xmark), 3))"			# pt2
+	 "0 __ymark c"									# pt3
+
+	 "0 __sub(__ymark, __div(__mul(4, __xmark), 3))"			# pt1
+	 "__mul(2, __xmark) __sub(__ymark, __div(__mul(4, __xmark), 3))"	# pt2
+	 "__mul(2, __xmark) __ymark c S"						# pt3
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphFilledCircle
@@ -172,12 +304,54 @@ def @GraphFilledCircle
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath xmark ymark xmark 0 360 arc"
-      "gsave [] 0 setdash stroke grestore fill"
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath xmark ymark xmark 0 360 arc"
+	  "gsave [] 0 setdash stroke grestore fill"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+#
+# draw a filled circle whose centre is at (xmark, ymark) and whose radius is xmark units;
+#
+# for curveto to work, we need to calculate the control points of the Bezier curve
+# as well as move the pen to the correct initial point. The circle is drawn as two
+# arcs of 180 degrees
+#
+#   pt0 = (xmark + xmark, ymark)
+#   pt1 = (xmark + xmark, ymark + 4/3 * xmark)
+#   pt2 = (0, ymark + 4/3 * xmark)
+#   pt3 = (0, ymark)
+#
+#   pt0 = (0, ymark)
+#   pt1 = (0, ymark - 4/3 * xmark)
+#   pt2 = (xmark + xmark, ymark - 4/3 * xmark)
+#   pt3 = (xmark + xmark, ymark)
+#
+# Note: this is not a strict translation because there is a setdash bracketed by
+#   gsave/grestore in the above PostScript but there is no closepath before it;
+#   but in PDF, it is not possible to execute a setdash within a path definition.
+#
+	{"n [] 0 d"
+	 "__mul(2, __xmark) __ymark m"
+	 "__mul(2, __xmark) __add(__ymark, __div(__mul(4, __xmark), 3))"	# pt1
+	 "0 __add(__ymark, __div(__mul(4, __xmark), 3))"			# pt2
+	 "0 __ymark c"									# pt3
+
+	 "0 __sub(__ymark, __div(__mul(4, __xmark), 3))"			# pt1
+	 "__mul(2, __xmark) __sub(__ymark, __div(__mul(4, __xmark), 3))"	# pt2
+	 "__mul(2, __xmark) __ymark c b"						# pt3
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphTriangle
@@ -191,12 +365,25 @@ def @GraphTriangle
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
-      "closepath [] 0 setdash stroke"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
+	  "closepath [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 m __xsize 0 l __xmark __mul(__ysize, 1.25) l s"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphFilledTriangle
@@ -210,12 +397,25 @@ def @GraphFilledTriangle
 	named vs left x { x"v" }
     { 0.15 ft }
 {
-    @HContract @VContract
-    { "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
-      "closepath gsave [] 0 setdash stroke grestore fill"
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
+	  "closepath gsave [] 0 setdash stroke grestore fill"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
-    @Graphic
-    {symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 m __xsize 0 l __xmark __mul(__ysize, 1.25) l h b"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
 }
 
 def @GraphNoLine
@@ -247,10 +447,19 @@ def @GraphSolid
 	named vs left x { x"v" }
     { 1.0 ft }
 {
-    @HContract @VContract
-    { "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
-       "/linewidth" linewidth "def xsize" dashlength "solid end"
-    } @Graphic { length @Wide }
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "solid end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphSolid UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
 }
 
 def @GraphDashed
@@ -266,10 +475,19 @@ def @GraphDashed
 	named vs left x { x"v" }
     { 1.0 ft }
 {
-    @HContract @VContract
-    { "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
-       "/linewidth" linewidth "def xsize" dashlength "dashed end"
-    } @Graphic { length @Wide }
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "dashed end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphDashed UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
 }
 
 def @GraphDotted
@@ -285,10 +503,19 @@ def @GraphDotted
 	named vs left x { x"v" }
     { 1.0 ft }
 {
-    @HContract @VContract
-    { "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
-       "/linewidth" linewidth "def xsize" dashlength "dotted end"
-    } @Graphic { length @Wide }
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "dotted end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphDotted UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
 }
 
 
@@ -493,18 +720,28 @@ def @Graph
     named ymax     named none { "false" }           { none           }
     named xticksep named none { "0" }               { none           }
     named yticksep named none { "0" }               { none           }
+    named rticksep named none { "0" }               { none           }
     import @GraphMath named xticks
 	named none                                  { "false"        }
+	named auto                                  { "false"        }
 	named "@"                                   { " lgen"        }
 	named "^"                                   { "^"            }
 		       { false    }
     import @GraphMath named yticks
 	named none                                  { "false"        }
+	named auto                                  { "false"        }
 	named "@"                                   { " lgen"        }
 	named "^"                                   { "^"            }
 		       { false    }
+    import @GraphMath named rticks
+	named none                                  { "false"        }
+	named auto                                  { "false"        }
+	named "@"                                   { " lgen"        }
+	named "^"                                   { "^"            }
+		       { }
     named xticklength                               { 0.5 ft   }
     named yticklength                               { 0.5 ft   }
+    named rticklength                               { 0.5 ft   }
     named dataformat                                { xandy    }
     named dashlength                                { 0.2 ft   }
     named linewidth				    { "currentlinewidth"   }
@@ -815,19 +1052,33 @@ def @Graph
     }
 
     @AddCaptions width @Wide height @High
-    {
-	{
-	    "grestore"
-	    save @Case { { Yes yes } @Yield "save" else @Yield {} }
-	    "gsave xsize ysize lgraphdict begin /ysize exch def /xsize exch def"
-	    "/alldata [" @Body "] def"
-	    xticksep "[" xticks "] 0 alldata" xmin xmax xlog
-	      @XExtra @XDecreasing xorigin xticklength "xset"
-	    yticksep "[" yticks "] 1 alldata" ymin ymax ylog
-	      @YExtra @YDecreasing yorigin yticklength "yset"
-	    "rundata" @Style // "end"
-	    save @Case { { Yes yes } @Yield "restore" else @Yield {} }
-	} @Graphic { //1rt objects }
+    @BackEnd @Case {
+	PostScript @Yield {
+	    {
+		"grestore"
+		save @Case { { Yes yes } @Yield "save" else @Yield {} }
+		"gsave xsize ysize lgraphdict begin /ysize exch def /xsize exch def"
+		"/alldata [" @Body "] def"
+		xticksep "[" xticks "] 0 alldata" xmin xmax xlog
+		  @XExtra @XDecreasing xorigin xticklength "xset"
+		yticksep "[" yticks "] 1 alldata" ymin ymax ylog
+		  @YExtra @YDecreasing yorigin yticklength "yset"
+
+		rticks @Case {
+
+		  ""   @Yield "norset"
+
+		  else @Yield {
+		    rticksep "[" rticks "] 1 alldata" ymin ymax ylog
+		    @YExtra @YDecreasing yorigin rticklength "rset"
+		  }
+		}
+
+		"rundata" @Style // "end"
+		save @Case { { Yes yes } @Yield "restore" else @Yield {} }
+	    } @Graphic { //1rt objects }
+	}
+	PDF @Yield { {"% @Graph UNIMPLEMENTED"} @Graphic { //1rt objects } }
     }
 
 @End @Graph                  

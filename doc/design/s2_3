@@ -146,12 +146,24 @@ Consider now what happens when horizontal and vertical are combined:
 The two parameters of @Code "/" now have two column marks each, and
 they will be merged with the corresponding marks in the other
 parameter, yielding the object
+
 @ID @OneRow {
+  @BackEnd @Case {
+    PostScript @Yield {
       @ShowMarks USA &
       { 0 ymark moveto xsize 10 pt add ymark lineto [ 3 pt ] 0 setdash stroke }
       @Graphic {1c @Wide }
       |0.2i @ShowMarks Australia
 /0.1i @ShowMarks Washington  |     @ShowMarks Canberra
+    }
+    PDF @Yield {
+      @ShowMarks USA &
+      { [ __mul(3, __pt) ] 0 d 0 __ymark m __add(__xsize, __mul(10, __pt)) __ymark l S }
+      @Graphic {1c @Wide }
+      |0.2i @ShowMarks Australia
+/0.1i @ShowMarks Washington  |     @ShowMarks Canberra
+    }
+  }
 }
 The @Code "0.2i" gap separates columns, not individual items in
 columns, so a gap attached to the second @Code "|" would serve no

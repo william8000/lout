@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,7 +20,7 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z26.c                                                      */
 /*  MODULE:       Echo Service                                               */
@@ -28,7 +28,7 @@
 /*                EchoLength(), Image()                                      */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 
 #if DEBUG_ON
 #define	MULTI	  7			/* max no of simultaneous calls      */
@@ -114,6 +114,7 @@ FULL_CHAR *EchoLength(int len)
   switch( BackEnd )
   {
     case POSTSCRIPT:
+    case PDF:
 
       sprintf( (char *) buff[i], "%.3fc", (float) len/CM);
       break;
@@ -190,6 +191,8 @@ FULL_CHAR *Image(unsigned int c)
     case COLOUR:		return  KW_COLOUR;
     case LANGUAGE:		return  KW_LANGUAGE;
     case CURR_LANG:		return  KW_CURR_LANG;
+    case CURR_FAMILY:		return  KW_CURR_FAMILY;
+    case CURR_FACE:		return  KW_CURR_FACE;
     case COMMON:		return  KW_COMMON;
     case RUMP:			return  KW_RUMP;
     case INSERT:		return  KW_INSERT;

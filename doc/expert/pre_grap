@@ -26,18 +26,35 @@ postscript.graphic @SubIndex { used by @@Graphic }
 }
 The result of the above invocation of the symbol @@Graphic is
 @ID @OneRow @OneRow {
-{ 0     0     moveto
-  0     ysize lineto
-  xsize ysize lineto
-  xsize 0     lineto
-  closepath
-  stroke
-}
-@Graphic
-{ //0.2c
-  ||0.2c hello, world ||0.2c
-  //0.2c
-}
+  @BackEnd @Case {
+    PostScript @Yield {
+      { 0     0     moveto
+        0     ysize lineto
+        xsize ysize lineto
+        xsize 0     lineto
+        closepath
+        stroke
+      }
+      @Graphic
+      { //0.2c
+        ||0.2c hello, world ||0.2c
+        //0.2c
+      }
+    }
+    PDF @Yield {
+      { 0       0       m
+        0       __ysize l
+        __xsize __ysize l
+        __xsize 0       l
+        s
+      }
+      @Graphic
+      { //0.2c
+        ||0.2c hello, world ||0.2c
+        //0.2c
+      }
+    }
+  }
 }
 @PP
 The right parameter always appears as part of the result, and indeed the
@@ -45,14 +62,32 @@ result is always an object whose size is identical to the size of the
 right parameter with @@OneCol and @@OneRow applied to
 it.  From now on we refer to this part of the result as the {@I base}.
 @PP
-The left parameter is implementation-dependent: that is, its
+The left parameter is implementation-dependent:  that is, its
 meaning is not defined by Lout, and different implementations could
 require different values for it.  The following description applies to
 Basser Lout, which uses the PostScript page description language
-@Cite { $adobe1990ps }.
-@PP
-The left parameter refers to a coordinate system whose origin 
-is the bottom left-hand corner of the base.  It may use the symbols
+@Cite { $adobe1990ps }.  Similar but more restricted possibilities exist
+with the PDF back end added to Lout in Version 3.12 (see a separate document
+distributed with Lout); to include both, use the @@BackEnd symbol like this:
+@ID @OneRow @Code {
+"{ @BackEnd @Case {"
+"      PostScript @Yield"
+"      {"
+"          ..."
+"      }"
+"      PDF @Yield"
+"      {"
+"          ..."
+"      }"
+"  }"
+"  @Graphic"
+"  {"
+"      ..."
+"  }"
+"}"
+}
+Returning to PostScript, the left parameter refers to a coordinate system
+whose origin is the bottom left-hand corner of the base.  It may use the symbols
 @Code xsize and @Code ysize to denote the horizontal and vertical size
 of the base; similarly, @Code xmark and @Code ymark denote the positions
 of the base's column and row marks:
@@ -158,10 +193,19 @@ These options are followed by the word {@Code "stroke"}.  So, for example,
 }
 has result
 @ID @OneRow {
-{ 0 0 moveto xsize 0 lineto
-  2 pt setlinewidth [ 5 pt ] 0 setdash stroke
-}
-@Graphic { 3i @Wide }
+  @BackEnd @Case {
+    PostScript @Yield {
+      { 0 0 moveto xsize 0 lineto
+        2 pt setlinewidth [ 5 pt ] 0 setdash stroke
+      }
+      @Graphic { 3i @Wide }
+    }
+    PDF @Yield {
+      { [ __mul(5, __pt) ] 0 d __mul(2, __pt) w 0 0 m __xsize 0 l S
+      }
+      @Graphic { 3i @Wide }
+    }
+  }
 }
 @PP
 When filling in the region enclosed by a path, the main option is
@@ -176,11 +220,22 @@ from 0 (black) to 1 (white).  So, for example,
 }
 has result
 @ID @OneRow {
-{ 0 0 moveto xsize 0 lineto 0 ysize lineto closepath
-  0.8 setgray fill
-}
-@Graphic
-{ 2c @Wide  2c @High }
+  @BackEnd @Case {
+    PostScript @Yield {
+      { 0 0 moveto xsize 0 lineto 0 ysize lineto closepath
+        0.8 setgray fill
+      }
+      @Graphic
+      { 2c @Wide  2c @High }
+    }
+    PDF @Yield {
+      { 0 0 m __xsize 0 l 0 __ysize l h
+        0.8 g f
+      }
+      @Graphic
+      { 2c @Wide  2c @High }
+    }
+  }
 }
 @PP
 There are many other options.  The value of the left parameter of

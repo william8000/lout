@@ -84,6 +84,11 @@ precise effect depends on the font (see below).  There is a default
 value (@Code {"nosmallcaps"}), so it is not necessary to mention this
 attribute when giving an initial font.
 @PP
+There are two predefined symbols, @@CurrFamily and @@CurrFace, which
+respectively return the family and face names of the current font.  For
+example, right now @@CurrFamily is @CurrFamily and @@CurrFace is
+@CurrFace.
+@PP
 When Lout runs, the first thing it reads is a list of font definitions,
 font.def @Index { @Code fontdef }
 like these:

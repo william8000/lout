@@ -217,7 +217,7 @@ This may seem awkward at first, but actually it is extremely convenient
 because you don't have to worry about whether the first line of the
 paragraph should appear on a new line as above, or immediately after
 the opening brace:  space at that point does not separate two objects,
-so it has no effect on the result.  The indent can be obtained by
+so it has no effect.  The indent can be obtained by
 starting the first line with an empty object (Section {@NumberOf empty}):
 @ID @OneRow @Code {
 "@IndentedDisplay lines @Break @I {"
@@ -232,9 +232,7 @@ The result is
      What winde
 Serves to'advance an honest minde.
 }
-as desired.
-@PP
-To set the entire document in a paragraph breaking style other than
-{@Code "adjust"}, you need to change the @Code "@InitialBreak" option,
+as desired.  To set the entire document in a paragraph breaking style other
+than {@Code "adjust"}, you need to change the @Code "@InitialBreak" option,
 as explained at the end of Section {@NumberOf linespace}.
 @End @Section

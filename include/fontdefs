@@ -154,12 +154,3 @@ fontdef	Dingbats	Slope		{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
 fontdef	Dingbats	Bold		{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
 fontdef	Dingbats	BoldSlope	{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
 
-
-###############################################################################################################################
-#                                                                                                                             #
-#  Non-Latin1 fonts (available in separate distributions; placeholder files replace them in the basic distribution).          #
-#                                                                                                                             #
-###############################################################################################################################
-
-@SysInclude { russian.fd }
-@SysInclude { latin2.fd }

@@ -14,7 +14,14 @@ a PostScript command for setting colour.  For example,
 @ID @Code "{ 1.0 0.0 0.0 setrgbcolor } @SetColour { hello, world }"
 produces the red result
 @ID {
-{ 1.0 0.0 0.0 setrgbcolor } @SetColour { hello, world }
+  @BackEnd @Case {
+    PostScript @Yield {
+      { 1.0 0.0 0.0 setrgbcolor } @SetColour { hello, world }
+    }
+    PDF @Yield {
+      { 1.0 0.0 0.0 rg 1.0 0.0 0.0 RG } @SetColour { hello, world }
+    }
+  }
 }
 Of course, a colour output device is needed to see the effect; on
 a monochrome device the result will be some shade of grey.  The

@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,7 +20,7 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z01.c                                                      */
 /*  MODULE:       Supervise                                                  */
@@ -28,7 +28,7 @@
 /*                PrintSym, AllowCrossDb, Encapsulated                       */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 
 
 /*****************************************************************************/
@@ -86,7 +86,7 @@ BOOLEAN	AltErrorFormat;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  BackEnd		POSTSCRIPT or PLAINTEXT                              */
+/*  BackEnd		POSTSCRIPT, PLAINTEXT or PDF                         */
 /*  BackEndWord         "PostScript" or "PlainText"                          */
 /*  PlainCharWidth      if PLAINTEXT, the width of each character            */
 /*  PlainCharHeight     if PLAINTEXT, the height of each character           */
@@ -148,6 +148,7 @@ static void PrintUsage(FILE *fp)
   lput(""								    );
   lput("  -s              suppress access to cross reference database"	    );
   lput("  -EPS            EPS (Encapsulated PostScript) output"		    );
+  lput("  -Z              PDF (Adobe Portable Document Format) output"      );
   lput("  -p              plain text output instead of PostScript"	    );
   lput("  -P              like -p but with form-feed char between pages"    );
   lput("  -S              safe execution (disable calls to system(3))"	    );
@@ -155,6 +156,7 @@ static void PrintUsage(FILE *fp)
   lput("  -o file         output to file instead of stdout"		    );
   lput("  -e file         error messages to file instead of stderr"	    );
   lput("  -a              alternative error format:  file:line:col ..."	    );
+  lput("  -w              print total number of words in output"	    );
   lput("  -i file         like @SysInclude { file }; not recommended"	    );
   lput("  -I directory    add directory to include file search path"	    );
   lput("  -C directory    add directory to LCM file search path"	    );
@@ -162,6 +164,7 @@ static void PrintUsage(FILE *fp)
   lput("  -H directory    add directory to hyphenation file search path"    );
   lput("  -D directory    add directory to database file search path"	    );
   lput("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'" );
+  lput("  -c file         use file.li instead of lout.li for crossrefs"	    );
   lput("  -x              initializing run, not for ordinary use"	    );
   lput("  -u              print this usage message on stderr and exit"	    );
   lput("  -V              print version and configuration information"	    );
@@ -407,7 +410,7 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "%-28s %s\n",
 	  "Basser Lout written by:", "Jeffrey H. Kingston (jeff@cs.usyd.edu.au)");
 	fprintf(stderr, "%-28s %s\n",
-	  "Free source available from:", "ftp://ftp.cs.su.oz.au/jeff/lout");
+	  "Free source available from:", "ftp://ftp.cs.usyd.edu.au/jeff/lout");
 	fprintf(stderr, "%-28s %s %s\n",
 	  "This executable compiled:", __TIME__, __DATE__);
 	fprintf(stderr, "%-28s %s%s%s\n", "System include directory:",
@@ -420,6 +423,12 @@ int main(int argc, char *argv[])
 	  SAFE_DFT ? " yes" : " no");
 	fprintf(stderr, "strcoll() used for sorting collation sequence:%s\n",
 	  COLLATE ? " yes" : " no");
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Basser Lout comes with ABSOLUTELY NO WARRANTY.\n");
+	fprintf(stderr, "This is free software, and you are welcome to\n");
+	fprintf(stderr, "redistribute it under certain conditions.  For\n");
+	fprintf(stderr, "details on both points, consult the GNU General\n");
+	fprintf(stderr, "Public License (distributed with this software).\n");
 	exit(0);
 	break;
 
@@ -427,6 +436,13 @@ int main(int argc, char *argv[])
       case CH_FLAG_WORDS:
      
 	seen_wordcount = TRUE;
+	break;
+
+
+      case CH_FLAG_PDF:
+
+	BackEnd = PDF;
+	BackEndWord = STR_PDF;
 	break;
 
 
@@ -670,6 +686,8 @@ int main(int argc, char *argv[])
   load(KW_COLOR,       COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_LANGUAGE,    LANGUAGE,       TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_CURR_LANG,   CURR_LANG,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_CURR_FAMILY, CURR_FAMILY,    FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_CURR_FACE,   CURR_FACE,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_COMMON,      COMMON,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_RUMP,        RUMP,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_INSERT,      INSERT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);

@@ -241,6 +241,7 @@ def @ReportLayout
         named @InitialBreak { @InitialBreak }
         named @InitialSpace { @InitialSpace }
         named @InitialLanguage { @InitialLanguage }
+	named @PageOrientation { @PageOrientation }
         named @PageHeaders { @PageHeaders }
         named @ColumnNumber { @ColumnNumber }
         named @FirstPageNumber { @FirstPageNumber }
@@ -476,6 +477,7 @@ def @ReportLayout
 		    //  @PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }
+			    @Orient { @PageOrientation }
 			    # extra { Yes }
 			    @AtTop { @TitleMaterial }
 			    @FirstPageNumber
@@ -490,7 +492,7 @@ def @ReportLayout
 		    //	Yes @BeginFigureCounter {}
 		    //	Yes @BeginTableCounter {}
 		    //  @PageLabel "i"
-		    //	@OddPage
+		    //	@OddPage @Orient { @PageOrientation }
 			{
 			    @FootNoteThrough @NoDo @BeginFootNoteCounter
 			    // @TitleMaterial
@@ -503,6 +505,7 @@ def @ReportLayout
 		    //	@PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }
+			    @Orient { @PageOrientation }
 			    # extra { Yes }
 			    @AtTop { @TitleMaterial }
 			    @FirstPageNumber

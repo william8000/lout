@@ -21,6 +21,8 @@
    def @@Char              { @Code "@Char"              }
    def @@Common            { @Code "@Common"            }
    def @@CurrLang          { @Code "@CurrLang"          }
+   def @@CurrFamily        { @Code "@CurrFamily"        }
+   def @@CurrFace          { @Code "@CurrFace"          }
    def @@Database          { @Code "@Database"          }
    def @@End               { @Code "@End"               }
    def @@Enclose           { @Code "@Enclose"           }
@@ -126,14 +128,24 @@
 
    def @HLine
    {
-	{ 0 0 moveto xsize 0 lineto stroke } @Graphic {}
+      @BackEnd @Case {
+      PostScript @Yield { {0 0 moveto xsize 0 lineto stroke} @Graphic {} }
+             PDF @Yield { {0 0 m __xsize 0 l s} @Graphic {} }
+      }
+#	{ 0 0 moveto xsize 0 lineto stroke } @Graphic {}
    }
 
    def @VDashLine
       right length
    {
       length @High {
-	{ 0 0 moveto 0 ysize lineto [ 3 pt ] 0 setdash stroke } @Graphic {}
+         @BackEnd @Case {
+         PostScript @Yield { { 0 0 moveto 0 ysize lineto [ 3 pt ] 0 setdash stroke } @Graphic {} }
+
+# VT: double quotes required:
+                PDF @Yield { { "__pt 3 0 d    0 0 m   0 __ysize l   s" } @Graphic {} }
+         }
+#	{ 0 0 moveto 0 ysize lineto [ 3 pt ] 0 setdash stroke } @Graphic {}
       }
    }
 
@@ -143,10 +155,24 @@
       {
         {  //0.2c
            0.6c @High 1.2c @Wide
-           { 0 0 moveto xsize 0 lineto
-	     xsize ysize lineto 0 ysize lineto closepath
-	     gsave 0.9 setgray fill grestore stroke }
-           @Graphic {}
+
+           @BackEnd @Case {
+              PostScript @Yield {
+                 { 0 0 moveto xsize 0 lineto
+                   xsize ysize lineto 0 ysize lineto closepath
+                   gsave 0.9 setgray fill grestore stroke } @Graphic {}
+              }
+              PDF @Yield {
+                 { 0 0 m   __xsize 0 l
+                   __xsize __ysize l   0 __ysize l   h
+                   q 0.9 g f Q s } @Graphic {}
+              }
+           }
+
+#           { 0 0 moveto xsize 0 lineto
+#	     xsize ysize lineto 0 ysize lineto closepath
+#	     gsave 0.9 setgray fill grestore stroke }
+#           @Graphic {}
         }
         ||offset @VDashLine 1c
       }
@@ -218,13 +244,33 @@
       right x
    {
       @HContract @VContract {
-        { 0 0 moveto xsize 0 lineto xsize ysize lineto
-    	  0 ysize lineto closepath stroke } @Graphic
-        {  //0.3c ||0.3c
-           9px @Break 8p @Font
-           2.8c @Wide 3.8c @High x
-           ||0.3c //0.3c
-        }
+         @BackEnd @Case {
+            PostScript @Yield {
+               { 0 0 moveto xsize 0 lineto xsize ysize lineto
+                 0 ysize lineto closepath stroke } @Graphic
+               {  //0.3c ||0.3c
+                  9px @Break 8p @Font
+                  2.8c @Wide 3.8c @High x
+                  ||0.3c //0.3c
+               }
+            }
+            PDF        @Yield {
+               { 0 0 m __xsize 0 l __xsize __ysize l
+                 0 __ysize l h s } @Graphic
+               {  //0.3c ||0.3c
+                  9px @Break 8p @Font
+                  2.8c @Wide 3.8c @High x
+                  ||0.3c //0.3c
+               }
+            }
+         }
+#        { 0 0 moveto xsize 0 lineto xsize ysize lineto
+#    	  0 ysize lineto closepath stroke } @Graphic
+#        {  //0.3c ||0.3c
+#           9px @Break 8p @Font
+#           2.8c @Wide 3.8c @High x
+#           ||0.3c //0.3c
+#        }
       }
    }
 
@@ -254,20 +300,37 @@
    }
 		
    def @ShowMarks
-      named linewidth  { 0.015 cm }
+      named linewidth  {
+      	@BackEnd @Case {
+      	  PostScript @Yield { 0.015 cm }
+      	  PDF        @Yield { __mul(0.015, __cm) }
+      	}
+      }
       named linestyle  { dashed   }
-      named dashlength { 0.15 cm  }
+      named dashlength {
+      	@BackEnd @Case {
+      	  PostScript @Yield { 0.15 cm }
+      	  PDF        @Yield { __mul(0.15, __cm) }
+      	}
+      }
       named paint      { lightgrey}
       right x
    {
       @HContract @VContract @Fig
       {   @Box margin { 0c } linewidth { linewidth } paint { paint }
 	  {   @Figure
-		 shape { -0.3 cm ymark
-			 {xsize ymark} ++ {0.3 cm 0}  []
-			 xmark -0.3 cm
-			 {xmark ysize} ++ {0 0.3 cm}
-		       }
+		 shape {
+		   @BackEnd @Case {
+		     PostScript @Yield {
+		       -0.3 cm ymark
+			   {xsize ymark} ++ {0.3 cm 0}  []
+			   xmark -0.3 cm
+			   {xmark ysize} ++ {0 0.3 cm}
+		     }
+		     PDF @Yield { ""	#	VT: PDF currently has no output
+		     }
+		   }
+		 }
 		 linewidth { linewidth }
 		 linestyle { linestyle }
 		 dashlength { dashlength }
@@ -288,9 +351,15 @@
       {   
 	 @Figure
 		 shape {
-			 xmark -0.3 cm
-			 {xmark ysize} ++ {0 0.3 cm}
-		       }
+		   @BackEnd @Case {
+		     PostScript @Yield {
+			   xmark -0.3 cm
+			   {xmark ysize} ++ {0 0.3 cm}
+		     }
+		     PDF @Yield { ""	#	VT: PDF currently has no output
+		     }
+		   }
+		 }
 		 linewidth { linewidth }
 		 linestyle { linestyle }
 		 dashlength { dashlength }
@@ -309,9 +378,15 @@
       {   
 	 @Figure
 		 shape {
+		   @BackEnd @Case {
+		     PostScript @Yield {
 			 -0.3 cm ymark
 			 {xsize ymark} ++ {0.3 cm 0}
-		       }
+		     }
+		     PDF @Yield { ""	#	VT: PDF currently has no output
+		     }
+		   }
+		 }
 		 linewidth { linewidth }
 		 linestyle { linestyle }
 		 dashlength { dashlength }
@@ -327,12 +402,28 @@
 
    def @TightBox right x
    {
-     "0 0 moveto xsize 0 lineto xsize ysize lineto 0 ysize lineto closepath stroke"
-     @Graphic x
+      @BackEnd @Case {
+         PostScript @Yield {
+            "0 0 moveto xsize 0 lineto xsize ysize lineto 0 ysize lineto closepath stroke"
+            @Graphic x
+         }
+         PDF @Yield {
+            "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h s"
+            @Graphic x
+         }
+      }
    }
 
    def @GreyBox right x
    {
-     "0 0 moveto xsize 0 lineto xsize ysize lineto 0 ysize lineto closepath 0.8 setgray fill"
-     @Graphic x
+      @BackEnd @Case {
+         PostScript @Yield {
+            "0 0 moveto xsize 0 lineto xsize ysize lineto 0 ysize lineto closepath 0.8 setgray fill"
+            @Graphic x
+         }
+         PDF @Yield {
+            "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h 0.8 g f"
+            @Graphic x
+         }
+      }
    }

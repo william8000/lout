@@ -92,6 +92,10 @@ The particular LCM files in this directory are:
 		  used by Lout and its standard packages.  See the header
 		  in the file for the details.
 
+    LtLatin2.LCM  Similar to LtLatin1.LCM but uses the Latin2 character set.
+
+    koi8r.LCM     For Russian
+
     Symb.LCM      The Symbol encoding vector, exactly as on page 606 of the
 		  PostScript LRM 2nd Ed., plus mappings.
 

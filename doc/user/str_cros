@@ -40,10 +40,10 @@ but Lout makes a note of the number of the page on which the word
 preceding it appears, and inserts that number in place of
 {@Code "@PageOf decl.of.ind"}.  The tag, {@Code "decl.of.ind"}, may be
 tag. @Index { tag }
-any simple word (actually Lout will accept a multi-word tag, but you
-will find that they are very inconvenient and better avoided).  The
-braces are used for the usual reason, to control grouping:  we don't
-want the following punctuation characters in the tag.
+any simple word (actually Lout will accept a multi-word tag, but they
+are very inconvenient and better avoided).  The braces are there, as
+usual, to control grouping:  we don't want the following punctuation
+characters in the tag.
 @PP
 One tag called @Code "last.page" is created automatically
 "last.page.tag" @Index { last.page tag }

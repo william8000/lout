@@ -10,7 +10,7 @@ inclusion in some other document, which may itself be a Lout document
 but need not be.  The opposite process, the inclusion of an illustration
 in a Lout document, is the subject of Section {@NumberOf include}.
 @PP
-Suppose you want to produce the following logo as an illustration
+Suppose you want to produce the following logo
 for inclusion in some other document:
 @ID {
 45d @Rotate @CurveBox { ARMY @LP 180d @Rotate ARMY }
@@ -79,6 +79,6 @@ command for formatting it is
 An EPS file is supposed to contain only one `page', so Lout will refuse
 to generate any second or subsequent pages when the @Code "-EPS" flag
 is given.  There is also a minor difference in format between ordinary
-and encapsulated PostScript files, which is the main reason why the
-@Code "-EPS" flag is needed at all.
+and encapsulated PostScript files, which is why the @Code "-EPS" flag
+is needed at all.
 @End @Section

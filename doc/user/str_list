@@ -47,7 +47,6 @@ centredlist. @Index @Code "@CentredList"
 centeredlist. @Index @Code "@CenteredList"
 cl. @Index @Code "@CL"
 which format the items like the corresponding display symbols do.
-@PP
 Other list symbols generate a @I label for each item.  For example,
 @Code "@NumberedList" causes the items to be numbered:
 numberedlist. @Index @Code "@NumberedList"

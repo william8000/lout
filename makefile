@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.11                          #
+#  Make file for installing Basser Lout Version 3.12                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  17 November 1997                                                           #
+#  6 April 1998                                                               #
 #                                                                             #
 #     make lout         Compile the Lout source                               #
 #     make c2lout       Compile a small auxiliary program called c2lout       #
@@ -45,7 +45,7 @@
 #      a database file.                                                       #
 #                                                                             #
 #      If this problem occurs you can probably fix it by changing the value   #
-#      of DBFIX below from 1.  Many thanks to Valeriy E. Ushakov for this.    #
+#      of DBFIX below to 1.  Many thanks to Valeriy E. Ushakov for this fix.  #
 #                                                                             #
 #         Systems requiring DBFIX = 0      Systems requiring DBFIX = 1        #
 #         -------------------------------------------------------------       #
@@ -148,16 +148,40 @@
 #  (9) Execute "make c2lout".  This will compile the c2lout program, leaving  #
 #      its binary in this directory.  No changes to other directories.        #
 #                                                                             #
-# (10) Execute "make lout".  This will compile the Lout source, leaving the   #
+# (10) If you want to be able to produce compressed PDF files, as opposed to  #
+#      uncompressed ones, you need to:                                        #
+#                                                                             #
+#      (a) obtain the zlib compression library from                           #
+#          <http://www.cdrom.com/pub/infozip/zlib/>.                          #
+#                                                                             #
+#      (b) decompress the zlib source files using gunzip and/or tar and       #
+#          then build the library by issuing the "make zlib.a" command        #
+#          whilst in the zlib directory. If you want to test the library,     #
+#          you should use the "make test" command (which also builds the      #
+#          library).                                                          #
+#                                                                             #
+#      (c) set the PDF_COMPRESSION variable below to 1                        #
+#                                                                             #
+#      (d) set the ZLIB variable to the path of the libz.a file. For example: #
+#          ZLIB = /usr/cs3/vtan/lout/lout.3.11/zlib-1.1.1/libz.a              #
+#                                                                             #
+#      (e) set the ZLIBPATH variable to the path of the zlib directory with   #
+#          -I in front. For example:                                          #
+#          ZLIBPATH = -I/usr/cs3/vtan/lout/lout.3.11/zlib-1.1.1/              #
+#                                                                             #
+#      If you don't want zlib support or cannot obtain it or cannot use it,   #
+#      leave the PDF_COMPRESSION, ZLIB, and ZLIBPATH variables as they are.   #
+#                                                                             #
+# (11) Execute "make lout".  This will compile the Lout source, leaving the   #
 #      binary in this directory.  No changes are made in other directories.   #
 #                                                                             #
-# (11) This makefile assumes that Lout is not installed on your system        #
+# (12) This makefile assumes that Lout is not installed on your system        #
 #      already.  If you do have an earlier version of Lout installed,         #
 #      the simplest way to get rid of it is to type "make uninstall" now.     #
 #      Of course, this is assuming that the old version was installed in the  #
 #      same directories as where you are about to install the new version.    #
 #                                                                             #
-# (12) Execute "make install".  This will do the following things:            #
+# (13) Execute "make install".  This will do the following things:            #
 #                                                                             #
 #      (a) It will copy the lout and c2lout binaries into $(BINDIR);          #
 #                                                                             #
@@ -178,55 +202,45 @@
 #                (.ld) files in directory $(LIBDIR)/data, and build           #
 #                the corresponding database index (.li) files.                #
 #                                                                             #
-#          Note to OS/2 users: this initializing run may fail with an error   #
-#          message pointing to file norweg.lh (the Norwegian language         #
-#          hyphenation file).  This problem has probably been fixed, but if   #
-#          it does happen, change line 9 of file ./include/langdefs to        #
-#                                                                             #
-#            langdef Norwegian Norsk { -   . : ! ? .) :) ?) !) .' :' !' ?' }  #
-#                                                                             #
-#          to dis-inform Lout about this file, then "make uninstall" and      #
-#          "make install" again.  Lout will not be able to hyphenate          #
-#          Norwegian language words if you have to do this.                   #
-#                                                                             #
 #      (d) It will change the mode of the files created in (c) to be          #
 #          publicly readable, just in case they weren't created that way.     #
 #                                                                             #
 #      It is good to build the various files during installation because      #
 #      later runs will not have write permission in the library directories.  #
 #                                                                             #
-# (13) Execute "make installman".  This installs the manual entries for       #
+# (14) Execute "make installman".  This installs the manual entries for       #
 #      lout and c2lout into directory $(MANDIR), which is assumed to exist.   #
 #      These entries are troff files; plain text versions are also available  #
 #      in directory ./man if you need them (install them yourself).           #
 #                                                                             #
-# (14) Execute "make installdoc".  This creates directory $(DOCDIR) and       #
+# (15) Execute "make installdoc".  This creates directory $(DOCDIR) and       #
 #      copies the Lout documentation into it.                                 #
 #                                                                             #
-# (15) If you want French error messages, execute "make installfr" now.       #
+# (16) If you want French error messages, execute "make installfr" now.       #
 #      If you want German error messages, execute "make installde" now.       #
 #      These commands compile the error messages files into packed forms      #
 #      using the gencat command, and store them in $(LIBDIR)/locale.          #
 #                                                                             #
-# (16) Execute "make clean".  This cleans up this directory.                  #
+# (17) Execute "make clean".  This cleans up this directory.                  #
 #                                                                             #
-# (16) If the usual size of a piece of paper at your site is not A4, you      #
+# (18) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
-#      on line 897 of file $(LIBDIR)/include/dl.  You can find the list of    #
-#      known page types in the User's Guide, and also at line 2010 in file    #
+#      on line 1520 of file $(LIBDIR)/include/dl.  You can find the list of   #
+#      known page types in the User's Guide, and also at line 2679 in file    #
 #      $(LIBDIR)/include/dl.                                                  #
 #                                                                             #
-# (17) If the usual language at your site is not English, you might like to   #
+# (19) If the usual language at your site is not English, you might like to   #
 #      now change the default value of the @InitialLanguage option on line    #
-#      879 of file $(LIBDIR)/include/dl.  This will mean that by default the  #
-#      date and words like Chapter and July will appear in a different        #
+#      1502 of file $(LIBDIR)/include/dl.  This will mean that by default     #
+#      the date and words like Chapter and July will appear in a different    #
 #      language, and hyphenation will be carried out according to patterns    #
 #      designed for that language.  You can find the list of known languages  #
 #      in the User's Guide, or in file $(LIBDIR)/include/langdefs; if yours   #
 #      is not on the list, let me know and we can work together to add it.    #
 #      This has nothing to do with locales and USELOC.                        #
 #                                                                             #
-#  Mail jeff@cs.su.oz.au if you have any problems.                            #
+#  Mail jeff@cs.usyd.edu.au if you have any problems.                         #
+#  PDF related problems can be mailed to vtan@ugrad.ug.cs.usyd.edu.au         #
 #                                                                             #
 ###############################################################################
 
@@ -260,6 +274,10 @@ USELOC	= 1
 LOC_FR	= fr
 LOC_DE	= de
 
+PDF_COMPRESSION	= 0
+ZLIB		=
+ZLIBPATH	=
+
 CC	= gcc
 
 RCOPY	= cp -r
@@ -284,22 +302,24 @@ CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
 	  -DCHAR_OUT=$(CHAROUT)					\
 	  -DLOCALE_ON=$(USELOC)					\
 	  -DASSERT_ON=1 $(COPTS)				\
-	  -DDEBUG_ON=1  -g
+	  -DDEBUG_ON=1  -g					\
+	  -DPDF_COMPRESSION=$(PDF_COMPRESSION)			\
+	  $(ZLIBPATH)
 
 OBJS	= z01.o z02.o z03.o z04.o z05.o z06.o z07.o z08.o	\
 	  z09.o z10.o z11.o z12.o z13.o z14.o z15.o z16.o	\
 	  z17.o z18.o z19.o z20.o z21.o z22.o z23.o z24.o	\
 	  z25.o z26.o z27.o z28.o z29.o z30.o z31.o z32.o	\
 	  z33.o z34.o z35.o z36.o z37.o z38.o z39.o z40.o	\
-	  z41.o z42.o z43.o z44.o z45.o z46.o z47.o
+	  z41.o z42.o z43.o z44.o z45.o z46.o z47.o z48.o
 
 lout:	$(OBJS)
-	$(CC) -o lout $(OBJS) -lm
+	$(CC) -o lout $(OBJS) $(ZLIB) -lm
 	chmod a+x lout
 
-$(OBJS): externs
+$(OBJS): externs.h
 
-externs:
+externs.h:
 
 c2lout:	c2lout.c
 	$(CC) $(COPTS) -o c2lout c2lout.c

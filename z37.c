@@ -1,6 +1,6 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,7 +20,7 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z37.c                                                      */
 /*  MODULE:       Font Service                                               */
@@ -32,7 +32,7 @@
 /*  metrics files (.AFM files, version 2).                                   */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 #define DEFAULT_XHEIGHT 500	/* the default XHeight if font has none      */
 #define	NO_FONT		  0	/* the not-a-font font number                */
 #define SZ_DFT	       1000	/* default lout size is 50p                  */
@@ -469,7 +469,7 @@ static void ReadFont(OBJECT face, OBJECT err)
 		bfound = TRUE;
 	      }
 	      else if( StringEqual(command, "L") &&
-		BackEnd == POSTSCRIPT && ch != '\0' )
+		BackEnd != PLAINTEXT && ch != '\0' )
 	      { if( lig[ch] == 1 )  lig[ch] = ligtop - MAX_CHARS;
 		lig[ligtop++] = ch;
 		i++;  /* skip L */
@@ -511,7 +511,8 @@ static void ReadFont(OBJECT face, OBJECT err)
 	        lig[ligtop++] = '\0';
 	      switch( BackEnd )
 	      {
-		case POSTSCRIPT: fnt[ch].left  = llx;
+		case POSTSCRIPT:
+		case PDF:	 fnt[ch].left  = llx;
 				 fnt[ch].down  = lly - xheight2;
 				 fnt[ch].right = wx;
 				 fnt[ch].up    = ury - xheight2;
@@ -531,7 +532,7 @@ static void ReadFont(OBJECT face, OBJECT err)
 	    }
 	  }
 	}
-	else if( BackEnd == POSTSCRIPT && Kern &&
+	else if( BackEnd != PLAINTEXT && Kern &&
 	  StringEqual(command, AsciiToFull("StartKernPairs")) )
 	{ FULL_CHAR ch1, ch2, last_ch1;
 	  FULL_CHAR name1[30], name2[30];
@@ -642,9 +643,9 @@ static void ReadFont(OBJECT face, OBJECT err)
 	  /* make a new font record and insert into font tree */
 	  font_num(face) = font_num(fontname) = font_count;
 	  font_size(fontname) =
-	    (BackEnd == POSTSCRIPT) ? SZ_DFT : PlainCharHeight;
+	    (BackEnd != PLAINTEXT) ? SZ_DFT : PlainCharHeight;
 	  font_xheight2(fontname) =
-	    (BackEnd == POSTSCRIPT) ? xheight2 : PlainCharHeight / 4;
+	    (BackEnd != PLAINTEXT) ? xheight2 : PlainCharHeight / 4;
 	  font_mapping(fontname) = font_mapping(filename);
 	  ch = MapCharEncoding(STR_PS_SPACENAME, font_mapping(fontname));
 	  font_spacewidth(fontname) = ch == '\0' ? 0 : fnt[ch].right;
@@ -771,8 +772,7 @@ void FontChange(STYLE *style, OBJECT x)
   }
   debug1(DFT, DDD, " found pars, num = %d", num);
   if( num == 0 )
-  { debug1(DFT, D,"FontChange returning %d (empty parameter, no change)",
-      font(*style));
+  { debug1(DFT, D, "FontChange returning %s", EchoStyle(style));
     return;
   }
 
@@ -933,7 +933,7 @@ void FontChange(STYLE *style, OBJECT x)
   assert( is_word(type(old)), "FontChange: old!" );
   new = MakeWord(WORD, string(old), no_fpos);
   Link(face, new);
-  font_size(new)        = BackEnd == POSTSCRIPT ? flen : font_size(old);
+  font_size(new)        = BackEnd != PLAINTEXT ? flen : font_size(old);
   font_xheight2(new)    = font_xheight2(old) * font_size(new) / font_size(old);
   font_mapping(new)	= font_mapping(old);
   font_spacewidth(new)	= font_spacewidth(old) * font_size(new)/font_size(old);
@@ -1201,6 +1201,36 @@ FULL_CHAR *FontName(FONT_NUM fnum)
 } /* end FontName */
 
 
+/*@::FontFamily(), FontFace@**************************************************/
+/*                                                                           */
+/*  FULL_CHAR *FontFamilyAndFace(fnum)                                       */
+/*                                                                           */
+/*  Return a static string of the current font family and face.              */
+/*                                                                           */
+/*****************************************************************************/
+
+FULL_CHAR *FontFamily(FONT_NUM fnum)
+{ OBJECT face, family;
+  debug1(DFT, D, "FontFamily( %d )", fnum);
+  assert( fnum <= font_count, "FontFamiliy!" );
+  Parent(face, Up(finfo[fnum].font_table));
+  Parent(family, Up(face));
+  debug1(DFT, D, "FontFamily returning %s", string(family));
+  return string(family);
+} /* end FontFamilyAndFace */
+
+
+FULL_CHAR *FontFace(FONT_NUM fnum)
+{ OBJECT face, family;
+  debug1(DFT, D, "FontFacec( %d )", fnum);
+  assert( fnum <= font_count, "FontFamiliy!" );
+  Parent(face, Up(finfo[fnum].font_table));
+  Parent(family, Up(face));
+  debug1(DFT, D, "FontFace returning %s", string(face));
+  return string(face);
+} /* end FontFamilyAndFace */
+
+
 /*@::FontFamilyAndFace(), FontPrintAll()@*************************************/
 /*                                                                           */
 /*  FULL_CHAR *FontFamilyAndFace(fnum)                                       */
@@ -1302,15 +1332,29 @@ void FontPrintPageSetup(FILE *fp)
       Child(ps_name, LastDown(AFMfilename));
       assert( is_word(type(ps_name)), "FontPrintPageSetup: ps_name!" );
       fprintf(fp, "%%%%IncludeResource: font %s\n", string(ps_name));
-      if( font_recoded(face) )
-      { fprintf(fp, "/%s%s %s /%s LoutRecode\n",
-	  string(ps_name), string(short_name),
-	  MapEncodingName(font_mapping(AFMfilename)), string(ps_name));
-        fprintf(fp, "/%s { /%s%s LoutFont } def\n", string(short_name),
-	  string(ps_name), string(short_name));
-      }
-      else fprintf(fp, "/%s { /%s LoutFont } def\n", string(short_name),
+
+      switch( BackEnd )
+      {
+	case POSTSCRIPT:
+
+          if( font_recoded(face) )
+          { fprintf(fp, "/%s%s %s /%s LoutRecode\n",
+	      string(ps_name), string(short_name),
+	      MapEncodingName(font_mapping(AFMfilename)), string(ps_name));
+            fprintf(fp, "/%s { /%s%s LoutFont } def\n", string(short_name),
+	      string(ps_name), string(short_name));
+          }
+          else fprintf(fp, "/%s { /%s LoutFont } def\n", string(short_name),
 	    string(ps_name));
+	  break;
+
+	
+	case PDF:
+
+	  PDFFont_AddFont(fp, string(short_name), string(ps_name),
+	    MapEncodingName(font_mapping(AFMfilename)));
+	  break;
+      }
     }
   }
   debug0(DFT, DD, "FontPrintPageSetup returning.");
@@ -1346,9 +1390,22 @@ void FontPrintPageResources(FILE *fp)
     assert( is_word(type(short_name)), "FontPrintPageResources: short_name!" );
     Child(ps_name, LastDown(AFMfilename));
     assert( is_word(type(ps_name)), "FontPrintPageResources: ps_name!" );
-    fprintf(fp, "%s font %s\n",
-      first ? "%%PageResources:" : "%%+", string(ps_name));
-    first = FALSE;
+
+    switch( BackEnd )
+    {
+      case POSTSCRIPT:
+
+        fprintf(fp, "%s font %s\n",
+          first ? "%%PageResources:" : "%%+", string(ps_name));
+        first = FALSE;
+	break;
+
+
+      case PDF:
+
+	/* PDFWriteFontResource(fp, string(ps_name)); */
+	break;
+    }
   }
   debug0(DFT, DD, "FontPrintPageResources returning.");
 } /* end FontPrintPageResources */

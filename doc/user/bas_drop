@@ -8,7 +8,7 @@ DropCapTwo.sym @Index @Code "@DropCapTwo"
 DropCapThree.sym @Index @Code "@DropCapThree"
 and {@Code "@DropCapThree"}.  Place the capital to be dropped just
 before the symbol, and the rest of the paragraph after it:
-@ID @Code {
+@ID @OneRow @Code {
 "I @DropCapTwo {"
 "it is a truth universally acknowledged, that a single man"
 "in possession of a good fortune, must be in want of a wife."
@@ -27,7 +27,7 @@ and spreads over three lines.
 Because Lout occasionally gets the height of the enlarged capital
 slightly wrong, there is a @Code "height" option which allows you
 to change the height if you need to:
-@ID @Code {
+@ID @OneRow @Code {
 "H @DropCapTwo height { 1.5v }"
 "{"
 "   ..."

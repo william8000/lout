@@ -1,6 +1,6 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  the Free Software Foundation; either Version 2, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -20,14 +20,14 @@
 /*                                                                           */
 /*  You should have received a copy of the GNU General Public License        */
 /*  along with this program; if not, write to the Free Software              */
-/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
 /*  FILE:         z36.c                                                      */
 /*  MODULE:       Hyphenation                                                */
 /*  EXTERNS:      Hyphenate()                                                */
 /*                                                                           */
 /*****************************************************************************/
-#include "externs"
+#include "externs.h"
 #define	NODE_MULT	4		/* what to multiply node indexes by  */
 #define MAX_CHAR	256		/* max chars represented in one char */
 #define TRIE_MAGIC	5361534
@@ -1036,7 +1036,11 @@ OBJECT Hyphenate(OBJECT x)
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
     if( !is_word(type(y)) || string(y)[0] == '\0' || !word_hyph(y) )
+    {
+      if( type(y) == GAP_OBJ && mode(gap(y)) == HYPH_MODE )
+	nobreak(gap(y)) = FALSE;
       continue;
+    }
     debug1(DHY, DD, "Hyphenate() examining %s", EchoObject(y));
 
     /* determine T, the trie to use */
@@ -1072,6 +1076,7 @@ OBJECT Hyphenate(OBJECT x)
       word_language(z) = word_language(y);
       word_hyph(z) = word_hyph(y);
       underline(z) = underline(y);
+      debug1(DHY, DD, "Hyphenate (hyph case) making fragment %s", string(z));
       FontWordSize(z);
       Link(NextDown(link), z);
       New(z, GAP_OBJ);
@@ -1082,7 +1087,8 @@ OBJECT Hyphenate(OBJECT x)
       Link(z, MakeWord(WORD, STR_GAP_ZERO_HYPH, &fpos(y)));
       key[stop + 1] = '\0';
       FontWordSize(y);
-      link = PrevDown(next_link);
+      /* *** link = PrevDown(next_link); */
+      link = NextDown(link);
       continue;
     }
 

@@ -22,6 +22,7 @@ but the features of one type are not available within other types.
 @Include { typ_over }
 @Include { typ_illu }
 @Include { typ_plai }
+@Include { typ_apdf }
 @Include { typ_orga }
 @EndSections
 @End @Chapter

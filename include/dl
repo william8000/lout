@@ -51,6 +51,11 @@
 
     def @R   right x { Base @Font x				}
     def @I   right x { Slope @Font x				}
+    def @II  right x { { @CurrFace @Case {
+                           Bold @Yield BoldSlope
+                           else @Yield Slope
+                       } } @Font x
+                     }
     def @B   right x { Bold @Font x				}
     def @BI  right x { BoldSlope @Font x			}
     def @S   right x { smallcaps @Font x			}
@@ -434,32 +439,58 @@
     {
 	col @Case {
 	    nochange		@Yield	{ nochange                }
-	    darkblue		@Yield	{ 0.0 0.0 0.5 setrgbcolor }
-	    blue		@Yield	{ 0.0 0.0 1.0 setrgbcolor }
-	    lightblue		@Yield	{ 0.5 0.5 1.0 setrgbcolor }
-	    darkgreen		@Yield	{ 0.0 0.5 0.0 setrgbcolor }
-	    green		@Yield	{ 0.0 1.0 0.0 setrgbcolor }
-	    lightgreen		@Yield	{ 0.5 1.0 0.5 setrgbcolor }
-	    darkred		@Yield	{ 0.5 0.0 0.0 setrgbcolor }
-	    red			@Yield	{ 1.0 0.0 0.0 setrgbcolor }
-	    lightred		@Yield	{ 1.0 0.5 0.5 setrgbcolor }
-	    darkcyan		@Yield	{ 0.0 0.5 0.5 setrgbcolor }
-	    cyan		@Yield	{ 0.0 1.0 1.0 setrgbcolor }
-	    lightcyan		@Yield	{ 0.5 1.0 1.0 setrgbcolor }
-	    darkmagenta		@Yield	{ 0.5 0.0 0.5 setrgbcolor }
-	    magenta		@Yield	{ 1.0 0.0 1.0 setrgbcolor }
-	    lightmagenta	@Yield	{ 1.0 0.5 1.0 setrgbcolor }
-	    darkyellow		@Yield	{ 0.5 0.5 0.0 setrgbcolor }
-	    yellow		@Yield	{ 1.0 1.0 0.0 setrgbcolor }
-	    lightyellow		@Yield	{ 1.0 1.0 0.5 setrgbcolor }
-	    darkgray		@Yield	{ 0.2 0.2 0.2 setrgbcolor }
-	    gray		@Yield	{ 0.5 0.5 0.5 setrgbcolor }
-	    lightgray		@Yield	{ 0.8 0.8 0.8 setrgbcolor }
-	    darkgrey		@Yield	{ 0.2 0.2 0.2 setrgbcolor }
-	    grey		@Yield	{ 0.5 0.5 0.5 setrgbcolor }
-	    lightgrey		@Yield	{ 0.8 0.8 0.8 setrgbcolor }
-	    black		@Yield	{ 0.0 0.0 0.0 setrgbcolor }
-	    white		@Yield	{ 1.0 1.0 1.0 setrgbcolor }
+	    darkblue		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.0 0.0 0.5 setrgbcolor }
+                                               PDF @Yield { 0.0 0.0 0.5 rg 0.0 0.0 0.5 RG } } }
+	    blue		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.0 0.0 1.0 setrgbcolor }
+                                               PDF @Yield { 0.0 0.0 1.0 rg 0.0 0.0 1.0 RG } } }
+	    lightblue		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.5 0.5 1.0 setrgbcolor }
+                                               PDF @Yield { 0.5 0.5 1.0 rg 0.5 0.5 1.0 RG } } }
+	    darkgreen		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.0 0.5 0.0 setrgbcolor }
+                                               PDF @Yield { 0.0 0.5 0.0 rg 0.0 0.5 0.0 RG } } }
+	    green		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.0 1.0 0.0 setrgbcolor }
+                                               PDF @Yield { 0.0 1.0 0.0 rg 0.0 1.0 0.0 RG } } }
+	    lightgreen		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.5 1.0 0.5 setrgbcolor }
+                                               PDF @Yield { 0.5 1.0 0.5 rg 0.5 1.0 0.5 RG } } }
+	    darkred		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.5 0.0 0.0 setrgbcolor }
+                                               PDF @Yield { 0.5 0.0 0.0 rg 0.5 0.0 0.0 RG } } }
+	    red			@Yield	{ @BackEnd @Case { PostScript @Yield { 1.0 0.0 0.0 setrgbcolor }
+                                               PDF @Yield { 1.0 0.0 0.0 rg 1.0 0.0 0.0 RG } } }
+	    lightred		@Yield	{ @BackEnd @Case { PostScript @Yield { 1.0 0.5 0.5 setrgbcolor }
+                                               PDF @Yield { 1.0 0.5 0.5 rg 1.0 0.5 0.5 RG } } }
+	    darkcyan		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.0 0.5 0.5 setrgbcolor }
+                                               PDF @Yield { 0.0 0.5 0.5 rg 0.0 0.5 0.5 RG } } }
+	    cyan		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.0 1.0 1.0 setrgbcolor }
+                                               PDF @Yield { 0.0 1.0 1.0 rg 0.0 1.0 1.0 RG } } }
+	    lightcyan		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.5 1.0 1.0 setrgbcolor }
+                                               PDF @Yield { 0.5 1.0 1.0 rg 0.5 1.0 1.0 RG } } }
+	    darkmagenta		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.5 0.0 0.5 setrgbcolor }
+                                               PDF @Yield { 0.5 0.0 0.5 rg 0.5 0.0 0.5 RG } } }
+	    magenta		@Yield	{ @BackEnd @Case { PostScript @Yield { 1.0 0.0 1.0 setrgbcolor }
+                                               PDF @Yield { 1.0 0.0 1.0 rg 1.0 0.0 1.0 RG } } }
+	    lightmagenta	@Yield	{ @BackEnd @Case { PostScript @Yield { 1.0 0.5 1.0 setrgbcolor }
+                                               PDF @Yield { 1.0 0.5 1.0 rg 1.0 0.5 1.0 RG } } }
+	    darkyellow		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.5 0.5 0.0 setrgbcolor }
+                                               PDF @Yield { 0.5 0.5 0.0 rg 0.5 0.5 0.0 RG } } }
+	    yellow		@Yield	{ @BackEnd @Case { PostScript @Yield { 1.0 1.0 0.0 setrgbcolor }
+                                               PDF @Yield { 1.0 1.0 0.0 rg 1.0 1.0 0.0 RG } } }
+	    lightyellow		@Yield	{ @BackEnd @Case { PostScript @Yield { 1.0 1.0 0.5 setrgbcolor }
+                                               PDF @Yield { 1.0 1.0 0.5 rg 1.0 1.0 0.5 RG } } }
+	    darkgray		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.2 0.2 0.2 setrgbcolor }
+                                               PDF @Yield { 0.2 0.2 0.2 rg 0.2 0.2 0.2 RG } } }
+	    gray		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.5 0.5 0.5 setrgbcolor }
+                                               PDF @Yield { 0.5 0.5 0.5 rg 0.5 0.5 0.5 RG } } }
+	    lightgray		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.8 0.8 0.8 setrgbcolor }
+                                               PDF @Yield { 0.8 0.8 0.8 rg 0.8 0.8 0.8 RG } } }
+	    darkgrey		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.2 0.2 0.2 setrgbcolor }
+                                               PDF @Yield { 0.2 0.2 0.2 rg 0.2 0.2 0.2 RG } } }
+	    grey		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.5 0.5 0.5 setrgbcolor }
+                                               PDF @Yield { 0.5 0.5 0.5 rg 0.5 0.5 0.5 RG } } }
+	    lightgrey		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.8 0.8 0.8 setrgbcolor }
+                                               PDF @Yield { 0.8 0.8 0.8 rg 0.8 0.8 0.8 RG } } }
+	    black		@Yield	{ @BackEnd @Case { PostScript @Yield { 0.0 0.0 0.0 setrgbcolor }
+                                               PDF @Yield { 0.0 0.0 0.0 rg 0.0 0.0 0.0 RG } } }
+	    white		@Yield	{ @BackEnd @Case { PostScript @Yield { 1.0 1.0 1.0 setrgbcolor }
+                                               PDF @Yield { 1.0 1.0 1.0 rg 1.0 1.0 1.0 RG } } }
 	}
     }
 
@@ -471,8 +502,18 @@
     {
 	col @Case {
 	    none      @Yield ""
-	    nochange  @Yield "gsave fill grestore"
-	    else      @Yield { "gsave" @ColourCommand col "fill grestore" }
+	    nochange  @Yield {
+		  @BackEnd @Case {
+			PostScript @Yield "gsave fill grestore"
+			PDF        @Yield "q f Q"
+		  }
+	    }
+	    else      @Yield {
+		  @BackEnd @Case {
+			PostScript @Yield { "gsave" @ColourCommand col "fill grestore" }
+			PDF        @Yield { "q" @ColourCommand col "f Q" }
+		  }
+	    }
 	}
     }
 
@@ -480,7 +521,12 @@
     {
 	lw @Case {
 	   ""	@Yield ""
-	   else	@Yield { lw "setlinewidth" }
+	   else	@Yield {
+	   	@BackEnd @Case {
+		  PostScript @Yield { lw "setlinewidth" }
+		  PDF        @Yield { lw "w" }
+	   	}
+	   }
 	}
     }
 
@@ -493,93 +539,385 @@
 
     def @FullWidthRule
 	named linewidth
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{}
     {
-	@HExpand { { "LoutRule" @LineWidth linewidth "stroke" } @Graphic {} }
+#	@HExpand { { "LoutRule" @LineWidth linewidth "stroke" } @Graphic {} }
+	@HExpand
+	{
+	  @BackEnd @Case {
+	    PostScript @Yield { { "LoutRule" @LineWidth linewidth "stroke" } @Graphic {} }
+	    PDF @Yield { { "0 0 m __xsize 0 l" @LineWidth linewidth "S" } @Graphic {} }
+	  }
+	}
     }
 
     def @LocalWidthRule
 	named linewidth
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{}
     {
-	{ "LoutRule" @LineWidth linewidth "stroke" } @Graphic {}
+#	{ "LoutRule" @LineWidth linewidth "stroke" } @Graphic {}
+	@BackEnd @Case {
+	  PostScript @Yield { { "LoutRule" @LineWidth linewidth "stroke" } @Graphic {} }
+	  PDF @Yield { { "0 0 m __xsize 0 l" @LineWidth linewidth "S" } @Graphic {} }
+	}
     }
 
     def @Box
 	named margin { 0.3f }
 	named linewidth
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{}
 	named paint { none }
 	right x
     {
-	@VContract @HContract 0c @HShift {
-	    {"LoutBox" @AddPaint paint @LineWidth linewidth "stroke"} @Graphic
-	    { ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	@BackEnd @Case {
+
+	  PostScript @Yield {
+	    @VContract @HContract 0c @HShift {
+	      {"LoutBox" @AddPaint paint @LineWidth linewidth "stroke"} @Graphic
+		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	    }
+	  }
+
+	  PDF        @Yield {
+	    @VContract @HContract 0c @HShift {
+		{ "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"		# <== same as /LoutBox
+		   @AddPaint paint @LineWidth linewidth "S" } @Graphic
+		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	    }
+	  }
+
 	}
     }
 
     def @CurveBox
 	named margin { 0.3f }
 	named linewidth
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{}
 	named paint { none }
 	right x
     {
 	@VContract @HContract 0c @HShift {
-	    { "LoutCurveBox" @AddPaint paint @LineWidth linewidth "stroke" }
-	    @Graphic { ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	  @BackEnd @Case {
+	    PostScript @Yield { { "LoutCurveBox" @AddPaint paint @LineWidth linewidth "stroke" }
+					  @Graphic { ^/margin ^|margin 0c @HShift @OneRow x |margin /margin } }
+	    PDF        @Yield {
+#
+# if p0 = (1, 0) and p3 = (0, 1) (ie we want an arc from 0 to 90 degrees with radius = 1)
+# then p1 = (1, 13/24) and p2 = (13/24, 1)
+#
+#	% path for @CurveBox symbol
+#	/LoutCurveBox
+#	{ xmark 0 moveto
+#	  xsize xmark sub xmark xmark 270 360 arc
+#	  xsize xmark sub ysize xmark sub xmark 0 90 arc
+#	  xmark ysize xmark sub xmark 90 180 arc
+#	  xmark xmark xmark 180 270 arc
+#	  closepath
+#	} def
+#
+	      {
+		  "__xmark 0 m"
+#
+# xsize xmark sub xmark xmark 270 360 arc
+# => quarter arc with centre = (xsize-xmark, xmark), radius = xmark
+#
+# p0 = (xsize-xmark, xmark-xmark) = (xsize-xmark, 0)
+# p1 = (xsize-xmark + 13/24 * xmark, 0) = (xsize - 11/24 * xmark, 0)
+# p2 = (xsize, xmark - 13/24 * xmark) = (xsize, 11/24 * xmark)
+# p3 = (xsize-xmark+xmark, xmark) = (xsize, xmark)
+		  "__sub(__xsize, __xmark) 0 l"					# p0
+		  "__sub(__xsize, __div(__mul(11, __xmark), 24)) 0"		# p1
+		  "__xsize __div(__mul(11, __xmark), 24)"				# p2
+		  "__xsize __xmark c"							# p3
+#
+# xsize xmark sub ysize xmark sub xmark 0 90 arc
+# => quarter arc, centre = (xsize-xmark, ysize-xmark), radius = xmark
+#
+# p0 = (xsize-xmark+xmark, ysize-xmark) = (xsize, ysize-xmark)
+# p1 = (xsize-xmark+xmark, ysize-xmark + 13/24 * xmark) = (xsize, ysize - 11/24 * xmark)
+# p2 = (xsize-xmark + 13/24 * xmark, ysize) = (xsize - 11/24 * xmark, ysize)
+# p3 = (xsize-xmark, ysize-xmark+xmark) = (xsize-xmark, ysize)
+		  "__xsize __sub(__ysize, __xmark) l"				# p0
+		  "__xsize __sub(__ysize, __div(__mul(11, __xmark), 24))"	# p1
+		  "__sub(__xsize, __div(__mul(11, __xmark), 24)) __ysize"	# p2
+		  "__sub(__xsize, __xmark) __ysize c"				# p3
+#
+# xmark ysize xmark sub xmark 90 180 arc
+# => quarter arc, centre = (xmark, ysize-xmark), radius = xmark
+#
+# p0 = (xmark, ysize-xmark+xmark) = (xmark, ysize)
+# p1 = (xmark - 13/24 * xmark, ysize-xmark+xmark) = (11/24 * xmark, ysize)
+# p2 = (xmark-xmark, ysize-xmark + 13/24 * xmark) = (0, ysize - 11/24 * xmark)
+# p3 = (xmark-xmark, ysize-xmark) = (0, ysize-xmark)
+		  "__xmark __ysize l"							# p0
+		  "__div(__mul(11, __xmark), 24) __ysize"				# p1
+		  "0 __sub(__ysize, __div(__mul(11, __xmark), 24))"		# p2
+		  "0 __sub(__ysize, __xmark) c"					# p3
+#
+# xmark xmark xmark 180 270 arc
+# => quarter arc, centre = (xmark, xmark), radius = xmark
+#
+# p0 = (xmark-xmark, xmark) = (0, xmark)
+# p1 = (xmark-xmark, xmark - 13/24 * xmark) = (0, 11/24 * xmark)
+# p2 = (xmark - 13/24 * xmark, xmark-xmark) = (11/24 * xmark, 0)
+# p3 = (xmark, xmark-xmark) = (xmark, 0)
+		  "0 __xmark l"								# p0
+		  "0 __div(__mul(11, __xmark), 24)"					# p1
+		  "__div(__mul(11, __xmark), 24) 0"					# p2
+		  "__xmark 0 c"								# p3
+
+		  "h"
+
+		  @AddPaint paint @LineWidth linewidth "S"
+		} @Graphic { ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	    }
+	  }
 	}
     }
 
     def @ShadowBox
 	named margin { 0.3f }
 	named linewidth
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{}
 	named paint { none }
 	named shadow { 0.2f }
 	right x
     {
 	@VContract @HContract 0c @HShift {
-	    "LoutShadowBox fill" @Graphic
-	    {	^/shadow ^|shadow 0c @HShift
-		@Box margin {margin} paint {paint} linewidth {linewidth} x
-		|shadow /shadow
+	  @BackEnd @Case {
+	    PostScript @Yield {
+		"LoutShadowBox fill" @Graphic
+		{ ^/shadow ^|shadow 0c @HShift
+		  @Box margin {margin} paint {paint} linewidth {linewidth} x
+		  |shadow /shadow
+		}
 	    }
+	    PDF @Yield {
+# /LoutShadowBox is:
+		{
+		  "__mul(__xmark, 2) 0 m __xsize 0 l"					#	xmark 2 mul 0 moveto xsize 0 lineto
+		  "__xsize __sub(__ysize, __mul(__xmark, 2)) l"				#	xsize ysize xmark 2 mul sub lineto
+		  "__sub(__xsize, __xmark) __sub(__ysize, __mul(__xmark, 2)) l"	#	xsize xmark sub ysize xmark 2 mul sub lineto
+		  "__sub(__xsize, __xmark) __xmark l"					#	xsize xmark sub xmark lineto
+		  "__mul(__xmark, 2) __xmark l h f"						#	xmark 2 mul xmark lineto closepath
+		}
+		@Graphic
+		{ ^/shadow ^|shadow 0c @HShift
+		  @Box margin {margin} paint {paint} linewidth {linewidth} x
+		  |shadow /shadow
+		}
+	    }
+	  }
 	}
     }
 
@@ -592,67 +930,312 @@
 
     def @BoundaryMarks
 	named linewidth
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{ 0.2p }
 	named length
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{ 0.5c }
 	named gap
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{ 0.5c }
 	named lout
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{ 0c }
 	named rout
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{ 0c }
 	named uout
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{ 0c }
 	named dout
-	    named c { " cm" }
-	    named i { " in" }
-	    named e { " em" }
-	    named p { " pt" }
-	    named f { " ft" }
-	    named s { " sp" }
-	    named v { " vs" }
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
 	{ 0c }
     {
 	def @UpStroke    { "0" gap       "rmoveto" "0" length     "rlineto" }
@@ -665,19 +1248,59 @@
 	def @ULSpot { lout "neg"       ysize uout "add" moveto }
 	def @URSpot { xsize rout "add" ysize uout "add" moveto }
 
+      @BackEnd @Case {
+        PostScript @Yield {
+		{
+		    @LLSpot @LeftStroke
+		    @LLSpot @DownStroke
+		    @LRSpot @DownStroke
+		    @LRSpot @RightStroke
+		    @ULSpot @LeftStroke
+		    @ULSpot @UpStroke
+		    @URSpot @RightStroke
+		    @URSpot @UpStroke
+	
+		    linewidth "setlinewidth stroke"
+		} @Graphic {}
+	  }
+	  PDF @Yield {
+		{
+#		    @LLSpot @LeftStroke
+		          "__sub(-"gap", "lout")            __sub(0, "dout") m "
+		    "__sub(__sub(-"gap", "lout"), "length") __sub(0, "dout") l"
 
-	{
-	    @LLSpot @LeftStroke
-	    @LLSpot @DownStroke
-	    @LRSpot @DownStroke
-	    @LRSpot @RightStroke
-	    @ULSpot @LeftStroke
-	    @ULSpot @UpStroke
-	    @URSpot @RightStroke
-	    @URSpot @UpStroke
+#		    @LLSpot @DownStroke
+		    "__sub(0, "lout")       __sub(-"gap", "dout") m "
+		    "__sub(0, "lout") __sub(__sub(-"gap", "dout"), "length") l"		#	note that __sub(__sub(-"gap", "dout"), "length") is equivalent to "- gap - dout - length"
 
-	    linewidth "setlinewidth stroke"
-	} @Graphic {}
+#		    @LRSpot @DownStroke
+		    "__add(__xsize,"rout")       __sub(-"gap", "dout") m "
+		    "__add(__xsize,"rout") __sub(__sub(-"gap", "dout"), "length") l"	#	note that __sub(__sub(-"gap", "dout"), "length") is equivalent to "- gap - dout - length"
+
+#		    @LRSpot @RightStroke
+			    "__add(__add(__xsize,"rout"),"gap")           __sub(0, "dout") m "
+		    "__add(__add(__add(__xsize,"rout"),"gap"),"length") __sub(0, "dout") l"
+
+#		    @ULSpot @LeftStroke
+		    "      __sub(__sub(0, "lout"), "gap")            __add(__ysize, "uout") m "
+		    "__sub(__sub(__sub(0, "lout"), "gap"), "length") __add(__ysize, "uout") l"
+
+#		    @ULSpot @UpStroke
+		    "__sub(0, "lout")       __add(__add(__ysize, "uout"), "gap") m "
+		    "__sub(0, "lout") __add(__add(__add(__ysize, "uout"), "gap"), "length") l"
+
+#		    @URSpot @RightStroke
+		    "      __add(__add(__xsize, "rout"), "gap")            __add(__ysize, "uout") m "
+		    "__add(__add(__add(__xsize, "rout"), "gap"), "length") __add(__ysize, "uout") l"
+
+#		    @URSpot @UpStroke
+		    "__add(__xsize, "rout")       __add(__add(__ysize, "uout"), "gap") m "
+		    "__add(__xsize, "rout") __add(__add(__add(__ysize, "uout"), "gap"), "length") l"
+
+		    linewidth "w S"
+		} @Graphic {}
+	  }
+	}
     }
 
     ###########################################################################
@@ -908,9 +1531,51 @@ def @DocumentLayout
     named @PageBoxType		{ None			} # None Box CurveBox ShadowBox
     named @PageBoxMargin	{ 1.00c			} # page box margin
     named @PageBoxLineWidth
-	named c { " cm" } named i { " in" } named e { " em" }
-	named p { " pt" } named f { " ft" } named s { " sp" }
-	named v { " vs" }
+#	named c { " cm" } named i { " in" } named e { " em" }
+#	named p { " pt" } named f { " ft" } named s { " sp" }
+#	named v { " vs" }
+	named c left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x" cm" }
+	    	PDF        @Yield { "__mul(__cm, "x")" }
+	    }
+	}
+	named i left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x" in" }
+	    	PDF        @Yield { "__mul(__in, "x")" }
+	    }
+	}
+	named e left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x" em" }
+	    	PDF        @Yield { "__mul(__em, "x")" }
+	    }
+	}
+	named p left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x" pt" }
+	    	PDF        @Yield { "__mul(__pt, "x")" }
+	    }
+	}
+	named f left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x" ft" }
+	    	PDF        @Yield { "__mul(__loutf, "x")" }
+	    }
+	}
+	named s left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x" sp" }
+	    	PDF        @Yield { "__mul(__louts, "x")" }
+	    }
+	}
+	named v left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x" vs" }
+	    	PDF        @Yield { "__mul(__loutv, "x")" }
+	    }
+	}
 				{			} # page box line thickness
     named @PageBoxPaint		{  none			} # page box paint
     named @PageBoxShadow	{  0.60c		} # shadow margin if ShadowBox
@@ -949,6 +1614,8 @@ def @DocumentLayout
     named @ContentsGap		{  0.20v @OrIfPlain 0f	} # extra gap above minor entry
     named @ContentsGapAbove	{  0.80v @OrIfPlain 1f	} # extra gap above major entry
     named @ContentsGapBelow	{  0.00v @OrIfPlain 0f	} # extra gap below major entry
+    named @ContentsPartGapAbove	{  1.00v @OrIfPlain 1f  } # extra gap above part entry
+    named @ContentsPartGapBelow	{  0.00v @OrIfPlain 0f  } # extra gap below part entry
     named @ContentsFormat
 	left number
 	right title
@@ -1250,6 +1917,7 @@ def @DocumentLayout
 	@BackEnd @Case {
 	   PlainText @Yield @HHH
 	   PostScript @Yield { {0 0 moveto xsize 0 lineto stroke} @Graphic {} }
+	   PDF @Yield { {0 0 m __xsize 0 l S} @Graphic {} }
 	}
     }
 
@@ -1285,7 +1953,7 @@ def @DocumentLayout
 
     def @Heading       right x { ragged @Break @HeadingFont      @Font x }
     def "^"		       { {} ^& {}				 }
-    def "&-"  left x   right y { x &0ch y				 }
+    def "&-"  left x   right y { x &0chu y				 }
 
 
     ###########################################################################
@@ -1877,7 +2545,8 @@ def @DocumentLayout
     {
 	def sendtag into { @TagPlace&&preceding } { tag }
 
-	sendtag | x
+	# seems wrong sendtag | x
+	sendtag // x
     }
 
     def droptagitem into { @ItemPlace&&preceding }
@@ -1886,7 +2555,7 @@ def @DocumentLayout
     {
 	def sendtag into { @TagPlace&&preceding } { tag }
 
-	sendtag | { //1vx x }
+	sendtag // //1vx x
     }
 
     def endlist force into { @EndListPlace&&preceding } {}
@@ -2047,25 +2716,25 @@ def @DocumentLayout
 	}
     }
 
-    def @OrientedWidth
+    def @OrientedWidth right @Orient
     {
-	@PageOrientation @Case {
+	@Orient @Case {
 	    { Portrait ReversePortrait }   @Yield @Width
 	    { Landscape ReverseLandscape } @Yield @Height
 	}
     }
 
-    def @OrientedHeight
+    def @OrientedHeight right @Orient
     {
-	@PageOrientation @Case {
+	@Orient @Case {
 	    { Portrait ReversePortrait }   @Yield @Height
 	    { Landscape ReverseLandscape } @Yield @Width
 	}
     }
 
-    def @OrientationAngle
+    def @OrientationAngle right @Orient
     {
-	@PageOrientation @Case {
+	@Orient @Case {
 	    Portrait         @Yield 0d
 	    Landscape        @Yield 90d
 	    ReversePortrait  @Yield 180d
@@ -2093,12 +2762,17 @@ def @DocumentLayout
 	}
     }
 
-    def @Background
+    def @Background right @Orient
     {	
-      "LoutPageSet" @Graphic
+#     "LoutPageSet" @Graphic	# VT: case PDF produces nothing
+      { @BackEnd @Case {
+          PostScript @Yield "LoutPageSet"
+          else @Yield "% @Background/LoutPageSet UNIMPLEMENTED"
+        }
+      } @Graphic
       {
-	@OrientationAngle @Rotate
-	@OrientedWidth @Wide @OrientedHeight @High
+	{ @OrientationAngle @Orient } @Rotate
+	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
 	{   //@TopMargin ||@OddLeftMargin
 	        @HExpand @VExpand @PageBackground
 	    ||@OddRightMargin //@FootMargin
@@ -2110,25 +2784,36 @@ def @DocumentLayout
 	left parity
 	right x
     {
-	{ parity "LoutMargSet" } @Graphic x
+#	{ parity "LoutMargSet" } @Graphic x	# VT: case PDF produces nothing
+	{ @BackEnd @Case {
+	    PostScript @Yield { parity "LoutMargSet" }
+	    else @Yield "% @MargSet/LoutMargSet UNIMPLEMENTED"
+	  }
+	} @Graphic x
     }
 
-    def @OddPage left extra right x
+    def @OddPage
+	left extra
+	named @Orient {}
+	right x
     {
-	@Background ||0io
-	@OrientationAngle @Rotate
-	@OrientedWidth @Wide @OrientedHeight @High
+	@Background @Orient ||0io
+	{ @OrientationAngle @Orient } @Rotate
+	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
 	{   //@TopMargin ||@OddLeftMargin
 	        1 @MargSet @PageBox @HExpand { extra // @VExpand x }
 	    ||@OddRightMargin //@FootMargin
 	}
     }
 
-    def @EvenPage left extra right x
+    def @EvenPage
+	left extra
+	named @Orient {}
+	right x
     {
-	@Background ||0io
-	@OrientationAngle @Rotate
-	@OrientedWidth @Wide @OrientedHeight @High
+	@Background @Orient ||0io
+	{ @OrientationAngle @Orient } @Rotate
+	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
 	{   //@TopMargin ||@EvenLeftMargin
 	        0 @MargSet @PageBox @HExpand { extra // @VExpand x }
 	    ||@EvenRightMargin //@FootMargin
@@ -2564,28 +3249,29 @@ def @DocumentLayout
 	//@MidGap @OddPageTopSect
     }
 
-    def @PageOddTopSection
+    def @PageOddTopSection right @Orient
     {
-	@OddPageTopSect ||@OrientedWidth @FullPlace
-			||@OrientedWidth @OddFullPlace
+	@OddPageTopSect ||{@OrientedWidth @Orient} @FullPlace
+			||{@OrientedWidth @Orient} @OddFullPlace
     }
 
-    def @PageEvenTopSection
+    def @PageEvenTopSection right @Orient
     {
-	@EvenPageTopSect ||@OrientedWidth @FullPlace
-			 ||@OrientedWidth @EvenFullPlace
+	@EvenPageTopSect ||{@OrientedWidth @Orient} @FullPlace
+			 ||{@OrientedWidth @Orient} @EvenFullPlace
     }
 
-    def @PageIntroOddTopSection
+    def @PageIntroOddTopSection right @Orient
     {
-	@OddPageTopSect
-	||@OrientedWidth @IntroFullPlace ||@OrientedWidth @IntroOddFullPlace
+	@OddPageTopSect ||{@OrientedWidth @Orient} @IntroFullPlace
+			||{@OrientedWidth @Orient} @IntroOddFullPlace
     }
 
-    def @PageIntroEvenTopSection
+    def @PageIntroEvenTopSection right @Orient
     {
 	@EvenPageTopSect
-	||@OrientedWidth @IntroFullPlace ||@OrientedWidth @IntroEvenFullPlace
+	||{@OrientedWidth @Orient} @IntroFullPlace
+	||{@OrientedWidth @Orient} @IntroEvenFullPlace
     }
 
     def @PageFootNoteList
@@ -2772,7 +3458,7 @@ def @DocumentLayout
 	{
             @BackEnd @Case {
 	        PlainText @Yield ","
-	        PostScript @Yield @FootNoteFont @Font @FootNoteBreak @Break {
+	        else @Yield @FootNoteFont @Font @FootNoteBreak @Break {
 		    +0.3v @VShift { Base 0.8f } @Font ","
 		}
             }
@@ -2782,7 +3468,7 @@ def @DocumentLayout
 	{
             @BackEnd @Case {
 	        PlainText @Yield { ({@NumberOf @Tag}) }
-	        PostScript @Yield @FootNoteFont @Font @FootNoteBreak @Break {
+	        else @Yield @FootNoteFont @Font @FootNoteBreak @Break {
 		    +0.3v @VShift { Base 0.8f } @Font @NumberOf @Tag
 		}
             }
@@ -2840,6 +3526,7 @@ def @DocumentLayout
 	named @ColumnNumber {}
 	named @PageHeaders {}
 	named extra { No }
+	named @Orient {}
 	named @AtTop { @Null }
 	right @PageNum
     {
@@ -2849,7 +3536,7 @@ def @DocumentLayout
 		{@PageHeaders.{@SStart @PageNum}} @OddTopHeader
 		    { @PageNumbers @Num @PageNum }
 		//@MidGap @AtTop
-		//@MidGap @PageOddTopSection
+		//@MidGap @PageOddTopSection @Orient
 		//@MidGap @ColList @ColumnNumber
 		//@MidGap @IndexAColList @IndexAColumnNumber
 		//@MidGap @IndexBColList @IndexBColumnNumber
@@ -2883,7 +3570,7 @@ def @DocumentLayout
 	    {
 		@PageHeaders.NonStart @EvenTopHeader
 		    { @PageNumbers @Num @PageNum }
-		//@MidGap @PageEvenTopSection
+		//@MidGap @PageEvenTopSection @Orient
 		//@MidGap @ColList @ColumnNumber
 		//@MidGap @IndexAColList @IndexAColumnNumber
 		//@MidGap @IndexBColList @IndexBColumnNumber
@@ -2910,13 +3597,14 @@ def @DocumentLayout
 		    rawnum { @PageNum }
 		    num { @PageNumbers @Num @PageNum }
 	    //  @FootNoteThrough @NoDo @BeginFootNoteCounter
-	    //  {} @EvenPage
+	    //  {} @EvenPage @Orient { @Orient }
 	        {
-		    @OrdinaryEvenPage ||@OrientedWidth @FullPageEvenPage
+		    @OrdinaryEvenPage ||{@OrientedWidth @Orient} @FullPageEvenPage
 	        }
 	    //  @SimplePageList
 		    @ColumnNumber { @ColumnNumber }
 		    @PageHeaders { @PageHeaders }
+		    @Orient { @Orient }
 		@Next @PageNum
         }
 
@@ -2924,9 +3612,9 @@ def @DocumentLayout
 		rawnum { @PageNum }
 		num { @PageNumbers @Num @PageNum }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroColList @ColumnNumber } @OddPage
+	//  { extra @Then @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
-		@OrdinaryOddPage ||@OrientedWidth @FullPageOddPage
+		@OrdinaryOddPage ||{@OrientedWidth @Orient} @FullPageOddPage
 	    }
 	//  @SimpleEvenPageList
 		@ColumnNumber { @ColumnNumber }
@@ -2937,6 +3625,7 @@ def @DocumentLayout
     def @SimpleIntroPageList
 	named @ColumnNumber {}
 	named @PageHeaders {}
+	named @Orient {}
 	named extra { No }
 	named @AtTop { @Null }
 	right @PageNum
@@ -2945,12 +3634,12 @@ def @DocumentLayout
 		num { @IntroPageNumbers @Num @PageNum }
 		rawnum { @PageNum }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroIntroColList @ColumnNumber } @OddPage
+	//  { extra @Then @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
 		{@PageHeaders.{@SStart @PageNum}} @IntroOddTopHeader
 		    { @IntroPageNumbers @Num @PageNum }
 		//@MidGap @AtTop
-		//@MidGap @PageIntroOddTopSection
+		//@MidGap @PageIntroOddTopSection @Orient
 		//@MidGap @IntroColList @ColumnNumber
 		//@MidGap @IndexAColList @IndexAColumnNumber
 		//@MidGap @IndexBColList @IndexBColumnNumber
@@ -2966,10 +3655,11 @@ def @DocumentLayout
 		num { @IntroPageNumbers @Num @Next @PageNum }
 		rawnum { @Next @PageNum }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  {} @EvenPage @Runner&&following @Open
+	//  {} @EvenPage @Orient { @Orient }
+	    @Runner&&following @Open
 	    {
 		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @Next @PageNum }
-		//@MidGap @PageIntroEvenTopSection
+		//@MidGap @PageIntroEvenTopSection @Orient
 		//@MidGap @IntroColList @ColumnNumber
 		//@MidGap @IndexAColList @IndexAColumnNumber
 		//@MidGap @IndexBColList @IndexBColumnNumber
@@ -2983,6 +3673,7 @@ def @DocumentLayout
 	//  @SimpleIntroPageList
 		@ColumnNumber { @ColumnNumber }
 		@PageHeaders { @PageHeaders }
+		@Orient { @Orient }
 	    @Next @Next @PageNum
     }
 
@@ -2990,6 +3681,7 @@ def @DocumentLayout
 	named @ColumnNumber {}
 	named @PageHeaders {}
 	named extra { No }
+	named @Orient {}
 	named @AtTop { @Null }
 	right @PageNum
     {
@@ -3016,7 +3708,7 @@ def @DocumentLayout
 			    owner   { @Owner }
 		    }
 		//@MidGap @AtTop
-		//@MidGap @PageOddTopSection
+		//@MidGap @PageOddTopSection @Orient
 		//@MidGap @ColList @ColumnNumber
 		//@MidGap @IndexAColList @IndexAColumnNumber
 		//@MidGap @IndexBColList @IndexBColumnNumber
@@ -3103,7 +3795,7 @@ def @DocumentLayout
 				prefix  { @Prefix }
 				owner   { @Owner }
 			}
-		    //@MidGap @PageEvenTopSection
+		    //@MidGap @PageEvenTopSection @Orient
 		    //@MidGap @ColList @ColumnNumber
 		    //@MidGap @IndexAColList @IndexAColumnNumber
 		    //@MidGap @IndexBColList @IndexBColumnNumber
@@ -3163,20 +3855,21 @@ def @DocumentLayout
 	    }
 
 		@FootNoteThrough @NoDo @BeginFootNoteCounter
-	    //  {} @EvenPage
+	    //  {} @EvenPage @Orient { @Orient }
 	        {
-		    @OrdinaryEvenPage ||@OrientedWidth @FullPageEvenPage
+		    @OrdinaryEvenPage ||{@OrientedWidth @Orient} @FullPageEvenPage
 	        }
 	    //  @RunningPageList
 		    @ColumnNumber { @ColumnNumber }
 		    @PageHeaders { @PageHeaders }
+		    @Orient { @Orient }
 		@Next @PageNum
         }
 
 	    @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroColList @ColumnNumber } @OddPage
+	//  { extra @Then @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
-		@OrdinaryOddPage ||@OrientedWidth @FullPageOddPage
+		@OrdinaryOddPage ||{@OrientedWidth @Orient} @FullPageOddPage
 	    }
 	//  @RunningEvenPageList
 		@ColumnNumber { @ColumnNumber }
@@ -3188,11 +3881,13 @@ def @DocumentLayout
 	named @ColumnNumber {}
 	named @PageHeaders {}
 	named @AtTop { @Null }
+	named @Orient {}
 	named extra { No }
 	right @PageNum
     {
 	    @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroIntroColList @ColumnNumber } @OddPage @Runner&&following @Open
+	//  { extra @Then @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	    @Runner&&following @Open
 	    {
 		@PageMarker
 		    num { @MakePageNum
@@ -3212,7 +3907,7 @@ def @DocumentLayout
 				owner   { @Owner }
 			}
 		//@MidGap @AtTop
-		//@MidGap @PageIntroOddTopSection
+		//@MidGap @PageIntroOddTopSection @Orient
 		//@MidGap @IntroColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
@@ -3229,7 +3924,8 @@ def @DocumentLayout
 		}
 	    }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  {} @EvenPage @Runner&&following @Open
+	//  {} @EvenPage @Orient { @Orient }
+	    @Runner&&following @Open
 	    {
 		@PageMarker
 		    num { @MakePageNum
@@ -3248,7 +3944,7 @@ def @DocumentLayout
 				prefix  { @Prefix }
 				owner   { @Owner }
 			}
-		//@MidGap @PageIntroEvenTopSection
+		//@MidGap @PageIntroEvenTopSection @Orient
 		//@MidGap @IntroColList @ColumnNumber
 		//@MidGap @IndexAColList @IndexAColumnNumber
 		//@MidGap @IndexBColList @IndexBColumnNumber
@@ -3270,6 +3966,7 @@ def @DocumentLayout
 	//  @RunningIntroPageList
 		@PageHeaders { @PageHeaders }
 		@ColumnNumber { @ColumnNumber }
+		@Orient { @Orient }
 	    @Next @Next @PageNum
     }
 
@@ -3277,6 +3974,7 @@ def @DocumentLayout
 	named @ColumnNumber {}
 	named @PageHeaders {}
 	named extra { No }
+	named @Orient {}
 	named @AtTop { @Null }
 	right @FirstPageNum
     {
@@ -3284,12 +3982,14 @@ def @DocumentLayout
 	    { None Simple } @Yield @SimplePageList
 		  @ColumnNumber { @ColumnNumber }
 		  @PageHeaders { @PageHeaders }
+		  @Orient { @Orient }
 		  extra { extra }
 		  @AtTop { @AtTop }
 		  @FirstPageNum
 	    { Running Titles } @Yield @RunningPageList
 		  @ColumnNumber { @ColumnNumber }
 		  @PageHeaders { @PageHeaders }
+		  @Orient { @Orient }
 		  extra { extra }
 		  @AtTop { @AtTop }
 		  @FirstPageNum
@@ -3301,6 +4001,7 @@ def @DocumentLayout
     def @IntroPageList
 	named @ColumnNumber {}
 	named @PageHeaders {}
+	named @Orient {}
 	named extra { No }
 	named @AtTop { @Null }
 	right @FirstPageNum
@@ -3309,12 +4010,14 @@ def @DocumentLayout
 	    { None Simple } @Yield @SimpleIntroPageList
 		  @ColumnNumber { @ColumnNumber }
 		  @PageHeaders { @PageHeaders }
+		  @Orient { @Orient }
 		  extra { extra }
 		  @AtTop { @AtTop }
 		  @FirstPageNum
 	    { Running Titles } @Yield @RunningIntroPageList
 		  @ColumnNumber { @ColumnNumber }
 		  @PageHeaders { @PageHeaders }
+		  @Orient { @Orient }
 		  extra { extra }
 		  @AtTop { @AtTop }
 		  @FirstPageNum
@@ -3322,8 +4025,9 @@ def @DocumentLayout
     }
 
     def @ContinuousPageList
+	named @Orient {}
     {
-	@OrientedWidth @Wide
+	{@OrientedWidth @Orient} @Wide
 	{   //@TopMargin ||@EvenLeftMargin
 	    {
 				@BeginFootNoteCounter
@@ -3373,9 +4077,19 @@ def @DocumentLayout
 
 	//pregap
 	//0.5vx
-	protect @Case {
-	    No    @Yield @Item
-	    Yes   @Yield @Protect @Item
+	@BackEnd @Case {
+	  PostScript @Yield {
+	    protect @Case {
+	      No    @Yield @Item
+	      Yes   @Yield @Protect @Item
+	    }
+	  }
+	  PDF @Yield {
+	    protect @Case {
+	      No    @Yield { "__link_source=<<"title">>" } @Graphic @Item
+	      Yes   @Yield { "__link_source=<<"title">>" } @Graphic { @Protect @Item }
+	    }
+	  }
 	}
 	//postgap
     }
@@ -3495,8 +4209,8 @@ def @DocumentLayout
 	left  wanted
 	named indent { 0.5rt }
 	named title {}
-	named pregap { @ContentsGapAbove }
-	named postgap { @ContentsGapBelow }
+	named pregap { @ContentsPartGapAbove }
+	named postgap { @ContentsPartGapBelow }
     {
 	def item
 	{
@@ -3647,7 +4361,7 @@ def @DocumentLayout
 	    PlainText @Yield {
 	        ({@EndNoteNumbers @Num num})
 	    }
-	    PostScript @Yield {
+	    else @Yield {
 	        +0.3v @VShift 0.8f @Font @EndNoteNumbers @Num num
 	    }
         }
@@ -3687,13 +4401,21 @@ def @DocumentLayout
 	left parity
 	right x
     {
-	@MarginNoteFont @Font @MarginNoteBreak @Break @ZeroSize
-	{
+	@MarginNoteFont @Font @MarginNoteBreak @Break @ZeroSize {
+	  @BackEnd @Case {
+	    PostScript @Yield {
 	    { parity "LoutMargShift gsave" // "grestore" } @Graphic
 	    {
 		|@MarginNoteHGap @MarginNoteWidth @Wide @OneRow x
 		|@MarginNoteHGap //@MarginNoteVGap
 	    }
+	    }
+	    PDF @Yield { "% @MargPut/LoutMargShift UNIMPLEMENTED" @Graphic {
+		  |@MarginNoteHGap @MarginNoteWidth @Wide @OneRow x
+		  |@MarginNoteHGap //@MarginNoteVGap
+	      }	# VT: PDF currently has no output
+	    }
+	  }
 	}
     }
 
@@ -3709,6 +4431,11 @@ def @DocumentLayout
     #                                                                         #
     ###########################################################################
 
+#
+# VT: the expressions in the braces will work for PostScript but not for PDF
+# they should be modified in the way the "named c { " cm" }" blocks were modified above
+# but since the point of @Place is to output a matrix (?), I have not implemented this change
+#
     def @Place
       named x
 	named "+" precedence 96 associativity left left a right b { a b "add" }
@@ -3753,8 +4480,14 @@ def @DocumentLayout
       right val
     {
 	@ZeroSize {
-	    { "LoutPageDict begin matr setmatrix" x y "translate end gsave"
-	      // "grestore" } @Graphic val
+	  @BackEnd @Case {
+	    PostScript @Yield {
+		{ "LoutPageDict begin matr setmatrix" x y "translate end gsave"
+		  // "grestore" } @Graphic val
+	    }
+	    else @Yield { { "% @Place UNIMPLEMENTED" } @Graphic val	# VT: PDF currently has no output
+	    }
+	  }
 	}
     }
 
@@ -4483,6 +5216,30 @@ def @DocumentLayout
 	left label
 	right tag
     {
+#
+# VT: I can't get this to work, so I've put back the original code
+#
+#	@RefListFont @Font @RefListBreak @Break {
+#	  @BackEnd @Case {
+#	    PostScript @Yield {
+#	      @NumberMarker&&preceding @Tagged tag &
+#	      @PageMark tag
+#	      |@RefListIndent {label @ListLabel tag} @RefItem {@RefPrint tag}
+#	      |@RefListRightIndent
+#	    }
+#	    PDF @Yield {
+#	      { "__link_target=<<"tag">>" }
+#	      @Graphic
+#	      {
+#	      @NumberMarker&&preceding @Tagged tag &
+#	      @PageMark tag
+#	      |@RefListIndent {label @ListLabel tag} @RefItem {@RefPrint tag}
+#	      |@RefListRightIndent
+#	      }
+#	    }
+#	  }
+#	}
+# VT: original:
 	@RefListFont @Font @RefListBreak @Break {
 	    @NumberMarker&&preceding @Tagged tag &
 	    @PageMark tag
@@ -4604,7 +5361,21 @@ def @DocumentLayout
 	def ";" precedence 90 left x { x";" }
 
 	@MakeReferences @Case {
-	    Yes  @Yield { @RefCiteStyle cite }
+#	    Yes  @Yield { @RefCiteStyle cite }
+	    Yes  @Yield {
+	      @BackEnd @Case {
+	        PostScript @Yield { @RefCiteStyle cite }
+	        PDF        @Yield {
+#
+# VT: can't get this to work: need to ask JHK; I want the text following the "$" to be
+# the name of the link that we are trying to create a link to
+#	          { "__link_source=<<"label">>" }
+#	          @Graphic
+			{ @RefCiteStyle cite }
+#	          { blue @Colour @Underline { @RefCiteStyle cite } }
+	        }
+	      }
+	    }
 	    else @Yield @Null
 	}
     }
@@ -5191,6 +5962,19 @@ def @DocumentLayout
     {
 	def numval
 	{
+#	    to @Case
+#	    {
+#		""    @Yield @PageOf @Tag
+#		else  @Yield {
+#		    { @PageOf @Tag } @Case
+#		    {
+#			{ @PageOf to } @Yield { @PageOf @Tag }
+#			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+#		    }
+#		}
+#	    }
+	 @BackEnd @Case {
+	  PostScript @Yield {
 	    to @Case
 	    {
 		""    @Yield @PageOf @Tag
@@ -5202,12 +5986,47 @@ def @DocumentLayout
 		    }
 		}
 	    }
+	  }
+#
+#	PDF: Index entries produce a blue underlined hyperlink for the page number
+#
+	  PDF @Yield {
+	    { "__link_source=<<"@Tag">>" }
+	    @Graphic { blue @Colour @Underline {
+	    to @Case
+	    {
+		""    @Yield @PageOf @Tag
+		else  @Yield {
+		    { @PageOf @Tag } @Case
+		    {
+			{ @PageOf to } @Yield { @PageOf @Tag }
+			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+		    }
+		}
+	    }
+	    }
+	    }
+	  }
+	 }
 	}
 
 	@MakeIndex @Case {
-	    Yes  @Yield { @PageMark @Tag
-			  x @DoIndex indent { indent } { y &0.03fu , numval }
-			}
+	    Yes  @Yield {
+		     @BackEnd @Case {
+			 PostScript @Yield {
+			   @PageMark @Tag
+			   x @DoIndex indent { indent } { y &0.03fu , numval }
+			 }
+			 PDF @Yield {
+			   {"__link_target=<<"@Tag">>"} @Graphic {""}
+			   @PageMark @Tag
+			   x @DoIndex indent { indent } { y &0.03fu , numval }
+			 }
+		     }
+		   }
+#	    Yes  @Yield { @PageMark @Tag
+#			  x @DoIndex indent { indent } { y &0.03fu , numval }
+#			}
 	    else @Yield @Null
 	}
     }
@@ -5303,6 +6122,19 @@ def @DocumentLayout
     {
 	def numval
 	{
+#	    to @Case
+#	    {
+#		""    @Yield @PageOf @Tag
+#		else  @Yield {
+#		    { @PageOf @Tag } @Case
+#		    {
+#			{ @PageOf to } @Yield { @PageOf @Tag }
+#			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+#		    }
+#		}
+#	    }
+	 @BackEnd @Case {
+	  PostScript @Yield {
 	    to @Case
 	    {
 		""    @Yield @PageOf @Tag
@@ -5314,6 +6146,28 @@ def @DocumentLayout
 		    }
 		}
 	    }
+	  }
+#
+#	PDF: Index entries produce a blue underlined hyperlink for the page number
+#
+	  PDF @Yield {
+	    { "__link_source=<<"@Tag">>" }
+	    @Graphic { blue @Colour @Underline {
+	    to @Case
+	    {
+		""    @Yield @PageOf @Tag
+		else  @Yield {
+		    { @PageOf @Tag } @Case
+		    {
+			{ @PageOf to } @Yield { @PageOf @Tag }
+			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+		    }
+		}
+	    }
+	    }
+	    }
+	  }
+	 }
 	}
 
 	@MakeIndexA @Case {
@@ -5415,6 +6269,19 @@ def @DocumentLayout
     {
 	def numval
 	{
+#	    to @Case
+#	    {
+#		""    @Yield @PageOf @Tag
+#		else  @Yield {
+#		    { @PageOf @Tag } @Case
+#		    {
+#			{ @PageOf to } @Yield { @PageOf @Tag }
+#			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+#		    }
+#		}
+#	    }
+	 @BackEnd @Case {
+	  PostScript @Yield {
 	    to @Case
 	    {
 		""    @Yield @PageOf @Tag
@@ -5426,6 +6293,28 @@ def @DocumentLayout
 		    }
 		}
 	    }
+	  }
+#
+#	PDF: Index entries produce a blue underlined hyperlink for the page number
+#
+	  PDF @Yield {
+	    { "__link_source=<<"@Tag">>" }
+	    @Graphic { blue @Colour @Underline {
+	    to @Case
+	    {
+		""    @Yield @PageOf @Tag
+		else  @Yield {
+		    { @PageOf @Tag } @Case
+		    {
+			{ @PageOf to } @Yield { @PageOf @Tag }
+			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+		    }
+		}
+	    }
+	    }
+	    }
+	  }
+	 }
 	}
 
 	@MakeIndexB @Case {
@@ -5475,7 +6364,7 @@ def @DocumentLayout
 
     def @LargeScaleStructure
 	named tag {}			# tag of this large-scale structure sym
-	named type {}			# MajorIntro, Major, or Minor
+	named type {}			# MajorIntro, Major, VeryMajor, or Minor
 	named initiallanguage {}	# its language
 	named title {}			# its full title
 	named runningtitle {}		# its running title
@@ -5490,7 +6379,7 @@ def @DocumentLayout
 	named numbers { None }
 	named attachnum {}		# only if numbers is not None
 	named retrievenum {}		# only if numbers is not None
-	named bypassnumber {}		# only if numbers is not None
+	named bypassnumber {}		# only if numbers is not None, or VeryMajor
 	named prefix {}			# prefix of number of this symbol
 	named pnprefix {}		# prefix for page numbers of this sym
 	named majornum { dft }
@@ -5561,6 +6450,16 @@ def @DocumentLayout
 			@Prefix { pnprefix @Join @ShortNum }
 		}
 
+		{ VeryMajor } @Yield {
+		    start @Runner
+		        @MajorNum { majornum @Dft @LongNum }
+		        @MajorTitle { majortitle @Dft @ShortTitle }
+		        @MinorNum {}
+		        @MinorTitle {}
+		        @Owner { tag }
+		        @Prefix {}
+		}
+
 		Minor @Yield {
 		    start @Runner
 			@MajorNum { majornum @Dft @LongNum }
@@ -5578,19 +6477,24 @@ def @DocumentLayout
 	    incontents.type @Case {
 
 		Yes.Minor @Yield {
-				incontents @ContentsEntry
-				    indent { contentsindent }
-				    number { @LongNum }
-				    title { initiallanguage @Language title }
-				    pagenum { @PageOf tag }
-			     }
+			incontents @ContentsEntry
+			    indent { contentsindent }
+			    number { @LongNum }
+			    title { initiallanguage @Language title }
+			    pagenum { @PageOf tag }
+	        }
 
 		{ Yes.Major Yes.MajorIntro Yes.ExtraMajor Yes.ExtraMajorIntro } @Yield {
-				incontents @MajorContentsEntry
-				    number { @LongNum }
-				    title { initiallanguage @Language title }
-				    pagenum { @PageOf tag }
-			     }
+			incontents @MajorContentsEntry
+			    number { @LongNum }
+			    title { initiallanguage @Language title }
+			    pagenum { @PageOf tag }
+	        }
+
+		{ Yes.VeryMajor } @Yield {
+			incontents @VeryMajorContentsEntry
+			    title { initiallanguage @Language { bypassnumber: &2s title } }
+		}
 
 		else @Yield @Null
 	    }
@@ -5598,6 +6502,8 @@ def @DocumentLayout
 
 	def @Heading
 	{
+@BackEnd @Case {
+	PostScript @Yield {
 	    type @Case {
 
 		Minor @Yield {
@@ -5611,7 +6517,75 @@ def @DocumentLayout
 		    headingbreak @Break { @LongNum headingformat title }
 		}
 
+		{ VeryMajor } @Yield sendheader {
+		    //aboveheadinggap
+		    headingfont @Font
+		    headingbreak @Break { bypassnumber headingformat title }
+		}
 	    }
+	}
+	PDF @Yield {
+
+# Rats! Cannot use the tag for the name of the link because the source
+# link has no access to the tag
+
+# using title will work most of the time; it will fail with a "problem
+# with left parameter of @Graphic" warning message if the title has
+# objects other than text in it. Eg, "@Title { My @FancyTitle }"
+# with "def @FancyTitle { @OneCol { @Bold "fancy" "title" }" }
+#
+# Example: the user manual has a definition for @Tex which causes this
+# warning message to appear
+
+#	  tag @Case {
+#	    "" @Yield {	# no tag specified: use title
+	      {  "__link_target_for_export=<<"title">>"
+	      } @Graphic {
+	        type @Case {
+
+		    Minor @Yield {
+		        headingfont @Font
+		        headingbreak @Break @Protect {@LongNum headingformat title}
+		    }
+
+		    { Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield sendheader {
+		        //aboveheadinggap
+		        headingfont @Font
+		        headingbreak @Break { @LongNum headingformat title }
+		    }
+
+		    { VeryMajor } @Yield sendheader {
+		        //aboveheadinggap
+		        headingfont @Font
+		        headingbreak @Break { bypassnumber headingformat title }
+		    }
+
+	        }	# type @Case
+	      }	# @Graphic
+#	    }
+#
+#	    else @Yield {	# tag specified: use it
+#	      {  "__link_target_for_export=<<"tag">>"
+#	      } @Graphic {
+#	        type @Case {
+#
+#		    Minor @Yield {
+#		        headingfont @Font
+#		        headingbreak @Break @Protect {@LongNum headingformat title}
+#		    }
+#
+#		    { Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield sendheader {
+#		        //aboveheadinggap
+#		        headingfont @Font
+#		        headingbreak @Break { @LongNum headingformat title }
+#		    }
+#
+#	        }	# type @Case
+#	      }	# @Graphic
+#	    }		# non-"" case
+#	  }		# tag @Case
+	}
+}
 	}
 
 	def @IfMajor right x
@@ -5624,7 +6598,7 @@ def @DocumentLayout
 
 	def @StartIfMajor {
 	    type @Case {
-		{ MajorIntro Major ExtraMajor ExtraMajorIntro } @Yield Start
+		{ MajorIntro Major ExtraMajor ExtraMajorIntro VeryMajor } @Yield Start
 		else @Yield NonStart
 	    }
 	}
