@@ -1,0 +1,197 @@
+/*@z04.c:Token Service:NewToken(), CopyTokenList(), EchoToken()@**************/
+/*                                                                           */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*                                                                           */
+/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Basser Department of Computer Science                                    */
+/*  The University of Sydney 2006                                            */
+/*  AUSTRALIA                                                                */
+/*                                                                           */
+/*  This program is free software; you can redistribute it and/or modify     */
+/*  it under the terms of the GNU General Public License as published by     */
+/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  any later version.                                                       */
+/*                                                                           */
+/*  This program is distributed in the hope that it will be useful,          */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of           */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            */
+/*  GNU General Public License for more details.                             */
+/*                                                                           */
+/*  You should have received a copy of the GNU General Public License        */
+/*  along with this program; if not, write to the Free Software              */
+/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*                                                                           */
+/*  FILE:         z04.c                                                      */
+/*  MODULE:       Token Service                                              */
+/*  EXTERNS:      NewToken(), CopyTokenList(), EchoCatOp(), EchoToken()      */
+/*                                                                           */
+/*****************************************************************************/
+#include "externs"
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT NewToken(xtype, xfpos, xvspace, xhspace, xprec, xactual)          */
+/*                                                                           */
+/*  Returns a new non-WORD token initialised as the parameters indicate.     */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT NewToken(xtype, xfpos, xvspace, xhspace, xprec, xactual)
+unsigned char xtype;  FILE_POS *xfpos;  unsigned char xvspace, xhspace;  unsigned char xprec;
+OBJECT xactual;
+{ OBJECT res;
+  debug1(DTS, DDD, "NewToken(%s, ...)", Image(xtype));
+  res = New(xtype);
+  FposCopy(fpos(res), *xfpos);
+  vspace(res) = xvspace;
+  hspace(res) = xhspace;
+  precedence(res) = xprec;
+  actual(res) = xactual;
+  debug1(DTS, DDD, "NewToken returning %s", EchoToken(res));
+  return res;
+} /* end NewToken */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT CopyTokenList(x, pos)                                             */
+/*                                                                           */
+/*  Returns a copy of the list of tokens pointed to by x.                    */
+/*  All file positions in the copy are set to *pos.                          */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT CopyTokenList(x, pos)
+OBJECT x;  FILE_POS *pos;
+{ OBJECT y, z, res;
+  res = nil;
+  y = x;
+  if( x != nil )
+  do
+  { if( type(y) == WORD )
+    { z = MakeWord(string(y), pos);
+      vspace(z) = vspace(y);
+      hspace(z) = hspace(y);
+    }
+    else z = NewToken(type(y), pos,vspace(y),hspace(y),precedence(y),actual(y));
+    res = Append(res, z, PARENT);
+    y = succ(y, PARENT);
+  } while( y != x );
+  return res;
+} /* end CopyTokenList */
+
+
+/*@@**************************************************************************/
+/*                                                                           */
+/*  unsigned char *EchoCatOp(xtype, xmark, xjoin)                            */
+/*                                                                           */
+/*  Return the catenation operator with this type, mark and join.            */
+/*                                                                           */
+/*****************************************************************************/
+
+unsigned char *EchoCatOp(xtype, xmark, xjoin)
+unsigned xtype;  BOOLEAN xmark, xjoin;
+{ switch( xtype )
+  {
+      case VCAT:   return (unsigned char *)
+			(xmark	? xjoin	? KW_VCAT_MJ : KW_VCAT_MN
+				: xjoin	? KW_VCAT_NJ : KW_VCAT_NN);
+
+      case HCAT:   return (unsigned char *)
+			(xmark	? xjoin	? KW_HCAT_MJ : KW_HCAT_MN
+				: xjoin	? KW_HCAT_NJ : KW_HCAT_NN);
+
+      case ACAT:   return (unsigned char *)
+			(xmark	? xjoin	? KW_ACAT_MJ : "??"
+				: xjoin	? KW_ACAT_NJ : "??");
+
+      default:	   Error(INTERN, no_fpos, "EchoCatOp: xtype = %d", xtype);
+		   return (unsigned char *) "";
+
+  } /* end switch */
+} /* end EchoCatOp */
+
+
+#if DEBUG_ON
+/*****************************************************************************/
+/*                                                                           */
+/*  unsigned char *EchoToken(x)                                              */
+/*                                                                           */
+/*  Return an image of token x.  Do not worry about preceding space.         */
+/*                                                                           */
+/*****************************************************************************/
+
+unsigned char *EchoToken(x)
+OBJECT x;
+{ switch( type(x) )
+  {
+    case WORD:
+    
+      return string(x);
+      break;
+
+
+    case TSPACE:
+    case TJUXTA:
+    case USE:
+    case GSTUB_EXT:
+    case GSTUB_INT:
+    case GSTUB_NONE:
+    
+      return Image(type(x));
+      break;
+
+
+    case BEGIN:
+    case END:
+    case ENV:
+    case CLOS:
+    case LBR:
+    case RBR:
+    case NULL_CLOS:
+    case CROSS:
+    case ONE_COL:
+    case ONE_ROW:
+    case WIDE:
+    case HIGH:
+    case HSCALE:
+    case VSCALE:
+    case SCALE:
+    case HCONTRACT:
+    case VCONTRACT:
+    case HEXPAND:
+    case VEXPAND:
+    case PADJUST:
+    case HADJUST:
+    case VADJUST:
+    case ROTATE:
+    case CASE:
+    case YIELD:
+    case FONT:
+    case SPACE:
+    case BREAK:
+    case NEXT:
+    case OPEN:
+    case TAGGED:
+    case INCGRAPHIC:
+    case SINCGRAPHIC:
+    case GRAPHIC:
+    case ACAT:
+    case HCAT:
+    case VCAT:
+    case CLOSURE:
+    
+      return SymName(actual(x));
+      break;
+
+
+    default:
+    
+      Error(INTERN, &fpos(x), "EchoToken: %s", Image(type(x)));
+      break;
+  }
+  return (unsigned char *) "";
+} /* end EchoToken */
+#endif

@@ -1,0 +1,83 @@
+.TH LOUT 1
+.SH NAME
+lout - prepare Lout document for printing
+.SH SYNOPSIS
+lout [ -i<filename> ] files
+.SH DESCRIPTION
+Invoke the Basser Lout interpreter on the concatenation of the named
+files, producing a PostScript file on standard output suitable for
+printing on PostScript printers using lpr(1).  If no files are named,
+stdin is used instead.  The special file name - may be used to denote
+standard input.
+.SH OPTIONS
+.TP 16
+-i<filename>  
+Search the directories of the include file path (see below) for
+<filename> and include it.  There may be multiple -i options.
+.TP
+-s
+Suppress all reading and writing of the cross reference database;
+other databases are not affected.  Useful when many simple documents that
+don't do any cross referencing are stored in one directory.
+.TP
+-e<filename>
+Direct error messages to <filename> instead of to stderr.
+.TP
+-o<filename>
+Direct PostScript output to <filename> instead of to stdout.
+.TP
+-I<dirname>
+Add <dirname> to the list of directories searched for @Include files
+and -i option files.  There may be multiple -I options.  @Include first
+searches the current directory, then searches the -I directories in the
+order given, and finally searches the default include file directory
+(see below).  @SysInclude and the -i option omit the search of the
+current directory.
+.TP
+-F<dirname>
+Add <dirname> to the list of directories searched for font (.AFM) files.
+There may be multiple -F options; the directories are searched in the
+order given, and finally the default font file directory is searched
+(see below).
+.TP
+-D<dirname>
+Add <dirname> to the list of directories searched for Lout database
+files.  There may be multiple -D options.  @Database searches the
+current directory, then the -D directories in the order given, and
+finally searches the default database file directory (see below).
+@SysDatabase omits the search of the current directory.
+.TP
+-V
+Print version information on stderr.
+.TP
+-EPS
+Produce output in the form of an EPS (Encapsulated PostScript) file,
+suitable for inclusion in another document.
+.SH LIMITS
+.nf
+At most 255 input files (no limit on @IncludeGraphic files)
+At most 255 characters per input line
+At most 100 fonts (each different size counts as one font)
+At most 5 deep nesting of @Include files
+.SH FILES
+.nf
+<BINDIR>/lout  -  Binary file
+<LIBDIR>/include  -  Default include file dir.
+<LIBDIR>/data  -  Default standard databases dir.
+<LIBDIR>/font  -  Default font metrics files dir.
+<DOCDIR>  -  Directory containing Lout documentation
+.fi
+.SH SEE ALSO
+.P
+lpr(1), ghostview(1)
+.SH REFERENCES
+.P
+For a description of the Lout document formatting system,
+see Jeffrey H. Kingston, "Document Formatting with Lout",
+Tech. Rep. 449, Basser Dept. of Computer Science, The
+University of Sydney 2006, Australia (December 1992).
+See Adobe Systems Inc., "PostScript Language Reference Manual
+(Second Edition)", Addison-Wesley, 1990, for PostScript.
+.SH AUTHOR
+.P
+Jeffrey H. Kingston

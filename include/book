@@ -1,0 +1,77 @@
+
+###############################################################################
+#                                                                             #
+#  Setup file for invoking @DocumentLayout for books                          #
+#                                                                             #
+#  Jeffrey H. Kingston                                                        #
+#  22 December 1992                                                           #
+#                                                                             #
+###############################################################################
+
+@SysInclude { ft  }
+@SysInclude { dl  }
+# @SysInclude { eq  }
+# @SysInclude { tab }
+# @SysInclude { pas }
+# @SysInclude { fig }
+
+@Use { @DocumentLayout
+  # @InitialFont       {  Times Base 12p } # initial font
+  # @InitialBreak      {  adjust 1.20fx  } # initial break
+  # @Hyphenate         {  Yes            } # Want hyphenation? Yes or No
+  # @MajorHeadingFont  {  Bold 2.0f      } # font for major headings
+  # @HeadingFont       {  Bold           } # font for ordinary headings
+  # @MinorHeadingFont  {  Bold           } # font for minor headings
+  # @BookCoverFont     {  Helvetica Base } # font for book cover
+
+  # @ParaGap           {  1.30vx         } # gap between paragraphs
+  # @ParaIndent        {  2.00f          } # paragraph first-line indent
+
+  # @DispGap           {  1.00v          } # gap above and below displays
+  # @DispIndent        {  2.00f          } # @IndentedDisplay indent
+  # @DefaultIndent     {  0.5rt          } # @Display indent
+  # @WideIndent        {  4.00f          } # @WideTaggedList indent
+  # @VeryWideIndent    {  8.00f          } # @VeryWideTaggedList indent
+
+  # @PageWidth         { 21.00c          } # width of page
+  # @PageHeight        { 29.70c          } # height of page
+  # @PageMargin        {  2.50c          } # size of all four margins
+  # @Columns           {  Single         } # Single, Double, Multi
+  # @DoubleColWidth    {  7.50c          } # column width used by Double
+  # @MultiColWidth     {  4.67c          } # column width used by Multi
+  # @ColGap            {  1.00c          } # gap between columns
+  # @TopGap            {  0.75c          } # gap between figures
+  # @MidGap            {  0.75c          } # gap above and below body text
+
+  # @FootNoteFont      {  0.80f          } # font for footnotes
+  # @FootNoteBreak     {  1.20fx         } # break for footnotes
+  # @FootLen           {  2.00c          } # footnote line and indent size
+  # @ColFootLen        {  1.20c          } # @FootLen when Double, Multi
+  # @FootGap           {  0.20c          } # gap between footnotes
+
+    @MakeIndex         {  Yes            } # Want index? Yes or No
+  # @IndexColumns      {  Double         } # Single, Double, Multi
+
+    @TableOfContents   {  Yes            } # Want contents? Yes or No
+  # @MajorContentsGap  {  1.30v          } # gap above major entry
+  # @ContentsGap       {  1.00v          } # gap above ordinary entry
+
+  # @ChapterNumbers    {  Yes            } # Yes or No            
+  # @SectionNumbers    {  Yes            } # Yes or No            
+  # @SubSectionNumbers {  Yes            } # Yes or No            
+  # @AppendixNumbers   {  Yes            } # Yes or No            
+  # @SubAppendixNumbers{  Yes            } # Yes or No            
+  # @ChapterGap        {  1.10b          } # gap before each chapter
+  # @SectionGap        {  2.00v          } # gap before each section
+  # @SubSectionGap     {  1.50v          } # gap before each subsection
+    @AppendixGap       {  1.10b          } # gap before each appendix
+  # @SubAppendixGap    {  2.00v          } # gap before each subappendix
+
+  # @PageNumbers       {  Yes            } # Want page numbers? Yes or No
+  # @FirstPageNumber   {  1              } # Number of first page 
+  # @PageOneTopFormat  { @Null               }
+  # @PageOneFootFormat { @Null               }
+  # @PageTopFormat     { |0.5rt - @PageNum - }
+  # @PageFootFormat    { @Null               }
+    @BookTitleFormat   { {Bold 2.0f} @Font {//2.0f @Title //0.5f} } 
+}

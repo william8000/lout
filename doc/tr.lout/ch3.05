@@ -1,0 +1,22 @@
+@Section
+   @Title { "@Space" }
+   @Tag { space }
+@Begin
+@PP
+The @@Space symbol
+space.sym @Index { @@Space symbol }
+changes the value of the @Code s unit of measurement (Section
+s.unit.space @SubIndex { and @@Space symbol }
+{@NumberOf concatenation}) within its right parameter to the value
+given by the left parameter:
+@ID {
+@Code "1c @Space { a b c d }"
+}
+has result
+@ID {
+1c @Space { a b c d }
+}
+As for the @@Break symbol, the left parameter of @@Space may be given
+relative to the enclosing @Code s unit, and it may include a gap
+mode.  Note that the @@Font symbol also sets the @Code s unit.
+@End @Section

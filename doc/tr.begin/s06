@@ -1,0 +1,26 @@
+@Section
+   @Tag { cnp }
+   @Title { Conditional new page }
+@Begin
+@PP
+Occasionally Lout will insert a page break directly following a heading,
+and this looks very poor.  The solution is to precede the heading with
+the conditional new page symbol {@Code "@CNP"}, which checks whether
+enough space is left in the page or column for a heading and at least
+two lines of text.  If so, @Code "@CNP" does nothing; if not, @Code "@CNP"
+causes a new page or column to be begun, like {@Code "@NP"}.  The recommended
+arrangement is
+@ID @Code {
+"end of previous part."
+"@DP"
+"@CNP"
+"@Heading { A Heading }"
+"@PP"
+"First paragraph of next part ..."
+}
+The @Code "@CNP" symbol should be preceded by either @Code "@DP" or
+@Code "@LP", preferably {@Code "@DP"}, and this determines the amount of
+space when the @Code "@NP" action does not occur.  In most cases it will
+be better to use the @Code "@Section" symbol described below, which has
+@Code "@CNP" included in it, rather than using @Code "@CNP" directly.
+@End @Section

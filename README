@@ -1,0 +1,55 @@
+LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)
+COPYRIGHT (C) 1993 Jeffrey H. Kingston
+
+Jeffrey H. Kingston
+Basser Department of Computer Science
+The University of Sydney 2006
+AUSTRALIA
+
+Telephone (direct): 61 2 692 4216
+Telephone (messages): 61 2 692 3423
+Email: jeff@cs.su.oz.au
+Fax: 61 2 692 3838
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 1, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+(file gnu.gpl in this directory); if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+Version 2.xx is not completely upward compatible with the original October
+1991 release.  The Lout base language semantics have changed slightly (some
+objects come out wider than they used to), but more importantly the standard
+packages DocumentLayout, ReportLayout, and BookLayout have been coalesced
+into one, and some changes made to some of the symbols.  This means that
+most setup files will need to be changed.  The more specialized packages
+(Tab, Eq, Fig, and Pas) are compatible with the old versions.  Apologies for
+any inconvenience caused.
+
+
+This directory contains everything needed to install the Lout document
+formatting system on Unix.  It contains the following directories:
+
+    include        Lout packages (in Lout) and hyphenation patterns file
+    data           Lout databases (in Lout)
+    font0          Adobe Systems font metrics (.AFM) files (ASCII)
+    font1          Adobe Systems font metrics (.AFM) files (ISO-LATIN-1)
+    doc            Lout documents (in Lout)
+    man            Lout manual entry
+
+and the following files:
+
+    externs z*.c   Lout source code
+    gnu.gpl        A copy of the GNU General Public License
+    hyph.install   Information about how to change the hyphenation patterns
+    makefile       A makefile for installing Lout
+
+Please see the makefile for installation instructions.

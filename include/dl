@@ -1,0 +1,2052 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @DocumentLayout package (Version 2.0)                                 #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, 17 July 1991.                          #
+#  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
+#                                                                             #
+#  This Lout package contains the basic definitions for documents, such as    #
+#  simple documents, technical reports, and books.  See "A Beginners' Guide   #
+#  to Lout" for user information.                                             #
+#                                                                             #
+###############################################################################
+
+export
+    @InitialFont @InitialBreak @Hyphenate
+    @MajorHeadingFont @HeadingFont @MinorHeadingFont @ParaGap @ParaIndent
+    @DispGap @DispIndent @DefaultIndent @WideIndent @VeryWideIndent
+
+    @Roman @UCRoman @Alpha @UCAlpha @Months @ShortMonths
+    @WeekDays @ShortWeekDays
+
+    "--" "---" @Bullet @ParSym @SectSym @Dagger @DaggerDbl @CDot @Sterling
+    @Yen @Florin @Star @Degree @Minute @Second @Multiply @Divide @Lozenge
+    @Register @CopyRight @TradeMark
+
+    @R @I @B @S @MajorHeading @Heading @MinorHeading "^" "&-" @Date
+
+    associate associates declination obligatory philanthropic present presents
+    project projects reciprocity recognizance reformation retribution table
+
+    @Runner @PageMark @PageOf @NumberOf
+
+    @PP @LP @DP @NP @CNP
+	
+    @BAD     @BeginAlignedDisplays
+    @EAD     @EndAlignedDisplays
+    @BND     @BeginNumberedDisplays
+    @END     @EndNumberedDisplays
+
+    @D       @Display
+    @LD      @LeftDisplay
+    @ID      @IndentedDisplay
+    @CD      @CentredDisplay @CenteredDisplay
+    @AD      @AlignedDisplay
+    @LAD     @LeftAlignedDisplay
+    @IAD     @IndentedAlignedDisplay
+    @CAD     @CentredAlignedDisplay @CenteredAlignedDisplay
+    @ND      @NumberedDisplay
+    @LND     @LeftNumberedDisplay
+    @IND     @IndentedNumberedDisplay
+    @CND     @CentredNumberedDisplay @CenteredNumberedDisplay
+    @AND     @AlignedNumberedDisplay
+    @LAND    @LeftAlignedNumberedDisplay
+    @IAND    @IndentedAlignedNumberedDisplay
+    @CAND    @CentredAlignedNumberedDisplay @CenteredAlignedNumberedDisplay
+
+    @RD      @RawDisplay
+    @RLD     @RawLeftDisplay
+    @RID     @RawIndentedDisplay
+    @RCD     @RawCentredDisplay @RawCenteredDisplay
+    @RAD     @RawAlignedDisplay
+    @RLAD    @RawLeftAlignedDisplay
+    @RIAD    @RawIndentedAlignedDisplay
+    @RCAD    @RawCentredAlignedDisplay @RawCenteredAlignedDisplay
+    @RND     @RawNumberedDisplay
+    @RLND    @RawLeftNumberedDisplay
+    @RIND    @RawIndentedNumberedDisplay
+    @RCND    @RawCentredNumberedDisplay @RawCenteredNumberedDisplay
+    @RAND    @RawAlignedNumberedDisplay
+    @RLAND   @RawLeftAlignedNumberedDisplay
+    @RIAND   @RawIndentedAlignedNumberedDisplay
+    @RCAND   @RawCentredAlignedNumberedDisplay
+             @RawCenteredAlignedNumberedDisplay
+	
+    @LI      @ListItem
+    @EL      @EndList
+
+    @RLL     @RawLeftList
+    @RCL     @RawCentredList @RawCenteredList
+
+    @LL	     @LeftList
+    @CL	     @CentredList @CenteredList
+
+    @RIL     @RawIndentedList
+    @RNL     @RawNumberedList
+    @RPNL    @RawParenNumberedList
+    @RRL     @RawRomanList
+    @RPRL    @RawParenRomanList
+    @RUCRL   @RawUCRomanList
+    @RPUCRL  @RawParenUCRomanList
+    @RAL     @RawAlphaList
+    @RPAL    @RawParenAlphaList
+    @RUCAL   @RawUCAlphaList
+    @RPUCAL  @RawParenUCAlphaList
+    @RBL     @RawBulletList
+    @RSL     @RawStarList
+    @RDL     @RawDashList
+
+    @IL      @IndentedList
+    @NL      @NumberedList 
+    @PNL     @ParenNumberedList
+    @RL      @RomanList
+    @PRL     @ParenRomanList
+    @UCRL    @UCRomanList
+    @PUCRL   @ParenUCRomanList
+    @AL      @AlphaList
+    @PAL     @ParenAlphaList
+    @UCAL    @UCAlphaList
+    @PUCAL   @ParenUCAlphaList
+    @BL      @BulletList 
+    @SL      @StarList 
+    @DL      @DashList
+
+    @TI      @TagItem
+    @RTL     @RawTaggedList
+    @RWTL    @RawWideTaggedList
+    @RVWTL   @RawVeryWideTaggedList
+
+    @TL	     @TaggedList
+    @WTL     @WideTaggedList
+    @VWTL    @VeryWideTaggedList
+
+    @Document @Doc @Report @Book			# root galley objects
+    @Abstract @Preface @Introduction			# outer level galleys
+    @Chapter @Section @Appendix @Text @ColText
+    @Figure @EndFigures @Table @EndTables		# inner level galleys
+    @Reference @RefStyle @RefPrint
+    @ReferenceSection @Ref @ChapRefSection @ChapRef
+    @IndexSection @Index @SubIndex @SubSubIndex @RawIndex
+    @RawSubIndex @RawSubSubIndex @IndexBlanks
+    @ContentsSection
+
+
+
+def @DocumentLayout
+    named @InitialFont       {  Times Base 12p } # initial font
+    named @InitialBreak      {  adjust 1.20fx  } # initial break
+    named @Hyphenate         {  Yes            } # Want hyphenation? Yes or No
+    named @MajorHeadingFont  {  Bold 2.0f      } # font for major headings
+    named @HeadingFont       {  Bold           } # font for ordinary headings
+    named @MinorHeadingFont  {  Bold           } # font for minor headings
+    named @BookCoverFont     {  Helvetica Base } # font for book cover
+
+    named @ParaGap           {  1.30vx         } # gap between paragraphs
+    named @ParaIndent        {  2.00f          } # paragraph first-line indent
+
+    named @DispGap           {  1.00v          } # gap above and below displays
+    named @DispIndent        {  2.00f          } # @IndentedDisplay indent
+    named @DefaultIndent     {  0.5rt          } # @Display indent
+    named @WideIndent        {  4.00f          } # @WideTaggedList indent
+    named @VeryWideIndent    {  8.00f          } # @VeryWideTaggedList indent
+
+    named @PageWidth         { 21.00c          } # width of page
+    named @PageHeight        { 29.70c          } # height of page
+    named @PageMargin        {  2.50c          } # size of all four margins
+    named @Columns           {  Single         } # Single, Double, Multi
+    named @DoubleColWidth    {  7.50c          } # column width used by Double
+    named @MultiColWidth     {  4.67c          } # column width used by Multi
+    named @ColGap            {  1.00c          } # gap between columns
+    named @TopGap            {  0.75c          } # gap between figures
+    named @MidGap            {  0.75c          } # gap above and below body text
+
+    named @FootNoteFont      {  0.80f          } # font for footnotes
+    named @FootNoteBreak     {  1.20fx         } # break for footnotes
+    named @FootLen           {  2.00c          } # footnote line and indent size
+    named @ColFootLen        {  1.20c          } # @FootLen when Double, Multi
+    named @FootGap           {  0.20c          } # gap between footnotes
+
+    named @MakeIndex         {  No             } # Want index? Yes or No
+    named @IndexColumns      {  Double         } # Single, Double, Multi
+
+    named @TableOfContents   {  No             } # Want contents? Yes or No
+    named @MajorContentsGap  {  1.30v          } # gap above major entry
+    named @ContentsGap       {  1.00v          } # gap above ordinary entry
+
+    named @ChapterNumbers    {  Yes            } # Yes or No            
+    named @SectionNumbers    {  Yes            } # Yes or No            
+    named @SubSectionNumbers {  Yes            } # Yes or No            
+    named @AppendixNumbers   {  Yes            } # Yes or No            
+    named @SubAppendixNumbers{  Yes            } # Yes or No            
+    named @ChapterGap        {  1.10b          } # gap before each chapter
+    named @SectionGap        {  2.00v          } # gap before each section
+    named @SubSectionGap     {  1.50v          } # gap before each subsection
+    named @AppendixGap       {  2.00v          } # gap before each appendix
+    named @SubAppendixGap    {  2.00v          } # gap before each subappendix
+
+    named @PageNumbers       {  Yes            } # Want page numbers? Yes or No
+    named @FirstPageNumber   {  1              } # Number of first page 
+    named @PageOneTopFormat  right @PageNum { @Null               }
+    named @PageOneFootFormat right @PageNum { @Null               }
+    named @PageTopFormat     right @PageNum { |0.5rt - @PageNum - }
+    named @PageFootFormat    right @PageNum { @Null               }
+    named @BookTitleFormat   right @Title   { Bold @Font @Title   } 
+
+@Begin
+
+    ###########################################################################
+    #                                                                         #
+    #  @Protect x                                                             #
+    #                                                                         #
+    #  Like @CNP, this reserves space on the current page or else makes sure  #
+    #  x appears on the following page.  Lookahead is proportional to font    #
+    #  size.                                                                  #
+    #                                                                         #
+    ###########################################################################
+
+    def @Protect right x { 3.0f @High //0io // x }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @HLine                                                                #
+    #                                                                         #
+    #   Draws a horizontal line to fill available space.                      #
+    #                                                                         #
+    ###########################################################################
+
+    def @HLine { {0 0 moveto xsize 0 lineto stroke} @Graphic {} }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Symbols stored in the "standard" database:                             #
+    #                                                                         #
+    #    @Roman           lower case Roman numerals i, ii, ... , c            #
+    #    @UCRoman         upper case Roman numerals I, II, ... , C            #
+    #    @Alpha           lower case Roman alphabet a, b,  ... , z            #
+    #    @UCAlpha         upper case Roman alphabet A, B,  ... , Z            #
+    #    @Months          months of the year:  January, ... , December        #
+    #    @ShortMonths     months of the year, abbreviated:  Jan, ... , Dec    #
+    #    @WeekDays        days of the week:  Sunday, ... , Saturday           #
+    #    @ShortWeekDays   days of the week, abbreviated:  Sun, ... , Sat      #
+    #                                                                         #
+    ###########################################################################
+
+    def @Roman		left @Tag right @Val { @Val }
+    def @UCRoman	left @Tag right @Val { @Val }
+    def @Alpha		left @Tag right @Val { @Val }
+    def @UCAlpha	left @Tag right @Val { @Val }
+    def @Months		left @Tag right @Val { @Val }
+    def @ShortMonths	left @Tag right @Val { @Val }
+    def @WeekDays	left @Tag right @Val { @Val }
+    def @ShortWeekDays	left @Tag right @Val { @Val }
+
+    @SysDatabase @Roman @UCRoman @Alpha @UCAlpha @Months
+		 @ShortMonths @WeekDays @ShortWeekDays
+    { "standard"  }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Selected characters from Adobe's fonts.                                #
+    #                                                                         #
+    ###########################################################################
+
+    def "--"		{ "\261" 			}
+    def "---"		{ "\320" 			}
+    def @Bullet		{ "\267"			}
+    def @ParSym		{ "\266"			}
+    def @SectSym	{ "\247"			}
+    def @Dagger		{ "\262"			}
+    def @DaggerDbl	{ "\263"			}
+    def @CDot		{ "\264"			}
+    def @Sterling	{ "\243"			}
+    def @Yen		{ "\245"			}
+    def @Florin		{ "\246"			}
+    def @Star		{ { Symbol Base } @Font "\052"	}
+    def @Degree		{ { Symbol Base } @Font "\260"	}
+    def @Minute		{ { Symbol Base } @Font "\242"	}
+    def @Second		{ { Symbol Base } @Font "\262"	}
+    def @Multiply	{ { Symbol Base } @Font "\264"	}
+    def @Divide		{ { Symbol Base } @Font "\270"	}
+    def @Lozenge	{ { Symbol Base } @Font "\340"	}
+    def @Register	{ { Symbol Base } @Font "\342"	}
+    def @CopyRight	{ { Symbol Base } @Font "\343"	}
+    def @TradeMark	{ { Symbol Base } @Font "\344"	}
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Miscellaneous.                                                         #
+    #                                                                         #
+    ###########################################################################
+
+    def @R             right x { Base @Font x				 }
+    def @I             right x { Slope @Font x				 }
+    def @B             right x { Bold @Font x				 }
+    def @S             right x { @OneRow { //0.04fo 0.8f @Font x }	 }
+    def "^"		       { {} ^& {}				 }
+    def "&-"  left x   right y { x &0ch y				 }
+    def @MajorHeading  right x { ragged @Break @MajorHeadingFont @Font x }
+    def @Heading       right x { ragged @Break @HeadingFont      @Font x }
+    def @MinorHeading  right x { ragged @Break @MinorHeadingFont @Font x }
+    def @Date { @Moment&&now @Open {@Day {@Months&&@Month}, @Century{@Year}} }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Exception list for hyphenation.                                        #
+    #                                                                         #
+    ###########################################################################
+
+    def associate     { "as" &- "so" &- "ciate"				}
+    def associates    { "as" &- "so" &- "ciates"			}
+    def declination   { "dec" &- "li" &- "na" &- "tion"			}
+    def obligatory    { "oblig" &- "a" &- "tory"			}
+    def philanthropic { "phil" &- "an" &- "thropic"			}
+    def present       { "present"					}
+    def presents      { "presents"					}
+    def project       { "project"					}
+    def projects      { "projects"					}
+    def reciprocity   { "reci" &- "procity"				}
+    def recognizance  { "re" &- "cog" &- "ni" &- "zance"		}
+    def reformation   { "ref" &- "or" &- "ma" &- "tion"			}
+    def retribution   { "ret" &- "ri" &- "bu" &- "tion"			}
+    def table         { "ta" &- "ble"					}
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Page and item markers.   @Runner is used only by books.                #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag
+    def @PageMarker
+	right @Tag
+    {
+	@Null
+    }
+
+    def @PageMark
+	right x
+    {
+	@PageMarker&&preceding @Tagged x
+    }
+
+    def @PageOf
+	right x
+    {
+	@PageMarker&&x @Open { @Tag }
+    }
+
+    export @Tag
+    def @NumberMarker
+	right @Tag
+    {
+	@Null
+    }
+
+    def @NumberOf
+	right x
+    {
+	@NumberMarker&&x @Open { @Tag }
+    }
+
+    export @TopOdd @TopEven @FootOdd @FootEven
+    def @Runner
+	named @TopOdd	right @PageNum { @Null }
+	named @TopEven	right @PageNum { @Null }
+	named @FootOdd	right @PageNum { @Null }
+	named @FootEven	right @PageNum { @Null }
+	named @Tag {}
+    { @Null
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @Hyph x                                                               #
+    #                                                                         #
+    #   Return "hyphen" if x is "Yes" or "yes", else "nohyphen".              #
+    #                                                                         #
+    ###########################################################################
+
+    def @Hyph right x
+    {
+	x @Case {
+	    {Yes yes} @Yield "hyphen"
+	    else      @Yield "nohyphen"
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  x @OrElse y                                                            #
+    #                                                                         #
+    #  This returns x unless its value is "dft", in which case it returns y.  #
+    #  Useful for defaulting the value of one parameter to another.           #
+    #                                                                         #
+    ###########################################################################
+
+    def @OrElse
+	left x
+	right y
+    {
+	x @Case {
+	    dft  @Yield y
+	    else @Yield x
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Paragraphs.                                                            #
+    #                                                                         #
+    ###########################################################################
+
+    macro @PP	{ //@ParaGap @ParaIndent @Wide &0i }
+    macro @LP	{ //@ParaGap			   }
+    macro @DP	{ //@DispGap			   }
+    macro @NP	{ //1.1b			   }
+    macro @CNP	{ // 3.2v @High //0io //           }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Beginning and ending of aligned displays.                              #
+    #                                                                         #
+    ###########################################################################
+
+    def @APlace            { @Galley }
+    def @EndAlignedPlace   { @Galley }
+    def @AlignedPlace      { @Galley }
+
+    def @BAligned into { @APlace&&preceding }
+    {
+	def @AlignedList { @AlignedPlace /1.1b @AlignedList }
+
+	//1.1b @AlignedList
+	//     @EndAlignedPlace
+    }
+
+    macro @BAD { // @APlace | @BAligned }
+    def   @EAD force into { @EndAlignedPlace&&preceding } {}
+
+    macro @BeginAlignedDisplays { @BAD }
+    macro @EndAlignedDisplays   { @EAD }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Beginning and ending of numbered displays.                             #
+    #                                                                         #
+    ###########################################################################
+
+    def @BeginNumberedPlace { @Galley }
+    def @EndNumberedPlace   { @Galley }
+    def @NextNumberPlace    { @Galley }
+
+    def @NNumber into { @NextNumberPlace&&following } {}
+    macro @NN { @NNumber @BeginNumberedPlace }
+
+    def @BNumbered into { @BeginNumberedPlace&&preceding }
+	named style right tag { (tag) }
+	named start { 1 }
+    {
+	def @NList right num
+	{
+	    |1rt style num & @NumberMarker num & @NextNumberPlace
+	    // @NList @Next num
+	}
+
+	//  @NList start
+	//  @EndNumberedPlace
+    }
+
+    macro @BND { // @BeginNumberedPlace // @BNumbered }
+    def   @END force into { @EndNumberedPlace&&preceding } {}
+    
+    macro @BeginNumberedDisplays { @BND }
+    macro @EndNumberedDisplays   { @END }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Galleys which carry displays to their places.                          #
+    #                                                                         #
+    ###########################################################################
+
+    def @DispPlace { @Galley }
+
+    def @Disp into { @DispPlace&&preceding }
+	right x
+    {
+	@OneRow x
+    }
+
+    def @NDisp into { @DispPlace&&preceding }
+	named @Tag {}
+	right x
+    {
+	@OneRow {
+	   @NumberMarker&&following @Tagged @Tag
+	   @PageMarker&&preceding @Tagged @Tag
+	   ^//
+	   @OneRow x
+	}
+    }
+
+    def @ADisp into { @AlignedPlace&&preceding }
+	right x
+    {
+	@OneRow x
+    }
+
+    def @ANDisp into { @AlignedPlace&&preceding }
+	named @Tag {}
+	right x
+    {
+	@OneRow {
+	   @NumberMarker&&following @Tagged @Tag
+	   @PageMarker&&preceding @Tagged @Tag
+	   ^/
+	   @OneRow x
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Displays and raw displays.                                             #
+    #                                                                         #
+    ###########################################################################
+
+    macro @G  { |@DefaultIndent }
+    macro @LG { |               }
+    macro @IG { |@DispIndent    }
+    macro @CG { |0.5rt          }
+
+    macro @D     { @DP @G   @DispPlace  |        @DP // @Disp   }
+    macro @LD    { @DP @LG  @DispPlace  |        @DP // @Disp   }
+    macro @ID    { @DP @IG  @DispPlace  |        @DP // @Disp   }
+    macro @CD    { @DP @CG  @DispPlace  |        @DP // @Disp   }
+
+    macro @AD    { @DP @G   @APlace     |        @DP // @ADisp  }
+    macro @LAD   { @DP @LG  @APlace     |        @DP // @ADisp  }
+    macro @IAD   { @DP @IG  @APlace     |        @DP // @ADisp  }
+    macro @CAD   { @DP @CG  @APlace     |        @DP // @ADisp  }
+
+    macro @ND    { @DP @G   @DispPlace  |1rt @NN @DP // @NDisp  }
+    macro @LND   { @DP @LG  @DispPlace  |1rt @NN @DP // @NDisp  }
+    macro @IND   { @DP @IG  @DispPlace  |1rt @NN @DP // @NDisp  }
+    macro @CND   { @DP @CG  @DispPlace  |1rt @NN @DP // @NDisp  }
+
+    macro @AND   { @DP @G   @APlace     |1rt @NN @DP // @ANDisp }
+    macro @LAND  { @DP @LG  @APlace     |1rt @NN @DP // @ANDisp }
+    macro @IAND  { @DP @IG  @APlace     |1rt @NN @DP // @ANDisp }
+    macro @CAND  { @DP @CG  @APlace     |1rt @NN @DP // @ANDisp }
+
+
+    macro @RD    {     @G   @DispPlace  |               @Disp   }
+    macro @RLD   {     @LG  @DispPlace  |               @Disp   }
+    macro @RID   {     @IG  @DispPlace  |               @Disp   }
+    macro @RCD   {     @CG  @DispPlace  |               @Disp   }
+
+    macro @RAD   {     @G   @APlace     |               @ADisp  }
+    macro @RLAD  {     @LG  @APlace     |               @ADisp  }
+    macro @RIAD  {     @IG  @APlace     |               @ADisp  }
+    macro @RCAD  {     @CG  @APlace     |               @ADisp  }
+
+    macro @RND   {     @G   @DispPlace  |1rt @NN        @NDisp  }
+    macro @RLND  {     @LG  @DispPlace  |1rt @NN        @NDisp  }
+    macro @RIND  {     @IG  @DispPlace  |1rt @NN        @NDisp  }
+    macro @RCND  {     @CG  @DispPlace  |1rt @NN        @NDisp  }
+
+    macro @RAND  {     @G   @APlace     |1rt @NN        @ANDisp }
+    macro @RLAND {     @LG  @APlace     |1rt @NN        @ANDisp }
+    macro @RIAND {     @IG  @APlace     |1rt @NN        @ANDisp }
+    macro @RCAND {     @CG  @APlace     |1rt @NN        @ANDisp }
+
+
+    macro @Display                            { @D     }
+    macro @LeftDisplay                        { @LD    }
+    macro @IndentedDisplay                    { @ID    }
+    macro @CentredDisplay                     { @CD    }
+    macro @CenteredDisplay                    { @CD    }
+
+    macro @AlignedDisplay                     { @AD    }
+    macro @LeftAlignedDisplay                 { @LAD   }
+    macro @IndentedAlignedDisplay             { @IAD   }
+    macro @CentredAlignedDisplay              { @CAD   }
+    macro @CenteredAlignedDisplay             { @CAD   }
+
+    macro @NumberedDisplay                    { @ND    }
+    macro @LeftNumberedDisplay                { @LND   }
+    macro @IndentedNumberedDisplay            { @IND   }
+    macro @CentredNumberedDisplay             { @CND   }
+    macro @CenteredNumberedDisplay            { @CND   }
+
+    macro @AlignedNumberedDisplay             { @AND   }
+    macro @LeftAlignedNumberedDisplay         { @LAND  }
+    macro @IndentedAlignedNumberedDisplay     { @IAND  }
+    macro @CentredAlignedNumberedDisplay      { @CAND  }
+    macro @CenteredAlignedNumberedDisplay     { @CAND  }
+
+
+    macro @RawDisplay                         { @RD    }
+    macro @RawLeftDisplay                     { @RLD   }
+    macro @RawIndentedDisplay                 { @RID   }
+    macro @RawCentredDisplay                  { @RCD   }
+    macro @RawCenteredDisplay                 { @RCD   }
+
+    macro @RawAlignedDisplay                  { @RAD   }
+    macro @RawLeftAlignedDisplay              { @RLAD  }
+    macro @RawIndentedAlignedDisplay          { @RIAD  }
+    macro @RawCentredAlignedDisplay           { @RCAD  }
+    macro @RawCenteredAlignedDisplay          { @RCAD  }
+
+    macro @RawNumberedDisplay                 { @RND   }
+    macro @RawLeftNumberedDisplay             { @RLND  }
+    macro @RawIndentedNumberedDisplay         { @RIND  }
+    macro @RawCentredNumberedDisplay          { @RCND  }
+    macro @RawCenteredNumberedDisplay         { @RCND  }
+
+    macro @RawAlignedNumberedDisplay          { @RAND  }
+    macro @RawLeftAlignedNumberedDisplay      { @RLAND }
+    macro @RawIndentedAlignedNumberedDisplay  { @RIAND }
+    macro @RawCentredAlignedNumberedDisplay   { @RCAND }
+    macro @RawCenteredAlignedNumberedDisplay  { @RCAND }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Lists and raw lists (except indented lists).                           #
+    #                                                                         #
+    ###########################################################################
+
+    def   @ItemPlace { @Galley }
+    def   @ListItem into { @ItemPlace&&preceding } right x { x }
+    macro @LI { @ListItem }
+
+    def   @EndListPlace { @Galley }
+    def   @EndList force into { @EndListPlace&&preceding } {}
+    macro @EL { @EndList }
+
+    def @RLL
+	named indent { @DispIndent }
+	named gap    { @DispGap }
+    {
+	def @List { |indent @ItemPlace | //gap @List }
+
+	@List // @EndListPlace
+    }
+
+    def   @RCL	{ @RLL indent { 0.5rt	 } }
+    macro @LL	{ @DP @RLL @DP	}
+    macro @CL	{ @DP @RCL @DP	}
+
+    macro @RawLeftList		{ @RLL	}
+    macro @RawCentredList	{ @RCL	}
+    macro @RawCenteredList	{ @RCL	}
+    macro @LeftList		{ @LL	}
+    macro @CentredList		{ @CL	}
+    macro @CenteredList		{ @CL	}
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Indented lists and raw indented lists, tagged automatically.           #
+    #                                                                         #
+    ###########################################################################
+
+    def @RawIndentedList
+       named style right tag	{               }
+       named indent		{ @DispIndent	}
+       named gap		{ @DispGap	}
+       named start		{ 1		}
+    {
+	def @IList right num
+	{   indent @Wide {style num} | @ItemPlace |
+	    //gap @IList @Next num
+	}
+
+	@IList start // @EndListPlace
+    }
+
+    def @RawNumberedList      { @RawIndentedList style { tag.	           } }
+    def @RawParenNumberedList { @RawIndentedList style { (tag)	           } }
+    def @RawRomanList	      { @RawIndentedList style { {@Roman&&tag}.    } }
+    def @RawParenRomanList    { @RawIndentedList style { ({@Roman&&tag})   } }
+    def @RawUCRomanList	      { @RawIndentedList style { {@UCRoman&&tag}.  } }
+    def @RawParenUCRomanList  { @RawIndentedList style { ({@UCRoman&&tag}) } }
+    def @RawAlphaList	      { @RawIndentedList style { {@Alpha&&tag}.    } }
+    def @RawParenAlphaList    { @RawIndentedList style { ({@Alpha&&tag})   } }
+    def @RawUCAlphaList	      { @RawIndentedList style { {@UCAlpha&&tag}.  } }
+    def @RawParenUCAlphaList  { @RawIndentedList style { ({@UCAlpha&&tag}) } }
+    def @RawBulletList	      { @RawIndentedList style { @Bullet	   } }
+    def @RawStarList	      { @RawIndentedList style { @Star		   } }
+    def @RawDashList	      { @RawIndentedList style { --	 	   } }
+
+    macro @IndentedList	      { @DP @RawIndentedList		@DP }
+    macro @NumberedList	      { @DP @RawNumberedList		@DP }
+    macro @ParenNumberedList  { @DP @RawParenNumberedList	@DP }
+    macro @RomanList	      { @DP @RawRomanList		@DP }
+    macro @ParenRomanList     { @DP @RawParenRomanList		@DP }
+    macro @UCRomanList	      { @DP @RawUCRomanList		@DP }
+    macro @ParenUCRomanList   { @DP @RawParenUCRomanList	@DP }
+    macro @AlphaList	      { @DP @RawAlphaList		@DP }
+    macro @ParenAlphaList     { @DP @RawParenAlphaList		@DP }
+    macro @UCAlphaList	      { @DP @RawUCAlphaList		@DP }
+    macro @ParenUCAlphaList   { @DP @RawParenUCAlphaList	@DP }
+    macro @BulletList	      { @DP @RawBulletList		@DP }
+    macro @StarList	      { @DP @RawStarList		@DP }
+    macro @DashList	      { @DP @RawDashList		@DP }
+
+    macro @RIL		{ @RawIndentedList	}
+    macro @RNL		{ @RawNumberedList	}
+    macro @RPNL		{ @RawParenNumberedList	}
+    macro @RRL		{ @RawRomanList		}
+    macro @RPRL		{ @RawParenRomanList	}
+    macro @RUCRL	{ @RawUCRomanList	}
+    macro @RPUCRL	{ @RawParenUCRomanList	}
+    macro @RAL		{ @RawAlphaList		}
+    macro @RPAL		{ @RawParenAlphaList	}
+    macro @RUCAL	{ @RawUCAlphaList	}
+    macro @RPUCAL	{ @RawParenUCAlphaList	}
+    macro @RBL		{ @RawBulletList	}
+    macro @RSL		{ @RawStarList		}
+    macro @RDL		{ @RawDashList		}
+
+    macro @IL		{ @IndentedList		}
+    macro @NL		{ @NumberedList		}
+    macro @PNL		{ @ParenNumberedList	}
+    macro @RL		{ @RomanList		}
+    macro @PRL		{ @ParenRomanList	}
+    macro @UCRL		{ @UCRomanList		}
+    macro @PUCRL	{ @ParenUCRomanList	}
+    macro @AL		{ @AlphaList		}
+    macro @PAL		{ @ParenAlphaList	}
+    macro @UCAL		{ @UCAlphaList		}
+    macro @PUCAL	{ @ParenUCAlphaList	}
+    macro @BL		{ @BulletList		}
+    macro @SL		{ @StarList		}
+    macro @DL		{ @DashList		}
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Indented lists and raw indented lists, tagged by the author.           #
+    #                                                                         #
+    ###########################################################################
+
+    def @TagPlace	{ @Galley }
+
+    def @TagItem into { @ItemPlace&&preceding }
+       left x
+       right y
+    { 
+       def senditem into { @TagPlace&&preceding } { x }
+
+       senditem | y
+    }
+
+    macro @TI { @TagItem }
+
+    def @RawTaggedList
+	named style right tag { tag }
+	named indent { @DispIndent }
+	named gap    { @DispGap }
+    {
+	def @LList
+	{   indent @Wide {style @TagPlace} | @ItemPlace
+	    //gap @LList
+	}
+
+	@LList // @EndListPlace
+    }
+
+    def @RawWideTaggedList	{ @RawTaggedList indent { @WideIndent       } }
+    def @RawVeryWideTaggedList	{ @RawTaggedList indent { @VeryWideIndent   } }
+    macro @TaggedList		{ @DP @RawTaggedList		@DP }
+    macro @WideTaggedList	{ @DP @RawWideTaggedList	@DP }
+    macro @VeryWideTaggedList	{ @DP @RawVeryWideTaggedList	@DP }
+
+    macro @RTL		{ @RawTaggedList		}
+    macro @RWTL		{ @RawWideTaggedList		}
+    macro @RVWTL	{ @RawVeryWideTaggedList	}
+    macro @TL		{ @TaggedList			}
+    macro @WTL		{ @WideTaggedList		}
+    macro @VWTL		{ @VeryWideTaggedList		}
+
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Definitions for laying out one general-purpose page.                   #
+    #                                                                         #
+    ###########################################################################
+
+    def @FullPlace        { @Galley }
+    def @ColPlace         { @Galley }
+    def @IndexPlace       { @Galley }
+
+    export @Tag
+    def @TopList right @Tag
+    {
+		   @Galley
+	//@TopGap  @TopList @Next @Tag
+    }
+
+    export @Tag
+    def @FootList right @Tag
+    {
+		    @Galley
+	//@FootGap  @FootList @Next @Tag
+    }
+
+    def @FootSect
+    {
+		    @FootLen @Wide @HLine
+	//@FootGap  @FootList 1 ||@FootLen
+    }
+
+    export @Tag
+    def @ColFootList right @Tag
+    {
+		    @Galley
+	//@FootGap  @ColFootList @Next @Tag
+    }
+
+    def @ColFootSect
+    {
+		    @ColFootLen @Wide @HLine
+	//@FootGap  @ColFootList 1 ||@ColFootLen
+    }
+
+    def @ColList right col
+    {
+	def @Column
+	{
+	    @VExpand { @ColPlace //1rt @OneRow { //@MidGap @ColFootSect } }
+	}
+
+	col @Case {
+
+	    Single @Yield @Column
+
+	    Double @Yield { @DoubleColWidth @Wide @Column
+			    ||@ColGap @ColList col }
+
+	    Multi  @Yield { @MultiColWidth @Wide @Column
+			    ||@ColGap @ColList col }
+
+	}
+    }
+    
+    def @IndexColList right col
+    {
+	col @Case {
+
+	    Single @Yield @VExpand @IndexPlace
+
+	    Double @Yield { @DoubleColWidth @Wide @VExpand @IndexPlace
+			    ||@ColGap @IndexColList col }
+
+	    Multi  @Yield { @MultiColWidth @Wide @VExpand @IndexPlace
+			    ||@ColGap @IndexColList col }
+
+	}
+    }
+
+    def @Page right x
+    {	@PageWidth @Wide @PageHeight @High
+	{   //@PageMargin ||@PageMargin
+	    @HExpand @VExpand x
+	    ||@PageMargin //@PageMargin
+	}
+    }
+
+    def @OnePage
+	named @Columns {}
+	named @PageTop {}
+	named @PageFoot {}
+    {
+	@Page {
+		      @PageTop
+	    //@MidGap @TopList
+	    //@MidGap @FullPlace
+	    //@MidGap @ColList @Columns
+	    //@MidGap @IndexColList @IndexColumns
+	    // //1rt  @OneRow { //@MidGap @FootSect //@MidGap @PageFoot }
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Introductory page (with @IntroFullPlace and @IntroColPlace).           #
+    #                                                                         #
+    ###########################################################################
+
+    def @IntroFullPlace   { @Galley }
+    def @IntroColPlace    { @Galley }
+
+    def @IntroColList right col
+    {
+	def @Column
+	{
+	    @VExpand { @IntroColPlace //1rt @OneRow { //@MidGap @ColFootSect } }
+	}
+
+	col @Case {
+
+	    Single @Yield @Column
+
+	    Double @Yield { @DoubleColWidth @Wide @Column
+			    ||@ColGap @IntroColList col }
+
+	    Multi  @Yield { @MultiColWidth @Wide @Column
+			    ||@ColGap @IntroColList col }
+
+	}
+    }
+
+    def @OneIntroPage
+	named @Columns {}
+	named @PageTop {}
+	named @PageFoot {}
+    {
+	@Page {
+	    @PageTop
+	    //@MidGap @TopList
+	    //@MidGap @IntroFullPlace
+	    //@MidGap @IntroColList @Columns
+	    //@MidGap @IndexColList @IndexColumns
+	    // //1rt @OneRow { //@MidGap @FootSect //@MidGap @PageFoot }
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Page layout for documents other than books (simple and tech. reports)  #
+    #                                                                         #
+    ###########################################################################
+
+    def @SimplePageList
+	named @Columns {}
+	named @PageNumbers {}
+	right @PageNum
+    {
+            @PageMarker @PageNum
+	//  @OnePage
+	        @Columns { @Columns }
+	        @PageTop {
+		    @PageNumbers @Case
+		    {
+		        {Yes yes} @Yield
+		        {
+			    @PageNum @Case
+			    {
+			        1    @Yield @PageOneTopFormat @PageNum
+			        else @Yield @PageTopFormat    @PageNum
+			    }
+		        }
+		        else @Yield @Null
+		    }
+	        }
+	        @PageFoot {
+		    @PageNumbers @Case
+		    {
+			{Yes yes} @Yield
+			{
+			    @PageNum @Case
+			    {
+				1    @Yield @PageOneFootFormat @PageNum
+				else @Yield @PageFootFormat    @PageNum
+			    }
+			}
+			else @Yield @Null
+		    }
+		}
+	//  @SimplePageList
+		@Columns { @Columns }
+		@PageNumbers { @PageNumbers }
+		@Next @PageNum
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Page list for ordinary pages of books.                                 #
+    #                                                                         #
+    ###########################################################################
+
+    def @OddPageList
+	named @Columns {}
+	right @PageNum
+    {
+	def @EvenPageList
+	    named @Columns {}
+	    right @PageNum
+	{
+		@PageMarker @PageNum
+	    //	@Runner&&following @Open
+		{
+		    @OnePage
+			@Columns { @Columns }
+			@PageTop { @TopEven @PageNum }
+			@PageFoot { @FootEven @PageNum }
+		}
+	    //	@OddPageList
+		    @Columns { @Columns }
+		    @Next @PageNum
+	}
+
+	    @PageMarker @PageNum
+	//  @Runner&&following @Open
+	    {
+		@OnePage
+		    @Columns { @Columns }
+		    @PageTop { @TopOdd @PageNum }
+		    @PageFoot { @FootOdd @PageNum }
+	    }
+	//  @EvenPageList
+		@Columns { @Columns }
+		@Next @PageNum
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Page list for introductory pages of books.                             #
+    #                                                                         #
+    ###########################################################################
+
+    def @IntroOddPageList
+	named @Columns {}
+	right @PageNum
+    {
+	    @PageMarker @Roman&&@PageNum
+	//  @Runner&&following @Open
+	    {
+		@OneIntroPage
+		    @Columns { @Columns }
+		    @PageTop { @TopOdd @Roman&&@PageNum }
+		    @PageFoot { @FootOdd @Roman&&@PageNum }
+	    }
+	//  @PageMarker @Roman&&{@Next @PageNum}
+	//  @Runner&&following @Open
+	    {
+		@OneIntroPage
+		    @Columns { @Columns }
+		    @PageTop { @TopEven @Roman&&{@Next @PageNum} }
+		    @PageFoot { @FootEven @Roman&&{@Next @PageNum} }
+	    }
+	//  @IntroOddPageList
+		@Columns { @Columns }
+		@Next @Next @PageNum
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Table of contents.                                                     #
+    #                                                                         #
+    ###########################################################################
+
+    def @ContentsPlace { @Galley }
+
+    def @ContentsEntry
+	left lpart
+	named pregap { @ContentsGap }
+	right rpart
+    {
+	def @Leaders { .. &4s @Leaders }
+
+	def sendentry into { @ContentsPlace&&preceding }
+	{
+	    //pregap
+	    lpart |1rt &2s @Leaders & 2f @Wide {|1rt rpart}
+	}
+
+	@TableOfContents @Case {
+	    {Yes yes} @Yield sendentry
+	    else      @Yield @Null
+	}
+    }
+
+    def @MajorContentsEntry
+	left lpart
+	named pregap { @MajorContentsGap }
+	right rpart
+    {
+	{@B lpart} @ContentsEntry pregap { pregap } rpart
+    }
+
+    def @ContentsSection
+    {
+	def @ContentsList { @ContentsPlace // @ContentsList }
+
+	@TableOfContents @Case {
+	    {Yes yes} @Yield { @BookTitleFormat Contents // @ContentsList }
+	    else      @Yield @Null
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Footnotes.                                                             #
+    #                                                                         #
+    ###########################################################################
+
+    def @FullFootNote
+	named @Tag {}
+	right x
+    {
+	def ftag
+	{ @OneRow { @FootList&&@Tag @Open { 0.8f @Font @Tag } ^/0.3vo }
+	}
+
+	def fnote into { @FootList&&following }
+	{
+	    @FootNoteFont @Font @FootNoteBreak @Break
+	    { @FootList&&preceding @Tagged @Tag  ftag & x }
+	}
+
+	@Null & @FootNoteFont @Font ftag & fnote
+    }
+
+    def @ColFootNote
+	named @Tag {}
+	right x
+    {
+	def ftag
+	{ @OneRow { @ColFootList&&@Tag @Open { 0.8f @Font @Tag } ^/0.3vo }
+	}
+
+	def fnote into { @ColFootList&&following }
+	{
+	    @FootNoteFont @Font @FootNoteBreak @Break
+	    { @ColFootList&&preceding @Tagged @Tag  ftag & x }
+	}
+
+	@Null & @FootNoteFont @Font ftag & fnote
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  References.                                                            #
+    #                                                                         #
+    ###########################################################################
+
+    export  @Type @Author @Title @Institution
+	    @Number @Publisher @Year @Proceedings
+	    @Journal @Volume @Pages @Comment
+
+    def @Reference
+	named @Tag          { TAG?         }
+	named @Type         { TYPE?        }
+	named @Author       { AUTHOR?      }
+	named @Title        { TITLE?       }
+	named @Institution  { INSTITUTION? }
+	named @Number       { NUMBER?      }
+	named @Publisher    { PUBLISHER?   }
+	named @Year         { YEAR?        }
+	named @Proceedings  { PROCEEDINGS? }
+	named @Journal      { JOURNAL?     }
+	named @Volume       { VOLUME?      }
+	named @Pages        { PAGES?       }
+	named @Comment      { @Null        }
+    { @Null }
+
+    export @Style
+    def @RefStyle
+	left @Tag
+	named @Style right reftag {}
+    {}
+
+    @SysDatabase @RefStyle { "refstyles" }
+
+    def @RefPrint right reftag
+    {	@RefStyle&&{ @Reference&&reftag @Open { @Type } }
+	@Open { @Style reftag }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Reference collection at end of chapter.                                #
+    #                                                                         #
+    ###########################################################################
+
+    def @ChapRefPlace { @Galley }
+
+    def @ChapRefSection
+	named @Title		{ References }
+	named style right tag	{ tag. }
+	named indent		{ @DispIndent }
+	named gap		{ @DispGap }
+	named start		{ 1 }
+    {
+	def @RefList right num
+	{
+	    @NumberMarker num &
+	    indent @Wide {style num}  |  @ChapRefPlace
+	    //gap @RefList @Next num
+	}
+
+	@Heading @Protect @Title
+	//@DispGap
+	@RefList start
+    }
+
+    def @ChapRef right x
+    {
+	def sendref into { @ChapRefPlace&&following }
+	    right @Key
+	{
+	    @NumberMarker&&preceding @Tagged x &
+	    @PageMarker&&preceding @Tagged x &
+	    @RefPrint x
+	}
+
+	@NumberMarker&&x @Open { @Tag } sendref x
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Reference collection at end of document.                               #
+    #                                                                         #
+    ###########################################################################
+
+    def @RefPlace { @Galley }
+
+    def @Ref right x
+    {
+	def sendref into { @RefPlace&&following }
+	    right @Key
+	{
+	    @NumberMarker&&preceding @Tagged x &
+	    @PageMarker&&preceding @Tagged x &
+	    @RefPrint x
+	}
+
+	@NumberMarker&&x @Open { @Tag } sendref x
+    }
+
+    def @ReferenceSection
+	named @Tag		{}
+	named @Title		{ References }
+	named @RunningTitle	{ dft }
+	named style right tag	{ tag. }
+	named headstyle right @Title { @Heading @Title }
+	named indent		{ @DispIndent }
+	named gap		{ @DispGap }
+	named start		{ 1 }
+    {
+	def @RefList right num
+	{
+	    @NumberMarker num &
+	    indent @Wide {style num}  |  @RefPlace
+	    //gap @RefList @Next num
+	}
+
+	    @Protect headstyle @Title
+	//  @PageMarker&&preceding @Tagged @Tag
+	//  @Title @MajorContentsEntry {@PageOf @Tag}
+	//  @Runner
+		@FootEven { |0.5rt 0.8f @Font @B @PageNum }
+		@FootOdd  { |0.5rt 0.8f @Font @B @PageNum }
+	//@DispGap  @RefList start
+	//  @Runner
+		@TopEven { @B @PageNum }
+		@TopOdd  { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Floating figures.                                                      #
+    #                                                                         #
+    ###########################################################################
+
+    def @FigurePlace { @Galley }
+    def @EndFigurePlace { @Galley }
+
+    def @FigureGalley into { @TopList&&following }
+	right prefix
+    {
+	def @FigureList right x
+	{
+	    @NumberMarker {prefix}x & ||0.5rt @FigurePlace ||
+	    //@TopGap
+	    @FigureList @Next x
+	}
+
+	@FigureList 1
+	//
+	@EndFigurePlace
+    }
+
+    def @EndFigures force into { @EndFigurePlace&&following } {}
+
+    def @Figure into { @FigurePlace&&following }
+	named @Caption {}
+	named @Tag {}
+	right @Body
+    {
+	@OneRow
+	{
+	    ||0.5rt @HContract @Body
+	    //@DispGap
+	    ||0.5rt
+	    @NumberMarker&&preceding @Tagged @Tag
+	    @PageMarker&&preceding @Tagged @Tag
+	    @B { Figure {@NumberOf @Tag}. }  @Caption
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Floating tables.                                                       #
+    #                                                                         #
+    ###########################################################################
+
+    def @TablePlace { @Galley }
+    def @EndTablePlace { @Galley }
+
+    def @TableGalley into { @TopList&&following }
+	right prefix
+    {
+	def @TableList right x
+	{
+	    @NumberMarker {prefix}x & ||0.5rt @TablePlace ||
+	    //@TopGap
+	    @TableList @Next x
+	}
+
+	@TableList 1
+	//
+	@EndTablePlace
+    }
+
+    def @EndTables force into { @EndTablePlace&&following } {}
+
+    def @Table into { @TablePlace&&following }
+	named @Caption {}
+	named @Tag {}
+	right @Body
+    {
+	@OneRow
+	{
+	    ||0.5rt @HContract @Body
+	    //@DispGap
+	    ||0.5rt
+	    @NumberMarker&&preceding @Tagged @Tag
+	    @PageMarker&&preceding @Tagged @Tag
+	    @B { Table {@NumberOf @Tag}. }  @Caption
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Lists of chapters, sections, subsections, and appendices.              #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag
+    def @ChapterList right @Tag
+    {
+			    @Galley
+	//@ChapterGap	    @ChapterList @Next @Tag
+    }
+
+    export @Tag
+    def @SectionList right @Tag
+    {
+			    @Galley
+        //@SectionGap	    @SectionList @Next @Tag
+    }
+
+    export @Tag
+    def @SubSectionList right @Tag
+    {
+			    @Galley
+	//@SubSectionGap    @SubSectionList @Next @Tag
+    }
+
+    export @Tag
+    def @AppendixList right @Tag
+    {
+			    @Galley
+	//@AppendixGap	    @AppendixList @Next @Tag
+    }
+
+    export @Tag
+    def @SubAppendixList right @Tag
+    {
+			    @Galley
+	//@SubAppendixGap   @SubAppendixList @Next @Tag
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Body text.                                                             #
+    #                                                                         #
+    ###########################################################################
+
+    export @ColText @FootNote
+	   @BeginSections @EndSections @BeginAppendices @EndAppendices
+
+    def @Text force into { @FullPlace&&preceding }
+	body x
+    {
+	def @FootNote right x { @FullFootNote x }
+
+	def @EndSectionsPlace { @Galley }
+	def @EndSections force into { @EndSectionsPlace&&preceding }  {}
+	macro @BeginSections
+	      { //@SectionGap @SectionList 1 // @EndSectionsPlace // }
+
+	def @EndAppendicesPlace { @Galley }
+	def @EndAppendices force into { @EndAppendicesPlace&&preceding }  {}
+	macro @BeginAppendices
+	      { //@AppendixGap @AppendixList 1 // @EndAppendicesPlace //}
+
+
+	export @FootNote
+	def @ColText force into { @ColPlace&&following }
+	    body x
+	{
+	    def @FootNote right x { @ColFootNote x }
+	
+	    x
+	}
+
+	x
+    }
+
+    export @FootNote
+	   @BeginSections @EndSections @BeginAppendices @EndAppendices
+    def @ColText force into { @ColPlace&&preceding }
+	body x
+    {
+	def @FootNote right x { @ColFootNote x }
+
+	def @EndSectionsPlace { @Galley }
+	def @EndSections force into { @EndSectionsPlace&&preceding }  {}
+	macro @BeginSections
+	      { //@SectionGap @SectionList 1 // @EndSectionsPlace // }
+
+	def @EndAppendicesPlace { @Galley }
+	def @EndAppendices force into { @EndAppendicesPlace&&preceding }  {}
+	macro @BeginAppendices
+	      { //@AppendixGap @AppendixList 1 // @EndAppendicesPlace //}
+	x
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Abstract.                                                              #
+    #                                                                         #
+    ###########################################################################
+
+    def @AbstractPlace { @Galley }
+
+    export @FootNote
+    def @Abstract into { @AbstractPlace&&preceding }
+	named @Title { ABSTRACT }
+	body x
+    {  
+	def @FootNote right x { @FullFootNote x }
+
+	|0.5rt @I @Title
+	//@DispGap x
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Preface.                                                               #
+    #                                                                         #
+    ###########################################################################
+
+    def @PrefacePlace { @Galley }
+
+    export @FootNote @BeginFigures @BeginTables
+    def @Preface force into { @PrefacePlace&&preceding }
+	named @Tag {}
+	named @Title { Preface }
+	named @RunningTitle { dft }
+	body @Body
+    {
+	def @FootNote right x { @ColFootNote x }
+	macro @BeginFigures { // @FigureGalley {} // }
+	macro @BeginTables  { // @TableGalley  {} // }
+
+	    ragged @Break @BookTitleFormat @Title
+	//  @PageMarker&&preceding @Tagged @Tag
+	//  @Body
+	//@SectionGap	@ChapRefSection
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Introduction.                                                          #
+    #                                                                         #
+    ###########################################################################
+
+    def @IntroductionPlace { @Galley }
+
+    export @FootNote @BeginFigures @BeginTables
+    def @Introduction force into { @IntroductionPlace&&preceding }
+	named @Tag {}
+	named @Title { Introduction }
+	named @RunningTitle { dft }
+	body @Body
+    {
+	def @FootNote right x { @ColFootNote x }
+	macro @BeginFigures { // @FigureGalley {} // }
+	macro @BeginTables  { // @TableGalley  {} // }
+
+	    ragged @Break @BookTitleFormat @Title
+	//  @Runner
+		@FootEven { |0.5rt 0.8f @Font @B @PageNum }
+		@FootOdd  { |0.5rt 0.8f @Font @B @PageNum }
+	//  @PageMarker&&preceding @Tagged @Tag
+	//  @Title @MajorContentsEntry {@PageOf @Tag}
+	//  @Body
+	//@SectionGap	@ChapRefSection
+	//  @Runner
+		@TopEven { @B @PageNum }
+		@TopOdd { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Chapters containing sections and subsections.                          #
+    #                                                                         #
+    ###########################################################################
+
+    export @FootNote @BeginFigures @BeginTables
+	   @BeginSections @EndSections @Section
+    def @Chapter force into { @ChapterList&&preceding }
+	named @Tag {}
+	named @Title {}
+	named @RunningTitle { dft }
+	body @Body
+    {
+	def @FootNote right x { @ColFootNote x }
+	macro @BeginFigures { // @FigureGalley {@NumberOf @Tag}. // }
+	macro @BeginTables  { // @TableGalley  {@NumberOf @Tag}. // }
+
+	def @EndSectionsPlace { @Galley }
+	def @EndSections force into { @EndSectionsPlace&&preceding } {}
+	macro @BeginSections
+	      { //@SectionGap @SectionList 1 // @EndSectionsPlace // }
+
+	export @BeginSubSections @EndSubSections @SubSection
+	def @Section force into { @SectionList&&preceding }
+	    named @Tag {}
+	    named @Title {}
+	    named @RunningTitle { dft }
+	    body @Body
+	{
+
+	    def @EndSubSectsPlace { @Galley }
+	    def @EndSubSections force into { @EndSubSectsPlace&&preceding } {}
+	    macro @BeginSubSections
+	     { //@SubSectionGap @SubSectionList 1// @EndSubSectsPlace//}
+
+	    def @SubSection force into { @SubSectionList&&preceding }
+		named @Tag {}
+		named @Title {}
+	        named @RunningTitle { dft }
+		body @Body
+	    {
+		def @SubSectionTitle
+		{
+		    @SubSectionNumbers @Case {
+			{Yes yes} @Yield { {@NumberOf @Tag}.  |2s  @Title }
+			else      @Yield @Title
+		    }
+		}
+
+		    @MinorHeading @Protect @SubSectionTitle
+		//  @NumberMarker {
+			{@ChapterList&&@Tag    @Open { @Tag }}.{
+			 @SectionList&&@Tag    @Open { @Tag }}.{
+			 @SubSectionList&&@Tag @Open { @Tag }}
+		    }
+		//  @ChapterList&&preceding     @Tagged @Tag
+		//  @SectionList&&preceding     @Tagged @Tag
+		//  @SubSectionList&&preceding  @Tagged @Tag
+		//  @NumberMarker&&preceding    @Tagged @Tag
+		//  @PageMarker&&preceding      @Tagged @Tag
+		//  {&5f @SubSectionTitle} @ContentsEntry {@PageOf @Tag}
+		//0io @Body
+	    }
+
+	    def @SectionTitle
+	    {
+		@SectionNumbers @Case {
+		    {Yes yes} @Yield { {@NumberOf @Tag}.  |2s  @Title }
+		    else      @Yield @Title
+		}
+	    }
+
+	        @Heading @Protect @SectionTitle
+	    //  @NumberMarker {
+		    {@ChapterList&&@Tag @Open { @Tag }}.{
+		     @SectionList&&@Tag @Open { @Tag }}
+		}
+	    //  @ChapterList&&preceding  @Tagged @Tag
+	    //  @SectionList&&preceding  @Tagged @Tag
+	    //  @NumberMarker&&preceding @Tagged @Tag
+	    //  @PageMarker&&preceding   @Tagged @Tag
+	    //  { &3f @SectionTitle } @ContentsEntry {@PageOf @Tag}
+	    //0io @Body
+
+	}
+
+	def @ChapterTitle
+	{
+	    @ChapterNumbers @Case {
+		{Yes yes} @Yield { Chapter {@NumberOf @Tag}.  |2s  @Title }
+		else      @Yield @Title
+	    }
+	}
+
+	def @ChapterNum
+	{
+	    @ChapterNumbers @Case {
+		{Yes yes} @Yield { Chapter {@NumberOf @Tag} }
+		else      @Yield @Null
+	    }
+	}
+
+	    ragged @Break @BookTitleFormat @ChapterTitle
+	//  @NumberMarker {
+		@ChapterList&&@Tag @Open { @Tag }
+	    }
+	//  @ChapterList&&preceding  @Tagged @Tag
+	//  @NumberMarker&&preceding @Tagged @Tag
+	//  @PageMarker&&preceding   @Tagged @Tag
+	//  { @ChapterTitle } @MajorContentsEntry {@PageOf @Tag}
+	//  @Runner
+		@FootEven { |0.5rt 0.8f @Font @B @PageNum }
+		@FootOdd  { |0.5rt 0.8f @Font @B @PageNum }
+	//  @Body
+	//@SectionGap @ChapRefSection
+	//  @Runner
+		@TopEven { @B @PageNum |1rt @I @ChapterNum }
+		@TopOdd  { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Sections containing subsections.                                       #
+    #                                                                         #
+    ###########################################################################
+
+    export @FootNote @BeginFigures @BeginTables
+	   @BeginSubSections @SubSection @EndSubSections
+    def @Section force into { @SectionList&&preceding }
+	named @Tag {}
+	named @Title {}
+	named @RunningTitle { dft }
+	body @Body
+    {
+	def @FootNote right x { @ColFootNote x }
+	macro @BeginFigures { // @FigureGalley {@NumberOf @Tag}. // }
+	macro @BeginTables  { // @TableGalley  {@NumberOf @Tag}. // }
+
+	def @EndSubSectsPlace { @Galley }
+	def @EndSubSections force into { @EndSubSectsPlace&&preceding }  {}
+	macro @BeginSubSections
+	  { //@SubSectionGap @SubSectionList 1 // @EndSubSectsPlace // }
+
+	def @SubSection force into { @SubSectionList&&preceding }
+	    named @Tag {}
+	    named @Title {}
+	    named @RunningTitle { dft }
+	    right @Body
+	{
+	    def @SubSectionTitle
+	    {
+		@SubSectionNumbers @Case {
+		    {Yes yes} @Yield { {@NumberOf @Tag}.  |2s  @Title }
+		    else      @Yield @Title
+		}
+	    }
+
+	        @MinorHeading @Protect @SubSectionTitle
+	    //	@NumberMarker {
+		    {@SectionList&&@Tag @Open { @Tag }}.{
+		     @SubSectionList&&@Tag @Open { @Tag }}
+		}
+	    //	@SubSectionList&&preceding @Tagged @Tag
+	    //	@SectionList&&preceding    @Tagged @Tag
+	    //	@NumberMarker&&preceding   @Tagged @Tag
+	    //	@PageMarker&&preceding     @Tagged @Tag
+	    //0io @Body
+	}
+
+	def @SectionTitle
+	{
+	    @SectionNumbers @Case {
+		{Yes yes} @Yield { {@NumberOf @Tag}.  |2s  @Title }
+		else      @Yield @Title
+	    }
+	}
+
+	    @Heading @Protect @SectionTitle
+	//  @NumberMarker {
+		@SectionList&&@Tag @Open { @Tag }
+	    }
+	//  @SectionList&&preceding  @Tagged @Tag
+	//  @NumberMarker&&preceding @Tagged @Tag
+	//  @PageMarker&&preceding   @Tagged @Tag
+	//0io @Body
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Appendices.                                                            #
+    #                                                                         #
+    ###########################################################################
+
+    export @FootNote @BeginFigures @BeginTables
+	   @BeginSubAppendices @SubAppendix @EndSubAppendices
+    def @Appendix force into { @AppendixList&&preceding }
+	named @Tag {}
+	named @Title {}
+	named @RunningTitle { dft }
+	body  @Body
+    {
+	def @FootNote right x { @ColFootNote x }
+	macro @BeginFigures { // @FigureGalley {@NumberOf @Tag}. // }
+	macro @BeginTables  { // @TableGalley  {@NumberOf @Tag}. // }
+
+	def @EndSubAppendicesPlace { @Galley }
+	def @EndSubAppendices force into {@EndSubAppendicesPlace&&preceding} {}
+	macro @BeginSubAppendices
+	  { //@SubAppendixGap @SubAppendixList 1 // @EndSubAppendicesPlace // }
+
+	def @SubAppendix force into { @SubAppendixList&&preceding }
+	    named @Tag {}
+	    named @Title {}
+	    named @RunningTitle { dft }
+	    right @Body
+	{
+	    def @SubAppendixTitle
+	    {
+		@SubAppendixNumbers @Case {
+		    {Yes yes} @Yield { {@NumberOf @Tag}.  |2s  @Title }
+		    else      @Yield @Title
+		}
+	    }
+
+	        @Heading @Protect @SubAppendixTitle
+	    //	@NumberMarker {
+		    {@AppendixList&&@Tag @Open { @Tag }}.{
+		     @SubAppendixList&&@Tag @Open { @Tag }}
+		}
+	    //	@SubAppendixList&&preceding @Tagged @Tag
+	    //	@AppendixList&&preceding    @Tagged @Tag
+	    //	@NumberMarker&&preceding   @Tagged @Tag
+	    //	@PageMarker&&preceding     @Tagged @Tag
+	    //	@SubAppendixTitle @ContentsEntry {@PageOf @Tag}
+	    //0io @Body
+	}
+
+	def @AppendixTitle
+	{
+	    @AppendixNumbers @Case {
+		{Yes yes} @Yield { Appendix {@NumberOf @Tag}.  |2s  @Title }
+		else      @Yield { Appendix.  @Title }
+	    }
+	}
+
+	def @AppendixNum
+	{
+	    @AppendixNumbers @Case {
+		{Yes yes} @Yield { @NumberOf @Tag }
+		else      @Yield @Null
+	    }
+	}
+
+	    ragged @Break @BookTitleFormat @AppendixTitle
+	//  @NumberMarker {
+		@AppendixList&&@Tag @Open { @UCAlpha&&@Tag }
+	    }
+	//  @AppendixList&&preceding @Tagged @Tag
+	//  @NumberMarker&&preceding @Tagged @Tag
+	//  @PageMarker&&preceding   @Tagged @Tag
+	//  @AppendixTitle @MajorContentsEntry {@PageOf @Tag}
+	//  @Runner
+		@FootEven { |0.5rt 0.8f @Font @B @PageNum }
+		@FootOdd  { |0.5rt 0.8f @Font @B @PageNum }
+	//  @Body
+	//@SectionGap @ChapRefSection
+	//  @Runner
+		@TopEven { @B @PageNum |1rt @I { Appendix @AppendixNum } }
+		@TopOdd  { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Index.                                                                 #
+    #                                                                         #
+    ###########################################################################
+
+    def @IndexList { @Galley //1vx @IndexList }
+
+    def @IndexSection
+	named @Tag {}
+	named @Title { Index }
+	named @RunningTitle { dft }
+	named headstyle right @Title { @Heading @Title //@DispGap }
+    {
+
+	def @IndexBody into { @IndexPlace&&following }
+	{ // @IndexList
+	  // @Runner
+		@TopEven { @B @PageNum }
+		@TopOdd  { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+	}
+
+        def indexsection
+        {
+		headstyle @Title
+	    //	@PageMarker&&preceding @Tagged @Tag
+	    //	@Title @MajorContentsEntry {@PageOf @Tag}
+	    //	@Runner
+		    @FootEven { |0.5rt 0.8f @Font @B @PageNum }
+		    @FootOdd  { |0.5rt 0.8f @Font @B @PageNum }
+	    //	@IndexBody
+        }
+
+	@MakeIndex @Case {
+	    {Yes yes} @Yield indexsection
+	    else      @Yield @Null
+	}
+    }
+
+    def @SendIndex
+	left key
+	right @Body
+    {
+        def sendindex into { @IndexList&&following }
+	    left @Key
+	    right @Body
+	{
+	    outdent @Break @Body
+	}
+
+	@MakeIndex @Case {
+	    {Yes yes} @Yield {key sendindex @Body}
+	    else      @Yield @Null
+	}
+    }
+
+    def @RawIndex       left x right y { {@PageMark x} x @SendIndex { &0f y } }
+    def @RawSubIndex    left x right y { {@PageMark x} x @SendIndex { &1f y } }
+    def @RawSubSubIndex left x right y { {@PageMark x} x @SendIndex { &2f y } }
+
+    def @Index       left x right y { x @RawIndex       { y, {@PageOf x} } }
+    def @SubIndex    left x right y { x @RawSubIndex    { y, {@PageOf x} } }
+    def @SubSubIndex left x right y { x @RawSubSubIndex { y, {@PageOf x} } }
+
+    def @IndexBlanks
+    {
+	b @RawIndex {} c @RawIndex {} d @RawIndex {} e @RawIndex {}
+	f @RawIndex {} g @RawIndex {} h @RawIndex {} i @RawIndex {}
+	j @RawIndex {} k @RawIndex {} l @RawIndex {} m @RawIndex {}
+	n @RawIndex {} o @RawIndex {} p @RawIndex {} q @RawIndex {}
+	r @RawIndex {} s @RawIndex {} t @RawIndex {} u @RawIndex {}
+	v @RawIndex {} w @RawIndex {} x @RawIndex {} y @RawIndex {}
+	z @RawIndex {}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Document.                                                              #
+    #                                                                         #
+    ###########################################################################
+
+    def @Document
+	named @InitialFont { @InitialFont }
+	named @InitialBreak { @InitialBreak }
+	named @Hyphenate { @Hyphenate }
+	named @PageNumbers { @PageNumbers }
+	named @FirstPageNumber { @FirstPageNumber }
+	named @Columns { @Columns }
+    {
+        { Times Base 12p } @Font @InitialFont @Font
+	{ {@Hyph @Hyphenate} adjust 1.20fx } @Break @InitialBreak @Break
+	{
+	    //  @FigureGalley {}
+	    //  @TableGalley  {}
+	    //  @SimplePageList
+		    @Columns { @Columns }
+		    @PageNumbers { @PageNumbers }
+		    @FirstPageNumber
+	}
+    }
+
+    macro @Doc { @Document // }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Report.                                                                #
+    #                                                                         #
+    ###########################################################################
+
+    def @Report
+	named @Title {}
+	named @Author {}
+	named @Institution {}
+	named @DateLine { @Date }
+	named @InitialFont { @InitialFont }
+	named @InitialBreak { @InitialBreak }
+	named @Hyphenate { @Hyphenate }
+	named @PageNumbers { @PageNumbers }
+	named @Columns { @Columns }
+    {
+	def @TitleMaterial
+	{
+		    |0.5rt @B {{clines 1.4vx} @Break @Title} |
+	    //0.25i |0.5rt @I {clines @Break @Author} |
+	    //0.25i |0.5rt clines @Break @Institution |
+	}
+
+	def @ReportContent force into { @ColPlace&&following }
+	{
+	    		    @SectionList 1
+	    //@AppendixGap  @AppendixList 1
+	    //@SectionGap   @ReferenceSection
+	}
+
+	{ Times Base 12p } @Font @InitialFont @Font
+	{ {@Hyph @Hyphenate} adjust 1.20fx } @Break @InitialBreak @Break
+	{
+	    # cover sheet
+            //  @PageMarker 0
+	    //  @Page {
+		    //1i	  @TitleMaterial
+		    //0.5i	  |0.5rt @OneCol { |0.5i @AbstractPlace |0.5i }
+		    //1i	  @DateLine
+		    //1rt	  @OneRow { //@MidGap @FootSect }
+		}
+
+	    //  @FigureGalley {}
+	    //  @TableGalley  {}
+	    //  @ReportContent
+
+	    # first page
+            //  @PageMarker 1
+	    //  @Page
+		{
+		  @PageNumbers @Case
+		  {
+		    {Yes yes} @Yield @PageOneTopFormat num
+		    else      @Yield @Null
+		  }
+		  //
+		  //0.5i	@TitleMaterial
+		  //@MidGap	@ColList @Columns
+		  //1rt @OneRow
+		  {
+				//@MidGap
+				@PageNumbers @Case
+				{
+				    {Yes yes} @Yield @PageOneFootFormat num
+				    else      @Yield @Null
+				}
+		  }
+		}
+
+	    # subsequent pages
+	    //	@SimplePageList
+		  @Columns { @Columns }
+		  @PageNumbers { @PageNumbers }
+		  2
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Book.                                                                  #
+    #                                                                         #
+    ###########################################################################
+
+    def @Book
+	named @Title {}
+	named @Author {}
+	named @Edition {}
+	named @Publisher {}
+	named @InitialFont { @InitialFont }
+	named @InitialBreak { @InitialBreak }
+	named @Hyphenate { @Hyphenate }
+    {
+	def @BookIntro force into { @IntroColPlace&&preceding }
+	{
+	  @BookCoverFont @Font
+	  { //1i    |0.5rt 2.5f @Font {1.2fx clines} @Break @Title |
+	    //2i    |0.5rt clines @Break @Author |
+	    //1i    |0.5rt clines @Break @Edition |
+	    //1rt   @OneRow @Publisher
+	  }
+	    //	    @Runner
+	    //1.1b  @PrefacePlace
+	    //1.1b  @ContentsSection
+	}
+
+	def @BookBody force into { @ColPlace&&preceding }
+	{
+		    @IntroductionPlace
+	    //@ChapterGap   @ChapterList 1
+	    //@AppendixGap  @AppendixList 1
+	    //1.1b  @ReferenceSection
+			headstyle { ragged @Break @BookTitleFormat @Title }
+	    //1.1b  @IndexSection
+			headstyle { ragged @Break @BookTitleFormat @Title }
+	}
+
+	{ Times Base 12p } @Font @InitialFont @Font
+	{ {@Hyph @Hyphenate} adjust 1.20fx } @Break @InitialBreak @Break
+	{
+			@IntroOddPageList @Columns { Single } 1
+	    //		@Runner
+			    @FootEven { @PageNum }
+			    @FootOdd  { |1rt @PageNum }
+	    //		@OddPageList @Columns { Single } 1
+	    //		@BookIntro
+	    //		@BookBody
+	    //		@Runner
+	}
+    }
+
+@End @DocumentLayout

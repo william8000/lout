@@ -1,0 +1,90 @@
+@Section
+   @Tag { intro }
+   @Title { Introduction }
+@Begin
+@PP
+The Lout document formatting system has been designed with the
+needs of the ordinary user very much in mind.  Although the features of Lout
+are virtually endless, and include mathematical equations, diagrams made
+from lines and shapes, bibliographic databases, and so on, the system is
+very simple to use.
+@PP
+Document formatting with Lout begins with the creation of a file like
+the following:
+@ID @Code {
+"@Doc @Text @Begin"
+"@Heading { Introduction }"
+"@PP"
+"For Virginia Woolf, @I Middlemarch"
+"was `the magnificent book which"
+"for all its imperfections is one"
+"of the few English novels written"
+"for grown-up people.'"
+"@End @Text"
+}
+Ordinary words are mixed with symbols of special meaning, such as
+{@Code "@Doc"}, {@Code "@Text"}, {@Code "@Heading"}, and
+{@Code "@I"}.  Most symbols begin with {@Code "@"}, but some, like
+{@Code "{"} and {@Code "}"}, do not.  It doesn't matter where the lines
+end:  the end of a line is treated the same as a single space.
+@PP
+This file is then processed by the Basser Lout interpreter, for example
+by typing
+@ID @Code "lout -idoc simple > simple.ps"
+on the Unix
+@FootNote { Unix is a trademark of "AT&T" Bell Laboratories. &0io }
+operating system, assuming that the file's name is
+{@Code "simple"}.  The @Code "-idoc" part instructs Lout to include a
+special @I {setup file} called {@Code doc}, in which the symbols are
+defined.  The output is the PostScript
+@FootNote { PostScript is a trademark of Adobe Systems, Inc. &0io }
+file {@Code "simple.ps"}, which is suitable for printing on most laser
+printers and many other devices.  When printed, it will appear like this:
+@ID {
+@Heading { Introduction }
+@PP
+For Virginia Woolf, @I Middlemarch was `the magnificent book which
+for all its imperfections is one of the few English novels written
+for grown-up people.'
+}
+The meaning of each symbol is now clear.  @Code "@Doc @Text @Begin" and
+@Code "@End @Text" have no visible effect, but they always bracket the
+document as a whole.  @Code "@Heading" makes the following thing into
+a heading; there is also @Code "@MajorHeading" for producing a large
+heading, and @Code "@MinorHeading" for a subheading.  The @Code "@PP"
+symbol starts a paragraph whose first line is indented; also available
+are {@Code "@LP"} which omits the indent, {@Code "@DP"} which leaves the
+amount of vertical space used for displays, and {@Code "@NP"}, which
+starts a new page or column (rarely used, since Lout does this
+automatically when the old one fills).  Finally, @Code "@I" changes the
+font of the following thing to {@I Italic}.
+@PP
+Braces are used to group parts of the document together so that nearby
+symbols will affect the whole part.  For example,
+@ID @Code "@I { Scenes of Clerical Life }"
+produces {@I { Scenes of Clerical Life }}.  The braces around
+@Code "Introduction" in the example above are not strictly necessary,
+since a single word does not need to be grouped; but a longer heading
+would require them.  Braces also help when a symbol must be immediately
+adjacent to another symbol or to a word:
+@ID @Code "QuikWipe{@TradeMark}"
+has result QuikWipe{@TradeMark}.  Without them Lout would confuse the
+two.  In a similar way, @Code "{@I Middlemarch}," produces
+{@I Middlemarch}, with the comma not set in Italic.
+@PP
+Characters like "{", which normally are symbols, will be
+treated as ordinary words when enclosed in double quotes.  For example,
+@Code "\"{\"" produces "{".  The characters
+@ID @Code "/    |    &    {    }    #    @    ^"
+should always be so enclosed, since otherwise they will have special
+effects.
+@PP
+The symbols described above form part of the {@I DocumentLayout @I package},
+a collection of symbols designed to make day-to-day document formatting
+easy.  This package also provides symbols for producing displays and
+lists, numbered sections, subsections, and appendices, footnotes,
+figures, tables, references, and cross references.  These are described
+in later sections of this report.  This same package may also be used to
+produce technical reports and books, as described in Sections
+@NumberOf reportlayout and {@NumberOf booklayout}.
+@End @Section

@@ -1,0 +1,14 @@
+Directory lout/font1 - font metrics for ISO-LATIN-1
+
+This directory is supposed to contain Adobe Systems
+font metrics (.AFM) files for the ISO-LATIN-1
+character set.  They are the source of Lout's
+information about the height and width of all
+characters.
+
+At the time of writing the directory is empty
+because I don't have these files.
+
+Jeffrey H. Kingston
+30 July 1991
+24 March 1993

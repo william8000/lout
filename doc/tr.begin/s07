@@ -1,0 +1,62 @@
+@Section
+   @Tag { sections }
+   @Title { Sections }
+@Begin
+@PP
+The DocumentLayout package provides sections, like this:
+@ID @Code {
+"some introductory text."
+"@BeginSections"
+"@Section"
+"    @Title { Introduction }"
+"@Begin"
+"@PP"
+"..."
+"..."
+"@End @Section"
+"@Section"
+"    @Title { Displays and lists }"
+"@Begin"
+"@PP"
+"..."
+"..."
+"@End @Section"
+"@EndSections"
+}
+@Code "@BeginSections" and @Code "@EndSections" symbols must
+bracket the sections, and paragraph symbols are needed at the
+beginning of each section but not before or after the whole group.  The
+@Code "@Title" option of @Code "@Section" is made into a numbered heading,
+like those in the present document, preceded by a conditional new page
+symbol (Section {@NumberOf cnp}).  The body of each section is enclosed in
+@Code "@Begin" and {@Code "@End @Section"}, although @Code "{" and @Code "}"
+are sufficient if preferred.  The former are more long-winded but less
+prone to error.
+@PP
+Within sections one may choose to have a sequence of subsections.  These
+are introduced by @Code "@BeginSubSections" and concluded by
+{@Code "@EndSubSections"}:
+@ID @Code {
+"in the following subsections."
+"@BeginSubSections"
+"@SubSection"
+"    @Title { ... }"
+"@Begin"
+"@PP"
+"..."
+"@End @SubSection"
+"@SubSection"
+"    @Title { ... }"
+"@Begin"
+"@PP"
+"..."
+"@End @SubSection"
+"@EndSubSections"
+}
+The first subsection of the first section will be numbered 1.1, and so
+on.  There are no sub-subsections.  DocumentLayout also provides appendices
+in an exactly analogous way, using the symbols {@Code "@BeginAppendices"},
+{@Code "@Appendix"}, and {@Code "@EndAppendices"}, and subappendices
+within any appendix using the symbols {@Code "@BeginSubAppendices"},
+{@Code "@SubAppendix"}, and {@Code "@EndSubAppendices"}.
+@End @Section

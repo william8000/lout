@@ -1,0 +1,91 @@
+@Section
+  @Tag { visibility }
+  @Title { Nested definitions, body parameters, and import and export }
+@Begin
+@PP
+A definition may contain
+nested.def @Index { Nested definitions }
+other definitions at the beginning of its body:
+@ID @Code {
+"def @NineSquare"
+"   right x"
+"{"
+"   def @Three { x |0.2i x |0.2i x }"
+""
+"   @Three /0.2i @Three /0.2i @Three"
+"}"
+}
+A parameter like @Code x may be invoked anywhere within the body of the
+symbol it is a parameter of, including within nested definitions.  A
+nested symbol like @Code "@Three" may be invoked anywhere from the
+beginning of its own body to the end of the body of the symbol it is
+defined within.  So, assuming an appropriate definition of
+{@Code "@Box"},
+@ID @Code {
+"@NineSquare @Box"
+}
+has result
+@ID @Fig {
+@NineSquare @Box { 0.2i @Wide 0.2i @High }
+}
+Nested definitions may themselves contain nested definitions, to
+arbitrary depth.
+@PP
+There are three special features which permit a nested symbol or
+parameter to be invoked outside its normal range; that is, outside the
+body of the enclosing symbol.  The first and simplest of these features
+is the {@I {body parameter}},
+parameter.body @SubIndex { @Code body parameter }
+body.par @Index { @Code body parameter }
+an alternative form of right parameter.  The Eq equation formatting
+package [{@Ref kingston92eq}] is a classic example of the use of a body
+parameter.  In outline, it looks like this:
+@ID @Code {
+"export \"+\" sup over"
+""
+"def @Eq"
+"    body x"
+"{"
+"    def \"+\" ..."
+"    def sup ..."
+"    def over ..."
+"    ..."
+""
+"    Slope @Font x"
+"}"
+}
+First we list those nested symbols and parameters that we intend to
+refer to outside the body of @Code "@Eq" in an @Code export clause,
+export @Index { @Code export clause }
+preceding the definition as shown.  Only exported symbols may be
+invoked outside the body of {@Code "@Eq"}.  A body parameter may not be
+exported.  The body parameter is like a right parameter except that the
+exported symbols are visible within it:
+@ID @Code {
+"@Eq { {x sup 2 + y sup 2} over 2 }"
+}
+calls on the nested definitions of @Code "@Eq" to produce the result
+@ID {
+@Eq { {x sup 2 + y sup 2} over 2 }
+}
+The body parameter's value must be enclosed in braces.  The term `body
+parameter' is a reminder that the value is interpreted as if it was
+within the body of the symbol.
+@PP
+The second place where exported symbols may be used is in the right
+parameter of the @@Open symbol, and following its alternative form,
+@@Use (Section {@NumberOf open}).
+@PP
+Finally, exported nested symbols and parameters may be made visible within
+a subsequent definition or macro by preceding it with an @Code import
+import @Index { @Code import clause }
+clause, like this:
+@ID @Code {
+"import @Eq"
+"def pythag { sqrt { x sup 2 + y sup 2 } }"
+}
+Note however that @Code pythag can only be used with some invocation of
+{@Code "@Eq"}:  within the body parameter of an invocation of {@Code "@Eq"},
+within the right parameter of an {@Code "@Eq&&tag @Open"}, or following
+a @@Use.  There may be several symbols in the @Code import clause.
+@End @Section

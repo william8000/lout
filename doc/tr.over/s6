@@ -1,0 +1,59 @@
+@Section
+   @Title { Cross references }
+@Begin
+@PP
+The terms @Code "@TextPlace&&preceding" and @Code "@FootPlace&&following"
+used above can be thought of as arrows in the final printed document,
+pointing from themselves to the place they name.  Expressed in this way,
+free of any reference to the internal action of the document formatter,
+they are easy to comprehend and work with.  These arrows are called
+cross references in Lout.
+@PP
+A galley is transported forwards along its arrow, but it turns out that
+a reverse flow of information can also be very useful.  For example,
+large documents often have cross references such as `see Table 6 on page
+57.'  If the numbers are replaced by arrows pointing to the table in
+question, it should be possible to have their values filled in
+automatically (an idea introduced by Scribe [{@Ref reid80}]).  An arrow
+pointing outside the docu&-ment could retrieve an entry from a database of
+references, Roman numerals, etc.  And a running page header like
+`Chapter 8:  Sorting' might obtain its value from an arrow pointing from
+the page header line down into the body text of the page, where the
+current chapter is known.
+@PP
+All these ideas are realized in Lout, but here we will just sketch a
+simplified version of the running page header definitions found in the
+BookLayout package [{@Ref kingston92begin}].  A symbol called
+@Code "@Runner" is first defined:
+@ID @Code {
+"def @Runner"
+"    right @Val"
+"{}"
+}
+@Code "@Runner" produces nothing at all, which means that we may place
+the invokation
+@ID @Code {
+"@Runner { Chapter"
+"8:  Sorting }"
+}
+at the end of a chapter without harm.  This invisible invokation will be
+carried along with the chapter and will end up on some page of the final
+printed document.
+@PP
+By modifying the definition of {@Code "@PageList"}, we can add to each
+page a header line containing the expression
+@ID @Code {
+"@Runner&&following"
+"@Open { @Val }"
+}
+This means `find the nearest following invokation of @Code "@Runner" in the
+final printed document and retrieve its @Code "@Val" parameter.' Every page
+of Chapter 8 will find the correct running header, since @Code "@Runner"
+was placed at the end of the chapter.  The invokation @Code "@Runner {}"
+placed at the beginning of the chapter will suppress the header on the
+first page of the chapter, as it is conventional to do.
+@PP
+These invokations of @Code "@Runner" are hidden from the non-expert user
+within the definition of the @Code "@Chapter" operator.  The result is a
+reliable implementation of a notoriously difficult feature.
+@End @Section

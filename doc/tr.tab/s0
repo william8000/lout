@@ -1,0 +1,39 @@
+@Report
+   @Title { Tab -- A Lout Package for Formatting Tables }
+   @Author { Jeffrey H. Kingston }
+   @Institution { Basser Department of Computer Science
+University of Sydney 2006
+Australia }
+   @DateLine { 22 December 1992 }
+//
+
+@Abstract {
+This report describes the use of Tab, a package of definitions for
+producing tables with the Lout document formatter:
+@Display @Tab
+   hmargin { 0.4c }
+   vmargin { 0.3v }
+   side { single }
+   @Fmta { @Col @B @CC X @Over A,B,C }
+   @Fmtb { @Col @I A ! @Col B !! @Col C }
+{
+@Rowa
+   above { single }
+   X { Value of mathematical formulae (millions of dollars) }
+@Rowb
+   above { double }
+   A { Quadratic formula }
+   B { @Eq { x ^= { minus b +- sqrt { b sup 2 - 4ac } } over 2a } }
+   C { 3^.5 }
+@Rowb
+   below { single }
+   A { Binomial theorem }
+   B { @Eq { ( a + b ) sup n ^= big sum from k=0 to infty 
+matrix atleft { ( } atright { ) } { n above k } a sup k b sup n-k
+} }
+   C { 12^ }
+}
+A wide variety of styles for columns and individual entries is provided,
+and entries may contain equations, figures, and other objects without
+restriction.
+}

@@ -1,0 +1,170 @@
+@Section
+   @Tag { lists }
+   @Title { Lists }
+@Begin
+@PP
+In the previous section, we saw that several consecutive displays are
+awkward to space correctly.  Provided they are not aligned or numbered,
+such displays are better treated as a {@I list}:
+@ID @Code {
+"... preceding text."
+"@IndentedList"
+"@ListItem @I Emma"
+"@ListItem @I { Mansfield Park }"
+"@EndList"
+"following text ..."
+}
+There are {@Code "@LeftList"}, {@Code "@IndentedList"}, and
+@Code "@CentredList" (or {@Code "@CenteredList"}) symbols; each item is
+introduced by {@Code "@ListItem"}, and the list ends with
+{@Code "@EndList"}.  There may be any number of items; @Code "@DP"
+symbols are inserted before, between, and after them.
+@PP
+A variety of automatically generated tags is available for indented
+lists.  Here is the full set, showing the first tag produced:
+@ID {
+     @Code "@NumberedList"	|1c	1.
+/1vx @Code "@ParenNumberedList" |	(1)
+/1vx @Code "@RomanList"		|	i.
+/1vx @Code "@ParenRomanList"	|	(i)
+/1vx @Code "@UCRomanList"	|	I.
+/1vx @Code "@ParenUCRomanList"	|	(I)
+/1vx @Code "@AlphaList"		|	a.
+/1vx @Code "@ParenAlphaList"	|	(a)
+/1vx @Code "@UCAlphaList"	|	A.
+/1vx @Code "@ParenUCAlphaList"	|	(A)
+/1vx @Code "@BulletList"	|	@Bullet
+/1vx @Code "@StarList"		|	@Star
+/1vx @Code "@DashList"		|	--
+}
+The Roman numerals end at c (100), and the alphabet ends
+at z (26), but ordinary numbers have no limit.  For example,
+@ID @Code {
+"@Heading { Quiz }"
+"@NumberedList"
+"@ListItem { Which American"
+"statesman owned a"
+"two-storey clock? }"
+"@ListItem { Which Yankee"
+"commander cut a swathe of"
+"destruction through the"
+"State of Georgia? }"
+"@EndList"
+}
+has result
+@ID {
+@Heading { Quiz }
+@DP
+@RawNumberedList
+@ListItem { Which American
+statesman owned a
+two-storey clock? }
+@ListItem { Which Yankee
+commander cut a swathe of
+destruction through the
+State of Georgia? }
+@EndList
+}
+Alternatively, the tags may be supplied by the author, using the
+@Code "@TaggedList" symbol and its variants @Code "@WideTaggedList" and
+{@Code "@VeryWideTaggedList"}, which leave a wider indent for the tags:
+@ID @Code {
+"@WideTaggedList"
+"{ 9 a.m. } @TagItem { Breakfast in"
+"the Ipamena Lounge, served with"
+"Irish coffee and fresh croissants. }"
+"{ 10 a.m. } @TagItem { Prof. A. Smith"
+"speaks on `The Wealth of Nations.' }"
+"@EndList"
+}
+has result
+@ID {
+@RawWideTaggedList
+{ 9 a.m. } @TagItem { Breakfast in
+the Ipamena Lounge, served with
+Irish coffee and fresh croissants. }
+{ 10 a.m. } @TagItem { Prof. A. Smith
+speaks on `The Wealth of Nations.' }
+@EndList
+}
+Each @Code "@TagItem" symbol uses the thing just preceding it as the tag.
+@PP
+Each of these lists also has a `raw' version which omits the preceding
+and following space.  These are mainly used when an item is itself a list:
+@ID @Code {
+"@ParenNumberedList"
+"@ListItem {"
+"   @RawParenRomanList"
+"   @ListItem { MV Nominees,"
+"hereinafter called the vendor, ... }"
+"   @EndList"
+"}"
+"@EndList"
+}
+has result
+@ID {
+@RawParenNumberedList
+@ListItem {
+   @RawParenRomanList
+   @ListItem { MV Nominees,
+hereinafter called the vendor, ... }
+   @EndList
+}
+@EndList
+}
+If @Code "@ParenRomanList" had been used instead of
+{@Code "@RawParenRomanList"}, (1) and (i) would have appeared on
+different lines.
+@PP
+In cases where it is desired to have a paragraph symbol following a raw
+list, owing to problems behind the scenes this symbol should be placed
+before the first {@Code "@ListItem"} or {@Code "@TagItem"}, not after
+the @Code "@EndList" as would naturally be expected.
+@PP
+A finer control over the appearance of lists is obtained with
+@Code "@RawIndentedList" and {@Code "@RawTaggedList"}.  These
+have {@I options}:  optional subsidiary symbols which modify the
+result.  For example,
+@ID @Code {
+"@RawIndentedList"
+"     style { [tag] }"
+"     indent { 0.5i }"
+"     gap { 0.3v }"
+"     start { 5 }"
+"@ListItem { ... }"
+"@ListItem { ... }"
+"@EndList"
+}
+shows the four options available with {@Code "@RawIndentedList"}, namely
+{@Code style}, @Code {indent}, {@Code gap}, and {@Code start}.  It
+has result
+@ID {
+@RawIndentedList
+     style { [tag] }
+     indent { 0.5i }
+     gap { 0.3v }
+     start { 5 }
+@ListItem { ... }
+@ListItem { ... }
+@EndList
+}
+The @Code style option determines the appearance of each tag, any
+@Code tag symbol
+within it being replaced by the number of the item.  If numbers are not
+wanted in the tag, @Code tag may be omitted.  The other options
+determine the indent, the gap between items, and the number of the first
+item.  In general, options may be given in any order, and if omitted
+will revert to a reasonable standard value.  @Code "@RawTaggedList" works
+in a similar way, except that @Code tag is replaced by the tag supplied
+by the @Code "@TagItem" symbol, and there is no @Code start option.  The
+symbol @Code "@DP" may be used above or below the list to produce the
+usual amount of space.
+@PP
+Individual list items are kept together on one page or column.  However,
+a new page may be started between two list items.
+@PP
+As in the previous section, every symbol introduced in this section has
+an abbreviated form consisting of @Code "@" followed by its capital
+letters only.  For example, @Code "@RawNumberedList" can be abbreviated
+to {@Code "@RNL"}, and @Code "@ListItem" to {@Code "@LI"}.
+@End @Section

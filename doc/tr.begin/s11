@@ -1,0 +1,30 @@
+@Section
+   @Tag { cols }
+   @Title { Multiple columns }
+@Begin
+@PP
+DocumentLayout normally produces pages with a single column of text occupying
+the full width.  To get multiple columns, enclose the document in
+@ID @Code {
+"@Doc @ColText @Begin"
+"..."
+"@End @ColText"
+}
+This will ordinarily produce two columns per page, although we will see
+in the next section how to produce three or more.
+@PP
+It is possible to start off a document with single columns and switch to
+multiple columns later, using the following arrangement:
+@ID @Code {
+"@Doc @Text @Begin"
+"single column part"
+"@ColText @Begin"
+"multiple column part"
+"@End @ColText"
+"@End @Text"
+}
+This is the most useful combination, because switching from multiple back to
+single causes a new page to be begun, which generally looks poor.  Tables
+and figures are always full width, but the width of footnotes depends on
+whether they occur within @Code "@Text" or {@Code "@ColText"}.
+@End @Section

@@ -1,0 +1,1716 @@
+/*@externs:External Declarations@*********************************************/
+/*                                                                           */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*                                                                           */
+/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Basser Department of Computer Science                                    */
+/*  The University of Sydney 2006                                            */
+/*  AUSTRALIA                                                                */
+/*                                                                           */
+/*  This program is free software; you can redistribute it and/or modify     */
+/*  it under the terms of the GNU General Public License as published by     */
+/*  the Free Software Foundation; either version 1, or (at your option)      */
+/*  any later version.                                                       */
+/*                                                                           */
+/*  This program is distributed in the hope that it will be useful,          */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of           */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            */
+/*  GNU General Public License for more details.                             */
+/*                                                                           */
+/*  You should have received a copy of the GNU General Public License        */
+/*  along with this program; if not, write to the Free Software              */
+/*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
+/*                                                                           */
+/*  FILE:         externs                                                    */
+/*  MODULE:       External Declarations                                      */
+/*                                                                           */
+/*****************************************************************************/
+#include <stdio.h>
+#include <string.h>
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Include, font and database directories, and the DEBUG_ON and ASSERT_ON   */
+/*  flags (defined by -D options on the cc command line in the makefile).    */
+/*                                                                           */
+/*  LATIN               Non-zero means compile for ISO-LATIN-1 char set.     */
+/*  INCL_DIR            The system directory where @Include files are kept   */
+/*  FONT_DIR            The system directory where .AFM font files are kept  */
+/*  DATA_DIR            The system directory where database files are kept   */
+/*  DEBUG_ON            Non-zero means compile debug code (lout -d)          */
+/*  ASSERT_ON           Non-zero means test assertions                       */
+/*                                                                           */
+/*  #define  LATIN      0                                                    */
+/*  #define  INCL_DIR   "/usr/local/lib/lout/include"                        */
+/*  #define  FONT_DIR   "/usr/local/lib/lout/font"                           */
+/*  #define  DATA_DIR   "/usr/local/lib/lout/data"                           */
+/*  #define  DEBUG_ON   0                                                    */
+/*  #define  ASSERT_ON  1                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  File naming conventions and version                                      */
+/*                                                                           */
+/*  LOUT_VERSION        Version information                                  */
+/*  CROSS_DB            The default name of the cross reference database     */
+/*  INDEX_SUFFIX        The suffix of database index files                   */
+/*  NEW_INDEX_SUFFIX    The additional suffix of new database index files    */
+/*  DATA_SUFFIX         The suffix of database data files                    */
+/*  NEW_DATA_SUFFIX     The additional suffix of new database data files     */
+/*  HYPH_FILENAME       The default name of the unpacked hyphenation file    */
+/*  HYPH_SUFFIX         The suffix of the packed hyphenation file            */
+/*                                                                           */
+/*****************************************************************************/
+
+#define	LOUT_VERSION		"Basser Lout Version 2.03 (April 1993)"
+#define	CROSS_DB		"lout"
+#define	INDEX_SUFFIX		".li"
+#define	NEW_INDEX_SUFFIX	"x"
+#define	DATA_SUFFIX		".ld"
+#define	NEW_DATA_SUFFIX		"x"
+#define	HYPH_FILENAME		"lout.hyph"
+#define	HYPH_SUFFIX		".packed"
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Significant Limits (other insignificant ones appear in other files)      */
+/*                                                                           */
+/*  MAX_LEN             The maximum value storable in type LENGTH            */
+/*                                                                           */
+/*  MAX_FILES           1 + the maximum number of files.  This cannot        */
+/*                      exceed 256 without changing type FILE_NUM; and       */
+/*                      it cannot exceed 255 without increasing MAX_WORD     */
+/*                      (a WORD is used to hold an array indexed by filenum  */
+/*                      in file z10.c).                                      */
+/*                                                                           */
+/*  MAX_LINE            1 + the maximum length of an input line, in files    */
+/*                      of all types.  This cannot exceed 256, at least in   */
+/*                      source files, unless the col_num field of FILE_POS   */
+/*                      is enlarged beyond its present 1 byte unsigned       */
+/*                                                                           */
+/*  MAX_WORD            1 + the maximum length of a word storable in an      */
+/*                      object record, which includes all file path names    */
+/*                      too.  It is reasonable to make this MAX_LINE, since  */
+/*                      a word longer than MAX_LINE cannot be read in        */
+/*                                                                           */
+/*  MAX_OBJECT_REC      1 + the maximum size of an object record, measured   */
+/*                      in ALIGNs.  The value chosen should exceed           */
+/*                      ceiling( (wr + MAX_WORD - 4) / sizeof(ALIGN) )       */
+/*                      where wr = sizeof(struct word_rec), so that words of */
+/*                      length MAX_WORD-1 can be stored in an object record  */
+/*                                                                           */
+/*  MAX_FONT            1 + the maximum number of sized fonts.  This can be  */
+/*                      increased easily since font metric memory is         */
+/*                      obtained as required from malloc().                  */
+/*                                                                           */
+/*  MAX_LEX_STACK       The maximum depth of @Includes and @Databases.       */
+/*                      This can be increased easily if desired.             */
+/*                                                                           */
+/*****************************************************************************/
+
+#define	MAX_LEN			32767
+#define	MAX_FILES		255
+#define MAX_LINE        	256
+#define MAX_WORD        	256
+#define	MAX_OBJECT_REC		73
+#define MAX_FONT		100
+#define	MAX_LEX_STACK	 	5
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Miscellaneous Macros                                                     */
+/*                                                                           */
+/*****************************************************************************/
+
+#define	BOOLEAN		unsigned	/* changed from: short unsigned      */
+#define	FALSE		0
+#define	TRUE		1
+#define	bool(x)		(x ? "TRUE" : "FALSE")
+#define	CHILD		0
+#define	PARENT		1
+#define	COL		0
+#define	ROW		1
+#define	dimen(x)	(x == COL ? "COL" : "ROW" )
+#define	nil		( (OBJECT) NULL )
+#define	null		( (FILE *) NULL )
+
+#define max(a, b)	((a) < (b) ? (b) : (a))
+#define min(a, b)	((a) < (b) ? (a) : (b))
+#define	ceiling(a, b)	( ((a) - 1)/(b) + 1 )	/* ceiling(a/b)              */
+#define is_odd(x)	( (x) & 1 )		/* TRUE if x is odd number   */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  ALIGN - the most restrictive memory alignment type.                      */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef int ALIGN;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  LENGTH - a distance measured in integral multiples of the basic unit.    */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef short int LENGTH;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  FONT_NUM - internal name for a font                                      */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef unsigned char FONT_NUM;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  GAP - what separates one object from another                             */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef struct
+{ unsigned char	ospare;			/* left for other things in STYLE    */
+  BOOLEAN	omark	: 1;		/* TRUE if this gap is marked        */
+  BOOLEAN	ojoin	: 1;		/* TRUE if joins exist across gap    */
+  unsigned	ounits	: 3;		/* units of measurement: fixed, etc  */
+  unsigned	omode	: 3;		/* spacing mode: edge-to-edge, etc   */
+  LENGTH	owidth;			/* width of the gap                  */
+} GAP;
+
+#define	mark(x)		(x).omark
+#define	join(x)		(x).ojoin
+#define	units(x)	(x).ounits
+#define	mode(x)		(x).omode
+#define	width(x)	(x).owidth
+
+#define SetGap(x, xmark, xjoin, xunits, xmode, xwidth)			\
+( mark(x) = xmark, join(x) = xjoin, units(x) = xunits,			\
+  mode(x) = xmode, width(x) = xwidth					\
+)
+
+#define GapCopy(x, y)							\
+( mark(x) = mark(y), join(x) = join(y), units(x) = units(y),		\
+  mode(x) = mode(y), width(x) = width(y)				\
+)
+
+#define ClearGap(x)	SetGap(x, FALSE, TRUE, FIXED_UNIT, NO_MODE, 0)
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  STYLE - information about how to break text, etc.                        */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef struct
+{ GAP		oline_gap;		/* separation between lines          */
+  union {
+    GAP		ospace_gap;		/* separation indiced by white space */
+    struct {
+      unsigned	ohyph_style    : 2;	/* hyphenation off or on             */
+      unsigned	ofill_style    : 2;	/* fill lines with text off/on       */
+      unsigned	odisplay_style : 3;	/* display lines adjusted, ragged... */
+    } oss;
+  } osu;
+} STYLE;
+
+#define	line_gap(x)	(x).oline_gap
+#define	space_gap(x)	(x).osu.ospace_gap
+#define	font(x)		(x).oline_gap.ospare
+#define	hyph_style(x)	(x).osu.oss.ohyph_style
+#define	fill_style(x)	(x).osu.oss.ofill_style
+#define	display_style(x)(x).osu.oss.odisplay_style
+
+#define StyleCopy(x, y)							\
+( GapCopy( line_gap(x), line_gap(y) ),					\
+  font(x) = font(y),							\
+  hyph_style(x) = hyph_style(y),					\
+  fill_style(x) = fill_style(y),					\
+  display_style(x) = display_style(y),					\
+  GapCopy( space_gap(x), space_gap(y) )					\
+)
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  CONSTRAINT - a size constraint                                           */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef struct
+{ LENGTH  obc;
+  LENGTH  obfc;
+  LENGTH  ofc;
+  LENGTH  osparec;
+} CONSTRAINT;
+
+#define	bc(x)		(x).obc
+#define	bfc(x)		(x).obfc
+#define	fc(x)		(x).ofc
+#define	sparec(x)	(x).osparec
+#define	constrained(x)	(bc(x)!=MAX_LEN || bfc(x)!=MAX_LEN || fc(x)!=MAX_LEN)
+
+#define	SetConstraint(c,x,y,z)	(bc(c) = (x),   bfc(c) = (y),    fc(c) = (z))
+#define	CopyConstraint(x, y)	(bc(x) = bc(y), bfc(x) = bfc(y), fc(x) = fc(y))
+#define FitsConstraint(b, f, c)	(b <= bc(c)  && b + f <= bfc(c) && f <= fc(c))
+
+#define	ig_fnum(x)	bc(constraint(x))
+#define	ig_xtrans(x)	bfc(constraint(x))
+#define	ig_ytrans(x)	fc(constraint(x))
+
+/*****************************************************************************/
+/*                                                                           */
+/*  FILE_NUM - the internal representation of a file                         */
+/*  FILE_POS - a position in the set of input files                          */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef unsigned char	FILE_NUM;
+#define	NO_FILE		0
+
+typedef	struct
+{ FILE_NUM	ofile_num;		/* no. of file this record is from   */
+  unsigned char	ocol_num;		/* column number this is related to  */
+  LENGTH	oline_num;		/* the line number of this record    */
+} FILE_POS;
+
+#define	file_num(x)	(x).ofile_num
+#define	col_num(x)	(x).ocol_num
+#define	line_num(x)	(x).oline_num
+
+#define FposCopy(x, y)							\
+( file_num(x) = file_num(y),						\
+  line_num(x) = line_num(y),						\
+  col_num(x)  = col_num(y)						\
+)
+
+/*@::declaration of OBJECT@***************************************************/
+/*                                                                           */
+/*  OBJECT - pointer to an arbitrary object (parse tree, symbol table, ...)  */
+/*                                                                           */
+/*****************************************************************************/
+
+#define LIST struct { union rec *opred, *osucc; }
+
+typedef union rec
+{
+  struct word_type		/* all fields of WORD, both token and object */
+  {  LIST	olist[2];
+     union
+     {	struct word_as_token
+	{	unsigned char	otype;
+		unsigned char	ohspace;
+		unsigned char	ovspace;
+		unsigned char	orec_size;
+	} oi1;
+
+	struct word_as_object
+	{	unsigned char	otype;
+		BOOLEAN		ogall_rec    : 1;
+		BOOLEAN		obroken      : 1;
+		BOOLEAN		othreaded    : 1;
+		BOOLEAN		oexternal    : 1;
+		BOOLEAN		oblocked     : 1;
+		BOOLEAN		obackward    : 1;
+		BOOLEAN		otrigger_externs   : 1;
+		BOOLEAN	        omust_expand : 1;
+		FONT_NUM	oword_font;
+		unsigned char	orec_size;
+	} oi2;
+     } ou1;
+     union
+     {	FILE_POS	ofpos;
+	int		oword_save_mark;
+     } ou5;
+     union
+     {  LENGTH	oback[2];
+	FILE	*ofilep;
+	/* union rec *ogall_sym; */
+     } ou3;
+     union
+     {	LENGTH	ofwd[2];
+	int	ogall_pos;
+     } ou4;
+     unsigned char ostring[4];
+  } os1;
+
+  struct closure_type		/* CLOSURE, both as token and object */
+  {  LIST	olist[2];
+     union
+     {	struct closure_as_token
+	{	unsigned char	otype;
+		unsigned char	ohspace;
+		unsigned char	ovspace;
+		unsigned char	oprecedence;
+	} oi1;
+
+	struct closure_as_object
+	{	unsigned char	otype;
+		BOOLEAN		ogall_rec    : 1;
+		BOOLEAN		obroken      : 1;
+		BOOLEAN		othreaded    : 1;
+		BOOLEAN		oexternal    : 1;
+		BOOLEAN		oblocked     : 1;
+		BOOLEAN		obackward    : 1;
+		BOOLEAN		otrigger_externs   : 1;
+		BOOLEAN	        omust_expand : 1;
+		unsigned short	ocross_type;
+	} oi2;
+     } ou1;
+     FILE_POS	ofpos;
+     LENGTH	oback[2];
+     LENGTH	ofwd[2];
+     union
+     {	STYLE		osave_style;
+	CONSTRAINT	oconstraint;
+     } ou2;
+     union rec *oactual;
+     union
+     { union rec *owhereto;
+       LENGTH    osave_mark;
+     } ou3;
+     union rec *oready_galls;
+  } os2;
+  
+  struct object_type		/* the general OBJECT */
+  {  LIST	olist[2];
+     union
+     {
+	struct
+	{	unsigned char	otype;
+		BOOLEAN		ogall_rec    : 1;
+		BOOLEAN		obroken      : 1;
+		BOOLEAN		othreaded    : 1;
+		BOOLEAN		oexternal    : 1;
+		BOOLEAN		oblocked     : 1;
+		BOOLEAN		obackward    : 1;
+		BOOLEAN		otrigger_externs   : 1;
+		BOOLEAN	        omust_expand : 1;
+		unsigned short	ocross_type;
+	} oi2;
+     } ou1;
+     FILE_POS	ofpos;
+     LENGTH	oback[2];
+     LENGTH	ofwd[2];
+     union
+     {	STYLE		osave_style;
+	CONSTRAINT	oconstraint;
+     } ou2;
+  } os3;
+
+  struct link_type		/* LINK */
+  {  LIST		olist[2];
+     unsigned char	otype;
+     unsigned char	onumber;
+     unsigned char	odb_targ;
+  } os4;
+  
+  struct gapobj_type		/* GAP_OBJ */
+  {  LIST		olist[2];
+     unsigned char	otype;
+     unsigned char	ohspace;
+     unsigned char	ovspace;
+     unsigned char	oprecedence;
+     FILE_POS		ofpos;
+     GAP		ogap;
+     int		osave_badness;		/* optimum paragraph breaker */
+     LENGTH		osave_space;		/* optimum paragraph breaker */
+     LENGTH		osave_actual_gap;	/* optimum paragraph breaker */
+     union rec  	*osave_prev;		/* optimum paragraph breaker */
+  } os5;
+
+  struct symbol_type
+  {  LIST	olist[2];
+     unsigned char otype;
+     BOOLEAN	ohas_lpar            : 1;
+     BOOLEAN	ohas_rpar            : 1;
+     BOOLEAN	oright_assoc         : 1;
+     BOOLEAN	ois_target           : 1;
+     BOOLEAN	ohas_target          : 1;
+     BOOLEAN	oforce_target	     : 1;
+     BOOLEAN	ois_tag              : 1;
+     BOOLEAN	ohas_tag             : 1;
+     BOOLEAN	ohas_body            : 1;
+     BOOLEAN	oindefinite          : 1;
+     BOOLEAN	orecursive           : 1;
+     BOOLEAN	ouses_extern_target  : 1;
+     BOOLEAN	ois_extern_target    : 1;
+     BOOLEAN	ois_key		     : 1;
+     BOOLEAN	ohas_key	     : 1;
+     unsigned	odirty               : 1;
+     unsigned	char oprecedence;
+     FILE_POS	ofpos;
+     union rec	*oenclosing;
+     union rec	*osym_body;
+     union rec	*obase_uses;
+     union rec	*ouses;
+     union rec	*omarker;
+     union rec	*ocross_sym;
+     union rec	*oimports;
+     unsigned char ouses_count;
+     BOOLEAN	ovisible	     : 1;
+     BOOLEAN	ohas_mark	     : 1;
+     BOOLEAN	ohas_join	     : 1;
+     BOOLEAN	ohas_par             : 1;
+     BOOLEAN	ouses_galley	     : 1;
+     short unsigned opredefined;
+  } os6;
+
+  struct cr_type
+  {  LIST		olist[2];
+     unsigned char	otype;
+     unsigned char	otarget_state;
+     FILE_NUM		otarget_file;
+     FILE_NUM		ocr_file;
+     union rec		*otarget_val;
+     int		otarget_seq;
+     int		otarget_pos;
+     int		ocr_seq;
+     int		ogall_seq;
+     union rec		*osymb;
+     union rec		*ogall_tag;
+     FILE_NUM		ogall_tfile;
+     FILE_NUM		ogentag_file;
+     int		ogentag_seq;
+     union rec		*ogentag_fseq;
+  } os7;
+
+  struct ext_gall_type
+  {  LIST		olist[2];
+     unsigned char	otype;
+     FILE_NUM		oeg_fnum;
+     long		oeg_fpos;
+     long		oeg_cont;
+     union rec		*oeg_symbol;
+  } os8;
+
+  struct uses_type
+  {  union rec	*oitem;
+     union rec	*onext;
+  } os9;
+
+  struct hash_entry_type
+  {  LIST	olist[1];
+  } os10;
+
+} *OBJECT;
+
+#define	succ(x, dim)	(x)->os1.olist[dim].osucc
+#define	pred(x, dim)	(x)->os1.olist[dim].opred
+#define type(x)		(x)->os1.ou1.oi1.otype
+#define	gall_rec(x)	(x)->os1.ou1.oi2.ogall_rec
+#define	non_blocking(x)	gall_rec(x)
+#define	broken(x)	(x)->os1.ou1.oi2.obroken
+#define	external(x)	(x)->os1.ou1.oi2.oexternal
+#define	threaded(x)	(x)->os1.ou1.oi2.othreaded
+#define	blocked(x)	(x)->os1.ou1.oi2.oblocked
+#define	backward(x)	(x)->os1.ou1.oi2.obackward
+#define	sized(x)	broken(x)
+#define	seen_nojoin(x)	blocked(x)
+#define	must_expand(x)	(x)->os1.ou1.oi2.omust_expand
+#define	trigger_externs(x) (x)->os1.ou1.oi2.otrigger_externs
+#define	hspace(x)	(x)->os1.ou1.oi1.ohspace
+#define	vspace(x)	(x)->os1.ou1.oi1.ovspace
+#define	word_font(x)	(x)->os1.ou1.oi2.oword_font
+#define	rec_size(x)	(x)->os1.ou1.oi2.orec_size
+#define	fpos(x)		(x)->os2.ofpos
+#define	back(x, dim)	(x)->os2.oback[dim]
+#define	fwd(x, dim)	(x)->os2.ofwd[dim]
+#define	size(x, dim)	(back(x, dim) + fwd(x, dim))
+#define word_save_mark(x) (x)->os1.ou5.oword_save_mark
+#define string(x)	(x)->os1.ostring
+
+#define	precedence(x)	(x)->os2.ou1.oi1.oprecedence
+#define	cross_type(x)	(x)->os2.ou1.oi2.ocross_type
+#define	thr_state(x)	cross_type(x)
+#define	save_style(x)	(x)->os2.ou2.osave_style
+#define	constraint(x)	(x)->os2.ou2.oconstraint
+#define actual(x)	(x)->os2.oactual
+#define whereto(x)	(x)->os2.ou3.owhereto
+#define save_mark(x)	(x)->os2.ou3.osave_mark
+#define ready_galls(x)	(x)->os2.oready_galls
+
+#define	number(x)	(x)->os4.onumber
+#define	db_targ(x)	(x)->os4.odb_targ
+#define	gap(x)		(x)->os5.ogap
+#define	save_space(x)	(x)->os5.osave_space
+#define	save_badness(x)	(x)->os5.osave_badness
+#define	save_actual_gap(x)  (x)->os5.osave_actual_gap
+#define	save_prev(x)	(x)->os5.osave_prev
+
+#define	has_lpar(x)	(x)->os6.ohas_lpar
+#define	has_rpar(x)	(x)->os6.ohas_rpar
+#define	right_assoc(x)	(x)->os6.oright_assoc
+#define	is_target(x)	(x)->os6.ois_target
+#define	has_target(x)	(x)->os6.ohas_target
+#define	force_target(x)	(x)->os6.oforce_target
+#define	is_tag(x)	(x)->os6.ois_tag
+#define	has_tag(x)	(x)->os6.ohas_tag
+#define	has_body(x)	(x)->os6.ohas_body
+#define	indefinite(x)	(x)->os6.oindefinite
+#define	recursive(x)	(x)->os6.orecursive
+#define	predefined(x)	(x)->os6.opredefined
+#define	dirty(x)	(x)->os6.odirty
+#define	enclosing(x)	(x)->os6.oenclosing
+#define	sym_body(x)	(x)->os6.osym_body
+#define	base_uses(x)	(x)->os6.obase_uses
+#define	uses(x)		(x)->os6.ouses
+#define	marker(x)	(x)->os6.omarker
+#define	cross_sym(x)	(x)->os6.ocross_sym
+#define	imports(x)	(x)->os6.oimports
+#define	uses_count(x)	(x)->os6.ouses_count
+#define	visible(x)	(x)->os6.ovisible
+#define	has_mark(x)	(x)->os6.ohas_mark
+#define	has_join(x)	(x)->os6.ohas_join
+#define	has_par(x)	(x)->os6.ohas_par
+#define	uses_galley(x)	(x)->os6.ouses_galley
+#define	is_extern_target(x) (x)->os6.ois_extern_target
+#define	uses_extern_target(x) (x)->os6.ouses_extern_target
+#define	is_key(x)	(x)->os6.ois_key
+#define	has_key(x)	(x)->os6.ohas_key
+
+#define	target_state(x)	(x)->os7.otarget_state
+#define	target_val(x)	(x)->os7.otarget_val
+#define	target_file(x)	(x)->os7.otarget_file
+#define	target_seq(x)	(x)->os7.otarget_seq
+#define	target_pos(x)	(x)->os7.otarget_pos
+#define	cr_file(x)	(x)->os7.ocr_file
+#define	cr_seq(x)	(x)->os7.ocr_seq
+#define	gall_seq(x)	(x)->os7.ogall_seq
+#define	symb(x)		(x)->os7.osymb
+#define	gall_tag(x)	(x)->os7.ogall_tag
+#define	gall_tfile(x)	(x)->os7.ogall_tfile
+#define	gentag_file(x)	(x)->os7.ogentag_file
+#define	gentag_seq(x)	(x)->os7.ogentag_seq
+#define	gentag_fseq(x) (x)->os7.ogentag_fseq
+
+#define	filep(x)	(x)->os1.ou3.ofilep
+/* #define	gall_sym(x)	(x)->os1.ou3.ogall_sym */
+#define	gall_pos(x)	(x)->os1.ou4.ogall_pos
+#define	left_pos(x)	fwd(x, COL)
+#define	save_scope(x)	fwd(x, ROW)
+
+#define	eg_fnum(x)	(x)->os8.oeg_fnum
+#define	eg_fpos(x)	(x)->os8.oeg_fpos
+#define	eg_cont(x)	(x)->os8.oeg_cont
+#define	eg_symbol(x)	(x)->os8.oeg_symbol
+#define	eg_scope(x)	(x)->os8.oeg_scope
+
+#define	item(x)		(x)->os9.oitem
+#define	next(x)		(x)->os9.onext
+
+/*@::object types@************************************************************/
+/*                                                                           */
+/*  OBJECT, TOKEN AND OTHER TYPES inhabiting type(x) and predefined(x)       */
+/*                                                                           */
+/*  Key letters in the adjacent comment indicate where the tag is legal:     */
+/*                                                                           */
+/*    t  a token type, pushed on token stack                                 */
+/*    o  an object type (returned by reduce(), inserted by Manifest)         */
+/*    i  an index type (a child of a galley header other than an object)     */
+/*    s  a predefined symbol (some symbol table entry has this predefined()) */
+/*    n  an indefinite object i.e. one which is ignored in catenation ops    */
+/*                                                                           */
+/*****************************************************************************/
+
+#define	LINK		 0		/*        a link between objects     */
+#define	GAP_OBJ		 1		/*  o     a gap object               */
+#define	CLOSURE		 2		/* to  n  a closure of a symbol      */
+#define	NULL_CLOS	 3		/* to sn  @Null                      */
+#define	CROSS		 4		/* to sn  && (a cross reference obj) */
+#define	HEAD		 5		/*  o  n  a galley header            */
+#define	SPLIT		 6		/*  o     @Split                     */
+#define	PAR		 7		/*  o     a parameter of a closure   */
+#define	WORD		 8		/*  o     a literal word             */
+#define	ROW_THR		 9		/*  o     a row thread               */
+#define	COL_THR		10		/*  o     a column thread            */
+#define	ACAT		11		/* to s   a sequence of &-ed objs    */
+#define	HCAT		12		/* to s   a sequence of |-ed objs    */
+#define	VCAT		13		/* to s   a sequence of /-ed objs    */
+#define	ONE_COL		14		/* to s   @OneCol                    */
+#define	ONE_ROW		15		/* to s   @OneRow                    */
+#define	WIDE		16		/* to s   @Wide                      */
+#define	HIGH		17		/* to s   @High                      */
+#define	HSCALE		18		/* to s   @HScale                    */
+#define	VSCALE		19		/* to s   @HScale                    */
+#define	SCALE		20		/* to s   @Scale                     */
+#define	HCONTRACT	21		/* to s   @HContract                 */
+#define	VCONTRACT	22		/* to s   @VContract                 */
+#define	HEXPAND		23		/* to s   @HExpand                   */
+#define	VEXPAND		24		/* to s   @VExpand                   */
+#define	PADJUST		25		/* to s   @PAdjust                   */
+#define	HADJUST		26		/* to s   @HAdjust                   */
+#define	VADJUST		27		/* to s   @VAdjust                   */
+#define	ROTATE		28		/* to s   @Rotate                    */
+#define	CASE		29		/* to s   @Case                      */
+#define	YIELD		30		/* to s   @Yield                     */
+#define	FONT		31		/* to s   @Font                      */
+#define	SPACE		32		/* to s   @Space                     */
+#define	BREAK		33		/* to s   @Break                     */
+#define	NEXT		34		/* to s   @Next                      */
+#define	ENV		35		/* to s   @LEnv                      */
+#define	CLOS		36		/* to s   @LClos                     */
+#define	LVIS		37		/* to s   @LVis                      */
+#define	OPEN		38		/* to s   @Open                      */
+#define	TAGGED		39		/* to s   @Tagged                    */
+#define	INCGRAPHIC	40		/* to s   @IncludeGraphic            */
+#define	SINCGRAPHIC	41		/* to s   @SysIncludeGraphic         */
+#define	GRAPHIC		42		/* to s   @Graphic                   */
+
+#define	TSPACE		43		/* t      a space token, parser only */
+#define	TJUXTA		44		/* t      a juxta token, parser only */
+#define	LBR		45		/* t  s   left brace token           */
+#define	RBR		46		/* t  s   right brace token          */
+#define	BEGIN		47		/* t  s   @Begin token               */
+#define	END		48		/* t  s   @End token                 */
+#define	USE		49		/* t  s   @Use                       */
+#define	GSTUB_NONE	50		/* t      a galley stub, no rpar     */
+#define	GSTUB_INT	51		/* t      galley stub internal rpar  */
+#define	GSTUB_EXT	52		/* t      galley stub external rpar  */
+#define	INCLUDE		53		/*    s   @Include                   */
+#define	SYS_INCLUDE	54		/*    s   @SysInclude                */
+#define	PREPEND		55		/*    s   @Prepend                   */
+#define	SYS_PREPEND	56		/*    s   @SysPrepend                */
+#define	DATABASE	57		/*    s   @Database                  */
+#define	SYS_DATABASE	58		/*    s   @SysDatabase               */
+#define	START		59		/*    s   \Start                     */
+
+#define	DEAD		60		/*   i    a dead galley              */
+#define	UNATTACHED	61		/*   i    an inner, unsized galley   */
+#define	CLOSE_INDEX	62		/*   i    synchronize galley closing */
+#define	RECEPTIVE	63		/*   i    a receptive object index   */
+#define	RECEIVING	64		/*   i    a receiving object index   */
+#define	RECURSIVE	65		/*   i    a recursive definite obj.  */
+#define	PRECEDES	66		/*   i    an ordering constraint     */
+#define	FOLLOWS		67		/*   i    other end of ordering c.   */
+#define	CROSS_FOLL	68		/*   i    following type cross-ref   */
+#define	GALL_FOLL	69		/*   i    galley with &&following    */
+#define	CROSS_TARG	70		/*   i    value of cross-ref         */
+#define	GALL_TARG	71		/*   i    target of these galleys    */
+#define	GALL_PREC	72		/*   i    galley with &&preceding    */
+#define	CROSS_PREC	73		/*   i    preceding type cross-ref   */
+#define	EXPAND_IND	74		/*   i    index of HEXPAND or VEXPD  */
+#define	THREAD		75		/*        a sequence of threads      */
+#define	CROSS_SYM	76		/*        cross-ref info             */
+#define	CR_ROOT		77		/*        RootCross                  */
+#define	MACRO		78		/*        a macro symbol             */
+#define	LOCAL		79		/*        a local symbol             */
+#define	LPAR		80		/*        a left parameter           */
+#define	NPAR		81		/*        a named parameter          */
+#define	RPAR		82		/*        a right parameter          */
+#define	EXT_GALL	83		/*        an external galley         */
+#define	CR_LIST		84		/*        a list of cross references */
+#define	DISPOSED	85		/*        a disposed record          */
+
+#define is_indefinite(x)  ((x) >= CLOSURE && (x) <= HEAD)
+#define is_definite(x) 	 ((x) >= SPLIT && (x) <= GRAPHIC)
+#define	is_par(x)	((x) >= LPAR   && (x) <= RPAR)
+#define	is_index(x)	((x) >= DEAD && (x) <= EXPAND_IND)
+#define	is_type(x)	((x) >= LINK && (x) < DISPOSED)
+#define	is_filecom(x)	((x) >= INCLUDE && (x) <= SYS_DATABASE)
+
+/*@::miscellaneous constants@*************************************************/
+/*                                                                           */
+/*  Miscellaneous Globally Defined Constants                                 */
+/*                                                                           */
+/*****************************************************************************/
+
+/* gap modes occupying mode(x) */
+#define	NO_MODE		0		/* for error detection: no mode      */
+#define	EDGE_MODE	1		/* edge-to-edge spacing              */
+#define	HYPH_MODE	2		/* edge-to-edge with hyphenation     */
+#define	MARK_MODE	3		/* mark-to-mark spacing              */
+#define	OVER_MODE	4		/* overstrike spacing                */
+#define	KERN_MODE	5		/* kerning spacing                   */
+#define	TAB_MODE	6		/* tabulation spacing                */
+#define	ADD_HYPH	7		/* temp value used by FillObject     */
+
+/* hyph_style(style) options                                                 */
+#define	HYPH_UNDEF	0		/* hyphenation option undefined      */
+#define	HYPH_OFF	1		/* hyphenation off                   */
+#define	HYPH_ON		2		/* hyphenation on                    */
+
+/* fill_style(style) options                                                 */
+#define	FILL_UNDEF	0		/* fill option undefined             */
+#define	FILL_OFF	1		/* no filling of lines               */
+#define	FILL_ON		2		/* fill lines with text              */
+
+/* display_style(style) options                                              */
+#define	DISPLAY_UNDEF	0		/* display option undefined          */
+#define	DISPLAY_ADJUST	1		/* adjust lines (except last)        */
+#define	DISPLAY_OUTDENT	2		/* outdent lines (except first)      */
+#define	DISPLAY_LEFT	3		/* left-justify lines, no adjust     */
+#define	DISPLAY_CENTRE	4		/* centre lines, no adjust           */
+#define	DISPLAY_RIGHT	5		/* right-justify lines, no adjust    */
+#define	DO_ADJUST	6		/* placed in ACATs when adjust need  */
+
+/* sides of a mark */
+#define	BACK		86		/* means 'lies to left of mark'      */
+#define	ON		87		/* means 'lies on mark'              */
+#define	FWD		88		/* means 'lies to right of mark'     */
+
+/* statuses of thread objects */
+#define	NOTSIZED	 0		/* this thread object is not sized   */
+#define	SIZED		 1		/* thread is sized but not printed   */
+#define	FINALSIZE	 2		/* thread object's size is now final */
+
+/* constraint statuses */
+#define	PROMOTE		89		/* this component may be promoted    */
+#define	CLOSE		90		/* must close dest before promoting  */
+#define	BLOCK		91		/* cannot promote this component     */
+#define	CLEAR		92		/* this constraint is now satisfied  */
+
+/* gap increment types */
+#define	ABS		93		/* absolute,  e.g.  3p               */
+#define	INC		94		/* increment, e.g. +3p               */
+#define	DEC		95		/* decrement, e.g. -3p               */
+
+/* file types */
+#define	SOURCE_FILE	 0		/* input file from command line      */
+#define	INCLUDE_FILE	 1		/* @Include file                     */
+#define	INCGRAPHIC_FILE	 2		/* @IncludeGraphic file              */
+#define	DATABASE_FILE	 3		/* database file                     */
+#define	INDEX_FILE	 4		/* database index file               */
+#define	FONT_FILE	 5		/* font file                         */
+#define	PREPEND_FILE	 6		/* PostScript prologue file          */
+#define	HYPH_FILE	 7		/* hyphenation file                  */
+#define	HYPH_PACKED_FILE 8		/* packed hyphenation file           */
+
+/* path types (i.e. sequences of directories for file searching) */
+#define	SOURCE_PATH	 0		/* path to search for source files   */
+#define	INCLUDE_PATH	 1		/* path for @Include files           */
+#define	SYSINCLUDE_PATH	 2		/* path for @SysInclude files        */
+#define	DATABASE_PATH	 3		/* path for @Database files          */
+#define	SYSDATABASE_PATH 4		/* path for @SysDatabase files       */
+#define	FONT_PATH	 5		/* path for fontdef files            */
+
+/* units of measurement */
+#define	NO_UNIT		 0		/* no unit - for error detection     */
+#define	FIXED_UNIT	 1		/* inches, cm, points, ems           */
+#define	FRAME_UNIT	 2		/* f's (frame widths)                */
+#define	AVAIL_UNIT	 3		/* a's (available spaces)            */
+#define	DEG_UNIT	 4		/* d's (degrees)                     */
+#define	NEXT_UNIT	 5		/* b's (inners)                      */
+ 
+/* units of distance as multiples of the basic unit */
+#define	CM	       567		/* 1 centimetre                      */
+#define	IN	      1440		/* 1 inch                            */
+#define	EM	       120		/* 1 em (= 1/12 inch)                */
+#define	PT		20		/* 1 point (= 1/72 inch)             */
+#define	FR	      4096		/* virtual unit for frame units      */
+#define	DG	       128		/* virtual unit for degrees          */
+#define	SF	       128		/* virtual unit for @Scale factors   */
+
+/* precedences */
+#define	NO_PREC		 0		/* lower than any precedence         */
+#define	BEGIN_PREC	 1		/* precedence of '@Begin'            */
+#define	END_PREC	 2		/* precedence of '@End'              */
+#define	LBR_PREC	 3		/* precedence of '{'                 */
+#define	RBR_PREC	 4		/* precedence of '}'                 */
+#define	VCAT_PREC	 5		/* precedence of /                   */
+#define	HCAT_PREC	 6		/* precedence of |                   */
+#define	ACAT_PREC	 7		/* precedence of & and white space   */
+#define	MIN_PREC        10		/* minimum precedence of user ops    */
+#define	MAX_PREC       100		/* maximim precedence of user ops    */
+#define	DEFAULT_PREC   100		/* default precedence of user ops    */
+#define CROSSOP_PREC   101		/* precedence of cross op &&         */
+#define GAP_PREC       102		/* precedence of gap op after cat op */
+#define JUXTA_PREC     103		/* precedence of juxtaposition &     */
+#define	FORCE_PREC     104		/* higher than any precedence        */
+
+/* error types */
+#define	INTERN	0			/* internal error (i.e. bug)         */
+#define	FATAL	1			/* fatal error, abort now            */
+#define	WARN	2			/* warning, non-fatal                */
+
+/*@::keywords@****************************************************************/
+/*                                                                           */
+/*  KEYWORDS                                                                 */
+/*                                                                           */
+/*****************************************************************************/
+
+#define	KW_DEF		"def"
+#define	KW_FONTDEF	"fontdef"
+#define	KW_FORCE	"force"
+#define	KW_INTO		"into"
+#define	KW_IMPORT	"import"
+#define	KW_EXPORT	"export"
+#define	KW_PRECEDENCE	"precedence"
+#define	KW_ASSOC	"associativity"
+#define	KW_LEFT		"left"
+#define	KW_RIGHT	"right"
+#define	KW_BODY		"body"
+#define	KW_MACRO	"macro"
+#define	KW_NAMED	"named"
+#define	KW_NEXT		"@Next"
+#define	KW_WIDE		"@Wide"
+#define	KW_HIGH		"@High"
+#define	KW_ONE_COL	"@OneCol"
+#define	KW_ONE_ROW	"@OneRow"
+#define	KW_HSCALE	"@HScale"
+#define	KW_VSCALE	"@VScale"
+#define	KW_SCALE	"@Scale"
+#define	KW_HCONTRACT	"@HContract"
+#define	KW_VCONTRACT	"@VContract"
+#define	KW_HEXPAND	"@HExpand"
+#define	KW_VEXPAND	"@VExpand"
+#define	KW_PADJUST	"@PAdjust"
+#define	KW_HADJUST	"@HAdjust"
+#define	KW_VADJUST	"@VAdjust"
+#define	KW_ROTATE	"@Rotate"
+#define	KW_INCGRAPHIC	"@IncludeGraphic"
+#define	KW_SINCGRAPHIC	"@SysIncludeGraphic"
+#define	KW_GRAPHIC	"@Graphic"
+#define	KW_CASE		"@Case"
+#define	KW_YIELD	"@Yield"
+#define	KW_FONT		"@Font"
+#define	KW_SPACE	"@Space"
+#define	KW_BREAK	"@Break"
+#define	KW_ENV		"@LEnv"
+#define	KW_CLOS		"@LClos"
+#define	KW_LVIS		"@LVis"
+#define	KW_OPEN		"@Open"
+#define	KW_USE		"@Use"
+#define	KW_TAGGED	"@Tagged"
+#define	KW_DATABASE	"@Database"
+#define	KW_SYSDATABASE	"@SysDatabase"
+#define	KW_INCLUDE	"@Include"
+#define	KW_SYSINCLUDE	"@SysInclude"
+#define	KW_PREPEND	"@PrependGraphic"
+#define	KW_SYSPREPEND	"@SysPrependGraphic"
+#define	KW_TARGET	"@Target"
+#define	KW_FOLLOWING	"following"
+#define	KW_PRECEDING	"preceding"
+#define	KW_NOW		"now"
+#define	KW_NULL		"@Null"
+#define	KW_GALLEY	"@Galley"
+#define	KW_INPUT	"@LInput"
+#define	KW_SPLIT	"@Split"
+#define	KW_TAG		"@Tag"
+#define	KW_KEY		"@Key"
+#define	KW_CROSS	"&&"
+
+#define	KW_LBR		"{"
+#define	KW_RBR		"}"
+#define	KW_BEGIN	"@Begin"
+#define	KW_END		"@End"
+
+#define	KW_VCAT_NN	"//"
+#define	KW_VCAT_MN	"^//"
+#define	KW_VCAT_NJ	"/"
+#define	KW_VCAT_MJ	"^/"
+#define	KW_HCAT_NN	"||"
+#define	KW_HCAT_MN	"^||"
+#define	KW_HCAT_NJ	"|"
+#define	KW_HCAT_MJ	"^|"
+#define	KW_ACAT_NJ	"&"
+#define	KW_ACAT_MJ	"^&"
+
+
+/*@::memory allocation and list macros@***************************************/
+/*                                                                           */
+/*  OBJECT GetMem(siz, pos)                                                  */
+/*  OBJECT New(typ)                                                          */
+/*  OBJECT NewWord(len, pos)                                                 */
+/*                                                                           */
+/*  Return a pointer to a new record, of appropriate length (in ALIGNs).     */
+/*  The New and NewWord versions initialise LIST, type and rec_size fields.  */
+/*  Note that NewWord must be used for WORD objects.                         */
+/*                                                                           */
+/*****************************************************************************/
+#define	USES_SIZE ceiling( sizeof(struct uses_type), sizeof(ALIGN) )
+
+#if DEBUG_ON
+#define newcount zz_newcount++,
+#else
+#define newcount
+#endif
+
+#define	GetMem(siz, pos)						\
+( newcount								\
+  (zz_size=(siz))>=MAX_OBJECT_REC ?					\
+      (OBJECT) Error(FATAL,pos,"word is too long")			\
+  : zz_free[zz_size] == nil ? zz_hold = GetMemory(zz_size, pos)		\
+  : (zz_hold = zz_free[zz_size],					\
+	zz_free[zz_size] = pred(zz_hold, CHILD), zz_hold)		\
+)
+
+#if DEBUG_ON
+#define checknew(typ)							\
+  !is_type(typ) ? Error(INTERN, no_fpos,"New: type = %s", Image(typ)) :	\
+  zz_lengths[typ] == 0 ? Error(INTERN, no_fpos, "New: 0 length!") : 0,
+#else
+#define checknew(typ)
+#endif
+
+#define	New(typ)							\
+( checknew(typ)								\
+  GetMem(zz_lengths[typ], no_fpos),					\
+  type(zz_hold) = typ,							\
+  pred(zz_hold, CHILD)  = succ(zz_hold, CHILD)  =			\
+  pred(zz_hold, PARENT) = succ(zz_hold, PARENT) = zz_hold		\
+)
+
+#define NewWord(len, pos)						\
+( zz_size = sizeof(struct word_type) + (len) - 3,			\
+  GetMem(ceiling(zz_size, sizeof(ALIGN)), pos),  /* RESETS zz_size */	\
+  rec_size(zz_hold) = zz_size,  type(zz_hold) = WORD,			\
+  pred(zz_hold, CHILD)  = succ(zz_hold, CHILD)  =			\
+  pred(zz_hold, PARENT) = succ(zz_hold, PARENT) = zz_hold		\
+)
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PutMem(x, siz)                                                           */
+/*  Dispose(x)                                                               */
+/*                                                                           */
+/*  Dispose x, which is of size siz.  Dispose works out the size itself.     */
+/*                                                                           */
+/*****************************************************************************/
+
+#if DEBUG_ON
+#define disposecount zz_disposecount++,
+#define	setdisposed  , type(zz_hold) = DISPOSED
+#else
+#define disposecount
+#define	setdisposed
+#endif
+
+#define PutMem(x, siz)							\
+( disposecount								\
+  zz_hold = (x),							\
+  zz_size = (siz),							\
+  pred(zz_hold, CHILD) = zz_free[zz_size],				\
+  zz_free[zz_size] = zz_hold						\
+)
+
+#define Dispose(x)							\
+( zz_hold = (x),							\
+  assert( pred(zz_hold, CHILD)  == zz_hold, "Dispose: pred(CHILD)!"  ),	\
+  assert( succ(zz_hold, CHILD)  == zz_hold, "Dispose: succ(CHILD)!"  ),	\
+  assert( pred(zz_hold, PARENT) == zz_hold, "Dispose: pred(PARENT)!" ),	\
+  assert( succ(zz_hold, PARENT) == zz_hold, "Dispose: succ(PARENT)!" ),	\
+  PutMem(zz_hold, type(zz_hold) == WORD ? rec_size(zz_hold)		\
+				  : zz_lengths[type(zz_hold)])		\
+  setdisposed								\
+)
+
+/*@@**************************************************************************/
+/*                                                                           */
+/*  OBJECT Append(x, y, dir)                                                 */
+/*                                                                           */
+/*  Return the append of lists x and y (dir is PARENT or CHILD).             */
+/*                                                                           */
+/*****************************************************************************/
+
+#define	Append(x, y, dir)						\
+( zz_res = (x),	zz_hold = (y),						\
+  zz_hold == nil ? zz_res  :						\
+  zz_res  == nil ? zz_hold :						\
+  ( zz_tmp = pred(zz_hold, dir),					\
+    pred(zz_hold, dir) = pred(zz_res, dir),				\
+    succ(pred(zz_res, dir), dir) = zz_hold,				\
+    pred(zz_res, dir) = zz_tmp,						\
+    succ(zz_tmp, dir) = zz_res						\
+  )									\
+)
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT Delete(x, dir)                                                    */
+/*                                                                           */
+/*  Delete x from its dir list, and return succ(x, dir) or nil if none.      */
+/*                                                                           */
+/*****************************************************************************/
+
+#define Delete(x, dir)							\
+( zz_hold = (x),							\
+  succ(zz_hold, dir) == zz_hold ? nil :					\
+  ( zz_res = succ(zz_hold, dir),					\
+    pred(zz_res, dir) = pred(zz_hold, dir),				\
+    succ(pred(zz_hold, dir), dir) = zz_res,				\
+    pred(zz_hold, dir) = succ(zz_hold, dir) = zz_hold,			\
+    zz_res								\
+  )									\
+)
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT DeleteAndDispose(x, dir)                                          */
+/*                                                                           */
+/*  Delete x as above, dispose it, and return succ(x, dir) or nil if none.   */
+/*                                                                           */
+/*****************************************************************************/
+
+#define DeleteAndDispose(x, dir)					\
+( zz_hold = (x),							\
+  zz_res  = succ(zz_hold, dir) == zz_hold ? nil :			\
+	    ( pred(succ(zz_hold, dir), dir) = pred(zz_hold, dir),	\
+	      succ(pred(zz_hold, dir), dir) = succ(zz_hold, dir) ),	\
+  pred(zz_hold, dir) = succ(zz_hold, dir) = zz_hold,			\
+  Dispose(zz_hold),							\
+  zz_res								\
+)
+
+#define Down(x)		succ(x, CHILD)
+#define NextDown(x)	succ(x, CHILD)
+#define LastDown(x)	pred(x, CHILD)
+#define PrevDown(x)	pred(x, CHILD)
+#define	Up(x)		succ(x, PARENT)
+#define	NextUp(x)	succ(x, PARENT)
+#define	LastUp(x)	pred(x, PARENT)
+#define	PrevUp(x)	pred(x, PARENT)
+
+#define	Child(y, link)							\
+for( y = pred(link, PARENT);  type(y) == LINK;  y = pred(y, PARENT) )
+
+#define	Parent(y, link)							\
+for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  UpDim(x, dim)                                                            */
+/*  DownDim(x, dim)                                                          */
+/*                                                                           */
+/*  Returns the dim'th child or parent link of node x (dim == COL or ROW).   */
+/*                                                                           */
+/*****************************************************************************/
+
+#define UpDim(x, dim)	( (dim) == COL ? succ(x, PARENT) : pred(x, PARENT) )
+#define DownDim(x, dim)	( (dim) == COL ? succ(x, CHILD) : pred(x, CHILD) )
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT Link(x, y)                                                        */
+/*                                                                           */
+/*  Make y a child of x in the directed graph, using a new link.             */
+/*  The link node is returned.                                               */
+/*                                                                           */
+/*****************************************************************************/
+
+#define Link(x, y)							\
+( xx_link = New(LINK),							\
+  Append(xx_link, (x), CHILD),						\
+  Append(xx_link, (y), PARENT)						\
+)
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT DeleteLink(link)                                                  */
+/*                                                                           */
+/*  Cut the link between nodes x and y of the directed graph.                */
+/*  Returns the link node of the next child of x, or x if none.              */
+/*                                                                           */
+/*****************************************************************************/
+
+#define DeleteLink(link)						\
+( xx_link = (link),							\
+  Delete(xx_link, PARENT),						\
+  DeleteAndDispose(xx_link, CHILD)					\
+)
+
+
+/*@@**************************************************************************/
+/*                                                                           */
+/*  DisposeChild(link)                                                       */
+/*                                                                           */
+/*  Delete link, and if its child is thereby unattached, dispose it.         */
+/*                                                                           */
+/*****************************************************************************/
+
+#define DisposeChild(link)						\
+( xx_link = (link),							\
+  xx_tmp = Delete(xx_link, PARENT),					\
+  DeleteAndDispose(xx_link, CHILD),					\
+  succ(xx_tmp, PARENT) == xx_tmp ? DisposeObject(xx_tmp) : 0		\
+) /* end DisposeChild */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  MoveLink(link, x, dir)                                                   */
+/*                                                                           */
+/*  Move the dir end of link from wherever it is now to node x.              */
+/*                                                                           */
+/*****************************************************************************/
+
+#define MoveLink(link, x, dir)						\
+( xx_link = (link),							\
+  Delete(xx_link, 1 - (dir) ),						\
+  Append(xx_link, (x), 1 - (dir) )					\
+) /* end MoveLink */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  TransferLinks(start_link, stop_link, dest_link)                          */
+/*                                                                           */
+/*  Move parent end of links start_link (inclusive) to stop_link (exclusive) */
+/*  to just before dest_link.                                                */
+/*                                                                           */
+/*****************************************************************************/
+
+#define TransferLinks(start_link, stop_link, dest_link)			\
+{ OBJECT xxstart = start_link, xxstop = stop_link, xxdest = dest_link;	\
+  if( xxstart != xxstop )						\
+  {	assert( type(xxstart) == LINK, "TransferLinks: start_link!" );	\
+	Append(xxstart, xxstop, CHILD); /* actually a split */		\
+	Append(xxstart, xxdest, CHILD);					\
+  }									\
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  DeleteNode(x)                                                            */
+/*                                                                           */
+/*  Delete node x and every edge attaching to x.                             */
+/*                                                                           */
+/*****************************************************************************/
+
+#define DeleteNode(x)							\
+{ xx_hold = (x);							\
+  while( Up(xx_hold)   != xx_hold ) DeleteLink( Up(xx_hold) );		\
+  while( Down(xx_hold) != xx_hold ) DeleteLink( Down(xx_hold) );	\
+  Dispose(xx_hold);							\
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  MergeNode(x, y)                                                          */
+/*                                                                           */
+/*  Take all the children of y and make them children of x.                  */
+/*  Take all the parents of y and make them parents of x.  Dispose y.        */
+/*                                                                           */
+/*****************************************************************************/
+
+#define MergeNode(x, y)							\
+{ xx_res = (x); xx_hold = (y);						\
+  xx_tmp = Delete(xx_hold, PARENT);					\
+  Append(xx_res, xx_tmp, PARENT);					\
+  xx_tmp = DeleteAndDispose(xx_hold, CHILD);				\
+  Append(xx_res, xx_tmp, CHILD);					\
+}  /* end MergeNode */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  ReplaceNode(x, y)                                                        */
+/*                                                                           */
+/*  Move all the parent links of y to x.                                     */
+/*                                                                           */
+/*****************************************************************************/
+
+#define ReplaceNode(x, y)						\
+( xx_tmp = Delete((y), PARENT),						\
+  Append((x), xx_tmp, PARENT)						\
+) /* end ReplaceNode */
+
+
+/*@::scanning catenation objects@*********************************************/
+/*                                                                           */
+/*  FirstDefinite(x, link, y)                                                */
+/*                                                                           */
+/*  On input, x is an object and link and y are undefined.  On output there  */
+/*  are two cases:                                                           */
+/*                                                                           */
+/*  link != x.  Then y is first definite child of x and link is its link.    */
+/*                                                                           */
+/*  link == x.  Then x has no definite child and y is undefined.             */
+/*                                                                           */
+/*  A SPLIT object is considered to be definite if both its children are     */
+/*  definite.  This condition is returned by SplitIsDefinite.                */
+/*                                                                           */
+/*****************************************************************************/
+
+#define FirstDefinite(x, link, y)					\
+{ for( link = Down(x);  link != x;  link = NextDown(link) )		\
+  { Child(y, link);							\
+    if( type(y) == SPLIT ? SplitIsDefinite(y) : is_definite(type(y)) )	\
+	break;								\
+  }									\
+} /* end FirstDefinite */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  NextDefinite(x, link, y)                                                 */
+/*                                                                           */
+/*  On input, x is an object and link is a link to one of its children; y    */
+/*  is undefined.  On output there are two cases:                            */
+/*                                                                           */
+/*  link != x.  Then y is the first definite child of x following link, and  */
+/*              link is changed to be the link of y.                         */
+/*                                                                           */
+/*  link == x.  Then x has no definite child following link, and y remains   */
+/*              undefined.                                                   */
+/*                                                                           */
+/*****************************************************************************/
+
+#define NextDefinite(x, link, y)					\
+{ for( link = NextDown(link);  link != x;  link = NextDown(link) )	\
+  { Child(y, link);							\
+    if( type(y) == SPLIT ? SplitIsDefinite(y) : is_definite(type(y)) )	\
+	break;								\
+  }									\
+} /* end NextDefinite */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  NextDefiniteWithGap(x, link, y, g)                                       */
+/*                                                                           */
+/*  On input, x is an object and link is a link to one of its children; y    */
+/*  and g are undefined.  On output there are two cases:                     */
+/*                                                                           */
+/*  link != x.  Then y is the first definite child of x following link, and  */
+/*              link is changed to be the link of y.  Also, g is defined     */
+/*              to be the gap just before y; this must exist and is tested   */
+/*              by an assert test.                                           */
+/*                                                                           */
+/*  link == x.  Then x has no definite child following link, and y and g     */
+/*              remain undefined.                                            */
+/*                                                                           */
+/*****************************************************************************/
+
+#define NextDefiniteWithGap(x, link, y, g)				\
+{ g = nil;								\
+  for( link = NextDown(link);  link != x;  link = NextDown(link) )	\
+  { Child(y, link);							\
+    if( type(y) == GAP_OBJ )  g = y;					\
+    else if( type(y)==SPLIT ? SplitIsDefinite(y):is_definite(type(y)) )	\
+    { assert( g != nil, "NextDefinite: g == nil!" );			\
+      break;								\
+    }									\
+  }									\
+} /* end NextDefiniteWithGap */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  LastDefinite(x, link, y)                                                 */
+/*                                                                           */
+/*  On input, x is an object and link and y are undefined.  On output there  */
+/*  are two cases:                                                           */
+/*                                                                           */
+/*  link != x.  Then y is the last definite child of x and link is its link. */
+/*                                                                           */
+/*  link == x.  Then x has no definite child and y is undefined.             */
+/*                                                                           */
+/*  A SPLIT object is considered to be definite if both its children are     */
+/*  definite.  This condition is returned by SplitIsDefinite.                */
+/*                                                                           */
+/*****************************************************************************/
+
+#define LastDefinite(x, link, y)					\
+{ for( link = LastDown(x);  link != x;  link = PrevDown(link) )		\
+  { Child(y, link);							\
+    if( type(y) == SPLIT ? SplitIsDefinite(y) : is_definite(type(y)) )	\
+	break;								\
+  }									\
+} /* end LastDefinite */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PrevDefinite(x, link, y)                                                 */
+/*                                                                           */
+/*  On input, x is an object and link is a link to one of its children; y    */
+/*  is undefined.  On output there are two cases:                            */
+/*                                                                           */
+/*  link != x.  Then y is the first definite child of x preceding link, and  */
+/*              link is changed to be the link of y.                         */
+/*                                                                           */
+/*  link == x.  Then x has no definite child preceding link, and y remains   */
+/*              undefined.                                                   */
+/*                                                                           */
+/*****************************************************************************/
+
+#define PrevDefinite(x, link, y)					\
+{ for( link = PrevDown(link);  link != x;  link = PrevDown(link) )	\
+  { Child(y, link);							\
+    if( type(y) == SPLIT ? SplitIsDefinite(y) : is_definite(type(y)) )	\
+	break;								\
+  }									\
+} /* end PrevDefinite */
+
+
+/*@::module declarations@*****************************************************/
+/*                                                                           */
+/*  MODULE DECLARATIONS                                                      */
+/*                                                                           */
+/*****************************************************************************/
+
+/*****  z01.c		Start Up		******************************/
+extern			main();			/* main program              */
+extern	OBJECT		StartSym;		/* sym tab entry for \Start  */
+extern	OBJECT		GalleySym;		/* sym tab entry for @Galley */
+extern	OBJECT		InputSym;		/* sym tab entry for \Input  */
+extern	OBJECT		PrintSym;		/* sym tab entry for \Print  */
+extern	BOOLEAN		AllowCrossDb;		/* true when -s flag absent  */
+extern	BOOLEAN		Encapsulated;		/* true when eps wanted      */
+extern	BOOLEAN		StringBeginsWith();	/* string compare            */
+extern	BOOLEAN		StringContains();	/* string search             */
+
+/*****  z02.c		Lexical Analyser	******************************/
+extern			LexInit();		/* initialise lex. analyser  */
+extern			LexPush();		/* switch to new file list   */
+extern			LexPop();		/* return to prev. file list */
+extern	BOOLEAN		LexLegalName();		/* check identifier format   */
+extern	OBJECT		LexGetToken();		/* get next token from input */
+extern	long		LexNextTokenPos();	/* like ftell() on curr file */
+
+/*****  z03.c		File Service	        ******************************/
+extern	FILE_POS	*no_fpos;		/* a null filepos            */
+extern			InitFiles();		/* initialize this module    */
+extern			AddToPath();		/* add directory to path     */
+extern	FILE_NUM	DefineFile();		/* declare input file        */
+extern	FILE_NUM	FirstFile();		/* first file of given type  */
+extern	FILE_NUM	NextFile();		/* next file of given type   */
+extern	FILE_NUM	FileNum();		/* file with given name      */
+extern	unsigned char	*FileName();		/* file name of file         */
+extern	unsigned char	*EchoFilePos();		/* string value of FILE_POS  */
+extern	FILE_POS	*PosOfFile();		/* string of file's FILE_POS */
+extern	FILE		*OpenFile();		/* open file for reading     */
+extern	FILE		*OpenIncGraphicFile();	/* open @IncludeGraphic file */
+extern	OBJECT		ReadFromFile();		/* read object from file     */
+extern			AppendToFile();		/* append object to file     */
+extern			CloseFiles();		/* close database files      */
+
+/*****  z04.c		Token Service	        ******************************/
+extern	OBJECT		NewToken();		/* get a new token           */
+extern	OBJECT		CopyTokenList();	/* copy a list of tokens     */
+extern	unsigned char	*EchoCatOp();		/* string value of CAT op    */
+extern	unsigned char	*EchoToken();		/* returns image of token    */
+
+/*****  z05.c		Definitions Reader	******************************/
+extern			ReadDefinitions();	/* read definitions          */
+
+/*****  z06.c		Parser			******************************/
+extern			InitParser();		/* initialise parser         */
+extern	OBJECT		Parse();		/* parser                    */
+
+/*****  z07.c		Object Service	        ******************************/
+extern	OBJECT		MakeWord();		/* a new WORD object         */
+extern	OBJECT		MakeWordTwo();		/* a new WORD object         */
+extern	OBJECT		CopyObject();		/* make a copy of an object  */
+extern			DisposeObject();	/* dispose an object         */
+extern	BOOLEAN		SplitIsDefinite();	/* TRUE if SPLIT is definite */
+
+/*****  z08.c		Object Manifest	        ******************************/
+extern	OBJECT		ReplaceWithTidy();	/* tidy up an object         */
+extern	OBJECT		Manifest();		/* manifest an object        */
+
+/*****  z09.c		Closure Expansion	******************************/
+extern	OBJECT		SetEnv();		/* build up environment      */
+extern			AttachEnv();		/* attach env. to object     */
+extern	OBJECT		SearchEnv();		/* search environment        */
+extern	OBJECT		GetEnv();		/* retrieve env. from object */
+extern	OBJECT		DetachEnv();		/* retrieve and detach env.  */
+extern	OBJECT		ClosureExpand();	/* expand a user-def CLOSURE */
+
+/*****  z10.c		Cross References	******************************/
+extern			CrossInit();		/* initialize cr record      */
+extern	OBJECT		CrossGenTag();		/* generates a tag           */
+extern	OBJECT		CrossMake();		/* returns a cross-reference */
+extern	OBJECT		GallTargEval();		/* returns the value of a cr */
+extern	OBJECT		CrossExpand();		/* returns the value of a cr */
+extern			CrossSequence();	/* record cr off root galley */
+extern			CrossClose();		/* close down this module    */
+
+/*****  z11.c		Style Service		******************************/
+extern			BreakChange();		/* change line spacing       */
+extern			SpaceChange();		/* change word spacing       */
+extern	unsigned char	*EchoStyle();		/* string value of a style   */
+
+/*****  z12.c		Size Finder		******************************/
+extern	OBJECT		MinSize();		/* min. possible size of obj */
+
+/*****  z13.c		Object Breaking		******************************/
+extern	OBJECT		BreakObject();		/* break object to fit width */
+
+/*****  z14.c		Object Filling	        ******************************/
+extern	OBJECT		FillObject();		/* optimal paragraph breaker */
+extern	OBJECT		SimpleFillObject();	/* simple paragraph breaker  */
+
+/*****  z15.c		Size Constraints	******************************/
+extern	unsigned char	*EchoConstraint();	/* string value of a constr. */
+extern			MinConstraint();	/* take minimum of two const */
+extern			EnlargeToConstraint();	/* enlarge obj to constraint */
+extern			RotateConstraint();	/* rotate constraints        */
+extern			InvScaleConstraint();	/* inverse scale a constr.   */
+extern			Constrained();		/* finds size constraint     */
+extern			DebugConstrained();	/* debug constraint code     */
+
+/*****  z16.c		Size Adjustments	******************************/
+extern			SetNeighbours();	/* locate definite neighbours*/
+extern			AdjustSize();		/* updates sizes if changed  */
+
+/*****  z17.c		Gap Widths		******************************/
+extern			GetGap();		/* convert string gap to num */
+extern	LENGTH		MinGap();		/* min. possible gap width   */
+extern	LENGTH		ExtraGap();		/* extra available gap width */
+extern	LENGTH		ActualGap();		/* gap width for output      */
+extern	unsigned char	*EchoGap();		/* echo gap (cat. operator)  */
+
+/*****  z18.c		Galley Transfer		******************************/
+extern			TransferInit();		/* initialise this module    */
+extern	OBJECT		TransferBegin();	/* begin transfer of galley  */
+extern			TransferComponent();	/* transfer one component    */
+extern			TransferEnd();		/* end galley transfer       */
+extern			TransferClose();	/* close this module         */
+
+/*****  z19.c		Galley Attaching	******************************/
+extern	OBJECT		SearchGalley();		/* search galley for target  */
+extern			AttachGalley();		/* start off a galley        */
+extern			DetachGalley();		/* detach a galley           */
+
+/*****  z20.c		Galley Flushing		******************************/
+extern			FlushGalley();		/* flush out a galley        */
+
+/***    z21.c		Galley Maker		******************************/
+extern			SizeGalley();		/* convert object to galley  */
+
+/***    z22.c		Galley Service		******************************/
+extern			FlushInners();		/* flush a list of galleys.  */
+extern			ExpandRecursives();	/* expand recursive definite */
+extern			Promote();		/* promote components        */
+extern			KillGalley();		/* destroy a galley          */
+extern			FreeGalley();		/* free a galley to flush    */
+extern			Interpose();		/* interpose a VCAT          */
+extern	BOOLEAN		TargetSymbol();		/* find target of galley     */
+extern	int		CheckConstraint();	/* check ordering constraint */
+
+/*****  z23.c		Galley Printer		******************************/
+extern			FixAndPrintObject();	/* fix and print component   */
+
+/*****  z24.c		Back End                ******************************/
+extern			PrintInit();		/* initialise this module    */
+extern			FontStripQuotes();	/* convert quoted string     */
+extern			FontDefine();		/* define a font             */
+extern			FontChange();		/* change current font       */
+extern			FontAtomSize();		/* set sizes of an atom      */
+extern	LENGTH		FontSize();		/* size of current font      */
+extern			PrintPrologue();	/* print output prologue     */
+extern			PrintOriginIncrement();	/* reset current o/p origin  */
+extern			PrintAtom();		/* print atom at given pos   */
+extern			PrintClose();		/* wrapup output stream      */
+extern			CoordTranslate();	/* translate coord system    */
+extern			CoordRotate();		/* rotate coord system       */
+extern			CoordScale();		/* scale coord system        */
+extern			SaveGraphicState();	/* save coord system etc.    */
+extern			RestoreGraphicState();	/* restore coord system etc. */
+extern			DefineGraphicNames();	/* define xsize, ysize, etc. */
+extern			PrintGraphicObject();	/* print PostScript object   */
+extern			PrintGraphicInclude();	/* include PostScript file   */
+
+/*****  z25.c		Object Echo	        ******************************/
+extern	unsigned char	*EchoObject();		/* print object, file or str */
+
+/*****  z26.c		Echo Service	        ******************************/
+extern			BeginString();		/* begin string accumulator  */
+extern			AppendString();		/* append to current string  */
+extern	unsigned char	*EndString();		/* return current string     */
+extern	unsigned char	*EchoLength();		/* echo a length             */
+extern	unsigned char	*Image();		/* string value of type(x)   */
+
+/*****	z27.c		Debug Service		******************************/
+extern			DebugInit();		/* set debug flag            */
+extern			Debug();		/* print debug o/p on stderr */
+extern			ProfileOn();		/* start profiling           */
+extern			ProfileOff();		/* stop profiling            */
+extern			ProfilePrint();		/* print profiling results   */
+
+/*****	z28.c		Error Service		******************************/
+extern			ErrorInit();		/* initialise log file       */
+extern			Error();		/* print error message       */
+extern	BOOLEAN		ErrorSeen();		/* TRUE after first error    */
+extern			EnterErrorBlock();	/* new block of error mess's */
+extern			LeaveErrorBlock();	/* commit or discard block   */
+
+/*****  z29.c		Symbol Table		******************************/
+extern			InitSym();		/* initialize table to empty */
+extern			PushScope();		/* push a new scope on stack */
+extern			PopScope();		/* pop a scope from stack    */
+extern			SuppressVisible();	/* suppress visible flag     */
+extern			UnSuppressVisible();	/* unsuppress visible flag   */
+extern			SuppressScope();	/* suppress all scoping      */
+extern			UnSuppressScope();	/* unsuppress scoping        */
+extern			SwitchScope();		/* switch to a saved scope   */
+extern			UnSwitchScope();	/* switch back from saved s. */
+extern			BodyParAllowed();	/* let body par be invoked   */
+extern			BodyParNotAllowed();	/* don't let body par be inv */
+extern	OBJECT		SearchSym();		/* search table for symbol   */
+extern	OBJECT		InsertSym();		/* insert a new symbol       */
+extern			DeleteEverySym();	/* dispose all symbols       */
+extern	unsigned char	*SymName();		/* string name of a symbol   */
+extern	unsigned char	*FullSymName();		/* full path name of symbol  */
+extern	OBJECT		ChildSym();		/* return a child of a sym   */
+extern			CheckSymSpread();	/* check hash table spread   */
+
+/*****  z30.c		Symbol Uses		******************************/
+extern			InsertUses();		/* record symbol x uses y    */
+extern			FlattenUses();		/* massage uses relation     */
+extern	BOOLEAN		SearchUses();		/* retrieve uses info        */
+extern	OBJECT		FirstExternTarget();	/* together these return all */
+extern	OBJECT		NextExternTarget();	/*   targets of extern galls */
+
+/*****  z31.c		Memory Allocator	******************************/
+extern			MemInit();		/* initialise mem. allocator */
+extern	OBJECT		GetMemory();		/* get some fresh memory     */
+extern			DebugMemory();		/* print memory usage        */
+extern	OBJECT		zz_free[];		/* array of free lists       */
+extern	unsigned char	zz_lengths[];		/* array of record lengths   */
+extern	int		zz_newcount;		/* debug count of New calls  */
+extern	int		zz_disposecount;	/* debug count of Disposes   */
+extern	OBJECT		zz_hold;		/* temporary variable only   */
+extern	OBJECT		zz_tmp;			/* temporary variable only   */
+extern	OBJECT		zz_res;			/* temporary variable only   */
+extern	int		zz_size;		/* temporary variable only   */
+extern	OBJECT		xx_link, xx_tmp;	/* temporary variable only   */
+extern	OBJECT		xx_hold, xx_res;	/* temporary variable only   */
+
+/*****  z32.c		Counter Service		******************************/
+extern	OBJECT		Next();			/* increment argument by one */
+
+/*****  z33.c		Database Service	******************************/
+extern	OBJECT		OldCrossDb;		/* cross refs from last run  */
+extern	OBJECT		NewCrossDb;		/* cross refs from this run  */
+extern	OBJECT		DbCreate();		/* create writable database  */
+extern			DbInsert();		/* insert into database      */
+extern			DbConvert();		/* con. writable to readable */
+extern	OBJECT		DbLoad();		/* open readable database    */
+extern	BOOLEAN		DbRetrieve();		/* retrieve from database    */
+extern	BOOLEAN		DbRetrieveNext();	/* next entry from database  */
+
+/*****  z34.c		Rotation Service    	******************************/
+extern			RotateSize();		/* calculate rotated size    */
+
+/*****  z35.c		Time Keeper     	******************************/
+extern	OBJECT		MomentSym;		/* the @Moment symbol        */
+extern			InitTime();		/* initialize this module    */
+extern	OBJECT		StartMoment();		/* a copy of the init time   */
+extern	unsigned char	*TimeString();		/* a string containing time  */
+
+/*****  z36.c		Hyphenation     	******************************/
+extern	OBJECT		Hyphenate();		/* hyphenate a paragraph     */
+
+/*@::assert and debug code@***************************************************/
+/*                                                                           */
+/*  ASSERT AND DEBUG CODE                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+#if ASSERT_ON
+#define assert(c, m)							\
+   ( (c) ? 0 : Error(INTERN, no_fpos, "Assert failed in %s", m) )
+#else
+#define assert(c, m)	0
+#endif
+
+#if DEBUG_ON
+
+struct dbs
+{	unsigned char	*flag;		/* external names for debug flags    */
+	BOOLEAN	on[3];			/* the debug flags                   */
+};
+extern	struct dbs 	dbg[];
+
+/* debug routines */
+#define debug0(cat, urg, str)                				\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str); else
+#define debug1(cat, urg, str, p1)					\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1); else
+#define debug2(cat, urg, str, p1, p2)					\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2); else
+#define debug3(cat, urg, str, p1, p2, p3)				\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3); else
+#define debug4(cat, urg, str, p1, p2, p3, p4)				\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4); else
+#define debug5(cat, urg, str, p1, p2, p3, p4, p5)			\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5); else
+#define debug6(cat, urg, str, p1, p2, p3, p4, p5, p6)			\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5, p6); else
+#define debug7(cat, urg, str, p1, p2, p3, p4, p5, p6, p7)		\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5,p6,p7); else
+#define debug8(cat, urg, str, p1, p2, p3, p4, p5, p6, p7, p8)		\
+    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2,p3,p4,p5,p6,p7,p8); else
+#define	ifdebug(cat, urg, x)						\
+    if( dbg[cat].on[urg] ) { x; } else 
+#define	debug_init(str)							\
+    DebugInit(str)
+
+/* debug styles */
+#define	D	 0
+#define	DD	 1
+#define	DDD	 2
+
+/* debug flags */
+#define	DSP	 1		/*  z01.c   -dsp   Supervise                 */
+#define	DLA	 2		/*  z02.c   -dla   Lexical Analyser          */
+#define	DFS	 3		/*  z03.c   -dfs   File Service              */
+#define	DTS	 4		/*  z04.c   -dts   Token Service             */
+#define	DRD	 5		/*  z05.c   -drd   Read Definitions          */
+#define	DOP	 6		/*  z06.c   -dop   Object Parser             */
+#define	DOS	 7		/*  z07.c   -dos   Object Service            */
+#define	DOM	 8		/*  z08.c   -dom   Object Manifest           */
+#define	DCE	 9		/*  z09.c   -dce   Closure Expansion         */
+#define	DCR	10		/*  z10.c   -dcr   Cross References	     */
+#define	DSS	11		/*  z11.c   -dss   Style Service	     */
+#define	DSF	12		/*  z12.c   -dsf   Size Finder               */
+#define	DOB	13		/*  z13.c   -dob   Object Breaking	     */
+#define	DOF	14		/*  z14.c   -dof   Object Filling	     */
+#define	DSC	15		/*  z15.c   -dsc   Size Constraints          */
+#define	DSA	16		/*  z16.c   -dsa   Size Adjustments	     */
+#define	DGW	17		/*  z17.c   -dgw   Gap Widths                */
+#define	DGT	18		/*  z18.c   -dgt   Galley Transfer           */
+#define	DGA	19		/*  z19.c   -dgf   Galley Attaching          */
+#define	DGF	20		/*  z20.c   -dgf   Galley Flushing           */
+#define	DGM	21		/*  z21.c   -dgm   Galley Maker              */
+#define	DGS	22		/*  z22.c   -dgs   Galley Service            */
+#define	DGP	23		/*  z23.c   -dgp   Galley Printer            */
+#define	DFT	24		/*  z24.c   -dft   Font Tables               */
+#define	DOE	25		/*  z25.c   -doe   Object Echo               */
+#define	DES	26		/*  z26.c   -des   Echo Service		     */
+#define	DZZ	27		/*  z27.c   -dzz   Debug Service             */
+#define	DYY	28		/*  z28.c   -dyy   Error Service             */
+#define	DST	29		/*  z29.c   -dst   Symbol Table              */
+#define	DSU	30		/*  z30.c   -dsu   Symbol Uses               */
+#define	DMA	31		/*  z31.c   -dma   Memory Allocator          */
+#define	DCS	32		/*  z32.c   -dcs   Counter Service           */
+#define	DBS	33		/*  z33.c   -dbs   Database Service          */
+#define	DRS	34		/*  z34.c   -drs   Rotation Service          */
+#define	DTK	35		/*  z35.c   -dtk   Time Keeper               */
+#define	DHY	36		/*  z36.c   -dhy   Hyphenation               */
+#define	DPP	37		/*          -dpp   Profiling                 */
+#define	ANY	38		/*          -d     any                       */
+
+#else
+#define ifdebug(cat, urg, x)
+#define debug0(cat, urg, str)
+#define debug1(cat, urg, str, p1)
+#define debug2(cat, urg, str, p1, p2)
+#define debug3(cat, urg, str, p1, p2, p3)
+#define debug4(cat, urg, str, p1, p2, p3, p4)
+#define debug5(cat, urg, str, p1, p2, p3, p4, p5)
+#define debug6(cat, urg, str, p1, p2, p3, p4, p5, p6)
+#define debug7(cat, urg, str, p1, p2, p3, p4, p5, p6, p7)
+#define debug8(cat, urg, str, p1, p2, p3, p4, p5, p6, p7, p8)
+#define	debug_init(str)	Error(FATAL, no_fpos,			\
+			"%s - debug flags not implemented", str)
+#endif

@@ -1,0 +1,88 @@
+@Section
+   @Title { "@Font" }
+   @Tag { font }
+@Begin
+@PP
+A @I font
+font. @Index { Fonts }
+is a collection of characters which may be
+printed.  Many fonts come in {@I families},
+family @Index { Family of a font }
+face @Index { Face of a font }
+which are groups of fonts that
+have been designed to go together.  For example, the Times family
+includes the following fonts:
+@ID { Times Base } @Font {
+    Base      @Font { Times Base }
+//1vx Slope     @Font { Times Slope }
+//1vx Bold       @Font { Times Bold }
+//1vx BoldSlope @Font { Times BoldSlope }
+}
+Thus, each font has two names: its @I { family name } (Times,
+Helvetica, etc.) and its @I { face name } (Base, Slope, etc.).  Times
+Base is more commonly called Times Roman, and Times Slope is more
+commonly called Times Italic.  Lout avoids these names in favour of
+generic names which can be applied to many font families.
+@PP
+When Lout runs, the first thing it reads is a list of font definitions,
+font.def @Index { @Code fontdef }
+like these:
+@ID {
+    @Code "fontdef  Times  Base   {"  @I implementation-dependent  @Code "}"
+//1vx @Code "fontdef  Times  Slope  {"  @I implementation-dependent  @Code "}"
+}
+Each line tells Lout of the existence of a font, and assigns it a family
+name and a face name.  There are a few fonts which are the only members
+of their families; even though these fonts do not need a face name, they
+must be given one by their {@Code fontdef}.  The part between braces may
+vary with different implementations of Lout, but it will usually be the
+name of a file containing the information Lout needs to work with the
+font; for example, Basser Lout uses
+adobe @Index { Adobe Systems, Inc. }
+Adobe Font Metrics files.
+@PP
+Ligatures,
+ligatures @Index Ligatures
+such as fl for {@OneCol f}l and fi for {@OneCol f}i, are considered by
+Basser Lout to be an integral part of the font:  if the @Code fontdef
+file mentions them, they will be used.  Enclosing one of the letters in
+@@OneCol is one sure way to disable a ligature.
+@PP
+The @@Font symbol
+font.sym @Index { @@Font symbol }
+returns its right parameter in a font
+and size specified by its left:
+@ID {
+@Code "{ Times Base 12p } @Font"  @I object
+}
+The family and face names must have appeared together in a {@Code fontdef};
+the size is arbitrary and may be given in any one of the {@Code "c"},
+{@Code "i"}, {@Code "p"}, {@Code "m"}, {@Code "f"}, {@Code "s"}, and
+{@Code "v"} units of measurement (Section {@NumberOf concatenation}),
+although @Code 10p and @Code 12p are the most common sizes for text.
+@PP
+When a @@Font symbol is nested inside the right parameter of
+another @@Font symbol, the inner one determines the font of its
+own right parameter.  However, it may be abbreviated so as to inherit
+part of the outer symbol:
+@ID @Code {
+"{ Times Base 12p } @Font"
+"{ hello, Slope @Font hello, 15p @Font hello }"
+}
+has result
+@ID {
+{ Times Base 12p } @Font
+{ hello, Slope @Font hello, 15p @Font hello }
+}
+The first inner @@Font inherits the outer family and size, changing only
+the face; the second inherits the outer family and face.  When a family
+name is given, it must be followed immediately by a face name.  A size
+change always comes last.
+@PP
+Sizes of the form +{@I length} and --{@I length} may also be used,
+meaning that the font size is to be @I length larger or smaller than
+the inherited value.  For example, --{@Code "2p"} is often used for
+superscripts and subscripts.  These forms are highly recommended, since
+they don't need to be changed if a decision is made to alter the font
+size of the document as a whole.
+@End @Section

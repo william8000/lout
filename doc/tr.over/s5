@@ -1,0 +1,104 @@
+@Section
+   @Title { Galleys }
+@Begin
+@PP
+The fundamental problem with inserting text, footnotes, and floating
+figures into pages is that the process seems impossible to describe in
+functional terms.  A footnote is entered within a paragraph of text, but
+it appears somewhere else:  at the foot of a page.  Some new abstraction
+is needed to explain this.
+@PP
+The landscape of features that previous document formatting systems have
+intro&-duced at this point can best be described metaphorically, as an
+antediluvian swamp populated by dinosaurs and demons, whose air is
+filled with the piteous cries of docu&-ment format designers in torment.
+@PP
+Lout's solution to this problem is a feature called the @I galley, after
+the metal trays used in manual typesetting.  A galley consists of an
+object plus an indication that the object is to appear somewhere other
+than its invokation point.  For example,
+@ID {
+@LittlePageList 1
+// @LittleEndRunPlace
+//
+@LittleText {
+@Heading { Galleys }
+@PP
+The fundamental problem with inserting text, footnotes, and floating
+figures into pages is that the process seems impossible to describe in
+functional terms.  A footnote is entered within a para&-graph of text, but
+it appears somewhere else:  at the foot of a page.  Some new abstraction
+is needed to explain this.
+}
+//
+@LittleEndRun
+}
+is the result of the expression
+@ID @Code {
+"@PageList 1"
+"//"
+"@Text {"
+"@Heading { Galleys }"
+"@PP"
+"The fundamental ..."
+"... to explain this."
+"}"
+}
+The only new definitions required are these:
+@ID @Code {
+"def @TextPlace { @Galley }"
+""
+"def @Text"
+"    into { @TextPlace&&preceding }"
+"    right x"
+"{ x }"
+}
+They say that @Code "@TextPlace" (which the reader will recall as lying
+within the pages of {@Code "@PageList"}) is a placeholder for an
+incoming galley, and that @Code "@Text" is a galley whose result is to
+appear, not where @Code "@Text" is invoked, but rather at some
+@Code "@TextPlace" preceding that point of invokation in the final
+printed document.
+@PP
+Although the abstraction can be understood in a static way, it is
+helpful to trace what happens when the Basser Lout batch formatter reads
+the expression above.
+@PP
+Since @Code "@PageList 1" indirectly con&-tains the special @Code "@Galley"
+symbol, it will be expanded only upon demand.  The discovery of the
+@Code "@Text" galley initiates a search for a {@Code "@TextPlace"},
+which is found within {@Code "@PageList 1"} and so forces one such
+expansion.  The available width at this @Code "@TextPlace" is six
+inches, so the @Code "@Text" galley is broken into six-inch components
+which are promoted one by one until the available height (nine inches)
+is exhausted.  Since the @Code "@Text" galley is not entirely consumed,
+a forward search of the docu&-ment is made, another @Code "@TextPlace" is
+found within the as yet unexpanded {@Code "@PageList 2"}, and the
+process is repeated.
+@PP
+The treatment of footnotes is the same, except that
+@ID @Code {
+"def @FootNote"
+"    into { @FootPlace&&following }"
+}
+is used to make the footnote appear later in the finished document than its
+invokation point.  Basser Lout suspends the promotion of text into pages
+just after the component containing the footnote's invokation point is
+promoted, switches to the placement of the footnote galley, then resumes
+the body text.
+@PP
+A collection of galleys all targeted to the same place may optionally
+appear sorted on a designated key, thus implementing sorted reference
+lists and indexes.  The author was obliged to make the sorting option a
+primitive feature, since it otherwise seems to require boolean operators
+which he preferred to exclude.
+@PP
+The @Code "@PageList" object which receives the @Code "@Text" galley
+can itself be viewed as a galley whose components are pages, and this
+leads to a dynamic view of Lout document assembly as a tree of galleys, each
+promoting into its parent, with the root galley promoting into the
+output file.  For example, the BookLayout package [{@Ref kingston92begin}]
+has @Code "@Section" galleys promoting into @Code "@Chapter" galleys
+promoting into a single @Code "@PageList" galley, which promotes into
+the output; no limit is imposed on the height of the tree.
+@End @Section

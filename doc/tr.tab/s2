@@ -1,0 +1,97 @@
+@Section
+   @Title { Changing the style of entries and columns }
+@Begin
+@PP
+The style of an entry is mainly determined by four symbols from standard
+Lout:  {@Code "@Font"}, {@Code "@Break"}, {@Code "@Wide"}, and
+{@Code "@High"}.  We will review them only briefly here, since they are
+treated elsewhere [{@Ref kingston92}, {@Ref kingston92begin}],
+then explain how they are used within tables.
+@PP
+The @Code "@Font" symbol changes the font and font size of an object.  For
+example,
+@ID @Code "Slope @Font { hello world }"
+produces {Slope @Font { hello world }}, and
+@ID @Code "{ Bold +2p } @Font { hello world }"
+produces
+@ID {{ Bold +2p } @Font { hello world }}
+which is two points larger than it otherwise would have been, as well
+as set in bold.  The DocumentLayout package provides the abbreviations
+@Code "@I" and @Code "@B" for @Code "Slope @Font" and {@Code "Bold @Font"}.
+@PP
+The @Code "@Break" symbol affects paragraph breaking.  Most relevant
+here are @Code "clines @Break" and {@Code "rlines @Break"}, which will
+centre or right-justify one or more lines in the given column:
+@ID @Code {
+"clines @Break {"
+"A small centred"
+"paragraph."
+"}"
+}
+produces
+@ID {
+clines @Break {
+A small centred
+paragraph.
+}
+}
+for example.  Actually, there is a small problem with these symbols:  they
+only work on paragraphs of at least two words, so they will fail to
+centre or right-justify a solitary word.  Tab provides two symbols,
+{@Code "@CC"} and {@Code "@RR"}, which do essentially the same thing,
+but which work on single words as well.
+@PP
+The @Code "@Wide" symbol forces an object to have a given width, by
+padding it with white space on the right if it is too small, or breaking
+its paragraphs if it is too wide:
+@ID @Code {
+"1.5i @Wide {"
+"This small paragraph will"
+"be broken to a width of"
+"one and one half inches."
+"}"
+}
+produces
+@ID {
+1.5i @Wide {
+This small paragraph will
+be broken to a width of
+one and one half inches.
+}
+}
+Widths may be specified in centimetres, points or ems using the letters
+{@Code "c"}, {@Code "p"} and {@Code "e"} instead of {@Code "i"}.  The
+@Code "@High" symbol is very similar, forcing an object to have a given
+height by adding white space beneath it.
+@PP
+Although we will use only these four symbols in the following, more
+exotic symbols may be used, for example @Code "90d @Rotate" which
+rotates any object (the entire table, for example, or one entry) ninety
+degrees, or any other positive or negative angle.  Symbols defined by
+the user or taken from other packages may also be used.
+@PP
+To change the style of an individual entry, enclose it in the symbols
+required:
+@ID @Code {
+"@Rowa"
+"    A { @CC { one entry of the table } }"
+}
+More commonly, the same style is to be applied to every entry in a
+particular column, and this is done by placing the symbols for the style
+inside the format option, between @Code "@Col" and the column letter:
+@ID @Code {
+"@Tab"
+"    @Fmta { @Col 3c @Wide @CC A  !  ... }"
+}
+Any @Code "@CC" or @Code "@RR" symbol should appear last, immediately
+before the column letter.  Now every entry in column @Code A will be
+centred in a three centimetre space, which means that the column as
+a whole will be three centimetres wide (excluding margins) and its
+entries will be centred.
+@PP
+It is best not to use the @Code "@Wide" symbol at first, since Lout is
+quite good at choosing appropriate column widths.  If the result is not
+satisfactory, and the table is wide enough to require paragraph breaking
+within its entries, @Code "@Wide" should be used only to reduce the width
+of the wider columns, not to increase the width of the narrower ones.
+@End @Section

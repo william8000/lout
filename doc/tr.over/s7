@@ -1,0 +1,41 @@
+@Section
+   @Title { Conclusion }
+@Begin
+@PP
+The Lout document formatting system permits features as diverse as page
+layout and equation formatting to be implemented by definitions written
+in a high-level language.  The consequent improvement in productivity
+has allowed an unprecedented repertoire of advanced features to be
+presented to the non-expert user.
+@PP
+To future research in document formatting, Lout offers evidence of the
+utility of the functional paradigm, as well as two new abstractions:
+galleys and cross references.  These provide a secure foundation for
+features which have proven very difficult to implement in the past.
+@PP
+A number of improvements to the current system can be envisaged.  Better
+paragraph and page breaking algorithms could be added to the formatter
+without any change to the language; non-rectangular objects would be
+useful in some places.  Perhaps the most useful improvement would be the
+representation of paragraphs as horizontal galleys, since this would allow
+the full power of the language to be brought to bear on paragraph
+layout, in contrast to the present built-in system which offers only the
+traditional styles (ragged right, justified, and so on).
+{ @Reference
+    @Tag { brooks91 }
+    @Type { JournalArticle }
+    @Author { Brooks, Kenneth P. }
+    @Title { Lilac: a two-view document editor }
+    @Journal { IEEE Computer }
+    @Volume { @Null }
+    @Pages { 7--19 }
+    @Year { 1991 }
+}
+@PP
+The author of a recent inter&-active document editor [{@Ref brooks91}]
+has recommended that the interface be supported by a functional base
+language, accessible to the expert user, for such purposes as page
+layout definition and fine control over formatting.  Lout appears to be
+an excellent candidate for such a language, because of its small size,
+precision, and functional semantics.
+@End @Section

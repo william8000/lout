@@ -1,0 +1,67 @@
+
+######################################################
+#                                                    #
+#  Lout setup file for producing the Fig report.     #
+#                                                    #
+#  Jeffrey H. Kingston                               #
+#  8 June 1991                                       #
+#  22 December 1992                                  #
+#                                                    #
+######################################################
+
+@SysInclude { ft  }
+@SysInclude { dl  }
+@SysInclude { tab }
+@SysInclude { eq  }
+@SysInclude { fig }
+
+   def @Code
+      right x
+   { { Helvetica Base -1p } @Font lines @Break x
+   }
+
+   import @Fig
+   def @JoinFigures
+      left A
+      named linestyle { solid }
+      named dashlength { 0.15 cm }
+      named arrow { noarrow }
+      named linewidth { 0.5 pt }
+      right B
+   {  @Arrow
+	 from { A"@CTR" ++ {{A"@CTR" @Angle B"@CTR"} A@CIRCUM} }
+	 to   { B"@CTR" ++ {{B"@CTR" @Angle A"@CTR"} B@CIRCUM} }
+         linestyle { linestyle }
+         dashlength { dashlength }
+         arrow { arrow }
+         linewidth { linewidth }
+      {}
+   }
+
+   def @ShowMarks
+      named linewidth  { 0.015 cm }
+      named linestyle  { dashed   }
+      named dashlength { 0.15 cm  }
+      named paint      { light    }
+      right x
+   {
+      @Fig
+      {   @Box margin { 0c } linewidth { linewidth } paint { paint }
+	  {   @Figure
+		 shape { -0.3 cm ymark
+			 {xsize ymark} ++ {0.3 cm 0}  []
+			 xmark -0.3 cm
+			 {xmark ysize} ++ {0 0.3 cm}
+		       }
+		 linewidth { linewidth }
+		 linestyle { linestyle }
+		 dashlength { dashlength }
+	      x
+	  }
+
+      }
+   }
+
+@Use { @DocumentLayout }
+
+@SysDatabase @Reference { "loutrefs"  }

@@ -1,0 +1,42 @@
+@Section
+   @Title { The non-expert's view }
+@Begin
+@PP
+The non-expert user perceives Lout as text interspersed with special
+symbols, in a style reminiscent of many other batch formatters:
+@ID @Code {
+"@Doc @Text @Begin"
+"@Heading { Standard Integrals }"
+"@PP"
+"The following list of standard"
+"integrals should be memorized:"
+"@NumberList"
+"@Item @Eq {int e sup x dx = e sup x}"
+"@Item @Eq {int dx over"
+"   sqrt { 1 - x sup 2 } = arc sin x}"
+"@EndList"
+"@End @Text"
+}
+Braces are used for grouping parameters to the features.  The symbols
+are all taken from two of the standard packages:  DocumentLayout, which
+provides headings, paragraphs, lists, footnotes, sections, and so on,
+and Eq, which provides mathematical typesetting in a style copied from
+the eqn language of Kernighan and Cherry [{@Ref kernighan75}].
+@PP
+At the time of writing, packages exist for formatting general documents,
+technical reports, and books, the latter providing an automatic table of
+contents, running page headers and footers, access to bibliographic
+databases, and a sorted index, among many other features.  Specialized
+packages exist for mathematical typesetting, drawing figures, and
+formatting Pascal programs.
+@PP
+The advanced features maintain the simple style established above.  To
+produce a footnote, for example, one simply types
+@ID @Code "@FootNote { ... }"
+at the appropriate point, and it will be numbered and placed at the
+bottom of the page; to add an item to the index,
+@ID @Code "expert @Index { Expert user }"
+is typed, and the right parameter will appear in the index, with a page
+number, at a place determined by the alphabetical ranking of the left
+parameter.  No technical knowledge is required to use these features.
+@End @Section

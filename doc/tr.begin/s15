@@ -1,0 +1,84 @@
+@Section
+   @Tag { big.changes }
+   @Title { Making more radical changes }
+@Begin
+@PP
+The DocumentLayout package makes a large number
+of decisions, about how large the pages will be, which fonts will
+ordinarily be used, and so on.  The more complex decisions, such as the
+appearance of tables of contents in books, can only be changed by
+modifying the packages,  but many of the simpler decisions can be changed
+quite easily by setting options in the setup file.
+@PP
+The first step is to obtain a private copy of the setup file.  A local
+expert will know where these files are kept; for example, in directory
+{ @Code "/usr/lout/include"}.  Suppose the @Code report setup file is
+copied into a file called { @Code myrep }; then typing
+@ID @Code "lout myrep myfile"
+instead of
+@ID @Code "lout -ireport myfile"
+runs Lout with the private copy of the setup file, {@Code "myrep"}.
+@PP
+Exactly what the setup file contains will depend upon the local
+situation, but it will be something like this:
+@ID @Code {
+"# Setup file for reports."
+"# J. H. Kingston, July 1991"
+""
+"@SysInclude { ft }"
+"@SysInclude { dl }"
+"# @SysInclude { eq }"
+"# @SysInclude { pas }"
+"# @SysInclude { fig }"
+"# @SysInclude { tab }"
+""
+"@Use { @DocumentLayout"
+"  # @InitialFont { Times Base 12p }"
+"  # @InitialBreak { adjust 1.2fx }"
+"  # @Hyphenate { Yes }"
+"  # @PageNumbers { Yes }"
+"  # @Columns { Single }"
+"  # @HeadingFont { Bold }"
+"  # @ParaIndent { 2.0f }"
+"  # @PageTop { |0.5rt - @PageNum - }"
+"  # @PageFoot { @Null }"
+"}"
+}
+Whenever Lout encounters a @Code "#" character not enclosed in quotes,
+it ignores it and everything following it up to the end of the line.  The
+first two lines of the setup file, then, are comments for the human
+reader.  After them come lines which cause Lout to read the file
+@Code "ft" of font definitions and the file @Code "dl" which contains
+the definition of the DocumentLayout package.
+@PP
+The next four lines are comments and will be ignored, but if the initial
+@Code "#" is deleted they cause Lout to read the definitions of the Eq
+equation formatting package and the Pas Pascal program formatting package
+[{@Ref kingston92eq}], the Fig diagram drawing package [{@Ref kingston92fig}],
+and the Tab table formatting package [{@Ref kingston92tab}].
+@PP
+Next comes a @Code "@DocumentLayout" symbol within a @Code "@Use"
+clause.  It is this symbol whose options may
+be changed so as to affect the overall layout.  These options are listed
+as comments on the following lines, together with the default value
+of each.  To change an option, delete the @Code "#" and change the
+value.  For example, the normal paragraph indent produced by @Code "@PP" is
+@Code "2.0f" (twice the current font size).  To change it, say to
+{@Code "3.0f"}, change the line to
+@ID @Code "@ParaIndent { 3.0f }"
+The display indent option (not shown here) should probably be changed as well.
+@PP
+The first five options have the same name as five of the @Code "@Document"
+symbol's options, and they determine the default value of those
+options.  The @Code "@PageTop" and @Code "@PageFoot" options determine
+the appearance of the page header and footer lines (where the page
+numbers appear), and are best left to experts;  but, for example,
+@ID @Code "@PageTop { |1rt  @PageNum }"
+will make the page number appear at the top right of each page, without
+the @Code "-" characters.
+@PP
+Those who wish to make more radical changes will have to copy the @Code dl
+file and change the definition of the DocumentLayout package.  This requires
+knowledge of the principles of Lout, and the primitive features from which
+others are built, as described in the Lout user manual [{@Ref kingston92}].
+@End @Section

@@ -1,0 +1,25 @@
+
+######################################################
+#                                                    #
+#  Lout setup file for producing a technical report  #
+#                                                    #
+#  Jeffrey H. Kingston                               #
+#  8 June 1991                                       #
+#                                                    #
+######################################################
+
+@SysInclude { ft  }
+@SysInclude { dl  }
+@SysInclude { eq  }
+@SysInclude { tab }
+@SysInclude { pas }
+@SysInclude { fig }
+
+   def @Code
+      right x
+   { { Helvetica Base -1p } @Font lines @Break x
+   }
+
+@Use { @DocumentLayout }
+
+@SysDatabase @Reference { "loutrefs"  }

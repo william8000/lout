@@ -1,0 +1,84 @@
+@Section
+   @Tag { reportlayout }
+   @Title { Technical reports }
+@Begin
+@PP
+This section describes how to use the DocumentLayout package to produce
+technical reports like the present document.  Type @Code "-ireport" in
+the Unix command instead of @Code "-idoc" to use the package in this
+way.  We present only the differences here; everything else works as
+before.
+@PP
+A technical report begins with a @Code "@Report" symbol analogous to the
+@Code "@Document" symbol described in the previous section.  Here it is,
+with its nine options and their default values:
+@ID @Code {
+"@Report"
+"    @Title {}"
+"    @Author {}"
+"    @Institution {}"
+"    @DateLine { @Date }"
+"    @InitialFont { Times Base 12p }"
+"    @InitialBreak { adjust 1.2fx }"
+"    @Hyphenate { Yes }"
+"    @PageNumbers { Yes }"
+"    @Columns { Single }"
+"//"
+}
+The {@Code "@Title"}, {@Code "@Author"}, and {@Code "@Institution"} options
+will be printed on the cover sheet and on the first page; they are formatted
+using {@Code "clines @Break"} (see page {@PageOf clines}).  Multiple authors
+should be given on separate lines within the @Code "@Author"
+option.  {@Code "@DateLine"} appears below the abstract on the cover sheet,
+and its default value is the current date as shown.  {@Code "@InitialFont"},
+{@Code "@InitialBreak"}, {@Code "@Hyphenate"}, {@Code "@PageNumbers"} and
+{@Code "@Columns"} are as described in the last section, except that there
+is nothing analogous to @Code "@Text" and {@Code "@ColText"}:  if
+@Code "@Columns" is set to {@Code Double}, the entire document after the
+title will be set in two columns.  There is no @Code "@FirstPageNumber"
+option.  As for {@Code "@Document"}, the symbol @Code "//" must follow
+after, and disaster will ensue if it is omitted.
+@PP
+If the technical report has an abstract, it comes next:
+@ID @Code {
+"@Abstract @Begin"
+"..."
+"..."
+"@End @Abstract"
+}
+The cover sheet of the present report shows how this will
+appear.  @Code "@Abstract" has a @Code "@Title" option like the ones
+below; its default value is {@I ABSTRACT}.
+@PP
+Next come the sections of the report, each enclosed in a @Code
+"@Section" symbol:
+@ID @Code {
+"@Section"
+"    @Title { Introduction }"
+"@Begin"
+"@PP"
+"..."
+"..."
+"@End @Section"
+}
+No @Code "@BeginSections" or @Code "@EndSections" symbols are needed.
+ The sections may contain subsections, preceded as usual by
+@Code "@BeginSubSections" and followed by {@Code "@EndSubSections"}.
+ After the sections there is opportunity for a sequence of appendices,
+each of the form
+@ID @Code {
+"@Appendix"
+"    @Title { ... }"
+"@Begin"
+"@PP"
+"..."
+"..."
+"@End @Appendix"
+}
+but these are quite optional.  No @Code "@BeginAppendices" and
+@Code "@EndAppendices" symbols are needed.  An appendix may contain
+sub-appendices via the usual symbols {@Code "@BeginSubAppendices"},
+{@Code "@SubAppendix"}, and {@Code "@BeginSubAppendices"}.  This ends
+the input; there is no {@Code "@End @Text"}, and any reference section
+will be added automatically.
+@End @Section

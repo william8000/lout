@@ -1,0 +1,21 @@
+@Report
+   @Title { A New Approach to Document Formatting }
+   @Author { Jeffrey H. Kingston }
+   @Institution { Basser Department of Computer Science
+University of Sydney 2006
+Australia }
+   @Columns { Double }
+   @DateLine { 22 December, 1992 }
+//
+
+@Abstract {
+This paper describes a new approach to document formatting, in which
+features are written in a small, coherent, high-level language called
+Lout.  The resulting increase in productivity has permitted many advanced
+features to be developed quickly and accurately, including page layout of
+unprecedented flexibility, equation formatting, automatically generated
+tables of contents, running page headers and footers, cross references,
+sorted indexes, and access to bibliographic databases.  A fully operational
+production implementation of the Lout system including all these features
+and many others is freely available.
+}

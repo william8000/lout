@@ -1,0 +1,48 @@
+Installation of hyphenation patterns
+
+Jeffrey H. Kingston
+22 December 1992
+
+Basser Lout Version 2.03 incorporates automatic hyphenation using the method
+introduced by TeX (see Appendix H of the TeXBook by D. E. Knuth).  No special
+action is required to install hyphenation unless it is desired to change the
+hyphenation patterns that control it.
+
+The first time on any run that hyphenation is required, Lout will search the
+@SysInclude directories for a binary file called lout.hyph.packed, which
+contains a memory image of the TeX hyphenation patterns, modified so that
+the file may be safely shared by big-endian and little-endian machines.  If
+this file cannot be found, Lout then searches for the text file lout.hyph
+instead, and uses it to construct lout.hyph.packed.  To change the hyphenation
+patterns, delete lout.hyph.packed and modify lout.hyph; the rest is automatic.
+
+File lout.hyph mainly contains the long list of TeX hyphenation patterns,
+but it begins with a sequence of character classes, one class per line,
+terminated by a blank line:
+
+    @!$%^&*()_-+=~`{[}]:;'|<,.>?/0123456789
+    aA
+    bB
+    cC
+    ...
+    yY
+    zZ
+
+Briefly, hyphenation of a word works like this.  If the word contains a
+character not found in any of these classes, it will not be hyphenated.
+Otherwise the word is analysed into sequences of letters separated by
+sequences of non-letters (the characters in the first class are by
+definition the non-letters, and the remaining characters are the letters).
+Each sequence of five or more letters is then matched with the hyphenation
+patterns and hyphenated.  The matching process treats the members of each
+class as identical (so the classes above ensure that the distinction
+between upper and lower case is ignored).  The hyphen character "-" is
+treated specially.  Apart from the weighting digits, the patterns should
+contain only letters.
+
+Extreme lengths were resorted to to compress the .packed file as much as
+possible, and attempts to increase the number of classes or patterns
+significantly are likely to fail.  Some words are not hyphenated well by
+the standard patterns and must be treated as exceptions; see the
+DocumentLayout package implementation (file dl in lout/include) for
+the standard list of these exceptions and how to deal with them.

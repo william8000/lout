@@ -1,0 +1,20 @@
+Directory lout/include
+
+This directory contains Lout source files for
+a variety of standard packages and setup files:
+
+   ft		A file of font definitions
+   dl		The DocumentLayout package
+   doc		A setup file calling dl for simple documents
+   report	A setup file calling dl for technical reports
+   book		A setup file calling dl for books
+   eq		The Eq equation formatting package
+   pas		The Pas Pascal formatting package
+   fig		The Fig figure drawing package
+   fig_prepend	A PostScript file needed by fig
+   tab		The Tab table formatting package
+   tab_prepend	A PostScript file needed by Tab
+   lout.hyph	Text file of hyphenation patterns
+
+Jeffrey H. Kingston
+22 December 1992

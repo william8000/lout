@@ -1,0 +1,133 @@
+@Section
+   @Tag { displays }
+   @Title { Displays }
+@Begin
+@PP
+The @Code "@Display" symbol displays the following thing in the centre
+of the page or column:
+@ID @Code "@Display @I Centred"
+has result
+@Display @I Centred
+Notice that @Code "@I Centred" does not have to be grouped within braces;
+it is already a single thing.  Spaces (@Code "@DP" symbols) are inserted
+automatically above and below the display, so no paragraph symbols are
+needed anywhere near the display.
+@PP
+The display can be made to appear at the left margin by using the
+{@Code "@LeftDisplay"} symbol instead of {@Code "@Display"}, or indented
+by using {@Code "@IndentedDisplay"}.  There are also @Code "@CentredDisplay"
+and @Code "@CenteredDisplay" symbols which are the same as
+{@Code "@Display"}.  In general, the word @Code Centred may be spelt
+@Code Centered wherever it appears.
+@PP
+Each display symbol has a `raw' version, which means that no space is
+inserted above or below; the user must therefore add paragraph symbols:
+@ID @Code {
+"... preceding text."
+"@DP"
+"@RawIndentedDisplay @I Emma"
+"@DP"
+"@RawIndentedDisplay @I"
+"{ Mansfield Park }"
+"@DP"
+"following text ..."
+}
+has result
+@ID {
+... preceding text.
+@DP
+@RawIndentedDisplay @I Emma
+@DP
+@RawIndentedDisplay @I { Mansfield Park }
+@DP
+following text ...
+}
+The point of this particular example is that two consecutive non-raw
+displays would be separated by two @Code "@DP" symbols, which is too
+much.  A better way to do this, using a list, will be presented in the
+next section.
+@PP
+Displays may be {@I aligned}, which means that nominated points within a
+sequence of displays are made to appear directly beneath each
+other.  Displays may also be {@I numbered}, which means that an
+automatically generated number is placed at the right-hand margin.  For
+example, here is a first display:
+@BeginNumberedDisplays
+@BeginAlignedDisplays
+@CentredAlignedNumberedDisplay
+  @Tag { fibeq }
+@Eq { F sub n ^= F sub n-1 + F sub n-2 }
+and here is a second display, which is aligned on its @Eq {equal} sign
+with the first, and also numbered in sequence with it:
+@CentredAlignedNumberedDisplay
+@Eq { F sub n - F sub n-1 ^= F sub n-2 }
+@EndNumberedDisplays
+@EndAlignedDisplays
+Mathematical examples have been chosen because they are the most common
+aligned and numbered displays; but any kind of display may be aligned or
+numbered.
+@PP
+Notice that the two displays are centred as a block as well as
+aligned.  Altogether then we have four ways in which displays vary:
+@BL
+@LI { A display can be raw or not raw; }
+@LI { It can be a {@Code "@Display"}, {@Code "@LeftDisplay"},
+{@Code "@IndentedDisplay"}, {@Code "@CentredDisplay"} or
+{@Code "@CenteredDisplay"}; }
+@LI { It can be aligned or not aligned; }
+@LI { It can be numbered or not numbered. }
+@EL
+All possible combinations are allowed.  The display that has everything
+is called
+@ID @Code { "@RawCentredAlignedNumberedDisplay" &0io }
+By leaving out some or all of {@Code Raw}, {@Code Aligned}, and
+{@Code Numbered}, and by changing or leaving out {@Code Centred},
+we get all these combinations.
+@PP
+When aligned displays are used, it is necessary to indicate where the
+aligned group begins and ends, by inserting @Code "@BeginAlignedDisplays"
+just before the first, and @Code "@EndAlignedDisplays" just after the
+last.  The alignment points are indicated by preceding them by the
+symbol {@Code "^"}.  Numbered displays are similarly bracketed by
+@Code "@BeginNumberedDisplays" and {@Code "@EndNumberedDisplays"}.  So
+then, with the help of the @Code "@Eq" equation formatting package
+[{@Ref kingston92eq}], here is the input for the two displays given
+earlier:
+@ID @Code {
+"... a first display:"
+"@BeginNumberedDisplays"
+"@BeginAlignedDisplays"
+"@CentredAlignedNumberedDisplay"
+"  @Tag { fibeq }"
+@OneCol { "@Eq { F sub n ^= F sub n-1 + F sub n-2 }" &0io }
+"and ... in sequence with it:"
+"@CentredAlignedNumberedDisplay"
+@OneCol { "@Eq { F sub n - F sub n-1 ^= F sub n-2 }" &0io }
+"@EndNumberedDisplays"
+"@EndAlignedDisplays"
+"Mathematical examples ..."
+}
+No braces need enclose @Code "@Eq { ... }" because it is already a
+single entity.  The @Code "@Tag { fibeq }" part is optional and is
+explained in Section {@NumberOf cross}.  Alignment and numbering work
+quite independently; they don't have to start or end together, and there
+can be non-aligned and non-numbered displays among the others.
+@PP
+@Code "@BeginNumberedDisplays" has two {@I options}:  subsidiary
+symbols which modify the result.  For example,
+@ID @Code {
+"@BeginNumberedDisplays"
+"   style { [tag] }"
+"   start { 12.5 }"
+}
+will cause the associated numbered displays to be labelled [12.5],
+[12.6], and so on.  The first label is the @Code style option with
+@Code tag replaced by the @Code start option.  Font changes and other
+symbols are acceptable within the @Code style option.  When omitted, the
+options have default values @Code "(tag)" and @Code "1" respectively.
+@PP
+Every symbol introduced in this section has an abbreviated form
+consisting of @Code "@" followed by its capital letters only.  For
+example, @Code "@BeginNumberedDisplays" can be abbreviated to {@Code "@BND"},
+and the display that has everything to {@Code "@RCAND"}.
+@End @Section

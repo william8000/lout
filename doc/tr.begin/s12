@@ -1,0 +1,56 @@
+@Section
+   @Tag { changes }
+   @Title { Changing the overall appearance }
+@Begin
+@PP
+A few aspects of the overall appearance of the document may be changed
+by beginning with a @Code "@Document" symbol, as in the following
+example:
+@ID @Code {
+"@Document"
+"    @InitialFont { Times Base 12p }"
+"    @InitialBreak { adjust 1.2fx }"
+"    @Hyphenate { Yes }"
+"    @PageNumbers { Yes }"
+"    @FirstPageNumber { 1 }"
+"    @Columns { Double }"
+"//"
+"@Text @Begin"
+"..."
+"@End @Text"
+}
+This shows the six options available with {@Code "@Document"}, and their
+default values.
+@PP
+@Code "@InitialFont" and @Code "@InitialBreak" determine
+the overall font and paragraph breaking style; @Code "1.2fx" means that
+the inter-line spacing is to be 1.2 times the current font size, measured
+from baseline to baseline.  To get double spacing, use {@Code "2.4fx"},
+etc.  @Code "@Hyphenate" determines whether hyphenation is permitted or
+not, and may be @Code Yes or {@Code No}.
+@PP
+@Code "@PageNumbers" determines whether or not page numbers will be
+printed (but not their format), and also may be @Code Yes or {@Code No};
+@Code "@FirstPageNumber" is the number given to the first page; and
+@Code "@Columns" determines the number of columns that @Code "@ColText"
+produces, and may be {@Code Single}, {@Code Double}, or {@Code Multi},
+the last usually meaning triple.
+@PP
+Since there are default values for the options, it is only necessary to
+mention those options that are to be changed.  For example, to produce a
+document in Helvetica 10 point font with no page numbers, begin with
+@ID @Code {
+"@Document"
+"    @InitialFont { Helvetica Base 10p }"
+"    @PageNumbers { No }"
+"//"
+}
+Disaster will ensue if the @Code "//" symbol is forgotten.  The
+@Code "@Doc" symbol used previously is just an abbreviation for
+{@Code "@Document //"}.
+@PP
+Of course, these five options only scratch the surface of the possible
+changes that could be made.  Section {@NumberOf big.changes} explains
+how to make many other and more radical changes to the overall appearance
+of the document.
+@End @Section

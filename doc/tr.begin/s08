@@ -1,0 +1,38 @@
+@Section
+   @Tag { footnotes }
+   @Title { Footnotes, figures, and tables }
+@Begin
+@PP
+A footnote is created by typing
+@ID @Code "@FootNote { Like this. }"
+after the word that the footnote refers to.  It will be numbered
+automatically and placed at the foot of the page or column;
+@FootNote { Like this. }
+or, if space there is insufficient, it may start on or run onto the
+following page or column.  Figures are created in a similar way:
+@ID @Code {
+"@Figure"
+"    @Caption { Basser Lout }"
+"@Fig {"
+"    @Box Lout &"
+"    @HArrow { 2c @Wide } &"
+"    @Box PostScript"
+"}"
+}
+The @Code "@Figure" symbol places the figure (which in this example is
+created using the Fig figure drawing package [{@Ref kingston92fig}]) at
+the top of the following column or page,
+@Figure
+    @Caption { Basser Lout }
+@Fig {
+    @Box Lout &
+    @HArrow { 2c @Wide } &
+    @Box PostScript
+}
+labelled by the @Code "@Caption" option and automatically numbered.  Unlike
+footnotes, figures will not break across several pages; each figure must
+fit on one page.
+@PP
+Tables are obtained in the same way using {@Code "@Table"} instead of
+{@Code "@Figure"}.
+@End @Section

@@ -1,0 +1,22 @@
+@Report
+   @Title { Eq -- A Lout Package for Typesetting Mathematics }
+   @Author { Jeffrey H. Kingston }
+   @Institution { Basser Department of Computer Science
+University of Sydney 2006
+Australia }
+   @DateLine { 22 December, 1992 }
+//
+
+@Abstract {
+This report describes the use of Eq, a package of definitions for
+typesetting mathematics with the Lout document formatter.  For example,
+@ID @Code "@Eq { big int supp 1 on 0 ` dx over sqrt {1 - x sup 2} = pi over 2 }"
+produces the output
+@ID @Eq { big int supp 1 on 0 ` dx over sqrt {1 - x sup 2} = pi over 2 }
+The advantages of Eq include careful attention to details of spacing, a
+repertoire of several hundred mathematical symbols, a simple syntax
+extensible by the user, and complete integration with the rest of Lout.
+@PP
+In addition, this report contains an appendix describing the use of Pas,
+a package of definitions for printing Pascal programs.
+}

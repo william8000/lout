@@ -1,0 +1,13 @@
+Directory lout/data
+
+This directory contains Lout database files:
+
+    loutrefs.ld		References used in the various reports
+    refstyles.ld	Reference printing styles
+    standard.ld		Roman numerals, months, etc.
+
+Corresponding .li files will be created in this directory the
+first time each database is accessed.
+
+Jeffrey H. Kingston
+22 December 1992
