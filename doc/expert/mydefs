@@ -22,6 +22,8 @@
    def @@Case                 { @Code "@Case"                 }
    def @@Char                 { @Code "@Char"                 }
    def @@ClearHeaderComponent { @Code "@ClearHeaderComponent" }
+   def @@Colour               { @Code "@Colour"               }
+   def @@Color                { @Code "@Color"                }
    def @@Common               { @Code "@Common"               }
    def @@CurrLang             { @Code "@CurrLang"             }
    def @@CurrFamily           { @Code "@CurrFamily"           }

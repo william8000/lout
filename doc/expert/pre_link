@@ -20,6 +20,10 @@ result of this is just {@I object}, but if the user of a screen
 viewer clicks on any point within the rectangular bounding box
 of that object, a link will be entered.
 @PP
+At present, @I object above is treated as though it were enclosed
+in @@OneCol.  This means that a long link source or destination point
+will not break over two lines as part of an enclosing paragraph.
+@PP
 To create a destination point, place
 @ID { @I tag @Code "@LinkDest" @I object }
 at some point in the document.  Again, @I tag must evaluate to a
@@ -51,8 +55,13 @@ link that takes them to the given URL location, assuming that
 the software which they are using to display the document is
 clever enough to do this.
 @PP
-At present, @I object above is treated as though it were enclosed
-in @@OneCol, which means that a long link source or destination point
-will not break over two lines as part of an enclosing paragraph.  This
-deficiency might be corrected in the future.
+For the purposes of @@Common, @@Rump, and @@Meld, two @@LinkSource
+objects are considered to be equal if their right parameters are
+equal; the left parameters are not considered.  This behaviour is
+needed, for example, to make index entries look reasonable when
+melded.  If two @@LinkSource objects with equal right parameters but
+different left parameters are melded into one, one of the two will
+be the result, but which one is undefined.  Notice that melding
+cannot produce an undefined link, since the worst it can do is
+delete a @@LinkSource.
 @End @Section

@@ -5,7 +5,7 @@
 @PP
 These symbols
 galley.sym @Index { @@Galley symbol }
-galley.sym @Index { @@ForceGalley symbol }
+forcegalley.sym @Index { @@ForceGalley symbol }
 both act as a placeholder for a galley.  That is, they may be replaced
 by components of a galley.  In the case of @@ForceGalley the galley will
 then have a forcing galley effect at this point although it need not be

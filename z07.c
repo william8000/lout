@@ -1,7 +1,7 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
-/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -61,7 +61,7 @@ BOOLEAN SplitIsDefinite(OBJECT x)
 static void DisposeSplitObject(OBJECT x)
 { int i, count;
   OBJECT y, link, uplink;
-  debug1(DOS, D, "[ DisposeSplitObject( %ld )", (long) x);
+  debug1(DOS, DDD, "[ DisposeSplitObject( %ld )", (long) x);
   assert(type(x) == SPLIT, "DisposeSplitObject: type(x) != SPLIT!");
   assert(Down(x) != x, "DisposeSplitObject: x has no children!")
   assert(LastDown(x) != Down(x), "DisposeSplitObject: x has one child!")
@@ -92,7 +92,7 @@ static void DisposeSplitObject(OBJECT x)
     DisposeChild(link);
   }
   DisposeChild(LastDown(x));
-  debug0(DOS, D, "] DisposeSplitObject returning");
+  debug0(DOS, DDD, "] DisposeSplitObject returning");
 } /* end DisposeSplitObject */
 
 
@@ -202,7 +202,7 @@ OBJECT MakeWordThree(FULL_CHAR *s1, FULL_CHAR *s2, FULL_CHAR *s3)
 OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 { OBJECT y, link, res, tmp;
 
-  debug2(DOS, DD, "[ CopyObject(%s, %s)", EchoObject(x), EchoFilePos(pos));
+  debug2(DOS, DDD, "[ CopyObject(%s, %s)", EchoObject(x), EchoFilePos(pos));
   switch( type(x) )
   {
 
@@ -369,7 +369,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
   } /* end switch */
   if( pos == no_fpos )  FposCopy(fpos(res), fpos(x));
   else FposCopy(fpos(res), *pos);
-  debug1(DOS, DD, "] CopyObject returning %s", EchoObject(res));
+  debug1(DOS, DDD, "] CopyObject returning %s", EchoObject(res));
   return res;
 } /* end CopyObject */
 
@@ -535,11 +535,29 @@ OBJECT Meld(OBJECT x, OBJECT y)
   { if( xlen >= MAX_MELD )
       Error(7, 1, "%s: maximum paragraph length (%d) exceeded", FATAL, &fpos(x),
 	KW_MELD, MAX_MELD-1);
-    xcomp[xlen] = z;
-    xgaps[xlen] = g;
-    debug3(DOS, DD, "  initializing xcomp[%d] to %s %s",
-      xlen, Image(type(z)), EchoObject(z));
-    xlen++;
+    assert( type(z) != ACAT, "Meld: xcomp is ACAT!");
+    if( g == nilobj || width(gap(g)) != 0 )
+    {
+      debug3(DOS, DD, "  initializing xcomp[%d] to %s %s",
+        xlen, Image(type(z)), EchoObject(z));
+      xcomp[xlen] = z;
+      xgaps[xlen] = g;
+      xlen++;
+    }
+    else
+    {
+      debug3(DOS, DD, "  extending xcomp[%d] with %s %s",
+        xlen-1, Image(type(z)), EchoObject(z));
+      if( type(xcomp[xlen-1]) != ACAT )
+      {
+	New(res, ACAT);
+	StyleCopy(save_style(res), save_style(x));
+	Link(res, xcomp[xlen-1]);
+	xcomp[xlen-1] = res;
+      }
+      Link(xcomp[xlen-1], g);
+      Link(xcomp[xlen-1], z);
+    }
     NextDefiniteWithGap(x, link, z, g, jn)
   }
 
@@ -554,11 +572,29 @@ OBJECT Meld(OBJECT x, OBJECT y)
   { if( ylen >= MAX_MELD )
       Error(7, 1, "%s: maximum paragraph length (%d) exceeded", FATAL, &fpos(y),
 	KW_MELD, MAX_MELD-1);
-    ycomp[ylen] = z;
-    ygaps[ylen] = g;
-    debug3(DOS, DD, "  initializing ycomp[%d] to %s %s",
-      ylen, Image(type(z)), EchoObject(z));
-    ylen++;
+    assert( type(z) != ACAT, "Meld: ycomp is ACAT!");
+    if( g == nilobj || width(gap(g)) != 0 )
+    {
+      debug3(DOS, DD, "  initializing ycomp[%d] to %s %s",
+        ylen, Image(type(z)), EchoObject(z));
+      ycomp[ylen] = z;
+      ygaps[ylen] = g;
+      ylen++;
+    }
+    else
+    {
+      debug3(DOS, DD, "  extending ycomp[%d] with %s %s",
+        ylen-1, Image(type(z)), EchoObject(z));
+      if( type(ycomp[ylen-1]) != ACAT )
+      {
+	New(res, ACAT);
+	StyleCopy(save_style(res), save_style(x));
+	Link(res, ycomp[ylen-1]);
+	ycomp[ylen-1] = res;
+      }
+      Link(ycomp[ylen-1], g);
+      Link(ycomp[ylen-1], z);
+    }
     NextDefiniteWithGap(y, link, z, g, jn)
   }
 
@@ -615,7 +651,12 @@ OBJECT Meld(OBJECT x, OBJECT y)
 
         debug3(DOS, DD, "  at table[%d][%d] (XY) linking %s",
 	  xi, yi, EchoObject(xcomp[xi]));
-        Link(Down(res), xcomp[xi]);
+	if( type(xcomp[xi]) != ACAT )
+	{
+          Link(Down(res), xcomp[xi]);
+	}
+	else
+	  TransferLinks(Down(xcomp[xi]), xcomp[xi], Down(res));
         g = xgaps[xi];
         xi--;
         yi--;
@@ -626,7 +667,12 @@ OBJECT Meld(OBJECT x, OBJECT y)
 
         debug3(DOS, DD, "  at table[%d][%d] (ydec) linking %s",
 	  xi, yi, EchoObject(ycomp[yi]));
-        Link(Down(res), ycomp[yi]);
+	if( type(ycomp[yi]) != ACAT )
+	{
+          Link(Down(res), ycomp[yi]);
+	}
+	else
+	  TransferLinks(Down(ycomp[yi]), ycomp[yi], Down(res));
         g = ygaps[yi];
         yi--;
 	break;
@@ -636,7 +682,12 @@ OBJECT Meld(OBJECT x, OBJECT y)
 
         debug3(DOS, DD, "  at table[%d][%d] (xdec) linking %s",
 	  xi, yi, EchoObject(xcomp[xi]));
-        Link(Down(res), xcomp[xi]);
+	if( type(xcomp[xi]) != ACAT )
+	{
+          Link(Down(res), xcomp[xi]);
+	}
+	else
+	  TransferLinks(Down(xcomp[xi]), xcomp[xi], Down(res));
         g = xgaps[xi];
         xi--;
     }
@@ -700,7 +751,8 @@ static BOOLEAN EqualChildren(OBJECT x, OBJECT y)
 /*****************************************************************************/
 
 BOOLEAN EqualManifested(OBJECT x, OBJECT y)
-{
+{ OBJECT xc, yc;
+
   if( is_word(type(x)) && is_word(type(y)) )
   {
     return StringEqual(string(x), string(y));
@@ -763,7 +815,6 @@ BOOLEAN EqualManifested(OBJECT x, OBJECT y)
     case BACKGROUND:
     case GRAPHIC:
     case PLAIN_GRAPHIC:
-    case LINK_SOURCE:
     case LINK_DEST:
     case LINK_URL:
     case INCGRAPHIC:
@@ -772,6 +823,15 @@ BOOLEAN EqualManifested(OBJECT x, OBJECT y)
 
       /* objects are equal if the children are equal */
       return EqualChildren(x, y);
+      break;
+
+
+    case LINK_SOURCE:
+
+      /* objects are equal if right children are equal */
+      Child(xc, LastDown(x));
+      Child(yc, LastDown(y));
+      return EqualManifested(xc, yc);
       break;
 
 

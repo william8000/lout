@@ -310,12 +310,17 @@ Changes and new features introduced in Version 3.25 [December 2001]
     I've decided not to maintain the PDF back end, but I will try to ensure
     that Lout's PostScript output works with PostScript-to-PDF converters.
 
+Changes and new features introduced in Version 3.26 [October 2002]
+
+    Fixed bug causing crash when breaking certain list items across pages
+    Merged index entries completely reimplemented
+    @DropTagItem (@DTI) now prevents page break after drop tag
+
 Things that ought to be done but haven't been done yet
 
     Fix bug in table running headers code
-    Fix bug in hyphenation across pages of some unusual kinds of list items
     Fix bug in index header placement when there are multiple indexes
     Column-width footnotes in full-width pages.
 
 Jeff Kingston
-21 October 2000
+undated

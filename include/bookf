@@ -1040,7 +1040,12 @@ def @BookSetup
 	}
 
 	@PartNumber @Case {
-	    ""   @Yield @Null
+	    ""   @Yield {
+		 @PartTitle @Case {
+		     "" @Yield @Null
+		     else @Yield @Part
+		 }
+	    }
 	    else @Yield @Part
 	}
 	//
@@ -1239,7 +1244,12 @@ def @BookSetup
 	}
 
 	@PartNumber @Case {
-	    ""   @Yield @Null
+	    ""   @Yield {
+		 @PartTitle @Case {
+		     "" @Yield @Null
+		     else @Yield @Part
+		 }
+	    }
 	    else @Yield @Part
 	}
 	//

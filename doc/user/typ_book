@@ -284,12 +284,12 @@ part.text @Index @Code "@PartText"
 "    @PartTitle { The Ancient World }"
 "    @PartText { ... }"
 }
-Any chapter with a non-empty @Code "@PartTitle" option will become the
-first chapter of a part.  It will be preceded by two pages containing the
-part number, title, and text, and there will also be an entry
-made in the table of contents.  @Code "@PartNumber" and @Code "@PartText"
-may be omitted.  Parts are @I not numbered automatically:  you
-have to supply your own numbers or letters as shown above.
+Any chapter with a non-empty @Code "@PartNumber" or @Code "@PartTitle"
+option will become the first chapter of a part.  It will be preceded
+by two pages containing the part number, title, and text, and there
+will also be an entry made in the table of contents.  Parts are @I not
+numbered automatically:  you have to supply your own numbers or letters
+as shown above.
 @PP
 The features described in other chapters are all available within
 books.  A table of contents and index will appear automatically, and

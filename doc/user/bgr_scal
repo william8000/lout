@@ -65,5 +65,4 @@ does produce scaling:
 This is a good option if scaling is being used when a display is
 around the same width as the page; it scales only if this is
 needed to fit the display into the column, not otherwise.
-slig
 @End @Section

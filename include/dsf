@@ -4045,10 +4045,10 @@ def @DocumentSetup
 
 	def @Merge left x right y
 	{
-	    {x @Rump y} @Case
+	    { x @Rump { x @Meld y } } @Case
 	    {
 	        ""      @Yield  x
-		else    @Yield  { { x &"0.03fu" , } @Meld y }
+		else    @Yield  { { x{@OneCol ,} } @Meld y }
 	    }
 
 	}
@@ -4063,7 +4063,13 @@ def @DocumentSetup
 	right y
     {
 	@MakeIndex @Case {
-	    Yes  @Yield { @PageMark @Tag & x @DoIndex stem { y } indent { indent } y }
+	    Yes  @Yield {
+		@PageMark @Tag &
+		x @DoIndex stem { y } indent { indent }
+		{
+	            y &"0.03fu" {}
+		}
+	    }
 	    else @Yield @Null
 	}
     }
@@ -4101,8 +4107,11 @@ def @DocumentSetup
 
 	@MakeIndex @Case {
 	    Yes @Yield {
-	    @PageMark @Tag &
-	    x @DoIndex stem { y } indent { indent } { y &"0.03fu" , @PgRange }
+	        @PageMark @Tag &
+	        x @DoIndex stem { y } indent { indent }
+	        {
+	            y &"0.03fu" {}{@OneCol ,} @PgRange
+	        }
 	    }
 	    else @Yield @Null
 	}
@@ -4157,13 +4166,47 @@ def @DocumentSetup
 	named indent { 0f }
 	right @Body
     {
+	def @Enclose right x
+	{
+	    @IndexACtd.indent @Case {
+
+		Yes.0f @Yield {
+		    @ClearHeaderComponent
+		    //1vx
+		    x
+		    //1vx
+		    1vx @SetHeaderComponent {
+			indent @Wide &
+			stem @IndexACtdFormat {continued @WordVal @IndexACtdWord}
+		    }
+		    //1vx
+		    1vx @BeginHeaderComponent (unused)
+		}
+
+		Yes.1f @Yield {
+		    @EndHeaderComponent
+		    //1vx
+		    x
+		    //1vx
+		    1vx @BeginHeaderComponent {
+			indent @Wide &
+			stem @IndexACtdFormat {continued @WordVal @IndexACtdWord}
+		    }
+		}
+
+		else @Yield x
+
+	    }
+	}
+
 	def @Merge left x right y
 	{
-	    {x @Rump y} @Case
+	    { x @Rump { x @Meld y } } @Case
 	    {
 	        ""      @Yield  x
-		else    @Yield  { { x &"0.03fu" , } @Meld y }
+		else    @Yield  { { x{@OneCol ,} } @Meld y }
 	    }
+
 	}
 
 	@IndexAFont @Font @IndexABreak @Break { indent @Wide & @Body }
@@ -4176,7 +4219,13 @@ def @DocumentSetup
 	right y
     {
 	@MakeIndexA @Case {
-	    Yes  @Yield { @PageMark @Tag & x @DoIndexA indent { indent } y }
+	    Yes  @Yield {
+		@PageMark @Tag &
+		x @DoIndexA stem { y } indent { indent }
+		{
+	            y &"0.03fu" {}
+		}
+	    }
 	    else @Yield @Null
 	}
     }
@@ -4211,14 +4260,17 @@ def @DocumentSetup
 	    }
 	}
 
-
 	@MakeIndexA @Case {
 	    Yes @Yield {
-	      @PageMark @Tag &
-	      x @DoIndexA indent { indent } { y &"0.03fu" , @PgRange }
+	        @PageMark @Tag &
+	        x @DoIndexA stem { y } indent { indent }
+	        {
+	            y &"0.03fu" {}{@OneCol ,} @PgRange
+	        }
 	    }
 	    else @Yield @Null
 	}
+
     }
 
     macro @SubIndexA { @IndexA indent { "1f" } }
@@ -4270,13 +4322,47 @@ def @DocumentSetup
 	named indent { 0f }
 	right @Body
     {
+	def @Enclose right x
+	{
+	    @IndexBCtd.indent @Case {
+
+		Yes.0f @Yield {
+		    @ClearHeaderComponent
+		    //1vx
+		    x
+		    //1vx
+		    1vx @SetHeaderComponent {
+			indent @Wide &
+			stem @IndexBCtdFormat {continued @WordVal @IndexBCtdWord}
+		    }
+		    //1vx
+		    1vx @BeginHeaderComponent (unused)
+		}
+
+		Yes.1f @Yield {
+		    @EndHeaderComponent
+		    //1vx
+		    x
+		    //1vx
+		    1vx @BeginHeaderComponent {
+			indent @Wide &
+			stem @IndexBCtdFormat {continued @WordVal @IndexBCtdWord}
+		    }
+		}
+
+		else @Yield x
+
+	    }
+	}
+
 	def @Merge left x right y
 	{
-	    {x @Rump y} @Case
+	    { x @Rump { x @Meld y } } @Case
 	    {
 	        ""      @Yield  x
-		else    @Yield  { { x &"0.03fu" , } @Meld y }
+		else    @Yield  { { x{@OneCol ,} } @Meld y }
 	    }
+
 	}
 
 	@IndexBFont @Font @IndexBBreak @Break { indent @Wide & @Body }
@@ -4289,7 +4375,13 @@ def @DocumentSetup
 	right y
     {
 	@MakeIndexB @Case {
-	    Yes  @Yield { @PageMark @Tag & x @DoIndexB indent { indent } y }
+	    Yes  @Yield {
+		@PageMark @Tag &
+		x @DoIndexB stem { y } indent { indent }
+		{
+	            y &"0.03fu" {}
+		}
+	    }
 	    else @Yield @Null
 	}
     }
@@ -4324,14 +4416,17 @@ def @DocumentSetup
 	    }
 	}
 
-
 	@MakeIndexB @Case {
 	    Yes @Yield {
 	        @PageMark @Tag &
-	        x @DoIndexB indent { indent } { y &"0.03fu" , @PgRange }
+	        x @DoIndexB stem { y } indent { indent }
+	        {
+	            y &"0.03fu" {}{@OneCol ,} @PgRange
+	        }
 	    }
 	    else @Yield @Null
 	}
+
     }
 
     macro @SubIndexB { @IndexB indent { "1f" } }
@@ -4502,7 +4597,8 @@ def @DocumentSetup
 
 		{ Yes.VeryMajor } @Yield {
 			incontents @VeryMajorContentsEntry
-			    title { initiallanguage @Language { bypassnumber: &2s title } }
+			    title { initiallanguage @Language {
+				bypassnumber @ColonSep title } }
 		}
 
 		else @Yield @Null

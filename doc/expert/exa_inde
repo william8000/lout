@@ -1,0 +1,179 @@
+@Section
+   @Title { Merged index entries }
+   @Tag { exa_inde }
+@Begin
+@PP
+Getting index entries to merge correctly has been quite a struggle.
+It is easy to specify what is wanted, but Lout lacks the lists and
+objects (in the object-oriented sense) that would make the
+implementation straightforward.  The whole problem was reanalysed
+for Version 3.26, reimplemented, tested more carefully than is
+usually necessary in Lout, and proved correct as follows.
+@PP
+We ignore page number ranges in this proof.  It is not hard to
+show that they will be handled correctly too, provided they
+do not overlap with other entries with the same key.  The
+effect of such overlaps is undefined, leaving us nothing to
+prove.  We also assume that every entry with a given
+key has the same label, including any indent (that is, the same
+initial part before the page number).  If labels differ the
+result is undefined and there is nothing to prove.
+@PP
+We will prove that raw entries always have the form
+@ID @Code "label &0.03fu {}"
+and that non-raw entries always have the form
+@ID @Code "label &0.03fu {}{@OneCol ,} pn1{@OneCol ,} pn2"
+where the pattern may repeat for any number of page numbers
+{@Code pn1}, {@Code pn2}, etc.  In addition, the page numbers
+will be distinct, monotone increasing, and consist of exactly
+the numbers in the original unmerged entries.
+@PP
+These expressions are not the simplest that would give the
+correct appearance.  Without @Code "&0.03fu {}" the code
+would not work correctly, as will be explained below.  Without
+@@OneCol the commas would be subject to an optimization which
+can merge them into the previous word.  It's too difficult to
+explain when this optimization will and will not be applied;
+suffice to say that it will sometimes not happen when melding,
+and this will cause @@Meld to get its equality testing wrong,
+so it must be prevented from happening at all.
+@PP
+Our proof is by induction on the number of entries merged
+together.  First, we need to establish the base cases.  If the
+index entry is raw, the following expression is used to define
+its value:
+@ID @Code "label &0.03fu {}"
+If the index entry is non-raw, the following expression is
+used to define its value:
+@ID @Code "label &"0.03fu" {}{@OneCol ,} pn"
+where @Code pn is the page number or page number range of
+the entry.  In each case we clearly have an entry that
+satisfies all the requirements of the theorem.
+@PP
+Now consider what happens when we come to merge two
+entries.  The code used to carry out this merge is
+@ID @OneRow @Code @Verbatim {
+def @Merge left x right y
+{
+    { x @Rump { x @Meld y } } @Case
+    {
+        ""   @Yield  x
+        else @Yield  { { x{@OneCol ,} } @Meld y }
+    }
+
+}
+}
+where @Code x is the first entry and {@Code y} is
+the second.
+@PP
+We call the expression
+@ID @Code "x @Rump { x @Meld y }"
+the {@I discriminant}, since it determines which case
+to apply.  We will track this in detail below, but
+approximately, its function is to determine whether @Code y
+contains something that is different from anything in
+{@Code x}.  If so, then @Code "x @Meld y" differs from
+@Code "x" and the discriminant is non-empty; if not,
+@Code "x @Meld y" is equal to @Code "x" and the discriminant
+is empty.
+@PP
+The first entry, @Code { x }, may be raw or non-raw, and the
+second, @Code { y }, may also be raw or non-raw, together
+giving four cases, which we take in turn.
+@PP
+If both entries are raw, then by assumption they have the
+same labels and so are identical.  Thus, @Code "x @Meld y"
+equals @Code { x }, the discriminant is empty,
+and the result is @Code { x }, which is correct.
+@PP
+If @Code { x } is raw and @Code { y } is non-raw, then
+the discriminant is non-empty and the result is the meld
+of two objects, the first having the form
+@ID @Code "label &0.03fu {}{@OneCol ,}"
+being @Code "x" with a comma appended, and
+the second being some non-raw entry such as
+@ID @Code "label &0.03fu {}{@OneCol ,} pn1{@OneCol ,} pn2"
+where the pattern may repeat.  We are assuming by induction
+that @Code y has this form.  Clearly, this meld gives a
+value equal to @Code { y }, which is the correct result.
+@PP
+If @Code { x } is non-raw and @Code { y } is raw, the
+@@Meld in the discriminant melds two values typified
+by
+@ID @Code "label &0.03fu {}{@OneCol ,} pn1{@OneCol ,} pn2"
+and
+@ID @Code "label &0.03fu {}"
+The result of this is @Code { x } with an empty object added
+at the end.  This empty object is the second element of @Code { y },
+which is not equal to any element of @Code { x }:  the second
+element of @Code x is not @Code "{}" but rather
+@Code { "{}{@OneCol ,}" }, because @@Meld treats immediately adjacent
+objects as single elements.  The result of @@Rump is then this
+extra empty object, so the discriminant is the empty object and
+we return @Code { x }, correctly.  It is this case that requires
+us to use {@Code "0.03fu"}; without it we would be melding
+@ID @Code "label{@OneCol ,} pn1{@OneCol ,} pn2"
+with
+@ID @Code "label"
+producing
+@ID @Code "label{@OneCol ,} pn1{@OneCol ,} pn2 label"
+leading to a non-empty discriminant and the wrong answer.
+@PP
+This leaves just the case where both @Code x and @Code y
+are non-raw.  We will divide this last case into three
+sub-cases, but first we need some general observations.
+@PP
+Index entries are sorted for merging in the order in
+which their anchor points appear in the final printed
+document.  This means that over the course of these
+entries the page numbers are non-decreasing.  It is
+therefore clear that, although the order of merging
+is undefined (actually a balanced tree order is used),
+whenever two entries are presented for merging, all the
+page numbers in the first entry are no larger than all
+the page numbers in the second entry.  We are also
+assuming inductively that the page numbers in each entry
+are distinct and monotone increasing.  Thus, there can
+be at most one page number common to any two entries
+being merged, and if there is one in common it is the
+last page number of the first entry and the first of
+the second.
+@PP
+Our first sub-case is when the two entries have no
+page number in common.  Since @Code { y } is non-raw,
+it has a page number not equal to any page number in
+@Code { x }.  Therefore the discriminant is non-empty
+and the result is the meld of @Code "x{@OneCol ,}"
+with @Code { y }, which for example could be the
+meld of
+@ID @Code "label &0.03fu {}{@OneCol ,} pn1{@OneCol ,} pn2{@OneCol ,}"
+with
+@ID @Code "label &0.03fu {}{@OneCol ,} pn3{@OneCol ,} pn4"
+This will give the right answer, since @@Meld treats
+adjacent objects as single elements, and always incorporates
+elements from the first parameter first when it has a choice.
+@PP
+Our second sub-case is when the two entries have a
+page number in common and @Code { y } has two or more
+page numbers.  The common page number must be the last
+of @Code x and the first of @Code { y }, so again
+@Code { y } has something (its last page number)
+distinct from @Code { x }, the discriminant is non-empty,
+and we end up for example melding
+@ID @Code "label &0.03fu {}{@OneCol ,} pn1{@OneCol ,} pn2{@OneCol ,}"
+with
+@ID @Code "label &0.03fu {}{@OneCol ,} pn2{@OneCol ,} pn3"
+Again it's clear that the meld will produce the right
+answer; in fact, this second sub-case could be unified
+with the first sub-case.
+@PP
+Our third sub-case is when the two entries have a page
+number in common and @Code { y } has only one page
+number.  In this case, typified by @Code { x } with value 
+@ID @Code "label &0.03fu {}{@OneCol ,} pn1{@OneCol ,} pn2"
+and @Code y with value
+@ID @Code "label &0.03fu {}{@OneCol ,} pn2"
+it is clear that @Code y offers nothing new, the
+discriminant is empty, and the result, quite correctly,
+is @Code { x }.  This completes the proof.
+@End @Section

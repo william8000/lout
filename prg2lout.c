@@ -509,7 +509,7 @@ typedef struct token_rec {
 TOKEN CStringToken = {
   "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",			/* Lout command for formatting strings              */
+  "@PS",		/* Lout command for formatting strings              */
   "",			/* no alternate command                             */
   "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */

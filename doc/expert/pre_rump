@@ -26,22 +26,64 @@ The only known use for @@Rump and @@Common is to implement merged index
 entries (Section {@NumberOf sorted}).
 @PP
 The @@Meld symbol returns the minimum meld of two paragraphs, that
-is the shortest paragraph that contains the two original paragraphs
+is, the shortest paragraph that contains the two original paragraphs
 as subsequences.  For example,
 @ID @Code "{ Aardvark , 1 , 2 } @Meld { Aardvark , 2 , 3 }"
 produces
 @ID { Aardvark , 1 , 2 } @Meld { Aardvark , 2 , 3 }
-The result is related to the well-known
-longest common substring, in that the meld contains everything not in
-the lcs plus one copy of everything in the lcs.  This function is
-well-suited to melding complex index entries.  Note that there must be
-a non-zero amount of space before each comma, otherwise each will become
-part of the preceding word, and, since @@Meld compares the two paragraphs
-word by word, the result will be different and less satisfactory.
+The result is related to the well-known longest common substring, in
+that the meld contains everything not in the lcs plus one copy of
+everything in the lcs.  Where there are several minimum melds, @@Meld
+returns the one in which the components of the first parameter are as
+far left as possible.
 @PP
 Determining the values of all these symbols requires testing whether
 one component of the first paragraph is equal to one component of the
 second.  Since Version 3.25, the objects involved may be arbitrary
 and Lout will perform the necessary detailed checking for equality;
 previously, only simple words were guaranteed to be tested correctly.
+Two words are equal if they contain the same sequence of characters,
+regardless of whether they are enclosed in quotes, and regardless
+of the current font or any other style information.  Otherwise,
+objects are equal if they are of the same type and have the same
+parameters, including gaps in concatenation objects.  The sole
+exception is @@LinkSource, whose left parameter is ignored during
+equality testing, since otherwise there would be problems in the
+appearance of melded clickable index entries.
+@PP
+Style changing operations (@@Font, @@Colour etc.) are not considered
+in equality testing, since these have been processed and deleted by the
+time that the tests are done.  Also, Lout tries hard to get rid of
+redundant braces around concatenation objects, which is why
+@ID @Code "{ a { b c } } @Meld { { a b } c }"
+produces
+@ID { { a { b c } } @Meld { { a b } c } }
+The two parameters are equal by the time they are compared by @@Meld.
+@PP
+One problematic area in the use of these operators is the definition
+of equality when objects are immediately adjacent.  Lout contains an
+optimization which merges immediately adjacent words whenever they
+have the same style.  For example,
+@ID @Code "{Hello}{world}"
+would be treated internally as one word, whereas
+@ID @Code "{Hello}{yellow @Colour world}"
+would be treated as two adjacent words.  Thus, although @@Font,
+@@Colour, and the other style operators are ignored in equality
+testing, they may affect the structure of the objects they lie
+within.
+@PP
+At present, @@Common and @@Rump treat all unmerged components of
+their paragraph as separate, even if one is immediately adjacent
+to another.  @@Common and @@Rump would thus see one component in
+the first example and two in the second.  @@Meld treats each group
+of immediately adjacent components as a single component, so it
+would see one component in both examples; but it would still not
+report them as equal, since one is a single word and the other is a
+pair of adjacent words.  These confusing and inconsistent properties
+might be revised in the future.  See Section {@NumberOf exa_inde}
+for an example of the practical use of these operators, in which
+very small unbreakable gaps are used to ensure that apparently
+adjacent components are separate, and @@OneCol is used to prevent
+the word merging optimization from taking effect when it would
+otherwise cause trouble.
 @End @Section

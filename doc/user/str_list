@@ -187,7 +187,9 @@ drop.list.item @Index @Code "@DropListItem"
 dli. @Index @Code "@DLI"
 symbol corresponding to {@Code "@ListItem"}, but it is very rarely
 needed.  Lout is not able to decide for itself whether a label is wide
-enough to require a drop item.
+enough to require a drop item.  Lout will refuse to skip to the next
+column or page between a drop tag and its item, preferring instead
+to move the drop tag to the next column or page.
 @PP
 Each list has a `raw' version which omits the preceding space, and
 raw.lists @Index { raw lists }

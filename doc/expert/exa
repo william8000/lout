@@ -17,5 +17,6 @@ not necessarily represent the current state of the Lout packages.
 @Include { exa_page }
 @Include { exa_chap }
 @Include { exa_bibl }
+@Include { exa_inde }
 @EndSections
 @End @Chapter

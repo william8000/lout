@@ -1,7 +1,7 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
-/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -159,11 +159,11 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
     debug0(DGM, DD, "SizeGalley cleaning up rows of hd:");
     for( link = hd;  NextDown(link) != hd;  link = NextDown(link) )
     { Child(y, NextDown(link));
-      debug2(DGM, DD, "  cleaning %s: %s", Image(type(y)), EchoObject(y));
       switch( type(y) )
       {
 	case GAP_OBJ:
 
+          debug2(DGM, DD, "  cleaning %s: %s", Image(type(y)), EchoObject(y));
 	  /* prev_gap = y; */
 	  if( !join(gap(y)) )  seen_nojoin(hd) = TRUE;
 	  break;
@@ -171,6 +171,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 
 	case VCAT:
 	  
+          debug1(DGM, DD, "  cleaning %s:", Image(type(y)));
+          ifdebug(DGM, DD, DebugObject(y));
 	  if( gall_dir(hd) == ROWM )
 	  { TransferLinks(Down(y), y, Up(y));
 	    DisposeChild(Up(y));
@@ -181,6 +183,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 
 	case ACAT:
 	  
+          debug2(DGM, DD, "  cleaning %s: %s", Image(type(y)), EchoObject(y));
 	  if( gall_dir(hd) == COLM )
 	  { TransferLinks(Down(y), y, Up(y));
 	    DisposeChild(Up(y));
@@ -191,6 +194,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 
 	case SPLIT:
 	  
+          debug1(DGM, DD, "  cleaning %s:", Image(type(y)));
+          ifdebug(DGM, DD, DebugObject(y));
 	  assert(Up(y)==LastUp(y), "SizeGalley COL_THR: Up(y)!=LastUp(y)!");
 	  Child(z, DownDim(y, ROWM));
 	  if( is_indefinite(type(z)) )
@@ -222,7 +227,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 		Link(tmp, t);
 	      }
 	    }
-	    DeleteLink(dlink);
+	    /* will be done by DisposeChild below DeleteLink(dlink); */
 	    assert(Up(y)==LastUp(y), "SizeGalley COL_THR: Up(y) != LastUp(y)!");
 	    DisposeChild(Up(y));
 	    link = PrevDown(link);
@@ -233,6 +238,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 	case CLOSURE:
 	case HEAD:
 	  
+          debug2(DGM, DD, "  cleaning %s: %s", Image(type(y)), EchoObject(y));
 	  if( gall_dir(hd) == COLM )
 	    external_hor(y) = TRUE;
 	  else
@@ -246,6 +252,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 
 	default:
 	  
+          debug2(DGM, DD, "  cleaning %s: %s", Image(type(y)), EchoObject(y));
 	  break;
       }
     }

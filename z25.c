@@ -1,7 +1,7 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
-/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -105,6 +105,29 @@ static void newline(void)
   }
 } /* end newline */
 
+/*****************************************************************************/
+/*                                                                           */
+/*  static int DiffChildrenParents(OBJECT x)                                 */
+/*                                                                           */
+/*  Return the number of children minus the number of parents.  For          */
+/*  the COL_THR and ROW_THR objects we are interested in, this difference    */
+/*  should be 0.                                                             */
+/*                                                                           */
+/*****************************************************************************/
+
+static int DiffChildrenParents(OBJECT x)
+{
+  int pcount, ccount;
+  OBJECT link;
+  pcount = 0;
+  for( link = Up(x);  link != x;  link = NextUp(link) )
+    pcount++;
+  ccount = 0;
+  for( link = Down(x);  link != x;  link = NextDown(link) )
+    ccount++;
+  return ccount - pcount;
+}
+
 
 /*@::echo()@******************************************************************/
 /*                                                                           */
@@ -123,6 +146,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 { OBJECT link, y, tmp, sym, z;
   char *op;  int prec, i, childcount, ycount;
   BOOLEAN npar_seen, name_printed, lbr_printed, braces_needed;
+  int cpcount;
 
   switch( type(x) )
   {
@@ -224,6 +248,9 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case ROW_THR:
 
 	aprint("{R ");
+	cpcount = DiffChildrenParents(x);
+	printnum(cpcount);
+	aprint(" ");
 	for( i=0, link = Down(x);  link != x && i < count ;  link = NextDown(link), i++ );
 	if( link != x )
 	{ CountChild(y, link, count);
@@ -234,23 +261,12 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	break;
 
 
-    /* ***
     case COL_THR:
 
 	aprint("{C ");
-	for( i=0, link = Down(x);  link != x && i < count ;  link = NextDown(link), i++ );
-	if( link != x )
-	{ CountChild(y, link, count);
-	  echo(y, HCAT_PREC, count);
-	}
-	aprint(" C}");
-	break;
-    *** */
-
-
-    case COL_THR:
-
-	aprint("{C ");
+	cpcount = DiffChildrenParents(x);
+	printnum(cpcount);
+	aprint(" ");
 	newline();
 	for( i=1, link = Down(x);  link != x;  link = NextDown(link), i++ )
 	{
@@ -345,12 +361,12 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case GAP_OBJ:
 
 	/* in this case the outer_prec argument is VCAT, HCAT or ACAT */
+	if( outer_prec == ACAT )  aprint(" ");
 	if( Down(x) != x )
-	{ if( outer_prec == ACAT )  aprint(" ");
+	{
 	  cprint( EchoCatOp(outer_prec, mark(gap(x)), join(gap(x))) );
 	  CountChild(y, Down(x), count);
 	  echo(y, FORCE_PREC, count);
-	  aprint(" ");
 	}
 	/* ***
 	else if( outer_prec == ACAT )
@@ -361,8 +377,8 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	else
 	{ cprint( EchoCatOp(outer_prec, mark(gap(x)), join(gap(x))) );
 	  cprint( EchoGap(&gap(x)) );
-	  aprint(" ");
 	}
+	aprint(" ");
 	break;
 
 

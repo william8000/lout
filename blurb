@@ -1,7 +1,7 @@
 
-         THE LOUT DOCUMENT FORMATTING SYSTEM, VERSION 3.25
+         THE LOUT DOCUMENT FORMATTING SYSTEM, VERSION 3.26
 
-Version 3.25 of the Lout document formatting system is now available
+Version 3.26 of the Lout document formatting system is now available
 (free of charge).  The system reads a high-level description of a
 document similar in style to LaTeX and produces a PostScript, PDF or
 plain text output file.
@@ -21,10 +21,10 @@ project that went back to the beginning.
 Lout is written in highly portable ANSI C.  It is distributed under the
 GNU public license as follows:
 
-   ftp://ftp.cs.usyd.edu.au/jeff/lout/lout-3.25.tar.gz
+   ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.26.tar.gz
 
-In other words, in a gzipped tar file called "lout-3.25.tar.gz" in the
-"jeff/lout" subdirectory of the home directory of "ftp ftp.cs.usyd.edu.au"
+In other words, in a gzipped tar file called "lout-3.26.tar.gz" in the
+"jeff/lout" subdirectory of the home directory of "ftp ftp.it.usyd.edu.au"
 with login name "ftp" or "anonymous" using any non-empty password.  The
 distribution contains
 
@@ -44,7 +44,8 @@ distribution contains
 For those who want to browse first, a PostScript version of the User's
 Guide may be found in the same ftp directory:
 
-   ftp://ftp.cs.usyd.edu.au/jeff/lout/lout-3.25.user.ps.gz
+   ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.26.user.ps.gz
 
-Lout was designed and implemented by Jeffrey H. Kingston (jeff@cs.usyd.edu.au)
-of the Basser Department of Computer Science at the University of Sydney.
+Lout was designed and implemented by Jeffrey H. Kingston (jeff@it.usyd.edu.au)
+of the School of Information Technologies (formerly Basser Department of
+Computer Science) at the University of Sydney.

@@ -1531,7 +1531,7 @@ def @BasicSetup
     {
 	def sendtag into { @TagPlace&&preceding } { tag }
 
-	sendtag // //1vxu x
+	sendtag // //1vx x
     }
 
     def endlist force into { @EndListPlace&&preceding } {}
