@@ -656,7 +656,7 @@
 }
 
 { in @Word @CurrLang @Case {
-    Czech	@Yield { V }
+    Czech	@Yield { In }
     Danish	@Yield { I }
     Dutch       @Yield { In }
     English	@Yield { In }

@@ -1,6 +1,6 @@
 /*@z48.c:PDF back end@********************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -1013,6 +1013,10 @@ static PDF_OBJECT_NUM PDFFont_FindFontEncoding(
 {
   t_font_encoding_entry_ptr entry = g_font_encoding_list;
 
+  /* these two lines are Uwe patch Jul 18, 2000 */
+  if (in_font_encoding_name == NULL)
+    return 0;
+
   while (entry != NULL)
   {
     if (strcmp((char*)in_font_encoding_name, (char*)entry->m_font_encoding)==0)
@@ -1039,7 +1043,8 @@ void PDFFont_AddFont(FILE* in_fp, const FULL_CHAR* in_short_font_name,
 {
   t_font_list_entry_ptr entry = PDFFont_FindListEntry(in_real_font_name);
   debug4(DPD, D, "PDFFont_AddFont(-, %s, %s, %s) [new = %s]",
-    in_short_font_name, in_real_font_name, in_font_encoding_name,
+    in_short_font_name, in_real_font_name,
+    (in_font_encoding_name ? in_font_encoding_name : ""),
     bool(entry == NULL));
   /* *** this attempted bug fix by Jeff K. problem may be multiple font
 	 entries for the same font

@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -131,7 +131,8 @@ static FULL_LENGTH FindAdjustIncrement(OBJECT x, FULL_LENGTH frame_size,int dim)
 OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
   FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg, int count,
   FULL_LENGTH *actual_back, FULL_LENGTH *actual_fwd)
-{ OBJECT y, link, prev, g, z, face, thr, fixed_thr, res, uplink, tmp;
+{ OBJECT y, link, prev, g, z, face, thr, res, uplink;
+  /* OBJECT fixed_thr, tmp; */
   FULL_LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
   FULL_LENGTH aback, afwd;
   int i; float scale_factor;  BOOLEAN jn;
@@ -1227,7 +1228,6 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case COL_THR:
     case ROW_THR:
 
-      /* *** old code
       assert( (type(x) == COL_THR) == (dim == COLM), "FixAndPrintObject: thr!" );
       for( link = Down(x), uplink = Up(x), i = 1;
 	link != x && uplink != x && i < count;
@@ -1247,12 +1247,13 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       }
 
       y = FixAndPrintObject(y, xmk, back(x, dim), fwd(x, dim), dim,
-	NO_SUPPRESS, pg, count);
-      if( Up(x) == x )  Dispose(x);
+	NO_SUPPRESS, pg, count, &aback, &afwd);
+      *actual_back = xb;  *actual_fwd = xf;
+      /* if( Up(x) == x )  Dispose(x); */
       break;
-      *** */
 
       /* convert everyone to FIXED_COL_THR or FIXED_ROW_THR as appropriate */
+      /* *** old code
       if( thr_state(x) == FINALSIZE )
 	debug1(DGP, D, "thr_state(%d)", (int) x);
       assert(thr_state(x) != FINALSIZE, "FAPO/COL_THR: thr_state(x)!");
@@ -1309,9 +1310,11 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       Dispose(x);
       assert(res != nilobj, "FixAndPrintObject: COL_THR res!");
       x = res;
+      *** */
       /* NB NO BREAK! */
 
 
+    /* ***
     case FIXED_COL_THR:
     case FIXED_ROW_THR:
 
@@ -1322,6 +1325,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	NO_SUPPRESS, pg, count, &aback, &afwd);
       *actual_back = back(x, dim);  *actual_fwd = fwd(x, dim);
       break;
+      *** */
 
 
     case BEGIN_HEADER:

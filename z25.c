@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -263,24 +263,6 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	  newline();
 	}
 	aprint(" C}");
-	break;
-
-
-    case FIXED_COL_THR:
-
-	aprint("{FC ");
-	CountChild(y, Down(x), count);
-	echo(y, NO_PREC, count);
-	aprint(" FC}");
-	break;
-
-
-    case FIXED_ROW_THR:
-
-	aprint("{FR ");
-	CountChild(y, Down(x), count);
-	echo(y, NO_PREC, count);
-	aprint(" FR}");
 	break;
 
 

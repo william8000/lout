@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.23                          #
+#  Make file for installing Basser Lout Version 3.24                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
 #  24 June 2000                                                               #
@@ -276,10 +276,10 @@ TRACING =
 # DEBUGGING = 1
 # TRACING = -g
 
-BINDIR	= /export/home/6monthspace/jeff/bin
-LIBDIR	= /export/home/6monthspace/jeff/lout.lib
-DOCDIR	= /export/home/6monthspace/jeff/lout.doc
-MANDIR	= /export/home/6monthspace/jeff/lout.man
+BINDIR	= /usr/staff/jeff/bin
+LIBDIR	= /usr/staff/jeff/lout.lib
+DOCDIR	= /usr/staff/jeff/lout.doc
+MANDIR	= /usr/staff/jeff/lout.man
 
 LIBFONT = font
 LIBMAPS = maps

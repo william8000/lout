@@ -638,7 +638,7 @@ BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode,
 BOOLEAN *used_source_suffix)
 { FULL_CHAR buff[MAX_BUFF], buff2[MAX_BUFF];
   OBJECT link, y, cpath;  FILE *fp, *fp2;
-  debug4(DFS, DD, "SearchPath(%s, %s, %s, %s, -)", str, EchoObject(fpath),
+  debug4(DFS, DD, "[ SearchPath(%s, %s, %s, %s, -)", str, EchoObject(fpath),
 	bool(check_ld), bool(check_lt));
 
   *used_source_suffix = FALSE;
@@ -646,7 +646,7 @@ BOOLEAN *used_source_suffix)
   /* if file name is "stdin" just return it */
   if( StringEqual(str, STR_STDIN) )
   {
-    debug0(DFS, DD, "  SearchPath returning stdin");
+    debug0(DFS, DD, "] SearchPath returning stdin");
     *full_name = nilobj;
     return stdin;
   }
@@ -687,7 +687,7 @@ BOOLEAN *used_source_suffix)
         debug1(DFS, DD, fp2 == null ? "  fail %s" : "  succeed %s", buff2);
         if( fp2 != null )
         { fclose(fp2);
-	  debug0(DFS, DD, "SearchPath returning null (adjacent .ld file)");
+	  debug0(DFS, DD, "] SearchPath returning null (adjacent .ld file)");
 	  *full_name = nilobj;
 	  return null;
         }
@@ -724,7 +724,7 @@ BOOLEAN *used_source_suffix)
 	{ fclose(fp);
 	  debug1(DFS, DD, "SearchPath calling StringRemove(%s)", buff);
 	  StringRemove(buff);
-	  debug0(DFS, DD, "SearchPath returning null (.li out of date)");
+	  debug0(DFS, DD, "] SearchPath returning null (.li out of date)");
 	  *full_name = nilobj;
 	  return null;
 	}
@@ -748,7 +748,7 @@ BOOLEAN *used_source_suffix)
     }
 
   }
-  debug1(DFS, DD, "SearchPath returning (fp %s null)", fp==null ? "==" : "!=");
+  debug1(DFS, DD, "] SearchPath returning (fp %s null)", fp==null ? "==" : "!=");
   *full_name = (fp == null || StringLength(string(y)) == 0) ? nilobj :
     MakeWord(WORD, buff, xfpos);
   return fp;
@@ -776,7 +776,7 @@ BOOLEAN *used_source_suffix)
 FILE *OpenFile(FILE_NUM fnum, BOOLEAN check_ld, BOOLEAN check_lt)
 { FILE *fp;  OBJECT fname, full_name, y;  BOOLEAN used_source_suffix;
   ifdebug(DPP, D, ProfileOn("OpenFile"));
-  debug2(DFS, DD, "OpenFile(%s, %s)", FileName(fnum), bool(check_ld));
+  debug2(DFS, DD, "[ OpenFile(%s, %s)", FileName(fnum), bool(check_ld));
   fname = ftab_num(file_tab, fnum);
   if( Down(fname) != fname )
   { Child(y, Down(fname));
@@ -791,7 +791,7 @@ FILE *OpenFile(FILE_NUM fnum, BOOLEAN check_ld, BOOLEAN check_lt)
     used_suffix(fname) = used_source_suffix;
   }
   ifdebug(DPP, D, ProfileOff("OpenFile"));
-  debug1(DFS, DD, "OpenFile returning (fp %s null)", fp==null ? "==" : "!=");
+  debug1(DFS, DD, "] OpenFile returning (fp %s null)", fp==null ? "==" : "!=");
   return fp;
 } /* end OpenFile */
 

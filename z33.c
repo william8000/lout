@@ -441,8 +441,12 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs,
   if( fp == null && create )
   { db = nilobj;
     debug0(DFS, D, "  calling DefineFile from DbLoad (2)");
+    /* *** bug fix JeffK 12/9/00; need same path as index file
     dfnum = DefineFile(string(stem), DATA_SUFFIX, &fpos(stem),
       DATABASE_FILE, DATABASE_PATH);
+    *** */
+    dfnum = DefineFile(string(stem), DATA_SUFFIX, &fpos(stem),
+      DATABASE_FILE, fpath);
     dfpos = 0L;  LexPush(dfnum, 0, DATABASE_FILE, 1, FALSE);
     t = LexGetToken();
     dlnum = line_num(fpos(t));

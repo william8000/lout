@@ -1,6 +1,6 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -181,8 +181,6 @@ void MemInit(void)
   zz_lengths[ PAR          ] =
   zz_lengths[ ROW_THR      ] =
   zz_lengths[ COL_THR      ] =
-  zz_lengths[ FIXED_ROW_THR] =
-  zz_lengths[ FIXED_COL_THR] =
   zz_lengths[ HSPANNER     ] =
   zz_lengths[ VSPANNER     ] =
   zz_lengths[ ACAT         ] =

@@ -1,6 +1,6 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -51,10 +51,61 @@ BOOLEAN SplitIsDefinite(OBJECT x)
 
 /*****************************************************************************/
 /*                                                                           */
+/*  DisposeSplitObject(x)                                                    */
+/*                                                                           */
+/*  Dispose SPLIT object x, taking care to handle COL_THR and ROW_THR        */
+/*  children properly.                                                       */
+/*                                                                           */
+/*****************************************************************************/
+
+static void DisposeSplitObject(OBJECT x)
+{ int i, count;
+  OBJECT y, link, uplink;
+  debug1(DOS, D, "[ DisposeSplitObject( %ld )", (long) x);
+  assert(type(x) == SPLIT, "DisposeSplitObject: type(x) != SPLIT!");
+  assert(Down(x) != x, "DisposeSplitObject: x has no children!")
+  assert(LastDown(x) != Down(x), "DisposeSplitObject: x has one child!")
+  assert(LastDown(x) == NextDown(Down(x)), "DisposeSplitObject: children!")
+
+  /* handle first child */
+  CountChild(y, Down(x), count);
+  if( type(y) == COL_THR )
+  {
+    /* find corresponding child link out of y and delete that link */
+    for( link = Down(y), uplink = Up(y), i = 1;
+         link != y && uplink != y && i < count;
+         link = NextDown(link), uplink = NextUp(uplink), i++ );
+    assert( link != y && uplink != y, "DisposeSplitObject: link (a)!" );
+    DisposeChild(link);
+  }
+  DisposeChild(Down(x));
+
+  /* handle second child */
+  CountChild(y, LastDown(x), count);
+  if( type(y) == ROW_THR )
+  {
+    /* find corresponding child link out of y and delete that link */
+    for( link = Down(y), uplink = Up(y), i = 1;
+         link != y && uplink != y && i < count;
+         link = NextDown(link), uplink = NextUp(uplink), i++ );
+    assert( link != y && uplink != y, "DisposeSplitObject: link (b)!" );
+    DisposeChild(link);
+  }
+  DisposeChild(LastDown(x));
+  debug0(DOS, D, "] DisposeSplitObject returning");
+} /* end DisposeSplitObject */
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  DisposeObject(x)                                                         */
 /*                                                                           */
 /*  Dispose object x recursively, leaving intact any shared descendants.     */
 /*  We return a useless integer so that we can use this in expresssions.     */
+/*                                                                           */
+/*  If x is a SPLIT object then one or both of its children could be         */
+/*  COL_THR or ROW_THR objects.  If such thread object is has this SPLIT     */
+/*  as its ith parent, then we need to dispose its ith child.                */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -62,57 +113,15 @@ int DisposeObject(OBJECT x)
 { debug2(DOS,DDD,"[DisposeObject( %ld ), type = %s, x =", (long) x, Image(type(x)));
   ifdebug(DOS, DDD, DebugObject(x));
   assert( Up(x) == x, "DisposeObject: x has a parent!" );
-  while( Down(x) != x )  DisposeChild(Down(x));   Dispose(x);
+  if( type(x) == SPLIT )
+    DisposeSplitObject(x);
+  else
+  { while( Down(x) != x )  DisposeChild(Down(x));
+    Dispose(x);
+  }
   debug0(DOS, DDD, "]DisposeObject returning.");
   return 0;
 } /* end DisposeObject */
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  DisposeSplitObject(x)                                                    */
-/*                                                                           */
-/*  Like DisposeObject(x), except that we assume that x is a SPLIT object,   */
-/*  and dispose of it carefully, making sure that any COL_THR and ROW_THR    */
-/*  objects underneath it are not corrupted.  The problem with using just    */
-/*  DisposeObject() is that it will delete the link into the COL_THR or      */
-/*  ROW_THR but not the correspondiong link out of it.                       */
-/*                                                                           */
-/*  We assume that only one of the two possible threads is present, to       */
-/*  simplify the code.                                                       */
-/*                                                                           */
-/*****************************************************************************/
-
-void DisposeSplitObject(OBJECT x)
-{ OBJECT y, col_child, row_child;
-  assert(type(x) == SPLIT, "DisposeSplitObject: type(x) != SPLIT!");
-
-  /* find the row child, if no intervening thread */
-  Child(y, DownDim(x, ROWM));
-  row_child = (type(y) == ROW_THR || type(y) == FIXED_ROW_THR) ? nilobj : y;
-
-  /* find the col child, if no intervening thread */
-  Child(y, DownDim(x, COLM));
-  col_child = (type(y) == COL_THR || type(y) == FIXED_COL_THR) ? nilobj : y;
-
-  /* this routine only works when exactly one of the two threads is present */
-  assert(col_child!=nilobj || row_child!=nilobj, "DisposeSplitObject: both!");
-  assert(col_child==nilobj || row_child==nilobj, "DisposeSplitObject: none!");
-
-  /* do the disposal */
-  if( row_child != nilobj )
-  {
-    assert(Up(row_child) != LastUp(row_child), "DisposeSplitObject row_child!");
-    DeleteLink(UpDim(row_child, COLM));
-    DisposeObject(x);
-  }
-  else if( col_child != nilobj )
-  {
-    assert(Up(col_child) != LastUp(col_child), "DisposeSplitObject col_child!");
-    DeleteLink(UpDim(col_child, ROWM));
-    DisposeObject(x);
-  }
-} /* end DisposeSplitObject */
 
 
 /*@::MakeWord(), MakeWordTwo()@***********************************************/

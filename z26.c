@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -156,8 +156,6 @@ FULL_CHAR *Image(unsigned int c)
     case GAP_OBJ:		return  AsciiToFull("gap_obj");
     case ROW_THR:		return  AsciiToFull("row_thr");
     case COL_THR:		return  AsciiToFull("col_thr");
-    case FIXED_ROW_THR:		return  AsciiToFull("fixed_row_thr");
-    case FIXED_COL_THR:		return  AsciiToFull("fixed_col_thr");
     case CLOSURE:		return  AsciiToFull("closure");
     case NULL_CLOS:		return  KW_NULL;
     case PAGE_LABEL:		return  KW_PAGE_LABEL;

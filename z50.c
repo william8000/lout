@@ -1,6 +1,6 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -141,9 +141,21 @@ static void PDF_PrintLength(FULL_CHAR *buff, int length, int length_dim)
 static void PDF_PrintPageSetupForFont(OBJECT face, int font_curr_page,
   FULL_CHAR *font_name, FULL_CHAR *first_size_str)
 {
+  FULL_CHAR *enc = NULL;
   fprintf(out_fp, "%%%%IncludeResource: font %s\n", font_name);
+  /***
   PDFFont_AddFont(out_fp, first_size_str, font_name,
     MapEncodingName(font_mapping(face)));
+  ***/
+  if (font_recoded(face)) {
+    MAPPING m = font_mapping(face);
+    /* This is a NASTY hack.  Need to rework the interface Since
+       PDF is random-access format - we don't care which page this
+       encoding is for and we need to only print it once -- Uwe */
+    MapEnsurePrinted(m, 1);
+    enc = MapEncodingName(m);
+  }
+  PDFFont_AddFont(out_fp, first_size_str, font_name, enc);
 } /* end PDF_PrintPageSetupForFont */
 
 

@@ -1,6 +1,6 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -662,11 +662,21 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	    /* otherwise we must reject, and warn the user */
 	    if( !scaled )
-	    {
+	    { char num1[20], num2[20];
 	      debug3(DGA, D, "  reject: vsize %s,%s in %s; y=",
 		EchoLength(back(y, dim)), EchoLength(fwd(y, dim)),
 		EchoConstraint(&c));
 	      ifdebug(DGA, D, DebugObject(y));
+	      if( size(y, dim) > 0 )
+	      { sprintf(num1, "%.1fc", (float) size(y, dim) / CM);
+	        sprintf(num2, "%.1fc", (float) bfc(c) / CM);
+	        if( dim == ROWM )
+		  Error(19, 12, "%s object too high for %s space; will try elsewhere",
+		    WARN, &fpos(y), num1, num2);
+	        else
+		  Error(19, 13, "%s object too wide for %s space; will try elsewhere",
+		    WARN, &fpos(y), num1, num2);
+	      }
 	      goto REJECT;
 	    }
 
@@ -760,7 +770,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	    }
 
 	    if( !scaled )
-	    {
+	    { char num1[20], num2[20];
 	      limiter(hd) = why;
 	      debug3(DGA, D, "  set limiter(%s) = %d %s", SymName(actual(hd)),
 		(int) limiter(hd), EchoObject(limiter(hd)));
@@ -768,6 +778,16 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 		EchoLength(back(z, dim)), EchoLength(fwd(z, dim)),
 		EchoConstraint(&c));
 	      ifdebug(DGA, D, DebugObject(y));
+	      if( size(z, dim) > 0 )
+	      { sprintf(num1, "%.1fc", (float) size(z, dim) / CM);
+	        sprintf(num2, "%.1fc", (float) bfc(c) / CM);
+	        if( dim == ROWM )
+		  Error(19, 14, "%s object too high for %s space; will try elsewhere",
+		    WARN, &fpos(y), num1, num2);
+	        else
+		  Error(19, 15, "%s object too wide for %s space; will try elsewhere",
+		    WARN, &fpos(y), num1, num2);
+	      }
 	      goto REJECT;
 	    }
 	  }

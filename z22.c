@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -192,7 +192,7 @@ void FlushInners(OBJECT inners, OBJECT hd)
 void ExpandRecursives(OBJECT recs)
 { CONSTRAINT non_c, hc, vc;
   OBJECT target_index, target, z, n1, inners, newrecs, hd, tmp, env, why;
-  debug0(DCR, DD, "ExpandRecursives(recs)");
+  debug0(DCR, DDD, "ExpandRecursives(recs)");
   SetConstraint(non_c, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
   n1 = nilobj;
   assert(recs != nilobj, "ExpandRecursives: recs == nilobj!");
@@ -200,7 +200,7 @@ void ExpandRecursives(OBJECT recs)
   { Child(target_index, Down(recs));  DeleteLink( Down(recs) );
     assert( type(target_index) == RECURSIVE, "ExpandRecursives: index!" );
     target = actual(target_index);
-    debug2(DCR, DD, "  expanding %s %s", Image(type(target_index)),
+    debug2(DCR, DDD, "  expanding %s %s", Image(type(target_index)),
       EchoObject(target));
 
     /* expand body of target, convert to galley, and check size */
@@ -224,14 +224,14 @@ void ExpandRecursives(OBJECT recs)
     Constrained(target, &hc, COLM, &why);
     debug2(DGS, DD, "] ExpandRecursives Constrained(%s, COLM) = %s",
       EchoObject(target), EchoConstraint(&hc));
-    debug3(DCR, DD, "    horizontal size: (%s, %s); constraint: %s",
+    debug3(DCR, DDD, "    horizontal size: (%s, %s); constraint: %s",
       EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)), EchoConstraint(&hc));
     if( !FitsConstraint(back(hd, COLM), fwd(hd, COLM), hc) )
     { DisposeChild(Up(hd));
       if( inners != nilobj ) DisposeObject(inners);
       if( newrecs != nilobj ) DisposeObject(newrecs);
       DeleteNode(target_index);
-      debug0(DCR, DD, "    rejecting (too wide)");
+      debug0(DCR, DDD, "    rejecting (too wide)");
       continue;
     }
     if( !external_ver(target) )
@@ -239,14 +239,14 @@ void ExpandRecursives(OBJECT recs)
       debug2(DSC, DD, "Constrained( %s, ROWM ) = %s",
 	EchoObject(target), EchoConstraint(&vc));
       Child(z, LastDown(hd));
-      debug3(DCR, DD, "    vsize: (%s, %s); constraint: %s",
+      debug3(DCR, DDD, "    vsize: (%s, %s); constraint: %s",
 	EchoLength(back(z, ROWM)), EchoLength(fwd(z, ROWM)), EchoConstraint(&vc));
       if( !FitsConstraint(back(z, ROWM), fwd(z, ROWM), vc) )
       {	DisposeChild(Up(hd));
 	if( inners != nilobj ) DisposeObject(inners);
 	if( newrecs != nilobj ) DisposeObject(newrecs);
 	DeleteNode(target_index);
-	debug0(DCR, DD, "    rejecting (too high)");
+	debug0(DCR, DDD, "    rejecting (too high)");
 	continue;
       }
     }
@@ -270,7 +270,7 @@ void ExpandRecursives(OBJECT recs)
     if( newrecs != nilobj )  MergeNode(recs, newrecs);
   } /* end while */
   Dispose(recs);
-  debug0(DCR, DD, "ExpandRecursives returning.");
+  debug0(DCR, DDD, "ExpandRecursives returning.");
 } /* end ExpandRecursives */
 
 /*@::FindSplitInGalley()@*****************************************************/
@@ -370,26 +370,6 @@ static OBJECT FindSplitInGalley(OBJECT hd)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  DisposeOneHeader(OBJECT link)                                            */
-/*                                                                           */
-/*  Dispose one header pointed to by link,  taking care not to disrupt       */
-/*  any thread objects that are tangled with the header.                     */
-/*                                                                           */
-/*****************************************************************************/
-
-static void DisposeOneHeader(OBJECT link)
-{ OBJECT y;
-  Child(y, link);
-  if( type(y) == SPLIT )
-  { DeleteLink(link);
-    DisposeSplitObject(y);
-  }
-  else DisposeChild(link);
-} /* end DisposeOneHeader */
-
-
-/*****************************************************************************/
-/*                                                                           */
 /*  DisposeHeaders(OBJECT hd)                                                */
 /*                                                                           */
 /*  Dispose the headers of hd.                                               */
@@ -401,7 +381,7 @@ static void DisposeHeaders(OBJECT hd)
   { assert(type(headers(hd)) == ACAT || type(headers(hd)) == VCAT,
       "DisposeHeaders: type(headers(hd))!");
     while( Down(headers(hd)) != headers(hd) )
-    { DisposeOneHeader(Down(headers(hd)));
+    { DisposeChild(Down(headers(hd)));
     }
     headers(hd) = nilobj;
   }
@@ -489,7 +469,7 @@ void HandleHeader(OBJECT hd, OBJECT header)
 
 	/* dispose last header object */
 	assert(LastDown(headers(hd))!=headers(hd), "Promote/END_HEADER!");
-	DisposeOneHeader(LastDown(headers(hd)));
+	DisposeChild(LastDown(headers(hd)));
 	if( Down(headers(hd)) == headers(hd) )
 	{ DisposeObject(headers(hd));
 	  headers(hd) = nilobj;
@@ -513,7 +493,7 @@ void HandleHeader(OBJECT hd, OBJECT header)
   {
     /* first disentangle child properly */
     assert(Down(header) != header && Down(header) == LastDown(header), "HH!");
-    DisposeOneHeader(Down(header));
+    DisposeChild(Down(header));
   }
   DisposeChild(Up(header));
   DisposeChild(gaplink);
@@ -719,14 +699,18 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	    /* galley is part flushed, leave it here */
 	    link = NextDown(link);
 	  }
-	  else if( foll_or_prec(z) == GALL_PREC )
+	  /* ??? else if( foll_or_prec(z) == GALL_PREC ) */
+	  else if( foll_or_prec(z) == GALL_PREC ||
+		   foll_or_prec(z) == GALL_FOLL_OR_PREC )
 	  {
 	    /* galley is preceding or foll_or_prec, send to CrossSequence */
 	    OBJECT t;
-	    type(y) = GALL_PREC;
+	    /* type(y) = GALL_PREC; */
+	    type(y) = foll_or_prec(z);
 	    pinpoint(y) = nilobj;
 	    Child(t, Down(z));
-	    actual(y) = CrossMake(whereto(z), t, GALL_PREC);
+	    /* actual(y) = CrossMake(whereto(z), t, GALL_PREC); */
+	    actual(y) = CrossMake(whereto(z), t, type(y));
 	    DisposeChild(Down(y));
 	    CrossSequence(actual(y));
 	    DisposeChild(NextDown(link));
@@ -864,7 +848,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	      string(page_label) : AsciiToFull("?");
 	    debug1(DGS, DD, "root promote definite; label_string = %s",
 	      label_string);
-	    debug1(DCR, D, "label_string = %s", label_string);
+	    debug1(DCR, DD, "label_string = %s", label_string);
 	    if( first )
 	    { BackEnd->PrintBeforeFirstPage(size(hd, COLM), size(y, ROWM),
 		label_string);

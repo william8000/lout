@@ -145,7 +145,15 @@ together on one page or column (enclosing the body of the figure or table
 in @Code "@OneRow" would have the same effect except that it would not
 incorporate the caption, hence the need for this option).  You need to be
 certain that the whole assembly will fit on one page when setting
-@Code "@OnePage" to {@Code "Yes"}.
+@Code "@OnePage" to {@Code "Yes"}.  If it doesn't, Lout should warn you
+with a message such as
+@ID @Code "25.3c object too high for 23.4c space; will try elsewhere"
+giving the size of the oversize object and the size of the space it
+failed to fit into; but (unfortunately) it does not given a clear
+indication of whether trying elsewhere succeeded or not.  When you
+see this message you need to check for yourself whether the figure was
+actually printed or not; it may mean merely that the figure was put
+back to a later page than the first possible one.
 @PP
 The @I default value of the @Code "@OnePage" option for each figure or
 table depends on the value of its @Code "@Location" option as follows:
@@ -180,6 +188,16 @@ object.  The example just given centres the figure inside a @Code "@CurveBox"
 which is horizontally expanded (by the @Code "@HExpand" symbol, which is not
 specific to figures) to occupy the full width of the page or column, rather
 than fitting snugly around the figure.
+@PP
+Although @Code "@CC" will always centre the figure or table, occasionally
+it underestimates the amount of space available to centre in, and hence
+the figure or table appears only partly centred, or even left
+justified.  This occurs when nothing on the page extends the full
+width of the page.  If this problem occurs, use
+@ID @Code "@Format { @HExpand @CC @Body }"
+The @Code "@HExpand" symbol expands the space available to the following
+object to the maximum possible amount, so that the centring is with respect
+to the full available width as desired.
 @PP
 The @Code "@Format" option applies to just the body of the figure, not to
 its caption.  It applies to each page or column of a multi-page or

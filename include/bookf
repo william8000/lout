@@ -94,7 +94,7 @@ def @BookSetup
     named @SubAppendixGap		{  2.0v  @OrIfPlain 3f		}
     named @SubSubAppendixGap		{  1.5v  @OrIfPlain 2f		}
 
-    named @PrefaceInContents		{  No 				}
+    named @PrefaceInContents		{  Yes 				}
     named @AbbreviationsInContents	{  Yes				}
     named @IntroductionInContents	{  Yes				}
     named @PartInContents		{  Yes				}
@@ -686,7 +686,8 @@ def @BookSetup
 			    @PageHeaders { @PageHeaders }
 			    @Orient { @PageOrientation }
 			    @IntroFirstPageNumber
-		    //	NonStart @Runner @Owner { @Tag }
+		    # //	NonStart @Runner @Owner { @Tag }
+		    //	None @Runner @Owner { @Tag }
 		    //	@PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }

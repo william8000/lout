@@ -34,6 +34,7 @@ Setup files (containing mainly lists of options settable by the user)
        blue             Blue
        perl             Perl + Pod
        pod              Pod
+       python           Python
 
 Source files (containing Lout and PostScript source code for the packages)
 --------------------------------------------------------------------------
@@ -70,6 +71,7 @@ Source files (containing Lout and PostScript source code for the packages)
        bluef            Blue
        perlf            Perl
        podf             Pod
+       pythonf          Python
 
 Miscellaneous
 -------------

@@ -281,10 +281,14 @@ Changes and new features introduced in Version 3.23 [24 June 2000]
     New symbols for expert users: @LinkSource and @LinkDest
     @Python symbol for typesetting Python programs using prg2lout.
 
+Changes and new features introduced in Version 3.24 [8 October 2000]
+
+    Bug fixes, including a new and better fix for table running headers bugs
+
 Things that ought to be done but haven't been done yet
 
     Various improvements/bug fixes for PDF output
     Review Uwe's proposal for moving word row marks to the baseline
 
 Jeff Kingston
-24 June 2000
+8 October 2000

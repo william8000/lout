@@ -1,6 +1,6 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -423,11 +423,11 @@ OBJECT *crs, OBJECT *res_env)
 	    /* would be best */
 	    if( db != OldCrossDb )
 	    { SetScope(env, &count, FALSE);
-	      debug2(DCR, D, "Retrieving %s, env = %s", SymName(sym),
+	      debug2(DCR, DD, "Retrieving %s, env = %s", SymName(sym),
 	        EchoObject(env));
 	    }
 	    else
-	    { debug1(DCR, D, "Retrieving %s, env = nilobj", SymName(sym));
+	    { debug1(DCR, DD, "Retrieving %s, env = nilobj", SymName(sym));
 	    }
 	    res = ReadFromFile(dfnum, dfpos, dlnum);
 	    for( i = 1;  i <= count;  i++ )  PopScope();
@@ -573,9 +573,9 @@ void CrossSequence(OBJECT x)
   assert( type(cs) == CROSS_SYM, "CrossSequence: cs!" );
 
   /* debug output */
-  debug2(DCR, DD, "CrossSequence %s %s", Image(ctype), EchoObject(x));
+  debug2(DCR, D, "[ CrossSequence %s %s", Image(ctype), EchoObject(x));
   debug1(DCR, DD, "  x = %s", EchoObject(x));
-  ifdebug(DCR, DD, DebugObject(cs));
+  ifdebug(DCR, D, DebugObject(cs));
 
   /* delete as much of x as possible */
   Child(tag, NextDown(Down(x)));
@@ -639,17 +639,25 @@ void CrossSequence(OBJECT x)
       else seq = string(key);
 
       /* either write out the index immediately or store it for later */
+      /* if( ctype == GALL_PREC || ctype == GALL_FOLL_OR_PREC ) */
       if( ctype == GALL_PREC )
       {	if( gall_tag(cs) == nilobj )
-	{ Error(10, 12, "no %s precedes this %s%s%s", WARN, &fpos(val),
-	    SymName(sym), SymName(sym), KW_CROSS, KW_PRECEDING);
+	{
+	  if( ctype == GALL_PREC )
+	    Error(10, 12, "no %s galley target precedes this %s%s%s", WARN,
+	      &fpos(val), SymName(sym), SymName(sym), KW_CROSS, KW_PRECEDING);
+	  else
+	    Error(10, 22, "no %s galley target follows or precedes this %s%s%s",
+	      WARN, &fpos(val), SymName(sym), SymName(sym), KW_CROSS,
+	      KW_FOLL_OR_PREC);
 	  debug0(DCR, DD, "  ... so substituting \"none\"");
 	  gall_tag(cs) = MakeWord(WORD, STR_NONE, &fpos(val));
 	}
 	assert( is_word(type(gall_tag(cs))) &&
-		!StringEqual(string(gall_tag(cs)), STR_EMPTY),
-			"CrossSequence: gall_tag!" );
-	debug3(DCR, DD, "  inserting galley (prec) %s&%s %s", SymName(sym),
+	  !StringEqual(string(gall_tag(cs)), STR_EMPTY),
+	  "CrossSequence: gall_tag!" );
+	debug4(DCR, DD, "  inserting galley (%s) %s&%s %s",
+	  ctype == GALL_PREC ? "GALL_PREC" : "GALL_FOLL_OR_PREC", SymName(sym),
 	  string(gall_tag(cs)), seq);
 	DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos, seq,
 			dfnum, (long) dfpos, dlnum, FALSE);
@@ -661,7 +669,7 @@ void CrossSequence(OBJECT x)
 	cs_pos(tmp) = dfpos;
 	cs_lnum(tmp) = dlnum;
 	Link(cs, tmp);
-	debug2(DCR, DD, "  saving galley (foll) %s&? %s", SymName(sym), seq);
+	debug2(DCR, D, "  saving galley (foll) %s&? %s", SymName(sym), seq);
       }
       DisposeObject(val);
       if( hold_key != nilobj )  DisposeObject(hold_key);
@@ -673,13 +681,13 @@ void CrossSequence(OBJECT x)
       if( gall_tag(cs) != nilobj )  DisposeObject(gall_tag(cs));
       if( !is_word(type(tag)) || StringEqual(string(tag), STR_EMPTY) )
       {
-	debug2(DCR, DD, "  GALL_TARG %s put none for %s",
+	debug2(DCR, D, "  GALL_TARG %s put none for %s",
 	  SymName(sym), EchoObject(tag));
 	DisposeObject(tag);
 	gall_tag(cs) = MakeWord(WORD, STR_NONE, no_fpos);
       }
       else gall_tag(cs) = tag;
-      debug2(DCR, DD, "  have new %s gall_targ %s", SymName(sym),
+      debug2(DCR, D, "  have new %s gall_targ %s", SymName(sym),
 	  EchoObject(gall_tag(cs)));
       for( link = Down(cs);  link != cs;  link = NextDown(link) )
       {	Child(y, link);
@@ -692,7 +700,7 @@ void CrossSequence(OBJECT x)
 	  case GALL_FOLL:
 	  case GALL_FOLL_OR_PREC:
 
-	    debug4(DCR, DD, "  inserting galley (%s) %s&%s %s",
+	    debug4(DCR, D, "  inserting galley (%s) %s&%s %s",
 	      Image(cs_type(y)), SymName(sym), string(gall_tag(cs)), string(y));
 	    if( Down(y) != y )
 	      Child(val, Down(y));
@@ -913,8 +921,8 @@ void CrossSequence(OBJECT x)
       break;
 
   } /* end switch */
-  debug0(DCR, DD, "CrossSequence returning.");
-  debug0(DCR, DD, "   cs =");
+  debug0(DCR, D, "] CrossSequence returning.");
+  debug0(DCR, D, "   cs =");
   ifdebug(DCR, DD, DebugObject(cs));
 } /* end CrossSequence */
 
@@ -932,7 +940,7 @@ void CrossClose(void)
 { OBJECT link, cs, ylink, y, sym;  BOOLEAN g;  int len, count;
   FILE_NUM dfnum;  long dfpos, cont;  int dlnum;
   FULL_CHAR buff[MAX_BUFF], seq[MAX_BUFF], tag[MAX_BUFF];
-  debug0(DCR, DD, "CrossClose()");
+  debug0(DCR, D, "[ CrossClose()");
   ifdebug(DCR, DD, if( RootCross != nilobj ) DebugObject(RootCross));
 
   /* if suppressing cross referencing, return */
@@ -1018,16 +1026,15 @@ void CrossClose(void)
 
 	  case GALL_FOLL_OR_PREC:
 
+	    if( gall_tag(cs) == nilobj )
+	    { Error(10, 21, "no %s precedes or follows this %s%s%s", WARN,
+		&fpos(y), SymName(sym), SymName(sym),KW_CROSS,KW_FOLL_OR_PREC);
+	      gall_tag(cs) = MakeWord(WORD, STR_NONE, no_fpos);
+	    }
 	    debug3(DCR, DD, "  inserting galley (foll_or_prec) %s&%s %s",
 	      SymName(sym), string(gall_tag(cs)), string(y));
-	    if( gall_tag(cs) == nilobj )
-	      Error(10, 21, "no %s precedes or follows this %s%s%s", WARN,
-		&fpos(y), SymName(sym), SymName(sym),KW_CROSS,KW_FOLL_OR_PREC);
-	    else
-	    {
-	      DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos,
-	        string(y), cs_fnum(y), (long) cs_pos(y), cs_lnum(y), FALSE);
-	    }
+	    DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos,
+	      string(y), cs_fnum(y), (long) cs_pos(y), cs_lnum(y), FALSE);
 	    break;
 
 
@@ -1065,6 +1072,6 @@ void CrossClose(void)
   /* make NewCrossDb readable, for next run */
   DbConvert(NewCrossDb, TRUE);
 
-  debug0(DCR, DD, "CrossClose returning.");
+  debug0(DCR, D, "] CrossClose returning.");
   ifdebug(DCR, DD, crtab_debug(crossref_tab, stderr));
 } /* end CrossClose */
