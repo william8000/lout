@@ -23,9 +23,9 @@ unpacked Lout hyphenation file german.lh or its packed equivalent
 german.lp (see below) is to be used when hyphenating German words.  These
 files are kept in the Lout system hyphenation directory (this directory).  If
 a language is desired but no hyphenation information file is available, the
-space between the braces may be left blank, and then the language will be
-defined but hyphenation in that language will never be attempted.  Another
-possibility is to include a placeholder file for the language (see below).
+file name may be replaced with -, and then the language will be defined but
+hyphenation in that language will never be attempted.  Another possibility
+is to include a placeholder file for the language (see below).
 
 The first time on any run that German hyphenation is required, Lout will
 search the directories of the hyphenation path for a binary file called
@@ -83,13 +83,28 @@ treated as a special case.  For example:
     ta-ble
     phil-an-thropic
 
-These words will be hyphenated in the places shown by the "-" characters.
+These words may be hyphenated in the places shown by the "-" characters.
 Character classes are in effect here (Table will be hyphenated as Ta-ble).
 If there are no exceptions, "Exceptions:" may be omitted.
 
+Next comes an optional LengthLimit section, which tells Lout to ignore
+some patterns.  For example,
+
+    LengthLimit:
+    4
+
+means that patterns containing more than 4 letters (note that
+. counts as a letter) are to be ignored.  The purpose is to discard
+the least important patterns from files that are too large for Lout
+to handle otherwise.  None of the files actually use this at present,
+but hyphenation files seem to be getting larger and larger, and if
+any whoppers come along they might have to be trimmed in this way.
+
 Finally comes the "Patterns:" heading followed by the list of TeX
 hyphenation patterns.  Apart from the weighting digits, the patterns
-should contain only letters.
+should contain only letters.  Lout understands some TeX escape sequences
+e.g. it will accept \^e anywhere in a hyphenation file as the ecircumflex
+character.
 
 The file may contain comments, which begin with % (either at the start
 of a line or after a white space character) and go to end of line.  The
@@ -107,7 +122,3 @@ Extreme lengths were resorted to to compress the .lp file as much as
 possible.  Files significantly larger than german.lh are likely to cause
 Lout to abort with an error message.  Please contact jeff@cs.su.oz.au if
 you have problems with this or anything else.
-
-French hyphenation: although I have a French TeX hyphenation file, I have
-not produced a Lout version of it because it contains many patterns which
-begin with "..", a notation I do not at present understand.

@@ -15,6 +15,7 @@ book. @Index @Code "@Book"
 "    @Edition {}"
 "    @Publisher {}"
 "    @BeforeTitlePage {}"
+"    @OnTitlePage {}"
 "    @AfterTitlePage {}"
 "    @InitialFont { Times Base 12p }"
 "    @InitialBreak { adjust 1.2fx hyphen }"
@@ -28,9 +29,9 @@ book. @Index @Code "@Book"
 "//"
 }
 This shows all the options of @Code "@Book" with their default values.  As
-usual with options, these may be given in any order, and only those
-that must be changed need be given at all.  The meaning of the
-@Code "//" symbol after the last option is beyond our scope, but total
+usual, these options may be given in any order, and only those
+to be changed need be given at all.  The meaning of the
+@Code "//" symbol after the last is beyond our scope, but total
 disaster will ensue if it is forgotten.
 @PP
 The {@Code "@Title"}, {@Code "@Author"}, and {@Code "@Edition"} options
@@ -40,10 +41,11 @@ style which centres each line (Section {@NumberOf paras}).  The
 @PP
 The {@Code "@BeforeTitlePage"} option will come out on the page (or
 pages) preceding the title page.  This is where publishers traditionally
-advertise other books of a similar kind, perhaps from a series.  If this
-option is empty or omitted, there will be no such pages.  If it is
-non-empty, there will be a pre-title page (a title page with just the
-title on it) first.
+advertise other books of a similar kind, perhaps from a series.
+@PP
+If {@Code "@OnTitlePage"} is given it will replace the title page
+that usually appears, superseding the {@Code "@Title"}, {@Code "@Author"},
+{@Code "@Edition"}, and @Code "@Publisher" options in the process.
 @PP
 The {@Code "@AfterTitlePage"} option will come out on the page
 (or pages) following the title page.  This is where publishers
@@ -58,8 +60,8 @@ them here and avoid having your own setup file.  If you already have
 your own setup file, change them in either place and omit them in
 the other.
 @PP
-@Code "@InitialFont" is the font in which the bulk of the book will be
-set, and should contain a family, a face, and a size.  The default
+@Code "@InitialFont" is the font of the bulk of the book,
+and should contain a family, a face, and a size.  The default
 value selects the Times family, the Base face, and the 12 point size.
 @PP
 @Code "@InitialBreak" controls the behaviour of paragraph breaking in
@@ -104,7 +106,10 @@ overall situation and try to minimize the ugliness, using the @TeX
 optimal paragraph breaking algorithm.  It takes two runs to do this,
 with intermediate results stored in Lout's cross reference database
 (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.
+it, which might be wise after major changes.  It is possible for this
+page layout optimizer to cycle, never settling on a single final best
+version; this is usually caused by footnotes or floating figures inserted
+at points which end up near page boundaries.
 @PP
 After the compulsory @Code "//" comes an optional preface:
 preface. @Index @Code "@Preface"
@@ -284,6 +289,7 @@ representative sample of these options, showing their default values:
 "@Use { @BookLayout"
 "    # @TitlePageFont { Helvetica Base }"
 "    # @SeparateIntroNumbering { Yes }"
+"    # @PrefaceAfterContents { No }"
 "    # @ReferencesBeforeAppendices { No }"
 "    # @ChapterStartPages { Any }"
 "    # @ChapterWord { chapter }"

@@ -1,6 +1,6 @@
 /*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -138,12 +138,18 @@ FULL_CHAR *EchoToken(OBJECT x)
     case BEGIN:
     case END:
     case ENV:
+    case ENVA:
+    case ENVB:
+    case ENVC:
+    case ENVD:
+    case CENV:
     case CLOS:
     case LBR:
     case RBR:
     case NULL_CLOS:
     case PAGE_LABEL:
     case CROSS:
+    case FORCE_CROSS:
     case ONE_COL:
     case ONE_ROW:
     case WIDE:
@@ -155,6 +161,7 @@ FULL_CHAR *EchoToken(OBJECT x)
     case HCOVER:
     case VCOVER:
     case SCALE:
+    case KERN_SHRINK:
     case HCONTRACT:
     case VCONTRACT:
     case HEXPAND:
@@ -180,6 +187,8 @@ FULL_CHAR *EchoToken(OBJECT x)
     case RUMP:
     case INSERT:
     case NEXT:
+    case PLUS:
+    case MINUS:
     case OPEN:
     case TAGGED:
     case INCGRAPHIC:
@@ -194,6 +203,7 @@ FULL_CHAR *EchoToken(OBJECT x)
     case DATABASE:
     case SYS_DATABASE:
     case LUSE:
+    case LEO:
     case LVIS:
     
       return actual(x) != nilobj ? SymName(actual(x)) : Image(type(x));

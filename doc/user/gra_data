@@ -3,11 +3,11 @@
    @Tag { data }
 @Begin
 @PP
-The @Code "@Data" symbol has several options for controlling the
+The @Code "@Data" symbol has options for controlling the
 data. @Index @Code "@Data"
-appearance of the data it encloses.  We have already seen the
+appearance of its data.  We have already seen the
 @Code "points" option, which controls what is printed at each data
-point.  The choices for it are
+point:
 points.graphs @Index { @Code "points" option in graphs }
 @CD @Tab
    vmargin { 0.5vx }
@@ -45,13 +45,12 @@ option which controls the size (radius) of all these symbols:
 symbolsize. @Index { @Code "symbolsize" option in graphs }
 @ID @OneRow @Code {
 "@Data"
-"    points { triangle }"
 "    symbolsize { 0.15 ft }"
 }
-shows the default size, 0.15 times the current font size.  More
-precisely, the default value of this option is taken from an option
+shows the default, 0.15 times the current font size.  More
+precisely, the default value is taken from an option
 to the @Code "@Graph" symbol, also called {@Code "symbolsize"}.  By
-setting this option you can therefore set the symbol size of all data
+setting that option you can therefore set the symbol size of all data
 points in the graph at once; its default value is {@Code "0.15 ft"}.
 @PP
 The @Code "@Data" symbol also has a @Code "pairs" option which
@@ -62,8 +61,7 @@ determines how each pair of points is connected.  The choices are
 example,
 @ID @OneRow @Code {
 "@Graph"
-"    abovecaption { Estimated population of Boston, New York, and Philadelphia"
-"1720--1770 }"
+"    abovecaption { Estimated population of Boston, New York, and Philadelphia }"
 "{"
 "    @Data  points { plus }  pairs { solid }"
 "    { 1720 12000  1730 13000  1740 15601  1760 15631  1770 15877 }"
@@ -76,11 +74,8 @@ example,
 "}"
 }
 produces
-@FootNote { Source:  R. C. Simmons, {@I{ The American Colonies }},
-W. W. Norton, New York, 1981. }
 @CD @Graph
     abovecaption { Estimated population of Boston, New York, and Philadelphia
-1720--1770
 }
 {
     @Data  points { plus }  pairs { solid }
@@ -93,7 +88,8 @@ W. W. Norton, New York, 1981. }
     { 1720 10000  1730 11500  1740 12654  1750 18202  1760 23750  1770 34583 }
 
 }
-We will see in Section {@NumberOf key} how to add an explanatory key to
+(R. C. Simmons, @I { The American Colonies }, W. W. Norton, New York,
+1981.)  We will see in Section {@NumberOf key} how to add an explanatory key to
 this graph.  If the points have symbols, these connecting lines will stop 1.5
 symbolsizes away from the data points, so as not to overstrike them.  If
 the points have no symbols and @Code "pairs" is {@Code "dashed"}, the
@@ -105,7 +101,6 @@ separation between dots, and a @Code "linewidth" option controls the
 width (thickness) of the lines and dots:
 @ID @OneRow @Code {
 "@Data"
-"    pairs { dashed }"
 "    dashlength { 0.2 ft }"
 "    linewidth { 0.5 pt }"
 "{"
@@ -130,8 +125,7 @@ this:
 "    yextra { 0 cm }"
 "    ymax { 80 }"
 "{"
-"    @Data"
-"        pairs { yhisto }"
+"    @Data pairs { yhisto }"
 "    { 0 1 10 3 20 2 30 4 40 15 50 60 60 58 70 28 80 15 90 7 100 0 }"
 "}"
 }
@@ -154,8 +148,7 @@ one x value to the next, with height equal to the y value lying between
 these two x values.  This means that the very last y value has no effect
 on the result (however, there must be a last y value anyway).
 @PP
-There is a variant of @Code "yhisto" called {@Code "surfaceyhisto"}.  Here
-is the previous example again, this time using {@Code "surfaceyhisto"}:
+There is an alternative to @Code "yhisto" called {@Code "surfaceyhisto"}:
 @CD @Graph
     hidecaptions { yes }
     abovecaption { Computer Science 3 Results (1993) }
@@ -197,11 +190,9 @@ than outlined ones:
 "}"
 }
 produces
-@FootNote { Source: Bryant Robey, Shea O. Rutstein, and Leo Morros:
-The fertility decline in developing countries, @I { Scientific
-American } & , December 1993. }
 @CD @Graph
-    abovecaption { Fertility rates in some developing countries }
+    abovecaption { Fertility rates in some developing countries
+    }
     xextra { 0 cm }
     yextra { 0 cm }
     xmax { 8 }
@@ -213,7 +204,9 @@ American } & , December 1993. }
         pairs { filledxhisto }
     { 0 1 3.2 2 2.2 3 3.0 4 3.5 5 2.8 6 5.9 7 4.8 8 5.3 9 }
 }
-Once again each bar goes from one y value to the next, with its x value
+(Bryant Robey, Shea O. Rutstein, and Leo Morros:  The fertility decline in
+developing countries, @I { Scientific American }, December 1993.)  Once
+again each bar goes from one y value to the next, with its x value
 equal to the x value lying between the two y values; this time the very
 first x value has no effect on the result.
 @PP

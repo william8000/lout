@@ -1,6 +1,6 @@
 /*@z05.c:Read Definitions:ReadFontDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -144,7 +144,7 @@ void ReadPrependDef(unsigned typ, OBJECT encl)
     return;
   }
   debug0(DFS, D, "  calling DefineFile from ReadPrependDef");
-  (void) DefineFile(string(fname), STR_EMPTY, &fpos(fname), PREPEND_FILE,
+  DefineFile(string(fname), STR_EMPTY, &fpos(fname), PREPEND_FILE,
 	   typ == PREPEND ? INCLUDE_PATH : SYSINCLUDE_PATH);
 
 } /* end ReadPrependDef */
@@ -190,6 +190,12 @@ void ReadDatabaseDef(unsigned typ, OBJECT encl)
     DisposeObject(fname);
     return;
   }
+  if( StringEndsWith(string(fname), DATA_SUFFIX) )
+  { Error(5, 47, "%s suffix should be omitted in %s clause", WARN,
+      &fpos(fname), DATA_SUFFIX, KW_DATABASE);
+    DisposeObject(fname);
+    return;
+  }
   if( Down(symbs) != symbs )
     (void) DbLoad(fname, typ == DATABASE ? DATABASE_PATH : SYSDATABASE_PATH,
       TRUE, symbs);
@@ -210,7 +216,7 @@ void ReadDatabaseDef(unsigned typ, OBJECT encl)
   t = LexGetToken(); sym_body(res) = Append(sym_body(res), t, PARENT);
 
 static void ReadTokenList(OBJECT token, OBJECT res)
-{ OBJECT t, xsym, new_par;
+{ OBJECT t, xsym, new_par, imps, link, y;  int scope_count, i;
   NextToken(t, res);
   for(;;) switch(type(t))
   {
@@ -233,6 +239,7 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case HCAT:
     case ACAT:
     case CROSS:
+    case FORCE_CROSS:
     case NULL_CLOS:
     case PAGE_LABEL:
     case ONE_COL:
@@ -246,6 +253,7 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case HCOVER:
     case VCOVER:
     case SCALE:
+    case KERN_SHRINK:
     case HCONTRACT:
     case VCONTRACT:
     case HEXPAND:
@@ -271,6 +279,8 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case RUMP:
     case INSERT:
     case NEXT:
+    case PLUS:
+    case MINUS:
     case TAGGED:
     case INCGRAPHIC:
     case SINCGRAPHIC:
@@ -351,7 +361,7 @@ static void ReadTokenList(OBJECT token, OBJECT res)
       PushScope(xsym, TRUE, FALSE);
       NextToken(t, res);
       PopScope();
-      if( type(t) == CROSS )
+      if( type(t) == CROSS || type(t) == FORCE_CROSS )
       { NextToken(t, res);
 	break;
       }
@@ -371,9 +381,26 @@ static void ReadTokenList(OBJECT token, OBJECT res)
 	    WARN, &fpos(new_par), KW_LBR, SymName(actual(new_par)));
 	  break;
 	}
+
+        /* add import list of the named parameter to current scope */
+        scope_count = 0;
+        imps = imports(actual(new_par));
+        if( imps != nilobj )
+        { for( link = Down(imps);  link != imps;  link = NextDown(link) )
+          { Child(y, link);
+            PushScope(actual(y), FALSE, TRUE);
+            scope_count++;
+          }
+        }
+
+	/* read the body of the named parameter */
 	PushScope(actual(new_par), FALSE, FALSE);
 	ReadTokenList(t, res);
 	PopScope();
+
+        /* pop the scopes pushed for the import list */
+        for( i = 0;  i < scope_count;  i++ )
+          PopScope();
 
 	/* get next token, possibly another named parameter */
 	PushScope(xsym, TRUE, FALSE);
@@ -421,7 +448,7 @@ static void ReadTokenList(OBJECT token, OBJECT res)
 /*                                                                           */
 /*****************************************************************************/
 
-static OBJECT ReadMacro(OBJECT *token, OBJECT encl)
+static OBJECT ReadMacro(OBJECT *token, OBJECT curr_encl, OBJECT encl)
 { OBJECT t, res;
 
   /* find macro name and insert into symbol table */
@@ -434,7 +461,8 @@ static OBJECT ReadMacro(OBJECT *token, OBJECT encl)
     *token = t;
     return nilobj;
   }
-  res = InsertSym(string(t), MACRO, &fpos(t), 0, FALSE, TRUE, 0, encl, nilobj);
+  res = InsertSym(string(t), MACRO, &fpos(t), 0, FALSE, TRUE,0,curr_encl,nilobj);
+  if( curr_encl != encl )  visible(res) = TRUE;
   UnSuppressScope();
 
   /* find opening left brace */
@@ -474,10 +502,10 @@ static OBJECT ReadMacro(OBJECT *token, OBJECT encl)
 
 void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
 { OBJECT t, res, res_target, export_list, import_list, link, y, z;
-  OBJECT curr_encl;
+  OBJECT curr_encl;  BOOLEAN compulsory_par;
   t = *token;
 
-  while( res_type != LOCAL ? is_string(t, KW_NAMED) : TRUE )
+  while( res_type==LOCAL || is_string(t, KW_NAMED) || is_string(t, KW_IMPORT) )
   {
     curr_encl = encl;
     if( is_string(t, KW_FONTDEF) )
@@ -516,11 +544,24 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
       t = LexGetToken();
       while( type(t) == CLOSURE ||
 	       (type(t)==WORD && !is_string(t,KW_EXPORT) && !is_string(t,KW_DEF)
-	       && !is_string(t, KW_MACRO)) )
+	       && !is_string(t, KW_MACRO) && !is_string(t, KW_NAMED)) )
       {	if( type(t) == CLOSURE )
 	{ if( type(actual(t)) == LOCAL )
-	  { PushScope(actual(t), FALSE, TRUE);
-	    Link(import_list, t);
+	  {
+	    /* *** letting this through now
+	    if( res_type == NPAR && has_par(actual(t)) )
+	    {
+	      Error(5, 46, "named parameter import %s has parameters",
+		WARN, &fpos(t), SymName(actual(t)));
+	    }
+	    else
+	    {
+	    *** */
+	      PushScope(actual(t), FALSE, TRUE);
+	      Link(import_list, t);
+	    /* ***
+	    }
+	    *** */
 	  }
 	  else
 	  { Error(5, 26, "import name expected here", WARN, &fpos(t));
@@ -588,11 +629,18 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
     if( is_string(t, KW_MACRO) )
     { if( Down(export_list) != export_list )
 	Error(5, 32, "ignoring export list of macro", WARN, &fpos(t));
-      res = ReadMacro(&t, curr_encl);
+      res = ReadMacro(&t, curr_encl, encl);
     }
     else
     {
       SuppressScope();  Dispose(t);  t = LexGetToken();
+
+      /* check for compulsory keyword */
+      if( res_type == NPAR && is_string(t, KW_COMPULSORY) )
+      { compulsory_par = TRUE;
+	Dispose(t);  t = LexGetToken();
+      }
+      else compulsory_par = FALSE;
 
       /* find name of symbol and insert it */
       if( !is_word(type(t)) )
@@ -605,6 +653,10 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
       res = InsertSym(string(t), res_type, &fpos(t), DEFAULT_PREC,
 		FALSE, FALSE, 0, curr_encl, nilobj);
       if( curr_encl != encl )  visible(res) = TRUE;
+      if( compulsory_par )
+      { has_compulsory(encl)++;
+	is_compulsory(res) = TRUE;
+      }
       t = LexGetToken();
 
       /* find force, if any */
@@ -619,8 +671,10 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
       if( is_string(t, KW_HORIZ) )
       { horiz_galley(res) = COLM;
 	Dispose(t);  t = LexGetToken();
+	/* *** want to allow KW_HORIZ with @Target form now
 	if( !is_string(t, KW_INTO) )
 	  Error(5, 35, "%s expected here", WARN, &fpos(t), KW_INTO);
+	*** */
       }
 
       /* find into clause, if any */
@@ -754,12 +808,17 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
 
     /* pop import scopes and store imports in sym tab */
     for( link=Down(import_list);  link != import_list;  link=NextDown(link) )
+    {
       PopScope();
+    }
     if( Down(import_list) == import_list || curr_encl != encl )
     { DisposeObject(import_list);
       import_list = nilobj;
     }
-    else imports(res) = import_list;
+    else
+    {
+      imports(res) = import_list;
+    }
 
     BodyParAllowed();
     if( t == nilobj ) t = LexGetToken();

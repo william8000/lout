@@ -10,10 +10,9 @@ as electronic mail.  Any document that can be produced by Lout in
 PostScript can be produced in plain text as well, by adding a @Code "-p"
 flag to the Unix command line:
 @ID @Code "lout -p simple"
-No other changes are required, although one is recommended (use of the
-@Code pdoc setup file, see below).  Here we are sending the output
-directly to the screen, but it can be redirected to a file, or piped through
-the @Code more command for viewing one page at a time, etc.
+No other changes are required.  Here we are sending the output directly to
+the screen, but it can be redirected to a file, or piped through the
+@Code more command for viewing one page at a time, etc.
 @PP
 Of course, plain text is an extremely limited medium of communication
 compared with PostScript, and this forces Lout to make some rather
@@ -35,7 +34,7 @@ degrees.  This means that page orientations (Section {@NumberOf pagesize})
 other than @Code Portrait do not work; }
 @LI { Ruled lines are not printed, and paint and colour options are
 ignored.  This spoils the graphics and graphs of Chapters
-{@NumberOf graphics}, {@NumberOf fig}, and {@NumberOf graphs}. }
+{@NumberOf graphics}, {@NumberOf diagrams}, and {@NumberOf graphs}. }
 @EndList
 Despite the problems, many things work surprisingly well.  Tables, for
 example, lose their ruled lines but otherwise look very good.  It does no
@@ -48,19 +47,15 @@ makes a mess of equations, which are best avoided).  Because of this problem
 it's best to make all horizontal lengths multiples of @Eq {1 frac 10} inch
 (conveniently expressed as {@Code 1s}), and all vertical lengths multiples
 of @Eq { 1 frac 6 } inch (conveniently expressed as {@Code 1f}).  To help
-you do this, there is a setup file called @Code pdoc which is exactly like
-@Code doc except that the values of the setup file options are chosen to
-suit plain text output.  Use it like this:
-pdoc.file @Index { @Code "pdoc" setup file }
-@ID @OneRow @Code {
-"@SysInclude { pdoc }"
-"@Doc @Text @Begin"
-"..."
-"@End @Text"
-}
-No plain text versions of the setup files for other document types are
-supplied, but they could easily be made following the example of
-{@Code pdoc}.
+you do this, the setup files contain many entries that look like this
+example:
+@ID @Code "# @InitialBreak { {adjust 1.2fx hyphen} @OrIfPlain {ragged 1fx nohyphen} }"
+The meaning is that the value of @Code "@InitialBreak" will be
+@Code "adjust 1.2fx hyphen" usually, but will switch to
+{@Code "ragged 1fx nohyphen"}, which is better suited to plain text,
+if the @Code "-p" command line flag is used.  These setup file values
+allow you to switch from PostScript to plain text and back again without
+changing anything at all except the @Code "-p" command line flag.
 @PP
 If you use @Code "lout -P" instead of {@Code "lout -p"}, the plain text
 output will contain a form-feed character (control-L) after each page
@@ -68,4 +63,15 @@ form.feed @Index { form-feed in plain text }
 except the last.  This character causes most printing devices to start
 a new page, which is very useful when your page height is not exactly
 right.
+@PP
+The @Code "@Document" symbol (Section {@NumberOf ordinary}) has an
+unpaginated. @Index @Code "@Unpaginated"
+@Code "@Unpaginated" option which, when set to {@Code "Yes"}, causes
+the plain text output to appear unpaginated, that is, in one long
+continous stream with no page breaks.  Its value is ignored if plain text
+output is not in effect, so it can be safely set to @Code "Yes" in
+documents intended for formatting both ways.  The usual margins apply;
+footnotes appear at the end; figures and tables do not work.  Lout
+stupidly reads the entire document before producing any output when
+this option is used, so if the document is long you might run out of memory.
 @End @Section

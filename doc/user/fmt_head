@@ -153,7 +153,8 @@ only after the @Code "@Use" clause.  However, the following symbols
 "@S @Date @Time `` '' -- --- @Bullet @ParSym @SectSym @Dagger @DaggerDbl"
 "@CDot @Sterling @Yen @Florin @Star @Degree @Minute @Second @Multiply"
 "@Divide @Lozenge @Register @CopyRight @TradeMark @Colour @Color"
-"@PageOf @Box @CurveBox @ShadowBox @Rotate @Scale @IncludeGraphic"
+"@Box @CurveBox @ShadowBox @FullWidthRule @LocalWidthRule"
+"@Rotate @Scale @IncludeGraphic"
 }
 And there are five symbols of special relevance to page headers and
 footers: {@Code "@Null"}, {@Code "@Centre"}, {@Code "@Center"},
@@ -226,7 +227,8 @@ page is now one that begins a major part of the document.
 In addition to the symbols described earlier for simple page headers
 and footers, these running header options may contain the symbols
 {@Code "@MajorNum"}, {@Code "@MajorTitle"}, {@Code "@MinorNum"},
-{@Code "@MinorTitle"}, {@Code "@DotSep"}, and {@Code "@DotJoin"}.
+{@Code "@MinorTitle"}, {@Code "@DotSep"}, {@Code "@NoDotSep"},
+{@Code "@DotJoin"}, {@Code "@NoDotJoin"}, and {@Code "@DashJoin"}.
 major.num @Index @Code "@MajorNum"
 major.title @Index @Code "@MajorTitle"
 minor.num @Index @Code "@MinorNum"
@@ -267,7 +269,19 @@ However, if either object is empty, the dot and two spaces are
 omitted.  It's a fine point, needed mainly for unnumbered chapters
 and sections.  @Code "@DotJoin" is the same as @Code "@DotSep" but
 dot.join @Index @Code "@DotJoin"
-without the two spaces.
+without the two spaces.  @Code "NoDotSep" is the same as
+nodot.sep @Index @Code "@NoDotSep"
+@Code "@DotSep" but leaving out the dot, @Code "@NoDotJoin" is the same
+nodot.join @Index @Code "@NoDotJoin"
+as @Code "@DotJoin" but again leaving out the dot, and @Code "@DashJoin"
+dash.join @Index @Code "@DashJoin"
+is the same as @Code "@DotJoin" except that `--' replaces the dot.
+@PP
+Lout uses @Code "@DotSep" between numbers and titles by default.  To
+get rid of all dots between numbers and titles it is necessary to
+change all occurrences of @Code "@DotSep" in the setup file to
+{@Code "@NoDotSep"}.  There are about ten occurrences, depending
+on the setup file.
 @PP
 The present document was produced using @Code "@PageHeaders { Titles }"
 with the default values of the sixteen options unchanged, as you might
@@ -277,4 +291,16 @@ like to verify.  @Code "@PageHeaders { NoTitles }" is identical to
 are always replaced by empty objects.  The description given at the
 beginning of this section, `like @Code "Titles" but with the titles
 blanked out,' is therefore accurate.
+@PP
+There is a @Code "@StructPageNums" setup file option that produces
+structpagenums. @Index @Code "@StructPageNums"
+structured page numbers when it is changed to {@Code Yes}; that is,
+page numbers that include a section number, subsection number, and so
+on.  Precisely which structure numbers are included is determined by the
+@Code "@SectionNumInRunners" option and its relatives.  @Code "@PageHeaders"
+must be @Code Titles when structured page numbers are used, and it is
+probably best to set @Code "@SectionGap" and some similar options to
+{@Code "2b"} (meaning new page) as well.  The @Code "@NumberSeparator"
+setup file option (Section {@NumberOf largescale}) affects the format
+of the structured page numbers.
 @End @Section

@@ -1,5 +1,10 @@
 %%BeginResource: procset LoutMarginNotes
 
+% path for @FullWidthRule symbol
+/LoutRule
+{ 0 0 moveto xsize 0 lineto
+} def
+
 % path for @Box symbol
 /LoutBox
 { 0 0 moveto xsize 0 lineto

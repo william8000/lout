@@ -1,6 +1,6 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -36,7 +36,8 @@ static OBJECT		targets[MAX_DEPTH];	/* currently open \Inputs    */
 static CONSTRAINT	constraints[MAX_DEPTH];	/* their COLM constraints    */
 static int		itop;			/* stack top	             */
 static CONSTRAINT	initial_constraint;	/* initial COLM constraint   */
-static STYLE		InitialStyle;		/* initial style             */
+       STYLE		InitialStyle;		/* initial style             */
+       OBJECT		InitialEnvironment;	/* initial environment	     */
 
 #if DEBUG_ON
 static void debug_targets(void)
@@ -61,16 +62,18 @@ static void debug_targets(void)
 
 void TransferInit(OBJECT InitEnv)
 { OBJECT dest, x, y, recs, inners, nothing, dest_index, up_hd, why;
-  debug1(DGT, D, "TransferInit( %s )", EchoObject(InitEnv));
-  SetConstraint(initial_constraint, MAX_LEN-1, MAX_LEN-1, MAX_LEN-1);
+  debug1(DGT, D, "[ TransferInit( %s )", EchoObject(InitEnv));
+  SetConstraint(initial_constraint,
+    MAX_FULL_LENGTH-1, MAX_FULL_LENGTH-1, MAX_FULL_LENGTH-1);
 
-  /* set initial style */
-  SetGap(line_gap(InitialStyle),  FALSE, FALSE, FIXED_UNIT, MARK_MODE, 18*PT);
+  /* set initial environment and style */
+  InitialEnvironment = InitEnv;
+  SetGap(line_gap(InitialStyle), FALSE,FALSE,FALSE,FIXED_UNIT,MARK_MODE,18*PT);
   vadjust(InitialStyle)         = FALSE;
   hadjust(InitialStyle)         = FALSE;
   padjust(InitialStyle)         = FALSE;
   space_style(InitialStyle)     = SPACE_LOUT;
-  SetGap(space_gap(InitialStyle), FALSE, TRUE,  FIXED_UNIT, EDGE_MODE,  1*EM);
+  SetGap(space_gap(InitialStyle), FALSE,FALSE,TRUE,FIXED_UNIT,EDGE_MODE,1*EM);
   hyph_style(InitialStyle)      = HYPH_UNDEF;
   fill_style(InitialStyle)      = FILL_UNDEF;
   display_style(InitialStyle)   = DISPLAY_UNDEF;
@@ -83,11 +86,15 @@ void TransferInit(OBJECT InitEnv)
 
   /* construct destination for root galley */
   New(up_hd, HEAD);
-  limiter(up_hd) = opt_components(up_hd) = opt_constraints(up_hd) = nilobj;
+  force_gall(up_hd) = FALSE;
+  actual(up_hd) = enclose_obj(up_hd) = limiter(up_hd) = nilobj;
+  opt_components(up_hd) = opt_constraints(up_hd) = nilobj;
   gall_dir(up_hd) = ROWM;
   New(dest_index, RECEIVING);
   New(dest, CLOSURE);  actual(dest) = PrintSym;
   actual(dest_index) = dest;
+  debug2(DGT, D, "TransferInit setting external_ver(%s %s) = TRUE",
+    Image(type(dest)), SymName(actual(dest)));
   external_ver(dest) = TRUE;
   external_hor(dest) = FALSE;
   threaded(dest) = FALSE;
@@ -96,7 +103,8 @@ void TransferInit(OBJECT InitEnv)
 
   /* construct root galley */
   New(root_galley, HEAD);
-  limiter(root_galley) = nilobj;
+  force_gall(root_galley) = FALSE;
+  enclose_obj(root_galley) = limiter(root_galley) = nilobj;
   opt_components(root_galley) = opt_constraints(root_galley) = nilobj;
   gall_dir(root_galley) = ROWM;
   FposCopy(fpos(root_galley), *no_fpos);
@@ -107,7 +115,7 @@ void TransferInit(OBJECT InitEnv)
   New(x, CLOSURE);  actual(x) = InputSym;
   Link(root_galley, x);
   SizeGalley(root_galley, InitEnv, TRUE, FALSE, FALSE, FALSE, &InitialStyle,
-    &initial_constraint, nilobj, &nothing, &recs, &inners);
+    &initial_constraint, nilobj, &nothing, &recs, &inners, nilobj);
   assert( recs   == nilobj , "TransferInit: recs   != nilobj!" );
   assert( inners == nilobj , "TransferInit: inners != nilobj!" );
   Link(dest_index, root_galley);
@@ -125,7 +133,7 @@ void TransferInit(OBJECT InitEnv)
   debug2(DSC, DD, "Constrained( %s, COLM ) = %s",
 	EchoObject(y), EchoConstraint(&constraints[itop]));
 
-  debug0(DGT, D, "TransferInit returning.");
+  debug0(DGT, D, "] TransferInit returning.");
   ifdebug(DGT, DD, debug_targets());
 } /* end TransferInit */
 
@@ -141,7 +149,7 @@ void TransferInit(OBJECT InitEnv)
 OBJECT TransferBegin(OBJECT x)
 { OBJECT xsym, index, y, link, env, new_env, hold_env, res, hd, target, why;
   CONSTRAINT c;
-  debug1(DGT, D, "TransferBegin( %s )", EchoObject(x));
+  debug1(DGT, D, "[ [ TransferBegin( %s )", EchoObject(x));
   ifdebug(DGT, DD, debug_targets());
   assert( type(x) == CLOSURE, "TransferBegin: non-CLOSURE!" );
 
@@ -175,17 +183,18 @@ OBJECT TransferBegin(OBJECT x)
   New(index, UNATTACHED);
   pinpoint(index) = nilobj;
   New(hd, HEAD);
-  limiter(hd) = opt_components(hd) = opt_constraints(hd) = nilobj;
-  gall_dir(hd) = ROWM;
   FposCopy(fpos(hd), fpos(x));
   actual(hd) = xsym;
-  foll_or_prec(hd) = TargetSymbol(x, &whereto(hd));
+  limiter(hd) = opt_components(hd) = opt_constraints(hd) = nilobj;
+  gall_dir(hd) = ROWM;
   ready_galls(hd) = nilobj;
   must_expand(hd) = TRUE;
   sized(hd) = FALSE;
   Link(index, hd);
   Link(hd, x);
   AttachEnv(env, x);
+  SetTarget(hd);
+  enclose_obj(hd) = (has_enclose(actual(hd)) ? BuildEnclose(hd) : nilobj);
 
   /* search for destination for hd and release it */
   Link(Up(target), index);
@@ -205,7 +214,7 @@ OBJECT TransferBegin(OBJECT x)
     { Child(env, LastDown(x));
       if( type(env) == ENV )  DisposeChild(LastDown(x));
     }
-    debug1(DGT,D, "TransferBegin returning failed, x: %s", EchoObject(x));
+    debug1(DGT,D, "] TransferBegin returning failed, x: %s", EchoObject(x));
     return x;
   }
 
@@ -246,12 +255,12 @@ OBJECT TransferBegin(OBJECT x)
 	  FATAL, &fpos(target), SymName(xsym));
       else res = NewToken(GSTUB_INT, no_fpos, 0, 0, precedence(xsym), nilobj);
     }
-    debug1(DGT, D, "[ TransferBegin returning %s", Image(type(res)));
+    debug1(DGT, D, "] TransferBegin returning %s", Image(type(res)));
   }
   else
   {
     res = NewToken(GSTUB_NONE, no_fpos, 0, 0, precedence(xsym), nilobj);
-    debug1(DGT, D, "TransferBegin returning %s", Image(type(res)));
+    debug1(DGT, D, "] TransferBegin returning %s", Image(type(res)));
   }
 
   DisposeObject(hold_env);
@@ -269,13 +278,13 @@ OBJECT TransferBegin(OBJECT x)
 
 void TransferComponent(OBJECT x)
 { OBJECT y, env, start_search, recs, inners, nothing, hd, dest, dest_index;
-  debug1(DGT, D, "TransferComponent( %s )", EchoObject(x));
+  debug1(DGT, D, "[ TransferComponent( %s )", EchoObject(x));
   ifdebug(DGT, DD, debug_targets());
 
   /* if no dest_index, discard x and exit */
   if( Down(targets[itop]) == targets[itop] )
   { DisposeObject(x);
-    debug0(DGT, D, "TransferComponent returning (no target).");
+    debug0(DGT, D, "] TransferComponent returning (no target).");
     return;
   }
   Child(dest_index, Down(targets[itop]));
@@ -283,7 +292,9 @@ void TransferComponent(OBJECT x)
 
   /* make the component into a galley */
   New(hd, HEAD);
-  limiter(hd) = opt_components(hd) = opt_constraints(hd) = nilobj;
+  force_gall(hd) = FALSE;
+  enclose_obj(hd) = limiter(hd) = nilobj;
+  opt_components(hd) = opt_constraints(hd) = nilobj;
   gall_dir(hd) = ROWM;
   FposCopy(fpos(hd), fpos(x));
   actual(hd) = whereto(hd) = ready_galls(hd) = nilobj;
@@ -294,7 +305,7 @@ void TransferComponent(OBJECT x)
   env = GetEnv(dest);
   debug1(DGT, DD, "  current env chain: %s", EchoObject(env));
   SizeGalley(hd, env, TRUE, threaded(dest), FALSE, TRUE, &save_style(dest),
-	&constraints[itop], nilobj, &nothing, &recs, &inners);
+	&constraints[itop], nilobj, &nothing, &recs, &inners, nilobj);
   if( recs != nilobj )  ExpandRecursives(recs);
 
   /* promote the components, remembering where old spot was */
@@ -336,7 +347,7 @@ void TransferComponent(OBJECT x)
     FlushGalley(y);
   }
   
-  debug0(DGT, D, "TransferComponent returning.");
+  debug0(DGT, D, "] TransferComponent returning.");
   ifdebug(DGT, DD, debug_targets());
 } /* end TransferComponent */
 
@@ -351,20 +362,22 @@ void TransferComponent(OBJECT x)
 
 void TransferEnd(OBJECT x)
 { OBJECT recs, inners, nothing, z, env, dest, hd, dest_index, y, start_search;
-  debug1(DGT, D, "] TransferEnd( %s )", EchoObject(x));
+  debug1(DGT, D, "[ TransferEnd( %s )", EchoObject(x));
   ifdebug(DGT, DD, debug_targets());
 
   /* if no dest_index, discard x and exit */
   if( Down(targets[itop]) == targets[itop] )
   { DisposeObject(x);  DisposeObject(targets[itop--]);
-    debug0(DGT, D, "TransferEnd returning: no dest_index");
+    debug0(DGT, D, "] TransferEnd returning: no dest_index");
     return;
   }
   Child(dest_index, Down(targets[itop]));
 
   /* make the component into a galley */
   New(hd, HEAD);  FposCopy(fpos(hd), fpos(x));
-  limiter(hd) = opt_components(hd) = opt_constraints(hd) = nilobj;
+  force_gall(hd) = FALSE;
+  enclose_obj(hd) = limiter(hd) = nilobj;
+  opt_components(hd) = opt_constraints(hd) = nilobj;
   gall_dir(hd) = ROWM;
   actual(hd) = whereto(hd) = ready_galls(hd) = nilobj;
   foll_or_prec(hd) = GALL_FOLL;
@@ -372,7 +385,8 @@ void TransferEnd(OBJECT x)
   Link(hd, x);  dest = actual(dest_index);  env = GetEnv(dest);
   debug1(DGT, DD, "  current env chain: %s", EchoObject(env));
   SizeGalley(hd, env, external_ver(dest), threaded(dest), FALSE, TRUE,
-    &save_style(dest), &constraints[itop], nilobj, &nothing, &recs, &inners);
+    &save_style(dest), &constraints[itop], nilobj, &nothing, &recs, &inners,
+    nilobj);
   if( recs != nilobj )  ExpandRecursives(recs);
 
   /* promote the components, remembering where old spot was */
@@ -393,11 +407,11 @@ void TransferEnd(OBJECT x)
     New(tinners, ACAT);
     while( Down(dest_index) != dest_index )
     { Child(y, Down(dest_index));
-      assert( type(y) == HEAD, "TransferComponent: input child!" );
+      assert( type(y) == HEAD, "TransferEnd: input child!" );
       if( opt_components(y) != nilobj )
       { DisposeObject(opt_components(y));
 	opt_components(y) = nilobj;
-	debug1(DOG, D, "TransferComponent de-optimizing %s (@Input case)",
+	debug1(DOG, D, "TransferEnd de-optimizing %s (@Input case)",
 	  SymName(actual(y)));
       }
       DetachGalley(y);
@@ -422,7 +436,7 @@ void TransferEnd(OBJECT x)
   
   /* pop target stack and exit */
   DisposeObject(targets[itop--]);
-  debug0(DGT, D, "TransferEnd returning.");
+  debug0(DGT, D, "] ] TransferEnd returning.");
   ifdebug(DGT, DD, debug_targets());
 } /* end TransferEnd */
 
@@ -436,7 +450,7 @@ void TransferEnd(OBJECT x)
 
 void TransferClose(void)
 { OBJECT inners;
-  debug0(DGT, D, "TransferClose()");
+  debug0(DGT, D, "[ TransferClose()");
   ifdebug(DGT, DD, debug_targets());
   debug0(DGA, D, "  calling FreeGalley from TransferClose");
   if( LastDown(root_galley) != root_galley )
@@ -446,5 +460,5 @@ void TransferClose(void)
     debug0(DGF, D, "  calling FlushGalley from TransferClose");
     FlushGalley(root_galley);
   }
-  debug0(DGT, D, "TransferClose returning.");
+  debug0(DGT, D, "] TransferClose returning.");
 }

@@ -86,8 +86,17 @@ export	"`" "``" "```" bin rel punct non vctr big
 	arccos arcsin arctan arg cos cosh cot coth csc deg det dim exp
 	gcd hom inf ker lg lim liminf limsup ln log max min Pr sec sin
 	sinh supr tan tanh mod ldots cdots vdots ddots del grad
-	"..." ",...," "'" empty
+	"..." ",...," "'" "''" "'''" "''''" empty
 	
+	leftarrow longleftarrow dblleftarrow dbllongleftarrow
+	rightarrow longrightarrow dblrightarrow dbllongrightarrow
+	leftrightarrow longleftrightarrow dblleftrightarrow dbllongleftrightarrow
+	mapsto longmapsto hookleftarrow hookrightarrow leadsto
+	leftharpoonup rightharpoonup leftharpoondown rightharpoondown
+	rightleftharpoons
+	uparrow dbluparrow downarrow dbldownarrow updownarrow dblupdownarrow
+	nearrow searrow swarrow nwarrow
+
 	sup sub tsub supp on ton frac half third over from to widefrom wideto
 	dot dotdot hat tilde vec dyad overbar underbar sqrt root
 	nextcol above labove cabove rabove mabove
@@ -299,7 +308,7 @@ def @Eq
     def minute          { @Sym "\242"  }
     def lessequal       { @Sym "\243"  }
     def fraction        { @Sym "\244"  }
-    def infinity        { @Sym "\245"  }
+    def infinity        { "1.2f" @Font @Sym "\245"  }
     def florin          { @Sym "\246"  }
     def club            { @Sym "\247"  }
     def diamond         { @Sym "\250"  }
@@ -783,6 +792,124 @@ def @Eq
 
     ###################################################################
     #                                                                 #
+    #  Arrow symbols.                                                 #
+    #                                                                 #
+    ###################################################################
+
+    def leftarrow		{ arrowleft }
+    def longleftarrow		{ { 1.6 1 } @Scale arrowleft }
+    def dblleftarrow		{ arrowdblleft }
+    def dbllongleftarrow	{ { 1.6 1 } @Scale arrowdblleft }
+    def rightarrow		{ arrowright }
+    def longrightarrow		{ { 1.6 1 } @Scale arrowright }
+    def dblrightarrow		{ arrowdblright }
+    def dbllongrightarrow	{ { 1.6 1 } @Scale arrowdblright }
+    def leftrightarrow		{ arrowboth }
+    def longleftrightarrow	{ { 1.6 1 } @Scale arrowboth }
+    def dblleftrightarrow	{ arrowdblboth }
+    def dbllongleftrightarrow	{ { 1.6 1 } @Scale arrowdblboth }
+
+    def mapsto
+    {
+	@HContract @VContract {
+	    "0 ymark 0.16 ft sub moveto 0 ymark 0.16 ft add lineto stroke"
+	    @Graphic arrowright
+	}
+    }
+
+    def longmapsto
+    {
+	@HContract @VContract {
+	    "0 ymark 0.16 ft sub moveto 0 ymark 0.16 ft add lineto stroke"
+	    @Graphic { { 1.6 1 } @Scale arrowright }
+	}
+    }
+
+    def hookleftarrow
+    {
+	@HContract @VContract {
+	    "xsize ymark moveto xsize ymark 0.1 ft add 0.1 ft -90 90 arc stroke"
+	    @Graphic leftarrow
+	}
+    }
+
+    def hookrightarrow
+    {
+	@HContract @VContract {
+	    "0 ymark moveto 0 0.1 ft ymark add 0.1 ft -90 90 arcn stroke"
+	    @Graphic rightarrow
+	}
+    }
+
+    def @ClipToSize right x
+    {
+	@HContract @VContract
+	{
+	"grestore newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
+	"0 ysize lineto closepath clip gsave"
+	} @Graphic x
+    }
+
+    def @ClipAboveMark
+	left amount
+	right x
+    {
+	@ClipToSize { ^//{{amount}o} x }
+    }
+
+    def @ClipBelowMark
+	left amount
+	right x
+    {
+	@ClipToSize { x //{{amount}o} }
+    }
+
+    def leftharpoonup
+    {
+	0.04f @ClipBelowMark leftarrow
+    }
+
+    def rightharpoonup
+    {
+	0.04f @ClipBelowMark rightarrow
+    }
+
+    def leftharpoondown
+    {
+	0.02f @ClipAboveMark leftarrow
+    }
+
+    def rightharpoondown
+    {
+	0.02f @ClipAboveMark rightarrow
+    }
+
+    def rightleftharpoons
+    {
+	@HContract @VContract {
+		rightharpoonup
+		^//0.1fo
+		 //0.1fo
+		leftharpoondown
+	}
+    }
+
+    def leadsto		{ @HContract { similar &0.4fo arrowright } }
+
+    def uparrow		{ arrowup }
+    def dbluparrow	{ arrowdblup }
+    def downarrow	{ arrowdown }
+    def dbldownarrow	{ arrowdbldown }
+    def updownarrow	{ @HContract { arrowup &0io arrowdown } }
+    def dblupdownarrow	{ @VContract { arrowdblup ^//0.2fo arrowdbldown } }
+    def nearrow		{ 0.5w @VShift 0.5w @HShift  45d @Rotate arrowright }
+    def searrow		{ 0.5w @VShift 0.5w @HShift 315d @Rotate arrowright }
+    def swarrow		{ 0.5w @VShift 0.5w @HShift 225d @Rotate arrowright }
+    def nwarrow		{ 0.5w @VShift 0.5w @HShift 135d @Rotate arrowright }
+
+
+    ###################################################################
+    #                                                                 #
     #   Other symbols taken from TeX.                                 #
     #                                                                 #
     ###################################################################
@@ -804,14 +931,23 @@ def @Eq
     #                                                                 #
     ###################################################################
 
-    def del	{ gradient		}
-    def grad	{ gradient		}
-    def "..."	{ ellipsis		}
-    def ",...,"	{ , ellipsis ``` ,	}
-    def "'"	{ minute		}
-    def empty	{ emptyset		}
+    def del	{ gradient			}
+    def grad	{ gradient			}
+    def "..."	{ ellipsis			}
+    def ",...,"	{ , ellipsis ``` ,		}
+    def "'"	{ minute			}
+    def "''"	{ minute minute			}
+    def "'''"	{ minute minute minute		}
+    def "''''"	{ minute minute minute minute	}
+    def empty	{ emptyset			}
 
 
+
+    ###################################################################
+    #                                                                 #
+    #   Miscellaneous                                                 #
+    #                                                                 #
+    ###################################################################
 
     ###################################################################
     #                                                                 #
@@ -830,7 +966,7 @@ def @Eq
 	right y
     {
 	@HContract @VContract
-	{          | 0.45w @VShift @Smaller @HSqueeze y
+	{          | 0.45w @VShift @Smaller @HSqueeze @VSqueeze y
 	  ^/gap  x
 	}
     }
@@ -844,8 +980,9 @@ def @Eq
     {
 	@HContract @VContract
 	{
-	       x
-	  /gap    |  @Smaller @HSqueeze y
+	       # x
+	       "." @KernShrink x
+	  /gap    |  @Smaller @HSqueeze @VSqueeze y
 	}
     }
 
@@ -859,7 +996,7 @@ def @Eq
 	@HContract @VContract
 	{
 	       x
-	  /gap    |  &0io 0.3f @HShift @Smaller @HSqueeze y
+	  /gap    |  &0io 0.2f @HShift @Smaller @HSqueeze @VSqueeze y
 	}
     }
 
@@ -883,7 +1020,8 @@ def @Eq
 	named gap { @SupGap }
 	right y
     {
-	@Smaller @HSqueeze x ^/  / @Smaller @HSqueeze y 
+	@Smaller @HSqueeze @VSqueeze x ^/  /
+	@Smaller @HSqueeze @VSqueeze y 
     }
 
     def ton
@@ -893,7 +1031,8 @@ def @Eq
 	named gap { @SupGap }
 	right y
     {
-	@Smaller @HSqueeze x ^/  / &0io 0.3f @HShift @Smaller @HSqueeze y
+	@Smaller @HSqueeze @VSqueeze x ^/  /
+	&0io 0.3f @HShift @Smaller @HSqueeze @VSqueeze y
     }
 
     def frac
@@ -903,7 +1042,7 @@ def @Eq
 	named gap { 0.2f }
 	right y
     {
-	@HContract @VContract @Smaller @HSqueeze
+	@HContract @VContract @Smaller @HSqueeze @VSqueeze
 	{ 1w @VShift { x /gap } | fraction &0io | 0w @VShift { |gap y }
 	}
     }
@@ -935,7 +1074,7 @@ def @Eq
     {  
 	@HContract @VContract
 	{          |0.5rt x
-	   //gap   |0.5rt &skew @Smaller @HSqueeze y
+	   //gap   |0.5rt &skew @Smaller @HSqueeze @VSqueeze y
 	}
     }
 
@@ -948,7 +1087,7 @@ def @Eq
 	right y
     {
 	@HContract @VContract
-	{          |0.5rt &skew @Smaller @HSqueeze y
+	{          |0.5rt &skew @Smaller @HSqueeze @VSqueeze y
 	  ^//gap   |0.5rt x
 	}
     }
@@ -1053,7 +1192,7 @@ def @Eq
 	    @VScale surd | @OneRow
 	    {
 		@HLine line { "0.03 ft setlinewidth 2 setlinecap" }
-		^//gap  |gap  @VSqueeze @Strut x //gap
+		^//gap  |gap  @VSqueeze @Strut x # //gap
 	    }
 	}
     }
@@ -1124,12 +1263,26 @@ def @Eq
     def matrix
 	precedence 100
 	named gap { @MedGap }
+	named strut
+	    named no  { }
+	    named No  { }
+	    named yes { 0.5f }
+	    named Yes { 0.5f }
+	{ No }
 	named atleft {}
 	named atright {}
 	named userow { No }
 	named shiftdelim { Yes }
 	body x
     { 
+	def @Strut
+	{
+	    strut @Case {
+		"" @Yield {}
+		else @Yield { @OneRow { strut @High ^/ strut @High } }
+	    }
+	}
+
 	def newrow
 	    precedence 50
 	    associativity left
@@ -1137,8 +1290,8 @@ def @Eq
 	    right y
 	{
 	    x @Case {
-		"" @Yield { y }
-		else @Yield { x /@RowGap y }
+		"" @Yield { y | @Strut }
+		else @Yield { x /@RowGap y | @Strut }
 	    }
 	}
 
@@ -1151,8 +1304,8 @@ def @Eq
 	    right y
 	{
 	    x @Case {
-		"" @Yield { y }
-		else @Yield { x ^/@RowGap y }
+		"" @Yield { y | @Strut }
+		else @Yield { x ^/@RowGap y | @Strut }
 	    }
 	}
 
@@ -1235,7 +1388,7 @@ def @Eq
 	}
     }
 
-    macro pmatrix  { matrix atleft { (       } atright { )       } }
+    macro pmatrix  { matrix atleft { "1.5f" @Font ( } atright { "1.5f" @Font ) }}
     macro bmatrix  { matrix atleft { blbrack } atright { brbrack } }
     macro brmatrix { matrix atleft { blbrace } atright { brbrace } }
     macro fmatrix  { matrix atleft { blfloor } atright { brfloor } }
@@ -1245,3 +1398,5 @@ def @Eq
     Slope @Font { separate @SpaceGap } @Space 1f @ZUnit 1f @YUnit @Body
 
 @End @Eq                  
+
+macro @E { @OneCol @Eq }

@@ -1,6 +1,6 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -115,8 +115,8 @@ void FlushGalley(OBJECT hd)
   OBJECT dest_encl;		/* the VCAT or ACAT enclosing dest, if any   */
   int    dest_side;		/* if dest_encl != nilobj, side dest is on   */
   BOOLEAN need_adjust;		/* TRUE as soon as dest_encl needs adjusting */
-  LENGTH dest_back, dest_fwd;	/* the current size of dest_encl or dest     */
-  LENGTH frame_size;		/* the total constraint of dest_encl         */
+  FULL_LENGTH dest_back, dest_fwd; /* the current size of dest_encl or dest  */
+  FULL_LENGTH frame_size;	/* the total constraint of dest_encl         */
   OBJECT prec_gap;		/* the gap preceding dest if any else nilobj */
   OBJECT prec_def;		/* the component preceding dest, if any      */
   OBJECT succ_gap;		/* the gap following dest if any else nilobj */
@@ -125,7 +125,7 @@ void FlushGalley(OBJECT hd)
   BOOLEAN prnt_flush;		/* TRUE when the parent of hd needs a flush  */
   OBJECT zlink, z, tmp, prnt;  int attach_status;  BOOLEAN remove_target;
   OBJECT why;
-  LENGTH perp_back, perp_fwd;   /* current perp size of dest_encl            */
+  FULL_LENGTH perp_back, perp_fwd;  /* current perp size of dest_encl        */
 
   debug1(DGF, D, "[ FlushGalley %s (hd)", SymName(actual(hd)));
   prnt_flush = FALSE;
@@ -214,7 +214,7 @@ void FlushGalley(OBJECT hd)
 
 	  /* hd will be linked to the unexpanded target in this case */
 	  remove_target = (actual(actual(dest_index)) == whereto(hd));
-          if( actual(hd) != nilobj && force_target(actual(hd)) )
+          if( force_gall(hd) )
           {
             /* if hd is a forcing galley, close all predecessors */
 	    debug3(DGA, D, "  forcing ATTACH_NULL case for %s into %s (%s)",
@@ -250,8 +250,7 @@ void FlushGalley(OBJECT hd)
 
           /* if hd is a forcing galley, or actual(dest_index) is   */
 	  /* @ForceGalley, then close all predecessors             */
-          if( actual(hd) != nilobj && (force_target(actual(hd))
-	    || actual(actual(dest_index)) == ForceGalleySym) )
+          if( force_gall(hd) || actual(actual(dest_index)) == ForceGalleySym )
           { Parent(prnt, Up(dest_index));
 	    debug1(DGA, D, "  forcing ATTACH_ACCEPT case for %s",
 	      SymName(actual(hd)));
@@ -378,6 +377,7 @@ void FlushGalley(OBJECT hd)
       case GALL_TARG:
       case CROSS_PREC:
       case CROSS_FOLL:
+      case CROSS_FOLL_OR_PREC:
       case CROSS_TARG:
       case PAGE_LABEL_IND:
 
@@ -425,6 +425,7 @@ void FlushGalley(OBJECT hd)
 			  debug2(DOG, D, "FlushGalley(%s) de-optimizing %s",
 			    "(CLOSE problem)", SymName(actual(hd)));
 			}
+			debug1(DGF, D, "  reject (a) %s", EchoObject(y));
 			goto REJECT;
 	}
 	break;
@@ -450,6 +451,7 @@ void FlushGalley(OBJECT hd)
       case VEXPAND:
       case ROTATE:
       case SCALE:
+      case KERN_SHRINK:
       case INCGRAPHIC:
       case SINCGRAPHIC:
       case GRAPHIC:
@@ -459,6 +461,7 @@ void FlushGalley(OBJECT hd)
       case ROW_THR:
       case CLOSURE:
       case CROSS:
+      case FORCE_CROSS:
 
 	if( dim == ROWM )
 	{
@@ -526,7 +529,7 @@ void FlushGalley(OBJECT hd)
 		  ActualGap(fwd(prec_def, dim), back(y, dim),
 			fwd(y, dim), &gap(prec_gap), frame_size,
 			dest_back + dest_fwd - fwd(prec_def, dim));
-	    debug3(DGF, DD, "  b,f: %s,%s;   dest_encl: %s",
+	    debug3(DGF, D, "  b,f: %s,%s;   dest_encl: %s",
 			EchoLength(dest_back), EchoLength(f),
 			EchoConstraint(&dest_par_constr));
 
@@ -578,12 +581,13 @@ void FlushGalley(OBJECT hd)
 		else opt_comps_permitted(hd) = MAX_FILES;  /* a large number */
 		debug1(DOG, D, "  REJECT permitted = %2d", opt_comps_permitted(hd));
 	      }
+	      debug1(DGF, D, "  reject (b) %s", EchoObject(y));
 	      goto REJECT;
 	    }
 
 	    /* calculate perpendicular effect of adding y to dest */
-	    pb = max(perp_back, back(y, 1-dim));
-	    pf = max(perp_fwd,  fwd(y,  1-dim));
+	    pb = find_max(perp_back, back(y, 1-dim));
+	    pf = find_max(perp_fwd,  fwd(y,  1-dim));
 
 	    /* check new size against perpendicular constraint */
 	    if( !FitsConstraint(pb, pf, dest_perp_constr) )
@@ -594,6 +598,7 @@ void FlushGalley(OBJECT hd)
 		debug1(DOG, D, "FlushGalley(%s) de-optimizing (perp problem)",
 		  SymName(actual(hd)));
 	      }
+	      debug1(DGF, D, "  reject (c) %s", EchoObject(y));
 	      goto REJECT;
 	    }
 
@@ -658,7 +663,8 @@ void FlushGalley(OBJECT hd)
       if( dest_encl != nilobj )
         CopyConstraint(constraint(z), dest_par_constr);
       else
-        SetConstraint(constraint(z), MAX_LEN, MAX_LEN, MAX_LEN);
+        SetConstraint(constraint(z),
+	  MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
       Link(opt_constraints(hd), z);
       debug2(DOG, D, "FlushGalley(%s) empty adding constraint %s",
         SymName(actual(hd)), EchoConstraint(&constraint(z)));
@@ -674,7 +680,6 @@ void FlushGalley(OBJECT hd)
   REJECT:
   
     /* reject this component and move to a new dest */
-    debug1(DGF, D, "  reject %s", EchoObject(y));
     assert(actual(dest) != PrintSym, "FlushGalley: reject print!");
     if( inners != nilobj )  DisposeObject(inners);
     if( stop_link != nilobj )
@@ -714,7 +719,7 @@ void FlushGalley(OBJECT hd)
       /* get first ready galley in from cross reference database */
       Child(eg, Down(ready_galls(hd)));
       SwitchScope(nilobj);
-      val = ReadFromFile(eg_fnum(eg), eg_fpos(eg));
+      val = ReadFromFile(eg_fnum(eg), eg_fpos(eg), eg_lnum(eg));
       UnSwitchScope(nilobj);
       if( val == nilobj )
 	Error(20, 1, "error in database file %s",
@@ -723,25 +728,26 @@ void FlushGalley(OBJECT hd)
       New(index2, UNATTACHED);
       pinpoint(index2) = nilobj;
       New(hd2, HEAD);
-      limiter(hd2) = nilobj;
       FposCopy(fpos(hd2), fpos(val));
+      actual(hd2) = actual(val);
+      limiter(hd2) = nilobj;
       opt_components(hd2) = opt_constraints(hd2) = nilobj;
       gall_dir(hd2) = horiz_galley(actual(val));
-      actual(hd2) = actual(val);
-      foll_or_prec(hd2) = TargetSymbol(val, &whereto(hd2));
-      foll_or_prec(hd2) = GALL_FOLL;
       sized(hd2) = FALSE;
       ready_galls(hd2) = nilobj;
       must_expand(hd2) = TRUE;
       Link(index2, hd2);
       Link(hd2, val);
+      SetTarget(hd2);
+      foll_or_prec(hd2) = GALL_FOLL;
+      enclose_obj(hd2) = (has_enclose(actual(hd2)) ? BuildEnclose(hd2) : nilobj);
       Link(Up(y), index2);
 
       /* set up the next ready galley for reading next time */
       Child(tag, Down(eg));  Child(seq, LastDown(eg));
       do /* skip duplicate seq values */
-      {	found = DbRetrieveNext(OldCrossDb, &gall, &newsym,
-		 newtag, newseq, &eg_fnum(eg), &eg_fpos(eg), &eg_cont(eg));
+      {	found = DbRetrieveNext(OldCrossDb, &gall, &newsym, newtag, newseq,
+		&eg_fnum(eg), &eg_fpos(eg), &eg_lnum(eg), &eg_cont(eg));
 	debug2(DGF, DD, "  ext gall  found:   %15s  gall:    %15s",
 			bool(gall), bool(found));
 	debug2(DGF, DD, "  ext gall  new sym: %15s  old sym: %15s",
@@ -756,7 +762,7 @@ void FlushGalley(OBJECT hd)
 	/* *** new code for merging galleys whose seq strings are equal *** */
 	if( found && StringEqual(newseq, string(seq)) )
 	{ SwitchScope(nilobj);
-	  val = ReadFromFile(eg_fnum(eg), eg_fpos(eg));
+	  val = ReadFromFile(eg_fnum(eg), eg_fpos(eg), eg_lnum(eg));
 	  UnSwitchScope(nilobj);
 	  if( val == nilobj )
 	    Error(20, 2, "error in database file %s",
@@ -806,6 +812,7 @@ void FlushGalley(OBJECT hd)
     else if( type(y) == RECEPTIVE && trigger_externs(y) && AllowCrossDb )
     { OBJECT sym, cr, ins, tag, seq, eg, cnt;  BOOLEAN found;
       FULL_CHAR newseq[MAX_BUFF];  FILE_NUM tfnum;  long tfpos, tcont;
+      int tlnum;
       debug1(DGF, DD, "  ext gall target %s", SymName(actual(actual(y))));
       for( sym = FirstExternTarget(actual(actual(y)), &cnt);
 	     sym != nilobj;  sym = NextExternTarget(actual(actual(y)), &cnt) )
@@ -818,13 +825,14 @@ void FlushGalley(OBJECT hd)
 	Child(tag, LastDown(cr));
 	assert( is_word(type(tag)), "FlushGalley: cr is_word(type(tag))!" );
 	found = DbRetrieve(OldCrossDb, TRUE, sym, string(tag),
-		newseq, &tfnum, &tfpos, &tcont);
+		newseq, &tfnum, &tfpos, &tlnum, &tcont);
 	if( found )
 	{ if( ready_galls(hd) == nilobj )  New(ready_galls(hd), ACAT);
 	  New(eg, EXT_GALL);
 	  debug1(DGF, DD, "  ext gall retrieved: into %s", SymName(sym));
 	  eg_fnum(eg) = tfnum;
 	  eg_fpos(eg) = tfpos;
+	  eg_lnum(eg) = tlnum;
 	  eg_symbol(eg) = sym;
 	  eg_cont(eg) = tcont;
 	  tag = MakeWord(WORD, string(tag), no_fpos);

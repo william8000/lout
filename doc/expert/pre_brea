@@ -45,27 +45,33 @@ respect to the others (`ragged left');
 }
 
 @LI {
+2i @Wide { |1rt @Code oragged @@Break @I object }
+oragged.break @Index { @Code oragged @@Break }
+|2m The obvious combination of {@Code ragged} and {@Code outdent};
+}
+
+@LI {
 2i @Wide { |1rt @Code lines @@Break @I object }
 lines.break @Index { @Code lines @@Break }
 |2m Break the paragraphs of {@I object} into lines at the same points
-that they are broken into lines in the input; do not adjust the lines.  Any
-spaces at the start of a line other than the first will appear in the output;
+that they are broken into lines in the input, and also at concatenation
+symbols of the form {@Code "&"}{@I k}{@Code "b"} for any {@I k} greater
+than 1.  Do not adjust the lines.  Any spaces at the start of a line
+other than the first line will appear in the output;
 }
 
 @LI {
 2i @Wide { |1rt @Code clines @@Break @I object }
 clines.break @Index { @Code clines @@Break }
-|2m Break the paragraphs of {@I object} into lines at the same points
-that they are broken into lines in the input file, then centre each line with
-respect to the others;
+|2m Break the paragraphs of {@I object} into lines as for @Code "lines"
+@@Break, then centre each line with respect to the others;
 }
 
 @LI {
 2i @Wide { |1rt @Code rlines @@Break @I object }
 rlines.break @Index { @Code rlines @@Break }
-|2m Break the paragraphs of {@I object} into lines at the same points
-that they are broken into lines in the input file, then right-justify
-each line with respect to the others.
+|2m Break the paragraphs of {@I object} into lines as for @Code "lines"
+@@Break, then right-justify each line with respect to the others.
 }
 
 @EL

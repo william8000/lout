@@ -17,20 +17,17 @@ Lout is distributed free of charge under the GNU Public License.  The
 gnu. @Index { GNU Public License }
 primary source is directory
 @ID @Code "ftp://ftp.cs.su.oz.au/jeff/lout"
-in which may be found the main distribution, which is a gzipped tar file
-called @Code "lout.3.08.tar.gz" or similar, and various other things
-including a PostScript version of this manual.  The main distribution
-is redistributed on the @Code comp.sources.misc newsgroup, which is
-archived at several sites around the world.  The distribution contains
-source code, libraries, documentation, license, and installation
-instructions.  Distribution by uuencoded email is also available, from me.
+in which may be found a gzipped tar file containing the main distribution
+(currently {@Code "lout.3.11.tar.gz"}), and various other things including
+a PostScript version of this guide.  The distribution contains source code,
+libraries, documentation, license, and installation instructions.
 @PP
 A mailing list has been set up for discussion of all topics related to
-Lout.  To subscribe, send email to @Code "lout-request@niif.spb.su"
+Lout.  To subscribe, send email to @Code "lout-request@ptc.spbu.ru"
 containing the word @Code "subscribe" in the Subject line.  To post an
-item, send email to {@Code "lout@niif.spb.su"}; it will be forwarded to
+item, send email to {@Code "lout@ptc.spbu.ru"}; it will be forwarded to
 all subscribers via email.  To unsubscribe, send email to
-@Code "lout-request@niif.spb.su" containing the word @Code "unsubscribe"
+@Code "lout-request@ptc.spbu.ru" containing the word @Code "unsubscribe"
 in the Subject line.
 @PP
 Lout began in 1984 as a research project into the design of a high-level
@@ -49,12 +46,12 @@ research phase ended in October 1991 with the first public release of Lout.
 @PP
 Since then the system has been steadily improved and extended.  Optimal
 paragraph breaking and automatic hyphenation were copied from Donald
+knuth @Index { Knuth, D. E. }
+tex. @Index { @TeX }
 E. Knuth's @TeX system @Cite { $knuth1984tex }, and the optimal paragraph
 breaking algorithm was applied to the problem of producing optimal page
 breaks.  The first implementations of horizontal galleys and optimal
 page breaking were by my student Gabor Inokai.  The strongest
-knuth @Index { Knuth, D. E. }
-tex. @Index { @TeX }
 influence during this period has come from Lout's users; indeed the
 number of people who have offered comments and suggestions is so great
 that it is quite out of my power to acknowledge them individually.  I

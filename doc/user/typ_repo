@@ -16,6 +16,7 @@ file and the @Code "@Report" symbol:
 "    @Institution {}"
 "    @DateLine { No }"
 "    @CoverSheet { Yes }"
+"    @ContentsSeparate { No }"
 "    @InitialFont { Times Base 12p }"
 "    @InitialBreak { hyphen adjust 1.2fx }"
 "    @InitialSpace { lout }"
@@ -73,14 +74,26 @@ them here and avoid having your own setup file.  If you already have
 your own setup file, change them in either place and omit them in
 the other.
 @PP
-If the @Code "@CoverSheet" option is {@Code Yes}, an unnumbered cover
+If @Code "@CoverSheet" is {@Code Yes}, an unnumbered cover
 cover.sheet. @Index @Code "@CoverSheet"
 sheet will be produced containing the title, author, institution,
-abstract, and dateline.  Otherwise these things will appear on the
+abstract, and dateline.  Otherwise they will appear on the
 first page.
 @PP
-@Code "@InitialFont" is the font in which the bulk of the report will be
-set, and should contain a family, a face, and a size.  The default
+In order to get a table of contents, it is necessary to use your
+own setup file (Section {@NumberOf setup} explains how to do this)
+and to set the @Code "@MakeContents" option within it to
+{@Code Yes}.  The table of contents will ordinarily appear beginning
+on the first page, but if the @Code "@ContentsSeparate" option of
+@Code "@Report" is
+contents.separate @Index @Code "@ContentsSeparate"
+set to @Code "Yes" it will appear on separate pages.  This is only
+effective if @Code "@CoverSheet" is {@Code No}, since a separate cover
+sheet and separate pages for the table of contents would leave nothing on
+the first page.
+@PP
+@Code "@InitialFont" is the font of bulk of the report,
+and should contain a family, a face, and a size.  The default
 value selects the Times family, the Base face, and the 12 point size.
 @PP
 @Code "@InitialBreak" controls the behaviour of paragraph breaking in
@@ -124,7 +137,10 @@ overall situation and try to minimize the ugliness, using the @TeX
 optimal paragraph breaking algorithm.  It takes two runs to do this,
 with intermediate results stored in Lout's cross reference database
 (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.
+it, which might be wise after major changes.  It is possible for this
+page layout optimizer to cycle, never settling on a single final best
+version; this is usually caused by footnotes or floating figures inserted
+at points which end up near page boundaries.
 @PP
 After the compulsory {@Code "//"} comes an optional abstract:
 abstract. @Index @Code "@Abstract"
@@ -278,7 +294,7 @@ you can set them in either place as you prefer.  @Code
 "@ReferencesBeforeAppendices" determines whether the reference list is
 printed out before or after any appendices.  @Code "@AbstractWord"
 determines the value of the title of the abstract if none is given there;
-its default value, {@Code abstract}, prodcues `Abstract' in the current
+its default value, {@Code abstract}, produces `Abstract' in the current
 language.  @Code "@ContentsWord" is similar; its default value produces
 `Contents' in the current language.  The other four options
 control the appearance of sections, and there are similar options for
@@ -298,9 +314,12 @@ initial font.  A family name and size is acceptable here as well:
 produces section headings in the Helvetica font, two points larger
 than the initial font size.
 @PP
-@Code "@SectionGap" determines how much space is left blank between
-sections; the default value is twice the initial inter-line
-spacing.  @Code "@SectionInContents" determines whether or not an
+@Code "@SectionGap" determines how much space is left blank before each
+section title;  the default value shown above is twice the current
+inter-line spacing.  The special value @Code "2b" may be used to get a
+page break rather than a space.  There are similar options for other
+large-scale structure symbols, which determine how much space is left
+before each one.  @Code "@SectionInContents" determines whether or not an
 entry is made in the table of contents for each section; it may be
 @Code Yes or {@Code No}.
 @End @Section

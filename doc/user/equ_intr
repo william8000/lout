@@ -23,6 +23,7 @@ within it; the place to put them is clearly marked in all the standard
 setup files.
 @PP
 With the @Code "eq" file included, you may write
+eq. @Index { @Code "@Eq" }
 @ID @Code "@Eq { ... }"
 at any point in your document, and the symbols of @Code "@Eq" will be
 available between the braces.  Any symbols available outside continue
@@ -31,12 +32,18 @@ with other symbols, without restriction.
 @PP
 Equations may appear within a paragraph of text, or they may be
 displayed.  {@Code "@Eq"}'s job is to produce an object containing the
-equation; it neither knows nor cares where this equation goes.  To get
-an equation within a paragraph, simply place @Code "@Eq { ... }" at the
-desired point.  To prevent it spreading over two lines, use
-{@Code "@OneCol @Eq { ... }"}.  To display an equation, use a display
-symbol like @Code "@IndentedDisplay" or @Code "@CentredDisplay" 
-(Section {@NumberOf displays}).  For example,
+equation; it neither knows nor cares where this equation goes.
+@PP
+To get an equation within a paragraph, simply place @Code "@Eq { ... }"
+at the desired point.  To make the optimal paragraph breaker work hard to
+arrange the paragraph so that the equation does not spread over two
+lines, use {@Code "@OneCol @Eq { ... }"}.  This is needed so frequently
+that a symbol @Code "@E" is defined in @Code "eq" along with @Code "@Eq"
+e. @Index { @Code "@E" }
+which is an abbreviation for {@Code "@OneCol @Eq"}.
+@PP
+To display an equation, use a display symbol like @Code "@IndentedDisplay"
+or @Code "@CentredDisplay" (Section {@NumberOf displays}).  For example,
 @ID @Code "@CentredDisplay @Eq { int supp pi on 0 sin ` x = 0 }"
 produces
 @CentredDisplay @Eq { int supp pi on 0 sin ` x = 0 }

@@ -20,14 +20,14 @@ The @@Use symbol is an @@Open symbol in a
 different form.  It may only appear just after the definitions
 in Lout's input, and it is equivalent to enclosing the remainder of the
 input in an @@Open symbol.  For example,
-@ID {
+@ID @OneRow {
       @I definitions
 //1vx @Code "@Use" @Code "{" @I x @Code "}"
 //1vx @Code "@Use" @Code "{" @I y @Code "}"
 //1vx @I { rest of input }
 }
 is equivalent to
-@ID {
+@ID @OneRow {
       @I definitions
 //1vx @I x @Code "@Open"
 //1vx @Code "{" &4mt @I y @Code "@Open"

@@ -165,7 +165,7 @@ the document, and we do not want the literal word @Code "tan" to be
 taken as a symbol.
 @PP
 Next comes the symbol's precedence, in this case the same as @Code "sin" and
-@Code "cos" (see Section {@NumberOf figsummary} for the precedence of
+@Code "cos" (see Section {@NumberOf dia_summ} for the precedence of
 each symbol).  Next is a list of the formal parameters, in this case
 just one, called {@Code "x"}, that is to be passed on the right.
 @PP

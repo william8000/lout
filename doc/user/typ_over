@@ -88,7 +88,10 @@ overall situation and try to minimize the ugliness, using the @TeX
 optimal paragraph breaking algorithm.  It takes two runs to do this,
 with intermediate results stored in Lout's cross reference database
 (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.
+it, which might be wise after major changes.  It is possible for this
+page layout optimizer to cycle, never settling on a single final best
+version; this is usually caused by footnotes or floating figures inserted
+at points which end up near page boundaries.
 @PP
 After the compulsory {@Code "//"} come the overheads themselves.  There
 are two alternatives here:  you may either choose to make a simple

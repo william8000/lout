@@ -16,13 +16,13 @@ nearly all beginning with "unresolved cross reference".  These
 should gradually go away on later runs.  The following shows the
 error message output on the fifth run for Letter size printing:
 
-lout file "gra_summ" (from "gra" line 44, from "all.letter" line 37):
-     8,1: 23.0c object too high for 21.8c space; @Scale inserted
-lout file "cpp_tabs" (from "cpp" line 24, from "all.letter" line 38):
+lout file "gra_summ" (from "gra" line 44, from "all" line 37):
+     8,1: 23.5c object too high for 21.8c space; @Scale inserted
+lout file "cpp_tabs" (from "cpp" line 24, from "all" line 38):
    53,23: c2lout: C text ended inside a comment
    55,35: c2lout: C text ended inside a comment
-lout file "ap_qck" (from "all.letter" line 40):
-  155,25: 22.6c object too high for 21.8c space; @Scale inserted
+lout file "ap_qck" (from "all" line 40):
+  155,25: 22.6c object too high for 21.9c space; @Scale inserted
 
 The first and last point to two places where there are unbreakable
 displays which are slightly too large to fit on one page and so
@@ -31,10 +31,12 @@ page hence these messages do not appear when using A4 size.  The
 other two warnings point to two places where a C program text ended
 inside a comment, which in these cases was deliberate so is no problem.
 
+Optimal page breaking has been turned off for this document owing to
+repeated failure to converge, caused by footnotes and floating figures
+close to large unbreakable displays.
+
 A copy of the final PostScript output file (A4 paper size) is
-stored at "ftp://ftp.cs.su.oz.au/jeff/lout/lout.3.08.user.ps.gz".
+stored at "ftp://ftp.cs.su.oz.au/jeff/lout/lout.3.11.user.ps.gz".
 
 Jeffrey H. Kingston
-21 September 1994
-25 July 1995
-8 May 1996
+17 November 1997

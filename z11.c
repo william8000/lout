@@ -1,6 +1,6 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -122,7 +122,7 @@ void changespace(STYLE *style, OBJECT x)
       mode(space_gap(*style))  = mode(res_gap);
       width(space_gap(*style)) = gap_inc == GAP_ABS ? width(res_gap) :
 	     gap_inc == GAP_INC ? width(space_gap(*style)) + width(res_gap) :
-	     max(width(space_gap(*style)) - width(res_gap), 0);
+	     find_max(width(space_gap(*style)) - width(res_gap), 0);
     }
   }
   debug1(DSS, D, "SpaceChange returning %s", EchoStyle(style));
@@ -190,6 +190,8 @@ static void changebreak(STYLE *style, OBJECT x)
 	fill_style(*style) = FILL_ON, display_style(*style) = DISPLAY_CENTRE;
     else if( StringEqual(string(x), STR_BREAK_RRAGGED) )
 	fill_style(*style) = FILL_ON, display_style(*style) = DISPLAY_RIGHT;
+    else if( StringEqual(string(x), STR_BREAK_ORAGGED) )
+	fill_style(*style) = FILL_ON, display_style(*style) = DISPLAY_ORAGGED;
     else if( StringEqual(string(x), STR_BREAK_LINES) )
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_LEFT;
     else if( StringEqual(string(x), STR_BREAK_CLINES) )
@@ -209,7 +211,7 @@ static void changebreak(STYLE *style, OBJECT x)
       mode(line_gap(*style))  = mode(res_gap);
       width(line_gap(*style)) = gap_inc == GAP_ABS ? width(res_gap) :
 	gap_inc == GAP_INC ? width(line_gap(*style)) + width(res_gap) :
-	max(width(line_gap(*style)) - width(res_gap), 0);
+	find_max(width(line_gap(*style)) - width(res_gap), 0);
     }
   }
 } /* end changebreak */
@@ -265,7 +267,7 @@ void YUnitChange(STYLE *style, OBJECT x)
   else
   { if( gap_inc == GAP_ABS ) yunit(*style) = width(res_gap);
     else if( gap_inc == GAP_INC ) yunit(*style) += width(res_gap);
-    else yunit(*style) = max(yunit(*style) - width(res_gap), 0);
+    else yunit(*style) = find_max(yunit(*style) - width(res_gap), 0);
   }
 } /* end YUnitChange */
 
@@ -287,6 +289,6 @@ void ZUnitChange(STYLE *style, OBJECT x)
   else
   { if( gap_inc == GAP_ABS ) zunit(*style) = width(res_gap);
     else if( gap_inc == GAP_INC ) zunit(*style) += width(res_gap);
-    else zunit(*style) = max(zunit(*style) - width(res_gap), 0);
+    else zunit(*style) = find_max(zunit(*style) - width(res_gap), 0);
   }
 } /* end ZUnitChange */

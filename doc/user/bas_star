@@ -4,7 +4,7 @@
 @Begin
 @PP
 Suppose you want to produce the following little document:
-@CD @Box margin { 1.3c } 7c @Wide 9c @High {
+@CD @Box margin { 1.3c } 7.0c @Wide 9c @High {
 @Display @Heading { Introduction by W. J. Harvey }
 harvey.w.j @Index { Harvey, W. J. }
 For Virginia Woolf, @I Middlemarch was `the magnificent book
@@ -32,15 +32,13 @@ use the text editor of your choice to construct this text file:
 "@SysInclude { doc }"
 "@Doc @Text @Begin"
 "@Display @Heading { Introduction by W. J. Harvey }"
-"For Virginia Woolf, @I Middlemarch was `the magnificent book"
-"which for all its imperfections is one of the few English novels"
-"written for grown-up people.'"
+"For Virginia Woolf, @I Middlemarch was `the magnificent book which for all its"
+"imperfections is one of the few English novels written for grown-up people.'"
 "@PP"
-"She was, no doubt, thinking of George Eliot's unblinking but"
-"compassionate delineation of her characters, of the subtlety of"
-"psychological analysis and the maturity of moral comment which"
-"underlie this complex and varied novel of English provincial"
-"life in the early nineteenth century."
+"She was, no doubt, thinking of George Eliot's unblinking but compassionate"
+"delineation of her characters, of the subtlety of psychological analysis and"
+"the maturity of moral comment which underlie this complex and varied novel"
+"of English provincial life in the early nineteenth century."
 "@End @Text"
 }
 Comparing this with the finished form, it's easy to guess that
@@ -87,32 +85,28 @@ Some characters are symbols that produce special effects -- for
 example, @Code "{" and @Code "}" produce grouping -- and to turn off
 these effects the characters must be enclosed in double quotes:  @Code
 "\"{\"" produces "{".  The complete set of these special characters is
-@ID @Code "/    |    &    {    }    #    @    ^   ~"
-Section {@NumberOf characters} treats unusual characters in full detail,
-and you will need to read it before trying to produce @Code "\\" or
-@Code {"\""}.
+@ID @Code "/    |    &    {    }    #    @    ^   ~   \\   \""
+Section {@NumberOf characters} treats unusual characters in full detail.
 @PP
 Symbols like @Code "@Doc" and @Code "@Text" must be separated from
 each other by one or more spaces, otherwise Lout will think they are part
 of one symbol.  See Section {@NumberOf spaces} for the details.
 @PP
-People familiar with other document formatting systems might expect that
-leaving a blank line would cause Lout to start a new paragraph; but
-this is not so, you must use a paragraph symbol.  Lout will ordinarily
-take notice of how many spaces you type between words (Section
-{@NumberOf spaces}, but it is willing to mimic the spacing rules of two
-other systems, troff and @TeX, if you prefer (Section {@NumberOf white}).
+People familiar with other systems might expect that leaving a blank line would
+cause Lout to start a new paragraph; but this is not so, you must use a
+paragraph symbol.  Lout will ordinarily take notice of how many spaces you type
+between words (Section {@NumberOf spaces}), but it will mimic the spacing rules
+of two other systems, troff and @TeX, if you prefer (Section {@NumberOf white}).
 @PP
 When Lout runs, you might see some error messages beginning with
 error.messages @Index { error messages }
 `unresolved cross reference' -- not on file @Code "intro" above, but on
 more complicated ones (anything with a footnote, for example).  These
-are nothing to worry about; they just mean that you have to run the
-@Code "lout" command again to finish off the complicated things
-(Section {@NumberOf cross}), and they will gradually go away.  Of
-course, if you see error messages about missing braces, unknown
-symbols, and so on, you need to revise your file.  Lout will tell
-you the line number of the problem, and how far along the line it is.
+just mean that you have to run the @Code "lout" command again to finish off
+the complicated things (Section {@NumberOf cross}), and they will gradually
+go away.  Of course, if you see error messages about missing braces, unknown
+symbols, and so on, you need to revise your file.  Lout will tell you the
+line number of the problem, and how far along the line it is.
 @PP
 @BI { WARNING: }  Lout allows documents to cause arbitrary system commands
 to be executed.  These typically do useful things such as format computer
@@ -130,6 +124,5 @@ file contains malicious code, since the document may direct Lout to include
 arbitrary PostScript code in the output.  The safe execution of PostScript
 programs is a matter for PostScript interpreters, not for Lout.  For example,
 the popular Ghostview program has a @Code "-safer" command line option,
-which is rumoured to disable unsafe PostScript features, although the
-manual entry available to the author does not say so.
+which is rumoured to disable unsafe PostScript features.
 @End @Section

@@ -1,6 +1,6 @@
 /*@z30.c:Symbol uses:InsertUses()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -50,7 +50,8 @@ void InsertUses(OBJECT x, OBJECT y)
     base_uses(x) = tmp;
   }
   if( is_par(type(y)) )
-  { uses_count(y) += (enclosing(y) == x ? 1 : 2);
+  {
+    uses_count(y) += (enclosing(y) == x ? 1 : 2);
     if( dirty(y) || uses_count(y) > 1 )  dirty(enclosing(y)) = TRUE;
   }
   else if( sym_body(y) == nilobj || dirty(y) )  dirty(x) = TRUE;

@@ -1,6 +1,6 @@
 /*@z03.c:File Service:Declarations, no_fpos@******************************** */
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -40,7 +40,9 @@
 
 #define	file_number(x)	word_font(x)		/* file number of file x     */
 #define	type_of_file(x) word_colour(x)		/* type of file x            */
+#define	used_suffix(x)	word_hyph(x)		/* file needs .lt suffix     */
 #define	updated(x)	fwd(x, COLM)		/* TRUE when x is updated    */
+#define	line_count(x)	fwd(x, ROWM)		/* number of lines written   */
 #define	path(x)		back(x, COLM)		/* search path for file x    */
 
 
@@ -223,10 +225,8 @@ void InitFiles(void)
 /*                                                                           */
 /*****************************************************************************/
 
-void AddToPath(int fpath, FULL_CHAR *dirname)
-{ OBJECT x;
-  x = MakeWord(WORD, dirname, no_fpos);
-  Link(file_path[fpath], x);
+void AddToPath(int fpath, OBJECT dirname)
+{ Link(file_path[fpath], dirname);
 } /* end AddToPath */
 
 
@@ -244,7 +244,7 @@ FILE_POS *xfpos, int ftype, int fpath)
 { register int i;
   OBJECT fname;
   assert( ftype < MAX_TYPES, "DefineFile: ftype!" );
-  debug5(DFS, D, "DefineFile(%s, %s,%s, %s, %d)",
+  debug5(DFS, DD, "DefineFile(%s, %s,%s, %s, %d)",
     str, suffix, EchoFilePos(xfpos), file_types[ftype], fpath);
   if( ftype == SOURCE_FILE && (i = StringLength(str)) >= 3 )
   {
@@ -262,9 +262,11 @@ FILE_POS *xfpos, int ftype, int fpath)
   Link(file_type[ftype], fname);
   path(fname) = fpath;
   updated(fname) = FALSE;
+  line_count(fname) = 0;
   type_of_file(fname) = ftype;
+  used_suffix(fname) = FALSE;
   ftab_insert(fname, &file_tab);
-  debug1(DFS, D, "DefineFile returning %s", string(fname));
+  debug1(DFS, DD, "DefineFile returning %s", string(fname));
   ifdebug(DFS, DD, ftab_debug(file_tab, stderr));
   return file_number(fname);
 } /* end DefineFile */
@@ -281,14 +283,14 @@ FILE_POS *xfpos, int ftype, int fpath)
 FILE_NUM FirstFile(int ftype)
 { FILE_NUM i;
   OBJECT link, y;
-  debug1(DFS, D, "FirstFile( %s )", file_types[ftype]);
+  debug1(DFS, DD, "FirstFile( %s )", file_types[ftype]);
   link = Down(file_type[ftype]);
   if( type(link) == ACAT )  i = NO_FILE;
   else
   { Child(y, link);
     i = file_number(y);
   }
-  debug1(DFS, D, "FirstFile returning %s", i==NO_FILE ? STR_NONE : FileName(i));
+  debug1(DFS, DD, "FirstFile returning %s", i==NO_FILE ? STR_NONE : FileName(i));
   return i;
 } /* end FirstFile */
 
@@ -303,14 +305,14 @@ FILE_NUM FirstFile(int ftype)
 
 FILE_NUM NextFile(FILE_NUM i)
 { OBJECT link, y;
-  debug1(DFS, D, "NextFile( %s )", FileName(i));
+  debug1(DFS, DD, "NextFile( %s )", FileName(i));
   link = NextDown(Up(ftab_num(file_tab, i)));
   if( type(link) == ACAT )  i = NO_FILE;
   else
   { Child(y, link);
     i = file_number(y);
   }
-  debug1(DFS, D, "NextFile returning %s", i==NO_FILE ? STR_NONE : FileName(i));
+  debug1(DFS, DD, "NextFile returning %s", i==NO_FILE ? STR_NONE : FileName(i));
   return i;
 } /* end NextFile */
 
@@ -326,14 +328,14 @@ FILE_NUM NextFile(FILE_NUM i)
 FILE_NUM FileNum(FULL_CHAR *str, FULL_CHAR *suffix)
 { register int i;  OBJECT fname;
   FULL_CHAR buff[MAX_BUFF];
-  debug2(DFS, D, "FileNum(%s, %s)", str, suffix);
+  debug2(DFS, DD, "FileNum(%s, %s)", str, suffix);
   if( StringLength(str) + StringLength(suffix) >= MAX_BUFF )
     Error(3, 6, "file name %s%s is too long", FATAL, no_fpos, str, suffix);
   StringCopy(buff, str);
   StringCat(buff, suffix);
   fname = ftab_retrieve(buff, file_tab);
   i = fname == nilobj ? NO_FILE : file_number(fname);
-  debug1(DFS, D, "FileNum returning %s",
+  debug1(DFS, DD, "FileNum returning %s",
     i == NO_FILE ? STR_NONE : FileName( (FILE_NUM) i));
   return (FILE_NUM) i;
 } /* end FileNum */
@@ -350,6 +352,8 @@ FILE_NUM FileNum(FULL_CHAR *str, FULL_CHAR *suffix)
 FILE_NUM DatabaseFileNum(FILE_POS *xfpos)
 { OBJECT x;
   FILE_NUM fnum;  FULL_CHAR *str;
+  debug2(DFS, D, "DatabaseFileNum(%s %s)", EchoFilePos(xfpos),
+    EchoFileSource(file_num(*xfpos)));
   x = ftab_num(file_tab, file_num(*xfpos));
   switch( type_of_file(x) )
   {
@@ -360,7 +364,7 @@ FILE_NUM DatabaseFileNum(FILE_POS *xfpos)
       str = FileName(file_num(*xfpos));
       fnum = FileNum(str, DATA_SUFFIX);
       if( fnum == NO_FILE )
-      { debug0(DFS, D, "  calling DefineFile from DatabaseFileNum");
+      { debug0(DFS, DD, "  calling DefineFile from DatabaseFileNum");
 	fnum = DefineFile(str, DATA_SUFFIX, xfpos, DATABASE_FILE, SOURCE_PATH);
       }
       break;
@@ -368,8 +372,21 @@ FILE_NUM DatabaseFileNum(FILE_POS *xfpos)
 
     case DATABASE_FILE:
 
-      /* return the same database file */
-      fnum = file_num(*xfpos);
+      /* return the enclosing source file (recursively if necessary) */
+      if( file_num(fpos(x)) == NO_FILE )
+      {
+	/* xfpos lies in a cross-reference database file; use itself */
+	/* ***
+	Error(3, 18, "DatabaseFileNum: database file position unknown",
+	  INTERN, no_fpos);
+	*** */
+	fnum = file_num(*xfpos);
+      }
+      else
+      {
+	/* xfpos lies in a user-defined database file; use its source */
+        fnum = DatabaseFileNum(&fpos(x));
+      }
       break;
 
 
@@ -390,6 +407,8 @@ FILE_NUM DatabaseFileNum(FILE_POS *xfpos)
       break;
 
   }
+  debug2(DFS, D, "DatabaseFileNum returning %d (%s)", fnum,
+    fnum == NO_FILE ? AsciiToFull("NO_FILE") : FileName(fnum));
   return fnum;
 } /* end DatabaseFileNum */
  
@@ -397,9 +416,13 @@ FILE_NUM DatabaseFileNum(FILE_POS *xfpos)
 /*@::FileName(), EchoFilePos(), PosOfFile()@**********************************/
 /*                                                                           */
 /*  FULL_CHAR *FileName(fnum)                                                */
+/*  FULL_CHAR *FullFileName(fnum)                                            */
 /*                                                                           */
 /*  Return the string name of this file.  This is as given to DefineFile     */
 /*  until OpenFile is called, after which it is the full path name.          */
+/*                                                                           */
+/*  FullFileName is the same except it will add a .lt to the file name       */
+/*  if that was needed when the file was opened for reading.                 */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -412,6 +435,29 @@ FULL_CHAR *FileName(FILE_NUM fnum)
 } /* end FileName */
 
 
+FULL_CHAR *FullFileName(FILE_NUM fnum)
+{ OBJECT x;
+  static FULL_CHAR ffbuff[2][MAX_BUFF];
+  static int ffbp = 1;
+
+  x = ftab_num(file_tab, fnum);
+  assert( x != nilobj, "FileName: x == nilobj!" );
+  if( used_suffix(x) )
+  {
+    if( Down(x) != x )  Child(x, Down(x));
+    ffbp = (ffbp + 1) % 2;
+    StringCopy(ffbuff[ffbp], string(x));
+    StringCat(ffbuff[ffbp], SOURCE_SUFFIX);
+    return ffbuff[ffbp];
+  }
+  else
+  {
+    if( Down(x) != x )  Child(x, Down(x));
+    return string(x);
+  }
+} /* end FullFileName */
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  FULL_CHAR *EchoFilePos(pos)                                              */
@@ -420,7 +466,7 @@ FULL_CHAR *FileName(FILE_NUM fnum)
 /*                                                                           */
 /*****************************************************************************/
 
-static FULL_CHAR buff[2][MAX_BUFF];  static bp = 1;
+static FULL_CHAR buff[2][MAX_BUFF];  static int bp = 1;
 
 static void append_fpos(FILE_POS *pos)
 { OBJECT x;
@@ -432,7 +478,7 @@ static void append_fpos(FILE_POS *pos)
       Error(3, 9, "file position %s... is too long to print",
         FATAL, no_fpos, buff[bp]);
     StringCat(buff[bp], STR_SPACE);
-    StringCat(buff[bp], STR_DIRECTORY);
+    StringCat(buff[bp], STR_DIR);
   }
   if( StringLength(buff[bp]) + StringLength(string(x)) + 13 >= MAX_BUFF )
     Error(3, 10, "file position %s... is too long to print",
@@ -453,6 +499,24 @@ FULL_CHAR *EchoFilePos(FILE_POS *pos)
 { bp = (bp + 1) % 2;
   StringCopy(buff[bp], STR_EMPTY);
   if( file_num(*pos) > 0 )  append_fpos(pos);
+  return buff[bp];
+} /* end EchoFilePos */
+
+FULL_CHAR *EchoAltFilePos(FILE_POS *pos)
+{
+  bp = (bp + 1) % 2;
+  StringCopy(buff[bp], STR_EMPTY);
+  if( file_num(*pos) > 0 )
+  {
+    /* *** x = ftab_num(file_tab, file_num(*pos)); *** */
+    StringCat(buff[bp], FullFileName(file_num(*pos)));
+    if( line_num(*pos) != 0 )
+    { StringCat(buff[bp], AsciiToFull(":"));
+      StringCat(buff[bp], StringInt( (int) line_num(*pos)));
+      StringCat(buff[bp], AsciiToFull(":"));
+      StringCat(buff[bp], StringInt( (int) col_num(*pos)));
+    }
+  }
   return buff[bp];
 } /* end EchoFilePos */
 
@@ -481,9 +545,9 @@ FULL_CHAR *EchoFileSource(FILE_NUM fnum)
     StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 9, "file")));
     /* for estrip's benefit: Error(3, 12, "file"); */
     StringCat(buff[bp], STR_SPACE);
-    x = ftab_num(file_tab, fnum);
+    /* *** x = ftab_num(file_tab, fnum); *** */
     StringCat(buff[bp], STR_QUOTE);
-    StringCat(buff[bp], string(x));
+    StringCat(buff[bp], FullFileName(fnum));
     StringCat(buff[bp], STR_QUOTE);
     if( file_num(fpos(x)) > 0 )
     { StringCat(buff[bp], AsciiToFull(" ("));
@@ -564,14 +628,20 @@ FILE_POS *PosOfFile(FILE_NUM fnum)
 /*  Also return the full path name in object *full_name if different from    */
 /*  the existing name, else nilobj.                                          */
 /*                                                                           */
+/*  Set *used_source_suffix to TRUE if the .lt source suffix had to be       */
+/*  added in order to find the file.                                         */
+/*                                                                           */
 /*****************************************************************************/
 
 static FILE *SearchPath(FULL_CHAR *str, OBJECT fpath, BOOLEAN check_ld,
-BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
+BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode,
+BOOLEAN *used_source_suffix)
 { FULL_CHAR buff[MAX_BUFF], buff2[MAX_BUFF];
-  OBJECT link, y, path;  FILE *fp, *fp2;
+  OBJECT link, y, cpath;  FILE *fp, *fp2;
   debug4(DFS, DD, "SearchPath(%s, %s, %s, %s, -)", str, EchoObject(fpath),
 	bool(check_ld), bool(check_lt));
+
+  *used_source_suffix = FALSE;
 
   /* if file name is "stdin" just return it */
   if( StringEqual(str, STR_STDIN) )
@@ -582,11 +652,11 @@ BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
   }
 
   /* use fpath if relative file name, use empty_path if absolute filename */
-  path = StringBeginsWith(str, STR_DIRECTORY) ? empty_path : fpath;
+  cpath = StringBeginsWith(str, STR_DIR) ? empty_path : fpath;
 
   /* try opening each path name in the search path */
   fp = null;
-  for( link = Down(path);  fp == null && link != path;  link = NextDown(link) )
+  for( link = Down(cpath);  fp == null && link != cpath;  link = NextDown(link) )
   { Child(y, link);
 
     /* set buff to the full path name */
@@ -594,12 +664,12 @@ BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
     { StringCopy(buff, str);
     }
     else
-    { if( StringLength(string(y)) + StringLength(STR_DIRECTORY) +
+    { if( StringLength(string(y)) + StringLength(STR_DIR) +
 	  StringLength(str) >= MAX_BUFF )
 	Error(3, 15, "file path name %s%s%s is too long",
-	  FATAL, &fpos(y), string(y), STR_DIRECTORY, str);
+	  FATAL, &fpos(y), string(y), STR_DIR, str);
       StringCopy(buff, string(y));
-      StringCat(buff, STR_DIRECTORY);
+      StringCat(buff, STR_DIR);
       StringCat(buff, str);
     }
 
@@ -617,7 +687,7 @@ BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
         debug1(DFS, DD, fp2 == null ? "  fail %s" : "  succeed %s", buff2);
         if( fp2 != null )
         { fclose(fp2);
-	  debug0(DFS, D, "SearchPath returning null (adjacent .ld file)");
+	  debug0(DFS, DD, "SearchPath returning null (adjacent .ld file)");
 	  *full_name = nilobj;
 	  return null;
         }
@@ -643,18 +713,18 @@ BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
       StringCopy(buff2, buff);
       StringCopy(&buff2[StringLength(buff2) - StringLength(INDEX_SUFFIX)],
 	DATA_SUFFIX);
-      debug2(DFS, D, "SearchPath comparing dates of .li %s and .ld %s",
+      debug2(DFS, DD, "SearchPath comparing dates of .li %s and .ld %s",
 	buff, buff2);
       if( stat( (char *) buff, &indexstat) == 0 &&
 	  stat( (char *) buff2, &datastat) == 0 )
       {
-	debug2(DFS, D, "SearchPath mtimes are .li %d and .ld %d",
+	debug2(DFS, DD, "SearchPath mtimes are .li %d and .ld %d",
 	  (int) indexstat.st_mtime, (int) datastat.st_mtime);
 	if( datastat.st_mtime > indexstat.st_mtime )
 	{ fclose(fp);
-	  debug1(DFS, D, "SearchPath calling StringRemove(%s)", buff);
+	  debug1(DFS, DD, "SearchPath calling StringRemove(%s)", buff);
 	  StringRemove(buff);
-	  debug0(DFS, D, "SearchPath returning null (.li out of date)");
+	  debug0(DFS, DD, "SearchPath returning null (.li out of date)");
 	  *full_name = nilobj;
 	  return null;
 	}
@@ -673,6 +743,7 @@ BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
       { if( fp != null )
 	  Error(3, 16, "files %s and %s both exist", FATAL, xfpos,buff,buff2);
 	fp = fp2;
+	*used_source_suffix = TRUE;
       }
     }
 
@@ -697,15 +768,15 @@ BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
 /*  .li file is out of date wrt the .ld file, it is to be removed.           */
 /*                                                                           */
 /*  If check_lt is TRUE, it means that the file to be opened is a source     */
-/*  file and OpenFile() is required to check for a .lout suffix version      */
+/*  file and OpenFile() is required to check for a .lt suffix version        */
 /*  if the file does not open without it.                                    */
 /*                                                                           */
 /*****************************************************************************/
 
 FILE *OpenFile(FILE_NUM fnum, BOOLEAN check_ld, BOOLEAN check_lt)
-{ FILE *fp;  OBJECT fname, full_name, y;
+{ FILE *fp;  OBJECT fname, full_name, y;  BOOLEAN used_source_suffix;
   ifdebug(DPP, D, ProfileOn("OpenFile"));
-  debug2(DFS, D, "OpenFile(%s, %s)", FileName(fnum), bool(check_ld));
+  debug2(DFS, DD, "OpenFile(%s, %s)", FileName(fnum), bool(check_ld));
   fname = ftab_num(file_tab, fnum);
   if( Down(fname) != fname )
   { Child(y, Down(fname));
@@ -714,11 +785,13 @@ FILE *OpenFile(FILE_NUM fnum, BOOLEAN check_ld, BOOLEAN check_lt)
   }
   else
   { fp = SearchPath(string(fname), file_path[path(fname)], check_ld,
-	   check_lt, &full_name, &fpos(fname), file_mode[type_of_file(fname)]);
+	   check_lt, &full_name, &fpos(fname), file_mode[type_of_file(fname)],
+	   &used_source_suffix);
     if( full_name != nilobj )  Link(fname, full_name);
+    used_suffix(fname) = used_source_suffix;
   }
   ifdebug(DPP, D, ProfileOff("OpenFile"));
-  debug1(DFS, D, "OpenFile returning (fp %s null)", fp==null ? "==" : "!=");
+  debug1(DFS, DD, "OpenFile returning (fp %s null)", fp==null ? "==" : "!=");
   return fp;
 } /* end OpenFile */
 
@@ -738,11 +811,12 @@ static char *compress_suffixes[MAX_COMPRESSED]
 
 FILE *OpenIncGraphicFile(FULL_CHAR *str, unsigned char typ,
 OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
-{ FILE *fp;  int p, i;
-  debug2(DFS, D, "OpenIncGraphicFile(%s, %s, -)", str, Image(typ));
+{ FILE *fp;  int p, i;  BOOLEAN used_source_suffix;
+  debug2(DFS, DD, "OpenIncGraphicFile(%s, %s, -)", str, Image(typ));
   assert( typ == INCGRAPHIC || typ == SINCGRAPHIC, "OpenIncGraphicFile!" );
   p = (typ == INCGRAPHIC ? INCLUDE_PATH : SYSINCLUDE_PATH);
-  fp = SearchPath(str, file_path[p], FALSE, FALSE, full_name,xfpos,READ_TEXT);
+  fp = SearchPath(str, file_path[p], FALSE, FALSE, full_name, xfpos,
+	READ_TEXT, &used_source_suffix);
   if( *full_name == nilobj )  *full_name = MakeWord(WORD, str, xfpos);
 
   /* if file is compressed, uncompress it into file LOUT_EPS */
@@ -769,7 +843,7 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
   }
   else *compressed = FALSE;
 
-  debug2(DFS, D, "OpenIncGraphicFile returning (fp %s null, *full_name = %s)",
+  debug2(DFS, DD, "OpenIncGraphicFile returning (fp %s null, *full_name = %s)",
     fp==null ? "==" : "!=", string(*full_name));
   return fp;
 } /* end OpenIncGraphicFile */
@@ -777,15 +851,37 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  FileSetUpdated(fnum)                                                     */
+/*  FileSetUpdated(fnum, newlines)                                           */
 /*                                                                           */
-/*  Declare that file fnum has been updated.                                 */
+/*  Declare that file fnum has been updated, and that it now contains        */
+/*  newlines lines.                                                          */
 /*                                                                           */
 /*****************************************************************************/
 
-void FileSetUpdated(FILE_NUM fnum)
-{ updated(ftab_num(file_tab, fnum)) = TRUE;
+void FileSetUpdated(FILE_NUM fnum, int newlines)
+{ 
+  debug2(DFS, DD, "FileSetUpdated(%s, %d)", FileName(fnum), newlines);
+  updated(ftab_num(file_tab, fnum)) = TRUE;
+  line_count(ftab_num(file_tab, fnum)) = newlines;
+  debug0(DFS, DD, "FileSetUpdated returning");
 } /* end FileSetUpdated */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  int FileGetLineCount(FILE_NUM fnum)                                      */
+/*                                                                           */
+/*  Return the number of lines so far written to file fnum.                  */
+/*                                                                           */
+/*****************************************************************************/
+
+int FileGetLineCount(FILE_NUM fnum)
+{ int res;
+  debug1(DFS, DD, "FileGetLineCount(%s)", FileName(fnum));
+  res = line_count(ftab_num(file_tab, fnum));
+  debug1(DFS, DD, "FileGetLineCount returning %d", res);
+  return res;
+} /* end FileGetLineCount */
 
 
 /*****************************************************************************/

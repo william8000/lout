@@ -1,6 +1,6 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -135,7 +135,7 @@ void PopScope(void)
 /*  SuppressVisible()                                                        */
 /*  UnSuppressVisible()                                                      */
 /*                                                                           */
-/*  Suppress all scopes (so that all calls to SearchSym fail); and undo it.  */
+/*  Make all children of any symbol acceptable, not just the exported ones.  */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -225,6 +225,32 @@ void BodyParNotAllowed(void)
 } /* end BodyParNotAllowed */
 
 
+/*****************************************************************************/
+/*                                                                           */
+/*  DebugScope(void)                                                         */
+/*                                                                           */
+/*  Debug print of current scope stack                                       */
+/*                                                                           */
+/*****************************************************************************/
+
+void DebugScope(void)
+{ int i;
+  if( suppress_scope )
+  {
+    debug0(DST, D, "suppressed");
+  }
+  else for( i = 0;  i < scope_top;  i++ )
+  { debug6(DST, D, "%s %s%s%s%s%s",
+      i == scope_top - 1 ? "->" : "  ",
+      SymName(scope[i]),
+      npars_only[i] ? " npars_only" : "",
+      vis_only[i]   ? " vis_only"   : "",
+      body_ok[i]    ? " body_ok"    : "",
+      i == scope_top - 1 && suppress_visible ? " suppress_visible" : "");
+  }
+} /* end DebugScope */
+
+
 /*@::InsertSym()@*************************************************************/
 /*                                                                           */
 /*  OBJECT InsertSym(str, xtype, xfpos, xprecedence, indefinite, xrecursive, */
@@ -243,7 +269,7 @@ unsigned char xprecedence, BOOLEAN xindefinite, BOOLEAN xrecursive,
 unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
 { register int sum, rlen;
   register unsigned char *x;
-  OBJECT p, q, s, link, entry, plink;  int len;
+  OBJECT p, q, s, tmp, link, entry, plink;  int len;
 
   debug3(DST, DD, "InsertSym( %s, %s, in %s )",
 	Image(xtype), str, SymName(xenclosing));
@@ -255,6 +281,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   has_body(s)          = FALSE;
   filter(s)            = nilobj;
   use_invocation(s)    = nilobj;
+  imports(s)           = nilobj;
   right_assoc(s)       = TRUE;
   precedence(s)        = xprecedence;
   indefinite(s)        = xindefinite;
@@ -271,6 +298,8 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   visible(s)           = FALSE;
   uses_galley(s)       = FALSE;
   horiz_galley(s)      = ROWM;
+  has_compulsory(s)    = 0;
+  is_compulsory(s)     = FALSE;
 
   uses_count(s)  = 0;
   dirty(s)       = FALSE;
@@ -284,6 +313,22 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   if( type(s) == LPAR )  has_lpar(enclosing(s)) = TRUE;
   if( type(s) == RPAR )  has_rpar(enclosing(s)) = TRUE;
 
+  /* assign a code letter between a and z to any NPAR symbol */
+  if( type(s) == NPAR )
+  { if( LastDown(enclosing(s)) != enclosing(s) )
+    { Child(tmp, LastDown(enclosing(s)));
+      if( type(tmp) == NPAR )
+      { if( npar_code(tmp) == 'z' || npar_code(tmp) == ' ' )
+	  npar_code(s) = ' ';
+	else
+	  npar_code(s) = npar_code(tmp)+1;
+      }
+      else
+	npar_code(s) = 'a';
+    }
+    else npar_code(s) = 'a';
+  }
+
   has_target(s)  = FALSE;
   force_target(s) = FALSE;
   if( !StringEqual(str, KW_TARGET) ) is_target(s) = FALSE;
@@ -291,7 +336,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   { is_target(s) = has_target(enclosing(s)) = TRUE;
 
     /* if @Target is found after @Key, take note of external target */
-    if( has_key(enclosing(s)) && xbody != nilobj && type(xbody) == CROSS )
+    if( has_key(enclosing(s)) && xbody != nilobj && is_cross(type(xbody)) )
     { if( LastDown(xbody) != Down(xbody) )
       { OBJECT sym;
 	Child(sym, Down(xbody));
@@ -307,6 +352,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   has_key(s) = is_key(s) = FALSE;
   has_optimize(s) = is_optimize(s) = FALSE;
   has_merge(s) = is_merge(s) = FALSE;
+  has_enclose(s) = is_enclose(s) = FALSE;
   if( enclosing(s) != nilobj && type(enclosing(s)) == LOCAL )
   {
     if( StringEqual(str, KW_TAG) )
@@ -321,7 +367,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
       /* if @Key is found after @Target, take note of external target */
       for( link=Down(enclosing(s));  link!=enclosing(s);  link=NextDown(link) )
       { Child(p, link);
-	if( is_target(p) && sym_body(p) != nilobj && type(sym_body(p))==CROSS )
+	if( is_target(p) && sym_body(p)!=nilobj && is_cross(type(sym_body(p))) )
 	{ OBJECT sym;
 	  Child(sym, Down(sym_body(p)));
 	  if( type(sym) == CLOSURE )
@@ -334,6 +380,9 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
 
     if( StringEqual(str, KW_MERGE) )
       is_merge(s) = has_merge(enclosing(s)) = TRUE;
+
+    if( StringEqual(str, KW_ENCLOSE) )
+      is_enclose(s) = has_enclose(enclosing(s)) = TRUE;
   }
 
   if( StringEqual(str, KW_FILTER) )
@@ -412,16 +461,26 @@ OBJECT SearchSym(FULL_CHAR *str, int len)
     { x = str;  y = string(p);
       do; while( *x++ == *y++ && --rlen );
       if( rlen == 0 )
-      {	s = scope_top;
+      {
+	debug1(DST, DDD, "  found %s", string(p));
+	s = scope_top;
 	do
 	{ s--;
 	  for( link = Down(p);  link != p;  link = NextDown(link) )
 	  { Child(q, link);
+	    { debugcond4(DST, DDD, enclosing(q) == scope[s],
+	       "  !npars_only[s] = %s, !vis_only[s] = %s, body_ok[s] = %s, !ss = %s",
+	       bool(!npars_only[s]), bool(!vis_only[s]), bool(body_ok[s]),
+	       bool(!suppress_scope));
+	    }
 	    if( enclosing(q) == scope[s]
 	      && (!npars_only[s] || type(q) == NPAR)
 	      && (!vis_only[s] || visible(q) || suppress_visible )
-	      && (body_ok[s] || type(q)!=RPAR || !has_body(enclosing(q)) )
-	      && !suppress_scope )
+	      && (body_ok[s] || type(q)!=RPAR || !has_body(enclosing(q))
+		  || suppress_visible )
+	      && (!suppress_scope || StringEqual(string(p), KW_INCLUDE) ||
+				     StringEqual(string(p), KW_SYSINCLUDE))
+	    )
 	    {	debug1(DST, DDD, "SearchSym returning %s", Image(type(q)));
 		return q;
 	    }
@@ -502,6 +561,27 @@ OBJECT ChildSym(OBJECT s, unsigned typ)
   }
   Error(29, 10, "symbol %s has missing %s", FATAL, &fpos(s),
     SymName(s), Image(typ));
+  return nilobj;
+} /* end ChildSym */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT ChildSymWithCode(s, code)                                         */
+/*                                                                           */
+/*  Find the child of symbol s with the given npar code, else nil.           */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT ChildSymWithCode(OBJECT s, unsigned char code)
+{ OBJECT link, y;
+  for( link = Down(actual(s));  link != actual(s);  link = NextDown(link) )
+  { Child(y, link);
+    if( type(y) == NPAR && enclosing(y) == actual(s) && npar_code(y) == code )
+      return y;
+  }
+  Error(29, 11, "symbol %s has erroneous code %c (database out of date?)",
+    FATAL, &fpos(s), SymName(actual(s)), (char) code);
   return nilobj;
 } /* end ChildSym */
 

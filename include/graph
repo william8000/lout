@@ -10,7 +10,8 @@
 #                                                                             #
 ###############################################################################
 
-@SysPrependGraphic { "graph.lpg" }
+@SysPrependGraphic { graph.lpg }
+@SysInclude { graph.etc }
 
 def @GraphObj
     left p
@@ -18,10 +19,13 @@ def @GraphObj
     named adj { 0 0 }
     right x
 {
-    //0io ||0io @HContract @VContract
-    { p "trpoint translate" adj "translate gsave" // "grestore" }
-    @Graphic { //margin ||margin x ||margin //margin }
-    ||0io //0io
+    @Null &  # kills previous white space
+    @HContract @VContract {
+	//0io ||0io @HContract @VContract 
+	{ p "trpoint translate" adj "translate gsave" // "grestore" }
+	@Graphic { //margin ||margin x ||margin //margin }
+	||0io //0io
+    }
 }
 
 def @GraphCross
@@ -244,7 +248,7 @@ def @GraphSolid
     { 1.0 ft }
 {
     @HContract @VContract
-    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto"
+    { "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
        "/linewidth" linewidth "def xsize" dashlength "solid end"
     } @Graphic { length @Wide }
 }
@@ -263,7 +267,7 @@ def @GraphDashed
     { 1.0 ft }
 {
     @HContract @VContract
-    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto"
+    { "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
        "/linewidth" linewidth "def xsize" dashlength "dashed end"
     } @Graphic { length @Wide }
 }
@@ -282,7 +286,7 @@ def @GraphDotted
     { 1.0 ft }
 {
     @HContract @VContract
-    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto"
+    { "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
        "/linewidth" linewidth "def xsize" dashlength "dotted end"
     } @Graphic { length @Wide }
 }
@@ -290,6 +294,7 @@ def @GraphDotted
 
 export @Data
 def @Graph
+    named save         { no       }
     named style        { frame    }
     named width
 	named cm left x { x"c" }
@@ -311,6 +316,8 @@ def @Graph
 		       { 4.0 cm   }
     named xextra       { "none"   }
     named yextra       { "none"   }
+    named xdecreasing  { no       }
+    named ydecreasing  { no       }
     named leftcaption  {          }
     named rightcaption {          }
     named abovecaption {          }
@@ -354,56 +361,7 @@ def @Graph
     named hidecaptions { yes       }
     named objects
 	named @NW
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -416,56 +374,7 @@ def @Graph
 	    right x
 	{ at @GraphObj adj { "xsize neg ysize" } margin { margin } x }
 	named @SW
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -478,56 +387,7 @@ def @Graph
 	    right x
 	{ at @GraphObj adj { "xsize neg 0" } margin { margin } x }
 	named @SE
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -540,56 +400,7 @@ def @Graph
 	    right x
 	{ at @GraphObj adj { "0 0" } margin { margin } x }
 	named @NE
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -602,56 +413,7 @@ def @Graph
 	    right x
 	{ at @GraphObj adj { "0 ysize" } margin { margin } x }
 	named @W
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -664,56 +426,7 @@ def @Graph
 	    right x
 	{ at @GraphObj adj { "xsize neg ysize 2 div" } margin { margin } x }
 	named @S
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -726,56 +439,7 @@ def @Graph
 	    right x
 	{ at @GraphObj adj { "xsize neg 2 div 0" } margin { margin } x }
 	named @E
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -788,56 +452,7 @@ def @Graph
 	    right x
 	{ at @GraphObj adj { "0 ysize 2 div" } margin { margin } x }
 	named @N
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -850,56 +465,7 @@ def @Graph
 	    right x
 	{ at @GraphObj adj { "xsize neg 2 div ysize" } margin { margin } x }
 	named @CTR
-	    named at
-		named pi                                    {     "3.14159"  }
-		named e                                     {     "2.71828"  }
-		named sqrt     precedence 40        right y {   y "sqrt"     }
-		named abs      precedence 40        right y {   y "abs"      }
-		named ceiling  precedence 40        right y {   y "ceiling"  }
-		named floor    precedence 40        right y {   y "floor"    }
-		named truncate precedence 40        right y {   y "truncate" }
-		named round    precedence 40        right y {   y "round"    }
-		named cos      precedence 40        right y {   y "cos"      }
-		named sin      precedence 40        right y {   y "sin"      }
-		named atan     precedence 39 left x right y { x y "atan"     }
-		named exp      precedence 38 left x right y { x y "exp"      }
-		named log      precedence 37 left x right y { x y "dolog"    }
-		named rand     precedence 36 left x right y { x y "dorand"   }
-		named "*"      precedence 35 left x right y { x y "mul"      }
-		named "/"      precedence 34 left x right y { x y "div"      }
-		named idiv     precedence 34 left x right y { x y "idiv"     }
-		named mod      precedence 34 left x right y { x y "mod"      }
-		named "-"      precedence 33 left x right y
-		{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-		named "-0"				    {     "-0"       }
-		named "-1"				    {     "-1"       }
-		named "-2"				    {     "-2"       }
-		named "-3"				    {     "-3"       }
-		named "-4"				    {     "-4"       }
-		named "-5"				    {     "-5"       }
-		named "-6"				    {     "-6"       }
-		named "-7"				    {     "-7"       }
-		named "-8"				    {     "-8"       }
-		named "-9"				    {     "-9"       }
-		named "-."				    {     "-."       }
-		named "+"      precedence 32 left x right y
-		{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-		named "="      precedence 30 left x right y { x y "eq"       }
-		named "!="     precedence 30 left x right y { x y "ne"       }
-		named "<"      precedence 30 left x right y { x y "lt"       }
-		named "<="     precedence 30 left x right y { x y "le"       }
-		named ">"      precedence 30 left x right y { x y "gt"       }
-		named ">="     precedence 30 left x right y { x y "ge"       }
-		named not      precedence 25        right y {   y "not"      }
-		named and      precedence 24 left x right y { x y "and"      }
-		named xor      precedence 23 left x right y { x y "xor"      }
-		named or       precedence 22 left x right y { x y "or"       }
-		named if
-		    named cond { true }
-		    named then {}
-		    named else {}
-		{ cond "{" then "} {" else "} ifelse" }
-	    {}
+	    import @GraphMath named at { 0 0 }
 	    named margin
 		named cm left x { x"c" }
 		named in left x { x"i" }
@@ -927,147 +493,15 @@ def @Graph
     named ymax     named none { "false" }           { none           }
     named xticksep named none { "0" }               { none           }
     named yticksep named none { "0" }               { none           }
-    named xticks
+    import @GraphMath named xticks
 	named none                                  { "false"        }
 	named "@"                                   { " lgen"        }
 	named "^"                                   { "^"            }
-	named pi                                    {     "3.14159"  }
-	named e                                     {     "2.71828"  }
-	named sqrt     precedence 40        right y {   y "sqrt"     }
-	named abs      precedence 40        right y {   y "abs"      }
-	named ceiling  precedence 40        right y {   y "ceiling"  }
-	named floor    precedence 40        right y {   y "floor"    }
-	named truncate precedence 40        right y {   y "truncate" }
-	named round    precedence 40        right y {   y "round"    }
-	named cos      precedence 40        right y {   y "cos"      }
-	named sin      precedence 40        right y {   y "sin"      }
-	named atan     precedence 39 left x right y { x y "atan"     }
-	named exp      precedence 38 left x right y { x y "exp"      }
-	named log      precedence 37 left x right y { x y "dolog"    }
-	named rand     precedence 36 left x right y { x y "dorand"   }
-	named "*"      precedence 35 left x right y { x y "mul"      }
-	named "/"      precedence 34 left x right y { x y "div"      }
-	named idiv     precedence 34 left x right y { x y "idiv"     }
-	named mod      precedence 34 left x right y { x y "mod"      }
-	named "-"      precedence 33 left x right y
-	{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-	named "-0"				    {     "-0"       }
-	named "-1"				    {     "-1"       }
-	named "-2"				    {     "-2"       }
-	named "-3"				    {     "-3"       }
-	named "-4"				    {     "-4"       }
-	named "-5"				    {     "-5"       }
-	named "-6"				    {     "-6"       }
-	named "-7"				    {     "-7"       }
-	named "-8"				    {     "-8"       }
-	named "-9"				    {     "-9"       }
-	named "-."				    {     "-."       }
-	named "+"      precedence 32 left x right y
-	{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-	named "="      precedence 30 left x right y { x y "eq"       }
-	named "!="     precedence 30 left x right y { x y "ne"       }
-	named "<"      precedence 30 left x right y { x y "lt"       }
-	named "<="     precedence 30 left x right y { x y "le"       }
-	named ">"      precedence 30 left x right y { x y "gt"       }
-	named ">="     precedence 30 left x right y { x y "ge"       }
-	named not      precedence 25        right y {   y "not"      }
-	named and      precedence 24 left x right y { x y "and"      }
-	named xor      precedence 23 left x right y { x y "xor"      }
-	named or       precedence 22 left x right y { x y "or"       }
-	named if
-	    named cond { true }
-	    named then {}
-	    named else {}
-	{ cond "{" then "} {" else "} ifelse" }
-	named xloop
-	    named from { 0 }
-	    named to { 0 }
-	    named by { 1 }
-	    named do named x { "xval" } {}
-	{ from by to "{ /xval exch def" do "} for" }
-	named yloop
-	    named from { 0 }
-	    named to { 0 }
-	    named by { 1 }
-	    named do named y { "yval" } {}
-	{ from by to "{ /yval exch def" do "} for" }
-	named zloop
-	    named from { 0 }
-	    named to { 0 }
-	    named by { 1 }
-	    named do named z { "zval" } {}
-	{ from by to "{ /zval exch def" do "} for" }
 		       { false    }
-    named yticks
+    import @GraphMath named yticks
 	named none                                  { "false"        }
 	named "@"                                   { " lgen"        }
 	named "^"                                   { "^"            }
-	named pi                                    {     "3.14159"  }
-	named e                                     {     "2.71828"  }
-	named sqrt     precedence 40        right y {   y "sqrt"     }
-	named abs      precedence 40        right y {   y "abs"      }
-	named ceiling  precedence 40        right y {   y "ceiling"  }
-	named floor    precedence 40        right y {   y "floor"    }
-	named truncate precedence 40        right y {   y "truncate" }
-	named round    precedence 40        right y {   y "round"    }
-	named cos      precedence 40        right y {   y "cos"      }
-	named sin      precedence 40        right y {   y "sin"      }
-	named atan     precedence 39 left x right y { x y "atan"     }
-	named exp      precedence 38 left x right y { x y "exp"      }
-	named log      precedence 37 left x right y { x y "dolog"    }
-	named rand     precedence 36 left x right y { x y "dorand"   }
-	named "*"      precedence 35 left x right y { x y "mul"      }
-	named "/"      precedence 34 left x right y { x y "div"      }
-	named idiv     precedence 34 left x right y { x y "idiv"     }
-	named mod      precedence 34 left x right y { x y "mod"      }
-	named "-"      precedence 33 left x right y
-	{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
-	named "-0"				    {     "-0"       }
-	named "-1"				    {     "-1"       }
-	named "-2"				    {     "-2"       }
-	named "-3"				    {     "-3"       }
-	named "-4"				    {     "-4"       }
-	named "-5"				    {     "-5"       }
-	named "-6"				    {     "-6"       }
-	named "-7"				    {     "-7"       }
-	named "-8"				    {     "-8"       }
-	named "-9"				    {     "-9"       }
-	named "-."				    {     "-."       }
-	named "+"      precedence 32 left x right y
-	{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
-	named "="      precedence 30 left x right y { x y "eq"       }
-	named "!="     precedence 30 left x right y { x y "ne"       }
-	named "<"      precedence 30 left x right y { x y "lt"       }
-	named "<="     precedence 30 left x right y { x y "le"       }
-	named ">"      precedence 30 left x right y { x y "gt"       }
-	named ">="     precedence 30 left x right y { x y "ge"       }
-	named not      precedence 25        right y {   y "not"      }
-	named and      precedence 24 left x right y { x y "and"      }
-	named xor      precedence 23 left x right y { x y "xor"      }
-	named or       precedence 22 left x right y { x y "or"       }
-	named if
-	    named cond { true }
-	    named then {}
-	    named else {}
-	{ cond "{" then "} {" else "} ifelse" }
-	named xloop
-	    named from { 0 }
-	    named to { 0 }
-	    named by { 1 }
-	    named do named x { "xval" } {}
-	{ from by to "{ /xval exch def" do "} for" }
-	named yloop
-	    named from { 0 }
-	    named to { 0 }
-	    named by { 1 }
-	    named do named y { "yval" } {}
-	{ from by to "{ /yval exch def" do "} for" }
-	named zloop
-	    named from { 0 }
-	    named to { 0 }
-	    named by { 1 }
-	    named do named z { "zval" } {}
-	{ from by to "{ /zval exch def" do "} for" }
 		       { false    }
     named xticklength                               { 0.5 ft   }
     named yticklength                               { 0.5 ft   }
@@ -1364,15 +798,36 @@ def @Graph
 	}
     }
 
+    def @XDecreasing
+    {
+	xdecreasing @Case {
+	    { No no } @Yield "false"
+	    { Yes yes } @Yield "true"
+	}
+    }
+
+    def @YDecreasing
+    {
+	ydecreasing @Case {
+	    { No no } @Yield "false"
+	    { Yes yes } @Yield "true"
+	}
+    }
+
     @AddCaptions width @Wide height @High
     {
 	{
-	    "grestore save gsave lgraphdict begin"
+	    "grestore"
+	    save @Case { { Yes yes } @Yield "save" else @Yield {} }
+	    "gsave xsize ysize lgraphdict begin /ysize exch def /xsize exch def"
 	    "/alldata [" @Body "] def"
-	    xticksep "[" xticks "] 0 alldata" xmin xmax xlog @XExtra xorigin xticklength "xset"
-	    yticksep "[" yticks "] 1 alldata" ymin ymax ylog @YExtra yorigin yticklength "yset"
-	    "rundata" @Style // "end restore"
-	} @Graphic { //1rt 0c @Space objects }
+	    xticksep "[" xticks "] 0 alldata" xmin xmax xlog
+	      @XExtra @XDecreasing xorigin xticklength "xset"
+	    yticksep "[" yticks "] 1 alldata" ymin ymax ylog
+	      @YExtra @YDecreasing yorigin yticklength "yset"
+	    "rundata" @Style // "end"
+	    save @Case { { Yes yes } @Yield "restore" else @Yield {} }
+	} @Graphic { //1rt objects }
     }
 
 @End @Graph                  

@@ -135,12 +135,6 @@ fontdef	Times		Semibold	{ Times-Semibold		Ti-Sm		LtLatin1.LCM	Recode	 }
 fontdef	Times		SemiboldItalic	{ Times-SemiboldItalic		Ti-SmIt		LtLatin1.LCM	Recode	 }
 
 
-fontdef	Dingbats	Base		{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
-fontdef	Dingbats	Slope		{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
-fontdef	Dingbats	Bold		{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
-fontdef	Dingbats	BoldSlope	{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
-
-
 fontdef	Chancery	Base		{ ZapfChancery-Roman		ZC-Rm		LtLatin1.LCM	Recode	 }
 fontdef	Chancery	Slope		{ ZapfChancery-Italic		ZC-It		LtLatin1.LCM	Recode	 }
 fontdef	Chancery	Bold		{ ZapfChancery-Bold		ZC-Bd		LtLatin1.LCM	Recode	 }
@@ -153,6 +147,12 @@ fontdef	Chancery	Light		{ ZapfChancery-Light		ZC-Lt		LtLatin1.LCM	Recode	 }
 fontdef	Chancery	Demi		{ ZapfChancery-Demi		ZC-Dm		LtLatin1.LCM	Recode	 }
 fontdef	Chancery	LightItalic	{ ZapfChancery-LightItalic	ZC-LtIt		LtLatin1.LCM	Recode	 }
 fontdef	Chancery	MediumItalic	{ ZapfChancery-MediumItalic	ZC-MdIt		LtLatin1.LCM	Recode	 }
+
+
+fontdef	Dingbats	Base		{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
+fontdef	Dingbats	Slope		{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
+fontdef	Dingbats	Bold		{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
+fontdef	Dingbats	BoldSlope	{ ZapfDingbats			ZD		Ding.LCM	NoRecode }
 
 
 ###############################################################################################################################

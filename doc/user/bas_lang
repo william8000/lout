@@ -38,9 +38,11 @@ Czech Cesky Cestina
 Danish Dansk
 Dutch Nederlands
 English
+EnglishUK
 Finnish Suomi
 French Francais Fran{@Char ccedilla}ais
 German Deutsch
+Italian Italiano
 Norwegian Norsk
 Polish Polski
 Russian
@@ -49,7 +51,9 @@ Spanish Espa{@Char ntilde}ol
 Swedish Svenska
 }
 As shown, most languages have alternative names, all equally acceptable
-to the @Code "@Language" symbol.
+to the @Code "@Language" symbol.  @Code "EnglishUK" differs from
+@Code "English" only by applying hyphenation rules said to be more
+appropriate for British English.
 @PP
 If your entire document is in a language other than English, you need
 to change the @Code "@InitialLanguage" option:

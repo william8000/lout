@@ -1,6 +1,6 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -77,7 +77,7 @@ static OBJECT InterposeWideOrHigh(OBJECT y, int dim)
   fwd(res, dim)  = fwd(y, dim);
   back(res, 1-dim) = back(y, 1-dim);
   fwd(res, 1-dim)  = fwd(y, 1-dim);
-  SetConstraint(constraint(res), MAX_LEN, size(res, dim), MAX_LEN);
+  SetConstraint(constraint(res), MAX_FULL_LENGTH, size(res, dim), MAX_FULL_LENGTH);
   ReplaceNode(res, y);
   Link(res, y);
   return res;
@@ -232,7 +232,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
   OBJECT env, n1, tmp, zlink, z, sym;	/* placeholders and temporaries	     */
   BOOLEAN was_sized;		/* true if sized(hd) initially               */
   int dim;			/* the galley direction                      */
-  LENGTH perp_back, perp_fwd;
+  FULL_LENGTH perp_back, perp_fwd;
   OBJECT why, junk;
 
   debug2(DGA, D, "[ AttachGalley(Galley %s into %s)",
@@ -320,7 +320,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       SymName(actual(target)));
     EnterErrorBlock(FALSE);
     New(target_galley, HEAD);
-    limiter(target_galley) = nilobj;
+    force_gall(target_galley) = FALSE;
+    enclose_obj(target_galley) = limiter(target_galley) = nilobj;
     opt_components(target_galley) = opt_constraints(target_galley) = nilobj;
     gall_dir(target_galley) = external_hor(target) ? COLM : ROWM;
     FposCopy(fpos(target_galley), fpos(target));
@@ -344,7 +345,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
         goto REJECT;
       }
     }
-    else SetConstraint(c, MAX_LEN, MAX_LEN, MAX_LEN);  /* actually unused */
+    else /* actually unused */
+      SetConstraint(c, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
 
     debug1(DGA, DDD, "  expanding %s", EchoObject(target));
     tmp = CopyObject(target, no_fpos);
@@ -355,9 +357,10 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       SymName(actual(target)), bool(external_hor(target)));
     SizeGalley(target_galley, env,
 	external_ver(target) || external_hor(target),
-	threaded(target),
-	non_blocking(target_index), trigger_externs(target_index),
-	&save_style(target), &c, whereto(hd), &dest_index, &recs, &tg_inners);
+	threaded(target), non_blocking(target_index),
+	trigger_externs(target_index), &save_style(target),
+	&c, whereto(hd), &dest_index, &recs, &tg_inners,
+	enclose_obj(hd) != nilobj ? CopyObject(enclose_obj(hd), no_fpos):nilobj);
     debug1(DGA, DD, "  SizeGalley tg_inners: %s", DebugInnersNames(tg_inners));
     if( recs != nilobj )  ExpandRecursives(recs);
     dest = actual(dest_index);
@@ -391,7 +394,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       *** */
       SizeGalley(hd, env, TRUE, dim == ROWM ? threaded(dest) : FALSE,
 	non_blocking(target_index), TRUE, &save_style(dest), &c, nilobj,
-	&n1, &recs, &hd_inners);
+	&n1, &recs, &hd_inners, nilobj);
       debug1(DGA,DD,"  SizeGalley hd_inners: %s", DebugInnersNames(hd_inners));
       if( recs != nilobj )  ExpandRecursives(recs);
       if( need_precedes )		/* need an ordering constraint */
@@ -440,6 +443,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	case GALL_TARG:
 	case CROSS_PREC:
 	case CROSS_FOLL:
+	case CROSS_FOLL_OR_PREC:
 	case CROSS_TARG:
 	case PAGE_LABEL_IND:
 	    
@@ -504,6 +508,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	case CLOSURE:
 	case CROSS:
+	case FORCE_CROSS:
 	case NULL_CLOS:
 	case PAGE_LABEL:
 
@@ -528,6 +533,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	case VEXPAND:
 	case ROTATE:
 	case SCALE:
+	case KERN_SHRINK:
 	case INCGRAPHIC:
 	case SINCGRAPHIC:
 	case GRAPHIC:
@@ -607,8 +613,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	    /* if forcing galley doesn't fit, try scaling first component */
 	    scaled = FALSE;
-	    if( actual(hd) != nilobj && force_target(actual(hd)) &&
-		size(y, dim) > 0 )
+	    if( force_gall(hd) && size(y, dim) > 0 )
 	    { int scale_factor;
 	      scale_factor = ScaleToConstraint(back(y,dim), fwd(y,dim), &c);
 	      if( scale_factor > 0.5 * SF )
@@ -653,8 +658,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	    /* if forcing galley doesn't fit, try scaling first component */
 	    scaled = FALSE;
-	    if( actual(hd) != nilobj && force_target(actual(hd)) &&
-		perp_back + perp_fwd > 0 )
+	    if( force_gall(hd) && perp_back + perp_fwd > 0 )
 	    { int scale_factor;
 	      scale_factor = ScaleToConstraint(perp_back, perp_fwd, &c);
 	      if( scale_factor > 0.5 * SF )
@@ -707,8 +711,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	    /* if forcing galley doesn't fit, try scaling z */
 	    scaled = FALSE;
-	    if( actual(hd) != nilobj && force_target(actual(hd)) &&
-		size(z, dim) > 0 && limiter(hd) != why )
+	    if( force_gall(hd) && size(z, dim) > 0 && limiter(hd) != why )
 	    { int scale_factor;
 	      scale_factor = ScaleToConstraint(back(z,dim), fwd(z,dim), &c);
 	      if( scale_factor > 0.5 * SF )
@@ -756,8 +759,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	    /* if forcing galley doesn't fit, try scaling z */
 	    scaled = FALSE;
-	    if( actual(hd) != nilobj &&
-		force_target(actual(hd)) && size(z, 1-dim) > 0 )
+	    if( force_gall(hd) && size(z, 1-dim) > 0 )
 	    { int scale_factor;
 	      scale_factor = ScaleToConstraint(back(z,1-dim), fwd(z,1-dim), &c);
 	      if( scale_factor > 0.5 * SF )
@@ -839,6 +841,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	case GAP_OBJ:
 	case CLOSURE:
 	case CROSS:
+	case FORCE_CROSS:
 	case NULL_CLOS:
 	case PAGE_LABEL:
 	

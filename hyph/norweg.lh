@@ -13,8 +13,8 @@ Lout hyphenation information
 % \catcode\ae=3D11
 % \catcode\o=3D11
 % \catcode\aa=3D11
-% \def\ae{}%
-% \def\o{}%
+% \def\ae{(^Z character deleted here by JeffK)}%
+% \def\o{(^\ character deleted here by JeffK)}%
 % \def\aa{=E5}%
 
 Classes:

@@ -71,7 +71,8 @@ but the braces may be omitted when the object is a juxtaposition of
 simple words or an invocation of a symbol without parameters, as in
 @Code "//0.3vx" and {@Code "||@Indent"}.
 @PP
-A gap consists of a length plus a gap mode.  A @I length
+A gap consists of a length plus a gap mode plus an optional indication
+of unbreakability.  A @I length
 length @Index { Length }
 is represented by an decimal number (which may not be negative) followed
 by a unit of measurement.  For example, @Code "2.5c" represents the
@@ -149,7 +150,7 @@ by Lout; it is included for the convenience of application packages.
 @End @Figure
 
 @PP
-A gap concludes with a {@I {gap mode}},
+After the length comes an optional @I {gap mode},
 gap.mode @Index { Gap mode }
 which is a single letter following the length, indicating how the length
 is to be measured.  As shown in Figure {@NumberOf gapmodes},
@@ -195,7 +196,7 @@ is to be measured.  As shown in Figure {@NumberOf gapmodes},
      @At { 4c   @Wide 0.5c @High } @Put { @LBox 0.5co }
      @At { 1.2c @Wide 1.5c @High } @Put { @DoubleArrow 3.3c }
      @At { 1.2c @Wide 1.7c @High }
-	@Put 3.3c @Wide { |0.5rt { max( {@I {l, a+b}}) } }
+	@Put 3.3c @Wide { |0.5rt { max( {@I {l, a+b+l"/10"}}) } }
      @At { 1.2c @Wide 0.4c @High } @Put { @DoubleArrow 1.0c }
      @At { 1.2c @Wide 0.2c @High } @Put { 1.0c @Wide { &0.5rt @I a } }
      @At { 4c   @Wide 0.4c @High } @Put { @DoubleArrow 0.5c }
@@ -249,8 +250,9 @@ k.gap.mode @Index { @Code k gap mode }
 measure the length from the last mark
 of the first object to the first mark of the second.  In the case of
 mark-to-mark, if the length is too small to prevent the objects
-overlapping, it is widened until they no longer do.  Kerning also
-widens, with the aim of preventing the mark of either object from
+almost overlapping, it is widened until they no longer do.  (The extra
+@I { "l/10" } is not applied when plain text output is in effect.)  Kerning
+also widens, with the aim of preventing the mark of either object from
 overlapping the other object; this mode is used for subscripts and
 superscripts.
 @PP
@@ -264,6 +266,14 @@ concatenation object.  It is the main user of the @Code b and @Code r
 units of measurement; for example, @Code "|1rt" will right-justify the
 following component, and @Code "|0.5rt" will centre it.
 @PP
+A gap is optionally concluded with an indication of unbreakability,
+which is a letter @Code "u" appended to the gap.  A paragraph will
+never be broken at an unbreakable gap.  In principle, a galley
+should not break at such a gap either, but, at present, a @Code "u"
+appended to a galley gap is ignored by the regular galley breaking
+algorithm.  However it is taken into account when calculating optimal
+galley breaks.
+@PP
 When two objects are separated only by zero or more white space
 white.space.when @SubIndex { when significant }
 space.f.when @SubIndex { when significant }
@@ -272,14 +282,15 @@ characters (spaces, tabs, newlines, and formfeeds), Lout inserts
 number of spaces.  Precisely, @I k is determined by discarding all space
 characters and tabs that precede newlines (these are invisible so are
 better ignored), then counting 1 for each newline, formfeed or space,
-and 8 for each tab character.
+and 8 for each tab character.  The gap will be unbreakable if @I k
+is zero.
 @PP
 A sequence of two or more objects separated by @Code "&" symbols is a
 paragraph.breaking.in.detail @SubIndex { in detail }
 {@I paragraph}.  Lout breaks paragraphs into lines automatically as
 required, by converting some of the @Code "&" symbols into
-{@Code "//1vx"}.  Gaps of length 0 (other than hyphenation gaps) are not
-eligible for this conversion.  `Optimal' line breaks are chosen, using a
+{@Code "//1vx"}.  Unbreakable gaps are not eligible for this
+conversion.  `Optimal' line breaks are chosen, using a
 method adapted from @TeX @Cite { $knuth1984tex }.
 tex @RawIndex { @TeX }
 tex.optimal @SubIndex { optimal paragraph breaking }

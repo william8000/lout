@@ -21,8 +21,8 @@ it is a truth universally acknowledged, that a single man
 in possession of a good fortune, must be in want of a wife.
 }
 }
-@Code "@DropCapThree" is the same except that the capital is larger,
-and spreads over three lines instead of two.
+@Code "@DropCapThree" is the same except that the capital is larger
+and spreads over three lines.
 @PP
 Because Lout occasionally gets the height of the enlarged capital
 slightly wrong, there is a @Code "height" option which allows you
@@ -40,6 +40,5 @@ spacing.  The default height in @Code "@DropCapThree" is {@Code "2.5v"}.
 These symbols produce an object which may appear anywhere in the
 usual way.  A paragraph symbol will be needed after the paragraph.  The
 paragraph breaking style of the body of the paragraph will be
-{@Code "adjust"}, and hyphenation will be off.  These settings cannot
-be changed at present.
+{@Code "adjust nohyphen"}; this cannot be changed at present.
 @End @Section

@@ -1,5 +1,5 @@
 @Section
-   @Title { The cross reference symbol "&&" }
+   @Title { The cross reference symbols "&&" and "&&&" }
    @Tag { crossref }
 @Begin
 @PP
@@ -21,11 +21,16 @@ to the first following it if such exists else to the first preceding it.
 A cross reference may be used in four ways:  where an object is
 expected, in which case its value is a copy of the target; with the
 @@Open and @@Use symbols; with the @@Tagged symbol; and in the
-@Code into clause of a galley definition, in which case the value of
-the tag must be {@Code preceding}, {@Code following}, or
-{@Code foll_or_prec}.
+@Code into clause or @Code "@Target" symbol of a galley definition, in
+which case the value of the tag must be {@Code preceding},
+{@Code following}, or {@Code foll_or_prec}.
 @PP
-Except within an @Code into clause, the symbol referred to must have
-a @@Tag parameter.  This is so even if the right parameter of the cross
-reference is {@Code preceding}, {@Code following}, or {@Code foll_or_prec}.
+Within an @Code "into" clause or @Code "@Target" symbol, the alternative
+form @Code "&&&" is acceptable and indicates a forcing galley (Section
+{@NumberOf targets}).
+@PP
+Except within an @Code into clause or @Code "@Target" symbol, the symbol
+referred to must have a @@Tag parameter.  This is so even if the right
+parameter of the cross reference is {@Code preceding}, {@Code following},
+or {@Code foll_or_prec}.
 @End @Section

@@ -33,10 +33,20 @@ Like -p but with a form-feed character between pages.
 .TP
 -S
 Safe execution:  disable all calls to system(3), instead echoing
-the commands that would have been executed.
+the commands that would have been executed.  Although this makes
+the Lout run certainly safe, the PostScript output file may not be.
+.TP
+-U
+Unsafe execution:  allow calls to system(3).  This is usually the
+default behaviour, but it is possible to make safe execution the
+default during installation (use lout -V to find out whether this
+was done or not), hence the need for this flag.
 .TP
 -e<filename>
 Direct error messages to <filename> instead of to stderr.
+.TP
+-a
+Use alternative error message format:  filename:linenum:colnum: message
 .TP
 -o<filename>
 Direct PostScript output to <filename> instead of to stdout.
@@ -99,7 +109,14 @@ Print usage information on stderr.
 .TP
 -V
 Print version information on stderr.
-.SH FILES
+.TP
+-w
+Show the total number of non-empty words printed in the output file.  This
+includes words and numbers in page headers and footers; section numbers and
+other numbers; every punctuation character in a font different from its
+adjacent word; and every little fragment of every equation; so it will
+always somewhat overestimate the true number.
+.SH FILES AND ENVIRONMENT VARIABLE
 .nf
 Binary file:                     <BINDIR>/lout
 Default include file directory:  <LIBDIR>/include
@@ -107,16 +124,20 @@ Default databases directory:     <LIBDIR>/data
 Default font metrics directory:  <LIBDIR>/font
 Default hyphenation directory:   <LIBDIR>/hyph
 Default character mappings dir.: <LIBDIR>/maps
+Default locales directory:       <LIBDIR>/locale
 Lout documentation directory:    <DOCDIR>
 .fi
+.sp
+The default library directory, <LIBDIR>, can be changed at runtime by
+setting environment variable LOUTLIB to an alternative directory name.
 .SH SEE ALSO
 .P
 c2lout(1), lpr(1), ghostview(1)
 .SH MAILING LIST
 .P
 A public mailing list for discussion of Lout exists.  To subscribe, mail
-lout-request@niif.spb.su with the word subscribe in the Subject line,
-then wait one working day.  To post an item, mail it to lout@niif.spb.su.
+lout-request@ptc.spbu.ru with the word subscribe in the Subject line,
+then wait one working day.  To post an item, mail it to lout@ptc.spbu.ru.
 .SH REFERENCES
 .P
 Jeffrey H. Kingston, "A User's Guide to the Lout Document Formatting

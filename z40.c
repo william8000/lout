@@ -1,6 +1,6 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -168,7 +168,7 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
     filter_out_file =
       DefineFile(string(sym_body(FilterOutSym)), STR_EMPTY, &fpos(x),
         FILTER_FILE, SOURCE_PATH);
-    LexPush(filter_out_file, 0, FILTER_FILE);
+    LexPush(filter_out_file, 0, FILTER_FILE, 1, FALSE);
     t = NewToken(BEGIN, &fpos(x), 0, 0, BEGIN_PREC, FilterOutSym);
     res = Parse(&t, nilobj, FALSE, FALSE);
     LexPop();
@@ -185,13 +185,14 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
 
 /*@::FilterWrite(), FilterScavenge()@*****************************************/
 /*                                                                           */
-/*  FilterWrite(x, fp)                                                       */
+/*  FilterWrite(x, fp, linecount)                                            */
 /*                                                                           */
 /*  Write out the active FILTERED object x by copying the file.              */
+/*  Increment *linecount by the number of lines written.                     */
 /*                                                                           */
 /*****************************************************************************/
 
-void FilterWrite(OBJECT x, FILE *fp)
+void FilterWrite(OBJECT x, FILE *fp, int *linecount)
 { FILE *in_fp;  OBJECT y;  int ch;
   assert( type(x) == FILTERED, "FilterWrite: type(x)!" );
   debug1(DFH, D, "FilterWrite(%s, fp)", EchoObject(x));
@@ -203,7 +204,11 @@ void FilterWrite(OBJECT x, FILE *fp)
   if( filter_use_begin(y) )
   { StringFPuts(KW_BEGIN, fp);
     StringFPuts("\n", fp);
-    while( (ch = getc(in_fp)) != EOF )  putc(ch, fp);
+    *linecount += 1;
+    while( (ch = getc(in_fp)) != EOF )
+    { putc(ch, fp);
+      if( ch == '\n' )  *linecount += 1;
+    }
     StringFPuts(KW_END, fp);
     StringFPuts(" ", fp);
     StringFPuts(SymName(filter_actual(y)), fp);
@@ -211,10 +216,15 @@ void FilterWrite(OBJECT x, FILE *fp)
   else
   { StringFPuts(KW_LBR, fp);
     StringFPuts("\n", fp);
-    while( (ch = getc(in_fp)) != EOF )  putc(ch, fp);
+    *linecount += 1;
+    while( (ch = getc(in_fp)) != EOF )
+    { putc(ch, fp);
+      if( ch == '\n' )  *linecount += 1;
+    }
     StringFPuts(KW_RBR, fp);
   }
   StringFPuts("\n", fp);
+  *linecount += 1;
   fclose(in_fp);
   debug0(DFH, D, "FilterWrite returning.");
 } /* end FilterWrite */

@@ -82,7 +82,7 @@ The second place where exported symbols may be used is in the right
 parameter of the @@Open symbol, and following its alternative form,
 @@Use (Section {@NumberOf open}).
 @PP
-Finally, exported nested symbols and parameters may be made visible within
+Exported nested symbols and parameters may be made visible within
 a subsequent definition or macro by preceding it with an @Code import
 import @Index { @Code import clause }
 clause, like this:
@@ -121,4 +121,29 @@ usage indicates a `path name' of the symbol.  For example,
 causes the definition of @Code "@Keywords" to occur directly after
 the existing definitions of {@Code "@ReportLayout"}, which itself
 lies within {@Code "@DocumentLayout"}.
+@PP
+A named parameter may also be preceded by an @Code "import" clause.
+As usual, the meaning is that the visible local definitions of
+the import symbol(s) are visible within the body (the default
+value) of the named parameter.  But furthermore, those symbols
+will be visible within all invocations of the parameter.  For
+example, suppose we define
+@ID @OneRow @Code {
+"def @Diag"
+"    import @Algebra named linewidth { 1p }"
+"    import @Algebra named dashlength { 2p }"
+"    ..."
+}
+Then, if @Code "@Algebra" exports symbols {@Code "+"},
+{@Code "-"}, and so on, we may write
+@ID @OneRow @Code {
+"@Diag"
+"    linewidth { 1f - 2p }"
+"    dashlength { 1f + 2p }"
+}
+using the symbols from {@Code "@Algebra"}.  There may be several
+symbols after the @Code "import" keyword.  All these symbols
+share an important restriction:  they may not have parameters.
+This is necessary because Lout would be unable to determine
+suitable values for any such parameters, if they did exist.
 @End @Section

@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -152,6 +152,7 @@ static void echo(OBJECT x, unsigned outer_prec)
     case GALL_TARG:
     case CROSS_PREC:
     case CROSS_FOLL:
+    case CROSS_FOLL_OR_PREC:
     case CROSS_TARG:
     case RECURSIVE:
     case PAGE_LABEL_IND:
@@ -336,6 +337,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 
 
     case CROSS:
+    case FORCE_CROSS:
 
 	assert( Down(x) != x, "echo: CROSS Down(x)!" );
 	Child(y, Down(x));
@@ -345,6 +347,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 	  echo(y, NO_PREC);
 	  cprint(KW_RBR);
 	}
+	cprint(Image(type(x)));
 	/* ***
 	cprint(KW_CROSS);
 	aprint("<");
@@ -642,6 +645,8 @@ static void echo(OBJECT x, unsigned outer_prec)
     case RUMP:
     case INSERT:
     case NEXT:
+    case PLUS:
+    case MINUS:
     case WIDE:
     case HIGH:
     case HSHIFT:
@@ -651,6 +656,7 @@ static void echo(OBJECT x, unsigned outer_prec)
     case GRAPHIC:
     case ROTATE:
     case SCALE:
+    case KERN_SHRINK:
     case CASE:
     case YIELD:
     case XCHAR:
@@ -674,7 +680,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 	/* print left parameter */
 	if( Down(x) != LastDown(x) )
 	{ Child(y, Down(x));
-	  echo(y, max(outer_prec, DEFAULT_PREC));
+	  echo(y, find_max(outer_prec, DEFAULT_PREC));
 	  aprint(" ");
 	}
 
@@ -684,7 +690,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 	assert( LastDown(x) != x, "echo: right parameter of predefined!" );
 	aprint(" ");
 	Child(y, LastDown(x));
-	echo(y, type(x)==OPEN ? FORCE_PREC : max(outer_prec,DEFAULT_PREC));
+	echo(y, type(x)==OPEN ? FORCE_PREC : find_max(outer_prec,DEFAULT_PREC));
 	if( braces_needed )  aprint(" "), cprint(KW_RBR);
 	break;
 
@@ -756,8 +762,9 @@ static void echo(OBJECT x, unsigned outer_prec)
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  aprint("   ");
-	  if( gall_rec(y) )  aprint("gall_rec!");
-	  else cprint(string(y));
+	  cprint(Image(cs_type(y)));
+	  aprint(": ");
+	  cprint(string(y));
 	  newline();
 	}
 	break;
@@ -881,9 +888,10 @@ FULL_CHAR *EchoIndex(OBJECT index)
 /*  Print overview of galley hd on stderr; mark pinpoint if found            */
 /*                                                                           */
 /*****************************************************************************/
+#define dprint(a, b, c) fprintf(stderr, "| %-7s %20s %s\n", a, b, c)
 
 void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
-{ OBJECT link, y, z;  char istr[30];  int i;
+{ OBJECT link, y;  char istr[30];  int i;
   for( i = 0;  i < indent;  i++ )  istr[i] = ' ';
   istr[i] = '\0';
   if( type(hd) != HEAD )
@@ -898,121 +906,18 @@ void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
     { fprintf(stderr, "++ %s ", Image(type(y)));
       DebugObject(y);
     }
-    else switch( type(y) )
-    {
-      case GAP_OBJ:
-
-	fprintf(stderr, "%s%s %s\n", istr, "gap", EchoGap(&gap(y)));
-	break;
-
-
-      case CROSS_PREC:
-
-	fprintf(stderr, "%scross_prec %s\n", istr, EchoObject(y));
-	break;
-
-
-      case PAGE_LABEL_IND:
-
-	fprintf(stderr, "%spage_label_ind %s\n", istr, EchoObject(y));
-	break;
-
-
-      case CROSS_TARG:
-
-	fprintf(stderr, "%scross_targ %s\n", istr, EchoObject(y));
-	break;
-
-
-      case EXPAND_IND:
-
-	fprintf(stderr, "%s%ld expand_ind %s\n", istr, (long) y,
-	  Image(type(actual(y))));
-	break;
-
-
-      case RECEIVING:
-
-	fprintf(stderr, "%sreceiving %s\n", istr, type(actual(y)) == CLOSURE ?
-	  SymName(actual(actual(y))) : Image(type(actual(y))));
-	if( Down(y) != y )
-	{ Child(z, Down(y));
-	  DebugGalley(z, nilobj, indent+4);
-	}
-	break;
-
-
-      case RECEPTIVE:
-
-	fprintf(stderr, "%sreceptive %s\n", istr, type(actual(y)) == CLOSURE ?
-	  SymName(actual(actual(y))) : Image(type(actual(y))));
-	if( Down(y) != y )
-	{ Child(z, Down(y));
-	  DebugGalley(z, nilobj, indent+4);
-	}
-	break;
-
-
-      case UNATTACHED:
-
-	fprintf(stderr, "%sunattached\n", istr);
-	if( Down(y) != y )
-	{ Child(z, Down(y));
-	  DebugGalley(z, nilobj, indent+4);
-	}
-	break;
-
-
-      case ONE_COL:
-      case ONE_ROW:
-      case WIDE:
-      case HIGH:
-      case HSHIFT:
-      case VSHIFT:
-      case HSCALE:
-      case VSCALE:
-      case HCOVER:
-      case VCOVER:
-      case HCONTRACT:
-      case VCONTRACT:
-      case HEXPAND:
-      case VEXPAND:
-      case PADJUST:
-      case HADJUST:
-      case VADJUST:
-      case ROTATE:
-      case SCALE:
-      case INCGRAPHIC:
-      case SINCGRAPHIC:
-      case GRAPHIC:
-      case ACAT:
-      case HCAT:
-      case VCAT:
-      case ROW_THR:
-      case CROSS:
-
-	fprintf(stderr, "%s%s\n", istr, Image(type(y)));
-	break;
-
-
-      case CLOSURE:
-
-	fprintf(stderr, "%s%s  external_hor = %s, external_ver = %s\n", istr,
-	  SymName(actual(y)), bool(external_hor(y)), bool(external_ver(y)));
-	break;
-
-
-      case WORD:
-      case QWORD:
-
-	fprintf(stderr, "%s\"%s\"\n", istr, string(y));
-	break;
-
-
-      default:
-
-	break;
-    }
+    else
+    if( type(y) == GAP_OBJ )
+      dprint("gap_obj", Image(type(y)), EchoGap(&gap(y)));
+    else if( is_index(type(y)) )
+      dprint("index", Image(type(y)), "");
+    else if( is_definite(type(y)) )
+      dprint("def_obj", Image(type(y)), is_word(type(y)) ? string(y):STR_EMPTY);
+    else if( is_indefinite(type(y)) )
+      dprint("indefin", Image(type(y)),
+	type(y) == CLOSURE ? SymName(actual(y)) : STR_EMPTY);
+    else
+      dprint("unknown", Image(type(y)), "");
   }
 } /* end DebugGalley */
 #endif

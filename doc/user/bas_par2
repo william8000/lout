@@ -60,10 +60,11 @@ default style.  Outdenting adds a small space at the start of each line
 outdent. @Index { outdented paragraphs }
 except the first, and is much less common.
 @PP
-The next three styles do not adjust lines, leaving the paragraph
+The next four styles do not adjust lines, leaving the paragraph
 ragged. @Index { @Code ragged paragraph breaking style }
 cragged. @Index { @Code cragged paragraph breaking style }
 rragged. @Index { @Code rragged paragraph breaking style }
+oragged. @Index { @Code oragged paragraph breaking style }
 {@I ragged}:
 @IndentedList
 @LI @Tab
@@ -102,10 +103,23 @@ in possession of a good fortune,
 must be in want of a wife.
 }}
 }
+@LI @Tab
+    @Fmta { @Col 6c @Wide @Code A ! @Col 7c @Wide B }
+{
+@Rowa
+    A { "oragged @Break ..." }
+    B { oragged @Break {
+It is a truth universally
+acknowledged, that a single man
+in possession of a good fortune,
+must be in want of a wife.
+}}
+}
 @EndList
 The paragraph is broken in the same places as @Code adjust breaks it,
 but the resulting lines are left-justified, centred, or right-justified
-with respect to each other, rather than adjusted.
+with respect to each other, rather than adjusted; @Code "oragged"
+is like @Code "outdent" except the resulting lines are not adjusted.
 @PP
 If you have a few words that must be kept together on one line, the
 preventing. @Index { preventing line breaks }

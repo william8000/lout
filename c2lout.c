@@ -25,7 +25,7 @@
 /*****************************************************************************/
 #include <stdio.h>
 
-#define C2LOUT_VERSION	"c2lout Version 1.0 (March 1994)"
+#define C2LOUT_VERSION	"c2lout Version 3.11 (December 1996)"
 #define	BOOLEAN		unsigned
 #define	FALSE		0
 #define	TRUE		1
@@ -56,8 +56,19 @@ static float	tab_out;		/* tab interval width (-T option)    */
 static char 	tab_unit;		/* unit of measurement for tab       */
 static BOOLEAN	Scan();
 
+extern void ProcessStandAlone(char *fname, FILE *in_fp, FILE *out_fp);
 
-#define Error(str, arg)							\
+#define Error0(str)							\
+{									\
+  if( line_num > 0 )							\
+    fprintf(err_fp, "c2lout %s %d,%d: ", file_name, line_num, line_pos);\
+  else									\
+    fprintf(err_fp, "c2lout: ");					\
+  fprintf(err_fp, str);						\
+  fprintf(err_fp, "\n");						\
+}
+
+#define Error1(str, arg)							\
 {									\
   if( line_num > 0 )							\
     fprintf(err_fp, "c2lout %s %d,%d: ", file_name, line_num, line_pos);\
@@ -75,7 +86,7 @@ static BOOLEAN	Scan();
   else if( null_ok )							\
     arg = (char *) NULL;						\
   else									\
-  { Error(message, 0);							\
+  { Error0(message);							\
     exit(1);								\
   }									\
 } /* end GetArg */
@@ -89,8 +100,7 @@ static BOOLEAN	Scan();
 /*                                                                           */
 /*****************************************************************************/
 
-main(argc, argv)
-int argc; char *argv[];
+void main(int argc, char *argv[])
 { FILE *in_fp, *out_fp = stdout;
   BOOLEAN at_least_one_file, raw_seen;  int i;
   char *infilename, *outfilename, *errfilename, *str;
@@ -115,7 +125,7 @@ int argc; char *argv[];
       case 'r':
 
 	if( i > 1 )
-	{ Error("-r must be first if it occurs at all", 0);
+	{ Error0("-r must be first if it occurs at all");
 	  exit(1);
 	}
 	raw_seen = TRUE;
@@ -126,11 +136,11 @@ int argc; char *argv[];
      
 	/* read name of input file */
 	if( !raw_seen )
-	{ Error("-i illegal with -r", 0);
+	{ Error0("-i illegal with -r");
 	  exit(1);
 	}
 	if( in_fp != NULL )
-	{ Error("-i seen twice", 0);
+	{ Error0("-i seen twice");
 	  exit(1);
 	}
 	GetArg(infilename, "usage: -i<filename>", FALSE);
@@ -138,7 +148,7 @@ int argc; char *argv[];
 	/* open the file */
 	in_fp = fopen(infilename, "r");
 	if( in_fp == NULL )
-	{ Error("cannot open input file %s", infilename);
+	{ Error1("cannot open input file %s", infilename);
 	  exit(1);
 	}
 
@@ -153,13 +163,13 @@ int argc; char *argv[];
      
 	/* read name of output file */
 	if( out_fp != NULL )
-	{ Error("-o seen twice", 0);
+	{ Error0("-o seen twice");
 	  exit(1);
 	}
 	GetArg(outfilename, "usage: -o<filename>", FALSE);
 	out_fp = fopen(outfilename, "w");
 	if( out_fp == NULL )
-	{ Error("cannot open output file %s", outfilename);
+	{ Error1("cannot open output file %s", outfilename);
 	  exit(1);
 	}
 	break;
@@ -171,7 +181,7 @@ int argc; char *argv[];
 	GetArg(errfilename, "usage: -e<filename>", FALSE);
 	err_fp = fopen(errfilename, "w");
 	if( err_fp == NULL )
-	{ Error("cannot open error file %s", errfilename);
+	{ Error1("cannot open error file %s", errfilename);
 	  exit(1);
 	}
 	break;
@@ -181,12 +191,12 @@ int argc; char *argv[];
      
 	/* read print style */
 	if( raw_seen )
-	{ Error("-p illegal with -r option", 0);
+	{ Error0("-p illegal with -r option");
 	  exit(1);
 	}
 	GetArg(str, "usage: -p<printstyle>", FALSE);
 	if( style_option != NO_STYLE )
-	{ Error("-p option appears twice!", 0);
+	{ Error0("-p option appears twice");
 	  exit(1);
 	}
 	else if( strcmp(str, "fixed")   == 0 )
@@ -201,7 +211,7 @@ int argc; char *argv[];
 	  tab_by_spacing = FALSE;
 	}
 	else
-	{ Error("unknown -p option %s", str);
+	{ Error1("unknown -p option %s", str);
 	  exit(1);
 	}
 	break;
@@ -211,7 +221,7 @@ int argc; char *argv[];
      
 	/* read font family */
 	if( raw_seen )
-	{ Error("-f illegal with -r option", 0);
+	{ Error0("-f illegal with -r option");
 	  exit(1);
 	}
 	GetArg(font_option, "usage: -f<font>", FALSE);
@@ -222,7 +232,7 @@ int argc; char *argv[];
      
 	/* read font size */
 	if( raw_seen )
-	{ Error("-s illegal with -r option", 0);
+	{ Error0("-s illegal with -r option");
 	  exit(1);
 	}
 	GetArg(size_option, "usage: -s<size>", FALSE);
@@ -233,7 +243,7 @@ int argc; char *argv[];
      
 	/* read line spacing */
 	if( raw_seen )
-	{ Error("-v illegal with -r option", 0);
+	{ Error0("-v illegal with -r option");
 	  exit(1);
 	}
 	GetArg(line_option, "usage: -v<vsize>", FALSE);
@@ -245,11 +255,11 @@ int argc; char *argv[];
 	/* read tab interval */
 	GetArg(tabin_option, "usage: -t<number>", TRUE);
 	if( tabin_option != NULL && sscanf(tabin_option,"%d",&tab_in) != 1 )
-	{ Error("usage: -t<number>\n", 0);
+	{ Error0("usage: -t<number>\n");
 	  exit(1);
 	}
 	if( tab_in <= 0 )
-	{ Error("-t: tab interval must be greater than 0\n", 0);
+	{ Error0("-t: tab interval must be greater than 0\n");
 	  exit(1);
 	}
 	break;
@@ -261,17 +271,17 @@ int argc; char *argv[];
 	GetArg(tabout_option, "usage: -T<number><unit>", TRUE);
 	if( tabout_option != NULL )
 	{ if( sscanf(tabout_option, "%f%c",&tab_out,&tab_unit) != 2 )
-	  { Error("usage: -T<number><unit>\n", 0);
+	  { Error0("usage: -T<number><unit>\n");
 	    exit(1);
 	  }
 	  if( tab_out <= 0 || tab_out >= 50 )
-	  { Error("-T: unreasonably large or small tab interval", 0);
+	  { Error0("-T: unreasonably large or small tab interval");
 	    exit(1);
 	  }
 	  if( tab_unit != 'c' && tab_unit != 'i' && tab_unit != 'p' &&
 	      tab_unit != 'm' && tab_unit != 'f' && tab_unit != 's' &&
 	      tab_unit != 'v' )
-	  { Error("-T: tab unit must be one of cipmfsv\n", 0);
+	  { Error0("-T: tab unit must be one of cipmfsv\n");
 	    exit(1);
 	  }
 	  tab_by_spacing = FALSE;
@@ -282,7 +292,7 @@ int argc; char *argv[];
       case 'n':
      
 	if( raw_seen )
-	{ Error("-n illegal with -r option", 0);
+	{ Error0("-n illegal with -r option");
 	  exit(1);
 	}
 	headers_option = FALSE;
@@ -292,10 +302,10 @@ int argc; char *argv[];
       case 'V':
      
 	if( raw_seen )
-	{ Error("-V illegal with -r option", 0);
+	{ Error0("-V illegal with -r option");
 	  exit(1);
 	}
-	Error("%s", C2LOUT_VERSION);
+	Error1("%s", C2LOUT_VERSION);
 	exit(0);
 	break;
 
@@ -303,17 +313,17 @@ int argc; char *argv[];
       case 'u':
      
 	if( raw_seen )
-	{ Error("-u illegal with -r option", 0);
+	{ Error0("-u illegal with -r option");
 	  exit(1);
 	}
-	Error("usage: c2lout C-files   or   c2lout -r Lout-files", 0);
+	Error0("usage: c2lout C-files   or   c2lout -r Lout-files");
 	exit(0);
 	break;
 
 
       default:
      
-	Error("unknown command line flag %s", argv[i]);
+	Error1("unknown command line flag %s", argv[i]);
 	exit(1);
 	break;
 
@@ -322,13 +332,13 @@ int argc; char *argv[];
     {
 	/* argument is source file, so open it */
 	if( raw_seen )
-	{ Error("file parameter illegal with -r flag!", 0);
+	{ Error0("file parameter illegal with -r flag!");
 	  exit(1);
 	}
 	at_least_one_file = TRUE;
 	in_fp = fopen(argv[i], "r");
 	if( in_fp == NULL )
-	{ Error("cannot open input file %s", argv[i]);
+	{ Error1("cannot open input file %s", argv[i]);
 	  exit(1);
 	}
 
@@ -346,11 +356,11 @@ int argc; char *argv[];
   {
     /* check that input and output files are open */
     if( in_fp == NULL )
-    { Error("-r: missing -i option", 0);
+    { Error0("-r: missing -i option");
       exit(1);
     }
     if( out_fp == NULL )
-    { Error("-r: missing -o option", 0);
+    { Error0("-r: missing -o option");
       exit(1);
     }
 
@@ -374,8 +384,7 @@ int argc; char *argv[];
 /*                                                                           */
 /*****************************************************************************/
 
-ProcessStandAlone(fname, in_fp, out_fp)
-char *fname;  FILE *in_fp, *out_fp;
+void ProcessStandAlone(char *fname, FILE *in_fp, FILE *out_fp)
 { static BOOLEAN first = TRUE;
   char *style_str, *font_str, *size_str, *line_str, *face_str,
        *tabin_str, *tabout_str;
@@ -426,7 +435,7 @@ char *fname;  FILE *in_fp, *out_fp;
 
       default:
 
-	Error("internal error in -p option", 0);
+	Error0("internal error in -p option");
 	exit(1);
 	break;
     }
@@ -470,8 +479,7 @@ char *fname;  FILE *in_fp, *out_fp;
 /*                                                                           */
 /*****************************************************************************/
 
-EmitTab(out_fp)
-FILE *out_fp;
+void EmitTab(FILE *out_fp)
 {
   if( tab_by_spacing )
   { putc(' ', out_fp);
@@ -513,8 +521,7 @@ FILE *out_fp;
 #define	C_CHAR			11
 #define	C_CHAR_BACKSLASH	12
 
-static BOOLEAN Scan(in_fp, out_fp)
-FILE *in_fp, *out_fp;
+static BOOLEAN Scan(FILE *in_fp, FILE *out_fp)
 { int state, ch;
   state = C_REGULAR;
   while( (ch = getc(in_fp)) != EOF )
@@ -549,7 +556,7 @@ FILE *in_fp, *out_fp;
 	{ /*{*/ fputs("$}", out_fp);
 	}
 	else if( ch == '@' )
-	{ Error("@ character in C program text", 0);
+	{ Error0("@ character in C program text");
 	  return FALSE;
 	}
 	else if( ch == '/' )
@@ -574,7 +581,7 @@ FILE *in_fp, *out_fp;
 	if( ch == '*' )
 	{ int nextch = getc(in_fp);
 	  if( nextch == EOF )
-	  { Error("unexpected end-of-file", 0);
+	  { Error0("unexpected end-of-file");
 	    return FALSE;
 	  }
 	  else if( nextch == '@' )
@@ -590,7 +597,7 @@ FILE *in_fp, *out_fp;
 	else if( ch == '/' ) /* C++ comment */
 	{ int nextch = getc(in_fp);
 	  if( nextch == EOF )
-	  { Error("unexpected end-of-file", 0);
+	  { Error0("unexpected end-of-file");
 	    return FALSE;
 	  }
 	  else if( nextch == '@' )
@@ -742,7 +749,7 @@ FILE *in_fp, *out_fp;
       case C_STRING:		/* inside a C string */
 
 	if( ch == '\t' )
-	{ Error("replaced tab character in string by \\t", 0);
+	{ Error0("replaced tab character in string by \\t");
 	  fputs("\\\\t", out_fp);
 	}
 	else if( ch == '\\' )
@@ -754,7 +761,7 @@ FILE *in_fp, *out_fp;
 	  state = C_REGULAR;
 	}
 	else if( ch == '\n' )
-	{ Error("unterminated C string", 0);
+	{ Error0("unterminated C string");
 	  /*{*/ fputs("\"}\n", out_fp);
 	  state = C_REGULAR;
 	}
@@ -765,7 +772,7 @@ FILE *in_fp, *out_fp;
       case C_STRING_BACKSLASH:	/* inside a C string just after \ */
 
 	if( ch == '\t' )
-	{ Error("replacing literal tab character after \\ by t", 0);
+	{ Error0("replacing literal tab character after \\ by t");
 	  putc('t', out_fp);
 	  state = C_STRING;
 	}
@@ -778,7 +785,7 @@ FILE *in_fp, *out_fp;
 	  state = C_STRING;
 	}
 	else if( ch == '\n' )
-	{ Error("multi-line string printed as two strings, sorry", 0);
+	{ Error0("multi-line string printed as two strings, sorry");
 	  fputs("\"}\n{@S \"", out_fp);
 	  state = C_STRING;
 	}
@@ -792,7 +799,7 @@ FILE *in_fp, *out_fp;
       case C_CHAR:	/* inside char literal */
 
 	if( ch == '\t' )
-	{ Error("replacing literal tab character by \\t", 0);
+	{ Error0("replacing literal tab character by \\t");
 	  fputs("\\\\t", out_fp);
 	}
 	else if( ch == '\\' )
@@ -803,7 +810,7 @@ FILE *in_fp, *out_fp;
 	{ fputs("\\\"", out_fp);
 	}
 	else if( ch == '\n' )
-	{ Error("unterminated C character constant", 0);
+	{ Error0("unterminated C character constant");
 	  fputs("\"}\n", out_fp);
 	  state = C_REGULAR;
 	}
@@ -827,7 +834,7 @@ FILE *in_fp, *out_fp;
 	  state = C_CHAR;
 	}
 	else if( ch == '\n' )
-	{ Error("unterminated C character constant", 0);
+	{ Error0("unterminated C character constant");
 	  /*{*/ fputs("\"}\n", out_fp);
 	  state = C_REGULAR;
 	}
@@ -840,7 +847,7 @@ FILE *in_fp, *out_fp;
 
       default:
 
-	Error("unknown case %d", state);
+	Error1("unknown case %d", state);
 	exit(1);
 	break;
 
@@ -866,7 +873,7 @@ FILE *in_fp, *out_fp;
     case C_COMMENT_STAR:	/* inside C comment just after * */
 
       /*{*/ fputs("\"}\n", out_fp);
-      Error("C text ended inside a comment", 0);
+      Error0("C text ended inside a comment");
       break;
 
 
@@ -874,7 +881,7 @@ FILE *in_fp, *out_fp;
     case CPP_LOUT_INSERT:	/* inside C++ comment which is a Lout insert */
     case LOUT_INSERT_STAR:	/* inside Lout insert comment just after * */
 
-      Error("C text ended inside a Lout inclusion", 0);
+      Error0("C text ended inside a Lout inclusion");
       exit(1);
       break;
 
@@ -883,7 +890,7 @@ FILE *in_fp, *out_fp;
     case C_STRING_BACKSLASH:	/* inside a C string just after \ */
 
       /*{*/ fputs("\"}\n", out_fp);
-      Error("C text ended inside a string literal", 0);
+      Error0("C text ended inside a string literal");
       break;
 
 
@@ -891,13 +898,13 @@ FILE *in_fp, *out_fp;
     case C_CHAR_BACKSLASH:	/* inside quoted char just after \ */
 
       /*{*/ fputs("\"}\n", out_fp);
-      Error("C text ended inside a character literal", 0);
+      Error0("C text ended inside a character literal");
       break;
 
 
     default:
 
-      Error("unknown final state", 0);
+      Error0("unknown final state");
       exit(1);
       break;
   }

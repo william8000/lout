@@ -1,6 +1,6 @@
 /*@z34.c:Rotation Service:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -53,8 +53,8 @@ rect.y = polar.radius * sin(polar.angle)
 /*                                                                           */
 /*****************************************************************************/
 
-void RotateSize(LENGTH *xcb, LENGTH *xcf, LENGTH *xrb, LENGTH *xrf,
-OBJECT y, LENGTH theta)
+void RotateSize(FULL_LENGTH *xcb, FULL_LENGTH *xcf, FULL_LENGTH *xrb,
+  FULL_LENGTH *xrf, OBJECT y, FULL_LENGTH theta)
 { rect_coord ycorners[4], xcorner;  polar_coord pol;
   double maxx, maxy, minx, miny, ang;  int i;
 #if DEBUG_ON
@@ -80,8 +80,8 @@ OBJECT y, LENGTH theta)
   ycorners[3].y = - (float) fwd(y, ROWM);
 
   /* rotate these four corners by theta and store their extremes */
-  maxx = maxy = (float) - MAX_LEN;
-  minx = miny = (float) MAX_LEN;
+  maxx = maxy = (float) - MAX_FULL_LENGTH;
+  minx = miny = (float) MAX_FULL_LENGTH;
   for( i = 0;  i < 4;  i++ )
   {	
     if( ycorners[i].x == 0 && ycorners[i].y == 0 )
@@ -98,8 +98,8 @@ OBJECT y, LENGTH theta)
     debug4(DRS, DD, "    transforming (%s, %s) -> (%s, %s)",
       EchoLength( (int) pol.radius), buff1,
       EchoLength( (int) xcorner.x), EchoLength( (int) xcorner.y) );
-    maxx = max(maxx, xcorner.x);    minx = min(minx, xcorner.x);
-    maxy = max(maxy, xcorner.y);    miny = min(miny, xcorner.y);
+    maxx = find_max(maxx, xcorner.x);    minx = find_min(minx, xcorner.x);
+    maxy = find_max(maxy, xcorner.y);    miny = find_min(miny, xcorner.y);
   }
 
   /* store sizes back into x and return */

@@ -15,10 +15,10 @@ export @OverheadTransparencies @Lecture @Overhead
 def @OverheadLayout
     named @DateLine			{ No			}
     named @ContentsWord			{ contents		}
-    named @FirstLectureNumber		{ 1			}
-    named @FirstOverheadNumber		{ 1			}
     named @LectureNumbers		{ Arabic		}
+    named @FirstLectureNumber		{ 1			}
     named @OverheadNumbers		{ Arabic		}
+    named @FirstOverheadNumber		{ 1			}
     named @TitlePageFont		{ Helvetica Base      	}
     named @LectureHeadingFont		{ Bold 1.20f		}
     named @LectureHeadingBreak		{ clines 1.2fx nohyphen	}
@@ -139,7 +139,7 @@ def @OverheadLayout
 	{
 	    @DP	|0.5rt @LectureHeadingFont @Font @LectureHeadingBreak @Break
 		       @LectureHeadingFormat { @RefHeading @RefListTitle } |
-	    //  @PageMarker&&preceding @Tagged @Tag
+	    //  @PageMark @Tag
 	    //  @ReferencesInContents @ContentsEntry
 		    title { @RefHeading @RefListTitle }
 		    pagenum { @PageOf @Tag }
@@ -204,9 +204,11 @@ def @OverheadLayout
 
 	def @OverheadNum
 	{
-	  @BypassNumber @Dft {
-	    @OverheadNumbers @Num { @OverheadsList&&@Tag @Open { num } }
-	  }
+	    @OverheadNumbers @Then {
+		@BypassNumber @Dft {
+		    @OverheadNumbers @Num @OverheadsList&&@Tag @Open { num }
+		}
+	    }
 	}
 
 	@DP { |0.5rt @InitialLanguage @Language @OverheadHeadingFont @Font
@@ -215,7 +217,7 @@ def @OverheadLayout
 		@MajorTitle { @GetTitle }
 		@MinorNum { @OverheadNum }
         //  @NumberMarker @Tag { @Tag } @Value { @OverheadNum }
-        //  @PageMarker&&preceding @Tagged @Tag
+        //  @PageMark @Tag
         //  @OverheadsList&&preceding @Tagged @Tag
         //  @OverheadInContents @ContentsEntry
 		indent { 0f }
@@ -257,9 +259,11 @@ def @OverheadLayout
 
         def @LectureNum
         {
-	  @BypassNumber @Dft {
-	    @LectureNumbers @Num { @LectureList&&@Tag @Open { num } }
-	  }
+	    @LectureNumbers @Then {
+		@BypassNumber @Dft {
+		    @LectureNumbers @Num @LectureList&&@Tag @Open { num }
+		}
+	    }
         }
 
         def @LectureTitle
@@ -287,12 +291,12 @@ def @OverheadLayout
 
             def @OverheadNum
 	    {
-	      @BypassNumber @Dft {
 		@OverheadNumbers @Then {
-		    @LectureNum @DotJoin @OverheadNumbers @Num
-		    { @LecOverheadsList&&@Tag @Open { num } }
+		    @BypassNumber @Dft {
+			@LectureNum @Join @OverheadNumbers @Num
+			{ @LecOverheadsList&&@Tag @Open { num } }
+		    }
 		}
-	      }
 	    }
 
 	    @DP	{ |0.5rt @InitialLanguage @Language @OverheadHeadingFont @Font
@@ -303,7 +307,7 @@ def @OverheadLayout
 	            @MajorNum { @LectureNum }
 	            @MinorNum { @OverheadNum }
             //  @NumberMarker @Tag { @Tag } @Value { @OverheadNum }
-            //  @PageMarker&&preceding @Tagged @Tag
+            //  @PageMark @Tag
             //  @LecOverheadsList&&preceding @Tagged @Tag
             //  @OverheadInContents @ContentsEntry
 		    indent { 2f }
@@ -329,14 +333,14 @@ def @OverheadLayout
 	            @MajorTitle { @GetTitle }
 	            @MinorTitle { @LectureTitle }
 	            @MajorNum { @LectureNum }
-	            @MinorNum { @LectureNum @DotJoin 1 }
+	            @MinorNum { @LectureNum @Join 1 }
 	    @DP |0.5rt @InitialLanguage @Language @LectureHeadingFont @Font 
 		@LectureHeadingBreak @Break { {} @LectureHeadingFormat @Title } |
             //  NonStart @Runner
 	            @MajorTitle { @GetTitle }
 	            @MinorTitle { @LectureTitle }
 	            @MajorNum { @LectureNum }
-	            @MinorNum { @LectureNum @DotJoin 1 }
+	            @MinorNum { @LectureNum @Join 1 }
 	}
 
 	    @Title @Case {
@@ -345,7 +349,7 @@ def @OverheadLayout
 	    }
 
         //  @NumberMarker @Tag { @Tag } @Value { @LectureNum }
-        //  @PageMarker&&preceding @Tagged @Tag
+        //  @PageMark @Tag
         //  @LectureList&&preceding  @Tagged @Tag
         //  @LectureInContents @ContentsEntry
 		number { @LectureNum }
@@ -353,7 +357,7 @@ def @OverheadLayout
 		pagenum { @PageOf @Tag }
 	//
         //  @FootNoteThrough @Do @BeginFootNoteCounter
-	//1.1b
+	#//1.1b
 	//  @LectureNumInTheorems @BeginAllCounters @LectureNum
 	//  @LectureNumInDisplays @BeginDisplayCounter @LectureNum
 	//  @LectureNumInFigures @BeginFigureCounter @LectureNum

@@ -10,7 +10,7 @@ circles, boxes, etc.) required by diagrams.  Instead, it provides an
 escape route to some other language that does have these features, via
 its @@Graphic symbol:
 postscript.graphic @SubIndex { used by @@Graphic }
-@ID @Code {
+@ID @OneRow @OneRow @Code {
 "{ 0 0 moveto"
 "  0 ysize lineto"
 "  xsize ysize lineto"
@@ -25,7 +25,7 @@ postscript.graphic @SubIndex { used by @@Graphic }
 "}"
 }
 The result of the above invocation of the symbol @@Graphic is
-@ID {
+@ID @OneRow @OneRow {
 { 0     0     moveto
   0     ysize lineto
   xsize ysize lineto
@@ -56,7 +56,7 @@ is the bottom left-hand corner of the base.  It may use the symbols
 @Code xsize and @Code ysize to denote the horizontal and vertical size
 of the base; similarly, @Code xmark and @Code ymark denote the positions
 of the base's column and row marks:
-@ID 9p @Font @Fig {
+@ID @OneRow 9p @Font @Fig {
    { &1rt @I ysize /0ik &1rt @I ymark /0ik &1rt 0 } |0.4c
    {  /
       |0ik @ShowMarks { 1c @High 1.5c @Wide ^| 3c @Wide ^/ 2c @High }
@@ -67,7 +67,7 @@ of the base's column and row marks:
 }
 In addition to these four symbols and 0, lengths may be denoted in
 centimetres, inches, points, ems, f's, v's and s's using the notation
-@ID @Tab
+@ID @OneRow @Tab
     vmargin { 0.5vx }
     hmargin { 1m }
     @Fmta { @Col {@I l  @Code A} ! @Col {instead of Lout's} ! @Col {{@I l}B} }
@@ -85,11 +85,11 @@ unlike Lout proper.
 @PP
 A point within the base (and, with care, a point outside it) may
 be denoted by a pair of lengths.  For example,
-@ID @Code {
+@ID @OneRow @Code {
 "xmark  ymark"
 }
 is the point where the marks cross, and
-@ID @Code {
+@ID @OneRow @Code {
 "0   2 cm"
 }
 is a point on the left edge, two centimetres above the bottom left-hand
@@ -125,7 +125,7 @@ line will be drawn connecting the current point to the start of the arc.
 @LP
 The first item should always be a {@Code moveto}, {@Code arc}, or
 {@Code arcn}.  It should be clear from this that the path given earlier:
-@ID @Code {
+@ID @OneRow @Code {
 "0 0 moveto"
 "0 ysize lineto"
 "xsize ysize lineto"
@@ -150,14 +150,14 @@ of the given length.
 }
 @EL
 These options are followed by the word {@Code "stroke"}.  So, for example,
-@ID @Code {
+@ID @OneRow @Code {
 "{ 0 0 moveto xsize 0 lineto"
 "  2 pt setlinewidth [ 5 pt ] 0 setdash stroke"
 "}"
 "@Graphic { 3i @Wide }"
 }
 has result
-@ID {
+@ID @OneRow {
 { 0 0 moveto xsize 0 lineto
   2 pt setlinewidth [ 5 pt ] 0 setdash stroke
 }
@@ -167,7 +167,7 @@ has result
 When filling in the region enclosed by a path, the main option is
 {@Code setgray}, which determines the shade of grey to use, on a scale
 from 0 (black) to 1 (white).  So, for example,
-@ID @Code {
+@ID @OneRow @Code {
 "{ 0 0 moveto xsize 0 lineto 0 ysize lineto closepath"
 "  0.8 setgray fill"
 "}"
@@ -175,7 +175,7 @@ from 0 (black) to 1 (white).  So, for example,
 "{ 2c @Wide  2c @High }"
 }
 has result
-@ID {
+@ID @OneRow {
 { 0 0 moveto xsize 0 lineto 0 ysize lineto closepath
   0.8 setgray fill
 }
@@ -186,11 +186,11 @@ has result
 There are many other options.  The value of the left parameter of
 @@Graphic may be any fragment of the PostScript page description language
 @Cite { $adobe1990ps }.  Here are two other examples:
-@ID @Code {
+@ID @OneRow @Code {
 xsize 2 div
 }
 denoting a length equal to half the horizontal size of the base, and
-@ID @Code {
+@ID @OneRow @Code {
 gsave fill grestore stroke
 }
 which both fills and strokes the path.  Since Basser Lout does not check
@@ -205,13 +205,13 @@ to be sure of avoiding these errors.
 PostScript experts may find the following information helpful when
 designing advanced graphics features.  The left parameter of @@Graphic
 may have two parts, separated by {@Code "//"}:
-@ID {
+@ID @OneRow {
 @Code "{" @I {first part} @Code "//" @I {second part} @Code "} @Graphic"
 @I object
 }
 If there is no {@Code "//"}, the second part is taken to be empty.  The
 PostScript output has the form
-@ID lines @Break {
+@ID @OneRow lines @Break {
 @Code gsave
 @I x @I y @Code translate
 @I {Code which defines {@Code xsize}, {@Code ysize}, {@Code xmark}, {@Code ymark}, {@Code ft}, {@Code vs}, and {@Code sp} }

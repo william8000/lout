@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -73,6 +73,7 @@ OBJECT CommandOptions;
 /*  Encapsulated        Produce a one-page encapsulated PostScript file      */
 /*  Kern                Do kerning                                           */
 /*  SafeExecution       Execute safely, i.e. prohibit system() calls         */
+/*  AltErrorFormat      Use alternative error message format                 */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -80,26 +81,31 @@ BOOLEAN AllowCrossDb;
 BOOLEAN Encapsulated;
 BOOLEAN Kern;
 BOOLEAN SafeExecution;
+BOOLEAN	AltErrorFormat;
 
 
 /*****************************************************************************/
 /*                                                                           */
 /*  BackEnd		POSTSCRIPT or PLAINTEXT                              */
+/*  BackEndWord         "PostScript" or "PlainText"                          */
 /*  PlainCharWidth      if PLAINTEXT, the width of each character            */
 /*  PlainCharHeight     if PLAINTEXT, the height of each character           */
 /*  PlainFormFeed       if PLAINTEXT, TRUE if separate components with \f.   */
 /*  InitializeAll       TRUE if this is an initializing run.                 */
 /*  MsgCat              category for locale-specific messages                */
+/*  TotalWordCount      total number of words printed                        */
 /*                                                                           */
 /*****************************************************************************/
 
 int BackEnd;
-LENGTH PlainCharWidth, PlainCharHeight;
+FULL_CHAR *BackEndWord;
+FULL_LENGTH PlainCharWidth, PlainCharHeight;
 BOOLEAN PlainFormFeed;
 BOOLEAN InitializeAll;
 #if LOCALE_ON
 nl_catd MsgCat;
 #endif
+int TotalWordCount;
 
 
 /*****************************************************************************/
@@ -120,9 +126,49 @@ BOOLEAN xleft, BOOLEAN xright, BOOLEAN xindef, unsigned char xprec)
     FALSE, FALSE, 0, s, nilobj);
   if( xright )  InsertSym( AsciiToFull("pb"), RPAR, no_fpos, DEFAULT_PREC,
     FALSE, FALSE, 0, s, nilobj);
-  if( xleft && xright )  right_assoc(s) = TRUE;
+  if( xleft && xright && xpre != PLUS && xpre != MINUS )
+    right_assoc(s) = TRUE;
   return s;
 } /* end load */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  static void PrintUsage(fp)                                               */
+/*                                                                           */
+/*  Print usage information on file fp.                                      */
+/*                                                                           */
+/*****************************************************************************/
+#define lput(str) fprintf(fp, "%s\n", str)
+
+static void PrintUsage(FILE *fp)
+{
+  lput(""								    );
+  lput("usage:  lout options files"					    );
+  lput(""								    );
+  lput("  -s              suppress access to cross reference database"	    );
+  lput("  -EPS            EPS (Encapsulated PostScript) output"		    );
+  lput("  -p              plain text output instead of PostScript"	    );
+  lput("  -P              like -p but with form-feed char between pages"    );
+  lput("  -S              safe execution (disable calls to system(3))"	    );
+  lput("  -U              unsafe execution (allow calls to system(3))"	    );
+  lput("  -o file         output to file instead of stdout"		    );
+  lput("  -e file         error messages to file instead of stderr"	    );
+  lput("  -a              alternative error format:  file:line:col ..."	    );
+  lput("  -i file         like @SysInclude { file }; not recommended"	    );
+  lput("  -I directory    add directory to include file search path"	    );
+  lput("  -C directory    add directory to LCM file search path"	    );
+  lput("  -F directory    add directory to font metrics file search path"   );
+  lput("  -H directory    add directory to hyphenation file search path"    );
+  lput("  -D directory    add directory to database file search path"	    );
+  lput("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'" );
+  lput("  -x              initializing run, not for ordinary use"	    );
+  lput("  -u              print this usage message on stderr and exit"	    );
+  lput("  -V              print version and configuration information"	    );
+  lput("  -               a file name denoting standard input"		    );
+  lput(""								    );
+
+} /* end PrintUsage */
 
 
 /*@::GetArg(), main()@********************************************************/
@@ -160,43 +206,62 @@ int main(int argc, char *argv[])
   int source_file_count;		/* number of source files in command */
   FULL_CHAR *cross_db;			/* name of cross reference database  */
   FULL_CHAR *outfile;			/* name of output file               */
+  FULL_CHAR *lib;			/* name of library directory         */
   FILE *out_fp;
   long MemCheckLong;
   FULL_CHAR oname[MAX_BUFF], oval[MAX_BUFF], buff[MAX_BUFF], *p;
   int bp;  OBJECT z;
+  BOOLEAN seen_wordcount;
+#if LOCALE_ON
+  char catname[MAX_BUFF], *loc;
+#endif
+
+  /* find the name of the library directory, from envt or else from -D */
+  lib = AsciiToFull(getenv("LOUTLIB"));
+  if( lib == (FULL_CHAR *) NULL )
+    lib = AsciiToFull(LIB_DIR);
 
   /* set locale if that's what we are doing */
 #if LOCALE_ON
-  char catname[MAX_BUFF], *loc;
   loc = setlocale(LC_MESSAGES, "");
   if( loc == (char *) NULL )
   { Error(1, 6, "unable to initialize locale", WARN, no_fpos);
     loc = "C";
   }
-  sprintf(catname, "%s/%s/LC_MESSAGES/errors.%s", LOCALE_DIR, loc, loc);
+  sprintf(catname, "%s/%s/%s/LC_MESSAGES/errors.%s",
+    lib, LOCALE_DIR, loc, loc);
   MsgCat = catopen(catname, 0);
 #endif
 
+#if COLLATE
+  if (!setlocale (LC_COLLATE, ""))
+    Error(1, 30, "unable to initialize collation", WARN, no_fpos);
+#endif /* COLLATE */
+
   /* initialise various modules, add current directory to search paths */
+  TotalWordCount = 0;
+  seen_wordcount = FALSE;
   BackEnd = POSTSCRIPT;
+  BackEndWord = STR_POSTSCRIPT;
   PlainCharWidth = PLAIN_WIDTH;
   PlainCharHeight = PLAIN_HEIGHT;
   PlainFormFeed = FALSE;
   InitializeAll = FALSE;
   AllowCrossDb = TRUE;
   Encapsulated = FALSE;
-  SafeExecution = FALSE;
+  SafeExecution = SAFE_DFT ? TRUE : FALSE;
   Kern = TRUE;
   MemInit();
   InitSym();
   LexInit();
   InitFiles();
-  AddToPath(SOURCE_PATH,   STR_EMPTY);
-  AddToPath(DATABASE_PATH, STR_EMPTY);
-  AddToPath(INCLUDE_PATH,  STR_EMPTY);
+  AddToPath(SOURCE_PATH,   MakeWord(WORD, STR_EMPTY, no_fpos));
+  AddToPath(DATABASE_PATH, MakeWord(WORD, STR_EMPTY, no_fpos));
+  AddToPath(INCLUDE_PATH,  MakeWord(WORD, STR_EMPTY, no_fpos));
 
   /* read command line */
   stdin_seen = FALSE;
+  AltErrorFormat = FALSE;
   cross_db = CROSS_DB;
   outfile = STR_STDOUT;
   source_file_count = 0;
@@ -210,6 +275,9 @@ int main(int argc, char *argv[])
 	/* read name of output file */
 	if( (outfile = GetArg(argv, argc, &i)) == NULL )
 	  Error(1, 7, "usage: -o <filename>", FATAL, no_fpos);
+	if( StringEndsWith(outfile, SOURCE_SUFFIX) )
+	  Error(1, 28, "-o: output file name %s ends with %s",
+	    FATAL, no_fpos, outfile, SOURCE_SUFFIX);
 	break;
 
 
@@ -244,6 +312,13 @@ int main(int argc, char *argv[])
 	break;
 
 
+      case CH_FLAG_ALTERR:
+     
+	/* alternative error message format */
+	AltErrorFormat = TRUE;
+	break;
+
+
       case CH_FLAG_EPSFIRST:
      
 	/* -EPS produces encapsulated PostScript output */
@@ -258,8 +333,8 @@ int main(int argc, char *argv[])
 	/* add directory to database and sysdatabase paths */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
 	  Error(1, 11, "usage: -D <directoryname>", FATAL, no_fpos);
-	AddToPath(DATABASE_PATH, arg);
-	AddToPath(SYSDATABASE_PATH, arg);
+	AddToPath(DATABASE_PATH, MakeWord(WORD, arg, no_fpos));
+	AddToPath(SYSDATABASE_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
 
 
@@ -268,7 +343,7 @@ int main(int argc, char *argv[])
 	/* add directory to character mapping path */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
 	  Error(1, 12, "usage: -C <directoryname>", FATAL, no_fpos);
-	AddToPath(MAPPING_PATH, arg);
+	AddToPath(MAPPING_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
 
 
@@ -277,7 +352,7 @@ int main(int argc, char *argv[])
 	/* add directory to font path */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
 	  Error(1, 13, "usage: -F <directoryname>", FATAL, no_fpos);
-	AddToPath(FONT_PATH, arg);
+	AddToPath(FONT_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
 
 
@@ -286,7 +361,7 @@ int main(int argc, char *argv[])
 	/* add directory to hyph path */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
 	  Error(1, 14, "usage: -H <directoryname>", FATAL, no_fpos);
-	AddToPath(HYPH_PATH, arg);
+	AddToPath(HYPH_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
 
 
@@ -295,8 +370,8 @@ int main(int argc, char *argv[])
 	/* add directory to include and sysinclude paths */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
 	  Error(1, 15, "usage: -I <directoryname>", FATAL, no_fpos);
-	AddToPath(INCLUDE_PATH, arg);
-	AddToPath(SYSINCLUDE_PATH, arg);
+	AddToPath(INCLUDE_PATH, MakeWord(WORD, arg, no_fpos));
+	AddToPath(SYSINCLUDE_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
 
 
@@ -332,14 +407,26 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "%-28s %s\n",
 	  "Basser Lout written by:", "Jeffrey H. Kingston (jeff@cs.usyd.edu.au)");
 	fprintf(stderr, "%-28s %s\n",
-	  "Free source available from:", "ftp://ftp.cs.usyd.edu.au/jeff/lout");
+	  "Free source available from:", "ftp://ftp.cs.su.oz.au/jeff/lout");
 	fprintf(stderr, "%-28s %s %s\n",
 	  "This executable compiled:", __TIME__, __DATE__);
-	fprintf(stderr, "%-28s %s\n", "System include directory:", INCL_DIR);
-	fprintf(stderr, "%-28s %s\n", "System database directory:", DATA_DIR);
+	fprintf(stderr, "%-28s %s%s%s\n", "System include directory:",
+	  lib, STR_DIR, INCL_DIR);
+	fprintf(stderr, "%-28s %s%s%s\n", "System database directory:",
+	  lib, STR_DIR, DATA_DIR);
 	fprintf(stderr, "Database index files created afresh automatically:%s\n",
 	  USE_STAT ? " yes" : " no");
+	fprintf(stderr, "Safe execution (disabling system()) is default:%s\n",
+	  SAFE_DFT ? " yes" : " no");
+	fprintf(stderr, "strcoll() used for sorting collation sequence:%s\n",
+	  COLLATE ? " yes" : " no");
 	exit(0);
+	break;
+
+
+      case CH_FLAG_WORDS:
+     
+	seen_wordcount = TRUE;
 	break;
 
 
@@ -352,9 +439,9 @@ int main(int argc, char *argv[])
       case CH_FLAG_PLAIN:
      
 	BackEnd = PLAINTEXT;
+	BackEndWord = STR_PLAINTEXT;
 	if( *(argv[i]+2) != '\0' )
 	{ float len1, len2;  FULL_CHAR units1, units2;
-	  debug1(DGP, DD, "  command line %s", argv[i]+2);
 	  if( sscanf(argv[i]+2, "%f%c%f%c",&len1,&units1,&len2,&units2) != 4 )
 	  { Error(1, 19, "usage: lout -%c<length><length>",
 	      FATAL, no_fpos, *(argv[i]+1));
@@ -393,8 +480,8 @@ int main(int argc, char *argv[])
 
 
       case CH_FLAG_USAGE:
-     
-	Error(1, 22, "usage: lout [ -i <filename> ] files", WARN, no_fpos);
+
+	PrintUsage(stderr);
 	exit(0);
 	break;
 
@@ -481,8 +568,15 @@ int main(int argc, char *argv[])
 	SafeExecution = TRUE;
 	break;
 
+      case CH_FLAG_UNSAFE:
+
+	/* allow unsafe execution */
+	SafeExecution = FALSE;
+	break;
+
       default:
      
+	PrintUsage(stderr);
 	Error(1, 26, "unknown command line flag %s", FATAL, no_fpos, argv[i]);
 	break;
 
@@ -513,13 +607,13 @@ int main(int argc, char *argv[])
   PrintInit(out_fp);
 
   /* append default directories to file search paths */
-  AddToPath(FONT_PATH,         AsciiToFull(FONT_DIR));
-  AddToPath(HYPH_PATH,         AsciiToFull(HYPH_DIR));
-  AddToPath(MAPPING_PATH,      AsciiToFull(MAPS_DIR));
-  AddToPath(SYSDATABASE_PATH,  AsciiToFull(DATA_DIR));
-  AddToPath(DATABASE_PATH,     AsciiToFull(DATA_DIR));
-  AddToPath(SYSINCLUDE_PATH,   AsciiToFull(INCL_DIR));
-  AddToPath(INCLUDE_PATH,      AsciiToFull(INCL_DIR));
+  AddToPath(FONT_PATH,       MakeWordThree(lib, STR_DIR, AsciiToFull(FONT_DIR)));
+  AddToPath(HYPH_PATH,       MakeWordThree(lib, STR_DIR, AsciiToFull(HYPH_DIR)));
+  AddToPath(MAPPING_PATH,    MakeWordThree(lib, STR_DIR, AsciiToFull(MAPS_DIR)));
+  AddToPath(SYSDATABASE_PATH,MakeWordThree(lib, STR_DIR, AsciiToFull(DATA_DIR)));
+  AddToPath(DATABASE_PATH,   MakeWordThree(lib, STR_DIR, AsciiToFull(DATA_DIR)));
+  AddToPath(SYSINCLUDE_PATH, MakeWordThree(lib, STR_DIR, AsciiToFull(INCL_DIR)));
+  AddToPath(INCLUDE_PATH,    MakeWordThree(lib, STR_DIR, AsciiToFull(INCL_DIR)));
 
   /* use stdin if no source files were mentioned */
   if( source_file_count == 0 )
@@ -543,9 +637,15 @@ int main(int argc, char *argv[])
   load(KW_BEGIN,       BEGIN,          FALSE,  FALSE,  FALSE, BEGIN_PREC  );
   load(KW_END,         END,            FALSE,  FALSE,  FALSE, END_PREC    );
   load(KW_ENV,         ENV,            FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_ENVA,        ENVA,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_ENVB,        ENVB,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_ENVC,        ENVC,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_ENVD,        ENVD,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_CENV,        CENV,           FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_CLOS,        CLOS,           FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_LVIS,        LVIS,           FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_LUSE,        LUSE,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_LEO,         LEO,            FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_LBR,         LBR,            FALSE,  FALSE,  FALSE, LBR_PREC    );
   load(KW_RBR,         RBR,            FALSE,  FALSE,  FALSE, RBR_PREC    );
   load(KW_INCLUDE,     INCLUDE,        FALSE,  FALSE,  FALSE, NO_PREC     );
@@ -574,6 +674,8 @@ int main(int argc, char *argv[])
   load(KW_RUMP,        RUMP,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_INSERT,      INSERT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_NEXT,        NEXT,           FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_PLUS,        PLUS,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_MINUS,       MINUS,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_OPEN,        OPEN,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_TAGGED,      TAGGED,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_WIDE,        WIDE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
@@ -586,6 +688,7 @@ int main(int argc, char *argv[])
   load(KW_VSCALE,      VSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HCOVER,      HCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_VCOVER,      VCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_KERN_SHRINK, KERN_SHRINK,    TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_SCALE,       SCALE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HCONTRACT,   HCONTRACT,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_VCONTRACT,   VCONTRACT,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
@@ -599,6 +702,7 @@ int main(int argc, char *argv[])
   load(KW_SINCGRAPHIC, SINCGRAPHIC,    FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_GRAPHIC,     GRAPHIC,        TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_CROSS,       CROSS,          TRUE,   TRUE,   FALSE, CROSSOP_PREC);
+  load(KW_FORCE_CROSS, FORCE_CROSS,    TRUE,   TRUE,   FALSE, CROSSOP_PREC);
   load(KW_NULL,        NULL_CLOS,      FALSE,  FALSE,  TRUE,  NO_PREC     );
   load(KW_PAGE_LABEL,  PAGE_LABEL,     FALSE,  TRUE,   TRUE,  DEFAULT_PREC);
 
@@ -621,11 +725,14 @@ int main(int argc, char *argv[])
   /* initialize filter module */
   FilterInit();
 
+  /* initialize enviroment table module */
+  EnvInit();
+
   /* initialise scope chain to <StartSym> */
   PushScope(StartSym, FALSE, FALSE);
 
   /* initialise lexical analyser */
-  LexPush(FirstFile(SOURCE_FILE), 0, SOURCE_FILE);
+  LexPush(FirstFile(SOURCE_FILE), 0, SOURCE_FILE, 1, FALSE);
 
   /* process input files */
   InitParser(cross_db);
@@ -644,6 +751,10 @@ int main(int argc, char *argv[])
   /* remove any leftover filter temporary files */
   FilterScavenge(TRUE);
 
+  /* print word count, if required */
+  if( seen_wordcount )
+    Error(1, 29, "total of all words printed: %d", WARN,no_fpos,TotalWordCount);
+
   /* check for unbalanced error blocks */
   CheckErrorBlocks();
 
@@ -654,6 +765,7 @@ int main(int argc, char *argv[])
   ifdebug(DMA, D, DebugMemory() );
   ifdebug(DPP, D, ProfileOff("main"));
   ifdebug(DPP, D, ProfilePrint());
+  ifdebug(DET, D, EnvDebug());
 
 #if LOCALE_ON
   catclose(MsgCat);

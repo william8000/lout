@@ -183,10 +183,18 @@ first appearance in the document.
 The value of @Code "@RefListSortKey" may be any sequence of words
 and options from the @Code "@Reference" symbol, but not @Code "@RefNum"
 for obvious reasons.  A possible more elaborate sorting key is
-@ID @Code "@RefListSortKey { @Author @Year }"
-sorting first by author, then by year within each author.  However you
+@ID @Code "@RefListSortKey { @Author:@Year:@Tag }"
+sorting first by author, then by year within each author, and finally
+by tag.  However you
 are supposed to choose tags which have this effect, and that is more
 reliable since the modern practice is to put the authors' surnames
 after their given names.  There seems to be little practical use for
 sorting keys other than {@Code "@Tag"} and {@Code "@Label"}.
+@PP
+A colon within the @Code "@RefListSortKey" option is converted by Lout
+into a character smaller than any printable character, which ensures that
+the sorting is carried out separately on the three fields.  It is essential
+that the sort key uniquely identify the reference, because if two sort
+keys are equal only one of the references will be printed.  The easiest
+way to ensure this is to always include @Code "@Tag" in the sort key.
 @End @Section

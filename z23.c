@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -30,6 +30,7 @@
 #include "externs"
 #define	NO_SUPPRESS	FALSE
 #define	SUPPRESS	TRUE
+#define word_equal(x, str)  (is_word(type(x)) && StringEqual(string(x), str))
 
 #define CountChild(y, link, i)						\
 for( y=pred(link, PARENT), i=1; type(y)==LINK;  y = pred(y, PARENT), i++ )
@@ -43,7 +44,7 @@ for( y=pred(link, PARENT), i=1; type(y)==LINK;  y = pred(y, PARENT), i++ )
 /*                                                                           */
 /*****************************************************************************/
 
-static float ScaleFactor(LENGTH avail_size, LENGTH inner_size)
+static float ScaleFactor(FULL_LENGTH avail_size, FULL_LENGTH inner_size)
 { float scale_factor;
   scale_factor = avail_size <= 0 ? 0 :
 		 inner_size <= 0 ? 0 : (float) avail_size / inner_size;
@@ -53,17 +54,17 @@ static float ScaleFactor(LENGTH avail_size, LENGTH inner_size)
 
 /*@::FindAdjustIncrement()@***************************************************/
 /*                                                                           */
-/*  static LENGTH FindAdjustIncrement(x, frame_size, dim)                    */
+/*  static FULL_LENGTH FindAdjustIncrement(x, frame_size, dim)               */
 /*                                                                           */
 /*  Find the amount by which to increase the width of the subobjects of      */
 /*  concatenation object x so that it is adjusted to fill size frame_size.   */
 /*                                                                           */
 /*****************************************************************************/
 
-static LENGTH FindAdjustIncrement(OBJECT x, LENGTH frame_size, int dim)
+static FULL_LENGTH FindAdjustIncrement(OBJECT x, FULL_LENGTH frame_size,int dim)
 { OBJECT y, link, prev, g;
   int adjustable_gaps;  BOOLEAN jn;
-  LENGTH inc, mk, actual_size;
+  FULL_LENGTH inc, mk, actual_size;
 
   debug2(DGP, DD, "FindAdjustIncrement(x, %s, %s)",
 	EchoLength(frame_size), dimen(dim));
@@ -125,12 +126,12 @@ static LENGTH FindAdjustIncrement(OBJECT x, LENGTH frame_size, int dim)
 /*                                                                           */
 /*****************************************************************************/
 
-void FixAndPrintObject(OBJECT x, LENGTH xmk, LENGTH xb, LENGTH xf, int dim,
-BOOLEAN suppress, LENGTH pg, int count)
+void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
+  FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg, int count)
 { OBJECT y, link, prev, g, uplink, z, face;
-  LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
+  FULL_LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
   int i; float scale_factor;  BOOLEAN jn;
-  debug6(DGP, D, "[ FixAndPrintObject(%s, %s, %s,%s, %s, %s, pg )",
+  debug6(DGP, DD, "[ FixAndPrintObject(%s, %s, %s,%s, %s, %s, pg )",
     Image(type(x)), EchoLength(xmk), EchoLength(xb), EchoLength(xf),dimen(dim),
     (suppress == SUPPRESS ? "suppress" : "no_suppress"));
   debug2(DGP, DD, "  size(x) = %s,%s;  x =",
@@ -154,6 +155,7 @@ BOOLEAN suppress, LENGTH pg, int count)
     case NULL_CLOS:
     case PAGE_LABEL:
     case CROSS:
+    case FORCE_CROSS:
     
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -179,7 +181,7 @@ BOOLEAN suppress, LENGTH pg, int count)
       }
       else
       {
-	debug3(DGP, D, "  FAPO %s %s (underline = %s)", Image(type(x)),
+	debug3(DGP, DD, "  FAPO %s %s (underline = %s)", Image(type(x)),
 	  string(x), bool(underline(x)));
 	if( string(x)[0] != '\0' )
 	{ PrintWord(x, word_save_mark(x), pg - xmk);
@@ -220,14 +222,14 @@ BOOLEAN suppress, LENGTH pg, int count)
 	/* work out the size of the shift depending on the units */
 	f = FindShift(x, y, dim);
 	ymk = xmk - f;
-	yb = max(0, xb - f);
-	yf = max(0, xf + f);
+	yb = find_max(0, xb - f);
+	yf = find_max(0, xf + f);
 	FixAndPrintObject(y, ymk, yb, yf, dim, suppress, pg, count);
 
 	/* recalculate the size of x as in MinSize */
 	f = FindShift(x, y, dim);
-	back(x, dim) = min(MAX_LEN, max(0, back(y, dim) + f));
-	fwd(x, dim)  = min(MAX_LEN, max(0, fwd(y, dim)  - f));
+	back(x, dim) = find_min(MAX_FULL_LENGTH, find_max(0, back(y, dim) + f));
+	fwd(x, dim)  = find_min(MAX_FULL_LENGTH, find_max(0, fwd(y, dim)  - f));
       }
       else
       {	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
@@ -285,8 +287,8 @@ BOOLEAN suppress, LENGTH pg, int count)
           if( dim == COLM )
             FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
           else if( (scale_factor = ScaleFactor(xb+xf, size(y, ROWM))) > 0 )
-          { SaveGraphicState();
-	    CoordTranslate(0, pg-(xmk-xb+(LENGTH) (back(y,ROWM)*scale_factor)));
+          { SaveGraphicState(y);
+	    CoordTranslate(0, pg-(xmk-xb+(FULL_LENGTH) (back(y,ROWM)*scale_factor)));
 	    CoordScale(1.0, scale_factor);
             FixAndPrintObject(y, 0, back(y,ROWM), fwd(y,ROWM), dim,
 	      NO_SUPPRESS, 0, count);
@@ -327,9 +329,9 @@ BOOLEAN suppress, LENGTH pg, int count)
           }
           else if( (scale_factor =
 	    ScaleFactor(bc(constraint(x))+fc(constraint(x)),size(y,COLM))) > 0 )
-          { SaveGraphicState();
+          { SaveGraphicState(y);
 	    CoordTranslate(save_mark(x) - bc(constraint(x))
-	       + (LENGTH) (back(y, COLM)*scale_factor), 0);
+	       + (FULL_LENGTH) (back(y, COLM)*scale_factor), 0);
 	    CoordScale(scale_factor, 1.0);
             FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
 	    RestoreGraphicState();
@@ -368,7 +370,7 @@ BOOLEAN suppress, LENGTH pg, int count)
           { assert( fc(constraint(x)) > 0, "FAPO: vertical scale factor!" );
 	    yb = xb * SF / fc(constraint(x));
 	    yf = xf * SF / fc(constraint(x));
-	    SaveGraphicState();
+	    SaveGraphicState(y);
 	    CoordTranslate(save_mark(x), pg - xmk);
 	    CoordScale( (float) bc(constraint(x))/SF,
 	      (float) fc(constraint(x))/SF);
@@ -379,6 +381,20 @@ BOOLEAN suppress, LENGTH pg, int count)
 	  break;
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
+      break;
+
+
+    case KERN_SHRINK:
+
+      CountChild(y, LastDown(x), count);
+      if( dim == COLM )
+      { FixAndPrintObject(y, xmk, back(y,dim), fwd(y,dim), dim,
+	  NO_SUPPRESS, pg, count);
+      }
+      else
+      {	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+        back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      }
       break;
 
 
@@ -402,18 +418,18 @@ BOOLEAN suppress, LENGTH pg, int count)
           if( dim == COLM )
           { CONSTRAINT colc, rowc, yc;
             save_mark(x) = xmk;
-	    SetConstraint(colc, back(x,COLM), MAX_LEN, fwd(x,COLM));
-	    SetConstraint(rowc, back(x,ROWM), MAX_LEN, fwd(x,ROWM));
+	    SetConstraint(colc, back(x,COLM), MAX_FULL_LENGTH, fwd(x,COLM));
+	    SetConstraint(rowc, back(x,ROWM), MAX_FULL_LENGTH, fwd(x,ROWM));
 	    RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc,COLM);
 	    FixAndPrintObject(y, 0, bc(yc), fc(yc), COLM,NO_SUPPRESS,pg,count);
           }
           else
           { CONSTRAINT colc, rowc, yc;
-	    SaveGraphicState();
+	    SaveGraphicState(y);
 	    CoordTranslate(save_mark(x), pg - xmk);
 	    CoordRotate(sparec(constraint(x)));
-	    SetConstraint(colc, back(x,COLM), MAX_LEN, fwd(x,COLM));
-	    SetConstraint(rowc, back(x,ROWM), MAX_LEN, fwd(x,ROWM));
+	    SetConstraint(colc, back(x,COLM), MAX_FULL_LENGTH, fwd(x,COLM));
+	    SetConstraint(rowc, back(x,ROWM), MAX_FULL_LENGTH, fwd(x,ROWM));
 	    RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc, ROWM);
 	    FixAndPrintObject(y, 0, bc(yc), fc(yc), ROWM, NO_SUPPRESS,0,count);
 	    RestoreGraphicState();
@@ -462,13 +478,18 @@ BOOLEAN suppress, LENGTH pg, int count)
             else pre = tmp, post = nilobj;
 	    back(x, dim) = xb;
 	    fwd(x, dim)  = xf;
-            SaveGraphicState();
+
+	    SaveTranslateDefineSave(x, save_mark(x), pg - (xmk + fwd(x, ROWM)));
+	    /* ***
+            SaveGraphicState(x);
             CoordTranslate(save_mark(x), pg - (xmk + fwd(x, ROWM)));
 	    debug4(DGP, DD, "GRAPHIC ROWM calling %s,%s %s,%s",
 	      EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)),
 	      EchoLength(back(x, ROWM)), EchoLength(fwd(x, ROWM)));
             DefineGraphicNames(x);
-            SaveGraphicState();
+            SaveGraphicState(x);
+	    *** */
+
             PrintGraphicObject(pre);
             RestoreGraphicState();
             FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, xb + xf, count);
@@ -497,8 +518,10 @@ BOOLEAN suppress, LENGTH pg, int count)
 
           if( dim == COLM )
 	  { save_mark(x) = xmk;
-	    if( sparec(constraint(x)) )
-	    { face = finfo[font(save_style(x))].original_font;
+	    if( incgraphic_ok(x) )
+	    { debug2(DGP, D, "  %s (style %s)",
+		EchoObject(x), EchoStyle(&save_style(x)));
+	      face = finfo[font(save_style(x))].original_font;
 	      if( font_page(face) < font_curr_page )
 	      {	debug3(DFT, DD, "FAPO-IG: x = %s, font = %d, face = %s",
 		  string(x), font(save_style(x)), EchoObject(face));
@@ -506,7 +529,7 @@ BOOLEAN suppress, LENGTH pg, int count)
 	      }
 	    }
 	  }
-          else if( sparec(constraint(x)) )
+          else if( incgraphic_ok(x) )
 	    PrintGraphicInclude(x, save_mark(x), pg - xmk);
 	  break;
 
@@ -554,15 +577,16 @@ BOOLEAN suppress, LENGTH pg, int count)
 	      dim, NO_SUPPRESS, pg, count);
 	  else
 	    FixAndPrintObject(prev, mk, back(prev,dim),
-	      max(fwd(prev, dim), back_edge+frame_size-mk),
+	      find_max(fwd(prev, dim), back_edge+frame_size-mk),
 	      dim, NO_SUPPRESS, pg, count);
-	  back(x, dim) = max(back(x, dim), xb);
+	  back(x, dim) = find_max(back(x, dim), xb);
 	  fwd(x, dim) = mk + fwd(prev, dim) - back_edge - back(x, dim);
 	}
 	else back(x, dim) = xb, fwd(x, dim) = xf;
       }
       else
-      { OBJECT start_group, zlink, m;  BOOLEAN dble_found;  LENGTH b, f, dlen;
+      { OBJECT start_group, zlink, m;  BOOLEAN dble_found;
+	FULL_LENGTH b, f, dlen;
 	start_group = nilobj;  dble_found = FALSE;  dlen = 0;
 	debug0(DGP, DD, "  groups beginning.");
 	FirstDefinite(x, link, y, jn);
@@ -593,9 +617,9 @@ BOOLEAN suppress, LENGTH pg, int count)
 		if( !is_definite(type(z)) || z == m )  continue;
 		FixAndPrintObject(z, xmk + b, b, xf - b, dim,
 		  SUPPRESS, pg, count);
-		b = max(b, back(z, dim));  f = max(f, fwd(z, dim));
+		b = find_max(b, back(z, dim));  f = find_max(f, fwd(z, dim));
 	      }
-	      dlen = max(dlen, b + f);
+	      dlen = find_max(dlen, b + f);
 	      dble_found = TRUE;
 	      start_group = nilobj;
 
@@ -610,8 +634,8 @@ BOOLEAN suppress, LENGTH pg, int count)
 	    else
 	    {
 	      /* continue with current group */
-	      b = max(b, back(y, dim));
-	      f = max(f, fwd(y, dim));
+	      b = find_max(b, back(y, dim));
+	      f = find_max(f, fwd(y, dim));
 	      if( fwd(y, dim) > fwd(m, dim) )  m = y;
 	      debug2(DGP, DD, "  continuing group: b = %s, f = %s",
 		EchoLength(b), EchoLength(f));
@@ -632,9 +656,9 @@ BOOLEAN suppress, LENGTH pg, int count)
 	    { CountChild(z, zlink, count);
 	      if( !is_definite(type(z)) || z == m )  continue;
 	      FixAndPrintObject(z, xmk+b, b, xf - b, dim, SUPPRESS, pg, count);
-	      b = max(b, back(z, dim));  f = max(f, fwd(z, dim));
+	      b = find_max(b, back(z, dim));  f = find_max(f, fwd(z, dim));
 	    }
-	    dlen = max(dlen, b + f);
+	    dlen = find_max(dlen, b + f);
 	    back(x, dim) = 0;  fwd(x, dim) = dlen;
 	  }
 	  else
@@ -648,7 +672,7 @@ BOOLEAN suppress, LENGTH pg, int count)
 	    { CountChild(z, zlink, count);
 	      if( !is_definite(type(z)) || z == m )  continue;
 	      FixAndPrintObject(z, xmk, xb, xf, dim, SUPPRESS, pg, count);
-	      b = max(b, back(z, dim));  f = max(f, fwd(z, dim));
+	      b = find_max(b, back(z, dim));  f = find_max(f, fwd(z, dim));
 	    }
 	    back(x, dim) = b;  fwd(x, dim) = f;
 	  }
@@ -661,7 +685,7 @@ BOOLEAN suppress, LENGTH pg, int count)
 
       if( dim == COLM )
       { BOOLEAN will_adjust, adjusting;
-	LENGTH actual_size,
+	FULL_LENGTH actual_size,
 	adjust_indent, frame_size, back_edge, adjust_inc, inc, adjust_sofar;
 	int adjustable_gaps, gaps_sofar;
 	BOOLEAN underlining; int underline_xstart; FONT_NUM underline_font;
@@ -686,6 +710,16 @@ BOOLEAN suppress, LENGTH pg, int count)
 
 	FirstDefinite(x, link, y, jn);
 	if( link == x )  break;  /* no definite children, nothing to print */
+
+	/*** nasty bug finder 
+	{ OBJECT ff = y;
+	debugcond1(DGP, DD, word_equal(ff, "@ReportLayout"),
+	  "FAPO(%s, COLM)", EchoObject(x));
+	debugcond1(DGP, DD, word_equal(ff, "@ReportLayout"),
+	  "  adjust_cat(x) = %s", bool(adjust_cat(x)));
+	}
+	***/
+
 	last_bad_gap = nilobj;
 	adjustable_gaps = 0;
 	back_edge = xmk - xb;
@@ -709,184 +743,245 @@ BOOLEAN suppress, LENGTH pg, int count)
 	}
 	actual_size = mk + fwd(prev, dim) - back_edge;
 
-
 	/*********************************************************************/
 	/*                                                                   */
-	/*  The line may be displayed in one of four ways:  centred, right-  */
-	/*  justified, adjusted, or none of the above (i.e. left justified). */
-	/*  An overfull line is always adjusted; otherwise, the line will    */
-	/*  be centred or right justified if the display style asks for it;  */
-	/*  otherwise, the line will be adjusted if adjust_cat(x) == TRUE    */
-	/*  (i.e. there is an enclosing @PAdjust) or if the display style is */
-	/*  DO_ADJUST (meaning that this line is one of a paragraph set in   */
-	/*  the adjust or outdent break style, other than the last line);    */
-	/*  otherwise, the line is left justified.                           */
-	/*                                                                   */
-	/*  The second step is to decide which of these four cases holds     */
-	/*  for this line, and to record the decision in these variables:    */
-	/*                                                                   */
-	/*    will_adjust      TRUE if the adjusted style applies; in this   */
-	/*                     case, variables adjust_inc and inc will be    */
-	/*                     set to the appropriate adjustment value;      */
-	/*                                                                   */
-	/*    adjust_indent    If centring or right justification applies,   */
-	/*                     the indent to produce this, else zero.        */
-	/*                                                                   */
-	/*  NB adjust_inc may be negative, if the optimal paragraph breaker  */
-	/*  has chosen to shrink some gaps.                                  */
+	/*  It is possible that the line cannot be displayed in any          */
+	/*  reasonable way, because the paragraph breaker was forced to      */
+	/*  produce an overfull line.  In this case, actual_size will        */
+	/*  exceed frame_size and there will be no adjustable gaps.  The     */
+	/*  solution is to horizontally scale the line if possible, or       */
+	/*  else to not print it at all.                                     */
 	/*                                                                   */
 	/*********************************************************************/
 
-	if( actual_size > frame_size )
-	{ adjust_cat(x) = TRUE;
-	  adjust_indent = 0;
-	}
-	else switch( display_style(save_style(x)) )
-	{
-	  case DO_ADJUST:	adjust_cat(x) = TRUE;
+	if( actual_size > frame_size && adjustable_gaps == 0 )
+	{ 
+	  /* can't be fixed by adjustment, so scale the line or delete it */
+	  CONSTRAINT c;
+	  SetConstraint(c, 0, frame_size, frame_size);
+	  fwd(x, dim) = actual_size;
+	  debug2(DGP, DD, "  oversize, actual_size = %s, frame_size = %s",
+	      EchoLength(actual_size), EchoLength(frame_size));
+	  if( BackEnd == POSTSCRIPT && InsertScale(x, &c) )
+	  {
+	    /* the problem has just been fixed, by inserting a @Scale above x */
+	    OBJECT prnt;
+	    Parent(prnt, Up(x));
+	    Child(y, Down(x));
+	    if( Down(x) == LastDown(x) && is_word(type(y)) )
+	    {
+	      Error(23, 3, "word %s horizontally scaled by factor %.2f (too wide for %s paragraph)",
+		WARN, &fpos(y), string(y), (float) bc(constraint(prnt)) / SF,
+		EchoLength(frame_size));
+	    }
+	    else
+	    {
+	      Error(23, 4, "%s object horizontally scaled by factor %.2f (too wide for %s paragraph)",
+		WARN, &fpos(x), EchoLength(size(x, COLM)),
+		(float) bc(constraint(prnt)) / SF, EchoLength(frame_size));
+	    }
+	    FixAndPrintObject(prnt, xmk, back(prnt, dim), fwd(prnt, dim), dim,
+	      NO_SUPPRESS, pg, count);
+	  }
+	  else
+	  {
+	    /* fix the problem by refraining from printing it */
+	    if( size(x, COLM) <= 0 )
+	      Error(23, 5, "oversize object has size 0 or less", INTERN, &fpos(x));
+	    Child(y, Down(x));
+	    if( Down(x) == LastDown(x) && is_word(type(y)) )
+	    { Error(23, 6, "word %s deleted (too wide for %s paragraph)",
+		WARN, &fpos(y), string(y), EchoLength(frame_size));
+	    }
+	    else
+	    { Error(23, 7, "%s object deleted (too wide for %s paragraph)",
+		WARN, &fpos(x), EchoLength(size(x, COLM)), EchoLength(frame_size));
+	    }
+	  }
+        }
+        else
+        {
+
+	  /*********************************************************************/
+	  /*                                                                   */
+	  /*  The line may be displayed in one of four ways:  centred, right-  */
+	  /*  justified, adjusted, or none of the above (i.e. left justified). */
+	  /*  An overfull line is always adjusted; otherwise, the line will    */
+	  /*  be centred or right justified if the display style asks for it;  */
+	  /*  otherwise, the line will be adjusted if adjust_cat(x) == TRUE    */
+	  /*  (i.e. there is an enclosing @PAdjust) or if the display style is */
+	  /*  DO_ADJUST (meaning that this line is one of a paragraph set in   */
+	  /*  the adjust or outdent break style, other than the last line);    */
+	  /*  otherwise, the line is left justified.                           */
+	  /*                                                                   */
+	  /*  The second step is to decide which of these four cases holds     */
+	  /*  for this line, and to record the decision in these variables:    */
+	  /*                                                                   */
+	  /*    will_adjust      TRUE if the adjusted style applies; in this   */
+	  /*                     case, variables adjust_inc and inc will be    */
+	  /*                     set to the appropriate adjustment value;      */
+	  /*                                                                   */
+	  /*    adjust_indent    If centring or right justification applies,   */
+	  /*                     the indent to produce this, else zero.        */
+	  /*                                                                   */
+	  /*  NB adjust_inc may be negative, if the optimal paragraph breaker  */
+	  /*  has chosen to shrink some gaps.                                  */
+	  /*                                                                   */
+	  /*********************************************************************/
+
+	  if( actual_size > frame_size )
+	  { 
+	    assert( adjustable_gaps > 0, "FAPO: adjustable_gaps!" );
+	    adjust_cat(x) = TRUE;
+	    adjust_indent = 0;
+	  }
+	  else switch( display_style(save_style(x)) )
+	  {
+	    case DO_ADJUST:	adjust_cat(x) = TRUE;
 				adjust_indent = 0;
 				break;
 	
-	  case DISPLAY_CENTRE:	adjust_cat(x) = FALSE;
+	    case DISPLAY_CENTRE: adjust_cat(x) = FALSE;
 				adjust_indent = (frame_size - actual_size)/2;
 				debug1(DGP, DD, "cdisp %s", EchoObject(x));
 				break;
 
-	  case DISPLAY_RIGHT:	adjust_cat(x) = FALSE;
+	    case DISPLAY_RIGHT:	adjust_cat(x) = FALSE;
 				adjust_indent = frame_size - actual_size;
 				debug1(DGP, DD, "rdisp %s", EchoObject(x));
 				break;
 
-	  default:		/* leave adjust_cat(x) as is */
+	    default:		/* leave adjust_cat(x) as is */
 				adjust_indent = 0;
 				break;
-	}
+	  }
 
-	debug2(DGP, DD, "ACAT %s %s",
-	  EchoStyle(&save_style(x)), EchoObject(x));
-	debug2(DGP, DD, "frame_size = %s, actual_size = %s",
-	  EchoLength(frame_size), EchoLength(actual_size));
+	  debug2(DGP, DD, "ACAT %s %s",
+	    EchoStyle(&save_style(x)), EchoObject(x));
+	  debug2(DGP, DD, "frame_size = %s, actual_size = %s",
+	    EchoLength(frame_size), EchoLength(actual_size));
 
-	if( adjust_cat(x) && adjustable_gaps > 0  )
-	{ will_adjust = TRUE;
-	  adjust_inc = (frame_size - actual_size) / adjustable_gaps;
-	  inc = max(adjust_inc, 0);
-	  gaps_sofar = 0;	/* number of gaps adjusted so far */
-	  adjust_sofar = 0;	/* total width of adjustments so far */
-	  debug2(DGP, DD, "will_adjust: adjustable_gaps = %d, adjust_inc = %s",
-	    adjustable_gaps, EchoLength(adjust_inc));
-	}
-	else will_adjust = FALSE;
+	  if( adjust_cat(x) && adjustable_gaps > 0  )
+	  { will_adjust = TRUE;
+	    adjust_inc = (frame_size - actual_size) / adjustable_gaps;
+	    inc = find_max(adjust_inc, 0);
+	    gaps_sofar = 0;	/* number of gaps adjusted so far */
+	    adjust_sofar = 0;	/* total width of adjustments so far */
+	    debug2(DGP, DD, "will_adjust: adjustable_gaps = %d, adjust_inc = %s",
+	      adjustable_gaps, EchoLength(adjust_inc));
+	  }
+	  else will_adjust = FALSE;
 
 
-	/*********************************************************************/
-	/*                                                                   */
-	/*  The third and final step is to traverse x, fixing subobjects.    */
-	/*  Variable adjusting is true while adjusting is occurring.         */
-	/*                                                                   */
-	/*********************************************************************/
+	  /*********************************************************************/
+	  /*                                                                   */
+	  /*  The third and final step is to traverse x, fixing subobjects.    */
+	  /*  Variable adjusting is true while adjusting is occurring.         */
+	  /*                                                                   */
+	  /*********************************************************************/
 
-	underlining = FALSE;
-	adjusting = will_adjust && last_bad_gap == nilobj;
-	FirstDefinite(x, link, y, jn);
-	prev = y;
-	mk = xmk - back(x, dim) + back(y, dim) + adjust_indent;
-	NextDefiniteWithGap(x, link, y, g, jn);
-	while( link != x )
-	{
+	  underlining = FALSE;
+	  adjusting = will_adjust && last_bad_gap == nilobj;
+	  FirstDefinite(x, link, y, jn);
+	  prev = y;
+	  mk = xmk - back(x, dim) + back(y, dim) + adjust_indent;
+	  NextDefiniteWithGap(x, link, y, g, jn);
+	  while( link != x )
+	  {
+	    /* check for underlining */
+	    if( underline(prev) )
+	    {
+	      debug3(DGP, DD, "  FAPO/ACAT1 underline() := %s for %s %s",
+	        bool(FALSE), Image(type(prev)), EchoObject(prev));
+	      underline(prev) = FALSE;
+	      if( !underlining )
+	      {
+	        /* underlining begins here */
+	        underlining = TRUE;
+	        debug2(DGP, DD, "underlining begins at %s %s",
+		  Image(type(prev)), EchoObject(prev));
+	        underline_font = is_word(type(prev)) ? word_font(prev) :
+		    font(save_style(x));
+	        underline_xstart = mk - back(prev, dim);
+	      }
+	      if( !underline(g) )
+	      {
+	        /* underlining ends here */
+	        debug2(DGP, DD, "underlining ends at %s %s",
+		  Image(type(prev)), EchoObject(prev));
+	        New(urec, UNDER_REC);
+	        back(urec, COLM) = underline_xstart;
+	        fwd(urec, COLM) = mk + fwd(prev, dim);
+	        back(urec, ROWM) = underline_font;
+	        underlining = FALSE;
+	        Link(Up(prev), urec);
+	      }
+	    }
+
+	    /* fix previous definite now we know it is not the last one  */
+	    if( adjusting && width(gap(g)) > 0 )
+	    { int tmp;
+
+	      FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
+	        dim, NO_SUPPRESS, pg, count);
+
+	      gaps_sofar++;
+	      tmp = ((frame_size - actual_size) * gaps_sofar) / adjustable_gaps;
+	      mk += save_actual_gap(g) + (tmp - adjust_sofar);
+	      adjust_sofar = tmp;
+	    }
+	    else
+	    {
+	      FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
+	        dim, NO_SUPPRESS, pg, count);
+
+	      mk += save_actual_gap(g);
+	    }
+	    prev = y;
+
+	    /* commence adjustment if required */
+	    if( !adjusting && will_adjust && g == last_bad_gap )
+	      adjusting = TRUE;
+
+	    NextDefiniteWithGap(x, link, y, g, jn);
+	  }
+
 	  /* check for underlining */
+	  debug3(DGP, DD, "  underlining is %s in %s %s", bool(underline(prev)),
+	    Image(type(prev)), EchoObject(prev));
 	  if( underline(prev) )
 	  {
-	    debug3(DGP, D, "  FAPO/ACAT1 underline() := %s for %s %s",
+	    debug3(DGP, DD, "  FAPO/ACAT1 underline() := %s for %s %s",
 	      bool(FALSE), Image(type(prev)), EchoObject(prev));
 	    underline(prev) = FALSE;
 	    if( !underlining )
 	    {
 	      /* underlining begins here */
+	      debug2(DGP, DD, "underlining begins at %s %s",
+	        Image(type(prev)), EchoObject(prev));
 	      underlining = TRUE;
-	      debug2(DGP, D, "underlining begins at %s %s",
-		Image(type(prev)), EchoObject(prev));
 	      underline_font = is_word(type(prev)) ? word_font(prev) :
-		  font(save_style(x));
+		    font(save_style(x));
 	      underline_xstart = mk - back(prev, dim);
 	    }
-	    if( !underline(g) )
-	    {
-	      /* underlining ends here */
-	      debug2(DGP, D, "underlining ends at %s %s",
-		Image(type(prev)), EchoObject(prev));
-	      New(urec, UNDER_REC);
-	      back(urec, COLM) = underline_xstart;
-	      fwd(urec, COLM) = mk + fwd(prev, dim);
-	      back(urec, ROWM) = underline_font;
-	      underlining = FALSE;
-	      Link(Up(prev), urec);
-	    }
-	  }
 
-	  /* fix previous definite now we know it is not the last one  */
-	  if( adjusting && width(gap(g)) > 0 )
-	  { int tmp;
-
-	    FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
-	      dim, NO_SUPPRESS, pg, count);
-
-	    gaps_sofar++;
-	    tmp = ((frame_size - actual_size) * gaps_sofar) / adjustable_gaps;
-	    mk += save_actual_gap(g) + (tmp - adjust_sofar);
-	    adjust_sofar = tmp;
-	  }
-	  else
-	  {
-	    FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
-	      dim, NO_SUPPRESS, pg, count);
-
-	    mk += save_actual_gap(g);
-	  }
-	  prev = y;
-
-	  /* commence adjustment if required */
-	  if( !adjusting && will_adjust && g == last_bad_gap )
-	    adjusting = TRUE;
-
-	  NextDefiniteWithGap(x, link, y, g, jn);
-	}
-
-	/* check for underlining */
-	debug3(DGP, D, "  underlining is %s in %s %s", bool(underline(prev)),
-	  Image(type(prev)), EchoObject(prev));
-	if( underline(prev) )
-	{
-	  debug3(DGP, D, "  FAPO/ACAT1 underline() := %s for %s %s",
-	    bool(FALSE), Image(type(prev)), EchoObject(prev));
-	  underline(prev) = FALSE;
-	  if( !underlining )
-	  {
-	    /* underlining begins here */
-	    debug2(DGP, D, "underlining begins at %s %s",
+	    /* underlining must end here */
+	    debug2(DGP, DD, "underlining ends at %s %s",
 	      Image(type(prev)), EchoObject(prev));
-	    underlining = TRUE;
-	    underline_font = is_word(type(prev)) ? word_font(prev) :
-		  font(save_style(x));
-	    underline_xstart = mk - back(prev, dim);
+	    New(urec, UNDER_REC);
+	    back(urec, COLM) = underline_xstart;
+	    fwd(urec, COLM) = mk + fwd(prev, dim);
+	    back(urec, ROWM) = underline_font;
+	    underlining = FALSE;
+	    Link(Up(prev), urec);
 	  }
 
-	  /* underlining must end here */
-	  debug2(DGP, D, "underlining ends at %s %s",
-	    Image(type(prev)), EchoObject(prev));
-	  New(urec, UNDER_REC);
-	  back(urec, COLM) = underline_xstart;
-	  fwd(urec, COLM) = mk + fwd(prev, dim);
-	  back(urec, ROWM) = underline_font;
-	  underlining = FALSE;
-	  Link(Up(prev), urec);
-	}
+	  /* fix the last definite subobject, prev, which must exist */
+	  FixAndPrintObject(prev, mk, back(prev, dim),
+	    frame_size - (mk - xmk) - back(x, dim),
+	    dim, NO_SUPPRESS, pg, count);
 
-	/* fix the last definite subobject, prev, which must exist */
-	FixAndPrintObject(prev, mk, back(prev, dim),
-	  frame_size - (mk - xmk) - back(x, dim),
-	  dim, NO_SUPPRESS, pg, count);
-
+        }
       }
       else for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
@@ -934,6 +1029,6 @@ BOOLEAN suppress, LENGTH pg, int count)
       break;
 
   } /* end switch */
-  debug2(DGP, D, "] FixAndPrintObject returning (size now %s,%s).",
+  debug2(DGP, DD, "] FixAndPrintObject returning (size now %s,%s).",
 	EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
 } /* end FixAndPrintObject */

@@ -1,6 +1,6 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -75,6 +75,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     case NULL_CLOS:
     case PAGE_LABEL:
     case CROSS:
+    case FORCE_CROSS:
     
       break;
 
@@ -98,6 +99,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     case VCOVER:
     case ROTATE:
     case SCALE:
+    case KERN_SHRINK:
     case SPLIT:
     case GRAPHIC:
     

@@ -5,8 +5,8 @@
 @PP
 Ordinary documents are the simplest kind, consisting of a plain sequence
 ordinary. @Index { ordinary documents }
-of numbered pages containing whatever you want.  To produce an ordinary
-document, use the @Code doc setup file and the @Code "@Doc" symbol:
+of numbered pages.  To produce an ordinary document, use the @Code doc
+setup file and the @Code "@Doc" symbol:
 doc. @Index @Code "@Doc"
 @ID @OneRow @Code {
 "@SysInclude { doc }"
@@ -14,12 +14,10 @@ doc. @Index @Code "@Doc"
 "..."
 "@End @Text"
 }
-where @Code ... stands for the body of your document.  This is exactly
-the arrangement recommended in Section {@NumberOf start} for getting
-started.
-@PP
-There is an alternative way to begin an ordinary document, using
-the @Code "@Document" symbol instead of {@Code "@Doc"}:
+where @Code ... stands for the body of your document.  This is the
+arrangement from Section {@NumberOf start} for getting
+started.  Alternatively, you can begin with
+@Code "@Document" instead of {@Code "@Doc"}:
 document. @Index @Code "@Document"
 @ID @OneRow @Code {
 "@SysInclude { doc }"
@@ -32,6 +30,7 @@ document. @Index @Code "@Document"
 "    @FirstPageNumber { 1 }"
 "    @ColumnNumber { 1 }"
 "    @OptimizePages { No }"
+"    @Unpaginated { No }"
 "//"
 "@Text @Begin"
 "..."
@@ -40,9 +39,8 @@ document. @Index @Code "@Document"
 This shows the eight options of {@Code "@Document"}, with their default
 values.  As usual with options, the options of {@Code "@Document"}
 may be given in any order, and only the ones that need to be changed
-need be given at all.
-@PP
-Notice the @Code "//" after the last option.  Its meaning is beyond our
+need be given at all.  Notice the @Code "//" after the last option.  Its
+meaning is beyond our
 "//" @Index { @Code "//" symbol }
 scope, but total disaster will ensue if it is forgotten.  The @Code "@Doc"
 symbol is an abbreviation for {@Code "@Document //"}, which is why you don't
@@ -55,8 +53,8 @@ them here and avoid having your own setup file.  If you already have
 your own setup file, change them in either place and omit them in
 the other.
 @PP
-@Code "@InitialFont" is the font in which the bulk of the document will
-be set, and should contain a family, a face, and a size.  The default
+@Code "@InitialFont" is the font of the bulk of the document,
+and should contain a family, a face, and a size.  The default
 value selects the Times family, the Base face, and the 12 point size.
 @PP
 @Code "@InitialBreak" controls the behaviour of paragraph breaking in
@@ -72,12 +70,12 @@ two objects, as described in Section
 of the bulk of the document.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
-footers throughout the document.  Its value may be {@Code None},
+footers throughout the document, and may be {@Code None},
 {@Code Simple}, {@Code Titles}, or {@Code NoTitles}.  Section
 {@NumberOf headers} has the details, but just briefly, {@Code None}
-means no page headers at all, {@Code Simple} means a simple style with
-a page number between hyphens at the top of each page except the first,
-@Code Titles produces full running titles as in the present document,
+means no page headers at all, {@Code Simple} means a
+page number between hyphens at the top of each page except the first,
+@Code Titles produces full running titles as in this guide,
 and @Code "NoTitles" is like @Code "Titles" with the running titles
 omitted, leaving just the page numbers.
 @PP
@@ -85,9 +83,8 @@ omitted, leaving just the page numbers.
 @PP
 @Code "@ColumnNumber" is the number of columns per page in the bulk of
 the document, and may be anything from {@Code 1} (the default value) to
-{@Code 10}.  Irrespective of its value, all figures and tables will be
-printed full width; and it is possible to produce full-width ordinary
-text in a multi-column document as well, using the @Code "@FullWidth"
+{@Code 10}.  It is possible to produce full-width ordinary
+text in a multi-column document, using the @Code "@FullWidth"
 full.width. @Index @Code "@FullWidth"
 symbol:
 @ID @OneRow @Code {
@@ -98,8 +95,7 @@ symbol:
 "@Text @Begin"
 "@FullWidth {"
 "@CentredDisplay @Heading { NOTICE TO TRESPASSERS }"
-"}Trespassers are hereby notified that, pursuant to the"
-"terms of the Trespassing Act, 1875, ..."
+"}Trespassers are hereby notified that, ..."
 "@End @Text"
 }
 This produces a full-width heading above a two-column body.  The word
@@ -108,13 +104,11 @@ of @Code "@FullWidth" because (regrettably) any space here will appear
 before @Code Trespassers in the output.  Alternatively you could use
 a paragraph symbol:
 @ID @OneRow @Code {
-"@Text @Begin"
 "@FullWidth {"
 "@CentredDisplay @Heading { NOTICE TO TRESPASSERS }"
 "}"
 "@PP"
 "Trespassers are hereby notified that, ..."
-"@End @Text"
 }
 You can have @Code "@FullWidth" symbols repeatedly through the document,
 producing full-width text wherever you want.  Just be aware that
@@ -131,7 +125,14 @@ tex.page @SubIndex { page optimization }
 optimal paragraph breaking algorithm.  It takes two runs to do this,
 with intermediate results stored in Lout's cross reference database
 (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.
+it, which might be wise after major changes.  It is possible for this
+page layout optimizer to cycle, never settling on a single final best
+version; this is usually caused by footnotes or floating figures inserted
+at points which end up near page boundaries.
+@PP
+The @Code "@Unpaginated" option, whose value is ignored unless plain text
+output is in effect, produces unpaginated output when changed to
+{@Code Yes} (see Section {@NumberOf plain}).
 @PP
 Within the @Code "@Text" symbol, it is possible to have a sequence
 of sections:
@@ -284,16 +285,18 @@ appendices, for which it is {@Code UCAlpha}.  This produces the appendices
 numbered in upper-case letters (A, B, C, etc.) that were mentioned earlier.
 @PP
 @Code "@SectionHeadingFont" is the font used for section headings.  The
-default value shown above produces the bold face from the family of the
-initial font.  A family name or size is acceptable here as well:
+default value produces the bold face from the family of the
+initial font.  A family name or size is also acceptable:
 @ID @Code "@SectionHeadingFont { Helvetica Base +2p }"
 makes the section heading appear in the Helvetica font, two
 points larger than the initial size.
 @PP
 @Code "@SectionGap" determines how much space is left blank before each
 section title;  the default value shown above is twice the current
-inter-line spacing.  There are similar options for other large-scale
-structure symbols, which determine how much space is left before each one.
+inter-line spacing.  The special value @Code "2b" may be used to get a
+page break rather than a space.  There are similar options for other
+large-scale structure symbols, which determine how much space is left
+before each one.
 @PP
 @Code "@SectionInContents" determines whether or not an entry is made in
 the table of contents for each section; it may be @Code Yes or {@Code No},

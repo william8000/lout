@@ -45,8 +45,8 @@ As this example shows, a label does not have to be a number; it can be
 any string of characters, including spaces and balanced parentheses;
 but it may not be an arbitrary Lout object.
 @PP
-The character @Code "^" in a label is special and indicates that the
-remainder of the label is to be treated as an exponent:
+The character @Code "^" in a label indicates that the
+remainder is to be treated as an exponent:
 @ID @OneRow @Code {
 "@Graph"
 "    xlog { 10 }"

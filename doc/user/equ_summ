@@ -321,6 +321,43 @@ ragged @Break {
 "amalg"		@Dbl @Eq {  amalg		}
 }
 @DP
+The following names define arrow symbols (no extra space):
+@DP
+ragged @Break {
+"leftarrow"		@Dbl @Eq {  leftarrow			}
+"longleftarrow"		@Dbl @Eq {  longleftarrow		}
+"dblleftarrow"		@Dbl @Eq {  dblleftarrow		}
+"dbllongleftarrow"	@Dbl @Eq {  dbllongleftarrow		}
+"rightarrow"		@Dbl @Eq {  rightarrow			}
+"longrightarrow"	@Dbl @Eq {  longrightarrow		}
+"dblrightarrow"		@Dbl @Eq {  dblrightarrow		}
+"dbllongrightarrow"	@Dbl @Eq {  dbllongrightarrow		}
+"leftrightarrow"	@Dbl @Eq {  leftrightarrow		}
+"longleftrightarrow"	@Dbl @Eq {  longleftrightarrow		}
+"dblleftrightarrow"	@Dbl @Eq {  dblleftrightarrow		}
+{ 1.15i @Wide @HScale "dbllongleftrightarrow" } @Dbl @Eq {  dbllongleftrightarrow	}
+"mapsto"		@Dbl @Eq {  mapsto			}
+"longmapsto"		@Dbl @Eq {  longmapsto			}
+"hookleftarrow"		@Dbl @Eq {  hookleftarrow		}
+"hookrightarrow"	@Dbl @Eq {  hookrightarrow		}
+"leadsto"		@Dbl @Eq {  leadsto			}
+"leftharpoonup"		@Dbl @Eq {  leftharpoonup		}
+"rightharpoonup"	@Dbl @Eq {  rightharpoonup		}
+"leftharpoondown"	@Dbl @Eq {  leftharpoondown		}
+"rightharpoondown"	@Dbl @Eq {  rightharpoondown		}
+"rightleftharpoons"	@Dbl @Eq {  rightleftharpoons		}
+"uparrow"		@Dbl @Eq {  uparrow			}
+"dbluparrow"		@Dbl @Eq {  dbluparrow			}
+"downarrow"		@Dbl @Eq {  downarrow			}
+"dbldownarrow"		@Dbl @Eq {  dbldownarrow		}
+"updownarrow"		@Dbl @Eq {  updownarrow			}
+"dblupdownarrow"	@Dbl @Eq {  dblupdownarrow		}
+"nearrow"		@Dbl @Eq {  nearrow			}
+"searrow"		@Dbl @Eq {  searrow			}
+"swarrow"		@Dbl @Eq {  swarrow			}
+"nwarrow"		@Dbl @Eq {  nwarrow			}
+}
+@DP
 The following names define punctuation symbols (thin space on the
 right-hand side):
 @DP

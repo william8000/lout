@@ -40,11 +40,8 @@ object to work on.  To understand this, ask yourself what rectangle
 @Code "@I" alone could possibly represent:  there is no such rectangle.
 @PP
 It helps to imagine the assembly of objects taking place before your
-eyes.  Look at
-@ID @Code Hello
-and imagine the objects H, e, l, l, o being assembled into the larger
-object Hello; look at
-@ID @Code "Hello world"
+eyes.  Look at @Code Hello and imagine the objects H, e, l, l, o being
+assembled into the larger object Hello; look at @Code "Hello world"
 and imagine Hello and world being assembled into Hello world.  When
 looking at
 @ID @Code "@I { Hello world }"
@@ -128,9 +125,8 @@ may be given using any one of the following seven units of measurement:
 @Rowa A { v } B { @Code "1v" is the current inter-line spacing }
 }
 The first four all define absolute distances and are strictly
-interchangeable, so use whichever seems convenient.  It is traditional
-to measure font sizes in points; typical sizes are @Code "12p" and
-{@Code "10p"}, but fractional sizes are allowed.
+interchangeable.  It is traditional to measure font sizes in points; typical
+sizes are @Code "12p" and {@Code "10p"}, but fractional sizes are allowed.
 @PP
 If you use the @Code "f" unit, the length will depend on the current
 font size.  This can be very useful.  For example, the default value of

@@ -1,6 +1,6 @@
 /*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -126,8 +126,14 @@ void LeaveErrorBlock(BOOLEAN commit)
   if( fp == NULL )  fp = stderr;
   if( commit )
   { for( i = start_block[block_top - 1];  i < mess_top;  i++ )
-    { PrintFileBanner(message_fnum[i]);
-      fputs(message[i], fp);
+    {
+      if( AltErrorFormat )
+      { fputs(message[i], fp);
+      }
+      else
+      { PrintFileBanner(message_fnum[i]);
+        fputs(message[i], fp);
+      }
     }
   }
   block_top--;
@@ -158,10 +164,6 @@ void CheckErrorBlocks(void)
 /*****************************************************************************/
 
 POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...)
-/* ***
-int set_num, msg_num; char *str; int etype;  FILE_POS *pos;
-char *p1, *p2, *p3, *p4, *p5, *p6;
-*** */
 {
   va_list ap;
   char val[MAX_BUFF];
@@ -174,10 +176,19 @@ char *p1, *p2, *p3, *p4, *p5, *p6;
     case INTERN:
     
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
-      PrintFileBanner(file_num(*pos));
-      fprintf(fp, condcatgets(MsgCat, 28, 4, "  %6s internal error: %s\n"),
-	EchoFileLine(pos), val);
+      if( AltErrorFormat )
+      {
+        fprintf(fp, condcatgets(MsgCat, 28, 7, "%s internal error: %s\n"),
+	  EchoAltFilePos(pos), val);
+      }
+      else
+      {
+        PrintFileBanner(file_num(*pos));
+        fprintf(fp, condcatgets(MsgCat, 28, 4, "  %6s internal error: %s\n"),
+	  EchoFileLine(pos), val);
+      }
       /* for estrip's benefit: Error(28, 4, "  %6s internal error: %s\n") */
+      /* for estrip's benefit: Error(28, 7, "%s internal error: %s\n") */
 #if DEBUG_ON
       abort();
 #else
@@ -189,10 +200,19 @@ char *p1, *p2, *p3, *p4, *p5, *p6;
     case FATAL:
     
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
-      PrintFileBanner(file_num(*pos));
-      fprintf(fp, condcatgets(MsgCat, 28, 5, "  %6s fatal error: %s\n"),
-	EchoFileLine(pos), val);
+      if( AltErrorFormat )
+      {
+        fprintf(fp, condcatgets(MsgCat, 28, 8, "%s fatal error: %s\n"),
+	  EchoAltFilePos(pos), val);
+      }
+      else
+      {
+        PrintFileBanner(file_num(*pos));
+        fprintf(fp, condcatgets(MsgCat, 28, 5, "  %6s fatal error: %s\n"),
+	  EchoFileLine(pos), val);
+      }
       /* for estrip's benefit: Error(28, 5, "  %6s fatal error: %s\n") */
+      /* for estrip's benefit: Error(28, 8, "%s fatal error: %s\n") */
       exit(1);
       break;
 
@@ -200,13 +220,28 @@ char *p1, *p2, *p3, *p4, *p5, *p6;
     case WARN:
     
       if( block_top == 0 || print_block[block_top - 1] )
-      { PrintFileBanner(file_num(*pos));
-	fprintf(fp, "  %6s: %s\n", EchoFileLine(pos), val);
+      {
+	if( AltErrorFormat )
+	{
+	  fprintf(fp, "%s: %s\n", EchoAltFilePos(pos), val);
+	}
+	else
+	{
+	  PrintFileBanner(file_num(*pos));
+	  fprintf(fp, "  %6s: %s\n", EchoFileLine(pos), val);
+	}
       }
       else if( mess_top < MAX_ERRORS )
-      { message_fnum[mess_top] = file_num(*pos);
-	sprintf(message[mess_top++], "  %6s: %s\n",
-	  EchoFileLine(pos), val);
+      {
+	if( AltErrorFormat )
+	{
+	  sprintf(message[mess_top++], "%s: %s\n", EchoAltFilePos(pos), val);
+	}
+	else
+	{ message_fnum[mess_top] = file_num(*pos);
+	  sprintf(message[mess_top++], "  %6s: %s\n",
+	    EchoFileLine(pos), val);
+	}
       }
       else Error(28, 6, "too many error messages", FATAL, pos);
       error_seen = TRUE;

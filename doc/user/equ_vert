@@ -103,7 +103,7 @@ axis shifted }
   B { @ShowHMark @Eq { pmatrix userow {yes} shiftdelim {yes} { @ExA } } }
   C { @ShowHMark @Eq { pmatrix userow {no } shiftdelim {yes} { @ExA } } }
 }
-To supply these possiblities, the @Code "matrix" symbol and all
+To supply these possibilities, the @Code "matrix" symbol and all
 its variants (@Code "pmatrix" etc.) have two options whose
 values may be {@Code "yes"} or {@Code "no"}:
 @ID @Code {

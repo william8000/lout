@@ -1,6 +1,6 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -32,7 +32,7 @@
 /*****************************************************************************/
 /*                                                                           */
 /*  SizeGalley(hd, env, rows, joined, nonblock, trig, style, c, target,      */
-/*                                                dest_index, recs, inners)  */
+/*                                     dest_index, recs, inners, enclose)    */
 /*                                                                           */
 /*  Convert unsized galley hd into sized format.  The input parameters are:  */
 /*                                                                           */
@@ -46,6 +46,8 @@
 /*    *c          the width constraint hd should conform to                  */
 /*    target      if non-nilobj, expand indefinite objects to reveal a       */
 /*                @Galley within this symbol                                 */
+/*    enclose     If non-nilobj, enclose any @Galley symbol encountered      */
+/*                during manifesting by this symbol.                         */
 /*                                                                           */
 /*  The output parameters, in addition to the converted hd, are:             */
 /*                                                                           */
@@ -58,7 +60,7 @@
 
 void SizeGalley(OBJECT hd, OBJECT env, BOOLEAN rows, BOOLEAN joined,
 BOOLEAN nonblock, BOOLEAN trig, STYLE *style, CONSTRAINT *c, OBJECT target,
-OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
+OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 { OBJECT y, link, z, crs, t, tlink, zlink, tmp, why;
   OBJECT extras, tmp1, tmp2, bt[2], ft[2], hold_env;
   BOOLEAN after_target;
@@ -74,6 +76,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
   /* manifest the child of hd, making sure it is simply joined if required */
   Child(y, Down(hd));
   tmp1 = target;
+  tmp2 = enclose;
   crs = nilobj;
   bt[COLM] = ft[COLM] = bt[ROWM] = ft[ROWM] = nilobj;
   New(hold_env, ACAT);  Link(hold_env, env);
@@ -86,7 +89,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
   if( joined )
   { New(bt[COLM], THREAD);  New(ft[COLM], THREAD);
     debug0(DGM, DD, "  SizeGalley calling Manifest (joined)");
-    y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd));
+    y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd),
+      &tmp2, FALSE);
     assert( Down(bt[COLM]) != bt[COLM] && Down(ft[COLM]) != ft[COLM],
 	"SizeGalley: threads!" );
     Child(tmp1, Down(bt[COLM]));  Child(tmp2, Down(ft[COLM]));
@@ -98,7 +102,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
   }
   else
   { debug0(DGM, DD, "  SizeGalley calling Manifest (not joined)");
-    y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd));
+    y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd),
+      &tmp2, FALSE);
   }
   debug0(DOM, D, "  ] returning from Manifest in SizeGalley");
   DisposeObject(hold_env);
@@ -117,6 +122,9 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
     debug0(DOB, DD, "  calling BreakObject from SizeGalley");
     debug0(DGM, DD, "  SizeGalley calling BreakObject:");
     y = BreakObject(y, c);
+    if( !FitsConstraint(back(y, COLM), fwd(y, COLM), *c) )
+      Error(21, 13, "%s,%s object too wide for available space",
+        FATAL, &fpos(y), EchoLength(back(y, COLM)), EchoLength(fwd(y, COLM)));
     back(hd, COLM) = back(y, COLM);
     fwd(hd, COLM)  = fwd(y, COLM);
     assert( FitsConstraint(back(hd, COLM), fwd(hd, COLM), *c),
@@ -172,7 +180,12 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	  
 	  assert(Up(y)==LastUp(y), "SizeGalley COL_THR: Up(y)!=LastUp(y)!");
 	  Child(z, DownDim(y, ROWM));
-	  if( is_indefinite(type(z)) )  external_ver(z) = TRUE;
+	  if( is_indefinite(type(z)) )
+	  {
+	    debug1(DGT, D, "SizeGalley setting external_ver(%s) to TRUE (a)",
+	      EchoObject(z));
+	    external_ver(z) = TRUE;
+	  }
 	  else if( type(z) == VCAT )
 	  { OBJECT hor, thor, clink, dlink;
 	    Child(hor, DownDim(y, COLM));
@@ -210,7 +223,11 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	  if( gall_dir(hd) == COLM )
 	    external_hor(y) = TRUE;
 	  else
+	  {
+	    debug1(DGT, D, "SizeGalley setting external_ver(%s) to TRUE (b)",
+	      EchoObject(y));
 	    external_ver(y) = TRUE;
+	  }
 	  break;
 
 
@@ -228,7 +245,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
     if( type(y) == SCALE_IND )
     {
       /* check that all is in order */
-      CONSTRAINT zc;  OBJECT t;  LENGTH b, f;
+      CONSTRAINT zc;  OBJECT t;  FULL_LENGTH b, f;
       z = actual(y);
       assert( type(z) == SCALE, "SizeObject: type(z) != SCALE!" );
       assert( bc(constraint(z)) == 0, "SizeObject: bc(constraint(z)) != 0" );
@@ -375,8 +392,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	case COVER_IND:
 
 	  /* adjust size of the COVER object, change it to @Scale etc. */
-	  { OBJECT cover, prnt, chld;  int dirn, thr_type, ok1, ok2, sf,subst;
-	    float sf1, sf2;  CONSTRAINT c;  LENGTH b, f;
+	  { OBJECT cover, prnt, chld;  int dirn, thr_type, ok1, ok2, sf,subst, esubst;
+	    float sf1, sf2;  CONSTRAINT c;  FULL_LENGTH b, f;
 	    cover = actual(z);
 	    if( type(cover) == HCOVER )
 	    { dirn = COLM;
@@ -384,6 +401,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	      ok1 = VCAT;
 	      ok2 = VCAT;
 	      subst = HSCALE;
+	      esubst = ONE_COL;
 	    }
 	    else
 	    { dirn = ROWM;
@@ -391,10 +409,11 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	      ok1 = ACAT;
 	      ok2 = HCAT;
 	      subst = VSCALE;
+	      esubst = ONE_ROW;
 	    }
 	    Parent(prnt, UpDim(cover, dirn));
 	    while( type(prnt) == SPLIT || type(prnt) == thr_type )
-	      Parent(prnt, Up(prnt));
+	      Parent(prnt, UpDim(prnt, dirn));
 	    Child(chld, Down(cover));
 	    if( type(prnt) != ok1 && type(prnt) != ok2 )
 	    {
@@ -405,6 +424,11 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	      debug1(DGM, DDD, "  prnt = %s:", Image(type(prnt)));
 	      ifdebug(DGM, DDD, DebugObject(prnt));
 	      type(cover) = subst;
+	    }
+	    else if( back(chld, dirn) == 0 && fwd(chld, dirn) == 0 )
+	    {
+	      /* empty object, this is treated as a no-op */
+	      type(cover) = esubst;
 	    }
 	    else if( back(chld, dirn) == 0 || fwd(chld, dirn) == 0 )
 	    { Error(21, 9, "%s replaced by %s (infinite scale factor)",
@@ -421,7 +445,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	      /* work out proposed scale factor and sizes for cover */
 	      sf1 = (float) back(prnt, dirn) / back(chld, dirn);
 	      sf2 = (float) fwd(prnt, dirn)  / fwd(chld, dirn);
-	      sf = max(sf1, sf2) * SF;
+	      sf = find_max(sf1, sf2) * SF;
 	      b = (back(chld, dirn) * sf) / SF;
 	      f = (fwd(chld,  dirn) * sf) / SF;
 

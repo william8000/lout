@@ -98,7 +98,10 @@ can fix this by using `tucked' subscripts, like this:
 }
 @EndList
 The @Code "tsub" and @Code "ton" symbols are exactly like @Code "sub"
-and @Code "on" except for this tucking-in effect.
+and @Code "on" except for this tucking-in effect.  However, the
+@Code "sub" symbol itself does a certain amount of tucking in; the
+amount is determined by kerning information in the font files and
+so is sensitive to the shape of the letters.
 @PP
 As usual in Lout, braces are used to group something into an indivisible
 object.  Leaving them out creates ambiguities:
@@ -221,6 +224,75 @@ the column.  Also available are @Code lcol for left-justified entries,
 right-justified entries, and @Code mcol for alignment along column
 marks.  Each column may contain entries of different kinds, except
 that @Code mcol does not work well with any other sort.
+@PP
+When several matrices appear side by side, slight differences in height
+can cause an unsightly appearance:
+@ID @Eq {
+matrix
+   atleft { ( }
+   atright { ) }
+{
+   row col a sub 11 col a sub 12
+   row col a sub 21 col a sub 22
+}
+matrix
+   atleft { ( }
+   atright { ) }
+{
+   row col b sub 11 col b sub 12
+   row col b sub 21 col b sub 22
+}
+=
+matrix
+   atleft { ( }
+   atright { ) }
+{
+   row col c sub 11 col c sub 12
+   row col c sub 21 col c sub 22
+}
+}
+To assist in resolving this problem, the @Code "matrix" symbol has
+a @Code "strut" option, which causes a strut to be inserted into
+every row, guaranteeing that every row has height at least equal
+to the height of the strut.  By using
+@ID @Code {
+"matrix"
+"    strut { Yes }"
+"..."
+}
+in each of the three matrices above, the result is improved to
+@ID @Eq {
+matrix
+   atleft { ( }
+   atright { ) }
+   strut { Yes }
+{
+   row col a sub 11 col a sub 12
+   row col a sub 21 col a sub 22
+}
+matrix
+   atleft { ( }
+   atright { ) }
+   strut { Yes }
+{
+   row col b sub 11 col b sub 12
+   row col b sub 21 col b sub 22
+}
+=
+matrix
+   atleft { ( }
+   atright { ) }
+   strut { Yes }
+{
+   row col c sub 11 col c sub 12
+   row col c sub 21 col c sub 22
+}
+}
+By default, the strut has height @Code "0.5f" (half the current font
+size) both above and below the axis of the row.  This can be changed
+by giving any length as the value of the @Code "strut" option:
+@Code "strut { 2.0c }" for two centimetres above and below
+the axis, and so on.
 @PP
 Some symbols have been added which produce `matrices' with commonly needed
 @Code atleft and @Code atright options already set for you.  Here are

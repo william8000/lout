@@ -11,11 +11,10 @@ previous chapters can be quite awkward, so Lout provides a range of
 document.types @Index { document types }
 each type.
 @PP
-At present there are six types:  ordinary documents, technical reports,
-books, overhead transparencies, stand-alone illustrations, and plain
-text documents.  The features of all other chapters are available within
-every document type, but the features of one document type are not
-available within other document types.
+There are five types:  ordinary documents, technical reports,
+books, overhead transparencies, and stand-alone illustrations.  The
+features of all other chapters are available within each document type,
+but the features of one type are not available within other types.
 @BeginSections
 @Include { typ_ordi }
 @Include { typ_repo }

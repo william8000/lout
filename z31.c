@@ -1,6 +1,6 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -176,6 +176,7 @@ void MemInit(void)
   zz_lengths[ PAGE_LABEL  ] =
   zz_lengths[ UNDER_REC   ] =
   zz_lengths[ CROSS       ] =
+  zz_lengths[ FORCE_CROSS ] =
   zz_lengths[ SPLIT       ] =
   zz_lengths[ PAR         ] =
   zz_lengths[ ROW_THR     ] =
@@ -194,6 +195,7 @@ void MemInit(void)
   zz_lengths[ HCOVER      ] =
   zz_lengths[ VCOVER      ] =
   zz_lengths[ SCALE       ] =
+  zz_lengths[ KERN_SHRINK ] =
   zz_lengths[ HCONTRACT   ] =
   zz_lengths[ VCONTRACT   ] =
   zz_lengths[ HEXPAND     ] =
@@ -220,11 +222,19 @@ void MemInit(void)
   zz_lengths[ RUMP        ] =
   zz_lengths[ INSERT      ] =
   zz_lengths[ NEXT        ] =
+  zz_lengths[ PLUS        ] =
+  zz_lengths[ MINUS       ] =
   zz_lengths[ ENV_OBJ     ] =
   zz_lengths[ ENV         ] =
+  zz_lengths[ ENVA        ] =
+  zz_lengths[ ENVB        ] =
+  zz_lengths[ ENVC        ] =
+  zz_lengths[ ENVD        ] =
+  zz_lengths[ CENV        ] =
   zz_lengths[ CLOS        ] =
   zz_lengths[ LVIS        ] =
   zz_lengths[ LUSE        ] =
+  zz_lengths[ LEO         ] =
   zz_lengths[ OPEN        ] =
   zz_lengths[ TAGGED      ] =
   zz_lengths[ INCGRAPHIC  ] =

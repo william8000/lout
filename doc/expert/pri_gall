@@ -5,8 +5,7 @@
 @PP
 It is time to pause and ask ourselves how close we are to achieving our
 aim of producing neatly formatted documents.  We can certainly produce
-the pieces of a document, using the page layout definitions from Section
-{@NumberOf definitions}:
+the pieces of a document:
 @ID {
 
 nohyphen @Break @LittlePageColumn {
@@ -268,17 +267,13 @@ nohyphen @Break @LittleDocument
 }  180d @Rotate @Arrow 1i -2p @Font @I {to printer}
 
 }
-and so on until the entire galley is promoted.  All these expansions and
-replacements are done with total
+and so on.  All these expansions and replacements are done with total
 integrity.  For example, if Lout finds after expanding @Code "@FootSect"
 that the page is too full to accept even the first line of the footnote,
 @Code "@FootSect" is reset to unexpanded and the search for a target for
 the footnote moves on.  And the cross reference direction, @Code
 preceding or @Code following, is always obeyed (although lack of space
 sometimes prevents Lout from choosing the nearest target).  Only the
-root galley contains receptive symbols in our running example, but in
-fact any galley may contain them, without restriction.
-@PP
-The discussion of galleys is continued at a more detailed level in
-Section {@NumberOf targets} and subsequent sections.
+root galley contains receptive symbols in our running example, but
+any galley may contain them, without restriction.
 @End @Section

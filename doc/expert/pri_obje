@@ -71,7 +71,7 @@ may be given just after the symbol, as in @Code "|0.5i" for example,
 which specifies horizontal concatenation with a gap of half an inch.  If
 no gap is given, it is assumed to be {@Code "0i"}.
 @PP
-@I {Vertical concatenation} & , denoted by the symbol {@Code "/"},
+@I {Vertical concatenation} & , denoted by {@Code "/"},
 is the same apart from the change of direction:
 @ID {
 @Code "Australia  /0.1i  USA"
@@ -98,7 +98,7 @@ has result
 tables @Index { Tables }
 There are several things to note carefully here.  White space (including
 tabs and newlines) adjacent to a concatenation symbol is ignored, so
-it may be used freely to lay out the expression clearly.  The symbol
+it may be used to lay out the expression clearly.  The symbol
 @Code "|" takes precedence over {@Code "/"}, which means that the rows
 are formed first, then vertically concatenated.  The symbol @Code "/" will
 merge two or more column marks, creating multiple
@@ -129,33 +129,31 @@ space is determined by the @@Wide symbol, whose form is
 @I length  @@Wide  @I object
 }
 and whose result is the given object modified to have exactly the given
-length.  For example, the expression
-@ID @OneRow  @Code {
+length.  For example,
+@ID @OneRow @Code {
 "5i @Wide {"
-"Macbeth was very ambitious.  This led him to wish to become"
-"king of Scotland.  The witches told him that this wish of"
-"his would come true.  The king of Scotland at this time was"
-"Duncan.  Encouraged by his wife, Macbeth murdered Duncan.  He"
-"was thus enabled to succeed Duncan as king.  (51 words)"
+"Macbeth was very ambitious.  This led him to wish to become king of"
+"Scotland.  The witches told him that this wish of his would come true.  The"
+"king of Scotland at this time was Duncan.  Encouraged by his wife, Macbeth"
+"murdered Duncan.  He was thus enabled to succeed Duncan as king.  (51 words)"
 "|0.5i"
-"Encouraged by his wife, Macbeth achieved his ambition and"
-"realized the prediction of the witches by murdering Duncan"
-"and becoming king of Scotland in his place.  (26 words)"
+"Encouraged by his wife, Macbeth achieved his ambition and realized the"
+"prediction of the witches by murdering Duncan and becoming king of Scotland"
+"in his place.  (26 words)"
 "}"
 }
 has for its result the following five inch wide object
 @Cite { $strunk1979style }:
 @ID {
 5i @Wide {
-Macbeth was very ambitious.  This led him to wish to become king
-of Scotland.  The witches told him that this wish of his would
-come true.  The king of Scotland at this time was Duncan.  Encouraged
-by his wife, Macbeth murdered Duncan.  He was thus enabled to succeed
-Duncan as king.  (51 words)
+Macbeth was very ambitious.  This led him to wish to become king of
+Scotland.  The witches told him that this wish of his would come true.  The
+king of Scotland at this time was Duncan.  Encouraged by his wife, Macbeth
+murdered Duncan.  He was thus enabled to succeed Duncan as king.  (51 words)
 |0.5i
-Encouraged by his wife, Macbeth achieved his ambition and realized
-the prediction of the witches by murdering Duncan and becoming king of
-Scotland in his place.  (26 words)
+Encouraged by his wife, Macbeth achieved his ambition and realized the
+prediction of the witches by murdering Duncan and becoming king of Scotland
+in his place.  (26 words)
 }
 }
 A paragraph of text can be included anywhere, and it will be broken

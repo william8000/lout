@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -32,17 +32,20 @@
 #define TOO_LOOSE_BAD	65536	/* 2^16; the max badness of a too loose line */
 #define	TIGHT_BAD	4096	/* 2^12; the max badness of a tight line     */
 #define	LOOSE_BAD	4096	/* 2^12; the max badness of a loose line     */
-#define	HYPH_BAD	1024	/* 2^10; threshold for calling hyphenation   */
-#define SQRT_TOO_LOOSE	256	/* 2^ 8; sqrt(TOO_LOOSE_BAD)                 */
-#define	SQRT_TIGHT_BAD	64	/* 2^ 6; sqrt(TIGHT_BAD)                     */
-#define	SQRT_LOOSE_BAD	64	/* 2^ 6; sqrt(LOOSE_BAD)                     */
+#define	HYPH_BAD	128	/* 2^ 7; threshold for calling hyphenation   */
+#define	HYPH_BAD_INCR	 16	/* 2 ^4: the badness of one hyphen           */
+#define	WIDOW_BAD_INCR	128	/* 2 ^7: the badness of one widow word       */
+#define SQRT_TOO_LOOSE	512	/* 2^ 9; sqrt(TOO_LOOSE_BAD) (used to be)    */
+#define	SQRT_TIGHT_BAD	128	/* 2^ 7; sqrt(TIGHT_BAD) (used to be)        */
+#define	SQRT_LOOSE_BAD	128	/* 2^ 7; sqrt(LOOSE_BAD) (used to be)        */
+#define	SQRT_TOO_TIGHT	4096	/* 2^12; sqrt(TOO_TIGHT_BAD) (used to be)    */
 #define MAX_EXPAND	1
 #define MAX_SHRINK	3
 
 
 typedef struct {
   OBJECT	llink;		/* link to gap before left end of interval   */
-  OBJECT	rlink;		/* link to gap before right end of interval  */
+  OBJECT	rlink;		/* link to gap after right end of interval   */
   OBJECT	cwid;		/* link to current line width in multi case  */
   int		nat_width;	/* natural width of interval                 */
   int		space_width;	/* natural width of spaces in the interval   */
@@ -52,43 +55,9 @@ typedef struct {
   int		tab_pos;	/* if tab_count > 0, this holds the position */
 				/*  of the left edge of the object following */
 				/*  the rightmost tab gap in the interval    */
-  int width_to_tab;		/* if tab_count > 0, the interval width up   */
+  int		width_to_tab;	/* if tab_count > 0, the interval width up   */
 				/*  to but not including the rightmost tab   */
 } INTERVAL;
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  static BOOLEAN DoNotBreak(g, hyph_allowed, nonzero_breaks, use_unbreak)  */
-/*                                                                           */
-/*  TRUE iff gap g is unbreakable i.e. unsuitable for replacement by a line  */
-/*  break.  Parameter hyph_allowed is true if hyphenation is allowed, and    */
-/*  nonzero_breaks is true if breaks are allowed only at gaps of non-zero    */
-/*  width.                                                                   */
-/*                                                                           */
-/*  A gap is always breakable if hyphenation is on and it has one of the     */
-/*  two hyphenation modes.  Otherwise, it is unbreakable if breaks are       */
-/*  allowed only at gaps of non-zero width and this gap has zero width,      */
-/*  or if the gap is marked as unbreakable, because it or a nearby gap has   */
-/*  overstrike mode.                                                         */
-/*                                                                           */
-/*****************************************************************************/
-
-#define DoNotBreak(g, hyph_allowed, nonzero_breaks, use_unbreakable)	\
-(									\
-  use_unbreakable ? unbreakable(g) :					\
-  hyph_allowed && (mode(gap(g))==HYPH_MODE || mode(gap(g))==ADD_HYPH) ?	\
-  FALSE : ((nonzero_breaks && width(gap(g))==0) || mode(gap(g))==OVER_MODE) \
-)
-
-/* *** old value
-  hyph_allowed && (mode(g)==HYPH_MODE || mode(g)==ADD_HYPH) ? FALSE :
-  (nonzero_breaks && width(g) == 0) || mode(g) == OVER_MODE
-*** */
-
-/*** old value
-(width(g)==0 && (!hyph_allowed || (mode(g)!=HYPH_MODE && mode(g)!=ADD_HYPH)))
-***/
 
 
 /*****************************************************************************/
@@ -111,8 +80,8 @@ typedef struct {
 /*                                                                           */
 /*  SetIntervalBadness(I)                                                    */
 /*                                                                           */
-/*  Private, calculates the badness and badness class of an interval.        */
-/*  Does not take into account any unbreakable gap at either end.            */
+/*  Private, calculates the badness and badness class of a non-empty         */
+/*  interval.  Does not take into account any unbreakable gap at either end. */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -127,6 +96,16 @@ typedef struct {
   { col_width = (I.cwid!=nilobj) ? bfc(constraint(I.cwid)) : etc_width;	\
     Child(g, I.llink);							\
     I.badness = save_badness(g);					\
+  }									\
+									\
+  /* penalize widow lines, of the form [ <object> &1rt ... ] */		\
+  if( I.tab_count > 0 )							\
+  { OBJECT glink = NextDown(NextDown(I.llink));				\
+    assert( type(glink) == LINK, "SIB: glink!");			\
+    Child(g, glink);							\
+    if( type(g) == GAP_OBJ && mode(gap(g)) == TAB_MODE &&		\
+	units(gap(g)) == AVAIL_UNIT && width(gap(g)) == 1*FR )		\
+      I.badness += WIDOW_BAD_INCR;					\
   }									\
 									\
   if( col_width <= 0 )							\
@@ -159,54 +138,153 @@ typedef struct {
     badness = (SQRT_TIGHT_BAD*(col_width - I.nat_width)) / col_width;	\
     I.badness += badness * badness;					\
   }									\
-  else { I.class = TOO_TIGHT;  I.badness += TOO_TIGHT_BAD; }		\
+  else									\
+  { I.class = TOO_TIGHT;						\
+    badness = (SQRT_TOO_TIGHT*(col_width - I.nat_width)) / col_width;	\
+    I.badness += badness * badness;					\
+  }									\
 } /* end macro SetIntervalBadness */
 
 
 /*@::CorrectOversize()@*******************************************************/
 /*                                                                           */
-/*  CorrectOversize(x, link, y, etc_width, hyph_allowed, nonzero_breaks)     */
+/*  CorrectOversize(x, problem_link, etc_width)                              */
 /*                                                                           */
-/*  Child y of x, whose link is link, has caused an oversize error, either   */
-/*  because it is wider than etc_width, or because it is joined by unbreak-  */
-/*  able gaps on the left to other objects with oversize total size.         */
+/*  The child of x whose link is problem_link has caused an oversize error,  */
+/*  either because it is wider than etc_width, or because it is joined by    */
+/*  unbreakable gaps to other objects with oversize total size.              */
+/*                                                                           */
+/*  CorrectOversize first finds the subsequence of all objects connected     */
+/*  to the problem one by unbreakable gaps.  It then places all of these     */
+/*  objects into a single sub-object, and either scales it to fit or else    */
+/*  replaces it by an empty object.                                          */
 /*                                                                           */
 /*****************************************************************************/
+#define BEFORE_STATE	0
+#define EQUAL_STATE	1
+#define AFTER_STATE	2
 
-static void CorrectOversize(OBJECT x, OBJECT link, OBJECT y, int etc_width,
-BOOLEAN hyph_allowed, BOOLEAN nonzero_breaks, BOOLEAN use_unbreakable)
-{ OBJECT tmp, z, last_z, zlink, new_y, new_acat;
-  CONSTRAINT c;  LENGTH total_size;
+static void CorrectOversize(OBJECT x, OBJECT problem_link, int etc_width)
+{ OBJECT y, link, g, prev_link, problem, tmp, first_link, last_link;
+  CONSTRAINT c;  BOOLEAN jn;  int state;
   SetConstraint(c, etc_width, etc_width, etc_width);
+  debug2(DOF, DD, "CorrectOversize(%s, problem_link, %s)",
+    EchoObject(x), EchoLength(etc_width));
 
-  /* determine the range of objects involved:  NextDown(zlink) ... link */
-  last_z = nilobj;
-  total_size = size(y, COLM);
-  for( zlink = PrevDown(link);  zlink != x;  zlink = PrevDown(zlink) )
-  { Child(z, zlink);
-    if( type(z) != GAP_OBJ )
-    { total_size += size(z, COLM);
-      last_z = z;
-    }
-    else if( !DoNotBreak(z, hyph_allowed,nonzero_breaks,use_unbreakable) )
-      break;
-  }
-  assert( !FitsConstraint(0, total_size, c), "CorrectOversize: fits!" );
+  /* determine the range of objects involved:  first_link ... last_link */
+  first_link = last_link = nilobj;
 
-  /* make y be a single object containing all the culprits, if not already */
-  if( NextDown(zlink) != link )
+  /* move to the first definite component of the paragraph */
+  FirstDefinite(x, link, y, jn);
+  assert( link != x, "CorrectOversize: link == x!" );
+  state = (link == problem_link ? EQUAL_STATE : BEFORE_STATE);
+  prev_link = nilobj;
+
+  while( link != x )
   {
+    ifdebug(DOF, DD,
+	Child(tmp, link);
+	debug4(DOF, DD, "  examining %s %s (%s,%s)", Image(type(tmp)),
+	  EchoObject(tmp), EchoLength(back(tmp, COLM)),
+	  EchoLength(fwd(tmp, COLM)));
+    )
+
+    /* update first_link and last_link depending on where we are */
+    switch( state )
+    {
+
+      case BEFORE_STATE:
+
+	if( prev_link == nilobj || !nobreak(gap(g)) )
+	{
+	  debug0(DOF, DD, "  (before) setting or resetting first_link");
+	  first_link = link;
+	}
+	break;
+
+
+      case EQUAL_STATE:
+
+	if( first_link == nilobj )
+	{
+	  debug0(DOF, DD, "  (equal) setting or resetting first_link");
+	  first_link = link;
+	}
+	break;
+
+
+      case AFTER_STATE:
+
+	assert( g != nilobj && type(g) == GAP_OBJ, "CorrectOversize: g!" );
+	debug2(DOF, DD, "  (after) g = %s (nobreak = %s)",
+	  EchoGap(&gap(g)), bool(nobreak(gap(g))));
+	if( last_link == nilobj && !nobreak(gap(g)) )
+	{
+	  debug0(DOF, DD, "  (after) setting last_link to prev_link");
+	  last_link = prev_link;
+	}
+	break;
+
+    }
+    
+    /* move to next definite component of the paragraph */
+    prev_link = link;
+    NextDefiniteWithGap(x, link, y, g, jn);
+    if( state == EQUAL_STATE )
+      state = AFTER_STATE;
+    else if( link == problem_link )
+      state = EQUAL_STATE;
+  }
+  if( last_link == nilobj )
+  {
+    debug0(DOF, DD, "  (wrapup) setting last_link");
+    last_link = prev_link;
+  }
+  assert( first_link != nilobj, "CorrectOversize: first_link!" );
+
+
+  /* replace first_link to last_link by a single object, if not already */
+  if( first_link != last_link )
+  { FULL_LENGTH b, f;  OBJECT after, new_acat, new_y, prev;
+
+    /* re-calculate the size of sub-paragraph first_link to last_link */
+    link = first_link;
+    Child(y, link);
+    debug3(DOF, DD, "  first culprit %s,%s: %s", EchoLength(back(y, COLM)),
+      EchoLength(fwd(y, COLM)), EchoObject(y));
+    b = back(y, COLM);
+    f = 0;
+    do
+    {
+      prev = y;
+      NextDefiniteWithGap(x, link, y, g, jn);
+
+      assert( link != x, "CorrectOversize: link!" );
+      Child(y, link);
+      debug4(DOF, DD, "  culprit (%s) %s,%s: %s", EchoGap(&gap(g)),
+	EchoLength(back(y, COLM)), EchoLength(fwd(y, COLM)), EchoObject(y));
+      f += MinGap(fwd(prev, COLM), back(y, COLM), fwd(y, COLM), &gap(g));
+      if( mark(gap(g)) )  b += f, f = 0;
+
+    } while( link != last_link );
+    f += fwd(y, COLM);
+    b = find_min(MAX_FULL_LENGTH, b);
+    f = find_min(MAX_FULL_LENGTH, f);
+    debug2(DOF, DD, "culprits' width is %s,%s", EchoLength(b), EchoLength(f));
+
     /* create a new ACAT and put the culprits under it */
     New(new_acat, ACAT);
-    FposCopy(fpos(new_acat), fpos(last_z));
+    Child(tmp, Down(first_link));
+    FposCopy(fpos(new_acat), fpos(tmp));
     StyleCopy(save_style(new_acat), save_style(x));
-    back(new_acat, COLM) = 0;
-    fwd(new_acat, COLM) = total_size;
+    back(new_acat, COLM) = b;
+    fwd(new_acat, COLM) = f;
     back(new_acat, ROWM) = 0;
     fwd(new_acat, ROWM) = 0;
-    TransferLinks(NextDown(zlink), NextDown(link), new_acat);
+    after = NextDown(last_link);
+    TransferLinks(first_link, after, new_acat);
 
-    /* create a new ONE_COL, link the new ACAT to it, and insert it */
+    /* create a new ONE_COL and link the new ACAT to it */
     New(new_y, ONE_COL);
     FposCopy(fpos(new_y), fpos(new_acat));
     back(new_y, COLM) = back(new_acat, COLM);
@@ -214,46 +292,66 @@ BOOLEAN hyph_allowed, BOOLEAN nonzero_breaks, BOOLEAN use_unbreakable)
     back(new_y, ROWM) = back(new_acat, ROWM);
     fwd(new_y, ROWM) = fwd(new_acat, ROWM);
     Link(new_y, new_acat);
-    Link(NextDown(zlink), new_y);
-    debug1(DOF, D, "new_y = %s", EchoObject(new_y));
-    y = new_y;
+
+    /* insert the new ONE_COL in place and call it problem */
+    Link(after, new_y);
+    problem = new_y;
+    debug1(DOF, DD, "problem = %s", EchoObject(problem));
   }
 
-  if( BackEnd == POSTSCRIPT && InsertScale(y, &c) )
-  { OBJECT prnt;
-    Parent(prnt, Up(y));
+  /* else the culprit is the common child of first_link and last_link */
+  else
+  { Child(problem, first_link);
+    debug3(DOF, DD, "sole problem %s,%s is %s", EchoLength(back(problem, COLM)),
+      EchoLength(fwd(problem, COLM)), EchoObject(problem));
+  }
 
-    /* the problem has just been fixed, by inserting a @Scale above y */
-    if( is_word(type(y)) )
+  /* now problem should not fit the size constraint we have, but sometimes does */
+  if( FitsConstraint(back(problem, COLM), fwd(problem, COLM), c) )
+  {
+    /* problem went away, so print warning message */
+    Error(14, 8, "phantom oversized object", WARN, &fpos(problem));
+  }
+
+  else if( BackEnd == POSTSCRIPT && InsertScale(problem, &c) )
+  { OBJECT prnt;
+    Parent(prnt, Up(problem));
+
+    /* the problem has just been fixed, by inserting a @Scale above problem */
+    if( is_word(type(problem)) )
     { Error(14, 1, "word %s horizontally scaled by factor %.2f (too wide for %s paragraph)",
-        WARN, &fpos(y), string(y), (float) bc(constraint(prnt)) / SF,
+        WARN, &fpos(problem), string(problem), (float) bc(constraint(prnt)) / SF,
 	EchoLength(etc_width));
     }
     else
-    { Error(14, 2, "%s object horizontally scaled by factor %.2f (too wide for %s paragraph)",
-        WARN, &fpos(y), EchoLength(size(y, COLM)),
+    {
+      Error(14, 2, "%s object horizontally scaled by factor %.2f (too wide for %s paragraph)",
+        WARN, &fpos(problem), EchoLength(size(problem, COLM)),
 	(float) bc(constraint(prnt)) / SF, EchoLength(etc_width));
     }
   }
+
   else
   {
-    /* fix the problem by replacing y by an empty object */
-    if( size(y, COLM) <= 0 )
-      Error(14, 3, "oversize object has size 0 or less", INTERN, &fpos(y));
-    if( is_word(type(y)) )
+    /* fix the problem by replacing problem by an empty object */
+    if( size(problem, COLM) <= 0 )
+      Error(14, 3, "oversize object has size 0 or less", INTERN, &fpos(problem));
+    if( is_word(type(problem)) )
     { Error(14, 4, "word %s deleted (too wide for %s paragraph)",
-	WARN, &fpos(y), string(y), EchoLength(etc_width));
+	WARN, &fpos(problem), string(problem), EchoLength(etc_width));
     }
     else
     { Error(14, 5, "%s object deleted (too wide for %s paragraph)",
-	WARN, &fpos(y), EchoLength(size(y, COLM)), EchoLength(etc_width));
+	WARN, &fpos(problem), EchoLength(size(problem, COLM)),
+	EchoLength(etc_width));
     }
     tmp = MakeWord(WORD, STR_EMPTY, &fpos(x));
     back(tmp, COLM) = fwd(tmp, COLM) = back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
     word_font(tmp) = word_colour(tmp) = 0;
     word_language(tmp) = word_hyph(tmp) = 0;
-    Link(link, tmp);  DisposeChild(link);
+    Link(Up(problem), tmp);  DisposeChild(Up(problem));
   }
+  debug0(DOF, DD, "CorrectOversize returning");
 } /* end CorrectOversize */
 
 
@@ -292,15 +390,15 @@ BOOLEAN hyph_allowed, BOOLEAN nonzero_breaks, BOOLEAN use_unbreakable)
 	  - back(foll, COLM) - fwd(right, COLM);			\
     }									\
 									\
-    ifdebug(DOF, D,							\
+    ifdebug(DOF, DD,							\
       if( Down(newg) != newg )						\
       { OBJECT tmp;							\
 	Child(tmp, Down(newg));						\
-	debug5(DOF, D, "newg %s: %s %s, gap = %s, save_space = %s",	\
+	debug5(DOF, DD, "newg %s: %s %s, gap = %s, save_space = %s",	\
 	Image(type(newg)), Image(type(tmp)), EchoObject(tmp),		\
 	EchoGap(&gap(newg)), EchoLength(save_space(newg)));		\
       }									\
-      else debug3(DOF, D, "newg %s: gap = %s, save_space = %s",		\
+      else debug3(DOF, DD, "newg %s: gap = %s, save_space = %s",		\
 	Image(type(newg)), EchoGap(&gap(newg)),				\
 	EchoLength(save_space(newg)));					\
     )									\
@@ -332,8 +430,7 @@ BOOLEAN hyph_allowed, BOOLEAN nonzero_breaks, BOOLEAN use_unbreakable)
 	debug0(DOF, DD, "   adding hyph_word from nat_width");		\
       }									\
     }									\
-    else if( DoNotBreak(newg, hyph_allowed, nonzero_breaks,		\
-		use_unbreakable) )					\
+    else if( nobreak(gap(newg)) )					\
       unbreakable_at_right = TRUE;					\
 									\
     I.rlink = Up(newg);							\
@@ -402,8 +499,10 @@ BOOLEAN hyph_allowed, BOOLEAN nonzero_breaks, BOOLEAN use_unbreakable)
     save_cwid(g) = I.cwid;						\
 									\
     /* if hyphenation case, must take away width of hyph_word */	\
+    /* and increase the badness to discourage breaks at this point */	\
     if( mode(gap(g)) == ADD_HYPH )					\
     { I.nat_width -= size(hyph_word,COLM);				\
+      save_badness(g) += HYPH_BAD_INCR;					\
       debug0(DOF, DD, "   subtracting hyph_word from nat_width");	\
     }									\
 									\
@@ -470,7 +569,10 @@ BOOLEAN hyph_allowed, BOOLEAN nonzero_breaks, BOOLEAN use_unbreakable)
     /* else no changes since tabs hide them */				\
   }									\
   I.llink = Up(lgap);							\
-  if( I.llink == I.rlink )  I.class = EMPTY_INTERVAL;			\
+  if( I.llink == I.rlink )						\
+  { I.class = EMPTY_INTERVAL;						\
+    I.badness = TOO_TIGHT_BAD + 1;					\
+  }									\
   else									\
   {									\
     if( save_cwid(lgap) != nilobj )					\
@@ -480,8 +582,7 @@ BOOLEAN hyph_allowed, BOOLEAN nonzero_breaks, BOOLEAN use_unbreakable)
       else Child(I.cwid, tlink);					\
     }									\
     SetIntervalBadness(I, max_width, etc_width);			\
-    if( DoNotBreak(lgap, hyph_allowed, nonzero_breaks,			\
-      use_unbreakable) )						\
+    if( nobreak(gap(lgap)) )						\
       I.class = UNBREAKABLE_LEFT;					\
   }									\
   debug1(DOF, DDD, "IShiftLeftEnd returning %s", IntervalPrint(I, x));	\
@@ -579,37 +680,35 @@ static FULL_CHAR *IntervalPrint(INTERVAL I, OBJECT x)
 
 /*@::FillObject()@************************************************************/
 /*                                                                           */
-/*  FillObject(x, c, multi, nonzero_breaks, can_hyphenate, allow_shrink,     */
-/*                          use_unbreakable, hyph_used)                      */
+/*  FillObject(x, c, multi, can_hyphenate, allow_shrink, extend_unbreakable, */
+/*                                              hyph_used)                   */
 /*                                                                           */
 /*  Break ACAT x into lines using optimal breakpoints.  Set hyph_used to     */
 /*  TRUE if any hyphenation was done.                                        */
 /*                                                                           */
-/*    multi           If multi is not nilobj, ignore c and use the sequence  */
-/*                    of constraints within multi for the successive lines.  */
+/*    multi               If multi is not nilobj, ignore c and use the       */
+/*                        sequence of constraints within multi for the       */
+/*                        successive lines.                                  */
 /*                                                                           */
-/*    nonzero_breaks  TRUE if line breaks at gaps of width zero are banned.  */
+/*    can_hyphenate       TRUE if hyphenation is permitted during this fill. */
 /*                                                                           */
-/*    can_hyphenate   TRUE if hyphenation is permitted during this fill.     */
+/*    allow_shrink        TRUE if gaps may be shrunk as well as expanded.    */
 /*                                                                           */
-/*    allow_shrink    TRUE if gaps may be shrunk as well as expanded.        */
-/*                                                                           */
-/*    use_unbreakable TRUE if the unbreakable() field is to be set and used  */
-/*                    to prevent gaps hidden under overstruck objects from   */
-/*                    becoming break points.                                 */
+/*    extend_unbreakable  TRUE if nobreak(gap()) fields are to be set so as  */
+/*                        to prevent gaps hidden under overstruck objects    */
+/*                        from becoming break points.                        */
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
-  BOOLEAN nonzero_breaks, BOOLEAN can_hyphenate, BOOLEAN allow_shrink,
-  BOOLEAN use_unbreakable, BOOLEAN *hyph_used)
-{ INTERVAL I, BestI;  OBJECT res, gp, tmp, z, y, link, prev;
-  int max_width, etc_width, outdent_margin, f;  BOOLEAN jn;
+OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
+  BOOLEAN allow_shrink, BOOLEAN extend_unbreakable, BOOLEAN *hyph_used)
+{ INTERVAL I, BestI;  OBJECT res, gp, tmp, z, y, link, ylink, prev, next;
+  int max_width, etc_width, outdent_margin, f;  BOOLEAN jn;  unsigned typ;
   static OBJECT hyph_word = nilobj;
   BOOLEAN hyph_allowed;	    /* TRUE when hyphenation of words is permitted  */
   assert( type(x) == ACAT, "FillObject: type(x) != ACAT!" );
 
-  debug4(DOF, D, "FillObject(x, %s, can_hyph = %s, %s); %s",
+  debug4(DOF, DD, "FillObject(x, %s, can_hyph = %s, %s); %s",
     EchoConstraint(c), bool(can_hyphenate),
     multi == nilobj ? "nomulti" : "multi", EchoStyle(&save_style(x)));
   ifdebug(DOF, DD, DebugObject(x); fprintf(stderr, "\n\n") );
@@ -619,8 +718,9 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
   if( multi == nilobj )
   {
     /* set max_width (width of 1st line), etc_width (width of later lines) */
-    max_width = min(fc(*c), bfc(*c));
-    if( display_style(save_style(x)) == DISPLAY_OUTDENT )
+    max_width = find_min(fc(*c), bfc(*c));
+    if( display_style(save_style(x)) == DISPLAY_OUTDENT ||
+        display_style(save_style(x)) == DISPLAY_ORAGGED )
     { outdent_margin = 2 * FontSize(font(save_style(x)), x);
       etc_width = max_width - outdent_margin;
     }
@@ -628,7 +728,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
     assert( size(x, COLM) > max_width, "FillObject: initial size!" );
 
     /* if column width is ridiculously small, exit with error message */
-    if( max_width <= 3 * FontSize(font(save_style(x)), x) )
+    if( max_width <= 2 * FontSize(font(save_style(x)), x) )
     {
       Error(14, 6, "paragraph deleted (assigned width %s is too narrow)",
          WARN, &fpos(x), EchoLength(max_width));
@@ -647,8 +747,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
 
   /* add &1rt {} to end of paragraph */
   New(gp, GAP_OBJ);  hspace(gp) = 1;  vspace(gp) = 0;
-  unbreakable(gp) = FALSE;
-  SetGap(gap(gp), FALSE, TRUE, AVAIL_UNIT, TAB_MODE, 1*FR);
+  SetGap(gap(gp), FALSE, FALSE, TRUE, AVAIL_UNIT, TAB_MODE, 1*FR);
   tmp = MakeWord(WORD, STR_GAP_RJUSTIFY, &fpos(x));
   Link(gp, tmp);  Link(x, gp);
   tmp = MakeWord(WORD, STR_EMPTY, &fpos(x));
@@ -659,31 +758,22 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
   word_hyph(tmp) = 0;
   Link(x, tmp);
 
-  /* if use_unbreakable, run through x and set every overstrike gap and  */
-  /* every gap in their shadows to be unbreakable                        */
-  if( use_unbreakable )
+  /* if extend_unbreakable, run through x and set every gap in the     */
+  /* shadow of a previous gap to be unbreakable                        */
+  if( extend_unbreakable )
   { int f, max_f;  OBJECT g;
     FirstDefinite(x, link, y, jn);
-    assert( link != x, "FillObject/use_unbreakable:  link == x!" );
+    assert( link != x, "FillObject/extend_unbreakable:  link == x!" );
     f = max_f = size(y, COLM);  prev = y;
     NextDefiniteWithGap(x, link, y, g, jn);
     while( link != x )
     {
-      /* implement the usual definition of being unbreakable */
-      if( hyph_allowed && (mode(gap(g))==HYPH_MODE || mode(gap(g))==ADD_HYPH) )
-	unbreakable(g) = FALSE;
-      else if( nonzero_breaks && width(gap(g)) == 0 )
-	unbreakable(g) = TRUE;
-      else if( mode(gap(g)) == OVER_MODE )
-	unbreakable(g) = TRUE;
-      else
-        unbreakable(g) = FALSE;
-
       /* add unbreakableness if gap is overshadowed by a previous one */
       f += MinGap(fwd(prev, COLM), back(y, COLM), fwd(y, COLM), &gap(g))
 	     - fwd(prev, COLM) + back(y, COLM);
       if( f < max_f )
-      { unbreakable(g) = (units(gap(g)) == FIXED_UNIT);
+      { if( units(gap(g)) == FIXED_UNIT )
+	  nobreak(gap(g)) = TRUE;
       }
       else
       { max_f = f;
@@ -705,15 +795,18 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
   IntervalInit(I, x, max_width, etc_width, hyph_word);  BestI = I;
   while( IntervalClass(I) != AT_END )
   {
-    debug1(DOF, D, "loop:  %s", IntervalPrint(I, x));
+    debug1(DOF, DD, "loop:  %s", IntervalPrint(I, x));
     switch( IntervalClass(I) )
     {
 
       case TOO_LOOSE:
+      case EMPTY_INTERVAL:
       
 	/* too loose, so save best and shift right end */
-	if( IntervalBadness(BestI) <= IntervalBadness(I) )  I = BestI;
-	debug1(DOF, D, "BestI: %s\n", IntervalPrint(I, x));
+	if( IntervalClass(I) == EMPTY_INTERVAL ||
+	    IntervalBadness(BestI) <= IntervalBadness(I) )
+	      I = BestI;
+	debug1(DOF, DD, "BestI: %s\n", IntervalPrint(I, x));
 	/* NB no break */
 
 
@@ -726,6 +819,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
 
       case LOOSE:
       case TIGHT:
+      case TOO_TIGHT:
       
 	/* reasonable, so check best and shift left end */
 	if( IntervalBadness(I) < IntervalBadness(BestI) )  BestI = I;
@@ -734,13 +828,13 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
 
       case UNBREAKABLE_LEFT:
       case TAB_OVERLAP:
-      case TOO_TIGHT:
       
 	/* too tight, or unbreakable gap at left end, so shift left end */
 	IntervalShiftLeftEnd(I, x, max_width, etc_width);
 	break;
 
 
+      /* ***
       case EMPTY_INTERVAL:
 
 	PrevDefinite(x, I.llink, y);
@@ -750,10 +844,10 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
 	  hyph_allowed = TRUE;
 	  *hyph_used = TRUE;
 	}
-	else CorrectOversize(x, I.llink, y,
-	  (I.cwid!=nilobj) ? bfc(constraint(I.cwid)) : etc_width,
-	  hyph_allowed, nonzero_breaks, use_unbreakable);
+	else CorrectOversize(x, I.llink,
+	  (I.cwid!=nilobj) ? bfc(constraint(I.cwid)) : etc_width);
 	goto RESTART;
+      *** */
 
 
       default:
@@ -765,14 +859,14 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
   }
 
   /* do end processing */
-  ifdebug(DOF, D,
-    debug0(DOF, D, "final result:");
-    debug1(DOF, D, "%s", IntervalPrint(BestI, x));
+  ifdebug(DOF, DD,
+    debug0(DOF, DD, "final result:");
+    debug1(DOF, DD, "%s", IntervalPrint(BestI, x));
     while( BestI.llink != x )
     { BestI.rlink = BestI.llink;
       Child(gp, BestI.rlink);
       BestI.llink = save_prev(gp);
-      debug1(DOF, D, "%s", IntervalPrint(BestI, x));
+      debug1(DOF, DD, "%s", IntervalPrint(BestI, x));
     }
   );
 
@@ -809,6 +903,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
     /* break the lines of x */
     while( llink != x )
     { New(y, ACAT);
+      adjust_cat(y) = adjust_cat(x);
       FposCopy(fpos(y), fpos(x));
       StyleCopy(save_style(y), save_style(x));
       if( Down(res) != res &&
@@ -819,7 +914,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
       fwd(y, COLM) = max_width;
 
       /* if outdented paragraphs, add 2.0f @Wide & to front of new line */
-      if( display_style(save_style(x)) == DISPLAY_OUTDENT )
+      if( display_style(save_style(x)) == DISPLAY_OUTDENT ||
+          display_style(save_style(x)) == DISPLAY_ORAGGED )
       {
 	OBJECT t1, t2, z;
 	t1 = MakeWord(WORD, STR_EMPTY, &fpos(x));
@@ -829,14 +925,14 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
 	word_language(t1) = 0;
 	word_hyph(t1) = 0;
 	New(t2, WIDE);
-	SetConstraint(constraint(t2), MAX_LEN, outdent_margin, MAX_LEN);
+	SetConstraint(constraint(t2), MAX_FULL_LENGTH, outdent_margin,
+	  MAX_FULL_LENGTH);
 	back(t2, COLM) = 0;  fwd(t2, COLM) = outdent_margin;
 	Link(t2, t1);
 	Link(y, t2);
 	New(z, GAP_OBJ);
-	unbreakable(z) = TRUE;
 	hspace(z) = vspace(z) = 0;
-	SetGap(gap(z), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
+	SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
 	Link(y, z);
       }
 
@@ -854,11 +950,10 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
 
 	/* add zero-width gap object */
         New(z, GAP_OBJ);
-	unbreakable(z) = TRUE;
 	debug0(DOF, DD, "   adding hyphen\n");
 	hspace(z) = vspace(z) = 0;
 	underline(z) = under;
-	SetGap(gap(z), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
+	SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
 	Link(x, z);
 
 	/* add hyphen */
@@ -924,12 +1019,51 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi,
       prev = z;
       NextDefiniteWithGap(y, link, z, gp, jn);
     }
-    fwd(y, COLM) = min(MAX_LEN, f + fwd(prev, COLM));
+    fwd(y, COLM) = find_min(MAX_FULL_LENGTH, f + fwd(prev, COLM));
 
     /* make last line DO_ADJUST if it is oversize */
     if( size(y, COLM) > max_width )  display_style(save_style(y)) = DO_ADJUST;
   }
 
-  debug0(DOF, D, "FillObject exiting");
+  /* rejoin unused hyphenated gaps so that kerning will work across them */
+  if( *hyph_used && type(res) == VCAT )
+  { for( link = Down(res);  link != res;  link = NextDown(link) )
+    { Child(y, link);
+      if( type(y) == ACAT )
+      { for( ylink = Down(y);  ylink != y;  ylink = NextDown(ylink) )
+        { Child(gp, ylink);
+	  if( type(gp) == GAP_OBJ && width(gap(gp)) == 0 &&
+	      mode(gap(gp)) == ADD_HYPH )
+	  {
+	    /* possible candidate for joining, look into what's on each side */
+	    Child(prev, PrevDown(ylink));
+	    Child(next, NextDown(ylink));
+	    if( is_word(type(prev)) && is_word(type(next)) &&
+	        word_font(prev) == word_font(next) &&
+	        word_colour(prev) == word_colour(next) &&
+	        word_language(prev) == word_language(next) &&
+	        underline(prev) == underline(next) )
+	    { 
+	      debug2(DOF, D, "joining %s with %s", EchoObject(prev),
+		EchoObject(next));
+	      typ = type(prev) == QWORD || type(next) == QWORD ? QWORD : WORD;
+	      tmp = MakeWordTwo(typ, string(prev), string(next), &fpos(prev));
+	      word_font(tmp) = word_font(prev);
+	      word_colour(tmp) = word_colour(prev);
+	      word_language(tmp) = word_language(prev);
+	      word_hyph(tmp) = word_hyph(prev);
+	      FontWordSize(tmp);
+	      underline(tmp) = underline(prev);
+	      MoveLink(ylink, tmp, CHILD);
+	      DisposeChild(Up(prev));
+	      DisposeChild(Up(next));
+	    }
+	  }
+        }
+      }
+    }
+  }
+
+  debug0(DOF, DD, "FillObject exiting");
   return res;
 } /* end FillObject */

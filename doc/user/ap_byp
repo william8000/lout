@@ -1,5 +1,6 @@
 @Appendix
     @Title { Bypass Symbols }
+    @Tag { bypass }
 @Begin
 @PP
 The `bypass' symbols described in this appendix are intended to be
@@ -47,8 +48,8 @@ use the @Code "@BypassNumber" option:
 "    @BypassNumber { 5.2 }"
 "..."
 }
-Give the full `path number' (5.2 or whatever) of the symbol.  There is a
-@Code "@BypassNumber" option for every symbol that has a @Code "@Title"
+Give the full `path number' (5.2, B.3 or whatever) of the symbol.  There is
+a @Code "@BypassNumber" option for every symbol that has a @Code "@Title"
 option and is usually assigned a number automatically by Lout, plus
 @Code "@Figure" and {@Code "@Table"}.  No changes to the setup file are
 required in order to use {@Code "@BypassNumber"}, and it is permitted

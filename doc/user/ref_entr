@@ -143,8 +143,8 @@ Keep to lower-case letters, since mixed cases confuse the sorting, and
 give the full four digits of the year to avoid trouble in the year
 2000.  Multi-word tags are possible but not recommended.
 @PP
-Unusually for Lout, you can have @Code "/" characters inside the
-@Code "@URL" option without enclosing them in quotes:
+Unusually for Lout, you can have @Code "/" and @Code "~" characters inside
+the @Code "@URL" option without enclosing them in quotes:
 @ID @Code "@URL { ftp://ftp.cs.su.oz.au/jeff/lout }"
 In fact it is better not to use quotes because then Lout will
 be able to break lines at @Code "/" characters, which is very useful
@@ -170,7 +170,7 @@ book.ref.type @Index { @Code Book reference type }
 "     @Month { August }"
 "     @Year { 1942 }"
 "     @Note { The date of composition is unknown,"
-"but is thought to be about the tenth century BC }"
+"but is thought to be about the tenth century BC. }"
 "}"
 }
 And here is what it produces:

@@ -196,7 +196,7 @@ mode has an extra property not shown here. }
   /4.2vx Tabulation     |0.3i   {@Code "|"} &1p {@I length} &1p {@Code t}
 }
 ||0.5i
-@Box margin { 0c } 6c @Wide 13.5c @High 9p @Font
+@Box margin { 0c } 6c @Wide 14.5c @High 9p @Font
 {
   @OneRow {
      @At { 1c   @Wide 0.5c @High } @Put { @LBox 0.2co }

@@ -54,7 +54,7 @@ any symbols.  However it does no harm, so we place it in front of every
 definition as a matter of course.
 @FootNote {
 Later chapters of this guide introduce specialized symbols for producing
-tables, equations, figures, graphs, and computer programs.  You need a
+tables, equations, diagrams, graphs, and computer programs.  You need a
 different @Code "import" clause when using those symbols within a
 definition, because they are not from the DocumentLayout package.  Examples
 may be found in the chapters concerned.

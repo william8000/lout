@@ -35,7 +35,7 @@
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
      }
   }
 }
@@ -60,7 +60,7 @@
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
      }
   }
 }
@@ -86,7 +86,7 @@
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
      }
   }
 }
@@ -95,7 +95,7 @@
 ##########################################################################
 #                                                                        #
 #  Small works not appearing within anything else: TechReport, Manual,   #
-#  MastersThesis, Misc                                                   #
+#  MastersThesis, Seminar, Misc                                          #
 #                                                                        #
 ##########################################################################
 
@@ -122,7 +122,7 @@
 	{ .  @Edition			} @If @Edition
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
      }
   }
 }
@@ -149,7 +149,33 @@
 	{ .  @Edition			} @If @Edition
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
+     }
+  }
+}
+
+{ Seminar @RefStyle @Style
+  {  @Reference&&reftag @Open
+     {
+	{ @Author.  {}			} @If @Author
+	{ @I @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @HowPublished		} @If @HowPublished
+	{ .  @Publisher			} @If @Publisher
+	{ .  @Organization		} @If @Organization
+	{ .  @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition			} @If @Edition
+	{ , @Day @Month @Year		} @If @Year @And @Month @And @Day
+	{ , @Month @Year		} @If @Year @And @Month @And @Not @Day
+	{ , @Year 			} @If @Year @And @Not @Month
+	{ .				} @If @True
+	{ {}  URL @URL.			} @If @URL
+	{ {}  @Note			} @If @Note
      }
   }
 }
@@ -174,7 +200,7 @@
 	{ , @Year			} @If @Year @And @Not @Month
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
      }
   }
 }
@@ -207,7 +233,7 @@
 	{ {} (@Year)			} @If @Year @And @Not @Month
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
      }
   }
 }
@@ -244,7 +270,7 @@
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
      }
   }
 }
@@ -273,7 +299,7 @@
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
 	{ {}  URL @URL.			} @If @URL
-	{ {}  @Note.			} @If @Note
+	{ {}  @Note			} @If @Note
      }
   }
 }

@@ -6,6 +6,11 @@
 #  Encoding (PostScript Language Reference Manual, 2nd Ed.,   #
 #  page 599) with the following additional entries:           #
 #                                                             #
+#     128   200     quotesinglbase                            #
+#     129   201     quotedblbase                              #
+#     130   202     ellipsis                                  #
+#     131   203     OE              (added in Version 3.09)   #
+#     132   204     oe              (added in Version 3.09)   #
 #     133   205     quotedblleft                              #
 #     134   206     quotedblright                             #
 #     135   207     fi                                        #
@@ -20,6 +25,7 @@
 #                                                             #
 #  Jeffrey H. Kingston                                        #
 #  14 March 1996                                              #
+#  19 May 1996                                                #
 #                                                             #
 #  Dec- Octal   Character       Functions ...                 #
 #  imal code    name                                          #
@@ -155,11 +161,11 @@
 125	175	braceright
 126	176	asciitilde
 127	177	-none-
-128	200	-none-
-129	201	-none-
-130	202	-none-
-131	203	-none-
-132	204	-none-
+128	200	quotesinglbase
+129	201	quotedblbase
+130	202	ellipsis
+131	203	OE
+132	204	oe
 133	205	quotedblleft
 134	206	quotedblright
 135	207	fi

@@ -64,7 +64,7 @@ has result
 The first inner @@Font inherits the outer family and size, changing only
 the face; the second inherits the outer family and face.  When a family
 name is given, it must be followed immediately by a face name.  A size
-change always comes last.
+change may appear first or last.
 @PP
 Sizes of the form +{@I length} and --{@I length} may also be used,
 meaning that the font size is to be @I length larger or smaller than

@@ -1,6 +1,6 @@
 /*@z46.c:Optimal Galleys:FindOptimize()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -42,7 +42,7 @@
 
 BOOLEAN FindOptimize(OBJECT x, OBJECT env)
 { OBJECT y, link, res;
-  OBJECT bt[2], ft[2], tmp1, crs;
+  OBJECT bt[2], ft[2], ntarget, nenclose, crs;
   debug1(DOG, D, "FindOptimize( %s )", EchoObject(x));
   assert( type(x) == CLOSURE, "FindOptimize: type(x) != CLOSURE!" );
   assert( has_target(actual(x)), "FindOptimize: x has no target!" );
@@ -73,8 +73,9 @@ BOOLEAN FindOptimize(OBJECT x, OBJECT env)
   assert( res != nilobj, "FindOptimize: res == nilobj!" );
 
   /* manifest and tidy the parameter, return TRUE if Yes */
-  bt[COLM] = ft[COLM] = bt[ROWM] = ft[ROWM] = tmp1 = crs = nilobj;
-  res = Manifest(res, env, &save_style(x), bt, ft, &tmp1, &crs, TRUE, FALSE);
+  bt[COLM] = ft[COLM] = bt[ROWM] = ft[ROWM] = ntarget = nenclose = crs = nilobj;
+  res = Manifest(res, env, &save_style(x), bt, ft, &ntarget, &crs, TRUE, FALSE,
+    &nenclose, FALSE);
   res = ReplaceWithTidy(res, TRUE);
   if( !is_word(type(res)) )
   { Error(46, 1, "unable to evaluate %s parameter, assuming value is No",
@@ -111,7 +112,7 @@ BOOLEAN FindOptimize(OBJECT x, OBJECT env)
 
 void SetOptimize(OBJECT hd, STYLE *style)
 { FULL_CHAR buff[MAX_BUFF], seq[MAX_BUFF];
-  OBJECT res, y, link, z;  FILE_NUM dfnum;  long dfpos, cont;
+  OBJECT res, y, link, z;  FILE_NUM dfnum;  long dfpos, cont;  int dlnum;
   debug2(DOG, D, "SetOptimize(%s, %s)", SymName(actual(hd)), EchoStyle(style));
 
   /* set opt_counts(hd) to result of previous run, if any */
@@ -119,10 +120,10 @@ void SetOptimize(OBJECT hd, STYLE *style)
   StringCat(buff, AsciiToFull("."));
   StringCat(buff, StringInt(line_num(fpos(hd))));
   if( DbRetrieve(OldCrossDb, FALSE, OptGallSym, buff, seq, &dfnum,
-    &dfpos, &cont) )
+    &dfpos, &dlnum, &cont) )
   {
     SwitchScope(nilobj);
-    res = ReadFromFile(dfnum, dfpos);
+    res = ReadFromFile(dfnum, dfpos, dlnum);
     UnSwitchScope(nilobj);
     assert( res != nilobj, "SetOptimize: res == nilobj!" );
     assert( type(res) == CLOSURE, "SetOptimize: type(res) != CLOSURE!" );
@@ -208,7 +209,7 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
   New(tmp, WIDE);
   if( (gall_dir(hd) == COLM && external_hor(dest)) ||
       (gall_dir(hd) == COLM && external_hor(dest)) )
-  { SetConstraint(constraint(tmp), MAX_LEN, MAX_LEN, MAX_LEN);
+  { SetConstraint(constraint(tmp), MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
   }
   else
   { Parent(prnt, Up(dest));
@@ -224,7 +225,7 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
     assert( type(g) == GAP_OBJ, "FlushGalley: type(g) != GAP_OBJ!" );
 
     /* ***
-    SetGap(gap(g), FALSE, TRUE, FRAME_UNIT, EDGE_MODE, 2 * FR);
+    SetGap(gap(g), FALSE, FALSE, TRUE, FRAME_UNIT, EDGE_MODE, 2 * FR);
     if( Down(g) == g )
     { junk = MakeWord(WORD, AsciiToFull("2b"), &fpos(g));
       Link(g, junk);
@@ -232,7 +233,7 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
     *** */
 
     /* first we overwrite whatever is there now by &1rt */
-    SetGap(gap(g), FALSE, TRUE, AVAIL_UNIT, TAB_MODE, 1 * FR);
+    SetGap(gap(g), FALSE, FALSE, TRUE, AVAIL_UNIT, TAB_MODE, 1 * FR);
     if( Down(g) != g )  DisposeChild(Down(g));
     tmp = MakeWord(WORD, AsciiToFull("1rt"), &fpos(g));
     Link(g, tmp);
@@ -249,7 +250,7 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
     New(g, GAP_OBJ);
     hspace(g) = 1;  vspace(g) = 0;
     FposCopy(fpos(g), fpos(tmp));
-    SetGap(gap(g), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 1 * CM);
+    SetGap(gap(g), FALSE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 1 * CM);
     tmp = MakeWord(WORD, AsciiToFull("1c"), &fpos(g));
     Link(g, tmp);
     Link(opt_components(hd), g);
@@ -284,7 +285,7 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
 void CalculateOptimize(OBJECT hd)
 { OBJECT z, y, ylink, og, og_par, para, link, wd, g, last;
   int count, compcount;  FULL_CHAR buff[MAX_BUFF];
-  FILE_NUM fnum;  int write_pos;  BOOLEAN hyph_used;
+  FILE_NUM fnum;  int write_pos, write_lnum;  BOOLEAN hyph_used;
   debug1(DOG, D, "CalculateOptimize(%s)", SymName(actual(hd)));
 
   /* delete the concluding GAP_OBJ stuck in by Promote() */
@@ -299,12 +300,12 @@ void CalculateOptimize(OBJECT hd)
   assert( Down(opt_constraints(hd)) != opt_constraints(hd), "KillGalleyo!" );
   /* *** no longer needed since z14 doesn't refer to these fields
   back(opt_components(hd), COLM) = 0;
-  fwd(opt_components(hd), COLM) = MAX_LEN;
+  fwd(opt_components(hd), COLM) = MAX_FULL_LENGTH;
   *** */
   Child(y, LastDown(opt_constraints(hd)));
   EnterErrorBlock(FALSE);
   opt_components(hd) = FillObject(opt_components(hd), &constraint(y),
-    opt_constraints(hd), gall_dir(hd) == COLM, FALSE, FALSE, TRUE, &hyph_used);
+    opt_constraints(hd), FALSE, FALSE, TRUE, &hyph_used);
   LeaveErrorBlock(FALSE);
   debug1(DOG, D, "after breaking (%shyph_used):", hyph_used ? "" : "not ");
   ifdebug(DOG, D, DebugOptimize(hd));
@@ -351,7 +352,7 @@ void CalculateOptimize(OBJECT hd)
     /* link wd to para, prepended by a gap if not first */
     if( Down(para) != para )
     { New(g, GAP_OBJ);
-      SetGap(gap(g), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 1*EM);
+      SetGap(gap(g), FALSE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 1*EM);
       if( ++compcount % 20 == 0 )
       { hspace(g) = 0;
 	vspace(g) = 1;
@@ -381,9 +382,9 @@ void CalculateOptimize(OBJECT hd)
     StringCat(buff, AsciiToFull("."));
     StringCat(buff, StringInt(line_num(fpos(hd))));
     fnum = DatabaseFileNum(&fpos(hd));
-    AppendToFile(og, fnum, &write_pos);
+    AppendToFile(og, fnum, &write_pos, &write_lnum);
     DbInsert(NewCrossDb, FALSE, OptGallSym, buff, &fpos(hd),
-      STR_ZERO, fnum, write_pos, FALSE);
+      STR_ZERO, fnum, write_pos, write_lnum, FALSE);
   }
   debug0(DOG, D, "CalculateOptimize returning.");
 }

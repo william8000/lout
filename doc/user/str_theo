@@ -39,9 +39,9 @@ display or paragraph symbols.  The theorem is numbered automatically,
 with the title and number inserted at the start of the first
 paragraph.  @Code "@Title" may be omitted.
 @PP
-The @Code "@Proof" symbol produces @Proof @Null
+@Code "@Proof" produces @Proof @Null
 proof. @Index @Code "@Proof"
-with the appropriate following space, and the @Code "@EndProof" symbol produces
+with the appropriate following space, and @Code "@EndProof" produces
 endproof. @Index @Code "@EndProof"
 a box at the end of the line.  They may be used anywhere, not
 just within theorems.

@@ -71,7 +71,7 @@ Now let's look at the next six lines of {@Code "doc"}:
 @ID @OneRow @Code {
 "# @SysInclude { tab }"
 "# @SysInclude { eq }"
-"# @SysInclude { fig }"
+"# @SysInclude { diag }"
 "# @SysInclude { graph }"
 "# @SysInclude { cprint }"
 "# @SysInclude { pas }"
@@ -105,11 +105,11 @@ clause.  It looks like this:
 @ID @OneRow @Code {
 "@Use { @DocumentLayout"
 "  # @InitialFont { Times Base 12p }"
-"  # @InitialBreak { adjust 1.20fx hyphen }"
+"  # @InitialBreak { {adjust 1.20fx hyphen} @OrIfPlain {ragged 1fx nohyphen} }"
 "  # @InitialLanguage { English }"
 "  # @InitialColour { black }"
 "  # @HeadingFont { Bold }"
-"  # @ParaGap { 1.30vx }"
+"  # @ParaGap { 1.3vx @OrIfPlain 1f }"
 "}"
 }
 @Code "@DocumentLayout" is a symbol, and @Code { "@InitialFont" },
@@ -128,6 +128,15 @@ font, change the @Code { "@InitialFont" } line to
 We won't go through all the options now, since they are the subject of
 following sections.
 @PP
+The @Code "@OrIfPlain" symbol that appears within some setup file
+options is used to set the value of the option differently when
+plain text output (Section {@NumberOf plain}) is being produced.  For
+example, the default value of @Code "@InitialBreak" is usually
+{@Code "adjust 1.20fx hyphen"}, but when plain text is being produced
+it switches to {@Code "ragged 1fx nohyphen"}.  When changing such
+options you can leave the @Code "@OrIfPlain" symbol there and change
+one or both of the alternative values as you wish.
+@PP
 The standard setup files are all much the same up to this point; the
 main variation is that in some files, some options are already set.  The
 @Code "slides" setup file, for example, contains
@@ -141,11 +150,7 @@ setup file) this clause is
 "  # @IndexWord { index }"
 "  # @AppendixWord { appendix }"
 "  # @SectionNumbers { Arabic }"
-"  # @SubSectionNumbers { Arabic }"
-"  # @SubSubSectionNumbers { Arabic }"
 "  # @AppendixNumbers { UCAlpha }"
-"  # @SubAppendixNumbers { Arabic }"
-"  # @SubSubAppendixNumbers { Arabic }"
 "  # @SectionHeadingFont { Bold }"
 "}"
 }
@@ -155,16 +160,11 @@ setup file for overhead transparencies, we find this:
 "@Use { @OverheadLayout"
 "  # @DateLine { No }"
 "  # @ContentsWord { contents }"
-"  # @FirstLectureNumber { 1 }"
 "  # @FirstOverheadNumber { 1 }"
-"  # @LectureNumbers { Arabic }"
 "  # @OverheadNumbers { Arabic }"
 "  # @TitlePageFont { Helvetica Base 1.5f }"
-"  # @LectureHeadingFont { Bold 1.20f }"
 "  # @OverheadHeadingFont { Bold }"
-"  # @LectureInContents { Yes }"
 "  # @OverheadInContents { No }"
-"  # @ReferencesInContents { Yes }"
 "}"
 }
 In general this second @Code "@Use" clause assigns values to options
@@ -174,7 +174,11 @@ or all document types.
 @PP
 The setup files used with C and C++ program printing ({@Code "cdoc"},
 {@Code "creport"}, etc.) contain a third @Code "@Use" clause, providing
-options specific to printing C and C++ programs.  The setup file ends
+options specific to printing C and C++ programs.  The setup files used
+with the @Code "@Diag" symbol also have an extra @Code "@Use" clause
+whose options relate to producing diagrams.  If you need C programs and
+diagrams, for example, you have to make your own setup file by combining
+these two (it will have four {@Code "@Use" clauses}).  The setup file ends
 with a comment identifying the spot where database declarations should
 database.dec @Index { database declarations, where to put }
 be put, and one such declaration, for reference printing styles.

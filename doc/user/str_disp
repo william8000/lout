@@ -10,8 +10,8 @@ of the page or column:
 @ID @Code "@Display @I { Invitation to Afternoon Tea }"
 has result
 @Display @I { Invitation to Afternoon Tea }
-Space is inserted automatically above and below the display, so no
-paragraph symbols are needed anywhere near it.
+Space is inserted automatically above and below the display; no
+paragraph symbols are needed.
 @PP
 To make the display appear at the left margin instead of centred, use
 leftdisplay. @Index @Code "@LeftDisplay"
@@ -35,8 +35,8 @@ id. @Index @Code "@ID"
 qd. @Index @Code "@QD"
 cd. @Index @Code "@CD"
 the full name:  {@Code "@D"}, {@Code "@LD"}, {@Code "@ID"}, {@Code "@QD"},
-and {@Code "@CD"}.  Owing to an unfortunate clash with the name of
-another symbol, there is no abbreviation for {@Code "@RightDisplay"}.
+and {@Code "@CD"}.  Owing to a clash with the name of another symbol,
+{@Code "@RightDisplay"} has no abbreviation.
 @PP
 Displays often need to be set using a different font, paragraph
 breaking style, and so on to the surrounding text.  It's best to set
@@ -48,10 +48,9 @@ out such displays like this:
 "Mr. and Mrs. Gilbert Newington-Smith"
 "}"
 }
-You can have as many of these symbols as you like, including
-specialized symbols like {@Code "@CurveBox"}, {@Code "@Eq"}, and
-{@Code "@Tab"}.  The only rule is that the display symbol must come
-first:  @Code "@I @Display ..." is wrong.
+You can have as many of these symbols as you like, including specialized
+ones like {@Code "@CurveBox"} and {@Code "@Tab"}.  The only rule is that
+the display symbol must come first:  @Code "@I @Display ..." is wrong.
 @PP
 It's not a good idea to have one display immediately followed by
 another one, because there will be too much vertical space between
@@ -71,10 +70,9 @@ without vertical space).  Although these symbols can display any
 object as usual, in practice they are used for displaying mathematics,
 so they are described in Section {@NumberOf mathdisplays}.
 @PP
-Three setup file options are provided for controlling the appearance of
-displays.  (For a general introduction to setup files and their
-options, consult Section {@NumberOf setup}.)  Here they are with their
-default values:
+Three setup file options control the appearance of displays.  (For a
+general introduction to setup files and their options, consult
+Section {@NumberOf setup}.)  Here they are with their default values:
 @ID @OneRow @Code {
 "@DisplayGap { 1.00v }"
 "@DefaultIndent { 0.5rt }"
@@ -87,11 +85,11 @@ default value, @Code {"1.00v"}, is equal to the current inter-line spacing.
 @PP
 @Code "@DefaultIndent" is the indent produced by
 default.indent @Index @Code "@DefaultIndent"
-{@Code "@Display"}; the default value, {@Code "0.5rt"},
-produces centring, although why it does so is beyond our scope
+{@Code "@Display"}; {@Code "0.5rt"} produces centring, although why it does
+so is beyond our scope
 @Cite { $kingston1995lout.expert }.  @Code "@DisplayIndent" is the
 display.indent. @Index @Code "@DisplayIndent"
-indent produced by {@Code "@IndentedDisplay"}, and at both margins by
+indent for {@Code "@IndentedDisplay"}, and used at both margins by
 {@Code "@QuotedDisplay"}.  Its default value, {@Code "2.00f"}, is twice
 the current font size.
 @End @Section

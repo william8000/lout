@@ -19,6 +19,8 @@ export	@CC @RR @Rule @DoubleRule @Line @DoubleLine @NP
 	@Rowa @Rowb @Rowc @Rowd @Rowe @Rowf @Rowg @Rowh @Rowi @Rowj
 	@MarkRowa @MarkRowb @MarkRowc @MarkRowd @MarkRowe @MarkRowf 
 	@MarkRowg @MarkRowh @MarkRowi @MarkRowj 
+	@FirstRowa @FirstRowb @FirstRowc @FirstRowd @FirstRowe @FirstRowf 
+	@FirstRowg @FirstRowh @FirstRowi @FirstRowj 
 
 def @Tab                 
 
@@ -52,8 +54,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmtb
@@ -69,8 +71,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmtc
@@ -86,8 +88,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmtd
@@ -103,8 +105,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmte
@@ -120,8 +122,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmtf
@@ -137,8 +139,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmtg
@@ -154,8 +156,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmth
@@ -171,8 +173,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmti
@@ -188,8 +190,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     named @Fmtj
@@ -205,8 +207,8 @@ def @Tab
 	named "@Over" precedence 11 left x right y { x // y }
 	named ","     precedence 12 left x right y {}
 	named @Col    precedence 12        right x {}
-	named @CC     right x { clines @Break { & x } }
-	named @RR     right x { rlines @Break { & x } }
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
     {}
 
     body @Body
@@ -215,8 +217,8 @@ def @Tab
 
     macro @NP { /1.1b }
 
-    def @CC right x { clines @Break { & x } }
-    def @RR right x { rlines @Break { & x } }
+    def @CC right x { clines @Break { & x & } }
+    def @RR right x { rlines @Break { & x & } }
 
     def @HSingle	{ linewidth ltabhs   }
     def @HSingleProject	{ linewidth ltabhsp  }
@@ -754,6 +756,17 @@ def @Tab
     macro @Rowh { / @DoRowh }
     macro @Rowi { / @DoRowi }
     macro @Rowj { / @DoRowj }
+
+    macro @FirstRowa { @DoRowa }
+    macro @FirstRowb { @DoRowb }
+    macro @FirstRowc { @DoRowc }
+    macro @FirstRowd { @DoRowd }
+    macro @FirstRowe { @DoRowe }
+    macro @FirstRowf { @DoRowf }
+    macro @FirstRowg { @DoRowg }
+    macro @FirstRowh { @DoRowh }
+    macro @FirstRowi { @DoRowi }
+    macro @FirstRowj { @DoRowj }
 
     macro @MarkRowa { ^/ @DoRowa }
     macro @MarkRowb { ^/ @DoRowb }

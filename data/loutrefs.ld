@@ -247,7 +247,7 @@ concepts, and issues }
      @Month { August }
      @Year { 1942 }
      @Note { The date of composition is unknown, but
-is thought to be about the tenth century BC }
+is thought to be about the tenth century BC. }
 }
 
 { @Reference

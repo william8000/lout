@@ -76,6 +76,8 @@ def @CPrint
 	class     enum      int       return    this      volatile
 	const     extern    long      short     throw     while
 
+	@EvaluateCp
+
     def @CP
 	named style        { style         }  # style
 	named font         { dft           }  # font family
@@ -364,6 +366,13 @@ def @CPrint
 	def void	{ @K "void"			}
 	def volatile	{ @K "volatile"			}
 	def while	{ @K "while"			}
+
+	def @EvaluateCp right x
+	{
+	  { @InitFontFamily Base } @Font
+	  { @Ident @InitSize } @Font
+	  { @InitLine lines } @Break x
+	}
 
 	{ @InitFontFamily Base } @Font { @Ident @InitSize } @Font
 	{ @InitLine lines } @Break @Body

@@ -7,8 +7,8 @@ A cross reference
 cross.ref @Index { Cross reference }
 in common terminology is something like `see Table 6'
 or `see page 57' -- a reference within a document to some other part of
-the document.  Readers find them very useful, but they are a major
-bookkeeping problem for authors.  As the document is revised, Table 6
+it.  Readers find them very useful, but they are a major
+problem for authors.  As the document is revised, Table 6
 becomes Table 7, the thing on page 57 moves to page 63, and all the
 cross references must be changed.
 @PP
@@ -51,23 +51,22 @@ one-word tag; then no braces are needed.
 @PP
 A cross reference is not an object; the reader should think of it as
 an arrow in the final printed document, beginning at the cross reference
-symbol and ending at the top of the target
+and ending at the top of the target
 target.cr @Index { Target of cross reference }
-invocation, like this:
-@ID 8p @Font {
-  { @LittlePage // @LittlePage }
-  ||0io ||0.7c
-  { //2c 
-    { @Code "@Table&&cities" }
-    //0.1c
-    ||0.5c 90d @Rotate @Arrow 2.5c
-    //0.05c
-    @HContract @VContract
-      @Fig { @Box margin { 0c } paint { grey } { 1.5c @Wide 1c @High } }
-  }
-}
-@PP
-Three special values may be given to the right parameter of
+#@ID 8p @Font {
+#  { @LittlePage // @LittlePage }
+#  ||0io ||0.7c
+#  { //2c 
+#    { @Code "@Table&&cities" }
+#    //0.1c
+#    ||0.5c 90d @Rotate @Arrow 2.5c
+#    //0.05c
+#    @HContract @VContract
+#      @Fig { @Box margin { 0c } paint { grey } { 1.5c @Wide 1c @High } }
+#  }
+#}
+#@PP
+invocation.  Three special values may be given to the right parameter of
 {@Code "&&"}:  {@Code preceding}, {@Code following}, and
 preceding. @Index { @Code preceding }
 following. @Index { @Code following }
@@ -78,9 +77,9 @@ appearing earlier in the final printed document than itself; that is, the
 arrow is guaranteed to point backwards through the document.  Usually it
 points to the nearest preceding invocation.  Similarly, 
 @Code "@Table&&following" points forwards, usually to the
-nearest following invocation of @Code "@Table".  The third special
-value, @Code "@Table&&foll_or_prec" is the same as @Code "@Table&&following"
-if it exists, otherwise it is the same as {@Code "@Table&&preceding"}.
+nearest following invocation.  @Code "@Table&&foll_or_prec" is the same as
+@Code "@Table&&following" if it exists, otherwise it is the same as
+{@Code "@Table&&preceding"}.
 @PP
 This section has been concerned with what a cross reference is -- an
 arrow from one point in a document to another -- but not with how it is

@@ -23,6 +23,7 @@
    def @@CurrLang          { @Code "@CurrLang"          }
    def @@Database          { @Code "@Database"          }
    def @@End               { @Code "@End"               }
+   def @@Enclose           { @Code "@Enclose"           }
    def @@Font              { @Code "@Font"              }
    def @@ForceGalley       { @Code "@ForceGalley"       }
    def @@Galley            { @Code "@Galley"            }
@@ -36,6 +37,7 @@
    def @@HShift            { @Code "@HShift"            }
    def @@Include           { @Code "@Include"           }
    def @@IncludeGraphic    { @Code "@IncludeGraphic"    }
+   def @@KernShrink        { @Code "@KernShrink"        }
    def @@Key               { @Code "@Key"               }
    def @@Language          { @Code "@Language"          }
    def @@LClos             { @Code "@LClos"             }

@@ -76,6 +76,12 @@ in Unix.  Lout will read each @Code "@Include" file as it comes to it,
 and if it finds an @Code "@Include" of a section while reading a chapter
 file, it will read the section too.
 @PP
+If the order of your chapters is fairly stable, it might be advantageous
+to use the @Code "@BypassNumber" option of @Code "@Chapter" (described
+in Appendix {@NumberOf bypass}) to fix the numbers of all your chapters,
+so that you get correct chapter numbers even when formatting one
+chapter at a time.
+@PP
 If you decide to store chapters in separate Unix directories, make sure
 that any @Code "/" characters in the file names are enclosed in double
 quotes:

@@ -12,8 +12,8 @@ simple to use.
 @Include { bas_star }
 @Include { bas_objs }
 @Include { bas_spac }
-@Include { bas_empt }
 @Include { bas_char }
+@Include { bas_empt }
 @Include { bas_font }
 @Include { bas_head }
 @Include { bas_par1 }

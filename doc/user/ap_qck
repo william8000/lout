@@ -354,12 +354,12 @@ B {
 @LP
 @Heading { 17.  Miscellaneous }
 @LD lines @Break {
-@Code "@Underline { Underline }"
+@Code "@Underline { will be underlined }"
 @Code "@Date"
 @Code "@Time"
 @Code "German @Language { ... }"
 @Code "\# comment to end of line"
-@Code "\"#&/@^{}|\"~"   (enclose these characters in quotes)
+@Code "\"#&/@^{}|~\""   (enclose these characters in quotes)
 }
 }
 } # end second table

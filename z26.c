@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -155,6 +155,7 @@ FULL_CHAR *Image(unsigned int c)
     case NULL_CLOS:		return  KW_NULL;
     case PAGE_LABEL:		return  KW_PAGE_LABEL;
     case CROSS:			return  KW_CROSS;
+    case FORCE_CROSS:		return  KW_FORCE_CROSS;
     case ONE_COL:		return  KW_ONE_COL;
     case ONE_ROW:		return  KW_ONE_ROW;
     case WIDE:			return  KW_WIDE;
@@ -174,6 +175,7 @@ FULL_CHAR *Image(unsigned int c)
     case VADJUST:		return  KW_VADJUST;
     case ROTATE:		return  KW_ROTATE;
     case SCALE:			return  KW_SCALE;
+    case KERN_SHRINK:		return  KW_KERN_SHRINK;
     case CASE:			return  KW_CASE;
     case YIELD:			return  KW_YIELD;
     case BACKEND:		return  KW_BACKEND;
@@ -192,11 +194,19 @@ FULL_CHAR *Image(unsigned int c)
     case RUMP:			return  KW_RUMP;
     case INSERT:		return  KW_INSERT;
     case NEXT:			return  KW_NEXT;
+    case PLUS:			return  KW_PLUS;
+    case MINUS:			return  KW_MINUS;
     case ENV_OBJ:		return  AsciiToFull("env_obj");
     case ENV:			return  KW_ENV;
+    case ENVA:			return  KW_ENVA;
+    case ENVB:			return  KW_ENVB;
+    case ENVC:			return  KW_ENVC;
+    case ENVD:			return  KW_ENVD;
+    case CENV:			return  KW_CENV;
     case CLOS:			return  KW_CLOS;
     case LVIS:			return  KW_LVIS;
     case LUSE:			return  KW_LUSE;
+    case LEO:			return  KW_LEO;
     case OPEN:			return  KW_OPEN;
     case TAGGED:		return  KW_TAGGED;
     case INCGRAPHIC:		return  KW_INCGRAPHIC;
@@ -233,7 +243,9 @@ FULL_CHAR *Image(unsigned int c)
     case RECURSIVE:		return  AsciiToFull("recursive");
     case PRECEDES:		return  AsciiToFull("precedes");
     case FOLLOWS:		return  AsciiToFull("follows");
+    case CROSS_LIT:		return  AsciiToFull("cross_lit");
     case CROSS_FOLL:		return  AsciiToFull("cross_foll");
+    case CROSS_FOLL_OR_PREC:	return  AsciiToFull("cross_foll_or_prec");
     case GALL_FOLL:		return  AsciiToFull("gall_foll");
     case GALL_FOLL_OR_PREC:	return  AsciiToFull("gall_foll_or_prec");
     case CROSS_TARG:		return  AsciiToFull("cross_targ");

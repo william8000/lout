@@ -35,6 +35,11 @@ follows after them.  They do not have to appear in the order they were
 defined, and they can even be omitted altogether, in which case the
 default value from the definition is used instead.
 @PP
+If the keyword @Code "compulsory" appears after @Code "named" and
+before the parameter's name, Lout will print a warning message whenever
+this parameter is missing.  However it will still use the default value
+as just described.
+@PP
 A named @Code "@Tag" parameter
 tag.par @Index { @Code "@Tag" parameter, default value of }
 does not take its default value from the definition; instead, if a default

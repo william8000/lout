@@ -6,8 +6,7 @@
 A @I key to a graph is an explanation of what each data set
 key. @Index { key in graph }
 represents.  To assist you in constructing a key, some extra symbols
-are provided in addition to @Code "@Graph".  Here are their names and
-values:
+are provided in addition to {@Code "@Graph"}:
 graph.cross @Index @Code "@GraphCross"
 graph.plus @Index @Code "@GraphPlus"
 graph.square @Index @Code "@GraphSquare"

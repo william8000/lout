@@ -35,8 +35,9 @@ recursive and receptive ones, discard all @@Font, @@Break, @@Space,
 @@SetColor, @@SetColour, and @@Language symbols, perform paragraph
 breaking as required, and discard all redundant braces.  Then view the
 galley as a sequence of one or more objects separated by vertical
-concatenation symbols; these are the components and split points.  For
-example, given the definition
+concatenation symbols; these are the components and split points,
+except that concatenation symbols whose gaps are unbreakable are not
+eligible to be split points.  For example, given the definition
 @ID @OneRow @Code {
 "def @Section into { @SectionPlace&&preceding }"
 "    named @Title {}"
@@ -64,8 +65,8 @@ becomes
 "//1vx"
 "no introduction."
 }
-with four components.  If @Code "@Body" was preceded by @Code "|1.0c" in
-the definition, the result would be
+with four components.  If @Code "@Body" had been preceded by @Code "|1.0c" in
+the definition, the result would have been
 @ID @OneRow @Code {
 "Introduction"
 "//0.7f"
@@ -73,8 +74,10 @@ the definition, the result would be
 "//"
 "|1.0c { This is a subject that really needs //1vx no introduction. }"
 }
-and now @Code "//1vx" is buried within one component and is not a
-potential split point.
+with @Code "//1vx" buried within one component and hence not a
+potential split point.  If @Code "0.7f" had been {@Code "0.7fu"},
+the gap would have been unbreakable and @Code "//0.7fu" would not
+have been a potential split point.
 @PP
 Version 3.03 has liberalized this somewhat in the following way.  When
 a component consists of a horizontal sequence of two or more objects
@@ -206,12 +209,14 @@ object, so this root galley is effectively @Code "@PageList" alone, as
 required.  The @Code "@Text" galley will find its first target preceding
 its invocation point, within {@Code "@PageList"}.
 @PP
-Printing {@PageMark rootg} the root galley on the output file is somewhat problematical,
+Printing {@PageMark rootg} the root galley on the output file is
+somewhat problematical,
 root.galley.printing @SubIndex { printing of }
 because Lout has no way of knowing how large the paper is.  Basser Lout
 simply prints one root galley component per page (except it skips
 components of height zero), and the user is responsible for ensuring
-that each component is page-sized.
+that each component is page-sized.  Gaps between root galley
+components, even unbreakable ones, have no effect on the result.
 @PP
 Basser Lout will promote a component only after any receptive symbols
 components.promotion @SubIndex { promotion of }
@@ -261,6 +266,25 @@ doing it would hold things up.  So there is a short period of grace when
 galleys, such as the entries in tables of contents just alluded to,
 can sneak into these receptive symbols.
 @PP
+The @Code "into" and @Code "force into" forms are actually just abbreviations
+for the true way that galleys are defined, which
+is by giving the symbol that is to be a galley a parameter or nested
+target.sym @Index { @Code "@Target" symbol }
+definition with the special name {@Code "@Target"}:
+@ID @Code {
+"def @Text"
+"    right x"
+"{"
+"    def @Target { @TextPlace&&preceding }"
+""
+"    x"
+"}"
+}
+A forcing galley is obtained by using @Code "&&&" instead of
+{@Code "&&"}.  @Code "@Target" may be an arbitrary object,
+provided that it yields such a cross reference when evaluated.  In
+this way, different invocations may have different targets.
+@PP
 The forcing galley effect can be obtained in another way, by replacing
 the @Code "@Galley" symbol to which the galley is attached by
 {@Code "@ForceGalley"}.  The advantage of this form is that the galley
@@ -281,6 +305,30 @@ it will have the effect of a forcing galley, while if it happens to
 attach to
 @ID @Code "@SomePlace noforce"
 it will not.
+@PP
+Within a galley, a symbol whose name is @@Enclose has a special
+enclose.sym @Index @@Enclose
+meaning:  when components of the galley replace a @@Galley or @@ForceGalley
+symbol, that symbol is first replaced by @@Enclose @@Galley or
+@@Enclose @@ForceGalley.  For example,
+@ID @Code {
+"def @Enclose"
+"    right x"
+"{"
+"    @Box x"
+"}"
+}
+within some galley definition causes each @@Galley or @@ForceGalley
+symbol that receives components of the galley to be replaced by
+{@Code "@Box @Galley"} or {@Code "@Box @ForceGalley"}, assuming an
+appropriate definition of @Code "@Box".  This is useful, for example,
+when producing multi-page boxed displays, figures, and tables.
+@PP
+An @@Enclose symbol may have only one parameter, which must be a
+right parameter.  It would not make sense to allow more parameters,
+since there is no suitable value to assign to them.  However, the
+@@Enclose symbol may contain inner definitions, and it may make use
+of any symbol that is available at that point, in the usual way.
 @PP
 A @Code "following" galley may fail to find a first target lying in a
 following component of the same galley as its invocation point.  This is

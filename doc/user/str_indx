@@ -42,12 +42,18 @@ which is used for sorting the index entries,
 @FootNote {
 The collating sequence used to decide what comes after what is the
 collating sequence used by the @Code "memcmp()" library routine (just
-the underlying binary character codes).  If this turns out not to be
-the one that you expected, the first thing to try is the replacement
-of all accented letters in index keys by unaccented ones.  Sorting is
-quite an intractable problem:  even if Lout knew the collating sequence
-for every language, which it doesn't, there would still remain the
-problem of sorting multilingual indexes.
+the underlying binary character codes).  Alternatively, the version
+of Lout installed on your system may use the @Code "strcoll()"
+collating sequence, which understands accented characters and whose
+effect depends on your locale.  To find out whether @Code "strcoll()"
+is in use or not, type @Code "lout -V" which prints out several lines
+of this and similar information.
+@PP
+If the sorting you get turns out to be not what you expected, the
+first thing to try is the replacement of all accented letters in index
+keys by unaccented ones.  Sorting is quite an intractable problem:  even
+if @Code "strcoll()" gets the sorting right for one language, there still
+remains the problem of sorting multilingual indexes.
 }
 but which is not itself printed anywhere.  It is best to construct these
 sorting keys from lower-case letters and the . character only, beginning
@@ -253,7 +259,7 @@ their default values:
 @ID @OneRow @Code {
 "@MakeIndex { No }"
 "@IndexFont { }"
-"@IndexBreak { outdent 1.2fx }"
+"@IndexBreak { oragged 1.2fx }"
 "@IndexColumnNumber { 2 }"
 "@IndexColumnGap { 1.00c }"
 }
@@ -269,7 +275,7 @@ indexfont. @Index @Code "@IndexFont"
 (e.g. {@Code "Times Base 12p"}).  Leaving it empty as above produces
 the same font as the rest of the document.  @Code "@IndexBreak" is the
 indexbreak. @Index @Code "@IndexBreak"
-paragraph breaking style applied to index entries; @Code outdent is the
+paragraph breaking style applied to index entries; @Code oragged is the
 traditional and best way.
 @PP
 @Code "@IndexColumnNumber" and @Code "@IndexColumnGap" determine the

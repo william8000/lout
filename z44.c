@@ -1,6 +1,6 @@
 /*@z44.c:Vertical Hyphenation:VerticalHyphenate()@****************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -119,6 +119,7 @@ static OBJECT FindTarget(OBJECT index)
     case CROSS_TARG:
     case CROSS_PREC:
     case CROSS_FOLL:
+    case CROSS_FOLL_OR_PREC:
     case PAGE_LABEL_IND:
 
       res = nilobj;  /* somewhat doubtful */
@@ -262,7 +263,7 @@ static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
 BOOLEAN VerticalHyphenate(OBJECT y)
 { OBJECT large_comp, index, z, link, g;
   OBJECT row_thread, s1, s2, sh, sv, shp, prev, nxt, large_comp_split;
-  LENGTH rump_fwd;
+  FULL_LENGTH rump_fwd;
   debug1(DVH, D, "[ VerticalHyphenate(y: %s), y =", EchoLength(size(y, ROWM)));
   ifdebug(DVH, D, DebugObject(y));
   debug0(DVH, DD, "galley before vertical hyphenation:");
@@ -309,7 +310,7 @@ BOOLEAN VerticalHyphenate(OBJECT y)
 
     /* Now sh is one of the HCAT components */
     if( type(sh) != VCAT )
-    { rump_fwd = max(rump_fwd, fwd(sh, ROWM));
+    { rump_fwd = find_max(rump_fwd, fwd(sh, ROWM));
     }
     else if( large_comp != nilobj )
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (two VCATs)");
@@ -340,7 +341,7 @@ BOOLEAN VerticalHyphenate(OBJECT y)
   }
 
   /* make sure that first gap does not change when rearranging */
-  rump_fwd = max(rump_fwd, fwd(prev, ROWM));
+  rump_fwd = find_max(rump_fwd, fwd(prev, ROWM));
   if( MinGap(rump_fwd, back(nxt, ROWM), fwd(nxt, ROWM), &gap(g)) !=
       MinGap(fwd(prev, ROWM), back(nxt, ROWM), fwd(nxt, ROWM), &gap(g)) )
   { debug0(DVH, D, "] VerticalHyphenate returning FALSE (first gap changes)");
@@ -473,7 +474,7 @@ static OBJECT BuildMergeTree(int n, OBJECT x, OBJECT *lenv, OBJECT *lact)
 
 OBJECT ConvertGalleyList(OBJECT x)
 { OBJECT res, y, link, junk1, junk2, obj;  int n;
-  debug1(DHY, D, "ConvertGalleyList(%s)", EchoObject(x));
+  debug1(DHY, DD, "ConvertGalleyList(%s)", EchoObject(x));
   Child(res, Down(x));
   Child(y, Down(res));
   MoveLink(Down(x), y, CHILD);
@@ -488,7 +489,83 @@ OBJECT ConvertGalleyList(OBJECT x)
   MoveLink(LastDown(y), obj, PARENT);
   assert( Down(y) == y && Up(y) == y, "ConvertGalleyList: y!" );
   Dispose(y);
-  debug0(DHY, D, "ConvertGalleyList returning, res =");
-  ifdebug(DHY, D, DebugObject(res));
+  debug0(DHY, DD, "ConvertGalleyList returning, res =");
+  ifdebug(DHY, DD, DebugObject(res));
   return res;
 } /* end ConvertGalleyList */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT BuildEnclose(hd)                                                  */
+/*                                                                           */
+/*  Build the @Enclose object for galley hd.                                 */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT BuildEnclose(OBJECT hd)
+{ OBJECT sym, parsym, x, y, link, par, val, env, res;
+  debug1(DHY, D, "BuildEnclose(%s)", SymName(actual(hd)));
+
+  /* find @Enclose symbol and check that it has just one parameter */
+  for( link = Down(actual(hd));  link != actual(hd);  link = NextDown(link) )
+  { Child(sym, link);
+    if( is_enclose(sym) )  break;
+  }
+  assert( link != actual(hd), "BuildEnclose: no enclose!" );
+  parsym = nilobj;
+  for( link = Down(sym);  link != sym;  link = NextDown(link) )
+  { Child(y, link);
+    switch( type(y) )
+    {
+	case LPAR:
+	case NPAR:
+
+	  Error(44, 1, "%s may not have a left or named parameter", FATAL,
+	    &fpos(y), KW_ENCLOSE);
+	  break;
+
+
+	case RPAR:
+
+	  if( has_body(sym) )
+	    Error(44, 2, "%s may not have a body parameter", FATAL,
+	      &fpos(y), KW_ENCLOSE);
+	  parsym = y;
+	  break;
+
+
+	default:
+
+	  break;
+    }
+  }
+  if( parsym == nilobj )
+    Error(44, 3, "%s must have a right parameter", FATAL, &fpos(sym),KW_ENCLOSE);
+
+  /* set x to new @Enclose closure with dummy actual right parameter */
+  New(x, CLOSURE);
+  FposCopy(fpos(x), fpos(hd));
+  actual(x) = sym;
+  New(par, PAR);
+  FposCopy(fpos(par), fpos(hd));
+  actual(par) = parsym;
+  Link(x, par);
+  val = MakeWord(WORD, AsciiToFull("??"), &fpos(hd));
+  Link(par, val);
+
+  /* set env to the appropriate environment for this symbol */
+  /* strictly speaking y should not be included if sym is a parameter */
+  Child(y, Down(hd));
+  assert(type(y) == CLOSURE, "BuildEnclose:  hd child!");
+  y = CopyObject(y, &fpos(hd));
+  env = SetEnv(y, nilobj);
+
+  /* build res, an ENV_OBJ with x at left and env at right */
+  New(res, ENV_OBJ);
+  Link(res, x);
+  Link(res, env);
+
+  debug1(DHY, D, "BuildEnclose returning %s", EchoObject(res));
+  return res;
+} /* end BuildEnclose */

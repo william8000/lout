@@ -19,17 +19,8 @@ setup file.  Alternatively, if you are using your own setup file, you may
 place the include commands within it; the place to put them is clearly
 marked in all the standard setup files.
 @PP
-To begin with a very simple example, the table
+To begin with a very simple example, the input
 tab. @Index @Code "@Tab"
-@CD
-@Tab
-    @Fmta { @Col A  !  @Col B  !  @Col C }
-{
-    @Rowa A { Austen } B { Chaucer } C { Donne }
-    @Rowa A { Balzac } B { Darwin } C { Goethe }
-    @Rowa A { Byron } B { Dickens } C { Homer }
-}
-is the result of the following Lout input:
 @ID @OneRow @Code {
 "@Tab"
 "    @Fmta { @Col A  !  @Col B  !  @Col C }"
@@ -39,13 +30,22 @@ is the result of the following Lout input:
 "    @Rowa A { Byron } B { Dickens } C { Homer }"
 "}"
 }
+produces the following table:
+@CD
+@Tab
+    @Fmta { @Col A  !  @Col B  !  @Col C }
+{
+    @Rowa A { Austen } B { Chaucer } C { Donne }
+    @Rowa A { Balzac } B { Darwin } C { Goethe }
+    @Rowa A { Byron } B { Dickens } C { Homer }
+}
 Immediately after the @Code "@Tab" symbol, which introduces the table,
 comes a @I { format option } & , {@Code "@Fmta"}, describing the format
 format.option @Index { format option in tables }
 of each row.  It says that each row contains three columns:
 {@Code "@Col A"}, {@Code "@Col B"}, and {@Code "@Col C"}.  The format
 option may have up to 26 columns, with names chosen freely
-from the upper-&-case letters from @Code A to {@Code Z}.  The symbol
+from the upper-case letters from @Code A to {@Code Z}.  The symbol
 @Code "!" separates each pair of columns.
 @PP
 After the format option comes the body of the table, enclosed in
@@ -62,8 +62,12 @@ Lout, this object may appear at any point in the document,
 @FootNote {
 In rare cases, when the table occupies an entire paragraph but is not
 displayed, a bug in the current version of Basser Lout causes the second
-column to appear much too far to the right.  You can work around this
-problem by replacing @Code "@Tab" by @Code "@OneCol @Tab" when it occurs.
+column to appear much too far to the right.  Until the problem is fixed,
+the first thing to try if this occurs is to replace the very first
+row symbol ({@Code "@Rowa"}, {@Code "@Rowb"}, etc.) by {@Code "@FirstRowa"},
+{@Code "@FirstRowb"}, etc.  That should work, but if it doesn't, replacing
+@Code "@Tab" by @Code "@OneCol @Tab" certainly will, although it also
+prevents the table from breaking across page boundaries.
 }
 even within a paragraph or another table.  Most commonly, though, tables
 are displayed using the @Code "@IndentedDisplay" and @Code "@CentredDisplay"

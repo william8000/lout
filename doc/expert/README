@@ -7,16 +7,13 @@ the command
 
 	lout all > outfile.ps
 
-in this directory.  This must be done four times
-to completely resolve all cross references (five
-times if Letter page size is used), although the
-PostScript file outfile.ps is printable after
+in this directory.  This must be done five times to
+completely resolve all cross references, although
+the PostScript file outfile.ps is printable after
 the first run.  Auxiliary files with .li and .ld
 suffixes will be created in this directory.  A
 copy of the final outfile.ps is included.  There
-should be no warning messages on the fourth run.
+should be no warning messages on the fifth run.
 
 Jeffrey H. Kingston
-23 December 1992
-8 May 1995
-8 May 1996
+17 November 1997

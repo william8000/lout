@@ -1,6 +1,6 @@
 /*@z27.c:Debug Service:Debug flags@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -79,6 +79,7 @@ struct dbs  dbg[] = {
     {"vh",    {0, 0, 0}},		/* Vertical Hyphenation      */
     {"ex",    {0, 0, 0}},		/* External Sort             */
     {"og",    {0, 0, 0}},		/* Optimal Galleys           */
+    {"et",    {0, 0, 0}},		/* Environment Table         */
     {"pp",    {0, 0, 0}},		/* Profiling                 */
     {"",      {0, 0, 0}},		/* any                       */
 };

@@ -1,6 +1,6 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -108,7 +108,7 @@ static FULL_CHAR NameRetrieve(FULL_CHAR *cname, MAP_VEC map)
 
 MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
 { FILE *fp;  MAP_VEC map;  MAPPING res;
-  int i, m, line_num, line_pos, prev_code, dc, oc, count;
+  int i, m, curr_line_num, line_pos, prev_code, dc, oc, count;
   FULL_CHAR buff[MAX_BUFF], cn[MAX_BUFF], ch, mapname[MAX_BUFF],
   mapval[MAX_BUFF];
   debug2(DCM,D, "MapLoad(%s, %s)", EchoObject(file_name),bool(must_print));
@@ -169,11 +169,11 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
   for( i = 0;  i < MAX_CHASH; i++ )  map->hash_table[i] = 0;
 
   /* first pass through the file; read character codes and names only */
-  prev_code = -1;  line_num = 0;
+  prev_code = -1;  curr_line_num = 0;
   while( fgets( (char *) buff, MAX_BUFF, fp) == (char *) buff )
   { 
     /* skip comment lines and blank lines */
-    line_num++;
+    curr_line_num++;
     for( i = 0;  buff[i] == ' ' || buff[i] == '\t';  i++ );
     if( buff[i] == '#' || buff[i] == '\n' || buff[i] == '\0' )  continue;
 
@@ -187,20 +187,20 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
 	FATAL, &fpos(file_name));
     if( dc < 1 && !StringEqual(cn, STR_NOCHAR) )
       Error(38, 6, "code %d too small (min is 1) in mapping file (line %d)",
-	FATAL, &fpos(file_name), dc, line_num);
+	FATAL, &fpos(file_name), dc, curr_line_num);
     if( dc < prev_code )
       Error(38, 7, "code %d out of order in mapping file (line %d)",
-	FATAL, &fpos(file_name), dc, line_num);
+	FATAL, &fpos(file_name), dc, curr_line_num);
     if( dc == prev_code )
       Error(38, 8, "code %d repeated in mapping file (line %d)",
-	FATAL, &fpos(file_name), dc, line_num);
+	FATAL, &fpos(file_name), dc, curr_line_num);
     if( dc > MAX_CHARS )
       Error(38, 9, "code %d too large (max is %d) in mapping file (line %d)",
-	FATAL, &fpos(file_name), dc, MAX_CHARS, line_num);
+	FATAL, &fpos(file_name), dc, MAX_CHARS, curr_line_num);
     prev_code = dc;
 
     /* insert character name, if any */
-    debug2(DCM, DD, "  line %d: %s", line_num, cn);
+    debug2(DCM, DD, "  line %d: %s", curr_line_num, cn);
     if( count >= 3 && !StringEqual(cn, STR_NOCHAR) )
     {
       /* insert (cn, dc) pair into hash table; name may be repeated */
@@ -213,11 +213,11 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
 
   /* second pass through the file: read mappings */
   rewind(fp);
-  line_num = 0;
+  curr_line_num = 0;
   while( fgets( (char *) buff, MAX_BUFF, fp) == (char *) buff )
   { 
     /* skip comment lines and blank lines */
-    line_num++;
+    curr_line_num++;
     for( i = 0;  buff[i] == ' ' || buff[i] == '\t';  i++ );
     if( buff[i] == '#' || buff[i] == '\n' || buff[i] == '\0' )  continue;
 
@@ -229,7 +229,7 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
     while( sscanf( (char *) &buff[line_pos], "%s %[^;];%n",
       mapname, mapval, &i) == 2 )
     {
-      debug3(DCM, DD, "  line %d: %s %s", line_num, mapname, mapval);
+      debug3(DCM, DD, "  line %d: %s %s", curr_line_num, mapname, mapval);
       line_pos += i;
       if( StringEqual(mapname, AsciiToFull("UC")) )
 	m = MAP_UPPERCASE;
@@ -241,11 +241,11 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
 	m = MAP_ACCENT;
       else
 	Error(38, 10, "unknown mapping name %s in mapping file %s (line %d)",
-	  FATAL, &fpos(file_name), mapname, FileName(map->fnum), line_num);
+	  FATAL, &fpos(file_name), mapname, FileName(map->fnum), curr_line_num);
       ch = NameRetrieve(mapval, map);
       if( ch == (FULL_CHAR) '\0' )
 	Error(38, 11, "unknown character %s in mapping file %s (line %d)",
-	  FATAL, &fpos(file_name), mapval, FileName(map->fnum), line_num);
+	  FATAL, &fpos(file_name), mapval, FileName(map->fnum), curr_line_num);
       map->map[m][dc] = ch;
     }
   }
@@ -351,7 +351,7 @@ static OBJECT DoWord(FULL_CHAR *buff, FULL_CHAR *q, OBJECT x, FONT_NUM fnum)
 /*                                                                           */
 /*****************************************************************************/
 
-static OBJECT DoVShift(OBJECT x, LENGTH vshift, OBJECT chld)
+static OBJECT DoVShift(OBJECT x, FULL_LENGTH vshift, OBJECT chld)
 { OBJECT res;
   New(res, VSHIFT);
   FposCopy(fpos(res), fpos(x));
@@ -376,7 +376,7 @@ static void DoAddGap(OBJECT new_acat)
   New(new_g, GAP_OBJ);
   FposCopy(fpos(new_g), fpos(new_acat));
   hspace(new_g) = vspace(new_g) = 0;
-  SetGap(gap(new_g), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0*IN);
+  SetGap(gap(new_g), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0*IN);
   Link(new_acat, new_g);
 }
 
@@ -397,7 +397,7 @@ static void DoAddGap(OBJECT new_acat)
 OBJECT MapSmallCaps(OBJECT x, STYLE *style)
 { MAPPING m;  int i;  OBJECT new_y, new_x, new_acat, tmp;
   FULL_CHAR buff[MAX_BUFF], *uc, *p, *q;
-  FONT_NUM small_font;  LENGTH vshift;  int state;  STYLE new_style;
+  FONT_NUM small_font;  FULL_LENGTH vshift;  int state;  STYLE new_style;
   static OBJECT font_change_word = nilobj;
   assert( is_word(type(x)), "MapSmallCaps: !is_word(type(x))" );
   debug2(DCM, D, "MapSmallCaps(%s %s)", Image(type(x)), string(x));

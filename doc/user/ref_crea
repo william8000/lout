@@ -40,15 +40,15 @@ to be writable (by @Code "chmod +w mystyle.ld" in Unix).  Now replace
 at the end of your setup file by
 @ID @Code "@Database @RefStyle { mystyle }"
 and Lout will read its reference styles from @Code "mystyle.ld" instead
-of from {@Code "refstyle.ld"}.  Since the two database files are at
+of {@Code "refstyle.ld"}.  Since the two are at
 present identical, this has changed nothing so far; but now any changes
 you make to @Code "mystyle.ld" will affect your document.  Changing
-@Code "@SysDatabase" to @Code "@Database" tells Lout to search your
+@Code "@SysDatabase" to @Code "@Database" makes Lout search your
 current directory for {@Code "mystyle.ld"}, whereas @Code "@SysDatabase"
 searches only the system directory.
 @PP
 In practice you will probably want to store your database of reference
-styles in some library directory of your own, so that it can be used by
+styles in some library directory, so that it can be used by
 many documents.  A Unix pathname is appropriate for this:
 @ID @Code "@Database @RefStyle { \"/usr/jeff/lib/mystyle\" }"
 Quotes are needed because of the @Code "/" characters.
@@ -107,7 +107,7 @@ to great lengths to do the right thing when options are omitted:
 @Rowa A { "        {  , @Year " }	B { "}  @If  @Year @And @Not @Month" }
 @Rowa A { "        {  ." }		B { "}  @If  @True" }
 @Rowa A { "        {  {}  URL @URL." }	B { "}  @If  @URL" }
-@Rowa A { "        {  {}  @Note." }	B { "}  @If  @Note" }
+@Rowa A { "        {  {}  @Note" }	B { "}  @If  @Note" }
 @Rowa A { "     }" }
 @Rowa A { "  }" }
 @Rowa A { "}" }

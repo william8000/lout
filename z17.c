@@ -1,6 +1,6 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -36,13 +36,15 @@
 /*                                                                           */
 /*  Object x is expected to be a WORD or QWORD containing a gap:             */
 /*                                                                           */
-/*      <gap>        ::=  [ <increment> ] <width> [ <mode> ]                 */
+/*      <gap>        ::=  [ <increment> ] <width> [ <mode> ] [ <nobreak> ]   */
 /*                   ::=                                                     */
+/*                                                                           */
+/*      <nobreak>    ::=  u                                                  */
+/*      <increment>  ::=  +  |  -                                            */
 /*      <width>      ::=  <unsigned number> <units>                          */
 /*      <units>      ::=  c  |  i  |  p  |  m  |  f  |  s                    */
 /*                   ::=  v  |  w  |  b  |  r  |  d  |  y  |  z              */
 /*      <mode>       ::=  e  |  h  |  x  |  o  |  k  |  t                    */
-/*      <increment>  ::=  +  |  -                                            */
 /*                                                                           */
 /*  Set *res_gap to the gap in the strings of x; *res_inc is the increment.  */
 /*  The gap is calculated using the given style.                             */
@@ -59,6 +61,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   debug2(DGW, DD, "GetGap( %s, %s, res_gap, res_inc )",
 	EchoObject(x), EchoStyle(style));
 
+  nobreak(*res_gap) = FALSE;
   width(*res_gap) = 0;  units(*res_gap) = FIXED_UNIT;
   mode(*res_gap)  = EDGE_MODE;  *res_inc = GAP_ABS;
 
@@ -76,7 +79,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
     return;
   }
 
-  /* find the gap increment */
+  /* read the optional gap increment */
   if( *str == CH_INCGAP )       *res_inc = GAP_INC, str++;
   else if( *str == CH_DECGAP )  *res_inc = GAP_DEC, str++;
 
@@ -90,8 +93,8 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   }
   while( numericchar(*str) )  str++;
 
-  /* find the units, calculate length, and check for reasonableness */
-  switch( *str )
+  /* read the compulsory units, calculate length, and check reasonableness */
+  switch( *str++ )
   {
     case CH_UNIT_CM:	setwidths( num*CM,                        FIXED_UNIT );
     case CH_UNIT_IN:	setwidths( num*IN,                        FIXED_UNIT );
@@ -123,24 +126,19 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   { Error(17, 5, "%.1fr too large (1.0r substituted)", WARN, &fpos(x), num);
     w = FR;
   }
-  else if( w > MAX_LEN )
-  { assert( units(*res_gap) != DEG_UNIT, "GetGap: oversize degrees!" );
-    Error(17, 6, "length %s is too large (maximum %dc substituted)",
-      WARN, &fpos(x), string(x), MAX_LEN/CM);
-    w = MAX_LEN;
-  }
   width(*res_gap) = w;
 
-  /* find the gap mode */
-  switch( *++str )
+  /* read the optional gap mode */
+  switch( *str )
   {
-    case CH_MODE_EDGE:
-    case '\0':		mode(*res_gap) = EDGE_MODE;	break;
-    case CH_MODE_HYPH:	mode(*res_gap) = HYPH_MODE;	break;
-    case CH_MODE_MARK:	mode(*res_gap) = MARK_MODE;	break;
-    case CH_MODE_OVER:	mode(*res_gap) = OVER_MODE;	break;
-    case CH_MODE_KERN:	mode(*res_gap) = KERN_MODE;	break;
-    case CH_MODE_TABL:	mode(*res_gap) = TAB_MODE;	break;
+    case CH_NOBREAK:
+    case '\0':		mode(*res_gap) = EDGE_MODE;          break;
+    case CH_MODE_EDGE:	mode(*res_gap) = EDGE_MODE;  str++;  break;
+    case CH_MODE_HYPH:	mode(*res_gap) = HYPH_MODE;  str++;  break;
+    case CH_MODE_MARK:	mode(*res_gap) = MARK_MODE;  str++;  break;
+    case CH_MODE_OVER:	mode(*res_gap) = OVER_MODE;  str++;  break;
+    case CH_MODE_KERN:	mode(*res_gap) = KERN_MODE;  str++;  break;
+    case CH_MODE_TABL:	mode(*res_gap) = TAB_MODE;   str++;  break;
 
     default:	Error(17, 7, "unknown gap mode in %s",
 		  WARN, &fpos(x), string(x));
@@ -148,7 +146,14 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 		return;
   }
 
-  if( *str != '\0' && *++str != '\0' )
+  /* read the optional nobreak */
+  if( *str == CH_NOBREAK )
+  { nobreak(*res_gap) = TRUE;
+    str++;
+  }
+
+  /* if string has not terminated, error */
+  if( *str != '\0' )
     Error(17, 8, "invalid width or gap %s", WARN, &fpos(x), string(x));
 
   debug2(DGW, DD, "GetGap returning (res_gap = %s, res_inc = %s)",
@@ -158,7 +163,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 
 /*@::MinGap()@****************************************************************/
 /*                                                                           */
-/*  LENGTH MinGap(a, b, c, xgap)                                             */
+/*  FULL_LENGTH MinGap(a, b, c, xgap)                                        */
 /*                                                                           */
 /*  Returns the minimum possible separation between the marks of two         */
 /*  objects with the given intervening gap.                                  */
@@ -166,8 +171,8 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 /*                                                                           */
 /*****************************************************************************/
 
-LENGTH MinGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap)
-{ LENGTH res;  int w;
+FULL_LENGTH MinGap(FULL_LENGTH a, FULL_LENGTH b, FULL_LENGTH c, GAP *xgap)
+{ FULL_LENGTH res;  int w;
   switch( units(*xgap) )
   {
     case FIXED_UNIT:	w = width(*xgap);
@@ -193,16 +198,19 @@ LENGTH MinGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap)
 
     case ADD_HYPH:
     case HYPH_MODE:
-    case EDGE_MODE:	res = min(MAX_LEN, a + w + b);
+    case EDGE_MODE:	res = find_min(MAX_SHORT_LENGTH, a + w + b);
 			break;
 
-    case MARK_MODE:	res = max(w, a + b);
+    case MARK_MODE:	if( BackEnd != PLAINTEXT )
+			  res = find_max(w, a + b + (FULL_LENGTH) (0.1 * w) );
+			else
+			  res = find_max(w, a + b);
 			break;
 
     case OVER_MODE:	res = w;
 			break;
 
-    case KERN_MODE:	res = max(max(a, b), w);
+    case KERN_MODE:	res = find_max(find_max(a, b), w);
 			break;
 
     case TAB_MODE:	res = a + b;
@@ -221,7 +229,7 @@ LENGTH MinGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap)
 
 /*@::ExtraGap()@**************************************************************/
 /*                                                                           */
-/*  LENGTH ExtraGap(a, b, xgap, dir)                                         */
+/*  FULL_LENGTH ExtraGap(a, b, xgap, dir)                                    */
 /*                                                                           */
 /*  Consider two objects, the first with forward length a, the second with   */
 /*  back length b.  The objects are separated by the given gap.              */
@@ -231,9 +239,9 @@ LENGTH MinGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap)
 /*                                                                           */
 /*****************************************************************************/
 
-LENGTH ExtraGap(LENGTH a, LENGTH b, GAP *xgap, int dir)
-{ LENGTH tmp, res;
-  LENGTH w = units(*xgap) == FIXED_UNIT ? width(*xgap) : 0;
+FULL_LENGTH ExtraGap(FULL_LENGTH a, FULL_LENGTH b, GAP *xgap, int dir)
+{ FULL_LENGTH tmp, res;
+  FULL_LENGTH w = units(*xgap) == FIXED_UNIT ? width(*xgap) : 0;
   switch( mode(*xgap) )
   {
     case NO_MODE:	assert(FALSE, "ExtraGap: NO_MODE");
@@ -245,13 +253,16 @@ LENGTH ExtraGap(LENGTH a, LENGTH b, GAP *xgap, int dir)
     case EDGE_MODE:	res = 0;
 			break;
 
-    case MARK_MODE:	res = max(0, w - a - b);
+    case MARK_MODE:	if( BackEnd != PLAINTEXT )
+			  res = find_max(0, (FULL_LENGTH) (0.9 * w) - a - b);
+			else
+			  res = find_max(0, w - a - b);
 			break;
 
-    case OVER_MODE:	res = MAX_LEN;
+    case OVER_MODE:	res = MAX_SHORT_LENGTH;
 			break;
 
-    case KERN_MODE:	tmp = max(a, max(b, w));
+    case KERN_MODE:	tmp = find_max(a, find_max(b, w));
 			res = dir == BACK ? tmp - b : tmp - a;
 			break;
 
@@ -271,7 +282,7 @@ LENGTH ExtraGap(LENGTH a, LENGTH b, GAP *xgap, int dir)
 
 /*@::ActualGap()@*************************************************************/
 /*                                                                           */
-/*  LENGTH ActualGap(a, b, c, xgap, f, mk)                                   */
+/*  FULL_LENGTH ActualGap(a, b, c, xgap, f, mk)                              */
 /*                                                                           */
 /*  Returns the actual separation between the marks of an object of size     */
 /*  (?, a) and an object of size (b, c) separated by gap *xgap in a frame    */
@@ -279,21 +290,22 @@ LENGTH ExtraGap(LENGTH a, LENGTH b, GAP *xgap, int dir)
 /*                                                                           */
 /*****************************************************************************/
 
-LENGTH ActualGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap, LENGTH f, LENGTH mk)
-{ LENGTH res;  int w, w2;
+FULL_LENGTH ActualGap(FULL_LENGTH a, FULL_LENGTH b, FULL_LENGTH c, GAP *xgap,
+  FULL_LENGTH f, FULL_LENGTH mk)
+{ FULL_LENGTH res;  int w, w2;
   switch( units(*xgap) )
   {
     case FIXED_UNIT:	w = width(*xgap);
 			break;
 
     case FRAME_UNIT:	if( width(*xgap) > FR )
-			  w = MAX_LEN;
+			  w = MAX_SHORT_LENGTH;
 			else
 			  w = (width(*xgap) * f) / FR;
 			break;
 
     case AVAIL_UNIT:	w = (width(*xgap) * (f - b - c)) / FR;
-			w = max(w, 0);
+			w = find_max(w, 0);
 			break;
 
     case NEXT_UNIT:	w = width(*xgap) * (b + c) / FR;
@@ -313,24 +325,27 @@ LENGTH ActualGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap, LENGTH f, LENGTH mk)
     case EDGE_MODE:	w2 = a + w + b;
 			break;
 
-    case MARK_MODE:	w2 = max( w, a + b );
+    case MARK_MODE:	if( BackEnd != PLAINTEXT )
+			  w2 = find_max(w, a + b + (FULL_LENGTH) (0.1 * w) );
+			else
+			  w2 = find_max(w, a + b);
 			break;
 
     case OVER_MODE:	w2 = w;
 			break;
 
-    case KERN_MODE:	w2 = max( max(a, b), w);
+    case KERN_MODE:	w2 = find_max( find_max(a, b), w);
 			break;
 
     case TAB_MODE:	w2 = w + b - mk;
-			w2 = max( w2, a + b );
+			w2 = find_max( w2, a + b );
 			break;
 
     default:		assert(FALSE, "ActualGap: mode");
 			w2 = 0;
 			break;
   }
-  res = min(MAX_LEN, w2);
+  res = find_min(MAX_SHORT_LENGTH, w2);
   debug6(DGW, D, "ActualGap( _,%s %s %s,%s; %s ) = %s",
 	EchoLength(a), EchoGap(xgap), EchoLength(b),
 	EchoLength(c), EchoLength(f), EchoLength(res) );
@@ -349,25 +364,27 @@ LENGTH ActualGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap, LENGTH f, LENGTH mk)
 
 FULL_CHAR *EchoGap(GAP *xgap)
 { char *letter = "?ehxokt";  char c;  FULL_CHAR *res;
+  char *u;
   static int i = 0;
   static char buff[3][20];
   assert( mode(*xgap) <= 6, "EchoGap: mode(*xgap)" );
   c = letter[mode(*xgap)];
+  u = nobreak(*xgap) ? "u" : "";
   switch( units(*xgap) )
   {
     case 0:	     sprintf(buff[i], "(none)%c", c);
 		     break;
 
-    case FIXED_UNIT: sprintf(buff[i], "%.1fc%c", (float) width(*xgap) / CM, c);
+    case FIXED_UNIT: sprintf(buff[i], "%.1fc%c%s", (float) width(*xgap)/CM, c,u);
 		     break;
 
-    case NEXT_UNIT:  sprintf(buff[i], "%.1fw%c", (float) width(*xgap) / FR, c);
+    case NEXT_UNIT:  sprintf(buff[i], "%.1fw%c%s", (float) width(*xgap)/FR, c,u);
 		     break;
 
-    case FRAME_UNIT: sprintf(buff[i], "%.1fb%c", (float) width(*xgap) / FR, c);
+    case FRAME_UNIT: sprintf(buff[i], "%.1fb%c%s", (float) width(*xgap)/FR, c,u);
 		     break;
 
-    case AVAIL_UNIT: sprintf(buff[i], "%.1fr%c", (float) width(*xgap) / FR, c);
+    case AVAIL_UNIT: sprintf(buff[i], "%.1fr%c%s", (float) width(*xgap)/FR, c,u);
 		     break;
 
     case DEG_UNIT:   sprintf(buff[i], "%.1fd", (float) width(*xgap) / DG);

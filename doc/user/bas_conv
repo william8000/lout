@@ -69,5 +69,7 @@ space).  For example,
 will produce an ordinary space between the two words, even with
 @Code "tex" which would otherwise consider that spot to be the end
 of a sentence.  Spaces adjacent to these two symbols have no effect on
-the result.
+the result.  Please note however that @Code "~" produces an
+unbreakable space (that is, one that will never be replaced by the end of
+a line) in contrast to just leaving a space, which is breakable.
 @End @Section

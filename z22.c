@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -26,7 +26,7 @@
 /*  MODULE:       Galley Service                                             */
 /*  EXTERNS:      Interpose(), FlushInners(), ExpandRecursives(),            */
 /*                Promote(), KillGalley(), FreeGalley(),                     */
-/*                TargetSymbol(), CheckComponentOrder()                      */
+/*                SetTarget(), CheckComponentOrder()                         */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -145,7 +145,8 @@ void ExpandRecursives(OBJECT recs)
 { CONSTRAINT non_c, hc, vc;
   OBJECT target_index, target, z, n1, inners, newrecs, hd, tmp, env, why;
   debug0(DCR, DD, "ExpandRecursives(recs)");
-  SetConstraint(non_c, MAX_LEN, MAX_LEN, MAX_LEN);  n1 = nilobj;
+  SetConstraint(non_c, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
+  n1 = nilobj;
   assert(recs != nilobj, "ExpandRecursives: recs == nilobj!");
   while( Down(recs) != recs )
   { Child(target_index, Down(recs));  DeleteLink( Down(recs) );
@@ -156,7 +157,9 @@ void ExpandRecursives(OBJECT recs)
 
     /* expand body of target, convert to galley, and check size */
     New(hd, HEAD);  actual(hd) = actual(target);  must_expand(hd) = TRUE;
-    limiter(hd) = opt_components(hd) = opt_constraints(hd) = nilobj;
+    force_gall(hd) = FALSE;
+    enclose_obj(hd) = limiter(hd) = nilobj;
+    opt_components(hd) = opt_constraints(hd) = nilobj;
     gall_dir(hd) = horiz_galley(actual(target));
     whereto(hd) = ready_galls(hd) = nilobj;
     foll_or_prec(hd) = GALL_FOLL;
@@ -165,7 +168,7 @@ void ExpandRecursives(OBJECT recs)
     Link(hd, tmp);  Link(target_index, hd);
     SizeGalley(hd, env, external_ver(target),
       gall_dir(hd) == ROWM ? threaded(target) : FALSE, FALSE, FALSE,
-      &save_style(target), &non_c, nilobj, &n1, &newrecs, &inners);
+      &save_style(target), &non_c, nilobj, &n1, &newrecs, &inners, nilobj);
     debug0(DCR, DDD, "    as galley:");
     ifdebug(DCR, DDD, DebugObject(hd));
     Constrained(target, &hc, COLM, &why);
@@ -261,6 +264,7 @@ static OBJECT FindSplitInGalley(OBJECT hd)
     case COL_THR:
     case ONE_COL:
     case SCALE:
+    case KERN_SHRINK:
     case HSCALE:
     case VSCALE:
     case HCOVER:
@@ -325,9 +329,9 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
   { New(y, GAP_OBJ);
     FposCopy(fpos(y), fpos(hd));
     hspace(y) = 0;  vspace(y) = 1;
-    /* SetGap(gap(y), FALSE, seen_nojoin(hd), FIXED_UNIT, NO_MODE, 0); */
-    SetGap(gap(y), FALSE, TRUE, FIXED_UNIT, NO_MODE, 0);
-    /* SetGap(gap(y), FALSE, threaded(dest), FIXED_UNIT, NO_MODE, 0); */
+    /* SetGap(gap(y), FALSE, FALSE, seen_nojoin(hd), FIXED_UNIT, NO_MODE, 0); */
+    SetGap(gap(y), FALSE, FALSE, TRUE, FIXED_UNIT, NO_MODE, 0);
+    /* SetGap(gap(y), FALSE, FALSE, threaded(dest), FIXED_UNIT, NO_MODE, 0); */
     /* ClearGap(gap(y)); */
     Link(stop_link, y);
   }
@@ -438,7 +442,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
     back(extra_null, ROWM) = fwd(extra_null, ROWM) = 0;
     New(extra_gap, GAP_OBJ);
     hspace(extra_gap) = vspace(extra_gap) = 0;
-    SetGap(gap(extra_gap), FALSE, FALSE, FIXED_UNIT, EDGE_MODE, 0);
+    SetGap(gap(extra_gap), FALSE, FALSE, FALSE, FIXED_UNIT, EDGE_MODE, 0);
     Link(Down(prnt), extra_gap);
     Link(Down(prnt), extra_null);
     debug0(DGS, DD, "  Promote adding extra nojoin gap");
@@ -504,14 +508,11 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
       
 	  /* expand @HExpand or @VExpand to occupy everything possible */
 	  dim = type(actual(y)) == HEXPAND ? COLM : ROWM;
-          debug1(DGP, D, " flushing %s", EchoObject(y));
 	  Constrained(actual(y), &c, dim, &why);
 	  if( constrained(c) )
-	  { LENGTH b = back(actual(y), dim);
-	    LENGTH f = fwd(actual(y), dim);
+	  { FULL_LENGTH b = back(actual(y), dim);
+	    FULL_LENGTH f = fwd(actual(y), dim);
 	    EnlargeToConstraint(&b, &f, &c);
-	    debug2(DGP, D, "FlushRoot call AdjustSize(hd, %s,%s, dim)",
-			EchoLength(b), EchoLength(f));
 	    debug1(DSA, D, "Promote %s AdjustSize", Image(type(actual(y))));
 	    AdjustSize(actual(y), b, f, dim);
 	  }
@@ -530,17 +531,16 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
 	  assert( Down(z) != z, "Promote: PAGE_LABEL Down(z) == z!" );
 	  Child(page_label, Down(z));
 	  DeleteLink(Up(page_label));
-	  debug2(DGP, D, " new page label %s %s", Image(type(page_label)),
-	    EchoObject(page_label));
 	  DisposeChild(NextDown(link));
 	  break;
 
 
 	case CROSS_PREC:
 	case CROSS_FOLL:
+	case CROSS_FOLL_OR_PREC:
 	case CROSS_TARG:
 	      
-	  debug2(DGS, D, "root promote %s %s", Image(type(y)), EchoObject(y));
+	  debug2(DGS, DD, "root promote %s %s", Image(type(y)), EchoObject(y));
 	  /* NB NO BREAK */
 
 
@@ -572,6 +572,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
 	case VEXPAND:
 	case ROTATE:
 	case SCALE:
+	case KERN_SHRINK:
 	case INCGRAPHIC:
 	case SINCGRAPHIC:
 	case GRAPHIC:
@@ -583,23 +584,20 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
 	case NULL_CLOS:
 	case PAGE_LABEL:
 	case CROSS:
+	case FORCE_CROSS:
 
 	  /* print this component */
-	  debug0(DGS, D, "root promote definite or indefinite");
+	  debug0(DGS, DD, "root promote definite or indefinite");
 	  if( !is_indefinite(type(y)) && size(y, ROWM) != 0 )
 	  {
 	    /* fix horizontally; work out which fonts needed */
-	    /* *** nice in theory (preserves joins), but ... 
-	    FixAndPrintObject(y, back(hd, COLM), back(hd, COLM), fwd(hd, COLM),
-	      COLM, FALSE, 0, 0);
-	    *** */
 	    FixAndPrintObject(y, back(y, COLM), back(y, COLM), fwd(y, COLM),
 	      COLM, FALSE, 0, 0);
 
 	    /* print prefatory or page separating material, including fonts */
 	    label_string = page_label != nilobj && is_word(type(page_label)) ?
 	      string(page_label) : AsciiToFull("?");
-	    debug1(DGS, D, "root promote definite; label_string = %s",
+	    debug1(DGS, DD, "root promote definite; label_string = %s",
 	      label_string);
 	    debug1(DCR, D, "label_string = %s", label_string);
 	    if( first )
@@ -652,8 +650,8 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
       Child(tmp2, DownDim(y, COLM));
       assert( type(tmp2) == COL_THR, "Promote: tmp2 not COL_THR!" );
       if( tmp1 != tmp2 )
-      { LENGTH b = max(back(tmp1, COLM), back(tmp2, COLM));
-	LENGTH f = max(fwd(tmp1, COLM),  fwd(tmp2, COLM));
+      { FULL_LENGTH b = find_max(back(tmp1, COLM), back(tmp2, COLM));
+	FULL_LENGTH f = find_max(fwd(tmp1, COLM),  fwd(tmp2, COLM));
 	debug0(DSA, D, "calling AdjustSize(tmp1) from Promote (node merging)");
 	AdjustSize(tmp1, b, f, COLM);
 	debug0(DSA, D, "calling AdjustSize(tmp2) from Promote (node merging)");
@@ -842,33 +840,39 @@ OBJECT relocate_link, OBJECT sym)
 } /* end FreeGalley */
 
 
-/*@::TargetSymbol()@**********************************************************/
+/*@::SetTarget()@*************************************************************/
 /*                                                                           */
-/*  unsigned char TargetSymbol(x, sym)                                       */
+/*  SetTarget(hd)                                                            */
 /*                                                                           */
-/*  Examine the parameters of closure x, which is known to have a @Target.   */
-/*  Return GALL_PREC, GALL_FOLL, or GALL_PREC_OR_FOLL, depending.            */
+/*  Search for the target of unsized galley hd, and set the following:       */
+/*                                                                           */
+/*     whereto(hd)          The symbol which is this galley's target         */
+/*     foll_or_prec(hd)     GALL_FOLL, GALL_PREC, GALL_FOLL_OR_PREC          */
+/*     force_gall(hd)       TRUE is this is a forcing galley                 */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char TargetSymbol(OBJECT x, OBJECT *sym)
-{ OBJECT y, link, cr, lpar, rpar;  unsigned char res;
-  debug1(DGS, DD, "TargetSymbol( %s )", EchoObject(x));
-  assert( type(x) == CLOSURE, "TargetSymbol: type(x) != CLOSURE!" );
-  assert( has_target(actual(x)), "TargetSymbol: x has no target!" );
+void SetTarget(OBJECT hd)
+{ OBJECT x, y, link, cr, lpar, rpar, env;
+  BOOLEAN copied;
+  debug1(DGS, D, "SetTarget(%s)", SymName(actual(hd)));
+  assert( type(hd) == HEAD, "SetTarget: type(hd) != HEAD!" );
+  Child(x, Down(hd));
+  assert( type(x) == CLOSURE, "SetTarget: type(x) != CLOSURE!" );
+  assert( has_target(actual(x)), "SetTarget: x has no target!" );
 
-  /* search the free variable list of x for @Target */
+  /* search the parameters of x for @Target */
   cr = nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
     if( type(y) == PAR && is_target(actual(y)) )
-    { assert( Down(y) != y, "TargetSymbol: Down(PAR)!" );
+    { assert( Down(y) != y, "SetTarget: Down(PAR)!" );
       Child(cr, Down(y));
       break;
     }
   }
 
-  /* search the children list of actual(x) for a default value of @Target */
+  /* search the children of actual(x) for a default value of @Target */
   if( cr == nilobj )
   for( link = Down(actual(x));  link != actual(x);  link = NextDown(link) )
   { Child(y, link);
@@ -877,52 +881,63 @@ unsigned char TargetSymbol(OBJECT x, OBJECT *sym)
       break;
     }
   }
+  assert(cr != nilobj, "SetTarget:  cr == nilobj!");
   
-  if( cr != nilobj )
+  /* if cr is not a cross-reference, expand it until it is */
+  copied = FALSE;
+  if( !is_cross(type(cr)) )
+  { OBJECT nbt[2], nft[2], ntarget, ncrs, nenclose;
+    nbt[COLM] = nft[COLM] = nbt[ROWM] = nft[ROWM] = nilobj;
+    ntarget = ncrs = nenclose = nilobj;
+    cr = CopyObject(cr, &fpos(x));
+    copied = TRUE;
+    env = GetEnv(x);
+    cr = Manifest(cr, env, &InitialStyle, nbt, nft, &ntarget, &ncrs,
+           FALSE, FALSE, &nenclose, TRUE);
+  }
+
+  /* check that cr is now a cross-reference object */
+  debug1(DGS, DD, "SetTarget examining %s", EchoObject(cr));
+  debug1(DGS, DD, "  type(cr) = %s", Image( (int) type(cr)) );
+  if( !is_cross(type(cr)) )
+    Error(22, 6, "target of %s is not a cross reference",
+      FATAL, &fpos(cr), SymName(actual(x)));
+
+  /* determine which symbol is the target of this galley */
+  Child(lpar, Down(cr));
+  if( type(lpar) != CLOSURE )
+    Error(22, 7, "left parameter of %s is not a symbol",
+      FATAL, &fpos(lpar), KW_CROSS);
+  whereto(hd) = actual(lpar);
+
+  /* determine the direction from the right parameter */
+  Child(rpar, NextDown(Down(cr)));
+  if( !is_word(type(rpar)) )
   {
-    /* check that cr is indeed a cross-reference object */
-    debug1(DGS, DD, "TargetSymbol examining %s", EchoObject(cr));
-    debug1(DGS, DD, "  type(cr) = %s", Image( (int) type(cr)) );
-    if( type(cr) != CROSS )
-      Error(22, 6, "target of %s is not a cross reference",
-	FATAL, &fpos(cr), SymName(actual(x)));
-
-    /* extract *sym from the left parameter */
-    Child(lpar, Down(cr));
-    if( type(lpar) != CLOSURE )
-      Error(22, 7, "left parameter of %s is not a symbol",
-	FATAL, &fpos(lpar), KW_CROSS);
-    *sym = actual(lpar);
-
-    /* extract direction from the right parameter */
-    Child(rpar, NextDown(Down(cr)));
-    if( !is_word(type(rpar)) )
-    {
-      Error(22, 8, "replacing %s%s? by %s%s%s", WARN, &fpos(rpar),
-	SymName(actual(lpar)), KW_CROSS,
-	SymName(actual(lpar)), KW_CROSS, KW_FOLLOWING);
-      res = GALL_FOLL;
-    }
-    else if( StringEqual(string(rpar), KW_PRECEDING) )
-       res = GALL_PREC;
-    else if( StringEqual(string(rpar), KW_FOLLOWING) )
-       res = GALL_FOLL;
-    else if( StringEqual(string(rpar), KW_FOLL_OR_PREC) )
-       res = GALL_FOLL_OR_PREC;
-    else
-    {
-      Error(22, 9, "replacing %s%s%s by %s%s%s",
-	WARN, &fpos(rpar), SymName(actual(lpar)), KW_CROSS,
-	string(rpar), SymName(actual(lpar)), KW_CROSS, KW_FOLLOWING);
-      res = GALL_FOLL;
-    }
-    return res;
+    Error(22, 8, "replacing %s%s? by %s%s%s", WARN, &fpos(rpar),
+      SymName(actual(lpar)), KW_CROSS,
+      SymName(actual(lpar)), KW_CROSS, KW_FOLLOWING);
+    foll_or_prec(hd) = GALL_FOLL;
   }
+  else if( StringEqual(string(rpar), KW_PRECEDING) )
+     foll_or_prec(hd) = GALL_PREC;
+  else if( StringEqual(string(rpar), KW_FOLLOWING) )
+     foll_or_prec(hd) = GALL_FOLL;
+  else if( StringEqual(string(rpar), KW_FOLL_OR_PREC) )
+     foll_or_prec(hd) = GALL_FOLL_OR_PREC;
   else
-  { assert(FALSE, "TargetSymbol: missing target of x");
-    return GALL_FOLL;
+  {
+    Error(22, 9, "replacing %s%s%s by %s%s%s",
+      WARN, &fpos(rpar), SymName(actual(lpar)), KW_CROSS,
+      string(rpar), SymName(actual(lpar)), KW_CROSS, KW_FOLLOWING);
+    foll_or_prec(hd) = GALL_FOLL;
   }
-} /* end TargetSymbol */
+
+  /* determine whether this is a forcing galley */
+  force_gall(hd) = force_target(actual(hd)) || type(cr) == FORCE_CROSS;
+
+  if( copied )  DisposeObject(cr);
+} /* end SetTarget */
 
 
 /*@::CheckComponentOrder()@***************************************************/

@@ -54,9 +54,8 @@ are; it allows 1.7 times the current font size for them, and
 @PP
 When a graph is to be presented as a centred display, it is generally
 best if the centring is done with respect to the frame alone, not the
-captions, ticks, and labels.  A @Code "hidecaptions" option is provided
-which accomplishes this by making the left and right captions and gaps
-seem to Lout to have zero width:
+captions, ticks, and labels.  The @Code "hidecaptions" option does this by
+making the left and right captions and gaps seem to Lout to have zero width:
 @ID @OneRow @Code {
 "@Graph"
 "    hidecaptions { yes }"

@@ -99,8 +99,8 @@ logarithmic x and y axes:
 "    ..."
 "}"
 }
-The value is the base of the logarithm, usually 10 or 2.  The default
-is the special value {@Code none}, meaning not logarithmic.  Logarithms
+The value is the base of the logarithm, usually 10 or 2, or
+{@Code none} (the default) meaning not logarithmic.  Logarithms
 to different bases differ only by a constant factor, so the main effect
 of different bases is on the choice of ticks and labels.  An @Code "xlog"
 option will be ignored if there are any negative or zero x data points,
@@ -141,4 +141,37 @@ boundary.  It is quite safe to set @Code "xextra" to @Code "0 cm" if
 desired, and indeed this is the default value when @Code style is
 {@Code axes} or {@Code none}.  The @Code "yextra" option works in
 exactly the same way for y values.
+@PP
+The @Code "xdecreasing" option plots the x values in decreasing order
+instead of increasing:
+@ID @Code {
+"@Graph"
+"    xdecreasing { yes }"
+"    abovecaption { New South Wales road deaths, 1960--1990"
+"(fatalities per 100 million vehicle km) }"
+"{"
+"    @Data"
+"        points { plus }"
+"        pairs { dashed }"
+"    {"
+"        1963 5.6  1971 4.3  1976 3.7  1979 3.4  1982 2.9  1985 2.3  1988 2.0"
+"    }"
+"}"
+}
+produces
+@CD @Graph
+    xdecreasing { yes }
+    abovecaption { New South Wales road deaths, 1960--1990
+(fatalities per 100 million vehicle km) }
+{
+    @Data
+        points { plus }
+        pairs { dashed }
+    {
+        1963 5.6  1971 4.3  1976 3.7  1979 3.4  1982 2.9  1985 2.3  1988 2.0
+    }
+}
+The value of @Code "xdecreasing" should be either @Code "no" (the default
+value) or {@Code "yes"}.  A similar @Code "ydecreasing" option does the same
+thing to the y axis.
 @End @Section

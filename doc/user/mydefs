@@ -174,3 +174,27 @@
 
    import @Eq
    def @ExA { 1 over sqrt { 1 - 4 x sup 2 } }
+
+   def @@Diag { @Code "@Diag" }
+
+   extend @DiagramPrint @Diag
+   macro @MyNode {
+    @Node
+	outline {
+	    LR:: { xsize 0 }
+	    LR:< 0d
+	    UL:: { 0 ysize }
+	    UL:< 270d
+	    0 0 LR UL 0 0
+	}
+   }
+
+   extend @DiagramPrint @Diag
+   macro @MyLink {
+    @Link
+	path {
+	    FROM:: from
+	    TO:: to
+	    FROM TO
+	}
+   }

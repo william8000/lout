@@ -46,9 +46,8 @@ Another expression ripe for packaging in a definition is
 @ID @Code {
 "@OneRow {  |  -2p @Font n  ^/0.5fk  2  }"
 }
-which produces @OneRow { | -2p @Font n ^/0.5sk 2 } as the reader
-familiar with Chapter {@NumberOf details}
-can verify.  But this time we would like to be able to write
+which produces @OneRow { | -2p @Font n ^/0.5sk 2 } (see
+Chapter {@NumberOf details}).  But this time we would like to be able to write
 @ID {
 @I object  @Code "@Super"  @I object
 }
@@ -115,8 +114,8 @@ empty object:
 @ID @Code {
 "..    ..    ..    ..    ..    ..    ..    ..    {}"
 }
-As the example shows, this would leave a small trailing space, which in
-practice turns out to be a major headache.  Lout solves this problem
+As the example shows, this would leave a small trailing space, which
+is a major headache.  Lout fixes this
 by replacing the last invocation with a different kind of empty object,
 called @@Null, whose effect is to make an adjacent concatenation symbol
 disappear, preferably one preceding the @@Null.  Thus, when Lout
@@ -125,9 +124,8 @@ replaces @Code "@Leaders" by @@Null in the expression
 "..    ..    ..    ..    ..    ..    ..    ..    @Leaders"
 }
 the trailing space, which is really a horizontal concatenation symbol,
-disappears as well.  This is carefully taken into account when deciding
-whether there is room to replace @Code "@Leaders" by its body at each
-stage.
+disappears as well.  This is taken into account when deciding
+whether there is room to replace @Code "@Leaders" by its body.
 @PP
 The remainder of this section is devoted to showing how definitions may
 be used to specify the @I {page layout}
@@ -146,8 +144,8 @@ we can define a page like this:
 }
 Now @Code "@Page" is an eight by
 eleven and a half inch object, with one inch margins, a place at the top for
-text, and a section at the bottom for footnotes (since @Code "//1rt" leaves
-sufficient space to bottom-justify the following object).  It will be
+text, and a section at the bottom for footnotes (since @Code "//1rt"
+bottom-justifies the following object).  It will be
 convenient for us to show the effect of invoking @Code "@Page" like this:
 @ID @Code
 { { //0.5ix 8p @Font "@Page" &2m => } &2m
@@ -160,9 +158,7 @@ The definition of a vertical list of pages should come as no surprise:
 @ID @OneRow @Code {
 "def @PageList"
 "{"
-"    @Page"
-"    //"
-"    @PageList"
+"    @Page  //  @PageList"
 "}"
 }
 This allows invocations like the following:
@@ -182,20 +178,18 @@ This allows invocations like the following:
   //     @LittlePage { "@TextPlace" //1rt "@FootSect" }
 }
 }
-setting  @Code "@PageList" to @Code @@Null on the last step.  An
-arbitrary number of pages can be generated in this way.
+setting  @Code "@PageList" to @Code @@Null on the last step.  Any
+number of pages can be generated.
 @PP
 A definition for @Code "@TextPlace" is beyond us at present, since
 @Code "@TextPlace" must be replaced by different parts of the text
-of the document on different pages.  We can,
-however, define @Code "@FootSect" to be a small space followed by a
-horizontal line followed by a list of places where footnotes are to go:
+of the document on different pages.  But we can
+define @Code "@FootSect" to be a small space followed by a
+horizontal line followed by a list of places where footnotes go:
 @ID @OneRow @Code {
 "def @FootList         "
 "{                     "
-"   @FootPlace         "
-"   //0.3v             "
-"   @FootList          "
+"   @FootPlace  //0.3v  @FootList"
 "}                     "
 "                      "
 "def @FootSect"

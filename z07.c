@@ -1,6 +1,6 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -24,7 +24,8 @@
 /*                                                                           */
 /*  FILE:         z07.c                                                      */
 /*  MODULE:       Object Service                                             */
-/*  EXTERNS:      MakeWord(), MakeWordTwo(), DisposeObject(), CopyObject(),  */
+/*  EXTERNS:      MakeWord(), MakeWordTwo(), MakeWordThree(),                */
+/*                DisposeObject(), CopyObject(),                             */
 /*                SplitIsDefinite(), InsertObject()                          */
 /*                                                                           */
 /*****************************************************************************/
@@ -109,6 +110,30 @@ OBJECT MakeWordTwo(unsigned typ, FULL_CHAR *str1, FULL_CHAR *str2, FILE_POS *pos
 } /* end MakeWordTwo */
 
 
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT MakeWordThree(s1, s2, s3)                                         */
+/*                                                                           */
+/*  Return an unsized WORD containing these three strings.                   */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT MakeWordThree(FULL_CHAR *s1, FULL_CHAR *s2, FULL_CHAR *s3)
+{ int len1 = StringLength(s1);
+  int len2 = StringLength(s2);
+  int len3 = StringLength(s3);
+  OBJECT res;
+  debug3(DOS, DD, "MakeWordThree(%s, %s, %s)", s1, s2, s3);
+  NewWord(res, WORD, len1 + len2 + len3, no_fpos);
+  StringCopy(string(res), s1);
+  StringCopy(&string(res)[len1], s2);
+  StringCopy(&string(res)[len1 + len2], s3);
+  debug4(DOS, DD, "MakeWordThree(%s, %s, %s) returning %s",
+    s1, s2, s3, EchoObject(res));
+  return res;
+} /* end MakeWordThree */
+
+
 /*@::CopyObject()@************************************************************/
 /*                                                                           */
 /*  OBJECT CopyObject(x, pos)                                                */
@@ -151,6 +176,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case NULL_CLOS:
     case PAGE_LABEL:
     case CROSS:
+    case FORCE_CROSS:
     case ONE_COL:
     case ONE_ROW:
     case WIDE:
@@ -162,6 +188,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case HCOVER:
     case VCOVER:
     case SCALE:
+    case KERN_SHRINK:
     case HCONTRACT:
     case VCONTRACT:
     case HEXPAND:
@@ -187,6 +214,8 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case RUMP:
     case INSERT:
     case NEXT:
+    case PLUS:
+    case MINUS:
     case OPEN:
     case TAGGED:
     case INCGRAPHIC:
@@ -262,28 +291,55 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  InsertObject(OBJECT x, OBJECT *ins)                                      */
+/*  OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)                 */
 /*                                                                           */
 /*  Search through manifested object x for an ACAT where ins may be          */
 /*  attached.  If successful, set *ins to nilobj after the attachment.       */
 /*                                                                           */
 /*****************************************************************************/
 
-void InsertObject(OBJECT x, OBJECT *ins)
-{ OBJECT link, y, g;
+OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
+{ OBJECT link, y, g, res;
   debug2(DOS, D, "InsertObject(%s, %s)", EchoObject(x), EchoObject(*ins));
   switch( type(x) )
   {
     case WORD:
     case QWORD:
+
+      New(res, ACAT);
+      FposCopy(fpos(res), fpos(x));
+      ReplaceNode(res, x);
+      Link(res, x);
+      StyleCopy(save_style(res), *style);
+      adjust_cat(res) = padjust(*style);
+      res = InsertObject(res, ins, style);
+      break;
+
+
     case NULL_CLOS:
     case HEAD:
     case CROSS:
+    case FORCE_CROSS:
     case PAGE_LABEL:
     case CLOSURE:
     case INCGRAPHIC:
     case SINCGRAPHIC:
 
+      res = x;
+      break;
+
+
+    case HCAT:
+    case VCAT:
+    case COL_THR:
+    case ROW_THR:
+    case SPLIT:
+
+      for( link = Down(x);  link != x && *ins != nilobj;  link = NextDown(link) )
+      { Child(y, link);
+	y = InsertObject(y, ins, style);
+      }
+      res = x;
       break;
 
 
@@ -303,42 +359,38 @@ void InsertObject(OBJECT x, OBJECT *ins)
     case GRAPHIC:
     case ROTATE:
     case SCALE:
+    case KERN_SHRINK:
     case WIDE:
     case HIGH:
     case HSHIFT:
     case VSHIFT:
-    case HCAT:
-    case VCAT:
-    case COL_THR:
-    case ROW_THR:
-    case SPLIT:
 
-      for( link = Down(x);  link != x && *ins != nilobj;  link = NextDown(link) )
-      { Child(y, link);
-	InsertObject(y, ins);
-      }
+      Child(y, LastDown(x));
+      y = InsertObject(y, ins, style);
+      res = x;
       break;
 
 
     case ACAT:
 
       New(g, GAP_OBJ);
-      SetGap(gap(g), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
+      SetGap(gap(g), FALSE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
       hspace(g) = vspace(g) = 0;
       Link(Down(x), g);
       Link(Down(x), *ins);
       *ins = nilobj;
+      res = x;
       break;
 
 
     default:
     
       assert1(FALSE, "InsertObject:", Image(type(x)));
+      res = x;
       break;
 
   }
-  debug1(DOS, D, "InsertObject returning (%s)",
-    *ins == nilobj ? "success" : "failure");
+  debug2(DOS, D, "InsertObject returning (%s) %s",
+    *ins == nilobj ? "success" : "failure", EchoObject(res));
+  return res;
 } /* end InsertObject */
-
-

@@ -27,9 +27,11 @@
     Danish	@Yield { Indhold }
     Dutch       @Yield { Inhoudsopgave }
     English	@Yield { Contents }
+    EnglishUK	@Yield { Contents }
     Finnish	@Yield { Sis{@Char adieresis}lt{@Char odieresis} }
     French	@Yield { Table des Mati{@Char egrave}res }
     German	@Yield { Inhalt }
+    Italian	@Yield { Indice }
     Norwegian   @Yield { Innhold }
     Polish	@Yield { Spis tre{@Char sacute}ci }
     Russian	@Yield { "\363\317\304\305\322\326\301\316\311\305" }
@@ -44,9 +46,11 @@
     Danish	@Yield { Referencer }
     Dutch       @Yield { Referenties }
     English	@Yield { References }
+    EnglishUK	@Yield { References }
     Finnish	@Yield { Viitteet }
     French	@Yield { R{@Char eacute}f{@Char eacute}rences }
     German	@Yield { Literaturverzeichnis }
+    Italian	@Yield { Riferimenti }
     Norwegian   @Yield { Referanser }
     Polish	@Yield { Odno{@Char sacute}niki }
     Russian	@Yield { "\354\311\324\305\322\301\324\325\322\301" }
@@ -61,9 +65,11 @@
     Danish	@Yield { Bibliografi }
     Dutch       @Yield { Bibliografie } 
     English	@Yield { Bibliography }
+    EnglishUK	@Yield { Bibliography }
     Finnish	@Yield { Kirjallisuusluettelo }
     French	@Yield { Bibliographie }
     German	@Yield { Literaturverzeichnis }
+    Italian	@Yield { Bibliografia }
     Norwegian   @Yield { Litteratur }
     Polish	@Yield { Literatura }
     Russian	@Yield { "\354\311\324\305\322\301\324\325\322\301" }
@@ -78,9 +84,11 @@
     Danish	@Yield { Figur }
     Dutch       @Yield { Figuur }
     English	@Yield { Figure }
+    EnglishUK	@Yield { Figure }
     Finnish	@Yield { Kuva }
     French	@Yield { Figure }
     German	@Yield { Abbildung }
+    Italian	@Yield { Figura }
     Norwegian   @Yield { Figur  }
     Polish	@Yield { Rysunek }
     Russian	@Yield { "\362\311\323\325\316\317\313" }
@@ -95,12 +103,14 @@
     Danish	@Yield { Figurliste }
     Dutch       @Yield { ?? }
     English	@Yield { List of Figures }
+    EnglishUK	@Yield { List of Figures }
     Finnish	@Yield { ?? }
     French	@Yield { Liste des figures }
     German	@Yield { Abbildungsverzeichnis }
+    Italian	@Yield { Indice delle Figure }
     Norwegian   @Yield { ??  }
     Polish	@Yield { Spis rysunk{@Char oacute}w }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\363\320\311\323\317\313 \311\314\314\300\323\324\322\301\303\311\312" }
     Slovenian   @Yield { Seznam slik }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -112,9 +122,11 @@
     Danish	@Yield { Tabel }
     Dutch       @Yield { Tabel }
     English	@Yield { Table }
+    EnglishUK	@Yield { Table }
     Finnish	@Yield { Taulukko }
     French	@Yield { Table }
     German	@Yield { Tabelle }
+    Italian	@Yield { Tabella }
     Norwegian   @Yield { Tabell }
     Polish	@Yield { Tabela }
     Russian	@Yield { "\364\301\302\314\311\303\301" }
@@ -129,12 +141,14 @@
     Danish	@Yield { Tabelliste }
     Dutch       @Yield { ?? }
     English	@Yield { List of Tables }
+    EnglishUK	@Yield { List of Tables }
     Finnish	@Yield { ?? }
     French	@Yield { Liste des tables }
     German	@Yield { Tabellenverzeichnis }
+    Italian	@Yield { Indice delle Tabelle }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Spis tabel }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\363\320\311\323\317\313 \324\301\302\314\311\303" }
     Slovenian   @Yield { Seznam tabel }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -146,12 +160,14 @@
     Danish	@Yield { Definition }
     Dutch       @Yield { ?? }
     English	@Yield { Definition }
+    EnglishUK	@Yield { Definition }
     Finnish	@Yield { ?? }
     French	@Yield { D{@Char eacute}finition }
     German	@Yield { Definition }
+    Italian	@Yield { Definizione }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Definicja }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\357\320\322\305\304\305\314\305\316\311\305" }
     Slovenian   @Yield { Definicija }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -163,12 +179,14 @@
     Danish	@Yield { Lemma }
     Dutch       @Yield { ?? }
     English	@Yield { Lemma }
+    EnglishUK	@Yield { Lemma }
     Finnish	@Yield { ?? }
     French	@Yield { Lemme }
     German	@Yield { Lemma }
+    Italian	@Yield { Lemma }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Lemat }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\354\305\315\315\301" }
     Slovenian   @Yield { Lema }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -180,12 +198,14 @@
     Danish	@Yield { S{@Char ae}tning }
     Dutch       @Yield { ?? }
     English	@Yield { Theorem }
+    EnglishUK	@Yield { Theorem }
     Finnish	@Yield { ?? }
     French	@Yield { Th{@Char eacute}or{@Char egrave}me }
     German	@Yield { Theorem }
+    Italian	@Yield { Teorema }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Twierdzenie }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\364\305\317\322\305\315\301" }
     Slovenian   @Yield { Teorem }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -197,12 +217,14 @@
     Danish	@Yield { Proposition }
     Dutch       @Yield { ?? }
     English	@Yield { Proposition }
+    EnglishUK	@Yield { Proposition }
     Finnish	@Yield { ?? }
     French	@Yield { Proposition }
     German	@Yield { Satz }
+    Italian	@Yield { Proposizione }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Za{@Char lslash}o{@Char zdotabove}enie }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\360\322\305\304\314\317\326\305\316\311\305" }
     Slovenian   @Yield { Predpostavka }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -214,12 +236,14 @@
     Danish	@Yield { Korollar }
     Dutch       @Yield { ?? }
     English	@Yield { Corollary }
+    EnglishUK	@Yield { Corollary }
     Finnish	@Yield { ?? }
     French	@Yield { Corollaire }
     German	@Yield { Korollar }
+    Italian	@Yield { Corollario }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Wniosek }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\363\314\305\304\323\324\327\311\305" }
     Slovenian   @Yield { Sklep }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -231,12 +255,14 @@
     Danish	@Yield { Eksempel }
     Dutch       @Yield { ?? }
     English	@Yield { Example }
+    EnglishUK	@Yield { Example }
     Finnish	@Yield { ?? }
     French	@Yield { Exemple }
     German	@Yield { Beispiel }
+    Italian	@Yield { Esempio }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Przyk{@Char lslash}ad }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\360\322\311\315\305\322" }
     Slovenian   @Yield { Primer }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -248,12 +274,14 @@
     Danish	@Yield { P{@Char aa}stand }
     Dutch       @Yield { ?? }
     English	@Yield { Claim }
+    EnglishUK	@Yield { Claim }
     Finnish	@Yield { ?? }
     French	@Yield { Affirmation }
     German	@Yield { Behauptung }
+    Italian	@Yield { Affermazione }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Stwierdzenie }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\365\324\327\305\322\326\304\305\316\311\305" }
     Slovenian   @Yield { Trditev }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -265,12 +293,14 @@
     Danish	@Yield { Bevis }
     Dutch       @Yield { ?? }
     English	@Yield { Proof }
+    EnglishUK	@Yield { Proof }
     Finnish	@Yield { ?? }
     French	@Yield { Preuve }
     German	@Yield { Beweis }
+    Italian	@Yield { Dimostrazione }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Dow{@Char oacute}d }
-    Russian	@Yield { ?? }
+    Russian	@Yield { "\344\317\313\301\332\301\324\305\314\330\323\324\327\317" }
     Slovenian   @Yield { Dokaz }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
@@ -282,9 +312,11 @@
     Danish	@Yield { Synopsis }
     Dutch       @Yield { Samenvatting }
     English	@Yield { Abstract }
+    EnglishUK	@Yield { Abstract }
     Finnish	@Yield { Yleiskatsaus }
     French	@Yield { R{@Char eacute}sum{@Char eacute} }
     German	@Yield { Zusammenfassung }
+    Italian	@Yield { Abstract }
     Norwegian   @Yield { Sammendrag }
     Polish	@Yield { Abstrakt }
     Russian	@Yield { "\341\302\323\324\322\301\313\324" } #correct!
@@ -299,9 +331,11 @@
     Danish	@Yield { Forord }
     Dutch       @Yield { Voorwoord } # or { Woord vooraf }
     English	@Yield { Preface }
+    EnglishUK	@Yield { Preface }
     Finnish	@Yield { Esipuhe }
     French	@Yield { Pr{@Char eacute}face }
     German	@Yield { Vorwort }
+    Italian	@Yield { Prefazione }
     Norwegian   @Yield { Forord }
     Polish	@Yield { Przedmowa }
     Russian	@Yield { "\360\322\305\304\311\323\314\317\327\311\305" }
@@ -316,9 +350,11 @@
     Danish	@Yield { Indledning }
     Dutch       @Yield { Inleiding }
     English	@Yield { Introduction }
+    EnglishUK	@Yield { Introduction }
     Finnish	@Yield { Johdanto }
     French	@Yield { Introduction }
     German	@Yield { Einleitung }
+    Italian	@Yield { Introduzione }
     Norwegian   @Yield { Innledning }
     Polish	@Yield { Wst{@Char eogonek}p }
     Russian	@Yield { "\367\327\305\304\305\316\311\305" }
@@ -333,9 +369,11 @@
     Danish	@Yield { Kapitel }
     Dutch       @Yield { Hoofdstuk }
     English	@Yield { Chapter }
+    EnglishUK	@Yield { Chapter }
     Finnish	@Yield { Luku }
     French	@Yield { Chapitre }
     German	@Yield { Kapitel }
+    Italian	@Yield { Capitolo }
     Norwegian   @Yield { Kapittel }
     Polish	@Yield { Rozdzia{@Char lslash} }
     Russian	@Yield { "\347\314\301\327\301" }
@@ -350,9 +388,11 @@
     Danish	@Yield { Appendiks }
     Dutch       @Yield { Appendix }
     English	@Yield { Appendix }
+    EnglishUK	@Yield { Appendix }
     Finnish	@Yield { Liite }
     French	@Yield { Annexe }
     German	@Yield { Anhang }
+    Italian	@Yield { Appendice }
     Norwegian   @Yield { Tillegg }
     Polish	@Yield { Dodatek }
     Russian	@Yield { "\360\322\311\314\317\326\305\316\311\305" }
@@ -367,9 +407,11 @@
     Danish	@Yield { Indeks }
     Dutch       @Yield { Index }
     English	@Yield { Index }
+    EnglishUK	@Yield { Index }
     Finnish	@Yield { Hakemisto }
     French	@Yield { Index }
     German	@Yield { Index }
+    Italian	@Yield { Indice Analitico }
     Norwegian   @Yield { Register }
     Polish	@Yield { Skorowidz }
     Russian	@Yield { "\351\316\304\305\313\323" }
@@ -384,10 +426,12 @@
     Danish	@Yield { Ingen titel }
     Dutch       @Yield { Zonder titel }
     English	@Yield { No title }
+    EnglishUK	@Yield { No title }
     Finnish	@Yield { Ei nime{@Char adieresis} }
     French	@Yield { Sans titre }
     German	@Yield { Ohne Titel }
     Polish	@Yield { Bez tytu{@Char lslash}u }
+    Italian	@Yield { Senza Titolo }
     Norwegian   @Yield { Utel tittel }
     Russian	@Yield { "\342\305\332 \316\301\332\327\301\316\311\321" }
     Slovenian   @Yield { Brez naslova }
@@ -401,12 +445,14 @@
     Danish	@Yield { sider }
     Dutch       @Yield { pagina's } # or {bladzijden}, {pag.}, {blz.}
     English	@Yield { pages }
+    EnglishUK	@Yield { pages }
     Finnish	@Yield { sivut }
     French	@Yield { pages }
     German	@Yield { Seiten }
+    Italian	@Yield { pagine }
     Norwegian   @Yield { sider }
     Polish	@Yield { strony }
-    Russian	@Yield { "\323\324\322\301\316\311\303" }
+    Russian	@Yield { "\323\324\322\301\316\311\303\331" }
     Slovenian   @Yield { strani }
     Spanish	@Yield { p{@Char aacute}ginas }
     Swedish	@Yield { sidor }
@@ -418,9 +464,11 @@
     Danish	@Yield { side }
     Dutch       @Yield { pagina } # or {bladzijde}, {pag.}, {blz.}
     English	@Yield { page }
+    EnglishUK	@Yield { page }
     Finnish	@Yield { sivu }
     French	@Yield { page }
     German	@Yield { Seite }
+    Italian	@Yield { pagina }
     Norwegian   @Yield { side }
     Polish	@Yield { strona }
     Russian	@Yield { "\323\324\322\301\316\311\303\301" }
@@ -435,9 +483,11 @@
     Danish	@Yield { Intet forlag }
     Dutch       @Yield { Ongepubliceerd } # or {Zonder uitgever}
     English	@Yield { No publisher }
+    EnglishUK	@Yield { No publisher }
     Finnish	@Yield { Ei kustantamo }
     French	@Yield { Sans {@Char eacute}diteur }
     German	@Yield { Ohne Verleger }
+    Italian	@Yield { Senza editore }
     Norwegian   @Yield { Upublisert }
     Polish	@Yield { Bez wydawcy }
     Russian	@Yield { "\302\305\332 \311\332\304\301\324\305\314\321" }
@@ -452,9 +502,11 @@
     Danish	@Yield { Teknisk rapport }
     Dutch       @Yield { Technisch rapport }
     English	@Yield { Tech. Rep. }
+    EnglishUK	@Yield { Tech. Rep. }
     Finnish	@Yield { Tekn. rap. }
     French	@Yield { Rapport technique }
     German	@Yield { Techn. Ber. }
+    Italian	@Yield { ?? }
     Norwegian   @Yield { Tekn. Rapp. }
     Russian	@Yield { "\324\305\310. \304\317\313\314\301\304" }
     Polish	@Yield { Sprawozdanie techniczne }
@@ -469,9 +521,11 @@
     Danish	@Yield { Ph.D.-afhandling }
     Dutch       @Yield { Proefschrift } # or {Dissertatie}
     English	@Yield { Ph.D. thesis }
+    EnglishUK	@Yield { Ph.D. thesis }
     Finnish	@Yield { tohtorinv{@Char adieresis}it{@Char odieresis}skirja }
     French	@Yield { Th{@Char egrave}se de Doctorat }
     German	@Yield { Doktorarbeit }
+    Italian	@Yield { Tesi di Dottorato }
     Norwegian   @Yield { Doktorgradsavhandling }
     Polish	@Yield { Praca doktorska }
     Russian	@Yield { "\313\301\316\304\311\304\301\324\323\313\301\321"
@@ -487,9 +541,11 @@
     Danish	@Yield { Specialeafhandling }
     Dutch       @Yield { Doctoraalscriptie } 
     English	@Yield { Master's thesis }
+    EnglishUK	@Yield { Master's thesis }
     Finnish	@Yield { diplomity{@Char odieresis} }
     French	@Yield { M{@Char eacute}moire de Ma{@Char icircumflex}trise }
     German	@Yield { Magisterarbeit }
+    Italian	@Yield { ?? }
     Norwegian   @Yield { Diplomoppgave }
     Polish	@Yield { Praca magisterska }
     Russian	@Yield { "\304\311\320\314\317\315\316\301\321"
@@ -505,9 +561,11 @@
     Danish	@Yield { I }
     Dutch       @Yield { In }
     English	@Yield { In }
+    EnglishUK	@Yield { In }
     Finnish	@Yield { teoksessa }
     French	@Yield { dans }
     German	@Yield { In }
+    Italian	@Yield { In }
     Norwegian   @Yield { I }
     Polish	@Yield { W }
     Russian	@Yield { "\327" }
@@ -955,10 +1013,12 @@
     Czech	@Yield { ?? }
     Danish	@Yield { @Char ae }
     English	@Yield { ?? }
+    EnglishUK	@Yield { ?? }
     Dutch	@Yield { ?? }
     Finnish	@Yield { @Char aring }
     French	@Yield { @Char ae }
     German	@Yield { ?? }
+    Italian	@Yield { @Char ae }
     Norwegian	@Yield { @Char ae }
     Polish	@Yield { ?? }
     Russian	@Yield { ?? }
@@ -972,9 +1032,11 @@
     Danish	@Yield { @Char oslash }
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
+    EnglishUK	@Yield { ?? }
     Finnish	@Yield { @Char adieresis }
     French	@Yield { ?? }
     German	@Yield { ?? }
+    Italian	@Yield { ?? }
     Norwegian	@Yield { @Char oslash }
     Polish	@Yield { ?? }
     Russian	@Yield { ?? }
@@ -988,9 +1050,11 @@
     Danish	@Yield { @Char aring }
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
+    EnglishUK	@Yield { ?? }
     Finnish	@Yield { @Char odieresis }
     French	@Yield { ?? }
     German	@Yield { ?? }
+    Italian	@Yield { ?? }
     Norwegian	@Yield { @Char aring }
     Polish	@Yield { ?? }
     Russian	@Yield { ?? }
@@ -1032,9 +1096,11 @@
     Danish	@Yield { @Char AE }
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
+    EnglishUK	@Yield { ?? }
     Finnish	@Yield { @Char Aring }
     French	@Yield { @Char AE }
     German	@Yield { ?? }
+    Italian	@Yield { @Char AE }
     Norwegian	@Yield { @Char AE }
     Polish	@Yield { ?? }
     Russian	@Yield { ?? }
@@ -1048,9 +1114,11 @@
     Danish	@Yield { @Char Oslash }
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
+    EnglishUK	@Yield { ?? }
     Finnish	@Yield { @Char Adieresis }
     French	@Yield { ?? }
     German	@Yield { ?? }
+    Italian	@Yield { ?? }
     Norwegian	@Yield { @Char Oslash }
     Polish	@Yield { ?? }
     Russian	@Yield { ?? }
@@ -1064,9 +1132,11 @@
     Danish	@Yield { @Char Aring }
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
+    EnglishUK	@Yield { ?? }
     Finnish	@Yield { @Char Odieresis }
     French	@Yield { ?? }
     German	@Yield { ?? }
+    Italian	@Yield { ?? }
     Norwegian	@Yield { @Char Aring }
     Polish	@Yield { ?? }
     Russian	@Yield { ?? }
@@ -1081,9 +1151,11 @@
     Danish	@Yield { januar }
     Dutch       @Yield { januari }
     English	@Yield { January }
+    EnglishUK	@Yield { January }
     Finnish	@Yield { tammikuu }
     French	@Yield { janvier }
     German	@Yield { Januar }
+    Italian	@Yield { gennaio }
     Norwegian	@Yield { januar }
     Polish	@Yield { stycze{@Char nacute} }
     Russian	@Yield { "\321\316\327\301\322\321" }
@@ -1097,9 +1169,11 @@
     Danish	@Yield { februar }
     Dutch       @Yield { februari }
     English	@Yield { February }
+    EnglishUK	@Yield { February }
     Finnish	@Yield { helmikuu }
     French	@Yield { f{@Char eacute}vrier }
     German	@Yield { Februar }
+    Italian	@Yield { febbraio }
     Norwegian	@Yield { februar }
     Polish	@Yield { luty }
     Russian	@Yield { "\306\305\327\322\301\314\321" }
@@ -1113,9 +1187,11 @@
     Danish	@Yield { marts }
     Dutch       @Yield { maart }
     English	@Yield { March }
+    EnglishUK	@Yield { March }
     Finnish	@Yield { maaliskuu }
     French	@Yield { mars }
     German	@Yield { M{@Char adieresis}rz }
+    Italian	@Yield { marzo }
     Norwegian	@Yield { mars }
     Polish	@Yield { marzec }
     Russian	@Yield { "\315\301\322\324\301" }
@@ -1129,9 +1205,11 @@
     Danish	@Yield { april }
     Dutch       @Yield { april }
     English	@Yield { April }
+    EnglishUK	@Yield { April }
     Finnish	@Yield { huhtikuu }
     French	@Yield { avril }
     German	@Yield { April }
+    Italian	@Yield { aprile }
     Norwegian	@Yield { april }
     Polish	@Yield { kwiecie{@Char nacute} }
     Russian	@Yield { "\301\320\322\305\314\321" }
@@ -1145,9 +1223,11 @@
     Danish	@Yield { maj }
     Dutch       @Yield { mei }
     English	@Yield { May }
+    EnglishUK	@Yield { May }
     Finnish	@Yield { toukokuu }
     French	@Yield { mai }
     German	@Yield { Mai }
+    Italian	@Yield { maggio }
     Norwegian	@Yield { mai }
     Polish	@Yield { maj }
     Russian	@Yield { "\315\301\321" }
@@ -1161,9 +1241,11 @@
     Danish	@Yield { juni }
     Dutch       @Yield { juni }
     English	@Yield { June }
+    EnglishUK	@Yield { June }
     Finnish	@Yield { kes{@Char adieresis}kuu }
     French	@Yield { juin }
     German	@Yield { Juni }
+    Italian	@Yield { giugno }
     Norwegian	@Yield { juni }
     Polish	@Yield { czerwiec }
     Russian	@Yield { "\311\300\316\321" }
@@ -1178,9 +1260,11 @@
     Danish	@Yield { juli }
     Dutch       @Yield { juli }
     English	@Yield { July }
+    EnglishUK	@Yield { July }
     Finnish	@Yield { hein{@Char adieresis}kuu }
     French	@Yield { juillet }
     German	@Yield { Juli }
+    Italian	@Yield { luglio }
     Norwegian	@Yield { juli }
     Polish	@Yield { lipiec }
     Russian	@Yield { "\311\300\314\321" }
@@ -1194,9 +1278,11 @@
     Danish	@Yield { august }
     Dutch       @Yield { augustus }
     English	@Yield { August }
+    EnglishUK	@Yield { August }
     Finnish	@Yield { elokuu }
     French	@Yield { ao{@Char ucircumflex}t }
     German	@Yield { August }
+    Italian	@Yield { agosto }
     Norwegian	@Yield { august }
     Polish	@Yield { sierpie{@Char nacute} }
     Russian	@Yield { "\301\327\307\325\323\324\301" }
@@ -1210,9 +1296,11 @@
     Danish	@Yield { september }
     Dutch       @Yield { september }
     English	@Yield { September }
+    EnglishUK	@Yield { September }
     Finnish	@Yield { syyskuu }
     French	@Yield { septembre }
     German	@Yield { September }
+    Italian	@Yield { settembre }
     Norwegian	@Yield { september }
     Polish	@Yield { wrzesie{@Char nacute} }
     Russian	@Yield { "\323\305\316\324\321\302\322\321" }
@@ -1226,9 +1314,11 @@
     Danish	@Yield { oktober }
     Dutch       @Yield { oktober }
     English	@Yield { October }
+    EnglishUK	@Yield { October }
     Finnish	@Yield { lokakuu }
     French	@Yield { octobre }
     German	@Yield { Oktober }
+    Italian	@Yield { ottobre }
     Norwegian	@Yield { oktober }
     Polish	@Yield { pa{@Char zacute}dziernik }
     Russian	@Yield { "\317\313\324\321\302\322\321" }
@@ -1242,9 +1332,11 @@
     Danish	@Yield { november }
     Dutch       @Yield { november }
     English	@Yield { November }
+    EnglishUK	@Yield { November }
     Finnish	@Yield { marraskuu }
     French	@Yield { novembre }
     German	@Yield { November }
+    Italian	@Yield { novembre }
     Norwegian	@Yield { november }
     Polish	@Yield { listopad }
     Russian	@Yield { "\316\317\321\302\322\321" }
@@ -1258,9 +1350,11 @@
     Danish	@Yield { december }
     Dutch       @Yield { december }
     English	@Yield { December }
+    EnglishUK	@Yield { December }
     Finnish	@Yield { joulukuu }
     French	@Yield { d{@Char eacute}cembre }
     German	@Yield { Dezember }
+    Italian	@Yield { dicembre }
     Norwegian	@Yield { desember }
     Polish	@Yield { grudzie{@Char nacute} }
     Russian	@Yield { "\304\305\313\301\302\322\321" }
@@ -1275,9 +1369,11 @@
     Danish	@Yield { jan }
     Dutch       @Yield { jan }
     English	@Yield { Jan }
+    EnglishUK	@Yield { Jan }
     Finnish	@Yield { tammikuu }
     French	@Yield { jan }
     German	@Yield { Jan }
+    Italian	@Yield { gen }
     Norwegian	@Yield { jan }
     Polish	@Yield { sty }
     Russian	@Yield { "\321\316\327" }
@@ -1291,9 +1387,11 @@
     Danish	@Yield { feb }
     Dutch       @Yield { feb }
     English	@Yield { Feb }
+    EnglishUK	@Yield { Feb }
     Finnish	@Yield { helmikuu }
     French	@Yield { f{@Char eacute}v }
     German	@Yield { Feb }
+    Italian	@Yield { feb }
     Norwegian	@Yield { feb }
     Polish	@Yield { luty }
     Russian	@Yield { "\306\305\327" }
@@ -1307,9 +1405,11 @@
     Danish	@Yield { mar }
     Dutch       @Yield { mrt }
     English	@Yield { Mar }
+    EnglishUK	@Yield { Mar }
     Finnish	@Yield { maaliskuu }
     French	@Yield { mar }
     German	@Yield { M{@Char adieresis}r }
+    Italian	@Yield { mar }
     Norwegian	@Yield { mar }
     Polish	@Yield { marz }
     Russian	@Yield { "\315\301\322" }
@@ -1323,9 +1423,11 @@
     Danish	@Yield { apr }
     Dutch       @Yield { apr }
     English	@Yield { Apr }
+    EnglishUK	@Yield { Apr }
     Finnish	@Yield { huhtikuu }
     French	@Yield { avr }
     German	@Yield { Apr }
+    Italian	@Yield { apr }
     Norwegian	@Yield { apr }
     Polish	@Yield { kwie }
     Russian	@Yield { "\301\320\322" }
@@ -1339,9 +1441,11 @@
     Danish	@Yield { maj }
     Dutch       @Yield { mei }
     English	@Yield { May }
+    EnglishUK	@Yield { May }
     Finnish	@Yield { toukokuu }
     French	@Yield { mai }
     German	@Yield { Mai }
+    Italian	@Yield { mag }
     Norwegian	@Yield { mai }
     Polish	@Yield { maj }
     Russian	@Yield { "\315\301\321" }
@@ -1355,9 +1459,11 @@
     Danish	@Yield { jun }
     Dutch       @Yield { jun }
     English	@Yield { Jun }
+    EnglishUK	@Yield { Jun }
     Finnish	@Yield { kes{@Char adieresis}kuu }
     French	@Yield { juin }
     German	@Yield { Jun }
+    Italian	@Yield { giu }
     Norwegian	@Yield { jun }
     Polish	@Yield { czer }
     Russian	@Yield { "\311\300\316\321" }
@@ -1371,9 +1477,11 @@
     Danish	@Yield { jul }
     Dutch       @Yield { jul }
     English	@Yield { Jul }
+    EnglishUK	@Yield { Jul }
     Finnish	@Yield { hein{@Char adieresis}kuu }
     French	@Yield { juil }
     German	@Yield { Jul }
+    Italian	@Yield { lug }
     Norwegian	@Yield { jul }
     Polish	@Yield { lip }
     Russian	@Yield { "\311\300\314\321" }
@@ -1387,9 +1495,11 @@
     Danish	@Yield { aug }
     Dutch       @Yield { aug }
     English	@Yield { Aug }
+    EnglishUK	@Yield { Aug }
     Finnish	@Yield { elokuu }
     French	@Yield { ao{@Char ucircumflex} }
     German	@Yield { Aug }
+    Italian	@Yield { ago }
     Norwegian	@Yield { aug }
     Polish	@Yield { sier }
     Russian	@Yield { "\301\327\307" }
@@ -1403,9 +1513,11 @@
     Danish	@Yield { sep }
     Dutch       @Yield { sep }
     English	@Yield { Sep }
+    EnglishUK	@Yield { Sep }
     Finnish	@Yield { syyskuu }
     French	@Yield { sep }
     German	@Yield { Sep }
+    Italian	@Yield { set }
     Norwegian	@Yield { sep }
     Polish	@Yield { wrze }
     Russian	@Yield { "\323\305\316" }
@@ -1419,9 +1531,11 @@
     Danish	@Yield { okt }
     Dutch       @Yield { okt }
     English	@Yield { Oct }
+    EnglishUK	@Yield { Oct }
     Finnish	@Yield { lokakuu }
     French	@Yield { oct }
     German	@Yield { Okt }
+    Italian	@Yield { ott }
     Norwegian	@Yield { okt }
     Polish	@Yield { pa{@Char zacute} }
     Russian	@Yield { "\317\313\324" }
@@ -1435,9 +1549,11 @@
     Danish	@Yield { nov }
     Dutch       @Yield { nov }
     English	@Yield { Nov }
+    EnglishUK	@Yield { Nov }
     Finnish	@Yield { marraskuu }
     French	@Yield { nov }
     German	@Yield { Nov }
+    Italian	@Yield { nov }
     Norwegian	@Yield { nov }
     Polish	@Yield { list }
     Russian	@Yield { "\316\317\321" }
@@ -1451,9 +1567,11 @@
     Danish	@Yield { dec }
     Dutch       @Yield { dec }
     English	@Yield { Dec }
+    EnglishUK	@Yield { Dec }
     Finnish	@Yield { joulukuu }
     French	@Yield { d{@Char eacute}c }
     German	@Yield { Dez }
+    Italian	@Yield { dic }
     Norwegian	@Yield { des }
     Polish	@Yield { gru }
     Russian	@Yield { "\304\305\313" }
@@ -1468,9 +1586,11 @@
     Danish	@Yield { s{@Char oslash}ndag }
     Dutch       @Yield { zondag }
     English	@Yield { Sunday }
+    EnglishUK	@Yield { Sunday }
     Finnish	@Yield { sunnuntai }
     French	@Yield { dimanche }
     German	@Yield { Sonntag }
+    Italian	@Yield { domenica }
     Norwegian	@Yield { s{@Char oslash}ndag }
     Polish	@Yield { niedziela }
     Russian	@Yield { "\327\317\323\313\322\305\323\305\316\330\305" }
@@ -1484,9 +1604,11 @@
     Danish	@Yield { mandag }
     Dutch       @Yield { maandag }
     English	@Yield { Monday }
+    EnglishUK	@Yield { Monday }
     Finnish	@Yield { maanantai }
     French	@Yield { lundi }
     German	@Yield { Montag }
+    Italian	@Yield { lunedi }
     Norwegian	@Yield { mandag }
     Polish	@Yield { poniedzia{@Char lslash}ek }
     Russian	@Yield { "\320\317\316\305\304\305\314\330\316\311\313" }
@@ -1500,9 +1622,11 @@
     Danish	@Yield { tirsdag }
     Dutch       @Yield { dinsdag }
     English	@Yield { Tuesday }
+    EnglishUK	@Yield { Tuesday }
     Finnish	@Yield { tiistai }
     French	@Yield { mardi }
     German	@Yield { Dienstag }
+    Italian	@Yield { martedi }
     Norwegian	@Yield { tirsdag }
     Polish	@Yield { wtorek }
     Russian	@Yield { "\327\324\317\322\316\311\313" }
@@ -1516,9 +1640,11 @@
     Danish	@Yield { onsdag }
     Dutch       @Yield { woensdag }
     English	@Yield { Wednesday }
+    EnglishUK	@Yield { Wednesday }
     Finnish	@Yield { keskiviikko }
     French	@Yield { mercredi }
     German	@Yield { Mittwoch }
+    Italian	@Yield { mercoledi }
     Norwegian	@Yield { onsdag }
     Polish	@Yield { {@Char sacute}roda }
     Russian	@Yield { "\323\322\305\304\301" }
@@ -1532,9 +1658,11 @@
     Danish	@Yield { torsdag }
     Dutch       @Yield { donderdag }
     English	@Yield { Thursday }
+    EnglishUK	@Yield { Thursday }
     Finnish	@Yield { torstai }
     French	@Yield { jeudi }
     German	@Yield { Donnerstag }
+    Italian	@Yield { giovedi }
     Norwegian	@Yield { torsdag }
     Polish	@Yield { czwartek }
     Russian	@Yield { "\336\305\324\327\305\322\307" }
@@ -1548,9 +1676,11 @@
     Danish	@Yield { fredag }
     Dutch       @Yield { vrijdag }
     English	@Yield { Friday }
+    EnglishUK	@Yield { Friday }
     Finnish	@Yield { perjantai }
     French	@Yield { vendredi }
     German	@Yield { Freitag }
+    Italian	@Yield { venerdi }
     Norwegian	@Yield { fredag }
     Polish	@Yield { pi{@Char aogonek}tek }
     Russian	@Yield { "\320\321\324\316\311\303\301" }
@@ -1564,9 +1694,11 @@
     Danish	@Yield { l{@Char oslash}rdag }
     Dutch       @Yield { zaterdag }
     English	@Yield { Saturday }
+    EnglishUK	@Yield { Saturday }
     Finnish	@Yield { lauantai }
     French	@Yield { samedi }
     German	@Yield { Samstag }
+    Italian	@Yield { sabato }
     Norwegian	@Yield { l{@Char oslash}rdag }
     Polish	@Yield { sobota }
     Russian	@Yield { "\323\325\302\302\317\324\301" }
@@ -1581,9 +1713,11 @@
     Danish	@Yield { s{@Char oslash}n }
     Dutch       @Yield { zo }
     English	@Yield { Sun }
+    EnglishUK	@Yield { Sun }
     Finnish	@Yield { su }
     French	@Yield { dim }
     German	@Yield { So }
+    Italian	@Yield { dom }
     Norwegian	@Yield { s{@Char oslash}n }
     Polish	@Yield { niedz }
     Russian	@Yield { "\327\323" }
@@ -1597,9 +1731,11 @@
     Danish	@Yield { man }
     Dutch       @Yield { ma }
     English	@Yield { Mon }
+    EnglishUK	@Yield { Mon }
     Finnish	@Yield { ma }
     French	@Yield { lun }
     German	@Yield { Mo }
+    Italian	@Yield { lun }
     Norwegian	@Yield { man }
     Polish	@Yield { pon }
     Russian	@Yield { "\320\316" }
@@ -1613,9 +1749,11 @@
     Danish	@Yield { tir }
     Dutch       @Yield { di }
     English	@Yield { Tue }
+    EnglishUK	@Yield { Tue }
     Finnish	@Yield { ti }
     French	@Yield { mar }
     German	@Yield { Di }
+    Italian	@Yield { mar }
     Norwegian	@Yield { tir }
     Polish	@Yield { wto }
     Russian	@Yield { "\327\324" }
@@ -1629,9 +1767,11 @@
     Danish	@Yield { ons }
     Dutch       @Yield { wo }
     English	@Yield { Wed }
+    EnglishUK	@Yield { Wed }
     Finnish	@Yield { ke }
     French	@Yield { mer }
     German	@Yield { Mi }
+    Italian	@Yield { mer }
     Norwegian	@Yield { ons }
     Polish	@Yield { {@Char sacute}ro }
     Russian	@Yield { "\323\322" }
@@ -1645,9 +1785,11 @@
     Danish	@Yield { tor }
     Dutch       @Yield { do }
     English	@Yield { Thu }
+    EnglishUK	@Yield { Thu }
     Finnish	@Yield { to }
     French	@Yield { jeu }
     German	@Yield { Do }
+    Italian	@Yield { gio }
     Norwegian	@Yield { tor }
     Polish	@Yield { czw }
     Russian	@Yield { "\336\324" }
@@ -1661,9 +1803,11 @@
     Danish	@Yield { fre }
     Dutch       @Yield { vr }
     English	@Yield { Fri }
+    EnglishUK	@Yield { Fri }
     Finnish	@Yield { pe }
     French	@Yield { ven }
     German	@Yield { Fr }
+    Italian	@Yield { ven }
     Norwegian	@Yield { fre }
     Polish	@Yield { pi{@Char aogonek}t }
     Russian	@Yield { "\320\324" }
@@ -1677,9 +1821,11 @@
     Danish	@Yield { l{@Char oslash}r }
     Dutch       @Yield { za }
     English	@Yield { Sat }
+    EnglishUK	@Yield { Sat }
     Finnish	@Yield { la }
     French	@Yield { sam }
     German	@Yield { Sa }
+    Italian	@Yield { sab }
     Norwegian	@Yield { l{@Char oslash}r }
     Polish	@Yield { sob }
     Russian	@Yield { "\323\302" }
@@ -1798,9 +1944,11 @@
     Danish	@Yield { @DayNum. @Month, @Year			}
     Dutch	@Yield { @DayNum @Month @Year			}
     English	@Yield { @DayNum @Month, @Year			}
+    EnglishUK	@Yield { @DayNum @Month, @Year			}
     Finnish	@Yield { @DayNum. @Month"ta" @Year		}
     French	@Yield { @DayNum @Month @Year			}
     German	@Yield { @DayNum. @Month @Year			}
+    Italian	@Yield { @DayNum @Month @Year			}
     Norwegian   @Yield { @DayNum @Month, @Year			}
     Polish	@Yield { @DayNum @Month @Year			}
     Russian	@Yield { @DayNum @Month @Year			}
@@ -1815,9 +1963,11 @@
     Danish	@Yield { @ShortHour.@Minute			}
     Dutch	@Yield { @ShortHour.@Minute			}
     English	@Yield { @TwelveHour.@Minute @MeriDiem		}
+    EnglishUK	@Yield { @TwelveHour.@Minute @MeriDiem		}
     Finnish	@Yield { @ShortHour.@Minute			}
     French	@Yield { @ShortHour"h"@Minute			}
     German	@Yield { @ShortHour.@Minute			}
+    Italian	@Yield { @ShortHour.@Minute			}
     Norwegian   @Yield { @ShortHour.@Minute 			}
     Polish	@Yield { @ShortHour.@Minute			}
     Russian	@Yield { @ShortHour.@Minute			}

@@ -1,6 +1,6 @@
 /*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -32,7 +32,7 @@
 
 /*****************************************************************************/
 /*                                                                           */
-/*  LENGTH FindShift(x, y, dim)                                              */
+/*  FULL_LENGTH FindShift(x, y, dim)                                         */
 /*                                                                           */
 /*  x = @HShift y or @VShift y depending on dim.  FindShift returns the      */
 /*  length of the shift measured from the mark of y to the mark of x.        */
@@ -40,8 +40,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-LENGTH FindShift(OBJECT x, OBJECT y, int dim)
-{ LENGTH len, res;
+FULL_LENGTH FindShift(OBJECT x, OBJECT y, int dim)
+{ FULL_LENGTH len, res;
   debug3(DSF, DD, "FindShift(%s, %s, %s)", Image(type(x)),
     EchoObject(y), dimen(dim));
 
@@ -152,11 +152,11 @@ OBJECT *sg, OBJECT *sdef, int *side)
 /*                                                                           */
 /*****************************************************************************/
 
-static void CatAdjustSize(OBJECT x, LENGTH *b, LENGTH *f, BOOLEAN ratm,
+static void CatAdjustSize(OBJECT x, FULL_LENGTH *b, FULL_LENGTH *f, BOOLEAN ratm,
 OBJECT y, int dim)
 { OBJECT link;
   OBJECT pg, prec_def, sg, sd;
-  LENGTH beffect, feffect, seffect;  int side;
+  FULL_LENGTH beffect, feffect, seffect;  int side;
   int bb, ff;
 
   debug6(DSA, D, "CatAdjustSize(%s x, %s, %s, %s, %s y, %s)", Image(type(x)),
@@ -228,14 +228,6 @@ OBJECT y, int dim)
 		ff = fwd(y, dim) + beffect + feffect - seffect;
 		break;
   }
-  if( bb > MAX_LEN || ff > MAX_LEN )
-  { debug2(DSA, D, "bb = %s, ff = %s, y =", EchoLength(bb), EchoLength(ff));
-    ifdebug(DSA, D, DebugObject(y));
-    debug0(DSA, D, "x was");
-    ifdebug(DSA, D, DebugObject(x));
-    Error(16, 1, "maximum size %s exceeded", FATAL, &fpos(y),
-      EchoLength(MAX_LEN));
-  }
   *b = bb;  *f = ff;
   debug2(DSA, D, "CatAdjustSize returning %s,%s", EchoLength(*b), EchoLength(*f));
 } /* end CatAdjustSize */
@@ -251,9 +243,9 @@ OBJECT y, int dim)
 /*                                                                           */
 /*****************************************************************************/
 
-void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
+void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 { OBJECT y, link, tlink, lp, rp, z, index;
-  BOOLEAN ratm;  LENGTH tb, tf, cby, cfy, rby, rfy;
+  BOOLEAN ratm;  FULL_LENGTH tb, tf, cby, cfy, rby, rfy;
 
   debug6(DSA, D, "[ AdjustSize( %s(%s,%s), %s, %s, %s ), x =",
 	type(x) == CLOSURE ? SymName(actual(x)) : Image(type(x)),
@@ -323,8 +315,8 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 	  if( lp == y && rp == y && !seen_nojoin(y) )
 	  {	
 	    /* if whole object is joined, do this */
-	    b = max(b, back(y, dim));
-	    f = max(f, fwd(y, dim));
+	    b = find_max(b, back(y, dim));
+	    f = find_max(f, fwd(y, dim));
 	  }
 	  else
 	  {
@@ -337,10 +329,10 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 		  "  z %s (size %s,%s) = ", Image(type(z)),
 		  EchoLength(back(z, dim)), EchoLength(fwd(z, dim)));
 	      ifdebugcond(DSA, DD,  dim == COLM && fwd(z, dim) > 20*CM, DebugObject(z));
-	      tb = max(tb, back(z, dim));
-	      tf = max(tf, fwd(z, dim));
+	      tb = find_max(tb, back(z, dim));
+	      tf = find_max(tf, fwd(z, dim));
 	    }
-	    b = 0;  f = max(tb + tf, fwd(y, dim));
+	    b = 0;  f = find_max(tb + tf, fwd(y, dim));
 	  }
 	  if( back(y, dim) == b && fwd(y, dim) == f )
 	  {
@@ -385,6 +377,7 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case ONE_COL:
       case ONE_ROW:
       case GRAPHIC:
+      case KERN_SHRINK:
 
 	back(x, dim) = b;  fwd(x, dim) = f;
 	break;
@@ -448,7 +441,7 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 	      WARN, &fpos(y),
 	      EchoLength(bc(constraint(y))), EchoLength(bfc(constraint(y))),
 	      EchoLength(fc(constraint(y))), EchoLength(b), EchoLength(f));
-	    SetConstraint(constraint(y), MAX_LEN, b+f, MAX_LEN);
+	    SetConstraint(constraint(y), MAX_FULL_LENGTH, b+f, MAX_FULL_LENGTH);
 	  }
 	  back(x, dim) = b;  fwd(x, dim) = f;
 	  EnlargeToConstraint(&b, &f, &constraint(y));
@@ -466,8 +459,8 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 	back(x, dim) = b;  fwd(x, dim) = f;
 	if( (type(y) == HSHIFT) == (dim == COLM) )
 	{ tf = FindShift(y, x, dim);
-	  b = min(MAX_LEN, max(0, b + tf));
-	  f = min(MAX_LEN, max(0, f - tf));
+	  b = find_min(MAX_FULL_LENGTH, find_max(0, b + tf));
+	  f = find_min(MAX_FULL_LENGTH, find_max(0, f - tf));
 	}
 	break;
 
@@ -477,8 +470,8 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 
 	assert( (type(y)==COL_THR) == (dim==COLM), "AdjustSize: COL_THR!" );
 	back(x, dim) = b;  fwd(x, dim) = f;
-	b = max(b, back(y, dim));
-	f = max(f, fwd(y, dim));
+	b = find_max(b, back(y, dim));
+	f = find_max(f, fwd(y, dim));
 	break;
 
 
@@ -504,8 +497,8 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 	  if( lp == y && rp == y )
 	  {
 	    /* if whole object is joined, do this */
-	    b = max(b, back(y, dim));
-	    f = max(f, fwd(y, dim));
+	    b = find_max(b, back(y, dim));
+	    f = find_max(f, fwd(y, dim));
 	  }
 	  else
 	  { /* if // or || is present, do this */
@@ -513,10 +506,10 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 	    for( link = NextDown(lp); link != rp;  link = NextDown(link) )
 	    { Child(z, link);
 	      if( type(z) == GAP_OBJ || is_index(type(z)) )  continue;
-	      tb = max(tb, back(z, dim));
-	      tf = max(tf, fwd(z, dim));
+	      tb = find_max(tb, back(z, dim));
+	      tf = find_max(tf, fwd(z, dim));
 	    }
-	    b = 0;  f = max(tb + tf, fwd(y, dim));
+	    b = 0;  f = find_max(tb + tf, fwd(y, dim));
 	  }
 	}
 	break;
@@ -528,6 +521,7 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case NULL_CLOS:
       case PAGE_LABEL:
       case CROSS:
+      case FORCE_CROSS:
       default:
       
 	assert1(FALSE, "AdjustSize:", Image(type(y)));

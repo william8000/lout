@@ -2,9 +2,11 @@ langdef Czech Cesky Cestina			{ czech		. : ! ? .) ?) !) .' !' ?' }
 langdef Danish Dansk				{ danish	. : ! ? .) ?) !) .' !' ?' }
 langdef Dutch Nederlands			{ dutch		. : ! ? .) ?) !) .' !' ?' }
 langdef English					{ english	. : ! ? .) ?) !) .' !' ?' }
+langdef EnglishUK				{ engluk	. : ! ? .) ?) !) .' !' ?' }
 langdef Finnish Suomi				{ finnish	. : ! ? .) ?) !) .' !' ?' }
-langdef French Francais "Fran\347ais"		{ -					  }
+langdef French Francais "Fran\347ais"		{ french				  }
 langdef German Deutsch				{ german	. : ! ? .) ?) !) .' !' ?' }
+langdef	Italian Italiano			{ italian	. : ! ? .) ?) !) .' !' ?' }
 langdef Norwegian Norsk				{ norweg	. : ! ? .) ?) !) .' !' ?' }
 langdef Polish Polski				{ polish	. : ! ? .) ?) !) .' !' ?' }
 langdef Russian "\362\325\323\323\313\311\312"  { russian	. : ! ? .) ?) !) .' !' ?' }

@@ -53,6 +53,17 @@ a book occasionally runs onto the first page of the following chapter
 or appendix, and this looks very poor.  If this happens, the solution
 is to place an @Code "@LP" after the last line (including the footnote).
 @PP
+In the rare case where more than one footnote is attached to one word,
+use @Code "@AnotherFootNote" for the second and subsequent footnotes:
+anotherfootnote. @Index @Code "@AnotherFootdNote"
+@ID @Code {
+"something or other."
+"@FootNote { The first footnote. }"
+"@AnotherFootNote { The second footnote. }"
+}
+This ensures that the superscripted numbers will be separated by
+commas, as convention demands.
+@PP
 The setup file contains a number of options for controlling the
 appearance of footnotes.  (See Section @NumberOf setup for a general
 introduction to setup files and their options.)  Here are all the

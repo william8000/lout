@@ -1,6 +1,6 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -46,9 +46,9 @@
 /*****************************************************************************/
 
 void MinConstraint(CONSTRAINT *xc, CONSTRAINT *yc)
-{ bc(*xc)  = min(bc(*xc),  bc(*yc));
-  bfc(*xc) = min(bfc(*xc), bfc(*yc));
-  fc(*xc)  = min(fc(*xc),  fc(*yc));
+{ bc(*xc)  = find_min(bc(*xc),  bc(*yc));
+  bfc(*xc) = find_min(bfc(*xc), bfc(*yc));
+  fc(*xc)  = find_min(fc(*xc),  fc(*yc));
 } /* end MinConstraint */
 
 
@@ -60,9 +60,9 @@ void MinConstraint(CONSTRAINT *xc, CONSTRAINT *yc)
 /*                                                                           */
 /*****************************************************************************/
 
-void EnlargeToConstraint(LENGTH *b, LENGTH *f, CONSTRAINT *c)
+void EnlargeToConstraint(FULL_LENGTH *b, FULL_LENGTH *f, CONSTRAINT *c)
 {
-  *f = min(bfc(*c) - *b, fc(*c));
+  *f = find_min(bfc(*c) - *b, fc(*c));
 } /* end EnlargeToConstraint */
 
 
@@ -86,14 +86,14 @@ void EnlargeToConstraint(LENGTH *b, LENGTH *f, CONSTRAINT *c)
 /*                                                                           */
 /*****************************************************************************/
 
-int ScaleToConstraint(LENGTH b, LENGTH f, CONSTRAINT *c)
+int ScaleToConstraint(FULL_LENGTH b, FULL_LENGTH f, CONSTRAINT *c)
 { float scale_factor;  int res;
   debug3(DSC, DD, "ScaleToConstraint(%s, %s, %s)", EchoLength(b),
     EchoLength(f), EchoConstraint(c));
   scale_factor = 1.0;
-  if( b     > 0 )  scale_factor = min(scale_factor, (float) bc(*c)/b       );
-  if( b + f > 0 )  scale_factor = min(scale_factor, (float) bfc(*c)/(b + f));
-  if(     f > 0 )  scale_factor = min(scale_factor, (float) fc(*c)/f       );
+  if( b     > 0 )  scale_factor = find_min(scale_factor, (float) bc(*c)/b       );
+  if( b + f > 0 )  scale_factor = find_min(scale_factor, (float) bfc(*c)/(b + f));
+  if(     f > 0 )  scale_factor = find_min(scale_factor, (float) fc(*c)/f       );
   res = scale_factor * SF;
   debug2(DSC, DD, "ScaleToConstraint returning %.2f (%d)", scale_factor, res);
   return res;
@@ -108,7 +108,7 @@ int ScaleToConstraint(LENGTH b, LENGTH f, CONSTRAINT *c)
 /*                                                                           */
 /*****************************************************************************/
 
-void InvScaleConstraint(CONSTRAINT *yc, LENGTH sf, CONSTRAINT *xc)
+void InvScaleConstraint(CONSTRAINT *yc, FULL_LENGTH sf, CONSTRAINT *xc)
 {
 #if DEBUG_ON
   char buff[10];
@@ -116,9 +116,12 @@ void InvScaleConstraint(CONSTRAINT *yc, LENGTH sf, CONSTRAINT *xc)
   ifdebug(DSC, DD, sprintf(buff, "%.3f", (float) sf / SF));
   debug2(DSC, DD, "InvScaleConstraint(yc, %s, %s)", buff, EchoConstraint(xc));
   assert( sf > 0, "InvScaleConstraint: sf <= 0!" );
-  bc(*yc)  = bc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, bc(*xc)  * SF / sf);
-  bfc(*yc) = bfc(*xc) == MAX_LEN ? MAX_LEN : min(MAX_LEN, bfc(*xc) * SF / sf);
-  fc(*yc)  = fc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, fc(*xc)  * SF / sf);
+  bc(*yc)  = bc(*xc)  == MAX_FULL_LENGTH ? MAX_FULL_LENGTH :
+    find_min(MAX_FULL_LENGTH, bc(*xc) * SF / sf);
+  bfc(*yc) = bfc(*xc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH :
+    find_min(MAX_FULL_LENGTH, bfc(*xc)* SF / sf);
+  fc(*yc)  = fc(*xc)  == MAX_FULL_LENGTH ? MAX_FULL_LENGTH :
+    find_min(MAX_FULL_LENGTH, fc(*xc) * SF / sf);
   debug1(DSC, DD, "InvScaleConstraint returning %s", EchoConstraint(yc));
 } /* end InvScaleConstraint */
 
@@ -131,7 +134,7 @@ void InvScaleConstraint(CONSTRAINT *yc, LENGTH sf, CONSTRAINT *xc)
 /*                                                                           */
 /*****************************************************************************/
 
-static void SemiRotateConstraint(CONSTRAINT *xc, LENGTH u, LENGTH v,
+static void SemiRotateConstraint(CONSTRAINT *xc, FULL_LENGTH u, FULL_LENGTH v,
 float angle, CONSTRAINT *yc)
 { float cs, sn;
 #if DEBUG_ON
@@ -142,12 +145,12 @@ float angle, CONSTRAINT *yc)
     EchoLength(u), EchoLength(v), buff, EchoConstraint(yc));
   cs = cos(angle);  sn = sin(angle);
   if( fabs(cs) < 1e-6 )
-    SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+    SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
   else
     SetConstraint(*xc,
-      min(MAX_LEN, (bc(*yc) - u * sn) / cs),
-      min(MAX_LEN, (bfc(*yc) - u * sn - v * sn) / cs),
-      min(MAX_LEN, (fc(*yc) - v * sn) / cs) );
+      find_min(MAX_FULL_LENGTH, (bc(*yc) - u * sn) / cs),
+      find_min(MAX_FULL_LENGTH, (bfc(*yc) - u * sn - v * sn) / cs),
+      find_min(MAX_FULL_LENGTH, (fc(*yc) - v * sn) / cs ));
   debug1(DSC, DD, "SemiRotateConstraint returning %s", EchoConstraint(xc));
 } /* end SemiRotateConstraint */
 
@@ -165,7 +168,7 @@ float angle, CONSTRAINT *yc)
 /*                                                                           */
 /*****************************************************************************/
 
-void RotateConstraint(CONSTRAINT *c, OBJECT y, LENGTH angle,
+void RotateConstraint(CONSTRAINT *c, OBJECT y, FULL_LENGTH angle,
 CONSTRAINT *hc, CONSTRAINT *vc, int dim)
 { CONSTRAINT c1, c2, c3, dc;  float theta, psi;
 #if DEBUG_ON
@@ -242,7 +245,11 @@ BOOLEAN InsertScale(OBJECT x, CONSTRAINT *c)
     /* set horizontal size and scale factor */
     bc(constraint(prnt)) = scale_factor;
     back(prnt, COLM) = ( back(x, COLM) * scale_factor ) / SF;
+
+    /* *** slightly too small?
     fwd(prnt,  COLM) = ( fwd(x,  COLM) * scale_factor ) / SF;
+    *** */
+    fwd(prnt,  COLM) = find_min(bfc(*c) - back(prnt, COLM), fc(*c));
 
     /* set vertical size and scale factor */
     fc(constraint(prnt)) = 1 * SF;
@@ -287,10 +294,10 @@ static void CatConstrained(OBJECT x, CONSTRAINT *xc, BOOLEAN ratm,
 OBJECT y, int dim, OBJECT *why)
 { int side;			/* the size of y that x is on: BACK, ON, FWD */
   CONSTRAINT yc;		/* constraints on y                          */
-  LENGTH backy, fwdy;		/* back(y), fwd(y) would be if x was (0, 0)  */
-  LENGTH be, fe;		/* amount back(x), fwd(x) can be for free    */
-  LENGTH beffect, feffect;	/* scratch variables for calculations        */
-  LENGTH seffect;		/* scratch variables for calculations        */
+  FULL_LENGTH backy, fwdy;	/* back(y), fwd(y) would be if x was (0, 0)  */
+  FULL_LENGTH be, fe;		/* amount back(x), fwd(x) can be for free    */
+  FULL_LENGTH beffect, feffect;	/* scratch variables for calculations        */
+  FULL_LENGTH seffect;		/* scratch variables for calculations        */
   OBJECT link, sg, pg;	/* link to x, its successor and predecessor  */
   OBJECT prec_def, sd;	/* definite object preceding (succeeding) x  */
   int tb, tbf, tf, tbc, tbfc, tfc, mxy, myz;
@@ -359,7 +366,7 @@ OBJECT y, int dim, OBJECT *why)
       }
     }
 
-    debug5(DSC, DDD, "side: %s, backy: %s, fwdy: %s, be: %s, fe: %s",
+    debug5(DSC, DD, "  side: %s, backy: %s, fwdy: %s, be: %s, fe: %s",
 		Image(side), EchoLength(backy), EchoLength(fwdy),
 		EchoLength(be), EchoLength(fe) );
 
@@ -370,44 +377,44 @@ OBJECT y, int dim, OBJECT *why)
 
       case BACK:
 	
-	tbc = bc(yc) == MAX_LEN ? MAX_LEN : bc(yc) - backy;
-	tbfc = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - backy - fwdy;
-	mxy = min(tbc, tbfc);
-	tb  = min(MAX_LEN, be + mxy);
-	tbf = min(MAX_LEN, be + fe + mxy);
-	tf  = min(MAX_LEN, fe + mxy);
+	tbc = bc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bc(yc) - backy;
+	tbfc = bfc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bfc(yc) - backy - fwdy;
+	mxy = find_min(tbc, tbfc);
+	tb  = find_min(MAX_FULL_LENGTH, be + mxy);
+	tbf = find_min(MAX_FULL_LENGTH, be + fe + mxy);
+	tf  = find_min(MAX_FULL_LENGTH, fe + mxy);
 	SetConstraint(*xc, tb, tbf, tf);
 	break;
 
 
       case ON:
 	
-	tbc = bc(yc) == MAX_LEN ? MAX_LEN : bc(yc) - backy;
-	tbfc = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - backy - fwdy;
-	tfc = fc(yc) == MAX_LEN ? MAX_LEN : fc(yc) - fwdy;
-	mxy = min(tbc, tbfc);
-	myz = min(tfc, tbfc);
-	tb  = min(MAX_LEN, be + mxy);
-	tbf = min(MAX_LEN, be + fe + tbfc);
-	tf  = min(MAX_LEN, fe + myz);
+	tbc = bc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bc(yc) - backy;
+	tbfc = bfc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bfc(yc) - backy - fwdy;
+	tfc = fc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : fc(yc) - fwdy;
+	mxy = find_min(tbc, tbfc);
+	myz = find_min(tfc, tbfc);
+	tb  = find_min(MAX_FULL_LENGTH, be + mxy);
+	tbf = find_min(MAX_FULL_LENGTH, be + fe + tbfc);
+	tf  = find_min(MAX_FULL_LENGTH, fe + myz);
 	SetConstraint(*xc, tb, tbf, tf);
 	break;
 	
 
       case FWD:
 
-	tfc = fc(yc) == MAX_LEN ? MAX_LEN : fc(yc) - fwdy;
-	tbfc = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - backy - fwdy;
-	mxy = min(tfc, tbfc);
-	tb  = min(MAX_LEN, be + mxy);
-	tbf = min(MAX_LEN, be + fe + mxy);
-	tf  = min(MAX_LEN, fe + mxy);
+	tfc = fc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : fc(yc) - fwdy;
+	tbfc = bfc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bfc(yc) - backy - fwdy;
+	mxy = find_min(tfc, tbfc);
+	tb  = find_min(MAX_FULL_LENGTH, be + mxy);
+	tbf = find_min(MAX_FULL_LENGTH, be + fe + mxy);
+	tf  = find_min(MAX_FULL_LENGTH, fe + mxy);
 	SetConstraint(*xc, tb, tbf, tf);
 	break;
 	
     }
   } /* end if( constrained ) */
-  else SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+  else SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
 } /* end CatConstrained */
 
 
@@ -425,7 +432,7 @@ OBJECT y, int dim, OBJECT *why)
 
 void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 { OBJECT y, link, lp, rp, z, tlink, g;  CONSTRAINT yc, hc, vc;
-  BOOLEAN ratm;  LENGTH xback, xfwd;  int tb, tf, tbf, tbc, tfc;
+  BOOLEAN ratm;  FULL_LENGTH xback, xfwd;  int tb, tf, tbf, tbc, tfc;
   debug2(DSC, DD, "[ Constrained(%s, xc, %s, why)", EchoObject(x), dimen(dim));
   assert( Up(x) != x, "Constrained: x has no parent!" );
 
@@ -433,7 +440,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
   /* a CLOSURE which is external_hor is unconstrained in both directions   */
   if( type(x) == CLOSURE && ((dim==ROWM && external_ver(x)) || external_hor(x)) )
   {
-    SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+    SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
     debug1(DSC, DD, "] Constrained returning %s (external)",EchoConstraint(xc));
     return;
   }
@@ -451,6 +458,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
   switch( type(y) )
   {
     case GRAPHIC:
+    case KERN_SHRINK:
     case ONE_COL:
     case ONE_ROW:
     case HCONTRACT:
@@ -467,7 +475,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
     case VSCALE:
     
       if( (dim == COLM) != (type(y) == HSCALE) )  Constrained(y, xc, dim, why);
-      else SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+      else SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
       break;
 
 
@@ -476,7 +484,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
     
       /* dubious, but not likely to arise anyway */
       if( (dim == COLM) != (type(y) == HCOVER) )  Constrained(y, xc, dim, why);
-      else SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+      else SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
       break;
 
 
@@ -486,7 +494,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
       if( dim == COLM && bc(constraint(y)) == 0 )
       {
 	/* Lout-supplied factor required later, could be tiny */
-	SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+	SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
       }
       else
       { InvScaleConstraint(xc,
@@ -520,7 +528,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
       { Constrained(y, &yc, dim, why);
 	tf = FindShift(y, x, dim);
 	SetConstraint(*xc,
-	  min(bc(yc), bfc(yc)) - tf, bfc(yc), min(fc(yc), bfc(yc)) + tf);
+	  find_min(bc(yc), bfc(yc)) - tf, bfc(yc), find_min(fc(yc), bfc(yc)) + tf);
       }
       else Constrained(y, xc, dim, why);
       break;
@@ -528,7 +536,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 
     case HEAD:
     
-      if( dim == ROWM ) SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+      if( dim == ROWM ) SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
       else
       {	CopyConstraint(yc, constraint(y));
 	debug1(DSC, DD, "  head: %s; val is:", EchoConstraint(&yc));
@@ -543,10 +551,10 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 
       assert( (type(y)==COL_THR) == (dim==COLM), "Constrained: COL_THR!" );
       Constrained(y, &yc, dim, why);
-      tb = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - fwd(y, dim);
-      tb = min(bc(yc), tb);
-      tf = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - back(y, dim);
-      tf = min(fc(yc), tf);
+      tb = bfc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bfc(yc) - fwd(y, dim);
+      tb = find_min(bc(yc), tb);
+      tf = bfc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bfc(yc) - back(y, dim);
+      tf = find_min(fc(yc), tf);
       SetConstraint(*xc, tb, bfc(yc), tf);
       break;
 
@@ -560,7 +568,8 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 	break;
       }
       Constrained(y, &yc, dim, why);
-      if( !constrained(yc) )  SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+      if( !constrained(yc) )
+	SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
       else
       {
 	REST_OF_HEAD:
@@ -577,10 +586,10 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 	if( lp == y && rp == y && !(type(y) == HEAD && seen_nojoin(y)) )
 	{
 	  /* if whole object is joined, do this */
-          tb = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - fwd(y, dim);
-          tb = min(bc(yc), tb);
-          tf = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - back(y, dim);
-          tf = min(fc(yc), tf);
+          tb = bfc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bfc(yc) - fwd(y, dim);
+          tb = find_min(bc(yc), tb);
+          tf = bfc(yc) == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : bfc(yc) - back(y, dim);
+          tf = find_min(fc(yc), tf);
           SetConstraint(*xc, tb, bfc(yc), tf);
 	}
 	else
@@ -590,13 +599,14 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 	  for(link = NextDown(lp); link != rp;  link = NextDown(link) )
 	  { Child(z, link);
 	    if( type(z) == GAP_OBJ || is_index(type(z)) )  continue;
-	    xback = max(xback, back(z, dim));  xfwd = max(xfwd, fwd(z, dim));
+	    xback = find_max(xback, back(z, dim));
+	    xfwd = find_max(xfwd, fwd(z, dim));
 	  }
 	  debug2(DSC, DD, "  lp != rp; xback,xfwd = %s,%s",
 			EchoLength(xback), EchoLength(xfwd));
-	  tbf = min(bfc(yc), fc(yc));
-	  tbc = tbf == MAX_LEN ? MAX_LEN : tbf - xfwd;
-	  tfc = tbf == MAX_LEN ? MAX_LEN : tbf - xback;
+	  tbf = find_min(bfc(yc), fc(yc));
+	  tbc = tbf == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : tbf - xfwd;
+	  tfc = tbf == MAX_FULL_LENGTH ? MAX_FULL_LENGTH : tbf - xback;
 	  SetConstraint(*xc, tbc, tbf, tfc);
 	}
       }
@@ -631,23 +641,23 @@ FULL_CHAR *EchoConstraint(CONSTRAINT *c)
   {
     case POSTSCRIPT:
 
-      if( bc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
+      if( bc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF, ");
       else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bc(*c)/CM);
-      if( bfc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
+      if( bfc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF, ");
       else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bfc(*c)/CM);
-      if( fc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF>");
+      if( fc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF>");
       else sprintf(&str[i][strlen(str[i])], "%.3fc>", (float) fc(*c)/CM);
       break;
 
     case PLAINTEXT:
 
-      if( bc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
+      if( bc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF, ");
       else sprintf(&str[i][strlen(str[i])], "%.1fs, ",
 	(float) bc(*c)/PlainCharWidth);
-      if( bfc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
+      if( bfc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF, ");
       else sprintf(&str[i][strlen(str[i])], "%.1fs, ",
 	(float) bfc(*c)/PlainCharWidth);
-      if( fc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF>");
+      if( fc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF>");
       else sprintf(&str[i][strlen(str[i])], "%.1fs>",
 	(float) fc(*c)/PlainCharWidth);
       break;
@@ -674,10 +684,12 @@ void DebugConstrained(OBJECT x)
   {
 
     case CROSS:
+    case FORCE_CROSS:
     case ROTATE:
     case INCGRAPHIC:
     case SINCGRAPHIC:
     case GRAPHIC:
+    case KERN_SHRINK:
     case WORD:
     case QWORD:
     

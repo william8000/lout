@@ -3,9 +3,9 @@
    @Tag { principles }
 @Begin
 @LP
-The document formatting language Lout is based on just four key ideas:
-objects, definitions, cross references, and galleys.  In this chapter we
-concentrate on them, postponing the inevitable details to later chapters.
+The Lout document formatting language is based on just four key ideas:
+objects, definitions, cross references, and galleys.  This chapter
+concentrates on them, postponing the inevitable details.
 @BeginSections
 @Include { pri_obje }
 @Include { pri_defi }

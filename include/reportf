@@ -14,6 +14,7 @@ extend @DocumentLayout
 export @Report @Abstract @Section @Appendix
 def @ReportLayout
     named @CoverSheet			{ Yes			}
+    named @ContentsSeparate		{ No			}
     named @DateLine			{ No			}
     named @ReferencesBeforeAppendices	{ No			}
 
@@ -25,11 +26,17 @@ def @ReportLayout
     named @IndexBWord			{ index			}
 
     named @SectionNumbers		{ Arabic		}
+    named @FirstSectionNumber		{ 1			}
     named @SubSectionNumbers		{ Arabic		}
+    named @FirstSubSectionNumber	{ 1			}
     named @SubSubSectionNumbers		{ Arabic		}
+    named @FirstSubSubSectionNumber	{ 1			}
     named @AppendixNumbers		{ UCAlpha		}
+    named @FirstAppendixNumber		{ 1			}
     named @SubAppendixNumbers		{ Arabic		}
+    named @FirstSubAppendixNumber	{ 1			}
     named @SubSubAppendixNumbers	{ Arabic		}
+    named @FirstSubSubAppendixNumber	{ 1			}
 
     named @AbstractHeadingFont		{ Bold			}
     named @AbstractHeadingBreak		{ ragged 1.2fx nohyphen }
@@ -91,12 +98,12 @@ def @ReportLayout
     named @IndexBHeadingFormat
 	    right title			{ title			}
 
-    named @SectionGap			{ 2.00v			}
-    named @SubSectionGap		{ 1.50v			}
-    named @SubSubSectionGap		{ 1.50v			}
-    named @AppendixGap			{ 2.00v			}
-    named @SubAppendixGap		{ 1.50v			}
-    named @SubSubAppendixGap		{ 1.50v			}
+    named @SectionGap			{ 2.0v  @OrIfPlain 3f	}
+    named @SubSectionGap		{ 1.5v  @OrIfPlain 2f	}
+    named @SubSubSectionGap		{ 1.5v  @OrIfPlain 2f	}
+    named @AppendixGap			{ 2.0v  @OrIfPlain 3f	}
+    named @SubAppendixGap		{ 1.5v  @OrIfPlain 2f	}
+    named @SubSubAppendixGap		{ 1.5v  @OrIfPlain 2f	}
 
     named @SectionInContents		{ Yes			}
     named @SubSectionInContents		{ Yes			}
@@ -136,6 +143,22 @@ def @ReportLayout
     named @AppendixNumInTables		{ Yes			}
     named @SubAppendixNumInTables	{ No			}
     named @SubSubAppendixNumInTables	{ No			}
+
+    named @SectionNumInRunners		{ Yes			}
+    named @SubSectionNumInRunners	{ No			}
+    named @SubSubSectionNumInRunners	{ No			}
+    named @AppendixNumInRunners		{ Yes			}
+    named @SubAppendixNumInRunners	{ No			}
+    named @SubSubAppendixNumInRunners	{ No			}
+
+    named @FigureContentsPrefix		{			}
+    named @TableContentsPrefix		{			}
+    named @SectionPrefix		{			}
+    named @AppendixPrefix		{			}
+    named @ReferencesPrefix		{			}
+    named @IndexPrefix			{			}
+    named @IndexAPrefix			{			}
+    named @IndexBPrefix			{			}
 @Begin
 
     #######################################################################
@@ -213,6 +236,7 @@ def @ReportLayout
         named @Institution {}
         named @DateLine { @DateLine }
         named @CoverSheet { @CoverSheet }
+        named @ContentsSeparate { @ContentsSeparate }
         named @InitialFont { @InitialFont }
         named @InitialBreak { @InitialBreak }
         named @InitialSpace { @InitialSpace }
@@ -243,7 +267,7 @@ def @ReportLayout
 	def @TitleMaterial
 	{
 	    //1i    @B {clines 1.4vx} @Break @Cntr @Title
-	    //1.00v @I clines @Break @Cntr @Author
+	    //1.00v @I clines @Break { |0.5rt @Author | }
 	    //1.00v clines @Break @Cntr @Institution
 	    //1.00v clines @Break @Cntr @DateValue
 	}
@@ -259,62 +283,132 @@ def @ReportLayout
 	def @ReferencesPart
 	    named @Tag {}
 	{
-		@ReferencesHeadingFont @Font @ReferencesHeadingBreak @Break @Protect
-		@ReferencesHeadingFormat @RefHeading @RefListTitle
-            //  @PageMarker&&preceding @Tagged @Tag
-            //  @ReferencesInContents @MajorContentsEntry
-		    title { @RefHeading @RefListTitle }
-		    pagenum { @PageOf @Tag }
-            //@RefListGap  @ReferencesSection
-	    //  NonStart @Runner @MajorTitle { @RefHeading @RefListTitle }
+
+           @LargeScaleStructure
+                tag { @Tag }
+                type { Major }
+                initiallanguage { @InitialLanguage }
+                title { @RefHeading @RefListTitle }
+                headingfont { @ReferencesHeadingFont }
+                headingbreak { @ReferencesHeadingBreak }
+                headingformat { @ReferencesHeadingFormat @Body }
+                incontents { @ReferencesInContents }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { @RefHeading @RefListTitle }
+                prefix { @ReferencesPrefix }
+                inrunners { Yes }
+                { //@RefListGap @ReferencesSection }
 	}
 
         def @IndexPart
 	    named @Tag {}
         {
-            @Full {
-		    @IndexHeadingFont @Font @IndexHeadingBreak @Break
-		    @IndexHeadingFormat { index @WordVal @IndexWord }
-                //  @PageMarker&&preceding @Tagged @Tag
-                //  @IndexInContents @MajorContentsEntry
-			title { index @WordVal @IndexWord }
-			pagenum { @PageOf @Tag }
-                //  NonStart @Runner @MajorTitle { index @WordVal @IndexWord }
-	    }
-            //  @IndexSection {NonStart @Runner @MajorTitle {
-		    index @WordVal @IndexWord }}
+
+            def @Run
+            {
+                NonStart @Runner
+                    @MajorNum {}
+                    @MajorTitle { index @WordVal @IndexWord }
+                    @MinorNum {}
+                    @MinorTitle {}
+                    @Owner { @Tag }
+                    @Prefix { @IndexPrefix }
+            }
+
+            @LargeScaleStructure
+                tag { @Tag }
+                type { Major }
+                initiallanguage { @InitialLanguage }
+                title { index @WordVal @IndexWord }
+                headingfont { @IndexHeadingFont }
+                headingbreak { @IndexHeadingBreak }
+                headingformat { @IndexHeadingFormat @Body }
+                incontents { @IndexInContents }
+                prefix { @IndexPrefix }
+                inrunners { Yes }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { index @WordVal @IndexWord }
+                sendheader { @Full @Body }
+                innergap { @SectionGap }
+		wantindefinite { Yes }
+                @IndexSection @Run
+
         }
 
         def @IndexAPart
 	    named @Tag {}
         {
-            @Full {
-		    @IndexAHeadingFont @Font @IndexAHeadingBreak @Break
-		    @IndexAHeadingFormat { index @WordVal @IndexAWord }
-                //  @PageMarker&&preceding @Tagged @Tag
-                //  @IndexAInContents @MajorContentsEntry
-			title { index @WordVal @IndexAWord }
-			pagenum { @PageOf @Tag }
-                //  NonStart @Runner @MajorTitle { index @WordVal @IndexAWord }
-	    }
-            //  @IndexASection {NonStart @Runner @MajorTitle {
-		    index @WordVal @IndexAWord }}
+            def @Run
+            {
+                NonStart @Runner
+                    @MajorNum {}
+                    @MajorTitle { index @WordVal @IndexAWord }
+                    @MinorNum {}
+                    @MinorTitle {}
+                    @Owner { @Tag }
+                    @Prefix { @IndexAPrefix }
+            }
+
+            @LargeScaleStructure
+                tag { @Tag }
+                type { Major }
+                initiallanguage { @InitialLanguage }
+                title { index @WordVal @IndexAWord }
+                headingfont { @IndexAHeadingFont }
+                headingbreak { @IndexAHeadingBreak }
+                headingformat { @IndexAHeadingFormat @Body }
+                incontents { @IndexAInContents }
+                prefix { @IndexAPrefix }
+                inrunners { Yes }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { index @WordVal @IndexAWord }
+                sendheader { @Full @Body }
+                innergap { @SectionGap }
+		wantindefinite { Yes }
+                @IndexASection @Run
+
         }
 
         def @IndexBPart
 	    named @Tag {}
         {
-            @Full {
-		    @IndexBHeadingFont @Font @IndexBHeadingBreak @Break
-		    @IndexBHeadingFormat { index @WordVal @IndexBWord }
-                //  @PageMarker&&preceding @Tagged @Tag
-                //  @IndexBInContents @MajorContentsEntry
-			title { index @WordVal @IndexBWord }
-			pagenum { @PageOf @Tag }
-                //  NonStart @Runner @MajorTitle { index @WordVal @IndexBWord }
-	    }
-            //  @IndexBSection {NonStart @Runner @MajorTitle {
-		    index @WordVal @IndexBWord }}
+            def @Run
+            {
+                NonStart @Runner
+                    @MajorNum {}
+                    @MajorTitle { index @WordVal @IndexBWord }
+                    @MinorNum {}
+                    @MinorTitle {}
+                    @Owner { @Tag }
+                    @Prefix { @IndexBPrefix }
+            }
+
+            @LargeScaleStructure
+                tag { @Tag }
+                type { Major }
+                initiallanguage { @InitialLanguage }
+                title { index @WordVal @IndexBWord }
+                headingfont { @IndexBHeadingFont }
+                headingbreak { @IndexBHeadingBreak }
+                headingformat { @IndexBHeadingFormat @Body }
+                incontents { @IndexBInContents }
+                prefix { @IndexBPrefix }
+                inrunners { Yes }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { index @WordVal @IndexBWord }
+                sendheader { @Full @Body }
+                innergap { @SectionGap }
+		wantindefinite { Yes }
+                @IndexBSection @Run
+
         }
 
         def @ReportBodyWithCoverSheet force into { @ColPlace&&preceding }
@@ -323,11 +417,11 @@ def @ReportLayout
 
 	    //			Start @Runner
 	    //@SectionGap	@ContentsPart
-	    //@SectionGap	@SectionList 1
+	    //@SectionGap	@SectionList @FirstSectionNumber
 	    //@SectionGap	@ReferencesBeforeAppendices @Do {
 				    @MakeReferences @Do @ReferencesPart
 				}
-            //@AppendixGap	@AppendixList 1
+            //@AppendixGap	@AppendixList @FirstAppendixNumber
 	    //@SectionGap	@ReferencesBeforeAppendices @NoDo {
 				    @MakeReferences @Do @ReferencesPart
 				}
@@ -338,18 +432,26 @@ def @ReportLayout
 	    //			@MakeIndex  @Do @IndexPart
         }
 
+	def @ContentsGap
+	{
+	    @ContentsSeparate @Case {
+		No  @Yield @SectionGap
+		Yes @Yield 2b
+	    }
+	}
+
         def @ReportBodyWithoutCoverSheet force into { @ColPlace&&preceding }
 	    named @Optimize { @OptimizePages }
         {
 
 	    //			Start @Runner
 	    //			@AbstractPlace
-	    //@SectionGap	@ContentsPart
-	    //@SectionGap	@SectionList 1
+	    //@ContentsGap	@ContentsPart
+	    //@ContentsGap	@SectionList @FirstSectionNumber
 	    //@SectionGap	@ReferencesBeforeAppendices @Do {
 				    @MakeReferences @Do @ReferencesPart
 				}
-            //@AppendixGap	@AppendixList 1
+            //@AppendixGap	@AppendixList @FirstAppendixNumber
 	    //@SectionGap	@EndFigureList
 	    //@SectionGap	@EndNoteList 1
 	    //@SectionGap	@ReferencesBeforeAppendices @NoDo {
@@ -390,9 +492,13 @@ def @ReportLayout
 		    //  @PageLabel "i"
 		    //	@OddPage
 			{
-			    @TitleMaterial
+			    @FootNoteThrough @NoDo @BeginFootNoteCounter
+			    // @TitleMaterial
 			    //0.5i |0.5rt @OneCol {|0.5i @AbstractPlace |0.5i}
-			    // //1rt @OneRow { //@MidGap @PageFootNoteSection }
+			    // //1rt @OneRow {
+				//@MidGap @PageFootNoteSection
+			        //@MidGap @ColFootNoteSection
+				}
 			}
 		    //	@PageList
 			    @ColumnNumber { @ColumnNumber }
@@ -445,28 +551,25 @@ def @ReportLayout
 	body @Body
     {
 
-        def @SectionNum
-	{
-	  @BypassNumber @Dft {
-	    @SectionNumbers @Num { @SectionList&&@Tag @Open { num } }
-	  }
-	}
-
-        def @SectionTitle
-	{
-	    @InitialLanguage @Language { @RunningTitle @Dft @Title }
-	}
-
         def @EndSubSectionsPlace { @Galley }
-
-        macro @BeginSubSections
-        {
-	    //@SubSectionGap @SubSectionList 1
-	    // @EndSubSectionsPlace //
-	}
 
         def @EndSubSections force into { @EndSubSectionsPlace&&preceding }
 	{}
+
+        macro @BeginSubSections
+        {
+	    //@SubSectionGap @SubSectionList @FirstSubSectionNumber
+	    // @EndSubSectionsPlace //
+	}
+
+        def @SectionShortNum
+	{
+	    @SectionNumbers @Then {
+		@BypassNumber @Dft {
+		    @SectionNumbers @Num @SectionList&&@Tag @Open { num }
+		}
+	    }
+	}
 
 	export @BeginSubSubSections @EndSubSubSections @SubSubSection
         def @SubSection force into { @SubSectionList&&preceding }
@@ -478,32 +581,27 @@ def @ReportLayout
 	    body @Body
         {
 
-	    def @SubSectionNum
-	    {
-	      @BypassNumber @Dft {
-		@SubSectionNumbers @Then {
-		    @SectionNum @DotJoin @SubSectionNumbers @Num
-		    { @SubSectionList&&@Tag @Open { num } }
-		}
-	      }
-	    }
-
-            def @SubSectionTitle
-	    {
-		@InitialLanguage @Language { @RunningTitle @Dft @Title }
-	    }
-
 	    def @EndSubSubSectionsPlace { @Galley }
-
-            macro @BeginSubSubSections
-            {
-		//@SubSubSectionGap @SubSubSectionList 1
-		// @EndSubSubSectionsPlace //
-	    }
 
             def @EndSubSubSections force into
 		{ @EndSubSubSectionsPlace&&preceding }
 	    {}
+
+            macro @BeginSubSubSections
+            {
+		//@SubSubSectionGap @SubSubSectionList @FirstSubSubSectionNumber
+		// @EndSubSubSectionsPlace //
+	    }
+
+	    def @SubSectionShortNum
+	    {
+		@SubSectionNumbers @Then {
+		    @BypassNumber @Dft {
+			@SectionShortNum @Join @SubSectionNumbers @Num
+			{ @SubSectionList&&@Tag @Open { num } }
+		    }
+		}
+	    }
 
 	    def @SubSubSection force into { @SubSubSectionList&&preceding }
 		named @Tag {}
@@ -513,76 +611,84 @@ def @ReportLayout
 		named @BypassNumber { dft }
 		body @Body
 	    {
-                
-		def @SubSubSectionNum
-		{
-		  @BypassNumber @Dft {
-		    @SubSubSectionNumbers @Then {
-			@SubSectionNum @DotJoin @SubSubSectionNumbers @Num
-			{ @SubSubSectionList&&@Tag @Open { num } }
-		    }
-		  }
-		}
 
-	            @InitialLanguage @Language @SubSubSectionHeadingFont @Font
-		    @SubSubSectionHeadingBreak @Break @Protect
-		      { @SubSubSectionNum @SubSubSectionHeadingFormat @Title }
-		//  @NumberMarker @Tag { @Tag } @Value { @SubSubSectionNum }
-		//  @SubSubSectionList&&preceding @Tagged @Tag
-		//  @PageMarker&&preceding @Tagged @Tag
-		//  @SubSubSectionInContents @ContentsEntry
-			indent { 6f }
-			number { @SubSubSectionNum }
-			title { @InitialLanguage @Language @Title }
-			pagenum { @PageOf @Tag }
-		//  @SubSubSectionNumInTheorems @BeginAllCounters @SubSectionNum
-		//  @SubSubSectionNumInDisplays @BeginDisplayCounter @SubSectionNum
-		//  @SubSubSectionNumInFigures @BeginFigureCounter @SubSectionNum
-		//  @SubSubSectionNumInTables @BeginTableCounter @SubSectionNum
-		//  @InitialLanguage @Language @Body
+		@LargeScaleStructure
+		    tag { @Tag }
+		    type { Minor }
+		    initiallanguage { @InitialLanguage }
+		    title { @Title }
+		    runningtitle { @RunningTitle }
+		    headingfont { @SubSubSectionHeadingFont }
+		    headingbreak { @SubSubSectionHeadingBreak }
+		    headingformat { @Num @SubSubSectionHeadingFormat @Body }
+		    incontents { @SubSubSectionInContents }
+		    contentsindent { 6f }
+		    numbers { @SubSubSectionNumbers }
+		    attachnum { @SubSubSectionList&&preceding @Tagged @Tag }
+		    retrievenum { @SubSubSectionList&&@Tag @Open { num } }
+		    bypassnumber { @BypassNumber }
+		    prefix { @SubSectionShortNum }
+		    majornum {}
+		    majortitle {}
+		    intheorems { @SubSubSectionNumInTheorems }
+		    indisplays { @SubSubSectionNumInDisplays }
+		    infigures { @SubSubSectionNumInFigures }
+		    intables { @SubSubSectionNumInTables }
+		    inrunners { @SubSubSectionNumInRunners }
+		    @Body
+
 	    }
 
-	        @InitialLanguage @Language @SubSectionHeadingFont @Font
-		@SubSectionHeadingBreak @Break @Protect
-		  { @SubSectionNum @SubSectionHeadingFormat @Title }
-	    //  @NumberMarker @Tag { @Tag } @Value { @SubSectionNum }
-	    //  @SubSectionList&&preceding @Tagged @Tag
-	    //  @PageMarker&&preceding @Tagged @Tag
-	    //  @SubSectionInContents @ContentsEntry
-		    indent { 3f }
-		    number { @SubSectionNum }
-		    title { @InitialLanguage @Language @Title }
-		    pagenum { @PageOf @Tag }
-	    //  @SubSectionNumInTheorems @BeginAllCounters @SubSectionNum
-	    //  @SubSectionNumInDisplays @BeginDisplayCounter @SubSectionNum
-	    //  @SubSectionNumInFigures @BeginFigureCounter @SubSectionNum
-	    //  @SubSectionNumInTables @BeginTableCounter @SubSectionNum
-	    //  @InitialLanguage @Language @Body
-	    //  NonStart @Runner
-		    @MajorNum { @SectionNum }
-		    @MajorTitle { @SectionTitle }
-		    @MinorNum { @SubSectionNum }
-		    @MinorTitle { @SubSectionTitle }
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Minor }
+		initiallanguage { @InitialLanguage }
+		title { @Title }
+		runningtitle { @RunningTitle }
+		headingfont { @SubSectionHeadingFont }
+		headingbreak { @SubSectionHeadingBreak }
+		headingformat { @Num @SubSectionHeadingFormat @Body }
+		incontents { @SubSectionInContents }
+		contentsindent { 3f }
+		numbers { @SubSectionNumbers }
+		attachnum { @SubSectionList&&preceding @Tagged @Tag }
+		retrievenum { @SubSectionList&&@Tag @Open { num } }
+		bypassnumber { @BypassNumber }
+		prefix { @SectionShortNum }
+		majornum {}
+		majortitle {}
+		intheorems { @SubSectionNumInTheorems }
+		indisplays { @SubSectionNumInDisplays }
+		infigures { @SubSectionNumInFigures }
+		intables { @SubSectionNumInTables }
+		inrunners { @SubSectionNumInRunners }
+		@Body
         }
 
-            @InitialLanguage @Language @SectionHeadingFont @Font
-	    @SectionHeadingBreak @Break @Protect
-	      { @SectionNum @SectionHeadingFormat @Title }
-	//  @NumberMarker @Tag { @Tag } @Value { @SectionNum }
-	//  @SectionList&&preceding @Tagged @Tag
-	//  @PageMarker&&preceding @Tagged @Tag
-	//  @SectionInContents @MajorContentsEntry
-		number { @SectionNum }
-		title { @InitialLanguage @Language @Title }
-		pagenum { @PageOf @Tag }
-	//  @SectionNumInTheorems @BeginAllCounters @SectionNum
-	//  @SectionNumInDisplays @BeginDisplayCounter @SectionNum
-	//  @SectionNumInFigures @BeginFigureCounter @SectionNum
-	//  @SectionNumInTables @BeginTableCounter @SectionNum
-	//  @InitialLanguage @Language @Body
-	//  NonStart @Runner
-		@MajorNum { @SectionNum }
-		@MajorTitle { @SectionTitle }
+	@LargeScaleStructure
+	    tag { @Tag }
+	    type { Minor }
+	    initiallanguage { @InitialLanguage }
+	    title { @Title }
+	    runningtitle { @RunningTitle }
+	    headingfont { @SectionHeadingFont }
+	    headingbreak { @SectionHeadingBreak }
+	    headingformat { @Num @SectionHeadingFormat @Body }
+	    incontents { @SectionInContents }
+	    contentsindent { 0f }
+	    numbers { @SectionNumbers }
+	    attachnum { @SectionList&&preceding @Tagged @Tag }
+	    retrievenum { @SectionList&&@Tag @Open { num } }
+	    bypassnumber { @BypassNumber }
+	    prefix { @SectionPrefix }
+	    majornum {}
+	    majortitle {}
+	    intheorems { @SectionNumInTheorems }
+	    indisplays { @SectionNumInDisplays }
+	    infigures { @SectionNumInFigures }
+	    intables { @SectionNumInTables }
+	    inrunners { @SectionNumInRunners }
+	    @Body
 
     }
 
@@ -604,20 +710,23 @@ def @ReportLayout
     {
         def @EndSubAppendicesPlace { @Galley }
 
-        macro @BeginSubAppendices
-	{   //@SubAppendixGap @SubAppendixList 1
-	    // @EndSubAppendicesPlace //
-	}
-
         def @EndSubAppendices force into { @EndSubAppendicesPlace&&preceding }
 	{}
 
-        def @AppendixShortNum
+        macro @BeginSubAppendices
         {
-	  @BypassNumber @Dft {
-	    @AppendixNumbers @Num { @AppendixList&&@Tag @Open { num } }
-	  }
-        }
+	    //@SubAppendixGap @SubAppendixList @FirstSubAppendixNumber
+	    // @EndSubAppendicesPlace //
+	}
+
+        def @AppendixShortNum
+	{
+	    @AppendixNumbers @Then {
+		@BypassNumber @Dft {
+		    @AppendixNumbers @Num @AppendixList&&@Tag @Open { num }
+		}
+	    }
+	}
 
         def @AppendixLongNum
         {
@@ -627,11 +736,6 @@ def @ReportLayout
 		}
 	    }
         }
-
-        def @AppendixTitle
-	{
-	    @InitialLanguage @Language { @RunningTitle @Dft @Title }
-	}
 
         export @BeginSubSubAppendices @EndSubSubAppendices @SubSubAppendix
         def @SubAppendix force into { @SubAppendixList&&preceding }
@@ -643,32 +747,28 @@ def @ReportLayout
             body @Body
         {
 
-            def @SubAppendixNum
-	    {
-	      @BypassNumber @Dft {
-		@SubAppendixNumbers @Then {
-		    @AppendixShortNum @DotJoin @SubAppendixNumbers @Num
-		    { @SubAppendixList&&@Tag @Open { num } }
-		}
-	      }
-	    }
-
-            def @SubAppendixTitle
-	    {
-		@InitialLanguage @Language { @RunningTitle @Dft @Title }
-	    }
-
             def @EndSubSubAppendicesPlace { @Galley }
-
-            macro @BeginSubSubAppendices
-            {
-		//@SubSubAppendixGap @SubSubAppendixList 1
-		// @EndSubSubAppendicesPlace //
-	    }
 
             def @EndSubSubAppendices force into
 		{ @EndSubSubAppendicesPlace&&preceding }
 	    {}
+
+            macro @BeginSubSubAppendices
+            {
+		//@SubSubAppendixGap
+		    @SubSubAppendixList @FirstSubSubAppendixNumber
+		// @EndSubSubAppendicesPlace //
+	    }
+
+            def @SubAppendixShortNum
+	    {
+		@SubAppendixNumbers @Then {
+		    @BypassNumber @Dft {
+			@AppendixShortNum @Join @SubAppendixNumbers @Num
+			{ @SubAppendixList&&@Tag @Open { num } }
+		    }
+		}
+	    }
 
             def @SubSubAppendix force into { @SubSubAppendixList&&preceding }
 		named @Tag {}
@@ -679,75 +779,85 @@ def @ReportLayout
 		body @Body
             {
 
-                def @SubSubAppendixNum
-		{
-		  @BypassNumber @Dft {
-		    @SubSubAppendixNumbers @Then {
-			@SubAppendixNum @DotJoin @SubSubAppendixNumbers @Num
-			{ @SubSubAppendixList&&@Tag @Open { num } }
-		    }
-		  }
-		}
+		@LargeScaleStructure
+		    tag { @Tag }
+		    type { Minor }
+		    initiallanguage { @InitialLanguage }
+		    title { @Title }
+		    runningtitle { @RunningTitle }
+		    headingfont { @SubSubAppendixHeadingFont }
+		    headingbreak { @SubSubAppendixHeadingBreak }
+		    headingformat { @Num @SubSubAppendixHeadingFormat @Body }
+		    incontents { @SubSubAppendixInContents }
+		    contentsindent { 6f }
+		    numbers { @SubSubAppendixNumbers }
+		    attachnum { @SubSubAppendixList&&preceding @Tagged @Tag }
+		    retrievenum { @SubSubAppendixList&&@Tag @Open { num } }
+		    bypassnumber { @BypassNumber }
+		    prefix { @SubAppendixShortNum }
+		    majornum {}
+		    majortitle {}
+		    intheorems { @SubSubAppendixNumInTheorems }
+		    indisplays { @SubSubAppendixNumInDisplays }
+		    infigures { @SubSubAppendixNumInFigures }
+		    intables { @SubSubAppendixNumInTables }
+		    inrunners { @SubSubAppendixNumInRunners }
+		    @Body
 
-	            @InitialLanguage @Language @SubSubAppendixHeadingFont @Font
-		    @SubSubAppendixHeadingBreak @Break @Protect
-		      { @SubSubAppendixNum @SubSubAppendixHeadingFormat @Title }
-	        //  @NumberMarker @Tag { @Tag } @Value { @SubSubAppendixNum }
-	        //  @SubSubAppendixList&&preceding @Tagged @Tag
-	        //  @PageMarker&&preceding @Tagged @Tag
-	        //  @SubSubAppendixInContents @ContentsEntry
-		        indent { 6f }
-		        number { @SubSubAppendixNum }
-		        title { @InitialLanguage @Language @Title }
-		        pagenum { @PageOf @Tag }
-		//  @SubSubAppendixNumInTheorems @BeginAllCounters @SubSubAppendixNum
-		//  @SubSubAppendixNumInDisplays @BeginDisplayCounter @SubSubAppendixNum
-		//  @SubSubAppendixNumInFigures @BeginFigureCounter @SubSubAppendixNum
-		//  @SubSubAppendixNumInTables @BeginTableCounter @SubSubAppendixNum
-	        //  @InitialLanguage @Language @Body
             }
 
-                @InitialLanguage @Language @SubAppendixHeadingFont @Font
-		@SubAppendixHeadingBreak @Break @Protect
-		  { @SubAppendixNum @SubAppendixHeadingFormat @Title }
-            //  @NumberMarker @Tag { @Tag } @Value { @SubAppendixNum }
-            //  @SubAppendixList&&preceding @Tagged @Tag
-            //  @PageMarker&&preceding @Tagged @Tag
-            //  @SubAppendixInContents @ContentsEntry
-		    indent { 3f }
-		    number { @SubAppendixNum }
-		    title { @InitialLanguage @Language @Title }
-		    pagenum { @PageOf @Tag }
-	    //  @SubAppendixNumInTheorems @BeginAllCounters @SubAppendixNum
-	    //  @SubAppendixNumInDisplays @BeginDisplayCounter @SubAppendixNum
-	    //  @SubAppendixNumInFigures @BeginFigureCounter @SubAppendixNum
-	    //  @SubAppendixNumInTables @BeginTableCounter @SubAppendixNum
-            //  @InitialLanguage @Language @Body
-            //  NonStart @Runner
-	            @MajorNum { @AppendixLongNum }
-	            @MajorTitle { @AppendixTitle }
-	            @MinorNum { @SubAppendixNum }
-	            @MinorTitle { @SubAppendixTitle }
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Minor }
+		initiallanguage { @InitialLanguage }
+		title { @Title }
+		runningtitle { @RunningTitle }
+		headingfont { @SubAppendixHeadingFont }
+		headingbreak { @SubAppendixHeadingBreak }
+		headingformat { @Num @SubAppendixHeadingFormat @Body }
+		incontents { @SubAppendixInContents }
+		contentsindent { 3f }
+		numbers { @SubAppendixNumbers }
+		attachnum { @SubAppendixList&&preceding @Tagged @Tag }
+		retrievenum { @SubAppendixList&&@Tag @Open { num } }
+		bypassnumber { @BypassNumber }
+		prefix { @AppendixShortNum }
+		majornum {}
+		majortitle {}
+		intheorems { @SubAppendixNumInTheorems }
+		indisplays { @SubAppendixNumInDisplays }
+		infigures { @SubAppendixNumInFigures }
+		intables { @SubAppendixNumInTables }
+		inrunners { @SubAppendixNumInRunners }
+		@Body
 
         }
 
-	    @InitialLanguage @Language @AppendixHeadingFont @Font 
-	    @AppendixHeadingBreak @Break { @AppendixLongNum @AppendixHeadingFormat @Title }
-	//  @NumberMarker @Tag { @Tag } @Value { @AppendixShortNum }
-	//  @AppendixList&&preceding @Tagged @Tag
-	//  @PageMarker&&preceding @Tagged @Tag
-	//  @AppendixInContents @MajorContentsEntry
-		number { @AppendixLongNum }
-		title { @InitialLanguage @Language @Title }
-		pagenum { @PageOf @Tag }
-	//  @AppendixNumInTheorems @BeginAllCounters @AppendixShortNum
-	//  @AppendixNumInDisplays @BeginDisplayCounter @AppendixShortNum
-	//  @AppendixNumInFigures @BeginFigureCounter @AppendixShortNum
-	//  @AppendixNumInTables @BeginTableCounter @AppendixShortNum
-        //  @InitialLanguage @Language @Body
-        //  NonStart @Runner
-		@MajorNum { @AppendixLongNum }
-		@MajorTitle { @AppendixTitle }
+	@LargeScaleStructure
+	    tag { @Tag }
+	    type { Minor }
+	    initiallanguage { @InitialLanguage }
+	    title { @Title }
+	    runningtitle { @RunningTitle }
+	    headingfont { @AppendixHeadingFont }
+	    headingbreak { @AppendixHeadingBreak }
+	    headingformat { @Num @AppendixHeadingFormat @Body }
+	    incontents { @AppendixInContents }
+	    contentsindent { 0f }
+	    word { appendix @WordVal @AppendixWord }
+	    numbers { @AppendixNumbers }
+	    attachnum { @AppendixList&&preceding @Tagged @Tag }
+	    retrievenum { @AppendixList&&@Tag @Open { num } }
+	    bypassnumber { @BypassNumber }
+	    prefix { @AppendixPrefix }
+	    majornum {}
+	    majortitle {}
+	    intheorems { @AppendixNumInTheorems }
+	    indisplays { @AppendixNumInDisplays }
+	    infigures { @AppendixNumInFigures }
+	    intables { @AppendixNumInTables }
+	    inrunners { Yes }
+	    @Body
     }
 
 @End @ReportLayout

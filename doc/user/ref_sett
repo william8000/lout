@@ -36,12 +36,12 @@ article, or whatever, and this determines what other options are
 required.  Section {@NumberOf entries} describes all the types provided
 by Lout, and Section {@NumberOf refstyles} explains how to add your own.
 @PP
-Database file names are supposed to end in @Code ".ld" for `Lout
-database,' so now let's suppose that you have made a database file called
+Lout database file names must end in {@Code ".ld"}, so now suppose that
+you have made one called
 ld.file @Index { @Code ".ld" file }
 refs.ld.file @Index { @Code "refs.ld" file }
-@Code "refs.ld" and put it in the same directory as your document.  The
-next step is to place
+@Code "refs.ld" and put it in the same directory as your document.  Next,
+place
 @ID @Code "@Database @Reference { refs }"
 database. @Index @Code "@Database"
 at the start of your document, just before {@Code "@Doc"},

@@ -5,7 +5,7 @@
 @PP
 The options to the @Code "@Graph" symbol, their default values, and
 their possible values are:
-@ID 0.85vx @Break @Tab
+@ID 0.79vx @Break @Tab
    hmargin { 0.15c }
    @Fmta { @Col @Code { "    "A } ! @Col @Code "{" ! @Col @Code B !
 	   @Col @Code "}" ! @Col ! @Col ! @Col C }
@@ -33,6 +33,14 @@ their possible values are:
     A { yextra }
     B { 0.5 cm }
     C { any @I distance ({@Code axes} and {@Code none} default is {@Code "0 cm"}) }
+@Rowa
+    A { xdecreasing }
+    B { no }
+    C { @Code yes or @Code no }
+@Rowa
+    A { ydecreasing }
+    B { no }
+    C { @Code yes or @Code no }
 @Rowa
     A { leftcaption }
     B { }
@@ -206,12 +214,12 @@ The minimum plottable x value is the minimum of all the x data,
 these are not {@Code none}.  If @Code xticks is {@Code none}, this
 minimum may be reduced further to a `round' number.  The maximum plottable
 x value is the maximum of the same values, and it may be increased further
-if {@Code xticks} is {@Code none}.  Similar remarks apply to the minimum
-and maximum plottable y values.
+if {@Code xticks} is {@Code none}.  Similar remarks apply to y values.
 @PP
 The value of the @Code "objects" option is a sequence of zero or more of
 the following:
 @ID @Tab
+    vmargin { 0.5vx }
     @Fmta { @Col A ! @Col { @Code "at {" @I expression @I expression
 @Code "}" } ! @Col @I object }
 {

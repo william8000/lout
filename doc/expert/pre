@@ -21,6 +21,7 @@
 @Include { pre_cove }
 @Include { pre_scal }
 @Include { pre_rota }
+@Include { pre_kshr }
 @Include { pre_rump }
 @Include { pre_inse }
 @Include { pre_next }

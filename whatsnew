@@ -1,4 +1,4 @@
-New features introduced in Version 3.04
+Changes and new features introduced in Version 3.04
 
     Bug fixes
     Underlining
@@ -24,7 +24,7 @@ New features introduced in Version 3.04
     @IncludeGraphic will now accept a compressed file e.g. filename.eps.gz
     @Verbatim { ... } like in LaTeX.
  
-New features introduced in Version 3.05
+Changes and new features introduced in Version 3.05
 
     Bug fixes
     ANSI C (getting very very close...)
@@ -34,13 +34,13 @@ New features introduced in Version 3.05
     Package for printing bar codes (see software directory)
     Moved initialization of non-English error message files into makefile
 
-New features introduced in Version 3.06
+Changes and new features introduced in Version 3.06
 
     Bug fixes
     Czech
     Plain text manual pages for people without troff
 
-New features introduced in Version 3.07
+Changes and new features introduced in Version 3.07
 
     Bug fixes
     @URL field added to references
@@ -55,7 +55,7 @@ New features introduced in Version 3.07
     Ability to set simple document options in the command line
     Horizontal galleys (for expert users)
     Drop capitals (large capitals in top left corner of paragraph)
-    Optimal body text breaking (makes large in-line displays practical)
+    Optimal body text breaking (makes large in-line displays more practical)
     More flexible control of the format of chapter, section etc. headings
     Option for starting chapters etc. on any, odd, or even pages
     Command line option -S for safe execution (prohibits calls to system())
@@ -72,10 +72,56 @@ New features introduced in Version 3.07
     @NotRevealed symbol (for expert users)
     Another, hopefully better attempt made at Latin-2 formatting
 
-New features introduced in Version 3.08
+Changes and new features introduced in Version 3.08
 
     Bug fixes
 
+Changes and new features introduced in Version 3.09
+
+    Bug fixes
+    French hyphenation
+    foll_or_prec works in all cases now, not just galleys (for expert users)
+    @Enclose symbol (for expert users)
+    Multi-page figures and tables can be boxed (revised @Format option)
+    Optimal paragraph breaker has been tuned to discourage widow words,
+      and to hyphenate more paragraphs but use fewer hyphens when it does
+    More consistent set of setup files since all now derived from one master
+    Setup files "doc" and "report" now work with plain text output
+    Unpaginated (continuous) plain text output
+    @FirstChapterNumber, @FirstSectionNumber etc. options in setup file
+    Alternative error message format (filename:linenum:colnum: ...)
+    Newline no longer needed at end of file
+    New diagram drawing package called Diag (replaces Fig):
+      many new link types; trees; labelled nodes and links; many useful options
+    New "oragged" paragraph breaking style, combines ragged and outdent
+    Comprehensive usage message printed by "lout -u"
+    Horizontal spacing of subscripts in equations (both eq and teq) improved
+
+Changes and new features introduced in Version 3.10
+
+    Bug fixes
+    @StructPageNums option for pages numbered by section
+    Dot between section (etc.) numbers and title made optional
+    Updated version of lout.teq (TeX-style equation formatter)
+    EvenPageTop and EvenFullPage figure and table locations
+    @Graph options for plotting values in decreasing rather than increasing order
+    References may cite other references now (bug fix)
+    Installation option for making "lout -S" the default behaviour
+    @E symbol added alongside @Eq as synonym for @OneCol @Eq
+    New language EnglishUK which is like English but with UK hyphenation rules
+    @AnotherFootNote symbol for consecutive footnotes on one word
+    LOUTLIB environment variable determines library directory at run time if set
+    Lots of arrow symbols added to eq and teq
+    Paragraph gaps may have "u" suffix, meaning unbreakable (for expert users)
+
+Changes and new features introduced in Version 3.11
+
+    Bug fixes
+    Sorting collation sequence may be locale-specific if desired
+    Changed paragraph breaker, no longer calls the notorious CorrectOversize
+    Word count feature (see manual entry, -w)
+    Italian language
+    Fix for the long-standing bug in database file reading on DOS-like systems
 
 Jeff Kingston
-8 May 1996
+17 November 1997

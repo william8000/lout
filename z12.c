@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -37,6 +37,33 @@
 
 /*****************************************************************************/
 /*                                                                           */
+/*  KernLength(fnum, ch1, ch2, res)                                          */
+/*                                                                           */
+/*  Set res to the kern length between ch1 and ch2 in font fnum, or 0 if     */
+/*  none.                                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+static FULL_LENGTH KernLength(FONT_NUM fnum, FULL_CHAR ch1, FULL_CHAR ch2)
+{ FULL_LENGTH res;
+  MAPPING m      = font_mapping(finfo[fnum].font_table);
+  FULL_CHAR *mp  = MapTable[m]->map[MAP_UNACCENTED];
+  int ua_ch1     = mp[ch1];
+  int ua_ch2     = mp[ch2];
+  int i = finfo[fnum].kern_table[ua_ch1], j;
+  if( i == 0 )  res = 0;
+  else
+  { FULL_CHAR *kc = finfo[fnum].kern_chars;
+    for( j = i;  kc[j] > ua_ch2;  j++ );
+    res = (kc[j] == ua_ch2) ?
+      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;
+  }
+  return res;
+} /* end KernLength */
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  OBJECT MinSize(x, dim, extras)                                           */
 /*                                                                           */
 /*  Set fwd(x, dim) and back(x, dim) to their minimum possible values.       */
@@ -46,7 +73,7 @@
 
 OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 { OBJECT y, z, link, prev, t, g, full_name;
-  int b, f, dble_fwd, llx, lly, urx, ury, status;
+  FULL_LENGTH b, f, dble_fwd, llx, lly, urx, ury; int status;
   float fllx, flly, furx, fury;
   BOOLEAN dble_found, found, will_expand, first_line, cp;
   FILE *fp;  FULL_CHAR buff[MAX_BUFF];
@@ -65,10 +92,11 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
 
     case CROSS:
+    case FORCE_CROSS:
 
       /* add index to the cross-ref */
       if( dim == ROWM )
-      {	New(z, cross_type(x));	/* CROSS_PREC or CROSS_FOLL */
+      {	New(z, cross_type(x)); /* CROSS_PREC, CROSS_FOLL or CROSS_FOLL_OR_PREC */
 	debug2(DCR, DD, "  MinSize CROSS: %ld %s", (long) x, EchoObject(x));
 	actual(z) = x;
 	Link(z, x);		/* new code to avoid disposal */
@@ -128,7 +156,12 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	x = y;	/* now sizing y, not x */
 	back(x, COLM) = fwd(x, COLM) = 0;  /* fix non-zero size @Null bug!! */
       }
-      else external_ver(x) = external_hor(x) = FALSE;
+      else
+      {
+	debug2(DGT, D, "MinSize setting external_ver(%s %s) = FALSE",
+	  Image(type(x)), SymName(actual(x)));
+	external_ver(x) = external_hor(x) = FALSE;
+      }
       back(x, dim) = fwd(x, dim) = 0;
       break;
 
@@ -153,7 +186,12 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	{ assert(FALSE, "MinSize: definite non-recursive closure");
 	}
       }
-      else external_ver(x) = external_hor(x) = FALSE;/* nb must be done here!*/
+      else
+      {
+	debug2(DGT, DD, "MinSize setting external_ver(%s %s) = FALSE",
+	  Image(type(x)), SymName(actual(x)));
+	external_ver(x) = external_hor(x) = FALSE;/* nb must be done here!*/
+      }
       back(x, dim) = fwd(x, dim) = 0;
       break;
 
@@ -277,6 +315,55 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       break;
 
 
+    case KERN_SHRINK:
+
+
+      Child(y, LastDown(x));
+      y = MinSize(y, dim, extras);
+      if( dim == COLM )
+      { FULL_CHAR ch_left, ch_right;  FULL_LENGTH ksize;
+	debug3(DSF, D, "MinSize(%s,%s %s, COLM)",
+	  EchoLength(back(y, COLM)), EchoLength(fwd(y, COLM)),
+	  EchoObject(x));
+
+	/* default value if don't find anything */
+       	back(x, dim) = back(y, dim);
+	fwd(x, dim)  = fwd(y, dim);
+
+	/* find first character of left parameter */
+	ch_right = (FULL_CHAR) '\0';
+	Child(y, Down(x));
+	while( type(y) == ACAT )
+	{ Child(y, Down(y));
+	}
+	if( is_word(type(y)) )  ch_right = string(y)[0];
+
+	/* find last character of right parameter */
+	ch_left = (FULL_CHAR) '\0';
+	Child(y, LastDown(x));
+	while( type(y) == ACAT )
+	{ Child(y, LastDown(y));
+	}
+	if( is_word(type(y)) )  ch_left = string(y)[StringLength(string(y))-1];
+
+	/* adjust if successful */
+	if( ch_left != (FULL_CHAR) '\0' && ch_right != (FULL_CHAR) '\0' )
+	{
+	  ksize = KernLength(word_font(y), ch_left, ch_right);
+	  debug4(DSF, D, "  KernLength(%s, %c, %c) = %s",
+	    FontName(word_font(y)), (char) ch_left, (char) ch_right,
+	    EchoLength(ksize));
+	  fwd(x, dim) += ksize;
+	}
+
+      }
+      else
+      {	back(x, dim) = back(y, dim);
+	fwd(x, dim)  = fwd(y, dim);
+      }
+      break;
+
+
     case WIDE:
 
       Child(y, Down(x));
@@ -305,7 +392,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
         { Error(12, 1, "forced to enlarge %s", WARN, &fpos(x), KW_HIGH);
 	  debug0(DSF, DD, "offending object was:");
 	  ifdebug(DSF, DD, DebugObject(y));
-	  SetConstraint(constraint(x), MAX_LEN, size(y, dim), MAX_LEN);
+	  SetConstraint(constraint(x), MAX_FULL_LENGTH, size(y, dim), MAX_FULL_LENGTH);
         }
         back(x, dim) = back(y, dim);
 	fwd(x, dim)  = fwd(y, dim);
@@ -325,8 +412,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       y = MinSize(y, dim, extras);
       if( (dim == COLM) == (type(x) == HSHIFT) )
       { f = FindShift(x, y, dim);
-	back(x, dim) = min(MAX_LEN, max(0, back(y, dim) + f));
-	fwd(x, dim)  = min(MAX_LEN, max(0, fwd(y, dim)  - f));
+	back(x, dim) = find_min(MAX_FULL_LENGTH, find_max(0, back(y, dim) + f));
+	fwd(x, dim)  = find_min(MAX_FULL_LENGTH, find_max(0, fwd(y, dim)  - f));
       }
       else
       { back(x, dim) = back(y, dim);
@@ -387,7 +474,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    { if( dim == COLM )
 	      {
 		/* compress adjacent words if compatible */
-		if( prev != nilobj && width(gap(g)) == 0 && type(x) == ACAT &&
+		if( prev != nilobj && width(gap(g)) == 0 && nobreak(gap(g)) &&
+		    type(x) == ACAT &&
 		    is_word(type(prev)) && vspace(g) + hspace(g) == 0 &&
 		    units(gap(g)) == FIXED_UNIT &&
 		    mode(gap(g)) == EDGE_MODE && !mark(gap(g)) &&
@@ -397,7 +485,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		    underline(prev) == underline(y) )
 		{
 		  unsigned typ;
-		  debug3(DSF, D, "compressing %s and %s at %s",
+		  debug3(DSF, DD, "compressing %s and %s at %s",
 		    EchoObject(prev), EchoObject(y), EchoFilePos(&fpos(prev)));
 		  if( StringLength(string(prev)) + StringLength(string(y))
 		      >= MAX_BUFF )
@@ -450,11 +538,26 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	      /* calculate running total length */
 	      if( prev == nilobj )  b = back(y, dim), f = 0;
 	      else
-	      {
+	      { FULL_LENGTH tmp;
+		tmp = MinGap(fwd(prev,dim), back(y,dim), fwd(y, dim), &gap(g));
 		assert(g!=nilobj && mode(gap(g))!=NO_MODE, "MinSize: NO_MODE!");
-		f += MinGap(fwd(prev, dim), back(y, dim), fwd(y, dim), &gap(g));
+		if( units(gap(g)) == FIXED_UNIT && mode(gap(g)) == TAB_MODE )
+		{
+		  f = find_max(width(gap(g)) + back(y, dim), f + tmp);
+		}
+		else
+		{
+		  f = f + tmp;
+		}
 		if( units(gap(g)) == FRAME_UNIT && width(gap(g)) > FR )
 		    will_expand = TRUE;
+		if( units(gap(g)) == AVAIL_UNIT && mark(gap(g)) )
+		  Error(12, 9, "mark alignment incompatible with centring or right justification",
+		    WARN, &fpos(g));
+		/* ***
+		if( units(gap(g)) == AVAIL_UNIT && width(gap(g)) >= FR )
+		    will_expand = TRUE;
+		*** */
 		if( mark(gap(g)) )  b += f, f = 0;
 	      }
 	      prev = y;
@@ -465,10 +568,10 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
 	if( prev == nilobj )  b = f = 0;
 	else f += fwd(prev, dim);
-	back(x, dim) = min(MAX_LEN, b);
-	fwd(x, dim)  = min(MAX_LEN, f);
+	back(x, dim) = find_min(MAX_FULL_LENGTH, b);
+	fwd(x, dim)  = find_min(MAX_FULL_LENGTH, f);
 
-	if( type(x) == ACAT && will_expand )  fwd(x, COLM) = MAX_LEN;
+	if( type(x) == ACAT && will_expand )  fwd(x, COLM) = MAX_FULL_LENGTH;
       }
       else
       {
@@ -509,7 +612,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    {
 	      /* found // or || operator, so end current group */
 	      dble_found = TRUE;
-	      dble_fwd = max(dble_fwd, b + f);
+	      dble_fwd = find_max(dble_fwd, b + f);
 	      debug1(DSF, DD, "  endgroup, dble_fwd: %s", EchoLength(dble_fwd));
 	      found = FALSE;
 	    }
@@ -522,8 +625,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    }
 	    else y = MinSize(y, dim, extras);
 	    if( found )
-	    { b = max(b, back(y, dim));
-	      f = max(f, fwd(y, dim));
+	    { b = find_max(b, back(y, dim));
+	      f = find_max(f, fwd(y, dim));
 	    }
 	    else
 	    { b = back(y, dim);
@@ -538,8 +641,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	/* finish off last group */
 	if( dble_found )
 	{ back(x, dim) = 0;
-	  dble_fwd = max(dble_fwd, b + f);
-	  fwd(x, dim) = min(MAX_LEN, dble_fwd);
+	  dble_fwd = find_max(dble_fwd, b + f);
+	  fwd(x, dim) = find_min(MAX_FULL_LENGTH, dble_fwd);
 	  debug1(DSF, DD, "  end group, dble_fwd: %s", EchoLength(dble_fwd));
 	}
 	else
@@ -553,19 +656,19 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case COL_THR:
     case ROW_THR:
 
-      assert( (type(x) == COL_THR) == (dim == COLM), "Manifest/COL_THR: dim!" );
+      assert( (type(x) == COL_THR) == (dim == COLM), "MinSize/COL_THR: dim!" );
       if( thr_state(x) == NOTSIZED )
-      {	assert( Down(x) != x, "Manifest/COL_THR: Down(x)!" );
+      {	assert( Down(x) != x, "MinSize/COL_THR: Down(x)!" );
 	Child(y, Down(x));
 	y = MinSize(y, dim, extras);
 	b = back(y, dim);
 	f = fwd(y, dim);
 	for( link = NextDown(Down(x));  link != x;  link = NextDown(link) )
 	{ Child(y, link);
-	  assert( type(y) != GAP_OBJ, "Manifest/COL_THR: GAP_OBJ!" );
+	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
 	  y = MinSize(y, dim, extras);
-	  b = max(b, back(y, dim));
-	  f = max(f, fwd(y, dim));
+	  b = find_max(b, back(y, dim));
+	  f = find_max(f, fwd(y, dim));
 	}
 	back(x, dim) = b;
 	fwd(x, dim)  = f;
@@ -585,7 +688,6 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       status = IG_LOOKING;
       Child(y, Down(x));
       fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y), &cp);
-      /* *** fp = OpenFile(fnum = sparec(constraint(x)), FALSE); */
       if( fp == NULL )  status = IG_NOFILE;
       first_line = TRUE;
       while( status == IG_LOOKING && StringFGets(buff, MAX_BUFF, fp) != NULL )
@@ -619,7 +721,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	  Error(12, 5, "%s deleted (cannot open file %s)", WARN, &fpos(x),
 	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
 	    string(full_name));
-	  sparec(constraint(x)) = FALSE;
+	  incgraphic_ok(x) = FALSE;
 	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
 	  break;
 
@@ -631,7 +733,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    string(full_name));
 	  back(y, COLM) = fwd(y, COLM) = back(y, ROWM) = fwd(y, ROWM) = 0;
 	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
-	  sparec(constraint(x)) = TRUE;
+	  incgraphic_ok(x) = TRUE;
 	  fclose(fp);
 	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
 	  break;
@@ -641,7 +743,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	  Error(12, 7, "%s deleted (bad first line in file %s)", WARN,
 	    &fpos(x), type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
 	    string(full_name));
-	  sparec(constraint(x)) = FALSE;
+	  incgraphic_ok(x) = FALSE;
 	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
 	  fclose(fp);
 	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
@@ -655,7 +757,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    string(full_name));
 	  back(y, COLM) = fwd(y, COLM) = back(y, ROWM) = fwd(y, ROWM) = 0;
 	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
-	  sparec(constraint(x)) = TRUE;
+	  incgraphic_ok(x) = TRUE;
 	  fclose(fp);
 	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
 	  break;
@@ -666,12 +768,12 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	  back(y, COLM) = llx;  fwd(y, COLM) = urx;
 	  back(y, ROWM) = lly;  fwd(y, ROWM) = ury;
 	  b = (urx - llx) * PT;
-	  b = max(0, min(b, MAX_LEN));
+	  b = find_min(MAX_FULL_LENGTH, find_max(0, b));
 	  back(x, COLM) = fwd(x, COLM) = b / 2;
 	  b = (ury - lly) * PT;
-	  b = max(0, min(b, MAX_LEN));
+	  b = find_min(MAX_FULL_LENGTH, find_max(0, b));
 	  back(x, ROWM) = fwd(x, ROWM) = b / 2;
-	  sparec(constraint(x)) = TRUE;
+	  incgraphic_ok(x) = TRUE;
 	  fclose(fp);
 	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
 	  break;

@@ -1,5 +1,5 @@
 @Chapter
-    @Title { Pascal Programs }
+    @Title { Pascal and Modula-2 Programs }
 @Begin
 @LP
 There is a @Code "@Pas" symbol for printing Pascal programs
@@ -154,4 +154,9 @@ has result
 @Com { A Pascal comment }
 }
 It may still be necessary to enclose the interior in double quotes.
+@PP
+There is a @Code "@Modula" symbol which allows you to format Modula-2
+programs in the same way as @Code "@Pas" does for Pascal.  You get it
+via {@Code "@SysInclude { modula }"}, and once again it is a quick-and-dirty
+production.
 @End @Chapter

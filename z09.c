@@ -1,6 +1,6 @@
 /*@z09.c:Closure Expansion:SearchEnv()@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -172,40 +172,57 @@ OBJECT *crs, OBJECT *res_env)
   res = *res_env = nilobj;
   if( is_par(type(actual(x))) )
   { prnt = SearchEnv(env, enclosing(actual(x)));
-    if( prnt == nilobj )
-    { debug3(DCE, D, "failing ClosureExpand( %s, crs, %s, %s, res_env )\n",
-	EchoObject(x), bool(crs_wanted), EchoObject(env));
-      Error(9, 1, "symbol with import list misused", FATAL, &fpos(x));
+    if( prnt != nilobj )
+    {
+      prnt_env = GetEnv(prnt);
+      for( link = Down(prnt);  link != prnt;  link = NextDown(link) )
+      { Child(par, link);
+        if( type(par) == PAR && actual(par) == actual(x) )
+        { assert( Down(par) != par, "ExpandCLosure: Down(par)!");
+	  Child(res, Down(par));
+	  if( dirty(enclosing(actual(par))) )
+	  { debug2(DSU, DD, "c %s %s", SymName(actual(par)), EchoObject(res));
+	    res = CopyObject(res, no_fpos);
+	  }
+	  else
+	  { debug2(DCE, DDD, "l %s %s",
+	      FullSymName(actual(par), AsciiToFull(".")), EchoObject(res));
+	    DeleteLink(Down(par));
+	    y = MakeWord(WORD, STR_NOCROSS, &fpos(res));
+	    Link(par, y);
+	  }
+	  ReplaceNode(res, x);
+	  if( type(actual(x)) == RPAR && has_body(enclosing(actual(x))) )
+	  { debug0(DCR, DDD, "  calling SetEnv from ClosureExpand (a)");
+	    *res_env = SetEnv(prnt, nilobj);  DisposeObject(x);
+	  }
+
+	  /* *** new code for optimizing left and right parameters */
+	  else if( type(actual(x)) == RPAR || type(actual(x)) == LPAR )
+	  { *res_env = prnt_env;
+	    DisposeObject(x);
+	  }
+	  /* *** end new code */
+
+	  else
+	  { AttachEnv(env, x);
+	    debug0(DCR, DDD, "  calling SetEnv from ClosureExpand (b)");
+	    *res_env = SetEnv(x, prnt_env);
+	  }
+	  break;
+        }
+      }
     }
-    assert( prnt != nilobj, "ClosureExpand: is_par but prnt == nilobj!" );
-    prnt_env = GetEnv(prnt);
-    for( link = Down(prnt);  link != prnt;  link = NextDown(link) )
-    { Child(par, link);
-      if( type(par) == PAR && actual(par) == actual(x) )
-      {	assert( Down(par) != par, "ExpandCLosure: Down(par)!");
-	Child(res, Down(par));
-	if( dirty(enclosing(actual(par))) )
-	{ debug2(DSU, DD, "c %s %s", SymName(actual(par)), EchoObject(res));
-	  res = CopyObject(res, no_fpos);
-	}
-	else
-	{ debug2(DCE, DDD, "l %s %s",
-	    FullSymName(actual(par), AsciiToFull(".")), EchoObject(res));
-	  DeleteLink(Down(par));
-	  y = MakeWord(WORD, STR_NOCROSS, &fpos(res));
-	  Link(par, y);
-	}
-	ReplaceNode(res, x);
-	if( type(actual(x)) == RPAR && has_body(enclosing(actual(x))) )
-	{ debug0(DCR, DDD, "  calling SetEnv from ClosureExpand (a)");
-	  *res_env = SetEnv(prnt, nilobj);  DisposeObject(x);
-	}
-	else
-	{ AttachEnv(env, x);
-	  debug0(DCR, DDD, "  calling SetEnv from ClosureExpand (b)");
-	  *res_env = SetEnv(x, prnt_env);
-	}
-	break;
+    else
+    {
+      /* fail only if there is no default value available */
+      if( sym_body(actual(x)) == nilobj )
+      {
+        debug3(DCE, D, "failing ClosureExpand( %s, crs, %s, %s, res_env )\n",
+	  EchoObject(x), bool(crs_wanted), EchoObject(env));
+        Error(9, 2, "no value for parameter %s of symbol %s:", WARN, &fpos(x),
+	  SymName(actual(x)), SymName(enclosing(actual(x))));
+        Error(9, 1, "symbol with import list misused", FATAL, &fpos(x));
       }
     }
   }

@@ -4,6 +4,7 @@
 @Begin
 @PP
 The @Code "@Verbatim" symbol prints the following object exactly as
+verbatim.sym @Index @Code "@Verbatim"
 it appears in the input file.  All special meanings for characters,
 symbols, etc. are turned off; there is one result line for each
 input line.  For example,
@@ -18,7 +19,7 @@ has result
 "A line of \"verbatim\" text"
 "Another line, with a \\ character"
 }
-Use @Code "{ Courier Base } @Font @Verbatim { ... }" to get the result
+Use @Code "@F @Verbatim { ... }" to get the result
 in a fixed-width font.
 @PP
 If the verbatim text contains @Code "{" or @Code "}" characters, then

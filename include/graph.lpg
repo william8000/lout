@@ -24,7 +24,7 @@ errordict begin
    } def
 end
 
-/lgraphdict 120 dict def
+/lgraphdict 200 dict def
 lgraphdict begin
 
 % error messages
@@ -124,33 +124,33 @@ lgraphdict begin
 
 % stroke a y histogram: - yhisto -
 /yhisto
-{ xprev ymin trpoint yextra sub moveto
+{ xprev yleft trpoint yextra sub moveto
   xprev yprev trpoint lineto
   xcurr yprev trpoint lineto
-  xcurr ymin trpoint yextra sub lineto 
+  xcurr yleft trpoint yextra sub lineto 
   linewidth setlinewidth stroke
 } def
 
 % stroke an x histogram: - xhisto -
 /xhisto
-{ xmin yprev trpoint exch xextra sub exch moveto
+{ xleft yprev trpoint exch xextra sub exch moveto
   xcurr yprev trpoint lineto
   xcurr ycurr trpoint lineto
-  xmin ycurr trpoint exch xextra sub exch lineto 
+  xleft ycurr trpoint exch xextra sub exch lineto 
   linewidth setlinewidth stroke
 } def
 
 % stroke a surface y histogram: - surfaceyhisto -
 /surfaceyhisto
 { firstpair
-  { xprev ymin trpoint yextra sub moveto
+  { xprev yleft trpoint yextra sub moveto
     xprev yprev trpoint lineto
   }
   { xprev yprev trpoint moveto
   } ifelse
   xcurr yprev trpoint lineto
   lastpair
-  { xcurr ymin trpoint yextra sub lineto 
+  { xcurr yleft trpoint yextra sub lineto 
   }
   { xcurr ycurr trpoint lineto
   } ifelse
@@ -160,33 +160,33 @@ lgraphdict begin
 % stroke a surface x histogram: - surfacexhisto -
 /surfacexhisto
 { firstpair
-  { xmin yprev trpoint exch xextra sub exch moveto
+  { xleft yprev trpoint exch xextra sub exch moveto
   }
   { xprev yprev trpoint moveto
   } ifelse
   xcurr yprev trpoint lineto
   xcurr ycurr trpoint lineto
   lastpair
-  { xmin ycurr trpoint exch xextra sub exch lineto 
+  { xleft ycurr trpoint exch xextra sub exch lineto 
   } if
   linewidth setlinewidth stroke
 } def
 
 % stroke a filled y histogram: - filledyhisto -
 /filledyhisto
-{ xprev ymin trpoint exch currentlinewidth 2 div add exch yextra sub moveto
+{ xprev yleft trpoint exch currentlinewidth 2 div add exch yextra sub moveto
   xprev yprev trpoint exch currentlinewidth 2 div add exch lineto
   xcurr yprev trpoint exch currentlinewidth 2 div sub exch lineto
-  xcurr ymin trpoint exch currentlinewidth 2 div sub exch yextra sub lineto 
+  xcurr yleft trpoint exch currentlinewidth 2 div sub exch yextra sub lineto 
   closepath fill
 } def
 
 % stroke a filled x histogram: - filledxhisto -
 /filledxhisto
-{ xmin yprev trpoint currentlinewidth 2 div add exch xextra sub exch moveto
+{ xleft yprev trpoint currentlinewidth 2 div add exch xextra sub exch moveto
   xcurr yprev trpoint currentlinewidth 2 div add lineto
   xcurr ycurr trpoint currentlinewidth 2 div sub lineto
-  xmin ycurr trpoint currentlinewidth 2 div sub exch xextra sub exch lineto 
+  xleft ycurr trpoint currentlinewidth 2 div sub exch xextra sub exch lineto 
   closepath fill
 } def
 
@@ -310,11 +310,22 @@ lgraphdict begin
   } if
 } def
 
+% % trpoint: transform (x, y) in graph space into (x', y') in print space
+% % x y trpoint x' y'
+% /trpoint
+% { exch xtr trxmin sub trxmax trxmin sub div xwidth mul xextra add
+%   exch ytr trymin sub trymax trymin sub div ywidth mul yextra add
+% } def
+
+
 % trpoint: transform (x, y) in graph space into (x', y') in print space
 % x y trpoint x' y'
 /trpoint
-{ exch xtr trxmin sub trxmax trxmin sub div xwidth mul xextra add
-  exch ytr trymin sub trymax trymin sub div ywidth mul yextra add
+{ exch xtr xdecr { trxmax exch sub } { trxmin sub } ifelse
+  trxmax trxmin sub div xwidth mul xextra add
+
+  exch ytr ydecr { trymax exch sub } { trymin sub } ifelse
+  trymax trymin sub div ywidth mul yextra add
 } def
 
 
@@ -388,14 +399,14 @@ lgraphdict begin
 % xpos printxtick -
 /printxtick
 { newpath
-  ymin trpoint moveto 0 yextra neg rmoveto
+  yleft trpoint moveto 0 yextra neg rmoveto
   0 xticklength neg rlineto [] 0 setdash stroke
 } def
 
 % printxlabel: print one x label
 % (xlabel) xpos printxlabel -
 /printxlabel
-{ ymin trpoint moveto 0 yextra neg rmoveto
+{ yleft trpoint moveto 0 yextra neg rmoveto
   0 xticklength neg rmoveto 0 0.9 ft neg rmoveto
   xlog 1 gt { 0 0.3 ft neg rmoveto } if
   dup expstringwidth -2 div 0 rmoveto expstringshow
@@ -405,14 +416,14 @@ lgraphdict begin
 % ypos printytick -
 /printytick
 { newpath
-  xmin exch trpoint moveto xextra neg 0 rmoveto
+  xleft exch trpoint moveto xextra neg 0 rmoveto
   yticklength neg 0 rlineto [] 0 setdash stroke
 } def
 
 % printylabel: print one y label
 % (ylabel) ypos printylabel -
 /printylabel
-{ xmin exch trpoint moveto xextra neg 0 rmoveto
+{ xleft exch trpoint moveto xextra neg 0 rmoveto
   yticklength neg 0 rmoveto -0.3 ft -0.3 ft rmoveto
   dup expstringwidth neg 0 rmoveto expstringshow
 } def
@@ -607,23 +618,31 @@ lgraphdict begin
 } def
 
 % xset: set up all data for x axis, including limits and ticks
-% xticksep xticks 0 alldata xmin xmax xlog xextra xaxis xticklength xset -
+% xticksep xticks 0 alldata xmin xmax xlog xextra xdecr xaxis xticklength xset -
 /xset
 { /xticklength exch def
   /xaxis exch def
+  /xdecr exch def
   /xextra exch def
-  xaxis exch ticksandlimits /xlog exch def /xmax exch def /xmin exch def /xticks exch def
+  xaxis exch ticksandlimits
+  /xlog exch def /xmax exch def /xmin exch def /xticks exch def
+  /xleft xdecr { xmax } { xmin } ifelse def
+  /xright xdecr { xmin } { xmax } ifelse def
   /xwidth xsize xextra 2 mul sub def
   /trxmin xmin xtr def /trxmax xmax xtr def
 } def
 
 % yset: set up all data for y axis, including limits and ticks
-% yticksep yticks 0 alldata ymin ymax ylog yextra yaxis yticklength yset -
+% yticksep yticks 0 alldata ymin ymax ylog yextra ydecr yaxis yticklength yset -
 /yset
 { /yticklength exch def
   /yaxis exch def
+  /ydecr exch def
   /yextra exch def
-  yaxis exch ticksandlimits /ylog exch def /ymax exch def /ymin exch def /yticks exch def
+  yaxis exch ticksandlimits
+  /ylog exch def /ymax exch def /ymin exch def /yticks exch def
+  /yleft ydecr { ymax } { ymin } ifelse def
+  /yright ydecr { ymin } { ymax } ifelse def
   /ywidth ysize yextra 2 mul sub def
   /trymin ymin ytr def /trymax ymax ytr def
 } def
@@ -632,7 +651,7 @@ lgraphdict begin
 /framestyle
 { 0 0 moveto xsize 0 lineto xsize ysize lineto
   0 ysize lineto closepath stroke
-  /printxtick /printxlabel xticks xmin printticks
+  /printxtick /printxlabel xticks xleft printticks
   /printytick /printylabel yticks ymin printticks
 } def
 
@@ -648,7 +667,7 @@ lgraphdict begin
   { framestyle }
   { xaxis yaxis trpoint dup 0 exch moveto xsize exch lineto
     dup 0 moveto ysize lineto stroke
-    /printxaxistick /printxaxislabel xticks xmin printticks
+    /printxaxistick /printxaxislabel xticks xleft printticks
     /printyaxistick /printyaxislabel yticks ymin printticks
   } ifelse
 } def

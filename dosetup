@@ -1,0 +1,28 @@
+#!/usr/bin/sh
+# dosetup <resultfilename> <choice> ... <choice>
+FNAME=$1
+shift
+
+# create a sed file that would remove all choices
+echo '/^--docbegin/,/^--docend/d'		  >  tmp.sed
+echo '/^--reportbegin/,/^--reportend/d'		  >> tmp.sed
+echo '/^--bookbegin/,/^--bookend/d'		  >> tmp.sed
+echo '/^--slidesbegin/,/^--slidesend/d'		  >> tmp.sed
+echo '/^--picturebegin/,/^--pictureend/d'	  >> tmp.sed
+echo '/^--cprintbegin/,/^--cprintend/d'		  >> tmp.sed
+echo '/^--eiffelprintbegin/,/^--eiffelprintend/d' >> tmp.sed
+echo '/^--blueprintbegin/,/^--blueprintend/d'     >> tmp.sed
+echo '/^--diagbegin/,/^--diagend/d'		  >> tmp.sed
+echo '/^--/d'		 			  >> tmp.sed
+
+# delete from the sed file those choices we want to retain
+for i in $*
+do
+	sed -n -e "/$i/!p" < tmp.sed > tmp.op
+	mv tmp.op tmp.sed
+done
+
+# edit master using the sed file and put the result into include
+sed -f tmp.sed < include/master > setup/$FNAME
+# chmod a+r-wx setup/$FNAME
+rm tmp.sed

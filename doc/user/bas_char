@@ -8,20 +8,18 @@ characters. @Index characters
 we have been doing all along.  However, for some characters this is not
 possible, either because they have some special meaning, as @Code "{"
 and @Code "}" do, or because the keyboard has no button for them.  This
-section explains how to get every possible character.
-@FootNote {
-Technically, how to get every printable character in the ISO-LATIN-1
-character set, every character in the Adobe Systems Symbol font, plus
-the characters {@Char quotedblleft}, {@Char quotedblright}, {@Char fi},
+section explains how to get every possible character:  every printable
+character in the ISO-LATIN-1 character set, every character in the Adobe
+Systems Symbol font, plus the characters {@Char quotesinglbase},
+{@Char quotedblbase}, {@Char ellipsis}, {@Char OE}, {@Char oe},
+{@Char quotedblleft}, {@Char quotedblright}, {@Char fi},
 {@Char fl}, {@Char endash}, {@Char emdash}, {@Char bullet}, {@Char dagger},
-{@Char daggerdbl}, {@Char florin}, and {@Char fraction}.  ISO-LATIN-2
-and Russian characters are available separately (consult directory
-@Code { software } in the Lout distribution).  In principle, there is no
-limit to the characters available, but to go beyond those given in this
-section requires expertise in defining encoding vectors and fonts
-@Cite { $kingston1995lout.expert}.
-}
-If it exists at all, you will find it here.
+{@Char daggerdbl}, {@Char florin}, and {@Char fraction}.  If it exists
+at all, you will find it here.  ISO-LATIN-2 and Russian characters are
+available separately (consult directory @Code { software } in the Lout
+distribution).  In principle, there is no limit to the characters available,
+but to go beyond those given in this section requires expertise in defining
+encoding vectors and fonts @Cite { $kingston1995lout.expert}.
 @PP
 First up we have the characters that you get simply by typing
 them.  The characters themselves are shown at the left, and what you
@@ -29,53 +27,55 @@ type to get them at the right:
 @ID @OneRow @Tab
     vmargin { 0.5vx }
     @Fmta { @Col @CC A ! @Col @Code A ! @Col ! @Col @CC B ! @Col @Code B !
-     @Col ! @Col @CC C ! @Col @Code C ! @Col ! @Col @CC D ! @Col @Code D }
+     @Col ! @Col @CC C ! @Col @Code C ! @Col ! @Col @CC D ! @Col @Code D !
+     @Col ! @Col @CC E ! @Col @Code E ! @Col ! @Col @CC F ! @Col @Code F }
 {
-@Rowa A { ! } B { $ } C { % } D { ' }
-@Rowa A { ( } B { ) } C { * } D { + }
-@Rowa A { , } B { - } C { 0 } D { 1 }
-@Rowa A { 2 } B { 3 } C { 4 } D { 5 }
-@Rowa A { 6 } B { 7 } C { 8 } D { 9 }
-@Rowa A { : } B { ; } C { < } D { = }
-@Rowa A { > } B { ? } C { A } D { B }
-@Rowa A { C } B { D } C { E } D { F }
-@Rowa A { G } B { H } C { I } D { J }
-@Rowa A { K } B { L } C { M } D { N }
-@Rowa A { O } B { P } C { Q } D { R }
-@Rowa A { S } B { T } C { U } D { W }
-@Rowa A { X } B { Y } C { Z } D { [ }
-@Rowa A { ] } B { _ } C { ` } D { a }
-@Rowa A { b } B { c } C { d } D { e }
-@Rowa A { f } B { g } C { h } D { i }
-@Rowa A { j } B { k } C { l } D { m }
-@Rowa A { n } B { o } C { p } D { q }
-@Rowa A { r } B { s } C { t } D { u }
-@Rowa A { v } B { w } C { x } D { y }
-@Rowa A { z } B {   } C {   } D {   }
+@Rowa A { ! } B { $ } C { % } D { ' } E { ( } F { ) }
+@Rowa A { * } B { + } C { , } D { - } E { 0 } F { 1 }
+@Rowa A { 2 } B { 3 } C { 4 } D { 5 } E { 6 } F { 7 }
+@Rowa A { 8 } B { 9 } C { : } D { ; } E { < } F { = }
+@Rowa A { > } B { ? } C { A } D { B } E { C } F { D }
+@Rowa A { E } B { F } C { G } D { H } E { I } F { J }
+@Rowa A { K } B { L } C { M } D { N } E { O } F { P }
+@Rowa A { Q } B { R } C { S } D { T } E { U } F { V }
+@Rowa A { W } B { X } C { Y } D { Z } E { [ } F { ] }
+@Rowa A { _ } B { ` } C { a } D { b } E { c } F { d }
+@Rowa A { e } B { f } C { g } D { h } E { i } F { j }
+@Rowa A { k } B { l } C { m } D { n } E { o } F { p }
+@Rowa A { q } B { r } C { s } D { t } E { u } F { v }
+@Rowa A { w } B { x } C { y } D { z } E {   } F {   }
 }
 Next come characters that have buttons but have a special meaning if
 they are typed directly, and consequently have to be enclosed in double
 quotes to turn off this meaning:
 quote.chars @Index { quote characters }
 @ID @OneRow @Tab
-    @Fmta { @Col @CC A ! @Col @Code B ! @Col C }
+    @Fmta { @Col @CC A ! @Col @Code B ! @Col !
+	    @Col @CC C ! @Col @Code D ! @Col !
+	    @Col @CC E ! @Col @Code F ! @Col !
+	    @Col @CC G ! @Col @Code H ! @Col I
+	    }
 {
-@Rowa A {   } B { "\" \"" } C { (space character) }
-@Rowa A { "\"" } B { "\"\\\"\"" }
-@Rowa A { "#" } B { "\"#\"" }
-@Rowa A { "&" } B { "\"&\"" }
-@Rowa A { "/" } B { "\"/\"" }
-@Rowa A { "@" } B { "\"@\"" }
-@Rowa A { "\\" } B { "\"\\\\\"" }
-@Rowa A { "^" } B { "\"^\"" }
-@Rowa A { "{" } B { "\"{\"" }
-@Rowa A { "|" } B { "\"|\"" }
-@Rowa A { "}" } B { "\"}\"" }
-@Rowa A { "~" } B { "\"~\"" }
+@Rowa
+  A { "\"" } B { "\"\\\"\"" }
+  C { "#"  } D { "\"#\"" }
+  E { "&"  } F { "\"&\"" }
+  G { "/"  } H { "\"/\"" }
+@Rowa
+  A { "@"  } B { "\"@\"" }
+  C { "\\" } D { "\"\\\\\"" }
+  E { "^"  } F { "\"^\"" }
+  G { "{"  } H { "\"{\"" }
+@Rowa
+  A { "|"  } B { "\"|\"" }
+  C { "}"  } D { "\"}\"" }
+  E { "~"  } F { "\"~\"" }
+  G {      } H { "\" \"" }
+  I { (space character) }
 }
-If you think you want {@Code "\""}, you probably really want
-`` and '', for which see below.  You can place whole sequences of
-characters, special or not, inside one pair of double quotes:
+If you think you want {@Code "\""}, you probably really want `` and '',
+for which see below.  You can place whole sequences of characters, special
+or not, inside one pair of double quotes:
 @ID @OneRow @Tab
     @Fmta { @Col A ! @Col ! @Col @Code B }
 {
@@ -90,63 +90,65 @@ Next we have some miscellaneous characters which have been deemed
 sufficiently important to deserve their own symbols:
 @ID @OneRow @Tab
     vmargin { 0.5vx }
-    @Fmta { @Col A ! @Col @Code B ! @Col ! @Col C ! @Col @Code D }
+    @Fmta { @Col A ! @Col @Code B ! @Col ! @Col C ! @Col @Code D !
+		                    @Col ! @Col E ! @Col @Code F }
 {
     @Rowa
 	A { ``		}
 	B { "``"	}
-	C { ''		}
-	D { "''"	}
+	C { ,,		}
+	D { ",,"	}
+	E { --		}
+	F { "--"	}
     @Rowa
-	A { --		}
-	B { "--"	}
-	C { ---		}
-	D { "---"	}
+	A { ''		}
+	B { "''"	}
+	C { ...		}
+	D { "..."	}
+	E { ---		}
+	F { "---"	}
     @Rowa
 	A { @Bullet	bullet @Index @Code "@Bullet"	}
 	B { "@Bullet"	}
 	C { @Star	star @Index @Code "@Star" }
 	D { "@Star"	}
+	E { @ParSym	parsym @Index @Code "@ParSym"	}
+	F { "@ParSym"	}
     @Rowa
-	A { @ParSym	parsym @Index @Code "@ParSym"	}
-	B { "@ParSym"	}
-	C { @SectSym	sectsym @Index @Code "@SectSym" }
-	D { "@SectSym"	}
-    @Rowa
-	A { @Dagger	dagger @Index @Code "@Dagger"	}
-	B { "@Dagger"	}
-	C { @DaggerDbl	daggerdbl @Index @Code "@DaggerDbl" }
-	D { "@DaggerDbl"}
+	A { @SectSym	sectsym @Index @Code "@SectSym" }
+	B { "@SectSym"	}
+	C { @Dagger	dagger @Index @Code "@Dagger"	}
+	D { "@Dagger"	}
+	E { @DaggerDbl	daggerdbl @Index @Code "@DaggerDbl" }
+	F { "@DaggerDbl"}
     @Rowa
 	A { @CDot	cdot @Index @Code "@CDot"	}
 	B { "@CDot"	}
 	C { @Sterling	sterling @Index @Code "@Sterling" }
 	D { "@Sterling"	}
+	E { @Yen	yen @Index @Code "@Yen"		}
+	F { "@Yen"	}
     @Rowa
-	A { @Yen	yen @Index @Code "@Yen"		}
-	B { "@Yen"	}
-	C { @Florin	florin @Index @Code "@Florin" }
-	D { "@Florin"	}
-    @Rowa
-	A { @Degree	degree @Index @Code "@Degree"	}
-	B { "@Degree"	}
-	C { @Minute	minute @Index @Code "@Minute" }
-	D { "@Minute"	}
+	A { @Florin	florin @Index @Code "@Florin" }
+	B { "@Florin"	}
+	C { @Degree	degree @Index @Code "@Degree"	}
+	D { "@Degree"	}
+	E { @Minute	minute @Index @Code "@Minute" }
+	F { "@Minute"	}
     @Rowa
 	A { @Second	second @Index @Code "@Second"	}
 	B { "@Second"	}
 	C { @Lozenge	lozenge @Index @Code "@Lozenge" }
 	D { "@Lozenge"	}
+	E { @Multiply	multiply @Index @Code "@Multiply"}
+	F { "@Multiply"	}
     @Rowa
-	A { @Multiply	multiply @Index @Code "@Multiply"}
-	B { "@Multiply"	}
-	C { @Divide	divide @Index @Code "@Divide" }
-	D { "@Divide"	}
-    @Rowa
-	A { @CopyRight	copyright @Index @Code "@CopyRight" }
-	B { "@CopyRight"}
-	C { @Register	register @Index @Code "@Register" }
-	D { "@Register"	}
+	A { @Divide	divide @Index @Code "@Divide" }
+	B { "@Divide"	}
+	C { @CopyRight	copyright @Index @Code "@CopyRight" }
+	D { "@CopyRight"}
+	E { @Register	register @Index @Code "@Register" }
+	F { "@Register"	}
     @Rowa
 	A { @TradeMark	trademark @Index @Code "@TradeMark" }
 	B { "@TradeMark"}
@@ -224,12 +226,12 @@ aid of double quotes, as we have seen.  If your keyboard has accented
 accented @Index { accented characters }
 characters on it, you can type them directly too; if not, you need to
 use the @Code "@Char" symbol, in which case you will probably need
-braces as well, like this:
+braces as well:
 @ID @Code "gar{@Char ccedilla}on"
 to distinguish the @Code "@Char" symbol and the character name from
 adjacent letters.
 @PP
-Finally we have the Adobe Systems Symbol font, a treasure trove of
+Next we have the Adobe Systems Symbol font, a treasure trove of
 symbol. @Index { Symbol font }
 sym. @Index { @Code "@Sym" symbol }
 exotic characters obtained with the @Code "@Sym" symbol:
@@ -299,4 +301,24 @@ There is only one Symbol font; it does not come in bold or italic faces
 like the other fonts.  Typing @Code "@B @Sym alpha" is therefore useless,
 and anyway there is no bold @Sym alpha character in any font distributed
 with Lout (except see Section {@NumberOf teq}).
+@PP
+Finally we have a few more characters that you get with the @Code "@Char"
+symbol, although they aren't ISO-LATIN-1 characters.
+@ID @OneRow -3p @Font @Tab
+    hmargin { 0.1c }
+    vmargin { 0.4vo }
+    @Fmta { @Col @CC @Char A ! @Col @Code { "@Char" A } ! @Col !
+            @Col @CC @Char B ! @Col @Code { "@Char" B } ! @Col !
+            @Col @CC @Char C ! @Col @Code { "@Char" C } ! @Col !
+            @Col @CC @Char D ! @Col @Code { "@Char" D } }
+    @Fmtb { @Col @CC @Char A ! @Col @Code { "@Char" A } ! @Col !
+            @Col ! @Col ! @Col ! @Col ! @Col  ! @Col ! @Col ! @Col  }
+{
+@Rowa A { quotesinglbase } B { quotedblbase } C { ellipsis } D { OE }
+@Rowa A { oe } B { quotedblleft } C { quotedblright } D { fi }
+@Rowa A { fl } B { endash } C { emdash } D { bullet }
+@Rowa A { dagger } B { daggerdbl } C { florin } D { fraction }
+}
+Most of these characters are also in the list of `characters important
+enough to deserve their own symbols' given above.
 @End @Section

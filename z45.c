@@ -1,6 +1,6 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.11)                       */
 /*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -61,13 +61,12 @@
 
 /* from system.h */
 
-#include <string.h>
-#include <stdlib.h>
+#include <string.h>   /* uwe: it also gives us strcoll() */
+/* already included in externs #include <stdlib.h> */
 #include <ctype.h>
 
 /* end system.h */
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
 #define UCHAR_LIM (UCHAR_MAX + 1)
 #define UCHAR(c) ((unsigned char) (c))
 
@@ -89,7 +88,7 @@ static int linelength = 40;
 /* bcopy -- from lib-text-util/bcopy.c */
 /* bcopy.c -- copy memory.
    renamed jeff_bcopy as a portability fix by JK
-   Copy LENGTH bytes from SOURCE to DEST.  Does not null-terminate.
+   Copy length bytes from source to dest.  Does not null-terminate.
    In the public domain.
    By David MacKenzie <djm@gnu.ai.mit.edu>.  */
 
@@ -355,6 +354,23 @@ findlines (buf, lines)
 /* Compare two lines A and B, returning negative, zero, or positive
    depending on whether A compares less than, equal to, or greater than B. */
 
+#if COLLATE
+static int
+compare (a, b)
+     register struct line *a, *b;
+{
+  int tmpa, tmpb, mini;
+
+      tmpa = a->length, tmpb = b->length;
+      mini = find_min(tmpa, tmpb);
+      if (mini == 0)
+	return tmpa - tmpb;
+      else
+	return strcoll (a->text, b->text);
+}
+
+#else /* !COLLATE -- good old ASCIIbetical order */
+
 static int
 compare (a, b)
      register struct line *a, *b;
@@ -362,7 +378,7 @@ compare (a, b)
   int diff, tmpa, tmpb, mini;
 
       tmpa = a->length, tmpb = b->length;
-      mini = min (tmpa, tmpb);
+      mini = find_min(tmpa, tmpb);
       if (mini == 0)
 	diff = tmpa - tmpb;
       else
@@ -380,6 +396,7 @@ compare (a, b)
 
   return diff;
 }
+#endif /* !COLLATE */
 
 /* Sort the array LINES with NLINES members, using TEMP for temporary space. */
 
