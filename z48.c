@@ -1,6 +1,6 @@
 /*@z48.c:PDF back end@********************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -38,6 +38,7 @@
 /*                                                                           */
 /*****************************************************************************/
 #define  PI   3.1415926535897931160
+#include "externs.h"
 
 
 /* ANSI headers */
@@ -49,9 +50,6 @@
 #if PDF_COMPRESSION
 #include "zlib.h"
 #endif
-
-/* lout headers */
-#include "externs.h"
 
 static void Assert(BOOLEAN condition, FILE_POS *inFilePos)
 {
@@ -366,8 +364,6 @@ static t_source_annot_entry_ptr g_source_annot_list;
 #ifdef USE_MATRICES
 static t_matrix g_cur_matrix;
 static t_matrix_entry_ptr g_matrix_stack;
-#else
-static int g_text_font_size_in_ems;			/* for kerning */
 #endif
 
 /* track these values in case they are ever required */
@@ -841,6 +837,8 @@ static t_font_list_entry_ptr
     new_entry->m_next_font_entry = g_font_list;
     g_font_list = new_entry;
   }
+  debug1(DPD, D, "new PDF font entry with short name %s",
+    new_entry->m_short_font_name);
   return new_entry;
 }
 
@@ -1040,7 +1038,14 @@ void PDFFont_AddFont(FILE* in_fp, const FULL_CHAR* in_short_font_name,
   const FULL_CHAR* in_real_font_name, const FULL_CHAR* in_font_encoding_name)
 {
   t_font_list_entry_ptr entry = PDFFont_FindListEntry(in_real_font_name);
+  debug4(DPD, D, "PDFFont_AddFont(-, %s, %s, %s) [new = %s]",
+    in_short_font_name, in_real_font_name, in_font_encoding_name,
+    bool(entry == NULL));
+  /* *** this attempted bug fix by Jeff K. problem may be multiple font
+	 entries for the same font
   if (entry == NULL)
+  *** */
+  if (TRUE)
     entry = PDFFont_NewListEntry(in_short_font_name, in_real_font_name,
       PDFFont_FindFontEncoding(in_font_encoding_name));
 
@@ -1484,13 +1489,18 @@ void PDFFont_Set(FILE* in_fp, FULL_LENGTH in_font_size,
   t_tempbuf str;
 
   t_font_list_entry_ptr entry = PDFFont_FindListEntry_Short(in_short_font_name);
-  Assert(entry != NULL, no_fpos);
+  if( entry == NULL )
+  {
+    Error(48, 42, "cannot find font entry for name %s", FATAL, no_fpos,
+      in_short_font_name);
+  }
+  /* Assert(entry != NULL, no_fpos); */
 #ifdef USE_MATRICES
   sprintf(str, "%s %u Tf\n", entry->m_PDF_font_name,
     (int) (g_page_v_scale_factor * in_font_size));
 #else
   sprintf(str, "%s %u Tf\n", entry->m_PDF_font_name, in_font_size);
-  g_text_font_size_in_ems = /* g_page_v_scale_factor * */ in_font_size;
+  /* g_text_font_size_in_ems = g_page_v_scale_factor * in_font_size; */
 #endif
 
 #if 1
@@ -1721,13 +1731,7 @@ void PDFText_Open(FILE* in_fp)
 /*                                                                           */
 /*  Apply kerning to a text string.                                          */
 /*                                                                           */
-/*  Note: because Lout defines a separate table of font sizes for each use   */
-/*  of a different font size in any font family, we get passed the converted */
-/*  size in the "in_kern" parameter. This value has rounding errors which    */
-/*  can (and probably do) result in small errors in the PDF kerning.         */
-/*                                                                           */
-/*  Ideally, the original kerning value (as in the Adobe font definition     */
-/*  files) should be used but there is no access to this value.              */
+/*  Note: in_kern is in 1/1000 of font size                                  */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -1735,7 +1739,8 @@ void PDFText_Kern(FILE* in_fp, int in_kern)
 {
   t_tempbuf str;
 
-  sprintf(str, ")%d(", -in_kern * 1000 / g_text_font_size_in_ems);
+  /* sprintf(str, ")%d(", -in_kern * 1000 / g_text_font_size_in_ems); */
+  sprintf(str, ")%d(", -in_kern);
   PDFPage_Write(in_fp, str);
 }
 
@@ -3047,23 +3052,32 @@ void  PDFPage_Init(FILE* in_fp, float in_scale_factor, int in_line_width)
   g_page_contents_obj_num = 0; /* undefined */
   g_page_length_obj_num = 0; /* undefined */
   g_page_start_offset = 0; /* undefined */
-  g_text_font_size_in_ems = 0; /* undefined */
+  /* g_text_font_size_in_ems = 0; */ /* undefined */
 
   g_page_h_scale_factor = g_page_v_scale_factor = in_scale_factor;
   g_page_h_origin = g_page_v_origin = 0;
   g_page_line_width = in_line_width;
 
+  /* ***
   g_graphics_vars[k_in] = IN;
   g_graphics_vars[k_cm] = CM;
   g_graphics_vars[k_pt] = PT;
   g_graphics_vars[k_em] = EM;
+  *** */
   g_graphics_vars[k_xsize] = 0; /* undefined */
   g_graphics_vars[k_ysize] = 0; /* undefined */
   g_graphics_vars[k_xmark] = 0; /* undefined */
   g_graphics_vars[k_ymark] = 0; /* undefined */
-  g_graphics_vars[k_loutf] = 0; /* undefined */
-  g_graphics_vars[k_loutv] = 0; /* undefined */
-  g_graphics_vars[k_louts] = 0; /* undefined */
+  /* ***
+  g_graphics_vars[k_loutf] = 0;
+  g_graphics_vars[k_loutv] = 0;
+  g_graphics_vars[k_louts] = 0;
+  *** */
+
+  /* No need to touch k_in other constant units */
+  g_units[k_loutf] = 0; /* undefined */
+  g_units[k_loutv] = 0; /* undefined */
+  g_units[k_louts] = 0; /* undefined */
 
   g_ET_pending = FALSE;
   g_TJ_pending = FALSE;
@@ -3200,6 +3214,9 @@ void PDFPage_Cleanup(FILE* in_fp)
 
   /* write out /Page ID */
   fputs("<<\n/Type /Page\n", in_fp);
+
+  /* write out page size and orientation */
+  fprintf(in_fp, "/CropBox [ 0 0 %u %u ]\n",g_doc_h_bound,g_doc_v_bound);
 
   /* write out parent object ref */
   fputs("/Parent ", in_fp);
@@ -3388,8 +3405,11 @@ static void PDFFile_WritePagesObject(FILE* in_fp)
     fputs(" ", in_fp);
   }
   fprintf(in_fp, " ]\n/Count %u\n", g_page_count);
+  /* ***
   fprintf(in_fp, "/MediaBox [ 0 0 612 792 ]\n");
-  /* fprintf(in_fp, "/MediaBox [ 0 0 %u %u ]\n",g_doc_h_bound,g_doc_v_bound); */
+  fprintf(in_fp, "/MediaBox [ 0 0 %u %u ]\n",g_doc_h_bound,g_doc_v_bound);
+  *** */
+  fprintf(in_fp, "/MediaBox [ 0 0 %u %u ]\n", g_doc_h_bound, g_doc_v_bound);
   fputs(">>\nendobj\n", in_fp);
 }
 

@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -157,16 +157,20 @@ typedef struct {
 /*****************************************************************************/
 
 #define MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word)	\
-{ OBJECT newg, foll;							\
+{ OBJECT newg, foll, tmp;						\
   BOOLEAN jn, unbreakable_at_right = FALSE;				\
   debug0(DOF, DD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
 									\
   /* search onwards to find newg, the next true breakpoint */		\
+  Child(tmp, rlink);							\
+  debug2(DOF, D, "NextDefiniteWithGap(%s, %s)", EchoObject(x),		\
+    EchoObject(tmp));							\
   NextDefiniteWithGap(x, rlink, foll, newg, jn);			\
 									\
   /* set right link and calculate badness of the new interval */	\
   if( rlink != x )							\
   { 									\
+    assert( Up(newg) == LastUp(newg), "MoveRightToGap: newg!" );	\
     /* set save_space(newg) now so that it is OK to forget right */	\
     debug0(DOF, DD, "  MoveRightToGap setting save_space(newg)");	\
     if( I.cwid != nilobj )  etc_width = bfc(constraint(I.cwid));	\
@@ -233,6 +237,8 @@ typedef struct {
       unbreakable_at_right = TRUE;					\
 									\
     I.rlink = Up(newg);							\
+    debug2(DOF, DD, "  MoveRightToGap setting I.rlink to %s %s",	\
+      Image(type(newg)), EchoObject(newg));				\
   }									\
   else I.rlink = x;							\
   SetIntervalBadness(I, max_width, etc_width);				\
@@ -438,6 +444,7 @@ static FULL_CHAR *IntervalPrint(INTERVAL I, OBJECT x)
   for( link = NextDown(I.llink);  link != I.rlink;  link = NextDown(link) )
   { assert(link != x, "IntervalPrint: link == x!");
     Child(y, link);
+    debug2(DOF, DD, "IntervalPrint at %s %s", Image(type(y)), EchoObject(y));
     assert(y != x, "IntervalPrint: y == x!");
     if( type(y) == GAP_OBJ )
     { g = y;
@@ -595,7 +602,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   IntervalInit(I, x, max_width, etc_width, hyph_word);  BestI = I;
   while( IntervalClass(I) != AT_END )
   {
-    debug1(DOF, DD, "loop:  %s", IntervalPrint(I, x));
+    debug0(DOF, DD, "loop:");
+    debug1(DOF, DD, "       %s", IntervalPrint(I, x));
     switch( IntervalClass(I) )
     {
 

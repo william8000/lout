@@ -1,6 +1,6 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */

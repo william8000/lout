@@ -1,6 +1,6 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -371,7 +371,7 @@ void DbConvert(OBJECT db, BOOLEAN full_name)
     fprintf(filep(db), "00 %s %s\n", LOUT_VERSION, "database index file");
     fclose(filep(db));
     debug2(DBS, DD, "  calling SortFile(%s, %s)", oldname, newname);
-    SortFile( (char *) oldname, (char *) newname);
+    SortFile(oldname, newname);
   }
   else StringRemove(newname);
   StringRemove(oldname);

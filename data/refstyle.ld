@@ -34,7 +34,7 @@
 	{ , @Month @Year		} @If @Year @And @Month
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -59,7 +59,7 @@
 	{ , @Month @Year		} @If @Year @And @Month
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -85,7 +85,7 @@
 	{ , @Month @Year		} @If @Year @And @Month
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -121,7 +121,7 @@
 	{ , @Address			} @If @Address
 	{ .  @Edition			} @If @Edition
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -148,7 +148,7 @@
 	{ , @Address			} @If @Address
 	{ .  @Edition			} @If @Edition
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -174,7 +174,7 @@
 	{ , @Month @Year		} @If @Year @And @Month @And @Not @Day
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -199,7 +199,7 @@
 	{ , @Month @Year		} @If @Year @And @Month
 	{ , @Year			} @If @Year @And @Not @Month
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -233,7 +233,7 @@
 	{ {} (@Month @Year)		} @If @Year @And @Month @And @Not @Day
 	{ {} (@Year)			} @If @Year @And @Not @Month
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -270,7 +270,7 @@
 	{ , @Month @Year		} @If @Year @And @Month
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }
@@ -299,7 +299,7 @@
 	{ , @Month @Year		} @If @Year @And @Month
 	{ , @Year 			} @If @Year @And @Not @Month
 	{ .				} @If @True
-	{ {}  URL @URL.			} @If @URL
+	{ {}  URL @I { @URL }.		} @If @URL
 	{ {}  @Note			} @If @Note
      }
   }

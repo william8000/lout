@@ -1,6 +1,6 @@
 /*@z39.c:String Handler:AsciiToFull(), StringEqual(), etc.@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -52,6 +52,30 @@
 /*  These procedures are defined as macros in file externs.                  */
 /*                                                                           */
 /*****************************************************************************/
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  BOOLEAN StringLessEqual(FULL_CHAR *a, FULL_CHAR *b)                      */
+/*                                                                           */
+/*  Written by Valery Ushakov (uwe).                                         */
+/*                                                                           */
+/*  If COLLATE, check whether a <= b.  Otherwise this routine is replaced    */
+/*  by a macro defined in extrerns.h                                         */
+/*                                                                           */
+/*  NB: must match compare() in z45.c.                                       */
+/*                                                                           */
+/*****************************************************************************/
+
+#if COLLATE
+BOOLEAN StringLessEqual(FULL_CHAR *a, FULL_CHAR *b)
+{
+  int coll = strcoll ((char *)a, (char *)b);
+  if (coll == 0)  /* then disambiguate with strcmp */
+     coll = strcmp ((char *)a, (char *)b);
+  return coll <= 0;
+}
+#endif /* COLLATE */
 
 
 /*@::StringBeginsWith(), StringContains(), StringInt(), StringFiveInt()@******/

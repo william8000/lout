@@ -41,6 +41,11 @@ OPTIONS
      -P              Like  -p  but  with  a  form-feed  character
                      between pages.
 
+     -Z              Produce Adobe Portable Document Format (PDF)
+                     output.   This  includes links, but the more
+                     advanced graphics packages of Lout  are  not
+                     supported.
+
      -S              Safe execution:  disable all calls  to  sys-
                      tem(3),  instead  echoing  the commands that
                      would have  been  executed.   Although  this
@@ -103,8 +108,8 @@ OPTIONS
      -D<dirname>     Add <dirname> to  the  list  of  directories
                      searched for Lout database files.  There may
                      be multiple -D options.  @Database  searches
-                     the  current  directory,  then the -D direc-
-                     tories  in  the  order  given,  and  finally
+                     the   current   directory,   then   the   -D
+                     directories in the order given, and  finally
                      searches  the  default  databases  directory
                      (see below).  @SysDatabase omits the  search
                      of the current directory.
@@ -130,6 +135,16 @@ OPTIONS
      -u              Print usage information on stderr.
 
      -V              Print version information on stderr.
+
+     -w              Show the total  number  of  non-empty  words
+                     printed  in  the output file.  This includes
+                     words  and  numbers  in  page  headers   and
+                     footers;  section numbers and other numbers;
+                     every punctuation character in a  font  dif-
+                     ferent  from  its  adjacent  word; and every
+                     little fragment of  every  equation;  so  it
+                     will  always  somewhat overestimate the true
+                     number.
 
 FILES AND ENVIRONMENT VARIABLE
      Binary file:                     <BINDIR>/lout

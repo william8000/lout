@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.13                          #
+#  Make file for installing Basser Lout Version 3.14                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  5 February 1999                                                            #
+#  30 March 1999                                                              #
 #                                                                             #
 #     make lout         Compile the Lout source                               #
 #     make c2lout       Compile a small auxiliary program called c2lout       #
@@ -69,10 +69,11 @@
 #                assumed to exist.                                            #
 #                                                                             #
 #      LIBDIR    Directory where Lout's libraries go.  This directory will    #
-#                be created.                                                  #
+#                be created (but it's parent must exist already).             #
 #                                                                             #
 #      DOCDIR    Directory where the documents describing the Lout system     #
-#                (written in Lout) go.  This directory will be created.       #
+#                (written in Lout) go.  This directory will be created (but   #
+#                its parent must exist already).                              #
 #                                                                             #
 #      MANDIR    Directory where the lout and c2lout online manual entries    #
 #                (in nroff -man) go.  This directory is assumed to exist.     #
@@ -222,13 +223,13 @@
 #                                                                             #
 # (18) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
-#      on line 1607 of file $(LIBDIR)/include/dlf.  You can find the list of  #
-#      known page types in the User's Guide, and also at line 2707 in file    #
-#      $(LIBDIR)/include/dlf.                                                 #
+#      on line 57 of file $(LIBDIR)/include/dsf.  You can find the list of    #
+#      known page types in the User's Guide, and also at line 585 in file     #
+#      $(LIBDIR)/include/dsf.                                                 #
 #                                                                             #
 # (19) If the usual language at your site is not English, you might like to   #
 #      now change the default value of the @InitialLanguage option on line    #
-#      1589 of file $(LIBDIR)/include/dlf.  This will mean that by default    #
+#      255 of file $(LIBDIR)/include/bsf.  This will mean that by default     #
 #      the date and words like Chapter and July will appear in a different    #
 #      language, and hyphenation will be carried out according to patterns    #
 #      designed for that language.  You can find the list of known languages  #
@@ -237,7 +238,6 @@
 #      This has nothing to do with locales and USELOC.                        #
 #                                                                             #
 #  Mail jeff@cs.usyd.edu.au if you have any problems.                         #
-#  PDF related problems can be mailed to vtan@ugrad.ug.cs.usyd.edu.au         #
 #                                                                             #
 ###############################################################################
 

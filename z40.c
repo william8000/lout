@@ -1,6 +1,6 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -86,7 +86,7 @@ OBJECT FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos)
   sprintf( (char *) buff, "%s%d", FILTER_OUT, filter_count);
   x = MakeWord(WORD, buff, xfpos);
   Link(res, x);
-  debug1(DFH, D, "FilterCreate returning %s", EchoObject(res));
+  debug2(DFH, D, "FilterCreate returning %d %s", (int) res, EchoObject(res));
   return res;
 } /* end FilterCreate */
 
@@ -104,7 +104,7 @@ void FilterSetFileNames(OBJECT x)
 { OBJECT y;
   assert( type(x) == FILTERED, "FilterSetFileNames: type(x)!" );
   assert( Down(x) != x, "FilterSetFileNames: x has no children!" );
-  debug1(DFH, D, "FilterSetFileNames(%s)", EchoObject(x));
+  debug2(DFH, D, "FilterSetFileNames(%d %s)", (int) x, EchoObject(x));
   Child(y, Down(x));
   assert( type(y) == WORD, "FilterSetFileNames: type(y)!" );
   sym_body(FilterInSym) = y;
@@ -129,7 +129,7 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
 
   assert( type(x) == FILTERED, "FilterExecute: type(x)!" );
   assert( type(env) == ENV, "FilterExecute: type(env)!" );
-  debug3(DFH, D, "FilterExecute(%s, \"%s\", %s)", EchoObject(x),
+  debug4(DFH, D, "FilterExecute(%d %s, \"%s\", %s)", (int) x, EchoObject(x),
     command, EchoObject(env));
 
   /* reset FilterInSym since Manifest of @Filter is now complete */
@@ -195,7 +195,7 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
 void FilterWrite(OBJECT x, FILE *fp, int *linecount)
 { FILE *in_fp;  OBJECT y;  int ch;
   assert( type(x) == FILTERED, "FilterWrite: type(x)!" );
-  debug1(DFH, D, "FilterWrite(%s, fp)", EchoObject(x));
+  debug2(DFH, D, "[ FilterWrite(%d %s, fp)", (int) x, EchoObject(x));
   Child(y, Down(x));
   in_fp = StringFOpen(string(y), READ_TEXT);
   if( in_fp == NULL )
@@ -219,6 +219,7 @@ void FilterWrite(OBJECT x, FILE *fp, int *linecount)
     *linecount += 1;
     while( (ch = getc(in_fp)) != EOF )
     { putc(ch, fp);
+      ifdebug(DFH, D, putc(ch, stderr));
       if( ch == '\n' )  *linecount += 1;
     }
     StringFPuts(KW_RBR, fp);
@@ -226,7 +227,7 @@ void FilterWrite(OBJECT x, FILE *fp, int *linecount)
   StringFPuts("\n", fp);
   *linecount += 1;
   fclose(in_fp);
-  debug0(DFH, D, "FilterWrite returning.");
+  debug0(DFH, D, "] FilterWrite returning.");
 } /* end FilterWrite */
 
 
@@ -245,7 +246,7 @@ void FilterScavenge(BOOLEAN all)
   { Child(y, link);
     nextlink = NextDown(link);
     if( all || Up(y) == LastUp(y) )
-    { debug1(DFH, DD, "FilterScavenge scavenging %s", string(y));
+    { debug1(DFH, D, "FilterScavenge scavenging %s", string(y));
       StringRemove(string(y));
       DisposeChild(link);
     }

@@ -4,8 +4,8 @@
 @Begin
 @PP
 There are two symbols for producing drop capitals, {@Code "@DropCapTwo"}
-DropCapTwo.sym @Index @Code "@DropCapTwo"
-DropCapThree.sym @Index @Code "@DropCapThree"
+drop.cap.two.sym @Index @Code "@DropCapTwo"
+drop.cap.three.sym @Index @Code "@DropCapThree"
 and {@Code "@DropCapThree"}.  Place the capital to be dropped just
 before the symbol, and the rest of the paragraph after it:
 @ID @OneRow @Code {

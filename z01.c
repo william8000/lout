@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -30,6 +30,15 @@
 /*****************************************************************************/
 #include "externs.h"
 
+/* On DOS/Win32 we need to set binary mode on stdout (Uwe) */
+#if OS_DOS
+#include <io.h>
+#include <fcntl.h>
+#ifdef __DJGPP__
+#define _setmode(fd, mode)     setmode((fd), (mode))
+#define _fileno(stream)        fileno((stream))
+#endif
+#endif
 
 /*****************************************************************************/
 /*                                                                           */
@@ -148,7 +157,7 @@ static void PrintUsage(FILE *fp)
   lput(""								    );
   lput("  -s              suppress access to cross reference database"	    );
   lput("  -EPS            EPS (Encapsulated PostScript) output"		    );
-  lput("  -Z              PDF (Adobe Portable Document Format) output"      );
+  lput("  -PDF or -Z      PDF (Adobe Portable Document Format) output"      );
   lput("  -p              plain text output instead of PostScript"	    );
   lput("  -P              like -p but with form-feed char between pages"    );
   lput("  -S              safe execution (disable calls to system(3))"	    );
@@ -448,6 +457,12 @@ int main(int argc, char *argv[])
 
       case CH_FLAG_FFPLAIN:
 
+	if( StringEqual(AsciiToFull(argv[i]+1), STR_PDF) )
+	{
+	  BackEnd = PDF;
+	  BackEndWord = STR_PDF;
+	  break;
+	}
 	PlainFormFeed = TRUE;
 	/* NB NO BREAK */
 
@@ -619,8 +634,8 @@ int main(int argc, char *argv[])
 #if OS_DOS
     /* For DOS/Win32 we need to set binary mode on stdout to prevent
        PDF compressed streams and xrefs from being corrupted - Uwe 12/98 */
-    if (_setmode(_fileno(stdout), _O_BINARY) == -1)
-      Error(1,27, "cannot set binary mode on stdout", FATAL, no_fpos);
+    if( BackEnd != PLAINTEXT && _setmode(_fileno(stdout), _O_BINARY) == -1 )
+      Error(1, 27, "cannot set binary mode on stdout", FATAL, no_fpos);
 #endif
     out_fp = stdout;
   }

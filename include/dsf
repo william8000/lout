@@ -3377,7 +3377,7 @@ def @DocumentSetup
 #	    Yes  @Yield { @RefCiteStyle cite }
 	    Yes  @Yield {
 	      @BackEnd @Case {
-	        { PlanText PostScript } @Yield { @RefCiteStyle cite }
+	        { PlainText PostScript } @Yield { @RefCiteStyle cite }
 	        PDF        @Yield {
 #
 # VT: can't get this to work: need to ask JHK; I want the text following the "$" to be

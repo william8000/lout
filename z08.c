@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -645,6 +645,12 @@ OBJECT *enclose, BOOLEAN fcr)
       if( is_tag(actual(y)) || is_key(actual(y)) )
       {	z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
 	z = ReplaceWithTidy(z, TRUE);
+	if( !is_word(type(z)) )
+	{
+	  debug2(ANY, D, "z = %s %s", Image(type(z)), EchoObject(z));
+	  Error(8, 41, "this %s is not a sequence of one or more words", FATAL,
+	    &fpos(y), SymName(actual(y)));
+	}
       }
       else if( type(z) == NEXT )
       {	z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
@@ -1686,7 +1692,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	New(newx2, ACAT);
         adjust_cat(newx2) = padjust(*style);
 	padjust(*style) = FALSE;
-        MoveLink(Down(x), newx2, CHILD);
+        MoveLink(NextDown(Down(x)), newx2, CHILD);
         Link(newx2, x2);
         x2 = newx2;
       }

@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -258,6 +258,12 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	break;
 
 
+    case THREAD:
+
+	aprint("<thread>");
+	break;
+
+
     case VCAT: op = "/", prec = VCAT_PREC;  goto ETC;
     case HCAT: op = "|", prec = HCAT_PREC;  goto ETC;
     
@@ -282,7 +288,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	break;
 
 
-    case ACAT: op = "&", prec = ACAT_PREC; /*   goto ETC;  */
+    case ACAT: op = "&", prec = ACAT_PREC;
 
 	childcount = 0;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
@@ -316,10 +322,12 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	  echo(y, FORCE_PREC, count);
 	  aprint(" ");
 	}
+	/* ***
 	else if( outer_prec == ACAT )
 	{ for( i = 1;  i <= vspace(x);  i++ )  newline();
 	  for( i = 1;  i <= hspace(x);  i++ )  aprint(" ");
 	}
+	*** */
 	else
 	{ cprint( EchoCatOp(outer_prec, mark(gap(x)), join(gap(x))) );
 	  cprint( EchoGap(&gap(x)) );

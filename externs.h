@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -98,7 +98,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.13 (February 1999)")
+#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.14 (March 1999)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -2133,7 +2133,10 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
   { Child(y, link);							\
     if( type(y) == GAP_OBJ )  g = y, jn = jn && join(gap(y));		\
     else if( type(y)==SPLIT ? SplitIsDefinite(y):is_definite(type(y)) )	\
-    { assert( g != nilobj, "NextDefinite: g == nilobj!" );		\
+    {									\
+      debug2(DFS, D, "  NextDefiniteWithGap at %s %s",			\
+	Image(type(y)), EchoObject(y));					\
+      assert( g != nilobj, "NextDefiniteWithGap: g == nilobj!" );	\
       break;								\
     }									\
   }									\
@@ -2586,7 +2589,7 @@ extern	BOOLEAN	  MapIsLowerCase(FULL_CHAR ch, MAPPING m);
 #define		  AsciiToFull(x)	( (FULL_CHAR *) (x) )
 #if COLLATE
 #define		  StringEqual(a, b)	(strcoll((char *)(a), (char *)(b))==0)
-#define		  StringLessEqual(a, b) (strcoll((char*)(a),(char*)(b))<=0)
+extern BOOLEAN    StringLessEqual(FULL_CHAR *a, FULL_CHAR *b);
 #else
 #define		  StringEqual(a, b)	(strcmp((char *)(a), (char *)(b))==0)
 #define		  StringLessEqual(a, b) (strcmp((char*)(a),(char*)(b))<=0)
@@ -2639,7 +2642,7 @@ extern	OBJECT	  ConvertGalleyList(OBJECT x);
 extern	OBJECT	  BuildEnclose(OBJECT hd);
 
 /*****  z45.c	  External Sort         **************************************/
-extern	void	  SortFile(char *infile, char *outfile);
+extern	void	  SortFile(FULL_CHAR *infile, FULL_CHAR *outfile);
 
 /*****  z46.c	  Optimal Galleys       **************************************/
 extern	BOOLEAN	  FindOptimize(OBJECT x, OBJECT env);
@@ -2836,6 +2839,7 @@ extern	struct dbs 	dbg[];
 #define debugcond3(cat, urg, cond, str, p1, p2, p3)
 #define debugcond4(cat, urg, cond, str, p1, p2, p3, p4)
 #define debugcond5(cat, urg, cond, str, p1, p2, p3, p4, p5)
+#define debugcond6(cat, urg, cond, str, p1, p2, p3, p4, p5, p6)
 #define	ifdebugcond(cat, urg, cond, x)
 #define	debug_init(str)	Error(1, 4, "%s - debug flags not implemented", \
 	FATAL, no_fpos, str)

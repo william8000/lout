@@ -1,6 +1,6 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -145,7 +145,7 @@ OBJECT MakeWordThree(FULL_CHAR *s1, FULL_CHAR *s2, FULL_CHAR *s3)
 OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 { OBJECT y, link, res, tmp;
 
-  debug2(DOS, DDD, "CopyObject(%s, %s)", EchoObject(x), EchoFilePos(pos));
+  debug2(DOS, DD, "[ CopyObject(%s, %s)", EchoObject(x), EchoFilePos(pos));
   switch( type(x) )
   {
 
@@ -257,6 +257,8 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
       {	Child(y, link);
 	Link(res, y);	/* do not copy children of FILTERED */
       }
+      debug3(DFH, D, "copying FILTERED %d into %d %s",
+	(int) x, (int) res, EchoObject(res));
       break;
 
 
@@ -299,7 +301,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
   } /* end switch */
   if( pos == no_fpos )  FposCopy(fpos(res), fpos(x));
   else FposCopy(fpos(res), *pos);
-  debug1(DOS, DDD, "CopyObject returning %s", EchoObject(res));
+  debug1(DOS, DD, "] CopyObject returning %s", EchoObject(res));
   return res;
 } /* end CopyObject */
 
@@ -559,6 +561,7 @@ OBJECT Meld(OBJECT x, OBJECT y)
         yi--;
 	break;
 
+
       case X_DIR:
 
         debug3(DOS, DD, "  at table[%d][%d] (xdec) linking %s",
@@ -581,8 +584,13 @@ OBJECT Meld(OBJECT x, OBJECT y)
 	  width(space_gap(save_style(res))));
 	tmp = MakeWord(WORD, AsciiToFull("1s"), &fpos(g));
 	Link(g, tmp);
+        Link(Down(res), g);
       }
-      Link(Down(res), g);
+      else
+      {
+	assert(Up(g) == LastUp(g), "Meld: g!" );
+        Link(Down(res), g);
+      }
     }
   }
 

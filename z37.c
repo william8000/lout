@@ -1,6 +1,6 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -719,7 +719,7 @@ void FontChange(STYLE *style, OBJECT x)
   SHORT_LENGTH *oldks, *newks;  int klen;
   debug2(DFT, D, "FontChange( %s, %s )", EchoStyle(style), EchoObject(x));
   assert( font(*style) <= font_count, "FontChange: font_count!");
-  /* ifdebug(DFT, DD, FontDebug()); */
+  ifdebug(DFT, DD, FontDebug());
 
   /* set par[0..num-1] to the 1, 2 or 3 parameters of the font operator */
   num = 0;

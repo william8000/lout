@@ -1,6 +1,6 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -812,6 +812,8 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       for( p++;  *p;  p++ )
       {
 	KernLength(word_font(x), unacc, *(p-1), *p, ksize);
+        KernLength(font_num(finfo[word_font(x)].original_font),
+	  unacc, *(p-1), *p, ksize);
 	if ( ksize != 0 )
 	{
 	  PDFText_Kern(out_fp, ksize);

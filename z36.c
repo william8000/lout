@@ -1,6 +1,6 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -319,6 +319,7 @@ static FULL_CHAR findrep(int i, TRIE T)
 } /* end findrep */
 
 
+#if 0
 /*****************************************************************************/
 /*                                                                           */
 /*  static FULL_CHAR *TrieRetrieve(key, T)                                   */
@@ -356,6 +357,7 @@ static FULL_CHAR *TrieRetrieve(FULL_CHAR *key, TRIE T)
     curr_node = NODE_MULT*next_node;  i++;
   }
 } /* end TrieRetrieve */
+#endif
 
 
 /*****************************************************************************/

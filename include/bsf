@@ -1369,7 +1369,8 @@ def @BasicSetup
     def @EndListPlace       { @Galley }
 
     def @RawList
-	named style right num {                  }
+	named style right num { num              }
+	named type  right num { num              }
 	named gap             { @ListGap         }
 	named indent          { @ListIndent      }
 	named itemindent      { 0c		 }
@@ -1383,7 +1384,8 @@ def @BasicSetup
 	    {
 	        |indent
 	        labelwidth @Wide {
-		    @NumberMarker @Value {style num} {style num} &0io
+		    # @NumberMarker @Value {style num} {style num} &0io
+		    @NumberMarker @Value {num} {style type num} &0io
 		}
 	        |itemindent  @ItemPlace  |rightindent
 	        //gap  @MakeList @NotRevealed @Next num
@@ -1479,29 +1481,40 @@ def @BasicSetup
     macro @EL   @EndList		{ // & endlist @DP		}
 
 
-    macro @RLL    @RawLeftList		{ @RawList labelwidth { 0c }           }
-    macro @RIL    @RawIndentedList	{ @RawList                             }
-    macro @RQL    @RawQuotedList	{ @RawList rightindent {@DisplayIndent}}
-    macro @RCL    @RawCentredList	{ @RawList labelwidth {0c}
+    macro @RLL    @RawLeftList		{ @RawList style {}
+						   labelwidth { 0c }           }
+    macro @RIL    @RawIndentedList	{ @RawList style {}                    }
+    macro @RQL    @RawQuotedList	{ @RawList style {}
+						   rightindent {@DisplayIndent}}
+    macro @RCL    @RawCentredList	{ @RawList style {}
+						   labelwidth {0c}
 						   itemindent {0.5rt}          }
     macro         @RawCenteredList	{ @RawCentredList                      }
     macro @RNL    @RawNumberedList      { @RawList style { num.	             } }
     macro @RPNL   @RawParenNumberedList { @RawList style { (num)	     } }
-    macro @RRL    @RawRomanList	        { @RawList style { {@Roman&&num}.    } }
-    macro @RPRL   @RawParenRomanList    { @RawList style { ({@Roman&&num})   } }
-    macro @RUCRL  @RawUCRomanList       { @RawList style { {@UCRoman&&num}.  } }
-    macro @RPUCRL @RawParenUCRomanList  { @RawList style { ({@UCRoman&&num}) } }
-    macro @RAL    @RawAlphaList	        { @RawList style { {@Alpha&&num}.    } }
-    macro @RPAL   @RawParenAlphaList    { @RawList style { ({@Alpha&&num})   } }
-    macro @RUCAL  @RawUCAlphaList       { @RawList style { {@UCAlpha&&num}.  } }
-    macro @RPUCAL @RawParenUCAlphaList  { @RawList style { ({@UCAlpha&&num}) } }
+    macro @RRL    @RawRomanList	        { @RawList type  { @Roman&&num }
+						   style { num.    } }
+    macro @RPRL   @RawParenRomanList    { @RawList type  { @Roman&&num }
+						   style { (num)   } }
+    macro @RUCRL  @RawUCRomanList       { @RawList type  { @UCRoman&&num }
+						   style { num.  } }
+    macro @RPUCRL @RawParenUCRomanList  { @RawList type  { @UCRoman&&num }
+						   style { (num) } }
+    macro @RAL    @RawAlphaList	        { @RawList type  { @Alpha&&num }
+						   style { num.    } }
+    macro @RPAL   @RawParenAlphaList    { @RawList type  { @Alpha&&num }
+						   style { (num)   } }
+    macro @RUCAL  @RawUCAlphaList       { @RawList type  { @UCAlpha&&num }
+						   style { num.  } }
+    macro @RPUCAL @RawParenUCAlphaList  { @RawList type  { @UCAlpha&&num }
+						   style { (num) } }
     macro @RBL    @RawBulletList        { @RawList style { @Bullet	     } }
     macro @RSL    @RawStarList	        { @RawList style { @Star	     } }
     macro @RDL    @RawDashList	        { @RawList style { --	 	     } }
-    macro @RTL    @RawTaggedList        { @RawList style { @TagPlace         } }
-    macro @RWTL   @RawWideTaggedList    { @RawList style { @TagPlace         }
+    macro @RTL    @RawTaggedList        { @RawList type { @TagPlace         } }
+    macro @RWTL   @RawWideTaggedList    { @RawList type { @TagPlace         }
 					           labelwidth { @WideIndent  } }
-    macro @RVWTL  @RawVeryWideTaggedList{ @RawList style { @TagPlace         }
+    macro @RVWTL  @RawVeryWideTaggedList{ @RawList type { @TagPlace         }
 					        labelwidth { @VeryWideIndent } }
 
 

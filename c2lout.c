@@ -64,11 +64,11 @@ extern void ProcessStandAlone(char *fname, FILE *in_fp, FILE *out_fp);
     fprintf(err_fp, "c2lout %s %d,%d: ", file_name, line_num, line_pos);\
   else									\
     fprintf(err_fp, "c2lout: ");					\
-  fprintf(err_fp, str);						\
+  fprintf(err_fp, str);							\
   fprintf(err_fp, "\n");						\
 }
 
-#define Error1(str, arg)							\
+#define Error1(str, arg)						\
 {									\
   if( line_num > 0 )							\
     fprintf(err_fp, "c2lout %s %d,%d: ", file_name, line_num, line_pos);\
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
      
 	/* read name of input file */
 	if( !raw_seen )
-	{ Error0("-i illegal with -r");
+	{ Error0("-i illegal without -r");
 	  exit(1);
 	}
 	if( in_fp != NULL )

@@ -25,7 +25,7 @@ often quite easy to find the problem, because it lies in whatever should
 have been printed next.
 @PP
 If you see {@Code VMerror} in an error message, it means that the printer
-VMerror. @Index { @Code VMerror PostScript error }
+vmerror. @Index { @Code VMerror PostScript error }
 is running out of memory.  In that case, one thing you can try is
 @ID @Code {
 "@Diag"

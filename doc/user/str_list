@@ -273,7 +273,8 @@ described in this section are derived from the two basic ones,
 are all the options, together with their default values:
 @ID @OneRow @Code {
 "@List"
-"    style {}"
+"    type { num }"
+"    style { num }"
 "    labelwidth { 2f }"
 "    indent { 0c }"
 "    rightindent { 0c }"
@@ -285,9 +286,13 @@ except that some combinations don't make sense, for example @Code "indent"
 with {@Code "@CentredList"} or @Code "style" with {@Code "@BulletList"},
 since the list symbol has clearly already set the option.
 @PP
-The @Code "style" option determines the format of the label, any
-@Code "num" symbol within it being replaced by the number of the
-item.  For example, @Code "@ParenNumberedList" is just
+The @Code "type" option determines the type of numbering (Arabic, Roman,
+etc.) and is not intended for ordinary use, since there are distinct
+symbols for each type, as we have seen.  The @Code "style" option
+determines the format of the label, any @Code "num" symbol within it
+being replaced by the number (in Arabic, Roman, etc. as determined by the
+@Code "type" option) of the item.  For example, @Code "@ParenNumberedList"
+is just
 @ID @OneRow @Code {
 "@List"
 "    style { (num) }"
@@ -297,9 +302,11 @@ and @Code "@BulletList" is just
 "@List"
 "    style { @Bullet }"
 }
-with @Code "num" not mentioned since no number is wanted.  It is not
-possible to change the style of @Code "@TaggedList" and its variants,
-since it is set to produce the label supplied by the author.
+with @Code "num" not mentioned since no number is wanted.  The
+@Code "@TaggedList" symbol and its variants also have the
+@Code "style" option; in their case, the @Code "num" symbol within
+it must be mentioned exactly once, and its value is set to produce
+the label supplied by the author.
 @PP
 The @Code "labelwidth" option determines the width set aside for the labels;
 this is where @Code "@WideTaggedList" and @Code "@VeryWideTaggedList" differ

@@ -186,8 +186,15 @@ Changes and new features introduced in Version 3.13 [released February 1999]
 	 these new arrangements do not affect the content of the packages.
 	 The user's guide documents it all.
 
+Changes and new features introduced in Version 3.14 [released March 1999]
+
+    Bug fixes
+    "lout -PDF" now available as alternative to "lout -Z"
+    Cross referencing list items yields just the raw item number now
+
 Things that ought to be done but haven't been done yet
 
+    Reinstate Uwe's collation code that was lost by 3.14 bug fixes
     Review and possible inclusion of new @Eq symbol by Mark Shields
     pdfmark in PostScript output
     Review Uwe's proposal for moving word row marks to the baseline
@@ -195,4 +202,4 @@ Things that ought to be done but haven't been done yet
     Several suggestions for enhancing the overhead transparencies package
 
 Jeff Kingston
-5 February 1999
+30 March 1999

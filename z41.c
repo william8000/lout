@@ -1,6 +1,6 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -146,6 +146,7 @@ static BOOLEAN need_lvis(OBJECT sym)	/* true if @LVis needed before sym */
 static void WriteClosure(OBJECT x, int *linecount, FILE_NUM fnum, OBJECT env)
 { OBJECT y, link, z, sym;
   BOOLEAN npar_written, name_printed;
+  debug2(DIO, D, "[ WriteClosure(%s %s)", Image(type(x)), EchoObject(x));
 
   sym = actual(x);
   /* *** if( use_invocation(sym) == x ) *** */
@@ -221,8 +222,11 @@ static void WriteClosure(OBJECT x, int *linecount, FILE_NUM fnum, OBJECT env)
 	  else
 	  { StringFPuts(STR_SPACE, last_write_fp);
 	  }
-	  if( filter(sym) != nilobj )
+	  /* old version: if( filter(sym) != nilobj ) */
+	  if( filter(sym) != nilobj && type(z) == FILTERED ) /* ??? */
 	  {
+	    debug1(DIO, D, "  filter(sym) != nilobj, type(z) == %s",
+	      Image(type(z)));
 	    assert( type(z) == FILTERED, "WriteClosure:  filter!" );
 	    WriteObject(z, NO_PREC, linecount, fnum);
 	  }
@@ -254,6 +258,7 @@ static void WriteClosure(OBJECT x, int *linecount, FILE_NUM fnum, OBJECT env)
       name_printed = TRUE;
     }
   }
+  debug0(DIO, D, "] WriteClosure returning");
 } /* end WriteClosure */
 
 
@@ -271,6 +276,7 @@ static void WriteClosure(OBJECT x, int *linecount, FILE_NUM fnum, OBJECT env)
 static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
 { OBJECT link, y, z, gap_obj, sym, env;  FULL_CHAR *name; int offset, lnum;
   int prec, i, last_prec;  BOOLEAN braces_needed;
+  debug2(DIO, D, "[ WriteObject(%s %s)", Image(type(x)), EchoObject(x));
   switch( type(x) )
   {
 
@@ -609,6 +615,7 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
       break;
 
   } /* end switch */
+  debug0(DIO, D, "] WriteObject returning");
 } /* end WriteObject */
 
 
@@ -623,7 +630,7 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
 
 void AppendToFile(OBJECT x, FILE_NUM fnum, int *pos, int *lnum)
 { FULL_CHAR buff[MAX_BUFF], *str;  int linecount;
-  debug2(DIO, D, "AppendToFile( %s, %s )", EchoObject(x), FileName(fnum));
+  debug2(DIO, D, "[ AppendToFile( %s, %s )", EchoObject(x), FileName(fnum));
 
   /* open file fnum for writing */
   if( last_write_fnum != fnum )
@@ -633,7 +640,8 @@ void AppendToFile(OBJECT x, FILE_NUM fnum, int *pos, int *lnum)
       Error(41, 3, "file name %s%s is too long",
 	FATAL, PosOfFile(fnum), str, NEW_DATA_SUFFIX);
     StringCopy(buff, str);  StringCat(buff, NEW_DATA_SUFFIX);
-    last_write_fp = StringFOpen(buff, APPEND_TEXT);
+    last_write_fp = StringFOpen(buff,
+      FileTestUpdated(fnum) ? APPEND_TEXT : WRITE_TEXT);
     if( last_write_fp == null )
       Error(41, 4, "cannot append to database file %s", FATAL, no_fpos, buff);
     last_write_fnum = fnum;
@@ -650,7 +658,7 @@ void AppendToFile(OBJECT x, FILE_NUM fnum, int *pos, int *lnum)
   StringFPuts(STR_NEWLINE, last_write_fp);
   StringFPuts(STR_NEWLINE, last_write_fp);
   FileSetUpdated(fnum, linecount + 2);
-  debug0(DIO, D, "AppendToFile returning.");
+  debug0(DIO, D, "] AppendToFile returning.");
 } /* end AppendToFile */
 
 

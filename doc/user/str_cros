@@ -82,8 +82,9 @@ Section @NumberOf cross (page @PageOf { cross }).
 }
 Like all tags, the value of the @Code "@Tag" option should be a simple
 word (although Lout does accept multi-word tags).  Cross referencing of
-list items works best with parenthesized lists, since, for example,
-(16) looks good inside a paragraph but 16. does not.
+list items yields just the number of the item, in Arabic, Roman, or
+whatever; it does not include the surrounding parentheses or other
+decorations introducted by the list's @Code "style" option.
 @PP
 To work cross references out, Lout has to process your document more
 multiple.runs @Index { multiple runs, why needed }
