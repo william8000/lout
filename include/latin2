@@ -6,4 +6,4 @@
 #                                                               #
 #################################################################
 
-@SysInclude { latin2.fd }
+@SysDatabase @FontDef { latin2 }

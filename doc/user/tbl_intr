@@ -91,8 +91,11 @@ In rare cases, when the table occupies an entire paragraph but is not
 displayed, a bug in the current version of Basser Lout causes the second
 column to appear much too far to the right.  Until the problem is fixed,
 the first thing to try if this occurs is to replace the very first
-row symbol ({@Code "@Rowa"}, {@Code "@Rowb"}, etc.) by {@Code "@FirstRowa"},
-{@Code "@FirstRowb"}, etc.
+row symbol ({@Code "@Row"}, {@Code "@Rowa"}, {@Code "@Rowb"}, etc.) by
+{@Code "@FirstRow"}, {@Code "@FirstRowa"}, {@Code "@FirstRowb"},
+etc.  There are also {@Code "@HeaderFirstRow"}, {@Code "@HeaderFirstRowa"},
+{@Code "@HeaderFirstRowb"} etc. symbols for replacing {@Code "@HeaderRow"},
+{@Code "@HeaderRowa"}, {@Code "@HeaderRowb"}, etc., if required.
 # That should work, but if it doesn't, replacing
 # @Code "@Tbl" by @Code "@OneCol @Tbl" certainly will, although it also
 # prevents the table from breaking across page boundaries.

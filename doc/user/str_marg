@@ -55,24 +55,26 @@ similar to the @Code "@InitialBreak" setup file option.
 @PP
 @Code "@MarginNoteHGap" determines how far away from the
 adjacent text column the margin note will appear; the default
-value is 0.5 centimetres.  @Code "@MarginNoteVGap" is the minimum
+value is 0.5 centimetres.  Notice that, by this definition, margin
+notes will appear in the page body margin (Section {@NumberOf margins})
+if there is one.  @Code "@MarginNoteVGap" is the minimum
 vertical separation between margin notes (i.e. it determines how
 far downwards a note will be shifted to avoid the previous
 one).  @Code "@MarginNoteWidth" determines the width of the column
 in which margin notes (both left and right) are set; the default
 value of 1.5 centimetres is suited to the 2.5 centimetre page margins
-that are the default, but if you widen the page margins you will be
-able to increase @Code "@MarginNoteWidth" too.
+that are the default, but if you widen the page or page body margins
+you will be able to increase @Code "@MarginNoteWidth" too.
 @PP
-Left notes extend into the left margin a total distance of
-@Code "@MarginNoteHGap" plus {@Code "@MarginNoteWidth"}, and it is
-up to you to make sure that this does not put them off
-the page.  Similar remarks apply to right notes.  And since notes
-are never shifted to the next page, only downwards, there is also
-a risk that a note will be shifted off the bottom of the page, if
-it is very long or if preceding notes obstruct it.  Again, it is
-up to you to avoid this problem by keeping your notes small and not
-too close together.
+Left notes extend into the left margin (including the left page body
+margin) a total distance of @Code "@MarginNoteHGap" plus
+{@Code "@MarginNoteWidth"}, and it is up to you to make sure that this
+does not put them off the page.  Similar remarks apply to right
+notes.  And since notes are never shifted to the next page, only
+downwards, there is also a risk that a note will be shifted off the
+bottom of the page, if it is very long or if preceding notes obstruct
+it.  Again, it is up to you to avoid this problem by keeping your notes
+small and not too close together.
 @PP
 Margin notes inside footnotes, figures and tables work well.  Margin
 notes in multi-column documents are disastrous unless used very

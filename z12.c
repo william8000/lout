@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -36,6 +36,10 @@
 #define IG_BADSIZE	3
 #define	IG_OK		4
 
+#if DEBUG_ON
+static int debug_depth = 1;
+static int debug_depth_max = 5;
+#endif
 
 /*****************************************************************************/
 /*                                                                           */
@@ -330,6 +334,9 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
   FILE *fp;  FULL_CHAR buff[MAX_BUFF];
 
   debug2(DSF, DD, "[ MinSize( %s, %s, extras )", EchoObject(x), dimen(dim));
+  debugcond4(DSF, D, dim == COLM && debug_depth++ < debug_depth_max,
+    "%*s[ MinSize(COLM, %s %d)", (debug_depth-1)*2, " ",
+    Image(type(x)), (int) x);
   ifdebug(DSF, DDD, DebugObject(x));
 
   switch( type(x) )
@@ -409,7 +416,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       }
       else
       {
-	debug2(DGT, D, "MinSize setting external_ver(%s %s) = FALSE",
+	debug2(DGT, DD, "MinSize setting external_ver(%s %s) = FALSE",
 	  Image(type(x)), SymName(actual(x)));
 	external_ver(x) = external_hor(x) = FALSE;
       }
@@ -503,7 +510,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
         /* find the available space for this HSPANNER and break it */
         SpannerAvailableSpace(t, COLM, &b, &f);
         SetConstraint(c, MAX_FULL_LENGTH, b+f, MAX_FULL_LENGTH);
-        debug2(DSF,D, "  BreakObject(%s,%s)",EchoObject(t),EchoConstraint(&c));
+        debug2(DSF,DD, "  BreakObject(%s,%s)",EchoObject(t),EchoConstraint(&c));
         t = BreakObject(t, &c);
         spanner_broken(t) = TRUE;
       }
@@ -597,6 +604,16 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case BEGIN_HEADER:
     case SET_HEADER:
+    
+      Child(y, LastDown(x));
+      y = MinSize(y, dim, extras);
+      back(x, dim) = back(y, dim);
+      fwd(x, dim)  = fwd(y, dim);
+      debug4(DSF, D, "MinSize(%s, %s) := (%s, %s)", Image(type(x)),
+	dimen(dim), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+      break;
+
+
     case PLAIN_GRAPHIC:
     case GRAPHIC:
     
@@ -825,7 +842,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	if( link != x )
 	{
 	  res = nilobj;
-	  NextDefiniteWithGap(x,  link, y, g, jn);
+	  NextDefiniteWithGap(x, link, y, g, jn);
 	  while( link != x )
 	  {
 	    /* check whether we need to break the paragraph here at g */
@@ -843,7 +860,10 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	      New(new_line, ACAT);
 	      TransferLinks(NextDown(x), Up(g), new_line);
 	      StyleCopy(save_style(new_line), save_style(x));
+	      adjust_cat(new_line) = padjust(save_style(x));
 	      Link(res, new_line);
+	      debug2(DSF, D, "  new_line(adjust_cat %s) = %s",
+		bool(adjust_cat(new_line)), EchoObject(new_line));
 
 	      /* may need to insert space at start of remainder */
 	      if( hspace(g) > 0 )
@@ -856,6 +876,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		word_language(z) = language(save_style(x));
 		word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
 		underline(z) = UNDER_OFF;
+		back(z, COLM) = fwd(z, COLM) = 0;
 		Link(Down(x), z);
 
 		/* follow the empty word with a gap of the right width */
@@ -866,6 +887,9 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		GapCopy(gap(z), space_gap(save_style(x)));
 		width(gap(z)) *= hspace(z);
 		Link(NextDown(Down(x)), z);
+
+		debug2(DSF, D, "  hspace(g) = %d, width(gap(z)) = %s",
+		  hspace(g), EchoLength(width(gap(z))));
 	      }
 
 	      /* append a gap to res (recycle g) */
@@ -1165,7 +1189,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       {	assert( Down(x) != x, "MinSize/ROW_THR: Down(x)!" );
 
 	/* first size all the non-spanning members of the thread */
-	debug1(DSF, D,  "[[ starting sizing %s", Image(type(x)));
+	debug1(DSF, DD,  "[[ starting sizing %s", Image(type(x)));
 	b = f = 0;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
@@ -1173,7 +1197,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	  if( type(y) != START_HVSPAN && type(y) != START_VSPAN &&
 	      type(y) != HSPAN        && type(y) != VSPAN )
 	  { y = MinSize(y, dim, extras);
-	    debug5(DSF, D, "   MinSize(%s) has size %s,%s -> %s,%s",
+	    debug5(DSF, DD, "   MinSize(%s) has size %s,%s -> %s,%s",
 	      Image(type(y)), EchoLength(back(y, dim)), EchoLength(fwd(y, dim)),
 	      EchoLength(b), EchoLength(f));
 	    b = find_max(b, back(y, dim));
@@ -1183,7 +1207,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	back(x, dim) = b;
 	fwd(x, dim)  = f;
 	thr_state(x) = SIZED;
-	debug3(DSF, D,  "][ middle sizing %s (%s,%s)", Image(type(x)),
+	debug3(DSF, DD,  "][ middle sizing %s (%s,%s)", Image(type(x)),
 	  EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
 
 	/* now size all the spanning members of the thread           */
@@ -1196,12 +1220,12 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	  { y = MinSize(y, dim, extras);
 	    back(x, dim) = find_max(back(x, dim), back(y, dim));
 	    fwd(x, dim) = find_max(fwd(x, dim), fwd(y, dim));
-	    debug5(DSF, D, "   MinSize(%s) has size %s,%s -> %s,%s",
+	    debug5(DSF, DD, "   MinSize(%s) has size %s,%s -> %s,%s",
 	      Image(type(y)), EchoLength(back(y, dim)), EchoLength(fwd(y, dim)),
 	      EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
 	  }
 	}
-	debug3(DSF, D,  "]] end sizing %s (%s,%s)", Image(type(x)),
+	debug3(DSF, DD,  "]] end sizing %s (%s,%s)", Image(type(x)),
 	  EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
       }
       break;
@@ -1329,6 +1353,9 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
 
   } /* end switch */
+  debugcond6(DSF, D, dim == COLM && --debug_depth < debug_depth_max,
+    "%*s] MinSize(COLM, %s %d) = (%s, %s)", debug_depth*2, " ", Image(type(x)),
+    (int) x, EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
   debug1(DSF, DD,  "] MinSize returning, x = %s", EchoObject(x));
   debug3(DSF, DD, "  (%s size is %s, %s)", dimen(dim),
 		EchoLength(back(x, dim)), EchoLength(fwd(x, dim)) );

@@ -1,6 +1,6 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -304,6 +304,7 @@ void MemInit(void)
   zz_lengths[ EXPAND_IND   ] =
   zz_lengths[ THREAD       ] =
   zz_lengths[ CR_LIST      ] =
+  zz_lengths[ SCOPE_SNAPSHOT] =
 	ceiling(sizeof(struct closure_type), sizeof(ALIGN));
 
   /* symbol types */

@@ -24,10 +24,10 @@ must be a Lout length.  For example,
 requests that tab stops be placed at half-inch intervals.  In other
 words, a distance of one tab stop in the program text will be equivalent to a
 distance of half an inch on the printed page.  For example,
-@ID @Code "@CP style { varying } tabout { 3f }"
+@ID @Code "@CP style { varying } tabout { 3f } numbered { Yes }"
 might produce the following, where tab characters in the program text
 have been used for indenting and also to align the comments:
-@ID @OneRow @CP style { varying } tabout { 3f } {
+@ID @OneRow @CP style { varying } tabout { 3f } numbered { Yes } {
 struct tnode {			/* the basic node */
 	char *word;		/* points to the text */
 	int count;		/* number of occurrences */
@@ -35,10 +35,12 @@ struct tnode {			/* the basic node */
 	struct tnode *right;	/* right child */
 };
 }
-The value {@Code "3f"} means three times the current font size, and
-it is the default value of @Code "tabout" for the @Code { varying }
-and @Code { symbol } styles (Section {@NumberOf cpsetup}).  In a
-12 point font this is 36 points, or half an inch.
+We've used @Code "numbered { Yes }" to demonstrate that the features
+for dealing with tabs work even with line numbers.  The value {@Code "3f"}
+means three times the current font size, and it is the default value of
+@Code "tabout" for the @Code { varying } and @Code { symbol } styles
+(Section {@NumberOf cpsetup}).  In a 12 point font this is 36 points,
+or half an inch.
 @PP
 If @Code "tabout" is too small, there is a danger that the
 alignment might fail.  For example,

@@ -1,6 +1,6 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -85,10 +85,13 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
   {
     SetOptimize(hd, style);
   }
-  debug0(DOM, D, "  [ calling Manifest from SizeGalley");
+  debug2(DOM, D, "[ calling Manifest(%s) from SizeGalley(%s)",
+    Image(type(y)), SymName(actual(hd)));
+  debug2(DOB, D, "[ calling Manifest(%s) from SizeGalley(%s)",
+    Image(type(y)), SymName(actual(hd)));
   if( joined )
   { New(bt[COLM], THREAD);  New(ft[COLM], THREAD);
-    debug0(DGM, DD, "  SizeGalley calling Manifest (joined)");
+    debug0(DGM, DD, "SizeGalley calling Manifest (joined)");
     y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd),
       &tmp2, FALSE);
     assert( Down(bt[COLM]) != bt[COLM] && Down(ft[COLM]) != ft[COLM],
@@ -101,11 +104,14 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
     DisposeObject(bt[COLM]);  DisposeObject(ft[COLM]);
   }
   else
-  { debug0(DGM, DD, "  SizeGalley calling Manifest (not joined)");
+  { debug0(DGM, DD, "SizeGalley calling Manifest (not joined)");
     y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd),
       &tmp2, FALSE);
   }
-  debug0(DOM, D, "  ] returning from Manifest in SizeGalley");
+  debug2(DOM, D, "] returning Manifest(%s) from SizeGalley(%s)",
+    Image(type(y)), SymName(actual(hd)));
+  debug2(DOB, D, "] returning Manifest(%s) from SizeGalley(%s)",
+    Image(type(y)), SymName(actual(hd)));
   DisposeObject(hold_env);
   debug0(DGM, DD, "SizeGalley: after manifesting, hd =");
   ifdebug(DGM, DD, DebugObject(hd));
@@ -113,15 +119,22 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
   /* horizontally size hd */
   debug0(DGM, DD, "SizeGalley horizontally sizing hd:");
   New(extras, ACAT);
+  debug2(DSF, D, "[ calling MinSize(%s) from SizeGalley(%s)",
+    Image(type(y)), SymName(actual(hd)));
   y = MinSize(y, COLM, &extras);
+  debug2(DSF, D, "] returning MinSize(%s) from SizeGalley(%s)",
+    Image(type(y)), SymName(actual(hd)));
 
   /* break hd if vertical galley */
   if( gall_dir(hd) == ROWM )
   {
     CopyConstraint(constraint(hd), *c);
-    debug0(DOB, DD, "  calling BreakObject from SizeGalley");
-    debug0(DGM, DD, "  SizeGalley calling BreakObject:");
+    debug0(DGM, DD, "SizeGalley calling BreakObject:");
+    debug2(DOB, D, "[ calling BreakObject(%s) from SizeGalley(%s)",
+      Image(type(y)), SymName(actual(hd)));
     y = BreakObject(y, c);
+    debug2(DOB, D, "] returning BreakObject(%s) from SizeGalley(%s)",
+      Image(type(y)), SymName(actual(hd)));
     if( !FitsConstraint(back(y, COLM), fwd(y, COLM), *c) )
       Error(21, 13, "%s,%s object too wide for available space",
         FATAL, &fpos(y), EchoLength(back(y, COLM)), EchoLength(fwd(y, COLM)));
@@ -129,13 +142,13 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
     fwd(hd, COLM)  = fwd(y, COLM);
     assert( FitsConstraint(back(hd, COLM), fwd(hd, COLM), *c),
 	"SizeGalley: BreakObject failed to fit!" );
-    debug2(DSF, DD, "MinSize(hd, COLM) = %s,%s",
+    debug2(DSF, D, "MinSize(hd, COLM) = %s,%s",
 	  EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)) );
   }
 
   /* hyphenate hd if horizontal optimal galley says so */
   else if( opt_components(hd) != nilobj && opt_hyph(hd) && type(y) == ACAT )
-  { debug0(DOG, D, "  SizeGalley calling Hyphenate()");
+  { debug0(DOG, D, "SizeGalley calling Hyphenate()");
     y = Hyphenate(y);
   }
 

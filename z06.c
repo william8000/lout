@@ -1,6 +1,6 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -809,7 +809,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       {
 	if( type(t) == WORD && (
 	    StringEqual(string(t), KW_DEF)     ||
-	    StringEqual(string(t), KW_FONTDEF) ||
+	    /* StringEqual(string(t), KW_FONTDEF) || */
 	    StringEqual(string(t), KW_LANGDEF) ||
 	    StringEqual(string(t), KW_MACRO)   ||
 	    StringEqual(string(t), KW_IMPORT)  ||

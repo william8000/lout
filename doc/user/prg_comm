@@ -12,10 +12,8 @@ character should then be Lout text.  For example, to force Lout to start
 a new page at some point within a C program, place
 @ID @Code "/*@ @NP */"
 at that point.  (In this case you can also simply include a formfeed
-formfeed. @Index { formfeed in program texts }
-character, control-L, without any comment; whatever the language, a formfeed
-in program text is taken to be a request to start a new page.)  Or, to
-make a heading in an Eiffel program, do this:
+character without any comment; see Section {@NumberOf formfeed}
+for more on this.)  Or, to make a heading in an Eiffel program, do this:
 @ID @Code "--@ @Display @Heading { treeprint }"
 (Eiffel comments begin with @Code "--" and end at the end of the
 line.)  Other possible uses for this feature include index entries and

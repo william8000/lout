@@ -1,6 +1,6 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -29,6 +29,11 @@
 /*****************************************************************************/
 #include "externs.h"
 #define	broken(x)	back(x, ROWM)	/* OK since no vertical sizes yet    */
+
+#if DEBUG_ON
+static int debug_depth = 1;
+static int debug_depth_max = 5;
+#endif
 
 
 /*****************************************************************************/
@@ -233,7 +238,7 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 				/* when my is broken			     */
   OBJECT link, y, prev, g;  FULL_LENGTH tmp, tmp2;
 
-  debug1(DOB, D, "[ BreakTable( x, %s )", EchoConstraint(c));
+  debug1(DOB, DD, "[ BreakTable( x, %s )", EchoConstraint(c));
 
   /* Initialise csize, bcount, fcount, bwidth, fwidth and broken(y) */
   bcount = fcount = 0;  bwidth = fwidth = 0;  prev = nilobj;
@@ -273,7 +278,7 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
   /* if column gaps alone are too wide, kill them all */
   if( !FitsConstraint(bwidth, fwidth, *c) )
   {
-    debug2(DOB, D, "column gaps alone too wide: bwidth: %s; fwidth: %s",
+    debug2(DOB, DD, "column gaps alone too wide: bwidth: %s; fwidth: %s",
        EchoLength(bwidth), EchoLength(fwidth));
     Error(13, 2, "reducing column gaps to 0i (object is too wide)",
       WARN, &fpos(x));
@@ -290,8 +295,8 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
   /* break each column, from smallest to largest */
   while( bcount + fcount > 0 && FitsConstraint(bwidth, fwidth, *c) )
   {
-    debug2(DOB, D, "bcount: %d;  bwidth: %s", bcount, EchoLength(bwidth));
-    debug2(DOB, D, "fcount: %d;  fwidth: %s", fcount, EchoLength(fwidth));
+    debug2(DOB, DD, "bcount: %d;  bwidth: %s", bcount, EchoLength(bwidth));
+    debug2(DOB, DD, "fcount: %d;  fwidth: %s", fcount, EchoLength(fwidth));
 
     /* find a minimal-width unbroken component my */
     my = nilobj;  msize = size(x, COLM);       /* an upper bound for size(y) */
@@ -314,18 +319,18 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 
     /* find neighbouring definite objects and resulting pd_extra and sd_extra */
     SetNeighbours(mlink, ratm, &pg, &prec_def, &sg, &succ_def, &mside);
-    debug2(DOB, D, "my (%s): %s", Image(mside), EchoObject(my));
+    debug2(DOB, DD, "my (%s): %s", Image(mside), EchoObject(my));
     pd_extra = pg == nilobj ? 0 :
       ExtraGap(broken(prec_def) ? fwd(prec_def,COLM) : 0, 0, &gap(pg), BACK);
     sd_extra = sg == nilobj ? 0 :
       ExtraGap(0, broken(succ_def) ? back(succ_def,COLM) : 0, &gap(sg), FWD);
-    debug2(DOB, D, "pd_extra:   %s;  sd_extra:      %s",
+    debug2(DOB, DD, "pd_extra:   %s;  sd_extra:      %s",
 		EchoLength(pd_extra), EchoLength(sd_extra) );
 
     /* calculate desirable constraints for my */
     av_colsize = (bfc(*c) - bwidth - fwidth) / (bcount + fcount);
-    debug1(DOB, D, "av_colsize = %s", EchoLength(av_colsize));
-    debug1(DOB, D, "prev_col_size = %s", EchoLength(prev_col_size));
+    debug1(DOB, DD, "av_colsize = %s", EchoLength(av_colsize));
+    debug1(DOB, DD, "prev_col_size = %s", EchoLength(prev_col_size));
     switch( mside )
     {
 
@@ -373,7 +378,7 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 	assert(FALSE, "BreakTable: mside");
 	break;
     }
-    debug1(DOB, D, "col_size = %s", EchoLength(col_size));
+    debug1(DOB, DD, "col_size = %s", EchoLength(col_size));
     prev_col_size = col_size;
 
     /* now break my according to these constraints, and accept it */
@@ -420,7 +425,7 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
   back(x, COLM) = bwidth;
   fwd(x, COLM) = fwidth;
 
-  debug2(DOB, D,  "] BreakTable returning %s,%s; x =",
+  debug2(DOB, DD,  "] BreakTable returning %s,%s; x =",
     EchoLength(bwidth), EchoLength(fwidth));
   ifdebug(DOB, DD, DebugObject(x));
   return x;
@@ -437,6 +442,8 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 
 OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 { OBJECT link, y;  CONSTRAINT yc;  FULL_LENGTH f;  BOOLEAN junk;
+  debugcond4(DOB, D, debug_depth++ < debug_depth_max,
+    "%*s[ BreakObject(%s %d)", (debug_depth-1)*2, " ", Image(type(x)), (int) x);
   debug4(DOB, DD,  "[ BreakObject(%s (%s,%s),  %s), x =",
     Image(type(x)), EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)),
     EchoConstraint(c));
@@ -452,6 +459,10 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
     ReplaceNode(y, x);
     DisposeObject(x);
     x = y;
+    debugcond6(DOB, D, --debug_depth < debug_depth_max,
+      "%*s] BreakObject(%s %d) (neg!) = (%s, %s)", debug_depth*2, " ",
+      Image(type(x)), (int) x, EchoLength(back(x, COLM)),
+      EchoLength(fwd(x, COLM)));
     debug0(DOB, DD, "] BreakObject returning (negative constraint).");
     return x;
   }
@@ -459,6 +470,10 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
   /* if no breaking required, return immediately */
   if( FitsConstraint(back(x, COLM), fwd(x, COLM), *c) )
   { debug0(DOB, DD, "] BreakObject returning (fits).");
+    debugcond6(DOB, D, --debug_depth < debug_depth_max,
+      "%*s] BreakObject(%s %d) (fits) = (%s, %s)", debug_depth*2, " ",
+      Image(type(x)), (int) x, EchoLength(back(x, COLM)),
+      EchoLength(fwd(x, COLM)));
     return x;
   }
 
@@ -677,6 +692,16 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 
     case BEGIN_HEADER:
     case SET_HEADER:
+    
+      Child(y, LastDown(x));
+      y = BreakObject(y, c);
+      back(x, COLM) = back(y, COLM);
+      fwd(x, COLM) = fwd(y, COLM);
+      debug3(DOB, D, "BreakObject(%s, COLM) = (%s, %s)", Image(type(x)),
+	EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)));
+      break;
+
+
     case PLAIN_GRAPHIC:
     case GRAPHIC:
     
@@ -752,6 +777,9 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
   }
   assert( back(x, COLM) >= 0, "BreakObject: back(x, COLM) < 0!" );
   assert( fwd(x, COLM) >= 0, "BreakObject: fwd(x, COLM) < 0!" );
+  debugcond6(DOB, D, --debug_depth < debug_depth_max,
+    "%*s] BreakObject(%s %d) = (%s, %s)", debug_depth*2, " ", Image(type(x)),
+    (int) x, EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)));
   debug2(DOB, DD,  "] BreakObject returning %s,%s, x =",
     EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)));
   ifdebug(DOB, DD,  DebugObject(x));

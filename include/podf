@@ -29,6 +29,8 @@ def @PodSetup
     named fixedverbatimfont		{ Courier Base		} # verbatim font
     named fixedtabin			{ 8			} # tab interval
     named fixedtabout			{ 8s			} # tab width
+    named fixedlinenumbersfont		{			} # line numbers font
+    named fixedlinenumbersformat right @Body{ @Body		} # line numbers format
 
     named fixedparagap			{ 1.0v			} # gap between paras
     named fixedlistgap			{ 1.0v			} # gap within lists
@@ -40,7 +42,7 @@ def @PodSetup
 
     named fixedaheadfont		{ Bold +4p		} # =head1 font
     named fixedaheadbreak		{ lines 1.1vx		} # =head1 para break
-    named fixedaheadformat right @Body	{ @DP @Body		} # =head1 format
+    named fixedaheadformat right @Body	{ //1v @Body		} # =head1 format
     named fixedbheadfont		{ Bold +2p		} # =head2 font
     named fixedbheadbreak		{ lines 1.1vx		} # =head2 para break
     named fixedbheadformat right @Body	{ @Body			} # =head2 format
@@ -64,11 +66,13 @@ def @PodSetup
 
     # the following options apply when style is "varying"
 
-    named varyingtextfont		{ 			} # text font
+    named varyingtextfont		{ Times Base		} # text font
     named varyingtextbreak		{ adjust 1.0vx hyphen	} # text para breaking
     named varyingverbatimfont		{ Courier Base -1p	} # verbatim font
     named varyingtabin			{ 8			} # tab interval
     named varyingtabout			{ 8s			} # tab width
+    named varyinglinenumbersfont	{			} # line numbers font
+    named varyinglinenumbersformat right @Body{ @Body		} # line numbers format
 
     named varyingparagap		{ 1.0v			} # gap between paras
     named varyinglistgap		{ 1.0v			} # gap within lists
@@ -80,7 +84,7 @@ def @PodSetup
 
     named varyingaheadfont		{ Bold +4p		} # =head1 font
     named varyingaheadbreak		{ lines 1.1vx		} # =head1 para break
-    named varyingaheadformat right @Body{ @DP @Body		} # =head1 format
+    named varyingaheadformat right @Body{ //1v @Body		} # =head1 format
     named varyingbheadfont		{ Bold +2p		} # =head2 font
     named varyingbheadbreak		{ lines 1.1vx		} # =head2 para break
     named varyingbheadformat right @Body{ @Body			} # =head2 format
@@ -103,11 +107,13 @@ def @PodSetup
 
     # the following options apply when style is "symbol"
 
-    named symboltextfont		{ 			} # text font
+    named symboltextfont		{ Times Base		} # text font
     named symboltextbreak		{ adjust 1.0vx hyphen	} # text para breaking
     named symbolverbatimfont		{ Courier Base -1p	} # verbatim font
     named symboltabin			{ 8			} # tab interval
     named symboltabout			{ 8s			} # tab width
+    named symbollinenumbersfont		{			} # line numbers font
+    named symbollinenumbersformat right @Body	{ @Body		} # line numbers format
 
     named symbolparagap			{ 1.0v			} # gap between paras
     named symbollistgap			{ 1.0v			} # gap within lists
@@ -119,7 +125,7 @@ def @PodSetup
 
     named symbolaheadfont		{ Bold +4p		} # =head1 font
     named symbolaheadbreak		{ lines 1.1vx		} # =head1 para break
-    named symbolaheadformat right @Body	{ @DP @Body		} # =head1 format
+    named symbolaheadformat right @Body	{ //1v @Body		} # =head1 format
     named symbolbheadfont		{ Bold +2p		} # =head2 font
     named symbolbheadbreak		{ lines 1.1vx		} # =head2 para break
     named symbolbheadformat right @Body	{ @Body			} # =head2 format
@@ -146,7 +152,7 @@ def @PodSetup
     export
     
 	@PV @PPG @PLG @PLI @PLRI @PLLW @PLL @PHA @PHB @PHC
-	@PFI @PFB @PFC @PFF @PFL @PFX @A "$>"
+	@PFI @PFB @PFC @PFF @PFL @PFX @A "$>" @PL
 
     def @Pod
 	named style		{ style			} # style
@@ -156,6 +162,7 @@ def @PodSetup
 	named verbatimfont	{ dft			} # verbatim font
 	named tabin		{ dft			} # tab interval
 	named tabout		{ dft			} # tab width
+	named linenumbersfont	{ dft			} # line numbers font
 	named paragap		{ dft			} # gap between paras
 	named listgap		{ dft			} # gap within lists
 	named listindent	{ dft			} # list label indent
@@ -347,10 +354,18 @@ def @PodSetup
 
 	def @PLL right x
 	{
+	    def bullet
+	    {
+		@BackEnd @Case {
+		    PlainText @Yield "*"
+		    else      @Yield @Char "bullet"
+		}
+	    }
+
 	    def value
 	    {
 		x @Case {
-		    "*" @Yield @Bullet
+		    "*" @Yield bullet
 		    else @Yield x
 		}
 	    }
@@ -504,6 +519,28 @@ def @PodSetup
 
 
 	macro "$>" { {} & }
+
+
+	def pl		# for formatting line numbers
+	    right x
+	{
+	    def strut { @VContract { 0.5v @High ^/ / 0.5v @High } }
+
+	    strut & style @Case {
+		fixed @Yield fixedlinenumbersformat {
+		    { linenumbersfont @Else fixedlinenumbersfont } @Font x
+		}
+		varying @Yield varyinglinenumbersformat {
+		    { linenumbersfont @Else varyinglinenumbersfont } @Font x
+		}
+		symbol @Yield symbollinenumbersformat {
+		    { linenumbersfont @Else symbollinenumbersfont } @Font x
+		}
+	    }
+	}
+
+
+	macro @PL { // pl }
 
 
 	@InitFont @Font @InitBreak @Break @Body

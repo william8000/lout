@@ -20,7 +20,6 @@
 #                                                                             #
 ###############################################################################
 
-@SysInclude { fontdefs }
 @SysInclude { langdefs }
 
 export @I @B @Heading @PP @LP @DP @NP
@@ -103,3 +102,5 @@ def @ToySetup
     def @Document { @PageList 1 }
 
 @End @ToySetup
+
+@SysDatabase @FontDef  { fontdefs }		  # font definitions

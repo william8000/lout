@@ -68,6 +68,7 @@ default values:
 @ID @OneRow @Code {
 "@CP         [ or @Eiffel, @Blue, etc. ]"
 "    style { fixed }"
+"    numbered { No }"
 "    font { Courier }"
 "    size { -1.0p }"
 "    line { 1.0vx }"
@@ -84,6 +85,10 @@ default values:
 "}"
 }
 We are already familiar with {@Code "style"}.  After that comes
+{@Code "numbered"}, whose value may be {@Code "No"} (the default),
+{@Code "Yes"}, or a number, and which determines whether or not
+line numbers are to be added and if so the value of the first
+one.  Next we have
 {@Code "font"}, which determines the font family to use, {@Code "size"},
 the font size to use, and {@Code "line"}, the inter-line spacing.  The
 default value for @Code "size" asks for one point smaller than in the

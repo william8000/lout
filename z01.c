@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -457,6 +457,10 @@ int main(int argc, char *argv[])
 	  SAFE_DFT ? " yes" : " no");
 	fprintf(stderr, "strcoll() used for sorting by default:%s\n",
 	  COLLATE ? " yes" : " no");
+	fprintf(stderr, "PDF compression on:%s\n",
+	  PDF_COMPRESSION ? " yes" : " no");
+	fprintf(stderr, "Debugging (-d, -dd, -ddd flags) available:%s\n",
+	  DEBUG_ON ? " yes" : " no");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Basser Lout comes with ABSOLUTELY NO WARRANTY.\n");
 	fprintf(stderr, "This is free software, and you are welcome to\n");
@@ -676,7 +680,6 @@ int main(int argc, char *argv[])
     if( out_fp == null )
       Error(1, 27, "cannot open output file %s", FATAL, no_fpos, outfile);
   }
-  FontInit();
   ColourInit();
   LanguageInit();
   PrintInit(out_fp);
@@ -816,6 +819,9 @@ int main(int argc, char *argv[])
   s=load(KW_ACAT_NJ, ACAT, TRUE, TRUE, FALSE, ACAT_PREC); setcat(s,FALSE,TRUE);
   s=load(KW_ACAT_MJ, ACAT, TRUE, TRUE, FALSE, ACAT_PREC); setcat(s,TRUE, TRUE);
 
+  /* intialize fonts and load @FontDef symbol */
+  FontInit();
+
   /* intialize current time and load @Moment symbol */
   InitTime();
 
@@ -856,7 +862,7 @@ int main(int argc, char *argv[])
   CheckErrorBlocks();
 
   /* wrapup */
-  ifdebug(DST, D, CheckSymSpread() );
+  ifdebug(DST, DD, CheckSymSpread() );
   ifdebug(ANY, D, DeleteEverySym() );
   debug0(DMA, D, "at end of run:");
   ifdebug(DMA, D, DebugMemory() );

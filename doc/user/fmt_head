@@ -154,7 +154,7 @@ floating figures and tables, for example, are not from BasicSetup so
 cannot be used.
 @PP
 There are five symbols of special relevance to page headers and
-footers: {@Code "@Null"}, {@Code "@Centre"}, {@Code "@Center"},
+footers:  {@Code "@Null"}, {@Code "@Centre"}, {@Code "@Center"},
 {@Code "@Right"}, and {@Code "@PageNum"}.
 @PP
 The @Code "@Null" symbol is similar to the empty object in printing as
@@ -179,6 +179,12 @@ page.num. @Index @Code "@PageNum"
 Arabic, Roman, etc. as specified by the @Code "@PageNumbers" or
 @Code "@IntroPageNumbers" option.  @Code "@PageNum" is available only
 within page header and footer options.
+@PP
+To get the @I last page into a header, so that you can have page
+headers like `Page 5 of 8', you need @Code "@NumberOf last.page" as
+described in Section {@NumberOf cross}.  You might have
+@ID @Code "@Centre { Page @PageNum of @NumberOf last.page }"
+as the value of @Code "@EvenTop" and the rest.
 @PP
 At this point you might like to pause and verify that the default
 values of the sixteen options given above produce what we said they

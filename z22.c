@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -425,6 +425,8 @@ void HandleHeader(OBJECT hd, OBJECT link, OBJECT header)
       /* move header and gap into headers() */
       MoveLink(LastDown(header), headers(hd), PARENT);
       Link(headers(hd), g);
+      debug2(DOB, D, "HandleHeader moving %s header %s",
+	SymName(actual(hd)), Image(type(header)));
       break;
 
 

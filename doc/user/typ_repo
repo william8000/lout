@@ -114,10 +114,7 @@ and to set the @Code "@MakeContents" option within it to
 on the first page, but if the @Code "@ContentsSeparate" option of
 @Code "@Report" is
 contents.separate @Index @Code "@ContentsSeparate"
-set to @Code "Yes" it will appear on separate pages.  This is only
-effective if @Code "@CoverSheet" is {@Code No}, since a separate cover
-sheet and separate pages for the table of contents would leave nothing on
-the first page.
+set to @Code "Yes" it will appear on separate pages.
 @PP
 @Code "@InitialFont" is the font of the bulk of the report,
 and should contain a family, a face, and a size.  The default
@@ -208,9 +205,8 @@ No @Code "@BeginSections" or @Code "@EndSections" symbols are needed.  The
 beginsections.reports @SubIndex { in reports }
 endsections.reports @SubIndex { in reports }
 general rule is that you need these bracketing symbols only when you are
-inside something else.  Sections lie inside
-@Code "@Text" in ordinary documents, but they don't lie inside anything
-else in technical reports.
+inside something else.  Sections lie inside @Code "@Text" in ordinary
+documents, but they don't lie inside anything else in technical reports.
 @PP
 A section may have subsections, between
 subsection.reports @SubIndex { in reports }

@@ -1,6 +1,6 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -46,7 +46,8 @@
 /*  typedef struct mapvec {                                                  */
 /*    OBJECT      file_name;                                                 */
 /*    FILE_NUM    fnum;                                                      */
-/*    BOOLEAN     must_print;                                                */
+/*    BOOLEAN     seen_recoded;                                              */
+/*    int	  last_page_printed;                                         */
 /*    OBJECT      name;                                                      */
 /*    OBJECT      vector[MAX_CHARS];                                         */
 /*    FULL_CHAR   hash_table[MAX_CHASH];                                     */
@@ -98,20 +99,23 @@ static FULL_CHAR NameRetrieve(FULL_CHAR *cname, MAP_VEC map)
 
 /*@::MapLoad()@***************************************************************/
 /*                                                                           */
-/*  MAPPING MapLoad(file_name, must_print)                                   */
+/*  MAPPING MapLoad(file_name, recoded)                                      */
 /*                                                                           */
 /*  Declare file_name to be a character mapping (LCM) file.  A file may be   */
-/*  so declared more than once.  If must_print is true, the encoding vector  */
-/*  given by this file must be printed in the PostScript output.             */
+/*  so declared more than once.  Parameter recoded is true if the font that  */
+/*  uses this mapping declares that it needs to be recoded, which in turn    */
+/*  means that this mapping might have to be printed out.  Whether or not it */
+/*  is actually printed depends upon whether we print a font that uses it    */
+/*  and that requires recoding.                                              */
 /*                                                                           */
 /*****************************************************************************/
 
-MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
+MAPPING MapLoad(OBJECT file_name, BOOLEAN recoded)
 { FILE *fp;  MAP_VEC map;  MAPPING res;
   int i, m, curr_line_num, line_pos, prev_code, dc, oc, count;
   FULL_CHAR buff[MAX_BUFF], cn[MAX_BUFF], ch, mapname[MAX_BUFF],
   mapval[MAX_BUFF];
-  debug2(DCM,D, "MapLoad(%s, %s)", EchoObject(file_name),bool(must_print));
+  debug2(DCM,D, "MapLoad(%s, %s)", EchoObject(file_name), bool(recoded));
 
   /* if the file name is "-", it means no mapping file is supplied */
   if( StringEqual(string(file_name), AsciiToFull("-")) )
@@ -120,12 +124,12 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
     return (MAPPING) 0;
   }
 
-  /* if seen this file name before, just update must_print and return prev */
+  /* if seen this file name before, just update seen_recoded and return prev */
   for( res = 1;  res < maptop;  res++ )
   {
     if( StringEqual(string(MapTable[res]->file_name), string(file_name)) )
     { Dispose(file_name);
-      MapTable[res]->must_print = MapTable[res]->must_print || must_print;
+      MapTable[res]->seen_recoded = MapTable[res]->seen_recoded || recoded;
       debug1(DCM, D, "MapLoad returning %d (not new)", res);
       return res;
     }
@@ -152,7 +156,8 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN must_print)
   fp = OpenFile(map->fnum, FALSE, FALSE);
   if( fp == NULL )  Error(38, 3, "cannot open character mapping file %s",
       FATAL, PosOfFile(map->fnum), FileName(map->fnum));
-  map->must_print = must_print;
+  map->seen_recoded = recoded;
+  map->last_page_printed = 0;
   StringCopy(buff, AsciiToFull("vec"));
   StringCat(buff, StringInt(maptop));
   map->name = MakeWord(WORD, buff, no_fpos);
@@ -287,39 +292,70 @@ FULL_CHAR *MapEncodingName(MAPPING m)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  MapPrintEncodings(fp)                                                    */
+/*  static PrintMapping(MAPPING m, FILE *fp)                                 */
+/*                                                                           */
+/*  Print mapping m onto fp.                                                 */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PrintMapping(MAPPING m, FILE *fp)
+{ MAP_VEC map = MapTable[m]; int i;
+  switch( BackEnd )
+  {
+    case POSTSCRIPT:
+
+      fprintf(fp, "%%%%BeginResource: encoding %s\n", string(map->name));
+      fprintf(fp, "/%s [\n", string(map->name));
+      for( i = 0;  i < MAX_CHARS;  i++ )
+        fprintf(fp, "/%s%c", string(map->vector[i]), (i+1)%8 != 0 ? ' ' : '\n');
+      fprintf(fp, "] def\n");
+      fprintf(fp, "%%%%EndResource\n\n");
+      break;
+
+
+    case PDF:
+
+      PDFFile_BeginFontEncoding(fp, (char*) string(map->name));
+      for( i = 0;  i < MAX_CHARS;  i++ )
+	fprintf(fp, "/%s%c", string(map->vector[i]), (i+1)%8 != 0 ? ' ' : '\n');
+      PDFFile_EndFontEncoding(fp);
+      break;
+  }
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void MapEnsurePrinted(MAPPING m, int curr_page, FILE *fp)                */
+/*                                                                           */
+/*  Ensure that MAPPING m is printed on page curr_page, if required.         */
+/*  It's required if it has neither been printed on the current page         */
+/*  already, nor on page 1 (page 1 is really the entire document setup).     */
+/*                                                                           */
+/*****************************************************************************/
+
+void MapEnsurePrinted(MAPPING m, int curr_page, FILE *fp)
+{ MAP_VEC map = MapTable[m];
+  assert( map->seen_recoded, "MapEnsurePrinted: not seen_recoded!" );
+  if( map->last_page_printed < curr_page && map->last_page_printed != 1 )
+  { map->last_page_printed = curr_page;
+    PrintMapping(m, fp);
+  }
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  MapPrintEncodings(fp) [OBSOLETE]                                         */
 /*                                                                           */
 /*  Print all encoding vectors in PostScript form on file fp.                */
 /*                                                                           */
 /*****************************************************************************/
 
 void MapPrintEncodings(FILE *fp)
-{ MAPPING m;  MAP_VEC map;  int i;
-  for( m = 1;  m < maptop;  m++ )  if( MapTable[m]->must_print )
-  { map = MapTable[m];
-    switch( BackEnd )
-    {
-      case POSTSCRIPT:
-
-        fprintf(fp, "%%%%BeginResource: encoding %s\n", string(map->name));
-        fprintf(fp, "/%s [\n", string(map->name));
-        for( i = 0;  i < MAX_CHARS;  i++ )
-          fprintf(fp, "/%s%c", string(map->vector[i]), (i+1) % 8 != 0 ? ' ' : '\n');
-        fprintf(fp, "] def\n");
-        fprintf(fp, "%%%%EndResource\n\n");
-	break;
-
-
-      case PDF:
-
-	PDFFile_BeginFontEncoding(fp, (char*) string(map->name));
-	for( i = 0;  i < MAX_CHARS;  i++ )
-	  fprintf(fp, "/%s%c", string(map->vector[i]),
-	    (i+1) % 8 != 0 ? ' ' : '\n');
-	PDFFile_EndFontEncoding(fp);
-	break;
-    }
-  }
+{ MAPPING m;
+  for( m = 1;  m < maptop;  m++ )
+    if( MapTable[m]->seen_recoded )  PrintMapping(m, fp);
 } /* end MapPrintEncodings */
 
 
@@ -333,11 +369,12 @@ void MapPrintEncodings(FILE *fp)
 
 void MapPrintResources(FILE *fp)
 { MAPPING m;  MAP_VEC map;
-  for( m = 1;  m < maptop;  m++ )  if( MapTable[m]->must_print )
+  for( m = 1;  m < maptop;  m++ )  if( MapTable[m]->seen_recoded )
   { map = MapTable[m];
     fprintf(fp, "%%%%+ encoding %s\n", string(map->name));
   }
 } /* end MapPrintResources */
+
 
 /*@@**************************************************************************/
 /*                                                                           */

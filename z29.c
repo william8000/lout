@@ -1,6 +1,6 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -236,10 +236,10 @@ void DebugScope(void)
 { int i;
   if( suppress_scope )
   {
-    debug0(DST, DD, "suppressed");
+    debug0(DST, D, "suppressed");
   }
   else for( i = 0;  i < scope_top;  i++ )
-  { debug6(DST, DD, "%s %s%s%s%s%s",
+  { debug6(DST, D, "%s %s%s%s%s%s",
       i == scope_top - 1 ? "->" : "  ",
       SymName(scope[i]),
       npars_only[i] ? " npars_only" : "",
@@ -248,6 +248,64 @@ void DebugScope(void)
       i == scope_top - 1 && suppress_visible ? " suppress_visible" : "");
   }
 } /* end DebugScope */
+
+
+/*@::ScopeSnapshot()@*********************************************************/
+/*                                                                           */
+/*  OBJECT GetScopeSnapshot()                                                */
+/*  LoadScopeSnapshot(ss)                                                    */
+/*  ClearScopeSnapshot(ss)                                                   */
+/*                                                                           */
+/*  A scope snapshot is a complete record of the state of the scope stack    */
+/*  at some moment.  These routines allow you to take a scope snapshot,      */
+/*  then subsequently load it (i.e. make it the current scope), then         */
+/*  subsequently clear it (i.e. return to whatever was before the Load).     */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT GetScopeSnapshot()
+{ OBJECT ss, x;  int i;
+  New(ss, ACAT);
+  for( i = scope_top-1;  scope[i] != StartSym;  i-- )
+  {
+    New(x, SCOPE_SNAPSHOT);
+    Link(ss, x);
+    Link(x, scope[i]);
+    ss_npars_only(x) = npars_only[i];
+    ss_vis_only(x) = vis_only[i];
+    ss_body_ok(x) = body_ok[i];
+  }
+  ss_suppress(ss) = suppress_visible;
+  return ss;
+} /* end GetScopeSnapshot */
+
+
+void LoadScopeSnapshot(OBJECT ss)
+{ OBJECT link, x, sym;  BOOLEAN tmp;
+  assert( type(ss) == ACAT, "LoadScopeSnapshot: type(ss)!" );
+  PushScope(StartSym, FALSE, FALSE);
+  for( link = LastDown(ss);  link != ss;  link = PrevDown(link) )
+  { Child(x, link);
+    assert( type(x) == SCOPE_SNAPSHOT, "LoadScopeSnapshot: type(x)!" );
+    Child(sym, Down(x));
+    PushScope(sym, ss_npars_only(x), ss_vis_only(x));
+    body_ok[scope_top-1] = ss_body_ok(x);
+  }
+  tmp = suppress_visible;
+  suppress_visible = ss_suppress(ss);
+  ss_suppress(ss) = tmp;
+  debug0(DST, D, "after LoadScopeSnapshot, scope is:")
+  ifdebug(DST, D, DebugScope());
+} /* end LoadScopeSnapshot */
+
+
+void ClearScopeSnapshot(OBJECT ss)
+{
+  while( scope[scope_top-1] != StartSym )
+    scope_top--;
+  scope_top--;
+  suppress_visible = ss_suppress(ss);
+} /* end ClearScopeSnapshot */
 
 
 /*@::InsertSym()@*************************************************************/
@@ -409,7 +467,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   len = StringLength(str);
   hash(str, len, sum);
 
-  ifdebug(DST, D, sym_spread[sum]++;  sym_count++);
+  ifdebug(DST, DD, sym_spread[sum]++;  sym_count++);
   entry = (OBJECT) &symtab[sum];
   for( plink = Down(entry);  plink != entry;  plink = NextDown(plink) )
   { Child(p, plink);
@@ -465,7 +523,7 @@ void InsertAlternativeName(FULL_CHAR *str, OBJECT s, FILE_POS *xfpos)
   len = StringLength(str);
   hash(str, len, sum);
 
-  ifdebug(DST, D, sym_spread[sum]++;  sym_count++);
+  ifdebug(DST, DD, sym_spread[sum]++;  sym_count++);
   entry = (OBJECT) &symtab[sum];
   for( plink = Down(entry);  plink != entry;  plink = NextDown(plink) )
   { Child(p, plink);
@@ -658,7 +716,7 @@ OBJECT ChildSymWithCode(OBJECT s, unsigned char code)
 
 void CheckSymSpread(void)
 { int i, j, sum, usum;  OBJECT entry, plink;
-  debug2(DST, D, "Symbol table spread (table size = %d, symbols = %d):",
+  debug2(DST, DD, "Symbol table spread (table size = %d, symbols = %d):",
     MAX_TAB, sym_count);
   usum = sum = 0;
   for( i = 0;  i < MAX_TAB;  i++ )

@@ -26,7 +26,7 @@ involved.  Lout will precede this error message with a file name,
 line number, and column number pointing to the Lout symbol
 ({@Code "@CP"}, {@Code "@Eiffel"} etc.) whose program text caused the
 error message, like this:
-@ID @Code @Verbatim {
+@ID @OneRow @Code @Verbatim {
 lout file "prg_tabs" (from "prg" line 96, from "all" line 46):
    56,23: prg2lout 2,1: program text ended within comment
 }

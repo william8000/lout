@@ -32,6 +32,7 @@
 
 @Use { @EiffelSetup
   # pipe			{		} # pipe source through this
+  # numbered			{ No		} # No, Yes, or a line number
   # style	     { varying @OrIfPlain fixed	} # fixed, varying, or symbol
 
   # the following options apply when style is "fixed"
@@ -48,6 +49,7 @@
   # fixednumbers		{ Base		} # number face
   # fixedstrings		{ Base		} # string face
   # fixedcomments		{ Base		} # comment face
+  # fixedlinenumbers		{ Base		} # line numbers face
 
   # fixedidentifiersformat	{ @Body		} # identifiers format
   # fixedkeywordsformat		{ @Body		} # keywords format
@@ -55,6 +57,7 @@
   # fixednumbersformat		{ @Body		} # numbers format
   # fixedstringsformat		{ @Body		} # strings format
   # fixedcommentsformat		{ @Body		} # comments format
+  # fixedlinenumbersformat	{ @Body		} # line numbers format
 
   # the following options apply when style is "varying"
 
@@ -70,6 +73,7 @@
   # varyingnumbers		{ Base		} # number face
   # varyingstrings		{ Slope		} # string face
   # varyingcomments		{ Base		} # comment face
+  # varyinglinenumbers		{ Base		} # line numbers face
 
   # varyingidentifiersformat	{ @Body		} # identifiers format
   # varyingkeywordsformat	{ @Body		} # keywords format
@@ -77,6 +81,7 @@
   # varyingnumbersformat	{ @Body		} # numbers format
   # varyingstringsformat	{ @Body		} # strings format
   # varyingcommentsformat	{ @Body		} # comments format
+  # varyinglinenumbersformat	{ @Body		} # line numbers format
 
   # the following options apply when style is "symbol"
 
@@ -92,6 +97,7 @@
   # symbolnumbers		{ Base		} # number face
   # symbolstrings		{ Slope		} # string face
   # symbolcomments		{ Base		} # comment face
+  # symbollinenumbers		{ Base		} # line numbers face
 
   # symbolidentifiersformat	{ @Body		} # identifiers format
   # symbolkeywordsformat	{ @Body		} # keywords format
@@ -99,4 +105,5 @@
   # symbolnumbersformat		{ @Body		} # numbers format
   # symbolstringsformat		{ @Body		} # strings format
   # symbolcommentsformat	{ @Body		} # comments format
+  # symbollinenumbersformat	{ @Body		} # line numbers format
 }

@@ -9,7 +9,7 @@ there is an exception.  The program text may contain an
 @Code "@Include" or @Code "@SysInclude" command, which, as for the
 @Code "@Verbatim" symbol (Section {@NumberOf verbatim}), causes Lout
 to take the program text from a file:
-@ID @Code {
+@ID @OneRow @Code {
 "@Eiffel"
 "{"
 "    @Include { \"/usr/staff/jeff/Eiffel/hash.e\" }"
@@ -32,7 +32,7 @@ is passed to {@Code prg2lout}.
 For example, suppose that all your Eiffel routines begin with the
 routine name one tab stop from the left margin and end at the first
 following @Eiffel { end } indented two tab stops.  Then
-@ID @Code {
+@ID @OneRow @Code {
 "@Eiffel"
 "    pipe { \"sed -n /^.insert/,/^..end/p\" }"
 "{"
@@ -44,7 +44,7 @@ file.  Assuming that your program text has been laid out in a
 disciplined manner, every line of the selection will begin with a
 tab character that is not wanted in this display, so an even better
 pipe is
-@ID @Code {
+@ID @OneRow @Code {
 "@Eiffel"
 "    pipe { \"sed -n /^.insert/,/^..end/p | cut -c2-\" }"
 "{"

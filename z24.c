@@ -1,6 +1,6 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -333,12 +333,20 @@ void PrintBeforeFirst(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
       /* print procedure definitions part of header */
       fprintf(out_fp, "%%%%BeginProlog\n");
       fprintf(out_fp, "%%%%BeginResource: procset %s\n", StartUpResource);
+      fprintf(out_fp, "/save_cp { currentpoint /cp_y exch def /cp_x exch def } def\n");
+      fprintf(out_fp, "/restore_cp { cp_x cp_y moveto } def\n");
+      fprintf(out_fp, "/outline { gsave 1 1 1 setrgbcolor dup show save_cp\n");
+      fprintf(out_fp, "  grestore true charpath stroke restore_cp } bind def\n");
       fprintf(out_fp, "/m  { 3 1 roll moveto show } bind def\n");
-      fprintf(out_fp, "/mo { 3 1 roll moveto true charpath stroke } bind def\n");
+      fprintf(out_fp, "/mo { 3 1 roll moveto outline } bind def\n");
       fprintf(out_fp, "/s  { exch currentpoint exch pop moveto show } bind def\n");
-      fprintf(out_fp, "/so { exch currentpoint exch pop moveto true charpath stroke } bind def\n");
+      fprintf(out_fp, "/so { exch currentpoint exch pop moveto outline } bind def\n");
       fprintf(out_fp, "/k  { exch neg 0 rmoveto show } bind def\n");
-      fprintf(out_fp, "/ko { exch neg 0 rmoveto true charpath stroke } bind def\n");
+      fprintf(out_fp, "/ko { exch neg 0 rmoveto outline } bind def\n");
+      fprintf(out_fp, "/r  { exch 0 rmoveto show } bind def\n");
+      fprintf(out_fp, "/ro { exch 0 rmoveto outline } bind def\n");
+      fprintf(out_fp, "/c  { gsave 3 1 roll rmoveto show grestore } bind def\n");
+      fprintf(out_fp, "/co { gsave 3 1 roll rmoveto outline grestore } bind def\n");
       fprintf(out_fp, "/ul { gsave setlinewidth dup 3 1 roll\n");
       fprintf(out_fp, "      moveto lineto stroke grestore } bind def\n");
       fprintf(out_fp, "/in { %d mul } def\n", IN);
@@ -407,7 +415,7 @@ void PrintBeforeFirst(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
       fputs("%%EndResource\n\n",				  out_fp);
 
       /* print encoding vectors as resources */
-      MapPrintEncodings(out_fp);
+      /* MapPrintEncodings(out_fp); obsolete now */
 
       /* print prepend files (assumed to be organized as DSC 3.0 Resources) */
       for( fnum=FirstFile(PREPEND_FILE);  fnum!=NO_FILE;  fnum=NextFile(fnum) )
@@ -458,7 +466,7 @@ void PrintBeforeFirst(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
       PDFFile_Init(out_fp, h/PT, v/PT, IN, CM, PT, EM);
 
       /* print encoding vectors as resources */
-	MapPrintEncodings(out_fp);
+      /* MapPrintEncodings(out_fp); obsolete now */
 
 	FontPrintPageSetup(out_fp);
 
@@ -604,6 +612,29 @@ void PrintBetween(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
 } /* end KernLength */
 
 
+/*****************************************************************************/
+/*                                                                           */
+/*  static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)     */
+/*                                                                           */
+/*  Print composite character cp, assuming that the current point is         */
+/*  set to the correct origin.  If outline is true, we want to print the     */
+/*  composite character in outline.                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)
+{ debug1(DGP, D, "PrintComposite(cp, %s, fp)", bool(outline));
+  while( cp->char_code != '\0' )
+  {
+    debug4(DGP, D, "  cp = %d printing code %d (%d, %d)", (int) cp,
+      cp->char_code, cp->x_offset, cp->y_offset);
+    fprintf(fp, "%d %d (%c)%s ", cp->x_offset, cp->y_offset,
+      cp->char_code, outline ? "co" : "c");
+    cp++;
+  }
+} /* end PrintComposite */
+
+
 /*@::PrintWord()@*************************************************************/
 /*                                                                           */
 /*  PrintWord(x, hpos, vpos)                                                 */
@@ -615,6 +646,7 @@ void PrintBetween(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
 void PrintWord(OBJECT x, int hpos, int vpos)
 { FULL_CHAR *p, *q, *a, *b, *lig, *unacc;
   int i, h, v, ksize;  char *command;  MAPPING m;
+  unsigned short *composite; COMPOSITE *cmp;
 
   debug6(DGP, DD, "PrintWord( %s, %d, %d ) font %d colour %d%s", string(x),
 	hpos, vpos, word_font(x), word_colour(x),
@@ -655,10 +687,10 @@ void PrintWord(OBJECT x, int hpos, int vpos)
         fprintf(out_fp, "%hd %s", FontSize(currentfont, x),
           FontName(currentfont));
         if( ++wordcount >= 5 )
-        { fputs("\n", out_fp);
+        { putc('\n', out_fp);
           wordcount = 0;
         }
-        else fputs(" ", out_fp);
+        else putc(' ', out_fp);
       }
 
       /* if colour is different to previous word then print change */
@@ -667,27 +699,11 @@ void PrintWord(OBJECT x, int hpos, int vpos)
 	if( currentcolour > 0 )
 	{ fprintf(out_fp, "%s", ColourCommand(currentcolour));
           if( ++wordcount >= 5 )
-          { fputs("\n", out_fp);
+          { putc('\n', out_fp);
             wordcount = 0;
           }
-          else fputs(" ", out_fp);
+          else putc(' ', out_fp);
 	}
-      }
-
-      /* move to coordinate of x */
-      debug1(DGP, DDD, "  currentxheight2 = %d", currentxheight2);
-      vpos = vpos - currentxheight2;
-      if( cpexists && currenty == vpos )
-      { printnum(hpos, out_fp);
-        command = word_outline(x) ? "so" : "s";
-      }
-      else
-      { currenty = vpos;
-        printnum(hpos, out_fp);
-        fputs(" ", out_fp);
-        printnum(currenty, out_fp);
-        command = word_outline(x) ? "mo" : "m";
-        cpexists = TRUE;
       }
 
       /* convert ligature sequences into ligature characters */
@@ -719,13 +735,93 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       } while( *p );
       *q = '\0';
 
+      /* move to coordinate of x */
+      cmp = finfo[word_font(x)].cmp_table;
+      composite = finfo[word_font(x)].composite;
+      debug1(DGP, DDD, "  currentxheight2 = %d", currentxheight2);
+      vpos = vpos - currentxheight2;
+      if( cpexists && currenty == vpos )
+      { printnum(hpos, out_fp);
+        command = word_outline(x) ? "so" : "s";
+      }
+      else
+      { currenty = vpos;
+        printnum(hpos, out_fp);
+        putc(' ', out_fp);
+        printnum(currenty, out_fp);
+        command = word_outline(x) ? "mo" : "m";
+        cpexists = TRUE;
+      }
+
       /* show string(x) */
+      putc('(', out_fp);
+      p = string(x);
+      if( composite[*p] )
+      {
+	fprintf(out_fp, ")%s ", command);
+	debug3(DGP, D,
+	  "  calling PrintComposite(&cmp[composite[%d] = %d]); cmp_top = %d",
+	  (int) *p, composite[*p], finfo[word_font(x)].cmp_top);
+	PrintComposite(&cmp[composite[*p]], word_outline(x), out_fp);
+	printnum(finfo[word_font(x)].size_table[*p].right, out_fp);
+        putc('(', out_fp);
+	command = word_outline(x) ? "ro" : "r";
+      }
+      else fputs(EightBitToPrintForm[*p], out_fp);
+      m = font_mapping(finfo[word_font(x)].font_table);
+      unacc = MapTable[m]->map[MAP_UNACCENTED];
+      /* acc   = MapTable[m]->map[MAP_ACCENT]; */
+      for( p++;  *p;  p++ )
+      { KernLength(word_font(x), unacc, *(p-1), *p, ksize);
+        if( ksize != 0 )
+        { fprintf(out_fp, ")%s %d(", command, -ksize);
+          ++wordcount;
+          command = word_outline(x) ? "ko" : "k";
+        }
+	if( composite[*p] )
+	{ fprintf(out_fp, ")%s ", command);
+	  debug3(DGP, D,
+	    "  calling PrintComposite(&cmp[composite[%d] = %d]); cmp_top = %d",
+	    (int) *p, composite[*p], finfo[word_font(x)].cmp_top);
+	  PrintComposite(&cmp[composite[*p]], word_outline(x), out_fp);
+	  printnum(finfo[word_font(x)].size_table[*p].right, out_fp);
+          putc('(', out_fp);
+	  command = word_outline(x) ? "ro" : "r";
+	}
+	else fputs(EightBitToPrintForm[*p], out_fp);
+      }
+      if( ++wordcount >= 5 )
+      { fprintf(out_fp, ")%s\n", command);
+        wordcount = 0;
+      }
+      else fprintf(out_fp, ")%s ", command);
+
+
+      /* move to coordinate of x */
+      /* *** old version
+      debug1(DGP, DDD, "  currentxheight2 = %d", currentxheight2);
+      vpos = vpos - currentxheight2;
+      if( cpexists && currenty == vpos )
+      { printnum(hpos, out_fp);
+        command = word_outline(x) ? "so" : "s";
+      }
+      else
+      { currenty = vpos;
+        printnum(hpos, out_fp);
+        fputs(" ", out_fp);
+        printnum(currenty, out_fp);
+        command = word_outline(x) ? "mo" : "m";
+        cpexists = TRUE;
+      }
+      *** */
+
+      /* show string(x) */
+      /* *** old version
       fputs("(", out_fp);
       p = string(x);
       fputs(EightBitToPrintForm[*p], out_fp);
       m = font_mapping(finfo[word_font(x)].font_table);
       unacc = MapTable[m]->map[MAP_UNACCENTED];
-      /* acc   = MapTable[m]->map[MAP_ACCENT]; */
       for( p++;  *p;  p++ )
       { KernLength(word_font(x), unacc, *(p-1), *p, ksize);
         if( ksize != 0 )
@@ -740,10 +836,14 @@ void PrintWord(OBJECT x, int hpos, int vpos)
         wordcount = 0;
       }
       else fprintf(out_fp, ")%s ", command);
+      *** */
 
       /* ordinary printing moves current point; outlining destroys it */
+      /* *** changed the outline commands now so that they move the current
+	     point the same way ordinary printing does
       if( word_outline(x) )
 	cpexists = FALSE;
+      *** */
       break;
 
 

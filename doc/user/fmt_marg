@@ -28,6 +28,22 @@ When setting these options you must ensure that
 In other words, the total margin on odd pages must be the same as on
 even pages.
 @PP
+In addition, four options are provided which add extra left and right
+margins to the page @I body (that is, everything but the running headers
+and footers):
+@ID @OneRow @Code {
+"@OddLeftBodyMargin { 0c }"
+"@OddRightBodyMargin { 0c }"
+"@EvenLeftBodyMargin { 0c }"
+"@EvenRightBodyMargin { 0c }"
+}
+The default is to add no page body margins, as shown.  Most people who
+use page body margins would change only @Code "@OddRightBodyMargin" and
+{@Code "@EvenLeftBodyMargin"}, since those are the outside margins.  As
+for ordinary margins, the total (left plus right) page body margin must
+be the same on odd and even pages.  Margin notes
+(Section {@NumberOf marginnotes}) occupy body margin space.
+@PP
 You can have a box drawn around each page if you wish.  Here are the
 relevant options and their default values:
 @ID @OneRow @Code {
@@ -76,6 +92,20 @@ draws a curved box, painted grey, around each page, with a one
 centimetre margin between its boundary and the page contents.  If the
 left margin is 2.5 centimetres, say, this gives a total left margin
 from the page edge to the page contents of 3.5 centimetres.
+@PP
+More generally, you can enclose each page in any object at all, by
+means of the @Code "@PageEnclose" option:
+@ID @Code {
+"@PageEnclose { @Body }"
+}
+Within this option, @Code "@Body" stands for the page, and it must
+occur exactly once.  You could place a curved box around each page,
+for example, by writing
+@ID @Code {
+"@PageEnclose { @CurveBox @Body }"
+}
+This is of course also available from the @Code "@PageBox" symbols, but
+with @Code "@PageEnclose" there are infinitely many other possibilities.
 @PP
 Finally, it is possible to have something other than the usual white
 background on the page, using the @Code "@PageBackground" option:

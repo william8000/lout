@@ -68,6 +68,12 @@ OPTIONS
           is sufficiently large.  For  example,  -T0.5i  produces
           half-inch tab intervals.
 
+     -L number
+          Attach line numbers to the program text, beginning with
+          number  or  1  if number is not given.  You may need to
+          give  the  1  anyway  to prevent prg2lout from taking a
+          following file name as a number.
+
      -S filename
           Use  filename  as  the setup file instead of the system
           default  setup  file.  The  setup  file  determines the

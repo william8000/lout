@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.20 (April 2000)")
+#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.21 (May 2000)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -924,7 +924,7 @@ typedef union
 /*                      object can have meaningful line numbers.  This has   */
 /*                      not been done in every case; it ought to be.         */
 /*                                                                           */
-/*  TOKEN - these fields are defined for all objects that are input tokens,  */
+/*  TOKEN - these fields are defined for all objects that are input tokens.  */
 /*          They may be overwritten after parsing is completed.              */
 /*                                                                           */
 /*      precedence      Precedence of this token (0 if has no parameters)    */
@@ -1092,7 +1092,7 @@ typedef union
 /*                          number   An ID number for this sym in this db    */
 /*                          db_targ  TRUE if sym is a galley target          */
 /*                                                                           */
-/*  WORD, QWORD when used as font records                                    */
+/*  WORD, QWORD when used as font records (consult z37.c for more detail)    */
 /*                                                                           */
 /*      string[]        Font name                                            */
 /*      font_num        The number of this font                              */
@@ -1241,7 +1241,9 @@ typedef union
 /*                                                                           */
 /*      filter_use_begin TRUE if filter enclosed in @Begin ... @End          */
 /*      filter_actual   The symbol this is an invocation of                  */
-/*      first child     WORD containing file name of filter output           */
+/*      first child     WORD containing file name of filter input file       */
+/*      second child    WORD containing file name of filter output file      */
+/*      last child      Scope snapshot for reading filter output file        */
 /*                                                                           */
 /*  XCHAR - @Char symbol                                                     */
 /*  NEXT - @Next symbol                                                      */
@@ -1460,6 +1462,13 @@ typedef union
 /*                                                                           */
 /*      children        The cross-references                                 */
 /*                                                                           */
+/*  SCOPE_SNAPSHOT - a snapshot of one element of the current scope stack    */
+/*                                                                           */
+/*      ss_npars_only   Value of npars_only in this element                  */
+/*      ss_vis_only     Value of vis_only in this element                    */
+/*      ss_body_ok      Value of body_ok in this element                     */
+/*      ss_suppress     Value of suppress_visible in this element            */
+/*                                                                           */
 /*  DISPOSED - a disposed object (available for reallocation)                */
 /*                                                                           */
 /*****************************************************************************/
@@ -1631,6 +1640,11 @@ typedef union rec
 #define	word_hyph(x)		(x)->os1.ou2.os22.oword_hyph
 #define	filter_use_begin(x)	(x)->os1.ou2.os22.oword_colour
 
+#define	ss_npars_only(x)	word_font(x)
+#define	ss_vis_only(x)		word_colour(x)
+#define	ss_body_ok(x)		word_outline(x)
+#define	ss_suppress(x)		word_language(x)
+
 #define	non_blocking(x)		(x)->os1.ou2.os23.onon_blocking
 #define	vert_sized(x)		non_blocking(x)
 #define	sized(x)		(x)->os1.ou2.os23.osized
@@ -1799,9 +1813,18 @@ struct metrics {
   SHORT_LENGTH last_adjust;
 };
 
+typedef struct composite_rec {
+  FULL_CHAR char_code;
+  SHORT_LENGTH x_offset;
+  SHORT_LENGTH y_offset;
+} COMPOSITE;
+
 typedef struct font_rec {
   struct metrics	*size_table;		/* metrics of sized fonts    */
   FULL_CHAR		*lig_table;		/* ligatures                 */
+  unsigned short	*composite;		/* non-zero means composite  */
+  COMPOSITE		*cmp_table;		/* composites to build	     */
+  int			cmp_top;		/* length of cmp_table	     */
   OBJECT		font_table;		/* record of sized fonts     */
   OBJECT		original_font;		/* font rec before resizing  */
   SHORT_LENGTH		underline_pos;		/* position of underline     */
@@ -1830,7 +1853,8 @@ typedef struct font_rec {
 typedef struct mapvec {
   OBJECT        file_name;              /* name of file containing the vec   */
   FILE_NUM      fnum;                   /* the file number of this file      */
-  BOOLEAN       must_print;             /* TRUE if this vec must be printed  */
+  BOOLEAN       seen_recoded;           /* TRUE if a font recode was seen    */
+  int		last_page_printed;	/* most recent page on which printed */
   OBJECT        name;                   /* PostScript name of encoding vec   */
   OBJECT        vector[MAX_CHARS];      /* character names                   */
   FULL_CHAR     hash_table[MAX_CHASH];  /* character hash table for inverse  */
@@ -1855,27 +1879,27 @@ typedef struct mapvec {
 #define	LINK		     0		/*        a link between objects     */
 #define	GAP_OBJ		     1		/*  o     a gap object               */
 #define	CLOSURE		     2		/* to  n  a closure of a symbol      */
-#define	BEGIN_HEADER	     3		/* to sn  @BeginHeaderComponent      */
-#define	END_HEADER	     4		/* to sn  @EndHeaderComponent        */
-#define	SET_HEADER	     5		/* to sn  @SetHeaderComponent        */
-#define	CLEAR_HEADER	     6		/* to sn  @ClearHeaderComponent      */
-#define	UNDER_REC	     7		/*  o  n  record of underlining      */
-#define	PAGE_LABEL	     8		/* to sn  @PageLabel                 */
-#define	NULL_CLOS	     9		/* to sn  @Null                      */
-#define	CROSS		    10		/* to sn  && (a cross reference obj) */
-#define	FORCE_CROSS	    11		/* to sn  &&& (a forcing cross ref.) */
-#define	HEAD		    12		/*  o  n  a galley header            */
-#define	SPLIT		    13		/*  o     @Split                     */
-#define	PAR		    14		/*  o     a parameter of a closure   */
-#define	WORD		    15		/*  o     a word                     */
-#define	QWORD		    16		/*  o     a word (was quoted in i/p) */
-#define	HSPANNER	    17		/*  o     a horizontal spanner       */
-#define	VSPANNER	    18		/*  o     a vertical spanner         */
-#define	ROW_THR		    19		/*  o     a row thread               */
-#define	COL_THR		    20		/*  o     a column thread            */
-#define	ACAT		    21		/* to s   a sequence of &-ed objs    */
-#define	HCAT		    22		/* to s   a sequence of |-ed objs    */
-#define	VCAT		    23		/* to s   a sequence of /-ed objs    */
+#define	UNDER_REC	     3		/*  o  n  record of underlining      */
+#define	PAGE_LABEL	     4		/* to sn  @PageLabel                 */
+#define	NULL_CLOS	     5		/* to sn  @Null                      */
+#define	CROSS		     6		/* to sn  && (a cross reference obj) */
+#define	FORCE_CROSS	     7		/* to sn  &&& (a forcing cross ref.) */
+#define	HEAD		     8		/*  o  n  a galley header            */
+#define	SPLIT		     9		/*  o     @Split                     */
+#define	PAR		    10		/*  o     a parameter of a closure   */
+#define	WORD		    11		/*  o     a word                     */
+#define	QWORD		    12		/*  o     a word (was quoted in i/p) */
+#define	HSPANNER	    13		/*  o     a horizontal spanner       */
+#define	VSPANNER	    14		/*  o     a vertical spanner         */
+#define	ROW_THR		    15		/*  o     a row thread               */
+#define	COL_THR		    16		/*  o     a column thread            */
+#define	ACAT		    17		/* to s   a sequence of &-ed objs    */
+#define	HCAT		    18		/* to s   a sequence of |-ed objs    */
+#define	VCAT		    19		/* to s   a sequence of /-ed objs    */
+#define	BEGIN_HEADER	    20		/* to s   @BeginHeaderComponent      */
+#define	END_HEADER	    21		/* to s   @EndHeaderComponent        */
+#define	SET_HEADER	    22		/* to s   @SetHeaderComponent        */
+#define	CLEAR_HEADER	    23		/* to s   @ClearHeaderComponent      */
 #define	ONE_COL		    24		/* to s   @OneCol                    */
 #define	ONE_ROW		    25		/* to s   @OneRow                    */
 #define	WIDE		    26		/* to s   @Wide                      */
@@ -1999,7 +2023,8 @@ typedef struct mapvec {
 #define	RPAR	           144		/*        a right parameter          */
 #define	EXT_GALL           145		/*        an external galley         */
 #define	CR_LIST	           146		/*        a list of cross references */
-#define	DISPOSED           147		/*        a disposed record          */
+#define	SCOPE_SNAPSHOT     147		/*        a scope snapshot	     */
+#define	DISPOSED           148		/*        a disposed record          */
 
 #define is_indefinite(x)  ((x) >= CLOSURE && (x) <= HEAD)
 #define is_header(x)  ((x) >= BEGIN_HEADER && (x) <= CLEAR_HEADER)
@@ -2065,9 +2090,9 @@ typedef struct mapvec {
 #define	SMALL_CAPS_ON	     1		/* small capitals                    */
 
 /* sides of a mark */
-#define	BACK	           148		/* means lies to left of mark        */
-#define	ON	           149		/* means lies on mark                */
-#define	FWD	           150		/* means lies to right of mark       */
+#define	BACK	           149		/* means lies to left of mark        */
+#define	ON	           150		/* means lies on mark                */
+#define	FWD	           151		/* means lies to right of mark       */
 
 /* statuses of thread objects */
 #define	NOTSIZED	 0		/* this thread object is not sized   */
@@ -2075,15 +2100,15 @@ typedef struct mapvec {
 #define	FINALSIZE	 2		/* thread object size is now final   */
 
 /* constraint statuses */
-#define	PROMOTE	           151		/* this component may be promoted    */
-#define	CLOSE	           152		/* must close dest before promoting  */
-#define	BLOCK	           153		/* cannot promote this component     */
-#define	CLEAR	           154		/* this constraint is now satisfied  */
+#define	PROMOTE	           152		/* this component may be promoted    */
+#define	CLOSE	           153		/* must close dest before promoting  */
+#define	BLOCK	           154		/* cannot promote this component     */
+#define	CLEAR	           155		/* this constraint is now satisfied  */
 
 /* gap increment types */
-#define	GAP_ABS	           155		/* absolute,  e.g.  3p               */
-#define	GAP_INC	           156		/* increment, e.g. +3p               */
-#define	GAP_DEC	           157		/* decrement, e.g. -3p               */
+#define	GAP_ABS	           156		/* absolute,  e.g.  3p               */
+#define	GAP_INC	           157		/* increment, e.g. +3p               */
+#define	GAP_DEC	           158		/* decrement, e.g. -3p               */
 
 /* file types */
 #define	SOURCE_FILE	 0		/* input file from command line      */
@@ -2193,7 +2218,14 @@ typedef struct mapvec {
 #define	KW_PRINT		AsciiToFull("\\Print")
 #define	KW_OPTGALL		AsciiToFull("@OptGall")
 #define	KW_DEF			AsciiToFull("def")
-#define	KW_FONTDEF		AsciiToFull("fontdef")
+#define	KW_FONTDEF		AsciiToFull("@FontDef")
+#define	KW_FAMILY		AsciiToFull("@Family")
+#define	KW_FACE			AsciiToFull("@Face")
+#define	KW_NAME			AsciiToFull("@Name")
+#define	KW_METRICS		AsciiToFull("@Metrics")
+#define	KW_EXTRA_METRICS	AsciiToFull("@ExtraMetrics")
+#define	KW_MAPPING		AsciiToFull("@Mapping")
+#define	KW_RECODE		AsciiToFull("@Recode")
 #define	KW_LANGDEF		AsciiToFull("langdef")
 #define	KW_FORCE		AsciiToFull("force")
 #define	KW_HORIZ		AsciiToFull("horizontally")
@@ -3082,6 +3114,9 @@ extern	void	  SwitchScope(OBJECT sym);
 extern	void	  UnSwitchScope(OBJECT sym);
 extern	void	  BodyParAllowed(void);
 extern	void	  BodyParNotAllowed(void);
+extern	OBJECT	  GetScopeSnapshot(void);
+extern	void	  LoadScopeSnapshot(OBJECT ss);
+extern	void	  ClearScopeSnapshot(OBJECT ss);
 extern	OBJECT	  InsertSym(FULL_CHAR *str, unsigned char xtype,
 		    FILE_POS *xfpos, unsigned char xprecedence,
 		    BOOLEAN xindefinite, BOOLEAN xrecursive,
@@ -3161,7 +3196,6 @@ extern	OBJECT	  Hyphenate(OBJECT x);
 extern	FONT_INFO *finfo;
 extern	int	  font_curr_page;
 extern	void	  FontInit(void);
-extern	void	  FontDefine(OBJECT family, OBJECT face, OBJECT inside);
 extern	void	  FontChange(STYLE *style, OBJECT x);
 extern	void	  FontWordSize(OBJECT x);
 extern	FULL_LENGTH  FontSize(FONT_NUM fnum, OBJECT x);
@@ -3180,10 +3214,11 @@ extern	BOOLEAN	  FontNeeded(FILE *fp);
 
 /*****  z38.c	  Character Mappings    **************************************/
 extern	MAP_VEC	  MapTable[];
-extern	MAPPING	  MapLoad(OBJECT filename, BOOLEAN must_print);
+extern	MAPPING	  MapLoad(OBJECT filename, BOOLEAN recoded);
 extern	FULL_CHAR MapCharEncoding(FULL_CHAR *str, MAPPING m);
 extern	FULL_CHAR *MapEncodingName(MAPPING m);
 extern	void	  MapPrintEncodings(FILE *fp);
+extern	void	  MapEnsurePrinted(MAPPING m, int curr_page, FILE *fp);
 extern	void	  MapPrintResources(FILE *fp);
 extern	OBJECT	  MapSmallCaps(OBJECT x, STYLE *style);
 extern	BOOLEAN	  MapIsLowerCase(FULL_CHAR ch, MAPPING m);
@@ -3193,7 +3228,7 @@ extern	BOOLEAN	  MapIsLowerCase(FULL_CHAR ch, MAPPING m);
 #define		  AsciiToFull(x)	( (FULL_CHAR *) (x) )
 #define		  StringEqual(a, b)	(strcmp((char *)(a), (char *)(b))==0)
 extern int	  strcollcmp(char *a, char *b);
-#define		  StringLessEqual(a, b) \
+#define		  TabbedStringLessEqual(a, b) \
 		    ( UseCollate ? strcollcmp((char *)(a),(char *)(b)) <= 0 \
 				 : strcmp((char *)(a),(char *)(b)) <= 0 )
 #define		  StringCat(a, b)	strcat((char *)(a),(char *)(b))

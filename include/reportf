@@ -43,7 +43,7 @@ def @ReportSetup
     named @AbstractHeadingFont		{ Bold			}
     named @AbstractHeadingBreak		{ ragged 1.2fx nohyphen }
     named @AbstractHeadingFormat
-	    right title			{ title			}
+	    right title			{ @Centre title		}
 
     named @ContentsHeadingFont		{ Bold			}
     named @ContentsHeadingBreak		{ ragged 1.2fx nohyphen }

@@ -1,6 +1,6 @@
 /*@z39.c:String Handler:AsciiToFull(), StringEqual(), etc.@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -62,13 +62,31 @@
 /*  Like strcoll, but returns 0 only iff strcmp returns 0.                   */
 /*  This allow to test for equality using only strcmp. --uwe                 */
 /*                                                                           */
+/*  The new version of strcollcmp analyses a and b into three fields         */
+/*  separated by \t, then does the comparison field by field.  This is       */
+/*  to ensure that the collation order of \t has no effect on the result.    */
+/*                                                                           */
 /*****************************************************************************/
 
+/* *** old version
 int strcollcmp(char *a, char *b)
 {
   int order = strcoll (a, b);
-  if( order == 0 ) /* then disambiguate with strcmp */
+  if( order == 0 ) / * then disambiguate with strcmp * /
     order = strcmp (a, b);
+  return order;
+}
+*** */
+
+int strcollcmp(char *a, char *b)
+{ char a1[100], b1[100];
+  int order;
+  sscanf(a, "%[^\t]", a1);
+  sscanf(b, "%[^\t]", b1);
+  order = strcoll(a1, b1);
+  if( order == 0 )
+    order = strcmp(a, b);  /* disambiguate with strcmp */
+  debug3(DBS, D, "strcollcmp(\"%s<tab>\", \"%s<tab>\") = %d", a1, b1, order)
   return order;
 }
 

@@ -243,6 +243,27 @@ Changes and new features introduced in Version 3.20 [8 April 2000]
     Multi-line style changes (@I, @Colour etc.) now work in lines @Break mode
     @Perl symbol for Perl programming language formatting (includes Pod)
 
+Changes and new features introduced in Version 3.21 [10 May 2000]
+
+    Bug fixes (including an old problem of bits lost from programs in tables)
+    Refinements to @Perl symbol for Perl programming language formatting
+    Program texts can now be formatted with line numbers added
+    -V now tells about PDF compression and whether debug output is available
+    "Page body margins" for indenting of page body wrt headers and footers
+    Margin notes code updated to work as desired with the new page body margins
+    @PageEnclose symbol generalizes @PageBox (enclose each page in anything)
+    Robustness wrt Linux strcoll() improved (tab characters no longer compared)
+    "Abstract" word in tech reports now centred again by default
+    Lout now builds composite characters - see Expert's Guide, under @Font
+
+    *** IMPORTANT: ONE CHANGE THAT IS NOT UPWARDLY COMPATIBLE ***
+
+    If you are using your own setup file, then it is likely to contain the
+    line "@SysInclude { fontdefs }".  There is no longer a fontdefs file,
+    there is now a fontdefs database, so you need to replace this line with
+    "@SysDatabase @FontDef { fontdefs }".
+
+
 Things that ought to be done but haven't been done yet
 
     PDF-like features in PostScript output
@@ -250,4 +271,4 @@ Things that ought to be done but haven't been done yet
     Review Uwe's proposal for moving word row marks to the baseline
 
 Jeff Kingston
-8 April 2000
+10 May 2000

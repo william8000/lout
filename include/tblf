@@ -187,6 +187,16 @@ def @TblSetup
 	@HeaderRowg
 	@HeaderRowh
 
+	@HeaderFirstRow
+	@HeaderFirstRowa
+	@HeaderFirstRowb
+	@HeaderFirstRowc
+	@HeaderFirstRowd
+	@HeaderFirstRowe
+	@HeaderFirstRowf
+	@HeaderFirstRowg
+	@HeaderFirstRowh
+
 	@EndHeaderRow
 
 	@NP
@@ -3144,6 +3154,16 @@ def @TblSetup
 	macro @HeaderRowf	{ /  @BeginHeaderComponent @DoRowf }
 	macro @HeaderRowg	{ /  @BeginHeaderComponent @DoRowg }
 	macro @HeaderRowh	{ /  @BeginHeaderComponent @DoRowh }
+
+	macro @HeaderFirstRow	{    @BeginHeaderComponent @DoRow  }
+	macro @HeaderFirstRowa	{    @BeginHeaderComponent @DoRowa }
+	macro @HeaderFirstRowb	{    @BeginHeaderComponent @DoRowb }
+	macro @HeaderFirstRowc	{    @BeginHeaderComponent @DoRowc }
+	macro @HeaderFirstRowd	{    @BeginHeaderComponent @DoRowd }
+	macro @HeaderFirstRowe	{    @BeginHeaderComponent @DoRowe }
+	macro @HeaderFirstRowf	{    @BeginHeaderComponent @DoRowf }
+	macro @HeaderFirstRowg	{    @BeginHeaderComponent @DoRowg }
+	macro @HeaderFirstRowh	{    @BeginHeaderComponent @DoRowh }
 
 	macro @EndHeaderRow	{ / @EndHeaderComponent }
 

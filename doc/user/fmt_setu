@@ -49,17 +49,15 @@ The remainder of this section is a tour through @Code {doc},
 explaining the various parts and how to modify them.  The first lines
 that actually do anything are these:
 @ID @OneRow @Code {
-"@SysInclude { fontdefs }"
 "@SysInclude { langdefs }"
 "@SysInclude { bsf }"
 "@SysInclude { dsf }"
 "@SysInclude { docf }"
 }
 We already know that @Code "@SysInclude" causes Lout to read a file from
-the Lout system include directory.  Files @Code fontdefs and @Code langdefs
-fontdefs.file @Index { @Code "fontdefs" file }
+the Lout system include directory.  File @Code langdefs
 langdefs.file @Index { @Code "langdefs" file }
-tell Lout what fonts and languages there are.  Files @Code "bsf" and
+tells Lout what languages there are, and files @Code "bsf" and
 @Code "dsf" contain
 bsf.file @Index { @Code "bsf" file }
 dsf.file @Index { @Code "dsf" file }
@@ -178,7 +176,8 @@ or all document types.
 The setup file ends with a comment identifying a spot where database
 declarations may
 database.dec @Index { database declarations, where to put }
-be put, and one such declaration, for reference printing styles.
+be put, and two such declarations, one for fonts and the other for
+reference printing styles.
 @PP
 The setup files used with other packages, such as C and C++ program printing,
 diagrams, and graphs, are similar to the @Code { doc } setup file we

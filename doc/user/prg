@@ -24,7 +24,7 @@ breaks and indenting you give to the program.  What Lout does do is cope
 with characters in the program text that it would ordinarily either reject
 or interpret in some way (braces and so on), ensuring that you can include
 program texts with absolutely no modifications; plus, if you wish, Lout
-will print keywords in bold, identifiers in italics, etc.
+will print keywords in bold, identifiers in italics, add line numbers, etc.
 @PP
 At the time of writing, the available programming languages are:
 eiffel. @Index { Eiffel program printing }
@@ -94,6 +94,7 @@ source file of that program ({@I prg2lout.c}) if you want to try it yourself.
 @Include { prg_opti }
 @Include { prg_chan }
 @Include { prg_tabs }
+@Include { prg_form }
 @Include { prg_comm }
 @Include { prg_prog }
 @Include { prg_pipe }

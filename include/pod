@@ -37,6 +37,12 @@
 #  There is no paragraph breaking option for verbatim since line breaks       #
 #  are honoured.                                                              #
 #                                                                             #
+#  As you can see below, we have been obliged to give "Times Base" as         #
+#  the default text font for varying style, rather than the usual empty,      #
+#  to get a varying-width font when Pod is embedded in fixed-width Perl.  If  #
+#  you are using a different text font family in your document you will have  #
+#  to change this option if you want your varying-width Pod in that family.   #
+#                                                                             #
 ###############################################################################
 
 @Use { @PodSetup
@@ -50,6 +56,8 @@
   # fixedverbatimfont		{ Courier Base		} # verbatim font
   # fixedtabin			{ 8			} # tab interval
   # fixedtabout			{ 8s			} # tab width
+  # fixedlinenumbersfont	{ 			} # line numbers font
+  # fixedlinenumbersformat	{ @Body			} # line numbers format
 
   # fixedparagap		{ 1.0v			} # gap between paras
   # fixedlistgap		{ 1.0v			} # gap within lists
@@ -85,11 +93,13 @@
 
   # the following options apply when style is "varying"
 
-  # varyingtextfont		{ 			} # text font
+  # varyingtextfont		{ Times Base		} # text font
   # varyingtextbreak		{ adjust 1.0vx hyphen	} # text para breaking
   # varyingverbatimfont		{ Courier Base -1p	} # verbatim font
   # varyingtabin		{ 8			} # tab interval
   # varyingtabout		{ 8s			} # tab width
+  # varyinglinenumbersfont	{ 			} # line numbers font
+  # varyinglinenumbersformat	{ @Body			} # line numbers format
 
   # varyingparagap		{ 1.0v			} # gap between paras
   # varyinglistgap		{ 1.0v			} # gap within lists
@@ -124,11 +134,13 @@
 
   # the following options apply when style is "symbol"
 
-  # symboltextfont		{ 			} # text font
+  # symboltextfont		{ Times Base		} # text font
   # symboltextbreak		{ adjust 1.0vx hyphen	} # text para breaking
   # symbolverbatimfont		{ Courier Base -1p	} # verbatim font
   # symboltabin			{ 8			} # tab interval
   # symboltabout		{ 8s			} # tab width
+  # symbollinenumbersfont	{ 			} # line numbers font
+  # symbollinenumbersformat	{ @Body			} # line numbers format
 
   # symbolparagap		{ 1.0v			} # gap between paras
   # symbollistgap		{ 1.0v			} # gap within lists

@@ -14,7 +14,6 @@
 #                                                                             #
 ###############################################################################
 
-  @SysInclude { fontdefs	} # font definitions
   @SysInclude { langdefs	} # language definitions
   @SysInclude { bsf		} # BasicSetup package
   @SysInclude { dsf		} # DocumentSetup package
@@ -85,11 +84,16 @@
   # @OddRightMargin	{ 2.5c	@OrIfPlain 10s	} # right margin of odd pages
   # @EvenLeftMargin	{ 2.5c	@OrIfPlain 10s	} # left margin of even pages
   # @EvenRightMargin	{ 2.5c	@OrIfPlain 10s	} # right margin of even pages
+  # @OddLeftBodyMargin	{ 0c			} # extra margin for page body
+  # @OddRightBodyMargin	{ 0c			} # extra margin for page body
+  # @EvenLeftBodyMargin	{ 0c			} # extra margin for page body
+  # @EvenRightBodyMargin{ 0c			} # extra margin for page body
   # @PageBoxType	{ None			} # None Box CurveBox ShadowBox
   # @PageBoxMargin	{ 1.00c			} # page box margin
   # @PageBoxLineWidth	{			} # page box line thickness
   # @PageBoxPaint	{ none			} # page box paint
   # @PageBoxShadow	{ 0.60c			} # shadow margin if ShadowBox
+  # @PageEnclose	{ @Body			} # enclose every page in this
   # @ColumnNumber	{ 1			} # number of columns (1 to 10)
   # @ColumnGap		{ 1.00c	@OrIfPlain 6s	} # column gap
 
@@ -362,4 +366,5 @@
 #                                                                             #
 ###############################################################################
 
+@SysDatabase @FontDef  { fontdefs }		  # font definitions
 @SysDatabase @RefStyle { refstyle }		  # reference printing styles

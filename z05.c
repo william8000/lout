@@ -1,6 +1,6 @@
-/*@z05.c:Read Definitions:ReadFontDef()@**************************************/
+/*@z05.c:Read Definitions:ReadLangDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -39,54 +39,6 @@
 /*****************************************************************************/
 
 #define is_string(t, str)    (type(t) == WORD && StringEqual(string(t), str) )
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  static ReadFontDef(encl)                                                 */
-/*                                                                           */
-/*  Read one font definition and pass it on to the font module.  The         */
-/*  syntax is  fontdef <family> <face> { <object> }.                         */
-/*                                                                           */
-/*****************************************************************************/
-
-static void ReadFontDef(OBJECT encl)
-{ OBJECT t, family, face, inside;
-  
-  SuppressScope();
-
-  /* get family name, allow for multiple tokens */
-  family = LexGetToken();
-  if( !is_word(type(family)) )
-    Error(5, 1, "expected font family name here", WARN, &fpos(family));
-  face = LexGetToken();
-  while( is_word(type(face)) && hspace(face) + vspace(face) == 0 )
-  {
-    family = MakeWordTwo(WORD, string(family), string(face), &fpos(family));
-    face = LexGetToken();
-  }
-
-  /* get face name, allow for multiple tokens */
-  if( !is_word(type(face)) )
-    Error(5, 2, "expected font face name here", WARN, &fpos(face));
-  UnSuppressScope();
-  t = LexGetToken();
-  while( is_word(type(t)) && hspace(t) + vspace(t) == 0 )
-  {
-    face = MakeWordTwo(WORD, string(face), string(t), &fpos(face));
-    t = LexGetToken();
-  }
-
-  if( type(t) != LBR )
-  { Error(5, 3, "expected opening %s of fontdef here", WARN, &fpos(t), KW_LBR);
-    Dispose(t);
-    return;
-  }
-  inside = Parse(&t, encl, FALSE, FALSE);
-  inside = ReplaceWithTidy(inside, FALSE);
-  FontDefine(family, face, inside);
-  return;
-} /* end ReadFontDef */
 
 
 /*****************************************************************************/
@@ -537,12 +489,8 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
   while( res_type==LOCAL || is_string(t, KW_NAMED) || is_string(t, KW_IMPORT) )
   {
     curr_encl = encl;
-    if( is_string(t, KW_FONTDEF) )
-    { ReadFontDef(encl);
-      t = LexGetToken();
-      continue;  /* next definition */
-    }
-    else if( is_string(t, KW_LANGDEF) )
+
+    if( is_string(t, KW_LANGDEF) )
     { ReadLangDef(encl);
       t = LexGetToken();
       continue;  /* next definition */

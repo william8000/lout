@@ -1,6 +1,6 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -59,7 +59,7 @@ typedef struct
 
 #define hash(pos, sym, tag, S)						\
 { FULL_CHAR *p = tag;							\
-  pos = (long) sym;							\
+  pos = (unsigned long) sym;						\
   while( *p ) pos += *p++;						\
   pos = pos % dtab_size(S);						\
 }
@@ -101,7 +101,7 @@ static DBCHECK_TABLE dtab_rehash(DBCHECK_TABLE S, int newsize)
 } /* end dtab_rehash */
 
 static void dtab_insert(OBJECT x, DBCHECK_TABLE *S)
-{ long pos;  OBJECT z, link, y;
+{ unsigned long pos;  OBJECT z, link, y;
   if( dtab_count(*S) == dtab_size(*S) - 1 )	/* one less since 0 unused */
     *S = dtab_rehash(*S, 2*dtab_size(*S));
   dtab_count(*S)++;
@@ -118,7 +118,7 @@ static void dtab_insert(OBJECT x, DBCHECK_TABLE *S)
 } /* end dtab_insert */
 
 static OBJECT dtab_retrieve(OBJECT sym, FULL_CHAR *tag, DBCHECK_TABLE S)
-{ OBJECT x, link, y;  long pos;
+{ OBJECT x, link, y;  unsigned long pos;
   hash(pos, sym, tag, S);
   x = dtab_item(S, pos);
   if( x == nilobj )  return nilobj;
@@ -648,7 +648,7 @@ FULL_CHAR *str, FULL_CHAR *line)
 
     /* compare str with this line and prepare next step */
     debug2(DBS, DD, "  comparing key %s with line %s", str, line);
-    if( StringLessEqual(str, line) )  r = mid - 1;
+    if( TabbedStringLessEqual(str, line) )  r = mid - 1;
     else l = mid_end + 1;
   } /* end while */
 
@@ -696,7 +696,7 @@ static BOOLEAN SearchLines(LINE *lines, int left, int right, FULL_CHAR *str,
     mid = (l + r) / 2;
     debug4(DBS, D, "  [l %d, r %d] examining lines[%d] = %s", l, r, mid,
       lines[mid]);
-    if( StringLessEqual(str, (FULL_CHAR *) lines[mid]) )  r = mid - 1;
+    if( TabbedStringLessEqual(str, (FULL_CHAR *) lines[mid]) )  r = mid - 1;
     else l = mid + 1;
   }
   sscanf( (char *) lines[l], "%[^\t]", buff);

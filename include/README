@@ -74,7 +74,6 @@ Source files (containing Lout and PostScript source code for the packages)
 Miscellaneous
 -------------
 
-       fontdefs         Standard font definitions file
        langdefs         Standard language definitions file
        mydefs           Empty file for if the user doesn't have a mydefs
        ts               The ToySetup package (an expert users' intro. example)

@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -1036,6 +1036,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  {
 	    case DO_ADJUST:	adjust_cat(x) = TRUE;
 				adjust_indent = 0;
+				debug1(DSF, D,  "adjust %s", EchoObject(x));
 				break;
 	
 	    case DISPLAY_CENTRE: adjust_cat(x) = FALSE;
@@ -1046,6 +1047,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    case DISPLAY_RIGHT:	adjust_cat(x) = FALSE;
 				adjust_indent = frame_size - actual_size;
 				debug1(DGP, DD, "rdisp %s", EchoObject(x));
+				debug1(DSF, D,  "rdisp %s", EchoObject(x));
 				break;
 
 	    default:		/* leave adjust_cat(x) as is */

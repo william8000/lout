@@ -1,5 +1,5 @@
 @Section
-   @Title { "@Font" and "@Char" }
+   @Title { {"@Font"}, {"@Char"}, and "@FontDef" }
    @Tag { font }
 @Begin
 @PP
@@ -40,10 +40,10 @@ returns its right parameter in a font and size specified by its left:
 @ID {
 @Code "{ Times Base 12p } @Font"  @I object
 }
-The family and face names must have appeared together in a {@Code fontdef};
-the size is arbitrary and may be given in any one of the {@Code "c"},
-{@Code "i"}, {@Code "p"}, {@Code "m"}, {@Code "f"}, {@Code "s"}, and
-{@Code "v"} units of measurement (Section {@NumberOf concatenation}),
+The family and face names must have appeared together in a {@Code "@FontDef"}
+(see below); the size is arbitrary and may be given in any one of the
+{@Code "c"}, {@Code "i"}, {@Code "p"}, {@Code "m"}, {@Code "f"}, {@Code "s"},
+and {@Code "v"} units of measurement (Section {@NumberOf concatenation}),
 although @Code 10p and @Code 12p are the most common sizes for text.  There
 may be empty objects and @@Null objects in the left parameter of @@Font;
 these are ignored.
@@ -89,31 +89,34 @@ respectively return the family and face names of the current font.  For
 example, right now @@CurrFamily is @CurrFamily and @@CurrFace is
 @CurrFace.
 @PP
-When Lout runs, the first thing it reads is a list of font definitions,
-font.def @Index { @Code fontdef }
-like these:
-@ID {
-    @Code "fontdef  Times  Base   {"  @I implementation-dependent  @Code "}"
-//1vx @Code "fontdef  Times  Slope  {"  @I implementation-dependent  @Code "}"
+To inform Lout that certain fonts exist, it is necessary to create a
+database of @Code "@FontDef" symbols.  A typical entry in such a
+database looks like this:
+@ID @Code @Verbatim {
+{ @FontDef
+    @Tag { Times-Base }
+    @Family { Times }
+    @Face { Base }
+    @Name { Times-Roman }
+    @Metrics { Ti-Rm }
+    @Mapping { LtLatin1.LCM }
 }
-Each line tells Lout of the existence of a font, and assigns it a family
-name and a face name.  There are a few fonts which are the only members
+}
+This entry informs Lout of the existence of a font whose family name
+is the value of {@Code "@Family"} and whose face name is the value
+of {@Code "@Face"}.  The @Code "@Tag" value must be exactly equal
+to {@Code "@Family"} followed by a hyphen followed by
+{@Code "@Face"}.  There are a few fonts which are the only members
 of their families; even though these fonts do not need a face name, they
-must be given one by their {@Code fontdef}.  The part between braces may
-vary with different implementations of Lout; it is supposed to contain
-the information Lout needs to work with the font.
+must be given one, probably {@Code Base}, by their {@Code "@FontDef"}.
 @PP
-In Basser Lout Version 3, this implementation-dependent part consists of
-a PostScript font name, an
+The other fields are implementation-dependent, but in Basser Lout
+Version 3 they are {@Code "@Name"}, a PostScript font name;
+{@Code "@Metrics"},  an
 adobe @Index { Adobe Systems, Inc. }
 Adobe font metrics (formerly AFM) file whose FontName entry must agree
-with the PostScript font name just mentioned, the name of a Lout
-Character Mapping (LCM) file, and the word @Code Recode or {@Code NoRecode}:
-@ID @Code
-"fontdef  Times  Base  {  Times-Roman  Ti-Ro  LtLatin1.LCM  Recode }"
-It seems to have become an invariable rule at Adobe Systems that the font
-name and the file name should be the same, but some operating systems do
-not permit such long file names, so Lout does not use them.  The files are
+with the PostScript font name just mentioned; and {@Code "@Mapping"},
+the name of a Lout Character Mapping (LCM) file.  The files are
 searched for in standard places.  Consult the PostScript Reference Manual
 @Cite { $adobe1990ps } for general information about fonts and encoding
 vectors; briefly, an 8-bit
@@ -121,18 +124,33 @@ lcm. @Index { LCM file }
 character code @I c in Lout's input is mapped to the character in the
 Adobe font metrics file whose name appears on the line labelled @I c in the
 LCM file.  The LCM file also defines various character-to-character
-mappings, such as upper-case to lower-case, which are used for various
-purposes, such as the production of small capitals.  If the word
-@Code NoRecode appears, Lout assumes that the given encoding vector is
-already associated with this font in the PostScript interpreter, and
-optimizes its output accordingly.
+mappings, such as upper-case to lower-case, which are used for such
+purposes as the production of small capitals.
 @PP
-If there are two font definitions with the same family and face name,
-it is an error unless the second one has the same font name and file name
-as the first, in which case it is silently ignored.  A PostScript font
-name and file may appear in two or more font definitions, allowing one
-PostScript font to have two or more equally valid Lout names, and
-different LCM files.
+The options shown above are all compulsory, but there are two other
+options which are optional.  The @Code "@Recode" option, if given,
+must have value @Code "Yes" (the default, so rarely seen) or
+{@Code "No"}.  If @Code "@Recode { No }" is given, Lout assumes that
+the given encoding vector is already associated with this font in
+the PostScript interpreter, and optimizes its output accordingly.
+@PP
+The other optional option, {@Code "@ExtraMetrics"}, has value
+equal to the name of a second font metrics file which, if given,
+is added to the main one defined by {@Code "@Metrics"}.  This
+extra metrics file contains @Code "C" (define character) and
+@Code "CC" (define composite character) entries in the same format
+as in AFM files; Lout will build composite characters declared in
+this extra file from the given pieces, which it does not do for
+composite characters in the main AFM file.  There are example
+extra metrics files in the current Lout distribution which show
+the precise format of these files.
+@PP
+It is not possible to have two @Code "@FontDef" database entries
+with the same family and face names, because then they must have
+the same {@Code "@Tag"}, which is not allowed.  However, a PostScript
+font name and file may appear in two or more font definitions,
+allowing one PostScript font to have two or more equally valid
+Lout names.  The LCM files may be equal or different as desired.
 @PP
 The @@Char symbol
 char @Index { @@Char symbol }

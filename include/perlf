@@ -5,7 +5,7 @@
 #                                                                             #
 #  Version 3.0                                                                #
 #  Jeffrey H. Kingston                                                        #
-#  5 April 2000                                                               #
+#  10 April 2000                                                              #
 #                                                                             #
 #  This package uses a filtered body parameter to convert program source      #
 #  code into Lout source.  The filter program is prg2lout, which is           #
@@ -16,7 +16,8 @@
 
 export @Perl
 def @PerlSetup
-    named pipe			{	}  # pipe through this first
+    named pipe					{	}  # pipe through this
+    named numbered				{ No	}  # numbered lines?
     named style
 	named @OrIfPlain left x right y
 	{ @BackEnd @Case { PlainText @Yield y else @Yield x } }
@@ -35,6 +36,7 @@ def @PerlSetup
     named fixednumbers				{ Base	}  # number face
     named fixedstrings				{ Base	}  # string face
     named fixedcomments				{ Base	}  # comment face
+    named fixedlinenumbers			{ Base	}  # line numbers face
 
     named fixedidentifiersformat right @Body	{ @Body	}  # identifier format
     named fixedkeywordsformat right @Body	{ @Body	}  # keyword format
@@ -42,6 +44,7 @@ def @PerlSetup
     named fixednumbersformat right @Body	{ @Body	}  # number format
     named fixedstringsformat right @Body	{ @Body	}  # string format
     named fixedcommentsformat right @Body	{ @Body	}  # comment format
+    named fixedlinenumbersformat right @Body	{ @Body	}  # line nums format
 
     # the following options apply when style is "varying"
     named varyingfont				{	}  # font family
@@ -56,6 +59,7 @@ def @PerlSetup
     named varyingnumbers			{ Base	}  # number face
     named varyingstrings			{ Slope	}  # string face
     named varyingcomments			{ Base	}  # comment face
+    named varyinglinenumbers			{ Base	}  # line numbers face
 
     named varyingidentifiersformat right @Body	{ @Body	}  # identifier format
     named varyingkeywordsformat right @Body	{ @Body	}  # keyword format
@@ -63,6 +67,7 @@ def @PerlSetup
     named varyingnumbersformat right @Body	{ @Body	}  # number format
     named varyingstringsformat right @Body	{ @Body	}  # string format
     named varyingcommentsformat right @Body	{ @Body	}  # comment format
+    named varyinglinenumbersformat right @Body	{ @Body	}  # line nums format
 
     # the following options apply when style is "symbol"
     named symbolfont				{	}  # font family
@@ -77,6 +82,7 @@ def @PerlSetup
     named symbolnumbers				{ Base	}  # number face
     named symbolstrings				{ Slope	}  # string face
     named symbolcomments			{ Base	}  # comment face
+    named symbollinenumbers			{ Base	}  # line numbers face
 
     named symbolidentifiersformat right @Body	{ @Body	}  # identifier format
     named symbolkeywordsformat right @Body	{ @Body	}  # keyword format
@@ -84,16 +90,18 @@ def @PerlSetup
     named symbolnumbersformat right @Body	{ @Body	}  # number format
     named symbolstringsformat right @Body	{ @Body	}  # string format
     named symbolcommentsformat right @Body	{ @Body	}  # comment format
+    named symbollinenumbersformat right @Body	{ @Body	}  # line nums format
 
 @Begin
 
     export
     
-	@PI @PK @PO @PN @PS @PC @PA @PM @PD
+	@PI @PK @PO @PN @PS @PC @PL @PA @PM @PD
 	@A "$>"
 
     def @Perl
 	named style        { style         }  # style
+	named numbered	   { numbered	   }  # want numbered lines?
 	named pipe         { pipe          }  # pipe through this first
 	named font         { dft           }  # font family
 	named size         { dft           }  # font size
@@ -106,6 +114,7 @@ def @PerlSetup
 	named numbers      { dft           }  # number font
 	named strings      { dft           }  # string font
 	named comments     { dft           }  # comment font
+	named linenumbers  { dft           }  # line numbers font
 	body @Body			      # filtered, see below
     @Begin
 
@@ -159,14 +168,24 @@ def @PerlSetup
 
 	def @Filter
 	{
+	    def wantnumbered
+	    {
+		numbered @Case {
+		  { No no }	@Yield ""
+		  { Yes yes }	@Yield "-L"
+		  else          @Yield { "-L"numbered }
+		}
+	    }
+
 	    pipe @Case {
 		"" @Yield {
-	    	    "prg2lout -r -lPerl" -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
-			-t{@InitTab} -T{@InitTabWidth}
+	    	    "prg2lout -r -lPerl" wantnumbered -i{@FilterIn}
+		    -o{@FilterOut} -e{@FilterErr}
+		    -t{@InitTab} -T{@InitTabWidth}
 		}
 		else @Yield {
 	    	    "cat" @FilterIn "|" pipe "|"
-		    "prg2lout -r -lPerl" -o{@FilterOut}
+		    "prg2lout -r -lPerl" wantnumbered -o{@FilterOut}
 		    -e{@FilterErr} -t{@InitTab} -T{@InitTabWidth}
 		}
 	    }
@@ -302,6 +321,23 @@ def @PerlSetup
 	}
 
 
+	def @PL		# for formatting line numbers
+	    right x
+	{
+	    style @Case {
+		fixed @Yield fixedlinenumbersformat {
+		    { linenumbers @Else fixedlinenumbers } @Font x
+		}
+		varying @Yield varyinglinenumbersformat {
+		    { linenumbers @Else varyinglinenumbers } @Font x
+		}
+		symbol @Yield symbollinenumbersformat {
+		    { linenumbers @Else symbollinenumbers } @Font x
+		}
+	    }
+	}
+
+
 	def @PA		# for formatting asterisks
 	{
 	    @PO @BackEnd @Case {
@@ -347,7 +383,7 @@ def @PerlSetup
 
 
 	{ @InitFontFamily Base @InitSize } @Font
-	{ @InitLine lines } @Break @Body
+	{ @InitLine lines nohyphen } @Break @Body
 
     @End @Perl
 

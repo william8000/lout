@@ -11,7 +11,6 @@
 ###############################################################################
 
 
-@SysInclude { fontdefs }			  # font definitions
 @SysInclude { langdefs }			  # language definitions
 @SysInclude { bsf }				  # BasicSetup package
 @SysInclude { dsf }				  # DocumentSetup package
@@ -32,3 +31,5 @@ def @LaTeX
 @SysDatabase @Reference { loutrefs }		  # references about Lout
 @SysDatabase @Reference { oldrefs }		  # old references about Lout
 @SysDatabase @RefStyle { refstyle }		  # reference printing styles
+@SysDatabase @FontDef  { fontdefs }		  # font definitions
+@SysDatabase @FontDef  { latin2 }		  # more font definitions

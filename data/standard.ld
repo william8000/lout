@@ -108,7 +108,7 @@
 }
 
 { figurelist @Word @CurrLang @Case {
-    Czech	@Yield { ?? }
+    Czech	@Yield { Seznam obr{@Char aacute}zk{@Char uring} }
     Danish	@Yield { Figurliste }
     Dutch       @Yield { ?? }
     English	@Yield { List of Figures }
@@ -381,7 +381,7 @@
 }
 
 { abbreviations @Word @CurrLang @Case {
-    Czech	@Yield { ?? }
+    Czech	@Yield { Zkratky }
     Danish	@Yield { ?? }
     Dutch       @Yield { ?? }
     English	@Yield { Abbreviations }
@@ -465,7 +465,7 @@
 }
 
 { lecture @Word @CurrLang @Case {
-    Czech	@Yield { Lecture }
+    Czech	@Yield { P{@Char rcaron}edn{@Char aacute}{@Char scaron}ka }
     Danish	@Yield { Lecture }
     Dutch       @Yield { Lecture }
     English	@Yield { Lecture }
@@ -486,7 +486,7 @@
 }
 
 { index @Word @CurrLang @Case {
-    Czech	@Yield { Index }
+    Czech	@Yield { Rejst{@Char rcaron}{@Char iacute}k }
     Danish	@Yield { Indeks }
     Dutch       @Yield { Index }
     English	@Yield { Index }
@@ -570,7 +570,7 @@
 }
 
 { nopublisher @Word @CurrLang @Case {
-    Czech	@Yield { Bez vydavatele }
+    Czech	@Yield { Vydavatel neuveden }
     Danish	@Yield { Intet forlag }
     Dutch       @Yield { Ongepubliceerd } # or {Zonder uitgever}
     English	@Yield { No publisher }
@@ -677,7 +677,7 @@
 }
 
 { continued @Word @CurrLang @Case {
-    Czech	@Yield { ?? }
+    Czech	@Yield { pokra{@Char ccaron}ov{@Char aacute}n{@Char iacute} }
     Danish	@Yield { ?? }
     Dutch       @Yield { ?? }
     English	@Yield { ctd. }
@@ -1365,7 +1365,7 @@
 
 
 { 1 @Months @CurrLang @Case {
-    Czech	@Yield { leden }
+    Czech	@Yield { ledna }
     Danish	@Yield { januar }
     Dutch       @Yield { januari }
     English	@Yield { January }
@@ -1385,7 +1385,7 @@
 } }
 
 { 2 @Months @CurrLang @Case {
-    Czech	@Yield { {@Char uacute}nor }
+    Czech	@Yield { {@Char uacute}nora }
     Danish	@Yield { februar }
     Dutch       @Yield { februari }
     English	@Yield { February }
@@ -1405,7 +1405,7 @@
 } }
 
 { 3 @Months @CurrLang @Case {
-    Czech	@Yield { b{@Char rcaron}ezen }
+    Czech	@Yield { b{@Char rcaron}ezna }
     Danish	@Yield { marts }
     Dutch       @Yield { maart }
     English	@Yield { March }
@@ -1425,7 +1425,7 @@
 } }
 
 { 4 @Months @CurrLang @Case {
-    Czech	@Yield { duben }
+    Czech	@Yield { dubna }
     Danish	@Yield { april }
     Dutch       @Yield { april }
     English	@Yield { April }
@@ -1445,7 +1445,7 @@
 } }
 
 { 5 @Months @CurrLang @Case {
-    Czech	@Yield { kv{@Char ecaron}ten }
+    Czech	@Yield { kv{@Char ecaron}tna }
     Danish	@Yield { maj }
     Dutch       @Yield { mei }
     English	@Yield { May }
@@ -1465,7 +1465,7 @@
 } }
 
 { 6 @Months @CurrLang @Case {
-    Czech	@Yield { {@Char ccaron}erven }
+    Czech	@Yield { {@Char ccaron}ervna }
     Danish	@Yield { juni }
     Dutch       @Yield { juni }
     English	@Yield { June }
@@ -1486,7 +1486,7 @@
 
 
 { 7 @Months @CurrLang @Case {
-    Czech	@Yield { {@Char ccaron}ervenec }
+    Czech	@Yield { {@Char ccaron}ervence }
     Danish	@Yield { juli }
     Dutch       @Yield { juli }
     English	@Yield { July }
@@ -1506,7 +1506,7 @@
 } }
 
 { 8 @Months @CurrLang @Case {
-    Czech	@Yield { srpen }
+    Czech	@Yield { srpna }
     Danish	@Yield { august }
     Dutch       @Yield { augustus }
     English	@Yield { August }
@@ -1546,7 +1546,7 @@
 } }
 
 { 10 @Months @CurrLang @Case {
-    Czech	@Yield { {@Char rcaron}{@Char iacute}jen }
+    Czech	@Yield { {@Char rcaron}{@Char iacute}jna }
     Danish	@Yield { oktober }
     Dutch       @Yield { oktober }
     English	@Yield { October }
@@ -1566,7 +1566,7 @@
 } }
 
 { 11 @Months @CurrLang @Case {
-    Czech	@Yield { listopad }
+    Czech	@Yield { listopadu }
     Danish	@Yield { november }
     Dutch       @Yield { november }
     English	@Yield { November }
@@ -1586,7 +1586,7 @@
 } }
 
 { 12 @Months @CurrLang @Case {
-    Czech	@Yield { prosinec }
+    Czech	@Yield { prosince }
     Danish	@Yield { december }
     Dutch       @Yield { december }
     English	@Yield { December }
@@ -1607,7 +1607,7 @@
 
 
 { 1 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { leden }
+    Czech	@Yield { ledna }
     Danish	@Yield { jan }
     Dutch       @Yield { jan }
     English	@Yield { Jan }
@@ -1627,7 +1627,7 @@
 } }
 
 { 2 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { {@Char uacute}nor }
+    Czech	@Yield { {@Char uacute}nora }
     Danish	@Yield { feb }
     Dutch       @Yield { feb }
     English	@Yield { Feb }
@@ -1647,7 +1647,7 @@
 } }
 
 { 3 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { b{@Char rcaron}ezen }
+    Czech	@Yield { b{@Char rcaron}ezna }
     Danish	@Yield { mar }
     Dutch       @Yield { mrt }
     English	@Yield { Mar }
@@ -1667,7 +1667,7 @@
 } }
 
 { 4 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { duben }
+    Czech	@Yield @Yield { dubna }
     Danish	@Yield { apr }
     Dutch       @Yield { apr }
     English	@Yield { Apr }
@@ -1687,7 +1687,7 @@
 } }
 
 { 5 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { kv{@Char ecaron}ten }
+    Czech	@Yield { kv{@Char ecaron}tna }
     Danish	@Yield { maj }
     Dutch       @Yield { mei }
     English	@Yield { May }
@@ -1707,7 +1707,7 @@
 } }
 
 { 6 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { {@Char ccaron}erven }
+    Czech	@Yield { {@Char ccaron}ervna }
     Danish	@Yield { jun }
     Dutch       @Yield { jun }
     English	@Yield { Jun }
@@ -1727,7 +1727,7 @@
 } }
 
 { 7 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { {@Char ccaron}ervenec }
+    Czech	@Yield { {@Char ccaron}ervence }
     Danish	@Yield { jul }
     Dutch       @Yield { jul }
     English	@Yield { Jul }
@@ -1747,7 +1747,7 @@
 } }
 
 { 8 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { srpen }
+    Czech	@Yield { srpna }
     Danish	@Yield { aug }
     Dutch       @Yield { aug }
     English	@Yield { Aug }
@@ -1787,7 +1787,7 @@
 } }
 
 { 10 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { {@Char rcaron}{@Char iacute}jen }
+    Czech	@Yield { {@Char rcaron}{@Char iacute}jna }
     Danish	@Yield { okt }
     Dutch       @Yield { okt }
     English	@Yield { Oct }
@@ -1807,7 +1807,7 @@
 } }
 
 { 11 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { listopad }
+    Czech	@Yield { listopadu }
     Danish	@Yield { nov }
     Dutch       @Yield { nov }
     English	@Yield { Nov }
@@ -1827,7 +1827,7 @@
 } }
 
 { 12 @ShortMonths @CurrLang @Case {
-    Czech	@Yield { prosinec }
+    Czech	@Yield { prosince }
     Danish	@Yield { dec }
     Dutch       @Yield { dec }
     English	@Yield { Dec }
@@ -1868,7 +1868,7 @@
 } }
 
 { 2 @WeekDays @CurrLang @Case {
-    Czech	@Yield { pon{@Char ecaron}l{@Char iacute} }
+    Czech	@Yield { pond{@Char ecaron}l{@Char iacute} }
     Danish	@Yield { mandag }
     Dutch       @Yield { maandag }
     English	@Yield { Monday }
@@ -2255,7 +2255,7 @@
 }
 
 { time @DateTimeFormat @Value { @CurrLang @Case {
-    Czech	@Yield { @ShortHour "hodin" @Minute "minut"	}
+    Czech	@Yield { @ShortHour:@Minute			}
     Danish	@Yield { @ShortHour.@Minute			}
     Dutch	@Yield { @ShortHour.@Minute			}
     English	@Yield { @TwelveHour.@Minute @MeriDiem		}

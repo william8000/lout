@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.19                          #
+#  Make file for installing Basser Lout Version 3.21                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  14 February 2000                                                           #
+#  10 May 2000                                                                #
 #                                                                             #
 #     make prg2lout     Compile a small auxiliary program called prg2lout     #
 #     make lout         Compile the Lout source                               #
@@ -60,8 +60,8 @@
 #      can always specify safe or unsafe execution by means of the -S and     #
 #      -U options to lout when processing a document; SAFEDFT means that      #
 #      -S rather than -U is the default behaviour.  Unsafe execution is       #
-#      required when formatting programs and verbatim text, so if in          #
-#      doubt, do not change the value of SAFEDFT.                             #
+#      required when formatting computer programs, so if in doubt, do not     #
+#      change the value of SAFEDFT.                                           #
 #                                                                             #
 #  (5) Set the following four macros defined below to appropriate values:     #
 #                                                                             #
@@ -190,15 +190,11 @@
 #      (c) It will perform an initializing "lout -x" run.  This run will      #
 #          do the following checks and initializations:                       #
 #                                                                             #
-#          (i)   It will read all the font files mentioned in file            #
-#                $(LIBDIR)/include/fontdefs and check that they               #
-#                exist and are in the correct format;                         #
-#                                                                             #
-#          (ii)  It will read all the hyphenation (.lh) files mentioned       #
+#          (i)   It will read all the hyphenation (.lh) files mentioned       #
 #                in file $(LIBDIR)/include/langdefs, check them, and build    #
 #                the packed (.lp) versions;                                   #
 #                                                                             #
-#          (iii) It will read and check the three standard database           #
+#          (ii)  It will read and check the four standard database            #
 #                (.ld) files in directory $(LIBDIR)/data, and build           #
 #                the corresponding database index (.li) files.                #
 #                                                                             #
@@ -225,9 +221,16 @@
 #                                                                             #
 # (18) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
-#      on line 57 of file $(LIBDIR)/include/dsf.  You can find the list of    #
-#      known page types in the User's Guide, and also at line 615 in file     #
-#      $(LIBDIR)/include/dsf.                                                 #
+#      on line 59 of file $(LIBDIR)/include/dsf:                              #
+#                                                                             #
+#          named @PageType { A4 @OrIfPlain Other }                            #
+#                                                                             #
+#      This is saying that the page type is to be A4 by default, unless       #
+#      plain text output is in effect (lout -p), in which case the page       #
+#      type is Other, which means that the page dimensions come from the      #
+#      @PageWidth and @PageHeight options.  Just change the A4, not the       #
+#      rest.  You can find the list of known page types, alternative to A4,   #
+#      in the User's Guide, and also at line 640 in $(LIBDIR)/include/dsf.    #
 #                                                                             #
 # (19) If the usual language at your site is not English, you might like to   #
 #      now change the default value of the @InitialLanguage option on line    #

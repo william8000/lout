@@ -23,6 +23,7 @@ cprint. @Index @Code "@CPSetup"
 {
 @Rowa A { "@Use {  @CPSetup" }
 @Rowb A { "pipe" } B {          }
+@Rowb A { "numbered" } B { No         }
 @Rowb A { "style" } B { fixed         }
 
 @Rowa 
@@ -39,6 +40,7 @@ cprint. @Index @Code "@CPSetup"
 @Rowb A { "fixednumbers" }		B { Base  }
 @Rowb A { "fixedstrings" }		B { Base  }
 @Rowb A { "fixedcomments" }		B { Base  }
+@Rowb A { "fixedlinenumbers" }		B { Base  }
 
 @Rowa 
 @Rowb A { "fixedidentifiersformat" }	B { "@Body"  }
@@ -47,6 +49,7 @@ cprint. @Index @Code "@CPSetup"
 @Rowb A { "fixednumbersformat" }	B { "@Body"  }
 @Rowb A { "fixedstringsformat" }	B { "@Body"  }
 @Rowb A { "fixedcommentsformat" }	B { "@Body"  }
+@Rowb A { "fixedlinenumbersformat" }	B { "@Body"  }
 
 @Rowa 
 @Rowa A { "..." }
@@ -60,12 +63,23 @@ options whose name begins with @Code "fixed" apply only when
 shown, which apply when @Code style is {@Code varying} and {@Code symbol}.
 @PP
 We can see in this extract that the default value of @Code style is
-{@Code fixed}.  We can also see the default font family, font face, font size,
+{@Code fixed}, and of @Code "numbers" is {@Code No}.  We can also see the
+default font family, font face, font size,
 line spacing, and tab settings when the style is {@Code "fixed"}.  The
 font family name for @Code "fixed" style is {@Code "Courier"}, but for the
 other styles (not shown) it is empty.  This causes the @Code "fixed" style
 to always switch to Courier, and the other styles to use the same font
 family as in the surrounding document.
+@PP
+The options from @Code "fixedidentifiers" to @Code "fixedlinenumbers" allow
+you to set the font face to use for each of these parts of your
+program.  People who want fixed-width fonts do not usually want very
+exciting font faces either, so the default values above are all
+{@Code "Base"}, but for the {@Code varying} and {@Code symbol} styles,
+the default identifier face is {@Code Slope}, the default keyword
+face is {@Code Bold}, and so on.  You can actually give a family name
+before the face name in these options, allowing you to switch font
+families for different parts of the program if you wish.
 @PP
 The @Code fixedidentifiersformat option allows you to make a more
 radical change to the format of identifiers than just the font.  Within
@@ -98,6 +112,18 @@ needs to be changed, to
 Or suppose you like @Code "varying" as it stands, but would like it to be
 the default style rather than {@Code "fixed"}.  Again, only one line needs
 to be changed, to {@Code "style { varying }"}.
+@PP
+It is probably not a good idea to change the default value of
+@Code { numbered } to {@Code Yes}, because small fragments of
+code within paragraphs will then get line numbers as well as large
+displayed programs.  If you do have many large numbered programs as
+well as small fragments, a better approach would be to place
+@ID @OneRow @Code @Verbatim {
+import @CPSetup
+macro @NCP { @CP numbered { Yes } }
+}
+(or the equivalent for your language) in your @Code mydefs file, so that
+you can type @Code "@NCP" instead of {@Code "@CP numbered { Yes }"}.
 @PP
 The setup files for the other languages are identical to this one, except
 that the symbol after @Code "@Use" is different, and some of the

@@ -65,15 +65,20 @@ If you are using your own setup file (Section {@NumberOf setup}), you
 can change it there.  If not, you can change it at the start of your
 document, as explained in Section {@NumberOf ordinary}.
 @PP
-Czech, Polish, and Slovenian use the ISO-LATIN-2 character set, and
+Czech, Polish, and Slovenian use the Latin2 character set, and
 users of these languages have to place
 @ID @Code "@SysInclude { latin2 }"
-at the very start of their documents in order to get access to the
-ISO-LATIN-2 versions of the fonts.  These have family names such as
-TimesCE, CourierCE, HelveticaCE, and so on, to distinguish them
-from the same fonts encoded in ISO-LATIN-1.  The face names are
-unchanged.  Consult file @Code "latin2.fd" in the standard include
-directory for a complete list of these fonts.
+at the start of their documents in order to get access to the
+Latin2 versions of the fonts.
+@FootNote { Prior to Version 3.21 of Lout, some accented characters
+were missing from these Latin2 fonts, but this deficiency has now
+been corrected by getting Lout to generate output for these characters
+which prints their base letter and accent separately. }  These have
+family names such as TimesCE, CourierCE, HelveticaCE, and so on (CE
+standing for Central European), to distinguish them from the same
+fonts encoded in Latin1.  The face names are unchanged.  Consult
+database file @Code "latin2.ld" in the standard database directory
+for a complete list of these fonts.
 @PP
 Russian uses Cyrillic characters.  In principle, users of Russian
 have to place

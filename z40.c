@@ -1,6 +1,6 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -86,6 +86,10 @@ OBJECT FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos)
   sprintf( (char *) buff, "%s%d", FILTER_OUT, filter_count);
   x = MakeWord(WORD, buff, xfpos);
   Link(res, x);
+  if( has_body(act) )  PushScope(act, FALSE, TRUE);
+  x = GetScopeSnapshot();
+  if( has_body(act) )  PopScope();
+  Link(res, x);
   debug2(DFH, D, "FilterCreate returning %d %s", (int) res, EchoObject(res));
   return res;
 } /* end FilterCreate */
@@ -124,7 +128,7 @@ void FilterSetFileNames(OBJECT x)
 /*****************************************************************************/
 
 OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
-{ int i, count, status;  OBJECT t, res;  char line[MAX_LINE];
+{ int status;  OBJECT t, res, scope_snapshot;  char line[MAX_LINE];
   FILE *err_fp;  FILE_NUM filter_out_file;
 
   assert( type(x) == FILTERED, "FilterExecute: type(x)!" );
@@ -161,9 +165,13 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
         FATAL, &fpos(x), command);
 
     /* read in output of system command as a Lout object */
+    /* *** using scope snapshot now
     SwitchScope(nilobj);
     count = 0;
     SetScope(env, &count, TRUE);
+    *** */
+    Child(scope_snapshot, LastDown(x));
+    LoadScopeSnapshot(scope_snapshot);
     debug0(DFS, D, "  calling DefineFile from FilterExecute");
     filter_out_file =
       DefineFile(string(sym_body(FilterOutSym)), STR_EMPTY, &fpos(x),
@@ -172,8 +180,11 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
     t = NewToken(BEGIN, &fpos(x), 0, 0, BEGIN_PREC, FilterOutSym);
     res = Parse(&t, nilobj, FALSE, FALSE);
     LexPop();
+    /* *** using scope snapshot now
     for( i = 1;  i <= count;  i++ )  PopScope();
     UnSwitchScope(nilobj);
+    *** */
+    ClearScopeSnapshot(scope_snapshot);
     StringRemove(string(sym_body(FilterOutSym)));
     sym_body(FilterOutSym) = filter_out_filename;
   }

@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-#  Lout @DocumentSetup package (Version 3.16)                                 #
+#  Lout @DocumentSetup package                                                #
 #                                                                             #
 #  Version 1.0 by Jeffrey H. Kingston, 17 July 1991.                          #
 #  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
@@ -14,6 +14,7 @@
 #  Version 3.13 by Jeffrey H. Kingston, October 1998.                         #
 #  Version 3.16 by Jeffrey H. Kingston, May 1999.                             #
 #  Version 3.17 by Jeffrey H. Kingston, September 1999.                       #
+#  Version 3.21 by Jeffrey H. Kingston, May 2000.                             #
 #                                                                             #
 #  This Lout package contains the general definitions used by all types of    #
 #  documents.  It needs to be extended (see docf, reportf, bookf, slidesf,    #
@@ -66,12 +67,17 @@ def @DocumentSetup
     named @OddRightMargin	{ 2.50c  @OrIfPlain 10s	} # right margin of odd pages
     named @EvenLeftMargin	{ 2.50c  @OrIfPlain 10s	} # left margin of even pages
     named @EvenRightMargin	{ 2.50c  @OrIfPlain 10s	} # right margin of even pages
+    named @OddLeftBodyMargin	{ 0c			} # extra margin for page body
+    named @OddRightBodyMargin	{ 0c			} # extra margin for page body
+    named @EvenLeftBodyMargin	{ 0c			} # extra margin for page body
+    named @EvenRightBodyMargin	{ 0c			} # extra margin for page body
     named @PageBoxType		{ None			} # None Box CurveBox ShadowBox
     named @PageBoxMargin	{ 1.00c			} # page box margin
     import @LengthUnits named @PageBoxLineWidth
 				{			} # page box line thickness
     named @PageBoxPaint		{  none			} # page box paint
     named @PageBoxShadow	{  0.60c		} # shadow margin if ShadowBox
+    named @PageEnclose right @Body { @Body		} # page enclose
     named @ColumnNumber		{  1			} # number of columns (1 to 10)
     named @ColumnGap		{  1.00c @OrIfPlain 6s	} # column gap
     named @FigureLocation	{  PageTop		} # default figure location
@@ -768,8 +774,8 @@ def @DocumentSetup
 	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
 	{   //@TopMargin ||@OddLeftMargin
 		@PageBackground @Background
-	        1 @MargSet
-		@PageBox @HExpand { extra // @VExpand x }
+	        # 1 @MargSet
+		@PageEnclose @PageBox @HExpand { extra // @VExpand x }
 	    ||@OddRightMargin //@FootMargin
 	}
     }
@@ -785,8 +791,8 @@ def @DocumentSetup
 	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
 	{   //@TopMargin ||@EvenLeftMargin
 		@PageBackground @Background
-	        0 @MargSet
-		@PageBox @HExpand { extra // @VExpand x }
+	        # 0 @MargSet
+		@PageEnclose @PageBox @HExpand { extra // @VExpand x }
 	    ||@EvenRightMargin //@FootMargin
 	}
     }
@@ -1529,6 +1535,16 @@ def @DocumentSetup
 	}
     }
 
+    def @OddBodyMargins right x
+    {
+	@OddLeftBodyMargin @Wide {} || 1 @MargSet x || @OddRightBodyMargin @Wide {}
+    }
+
+    def @EvenBodyMargins right x
+    {
+	@EvenLeftBodyMargin @Wide {} || 0 @MargSet x || @EvenRightBodyMargin @Wide {}
+    }
+
     def @SimplePageList
 	named @ColumnNumber {}
 	named @PageHeaders {}
@@ -1542,11 +1558,14 @@ def @DocumentSetup
 	{
 		{@PageHeaders.{@SStart @PageNum}} @OddTopHeader
 		    { @PageNumbers @Num @PageNum }
-		//@MidGap @AtTop
-		//@MidGap @PageOddTopSection @Orient
-		//@MidGap @ChooseColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageOddTopSection @Orient
+			//@MidGap @ChooseColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //         @OddBodyMargins @PageFootSection
 		   //@MidGap {@PageHeaders.{@SStart @PageNum}} @OddFootHeader
 				 { @PageNumbers @Num @PageNum }
 		}
@@ -1556,8 +1575,8 @@ def @DocumentSetup
 	{
 		{@PageHeaders.{@SStart @PageNum}} @OddTopHeader
 		    { @PageNumbers @Num @PageNum }
-		//@MidGap @OddFullPageSection
-		// //1rt @OneRow
+		//@MidGap @OddBodyMargins @OddFullPageSection
+		//1rt @OneRow
 		{ //@MidGap {@PageHeaders.{@SStart @PageNum}} @OddFootHeader
 				 { @PageNumbers @Num @PageNum }
 		}
@@ -1574,10 +1593,13 @@ def @DocumentSetup
 	    {
 		@PageHeaders.NonStart @EvenTopHeader
 		    { @PageNumbers @Num @PageNum }
-		//@MidGap @PageEvenTopSection @Orient
-		//@MidGap @ChooseColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@EvenBodyMargins {
+			@PageEvenTopSection @Orient
+			//@MidGap @ChooseColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @EvenBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @EvenFootHeader
 			     { @PageNumbers @Num @PageNum }
 		}
@@ -1587,8 +1609,8 @@ def @DocumentSetup
 	    {
 		@PageHeaders.NonStart @EvenTopHeader
 		    { @PageNumbers @Num @PageNum }
-		//@MidGap @EvenFullPageSection
-		// //1rt @OneRow
+		//@MidGap @EvenBodyMargins @EvenFullPageSection
+		//1rt @OneRow
 		{ //@MidGap @PageHeaders.NonStart @EvenFootHeader
 			     { @PageNumbers @Num @PageNum }
 		}
@@ -1613,7 +1635,7 @@ def @DocumentSetup
 		rawnum { @PageNum }
 		num { @PageNumbers @Num @PageNum }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	//  { extra @Then @OddBodyMargins @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
 		@OrdinaryOddPage ||{@OrientedWidth @Orient} @FullPageOddPage
 	    }
@@ -1635,15 +1657,18 @@ def @DocumentSetup
 		num { @IntroPageNumbers @Num @PageNum }
 		rawnum { @PageNum }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	//  { extra @Then @OddBodyMargins @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
 		{@PageHeaders.{@SStart @PageNum}} @IntroOddTopHeader
 		    { @IntroPageNumbers @Num @PageNum }
-		//@MidGap @AtTop
-		//@MidGap @PageIntroOddTopSection @Orient
-		//@MidGap @ChooseIntroColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageIntroOddTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @OddBodyMargins @PageFootSection
 		   //@MidGap
 		       {@PageHeaders.{@SStart @PageNum}} @IntroOddFootHeader
 			   { @IntroPageNumbers @Num @PageNum }
@@ -1657,10 +1682,13 @@ def @DocumentSetup
 	    @Runner&&following @Open
 	    {
 		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @Next @PageNum }
-		//@MidGap @PageIntroEvenTopSection @Orient
-		//@MidGap @ChooseIntroColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@EvenBodyMargins {
+			@PageIntroEvenTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @EvenBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @IntroEvenFootHeader
 				{ @IntroPageNumbers @Num @Next @PageNum }
 		}
@@ -1698,10 +1726,13 @@ def @DocumentSetup
 	    @Runner&&following @Open
 	    {
 		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @PageNum }
-		//@MidGap @PageIntroEvenTopSection @Orient
-		//@MidGap @ChooseIntroColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@EvenBodyMargins {
+			@PageIntroEvenTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @EvenBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @IntroEvenFootHeader
 				{ @IntroPageNumbers @Num @PageNum }
 		}
@@ -1716,15 +1747,18 @@ def @DocumentSetup
 		num { @IntroPageNumbers @Num @PageNum }
 		rawnum { @PageNum }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	//  { extra @Then @OddBodyMargins @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
 		{@PageHeaders.{@SStart @PageNum}} @IntroOddTopHeader
 		    { @IntroPageNumbers @Num @PageNum }
-		//@MidGap @AtTop
-		//@MidGap @PageIntroOddTopSection @Orient
-		//@MidGap @ChooseIntroColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageIntroOddTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @OddBodyMargins @PageFootSection
 		   //@MidGap
 		       {@PageHeaders.{@SStart @PageNum}} @IntroOddFootHeader
 			   { @IntroPageNumbers @Num @PageNum }
@@ -1767,11 +1801,14 @@ def @DocumentSetup
 			    prefix  { @Prefix }
 			    owner   { @Owner }
 		    }
-		//@MidGap @AtTop
-		//@MidGap @PageOddTopSection @Orient
-		//@MidGap @ChooseColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageOddTopSection @Orient
+			//@MidGap @ChooseColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @OddBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.@Start @RunningOddFootHeader
 			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -1807,9 +1844,12 @@ def @DocumentSetup
 			    prefix  { @Prefix }
 			    owner   { @Owner }
 		    }
-		//@MidGap @AtTop
-		//@MidGap @OddFullPageSection
-		// //1rt @OneRow
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @OddFullPageSection
+		}
+		//1rt @OneRow
 		{
 		   //@MidGap @PageHeaders.@Start @RunningOddFootHeader
 			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
@@ -1852,10 +1892,13 @@ def @DocumentSetup
 				prefix  { @Prefix }
 				owner   { @Owner }
 			}
-		    //@MidGap @PageEvenTopSection @Orient
-		    //@MidGap @ChooseColList @ColumnNumber
-		    // //1rt @OneRow
-		    {  //        @PageFootSection
+		    //@MidGap
+		    @EvenBodyMargins {
+			@PageEvenTopSection @Orient
+		    	//@MidGap @ChooseColList @ColumnNumber
+		    }
+		    //1rt @OneRow
+		    {  //        @EvenBodyMargins @PageFootSection
 		       //@MidGap @PageHeaders.@Start @RunningEvenFootHeader
 			   @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 			   @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -1891,8 +1934,9 @@ def @DocumentSetup
 				prefix  { @Prefix }
 				owner   { @Owner }
 			}
-		    //@MidGap @EvenFullPageSection
-		    // //1rt @OneRow
+		    //@MidGap
+		    @EvenBodyMargins @EvenFullPageSection
+		    //1rt @OneRow
 		    {
 		       //@MidGap @PageHeaders.@Start @RunningEvenFootHeader
 			   @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
@@ -1921,7 +1965,7 @@ def @DocumentSetup
         }
 
 	    @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	//  { extra @Then @OddBodyMargins @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
 		@OrdinaryOddPage ||{@OrientedWidth @Orient} @FullPageOddPage
 	    }
@@ -1940,7 +1984,7 @@ def @DocumentSetup
 	right @PageNum
     {
 	    @FootNoteThrough @NoDo @BeginFootNoteCounter
-	//  { extra @Then @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	//  { extra @Then @OddBodyMargins @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    @Runner&&following @Open
 	    {
 		@PageMarker
@@ -1960,11 +2004,14 @@ def @DocumentSetup
 				prefix  { @Prefix }
 				owner   { @Owner }
 			}
-		//@MidGap @AtTop
-		//@MidGap @PageIntroOddTopSection @Orient
-		//@MidGap @IntroColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageIntroOddTopSection @Orient
+			//@MidGap @IntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @OddBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.@Start @RunningIntroOddFootHeader
 			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -1998,10 +2045,13 @@ def @DocumentSetup
 				prefix  { @Prefix }
 				owner   { @Owner }
 			}
-		//@MidGap @PageIntroEvenTopSection @Orient
-		//@MidGap @ChooseIntroColList @ColumnNumber
-		// //1rt @OneRow
-		{  //        @PageFootSection
+		//@MidGap
+		@EvenBodyMargins {
+			@PageIntroEvenTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @EvenBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.@Start @RunningIntroEvenFootHeader
 			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }

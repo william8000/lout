@@ -1,6 +1,6 @@
 /*@z47.c:Environment Table:EnvReadRetrieve()@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -48,7 +48,7 @@ static OBJECT tab[TAB_SIZE];
 
 #define hash1(pos, env, fnum)						\
 {									\
-  pos = ( (int) env + fnum ) % TAB_SIZE;				\
+  pos = ( (unsigned int) env + fnum ) % TAB_SIZE;			\
 }
 
 #define hash2(pos, fnum, offset)					\
@@ -91,7 +91,7 @@ void EnvInit(void)
 /*****************************************************************************/
 
 BOOLEAN EnvWriteRetrieve(OBJECT env, FILE_NUM fnum, int *offset, int *lnum)
-{ int pos;  OBJECT link, y, z;
+{ unsigned int pos;  OBJECT link, y, z;
   debug2(DET, DD, "EnvWriteRetrieve(env %d, %s)", (int) env, FileName(fnum));
   debug1(DET, DDD, "  %s", EchoObject(env));
   stat_writes++;
@@ -127,7 +127,7 @@ BOOLEAN EnvWriteRetrieve(OBJECT env, FILE_NUM fnum, int *offset, int *lnum)
 /*****************************************************************************/
 
 void EnvWriteInsert(OBJECT env, FILE_NUM fnum, int offset, int lnum)
-{ int pos;  OBJECT loser, x;
+{ unsigned int pos;  OBJECT loser, x;
   debug3(DET, DD, "EnvWriteInsert(env %d, %s, %d)", (int) env,
     FileName(fnum), offset);
 

@@ -1,6 +1,6 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -66,7 +66,7 @@ typedef struct
 #define	crtab_chain(S,i) (S)->tab_chains[i]
 
 #define hash(pos, sym, fnum, S)						\
-{ pos = ( ((long) sym) + fnum ) % crtab_size(S);				\
+{ pos = ( ((unsigned long) sym) + fnum ) % crtab_size(S);				\
 }
 
 static CROSSREF_TABLE crtab_new(int newsize)
@@ -85,7 +85,7 @@ static CROSSREF_TABLE crtab_new(int newsize)
 } /* end crtab_new */
 
 static CROSSREF_TABLE crtab_rehash(CROSSREF_TABLE S, int newsize)
-{ CROSSREF_TABLE NewS;  int i;  long newpos;  CROSSREF_ENTRY p, q;
+{ CROSSREF_TABLE NewS;  int i;  unsigned long newpos;  CROSSREF_ENTRY p, q;
   NewS = crtab_new(newsize);
   for( i = 0;  i < crtab_size(S);  i++ )
   { p = crtab_chain(S, i);
@@ -105,7 +105,7 @@ static CROSSREF_TABLE crtab_rehash(CROSSREF_TABLE S, int newsize)
 } /* end crtab_rehash */
 
 static int crtab_getnext(OBJECT sym, FILE_NUM fnum, CROSSREF_TABLE *S)
-{ CROSSREF_ENTRY x;  OBJECT t;  long pos;
+{ CROSSREF_ENTRY x;  OBJECT t;  unsigned long pos;
 
   /* if S is NULL, create a new table */
   if( *S == NULL )  *S = crtab_new(INIT_CROSSREF_NUM);

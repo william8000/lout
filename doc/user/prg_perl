@@ -30,8 +30,8 @@ here-document) is one of @Perl { EOF }, @Perl { EOT }, @Perl { END },
 and the empty string, all optionally enclosed in quotes of any of the
 three kinds.  If this condition is not met, then the here-document will
 be treated as Perl program text.  If the condition is met, there is still
-another problem:  everything after the @Perl { << } symbol on the same
-line will be treated (incorrectly) as a string; the worst consequence
+another problem:  the @Perl { << } symbol and everything after it on the
+same line will be treated (incorrectly) as a string.  The worst consequence
 of this is that stacked here-documents will not be printed properly.
 }
 
@@ -47,11 +47,12 @@ character is immediately preceded by @Code { "q" }, @Code { "qq" },
 @Code { "qx" }, @Code { "qw" }, @Code { "qr" }, @Code { "m" },
 @Code { "s" }, @Code { "y" }, or @Code { "tr" }.  It also chooses the
 regular expression interpretation if the @Code "/" character appears
-at the start of a line, or if it is
-immediately preceded by zero, one, or two space or tab characters, which
-are themselves immediately preceded by a complete lexical unit which is
-one of @Code { "(" }, @Code { "=" }, @Code { "=~" }, @Code { "!~" },
-@Code { "split" }, @Code { "if" }, @Code { "not" }, @Code { "unless" },
+at the start of a line, or if it is immediately preceded by zero, one,
+or two space or tab characters, which are themselves immediately preceded
+by a complete lexical unit which is one of @Code { "(" }, @Code { "=" },
+@Code { "=~" }, @Code { "!~" }, @Code { "split" }, @Code { "if" },
+@Code { "and" }, @Code { "&&" }, @Code { "or" }, @Code { "||" },
+@Code { "not" }, @Code { "!" }, @Code { "unless" },
 @Code { "for" }, @Code { "foreach" }, and @Code { "while" }.  Otherwise
 it chooses the division interpretation.  In the rare cases where this
 rule fails, you can force @Code { prg2lout } to choose the regular expression
@@ -62,23 +63,19 @@ division interpretation by placing at least three spaces before the
 }
 
 @LI {
-The @Code { prg2lout } program recognises complete substitution operators,
-such as @Code "s/abc/ABC/" and {@Code "s{abc}{ABC}"}, as individual lexical
-units, and it formats them as it does strings.  However, its rule for
-deciding where these units end is rather simple-minded:  at the start,
-it works out what character finishes the unit (in the examples above,
-@Code "/" and @Code "}" respectively), and scans along until it reaches
-the second occurrence of this character not preceded by the @Code "\\"
-escape character.  This is inadequate in two respects.  Firstly,
-@ID @Code "s{{}}{}"
-is a complete legal substitution expression in Perl, but @Code { prg2lout }
-will think it ends after the second {@Code "}"}, and so format the rest
-of it wrongly.  Secondly, and more seriously,
-@ID @Code "s{abc}<ABC>"
-is also allowed in Perl, but @Code { prg2lout } does not understand that
-the finishing character can change in this way, so in this example it will
-keep scanning forever, looking for the second @Code "}" character, which is
-disastrous.
+Substitution expressions, even such lexically complex ones as
+@Perl { s{{@D}}[{@I}] }, are handled correctly.  However,
+@Code { prg2lout } does not understand that the letters @Code "gimosx"
+in any combination appearing immediately after a substitution
+expression are part of it; it treats them as the start of a new lexical
+unit.  This new unit will usually be taken to be an identifier, which
+is harmless enough, but occasionally it is taken to be something
+else.  For example, in
+@ID @Code @Verbatim { s///s; }
+the trailing @Code "s" will be mistaken for the start of a new
+substitution expression, with @Code ";" delimiting the first
+pattern.  This particular example can be fixed by inserting a
+space before the semicolon.
 }
 
 @EndList
@@ -93,7 +90,7 @@ Thus, asking for Perl always gives you Pod as well.  If you are using
 your own setup files for both languages, it is probably better to
 break this connection by deleting this line from your copy of the
 @Code perl setup file and placing
-@ID @Code {
+@ID @OneRow @Code {
 "@Include { mypod }"
 "@Include { myperl }"
 }
@@ -105,4 +102,19 @@ do not really apply.  So for Pod only these have been discarded and replaced
 by a completely different set of options, controlling such things as
 the size of headings and the gaps between list items, which you can
 find documented in the @Code { pod } setup file.
+@PP
+If you ask for line numbers on a Pod program, or on a Perl program that
+contains Pod, any text blocks in the Pod that would otherwise have
+appeared as filled paragraphs will come out with the line breaks in
+the source respected, and lines numbered accordingly.  Because
+@Code "prg2lout" attaches line numbers before Lout breaks paragraphs,
+it is not possible to number the lines after paragraph breaking.
+@PP
+Owing to problems behind the scenes, if a Pod inclusion in a Perl
+program has unbalanced braces, @Code "prg2lout" is forced to insert
+braces into the Pod text to make them balance.  It will insert a
+left brace directly before any unbalanced right brace, and it will
+insert right braces at the end of the Pod inclusion to balance any
+preceding unbalanced left braces.  It will tell you if it has to do
+this.  This problem does not afflict Pod when used as a separate language.
 @End @Section
