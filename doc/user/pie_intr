@@ -1,0 +1,65 @@
+@Section
+   @Title { Introduction }
+   @Tag { pie_intr }
+@Begin
+@PP
+The Lout definitions for pie graph formatting are kept in a file called
+{@Code "pie"}, which you must include at the start of your document if
+pie.file @Index { @Code "pie" setup file }
+you want pie graphs, like this:
+@ID -1px @Break @OneRow @Code {
+"@SysInclude { pie }"
+"@SysInclude { doc }"
+"@Doc @Text @Begin"
+"..."
+"@End @Text"
+}
+Setup files for specialized packages, such as {@Code "pie"}, should be
+included before the main setup file.  Once this is done, the @Code "@Pie"
+symbol used below will then be available for use anywhere within your
+document.  As usual in Lout, the @Code "@Pie" symbol produces an object
+which may appear anywhere at all -- in a centred display, for example,
+or in a figure, or as an entry in a table.
+@PP
+A pie graph is made by a @Code "@Pie" symbol enclosing a sequence of
+@Code "@Slice" symbols.  These @Code "@Slice" symbols and their options
+are the only things that may appear inside the @Code "@Pie" symbol.
+@PP
+Every option of @Code "@Slice" is also an option of {@Code "@Pie"}.
+Giving a value to such an option at @Code "@Pie" will make that
+the default value for very {@Code "@Slice"}.  For example,
+you can write
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+    weight { 20 }
+{
+    ...
+}
+}
+to give every slice a weight (angular extent) of 20.  If all but a
+few slices have the same weight, you can still do this, just giving
+a @Code weight option to the exceptional slices.
+@PP
+Furthermore, every option of @Code "@Pie" appears in the setup
+file, and giving a value to an option there makes that value the
+default value for every @Code "@Pie" in your document.  For example,
+if you want every slice of every pie to be light red, you can set
+the @Code paint option in the setup file to {@Code lightred},
+and all your slices will be painted this colour unless you
+override the setup file value by giving @Code paint options to
+some pies or slices.
+@PP
+See Section @NumberOf setup to find out how to make your own copy
+of the setup file, perhaps calling it {@Code mypie}, and change
+some options within it.  Your document would then typically
+start like this:
+@ID -1px @Break @OneRow @Code {
+"@Include { mypie }"
+"@SysInclude { doc }"
+"@Doc @Text @Begin"
+"..."
+"@End @Text"
+}
+and by changing options within file @Code "mypie" you can
+affect every pie graph in your document.
+@End @Section

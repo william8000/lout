@@ -17,22 +17,14 @@ nearly all beginning with "unresolved cross reference".  These
 should gradually go away on later runs.  The following shows the
 error message output on the later runs for A4 size printing:
 
-lout file "typ_repo" (from "typ" line 19, from "all" line 38):
-    38,1: 1.0c object too high for 0.2c space; will try elsewhere
-lout file "typ_over" (from "typ" line 21, from "all" line 38):
-     8,1: 1.0c object too high for 0.0c space; will try elsewhere
-lout file "gra_summ" (from "gra" line 44, from "all" line 45):
-     8,1: 23.6c object too high for 23.6c space; @Scale inserted
-lout file "prg_tabs" (from "prg" line 108, from "all" line 46):
-   58,23: prg2lout 2,1: program text ended within comment
-   60,35: prg2lout 2,1: program text ended within comment
+lout file "gra_summ" (from "gra" line 44, from "all" line 46):
+    10,1: 23.7c object too high for 23.6c space; @Scale inserted
+lout file "prg_tabs" (from "prg" line 112, from "all" line 48):
+   66,23: prg2lout 2,1: program text ended within comment
+   68,35: prg2lout 2,1: program text ended within comment
 
-The first two warnings are about footnotes whose first lines did not
-fit on the bottom of the current page, so had to begin on the following
-page.  The third warning is about a large table that had to be scaled
-down very slightly to fit on the page (lengths are printed to one
-decimal place, which in this case gives the misleading impression
-that the table did actually fit to begin with).  The last two warnings
+The first warning is about a large table that had to be scaled
+down very slightly to fit on the page.  The last two warnings
 point to two places where a C program text ended inside a comment,
 which in these cases was deliberate.  If you set the document in
 Letter size paper, you will get a somewhat different set of warning
@@ -43,7 +35,7 @@ repeated failure to converge, caused by footnotes and floating figures
 close to large unbreakable displays.
 
 A copy of the final PostScript output file (A4 paper size) is
-stored at "ftp://ftp.cs.su.oz.au/jeff/lout/lout-3.26.user.ps.gz".
+stored at "ftp://ftp.cs.su.oz.au/jeff/lout/lout-3.27.user.ps.gz".
 
 Jeffrey H. Kingston
-16 October 2002
+22 November 2002

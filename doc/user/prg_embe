@@ -20,20 +20,20 @@ of the table at the start of this chapter.
 The program texts within the Lout document are enclosed in braces
 preceded by the Lout symbol from the third column of the table, like
 this for the C language:
-@ID @OneRow @Code {
-"@IndentedDisplay @CP {"
-"#include <stdio.h>"
-""
-"treeprint(p)        /* print tree p recursively */"
-"struct tnode *p;"
-"{"
-"        if (p != NULL) {"
-"                treeprint(p->left);"
-"                printf(\"%4d %s\\n\", p->count, p->word);"
-"                treeprint(p->right);"
-"        }"
-"}"
-"}"
+@ID @OneRow @Code @Verbatim {
+@IndentedDisplay @CP {
+#include <stdio.h>
+
+treeprint(p)        /* print tree p recursively */
+struct tnode *p;
+{
+        if (p != NULL) {
+                treeprint(p->left);
+                printf(\%4d %s\\n\, p->count, p->word);
+                treeprint(p->right);
+        }
+}
+}
 }
 Although computer programs violate the rules of legal Lout input in many ways,
 these rules are suspended by the {@Code "@CP"}, {@Code "@Eiffel"} etc. symbols,
@@ -61,6 +61,10 @@ anywhere.  When including a program text within a paragraph, use
 other languages) to prevent it being broken across two lines, if desired.
 @PP
 In cases where the program text has unbalanced braces, it is necessary to
+programs. @RawIndex { programs }
+programs.braces @SubIndex { braces in }
+braces. @RawIndex { braces }
+braces.in.program @SubIndex { in program formatting }
 use the alternative form @Code "@CP @Begin ... @End @CP" (or the
 equivalent for other languages), so that Lout does not confuse program
 braces with Lout braces.  In that case the program text must not

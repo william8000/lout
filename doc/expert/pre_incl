@@ -17,4 +17,27 @@ included file may contain arbitrary Lout text, including other
 directory, then in a sequence of standard places which are not necessarily the
 same places that databases are searched for.  @@SysInclude searches the
 standard places only.
+@PP
+From Version 3.27, a special behaviour has been instituted when an
+attempt is made to @@Include or @@SysInclude the same file twice.
+If a second or subsequent attempt occurs after the end of definitions,
+@@Use clauses, and @@Database clauses (i.e. if it occurs within the
+content of the document), it will go ahead, thus allowing the
+repeated inclusion of files containing objects -- not necessarily
+recommended, but certainly one way of repeating information.  But
+if a second or subsequent attempt occurs within the region of
+definitions, @@Use clauses, and @@Database clauses, then that attempt
+will be silently ignored.
+@PP
+This behaviour is useful for situations where two packages
+depend on a third, caled, say, {@Code C }.  We can then place
+@ID @Code "@SysInclude { C }"
+at the start of both packages.  If neither package is included, then
+{@Code C} won't be either.  But if one or both is included, then
+{@Code C} will be included just once at the start of the first.
+Any pattern of acyclic dependencies between packages can be
+expressed with this mechanism, just by including every package
+that a given package depends on at the start of the file containing
+that package.  Cyclic dependencies are beyond Lout's one-pass
+comprehension anyway.
 @End @Section

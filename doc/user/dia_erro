@@ -8,6 +8,8 @@ any PostScript device.  However, some of the options of {@Code "@Diag"}'s
 symbols are passed through Lout to the output file without checking,
 including anything containing @Code "@Diag" lengths, angles, points, and
 tags.  Any errors in these options will not be detected until the file
+errors. @RawIndex { errors }
+errors.in.diagrams @SubIndex { in diagrams }
 is printed.
 @PP
 The most likely errors are {@I syntax @I errors}, as in
@@ -27,6 +29,10 @@ have been printed next.
 If you see {@Code VMerror} in an error message, it means that the printer
 vmerror. @Index { @Code VMerror PostScript error }
 is running out of memory.  In that case, one thing you can try is
+diagrams. @RawIndex { diagrams }
+diagrams.save @SubIndex { @Code "save" option }
+save. @RawIndex { @Code "save" option }
+save.in.diagrams @SubIndex { in diagrams }
 @ID @Code {
 "@Diag"
 "    save { yes }"

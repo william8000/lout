@@ -4,6 +4,8 @@
 @Begin
 @LP
 This chapter describes how to typeset computer program text using Lout
+programs. @Index { programs }
+computer.programs. @RawIndex { computer programs @I see programs }
 in conjunction with the @Code prg2lout
 prg2lout. @Index { @Code prg2lout filter program }
 @FootNote {
@@ -27,11 +29,13 @@ program texts with absolutely no modifications; plus, if you wish, Lout
 will print keywords in bold, identifiers in italics, add line numbers, etc.
 @PP
 At the time of writing, the available programming languages are:
-eiffel. @Index { Eiffel program printing }
-c. @Index { C and C++ program printing }
 blue. @Index { Blue program printing }
+c. @Index { C and C++ program printing }
+eiffel. @Index { Eiffel program printing }
+java. @Index { Java program printing }
 perl. @Index { Perl program printing }
 pod. @Index { Pod (for Perl) printing }
+python. @Index { Python program printing }
 @CD @Tbl
     mv { 0.5vx }
     af { Italic }

@@ -5,6 +5,9 @@
 @PP
 By default, entries appear at the left within cells, not counting the
 cell margin.  The @Code indent option causes entries to be indented
+tables. @RawIndex { tables }
+tables.indent @SubIndex { @Code "indent" option }
+indent.tables @Index { @Code "indent" option (tables) }
 horizontally.  For example,
 @ID @OneRow @Code "@Cell indent { ctr }"
 horizontally centres the entry within the cell.  Other possible values
@@ -15,6 +18,9 @@ are {@Code "left"} (the default value), {@Code "right"},
 example, {@Code 2f}) meaning that much indent.
 @PP
 There is a corresponding @Code "indentvertical" option for vertical indenting
+tables. @RawIndex { tables }
+tables.indentvertical @SubIndex { @Code "indentvertical" option }
+indentvertical.tables @Index { @Code "indentvertical" option (tables) }
 within the cell.  It takes the same values except that @Code "left" is
 renamed {@Code "top"} (the default), and @Code "right" is renamed
 {@Code foot}.  A common problem with vertical placement is that words that
@@ -44,6 +50,10 @@ we see that the words are aligned correctly despite these
 worries.  This is because by default
 @Code "@Tbl" adds a @I { vertical strut } to each entry:  an invisible
 object of zero width and height {@Code "1f"}, which covers for any absent
+tables. @RawIndex { tables }
+tables.strut @SubIndex { @Code "strut" option }
+strut.option. @RawIndex { @Code "strut" option }
+strut.option.in.tables @SubIndex { in tables }
 ascenders and descenders.  The option
 @ID @OneRow @Code "@Cell strut { no }"
 can be used to remove the strut; other acceptable values for this
@@ -51,6 +61,9 @@ option are {@Code yes} (the default value), and any length, which will
 add a strut of that length.
 @PP
 For completeness there is a corresponding @Code "struthorizontal" option; it
+tables. @RawIndex { tables }
+tables.struthorizontal @SubIndex { @Code "struthorizontal" option }
+struthorizontal.tables @Index { @Code "struthorizontal" option (tables) }
 takes the same values, its default value is {@Code no}, and it unlikely
 ever to be used.
 @End @Section

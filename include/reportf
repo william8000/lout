@@ -37,6 +37,7 @@ def @ReportSetup
     named @AbstractWord			{ abstract		}
     named @ContentsWord			{ contents		}
     named @AppendixWord			{ appendix		}
+    named @GlossaryWord			{ glossary		}
     named @IndexWord			{ index			}
     named @IndexAWord			{ index			}
     named @IndexBWord			{ index			}
@@ -99,6 +100,11 @@ def @ReportSetup
     named @ReferencesHeadingFormat
 	    right title			{ title			}
 
+    named @GlossaryHeadingFont		{ Bold			}
+    named @GlossaryHeadingBreak		{ ragged 1.2fx nohyphen	}
+    named @GlossaryHeadingFormat
+	    right title			{ title			}
+
     named @IndexHeadingFont		{ Bold			}
     named @IndexHeadingBreak		{ ragged 1.2fx nohyphen	}
     named @IndexHeadingFormat
@@ -128,6 +134,7 @@ def @ReportSetup
     named @SubAppendixInContents	{ Yes			}
     named @SubSubAppendixInContents	{ No			}
     named @ReferencesInContents		{ Yes			}
+    named @GlossaryInContents		{ Yes			}
     named @IndexInContents		{ Yes			}
     named @IndexAInContents		{ Yes			}
     named @IndexBInContents		{ Yes			}
@@ -172,6 +179,7 @@ def @ReportSetup
     named @SectionPrefix		{			}
     named @AppendixPrefix		{			}
     named @ReferencesPrefix		{			}
+    named @GlossaryPrefix		{			}
     named @IndexPrefix			{			}
     named @IndexAPrefix			{			}
     named @IndexBPrefix			{			}
@@ -270,6 +278,7 @@ def @ReportSetup
 	named @AbstractDisplay { @AbstractDisplay }
 	named @AbstractTitle { @AbstractTitle }
 	named @Abstract {}
+	named @GlossaryText { @GlossaryText }
 	named @IndexText { @IndexText }
 	named @IndexAText { @IndexAText }
 	named @IndexBText { @IndexBText }
@@ -359,6 +368,44 @@ def @ReportSetup
                 inrunners { Yes }
                 { //@RefListGap @ReferencesSection }
 	}
+
+        def @GlossaryPart
+	    named @Tag {}
+        {
+
+            def @Run
+            {
+                NonStart @Runner
+                    @MajorNum {}
+                    @MajorTitle { glossary @WordVal @GlossaryWord }
+                    @MinorNum {}
+                    @MinorTitle {}
+                    @Owner { @Tag }
+                    @Prefix { @GlossaryPrefix }
+            }
+
+            @LargeScaleStructure
+                tag { @Tag }
+                type { Major }
+                initiallanguage { @InitialLanguage }
+                title { glossary @WordVal @GlossaryWord }
+                headingfont { @GlossaryHeadingFont }
+                headingbreak { @GlossaryHeadingBreak }
+                headingformat { @GlossaryHeadingFormat @Body }
+                headingtext { @GlossaryText }
+                incontents { @GlossaryInContents }
+                prefix { @GlossaryPrefix }
+                inrunners { Yes }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { glossary @WordVal @GlossaryWord }
+                sendheader { @Full @Body }
+                innergap { @SectionGap }
+		wantindefinite { Yes }
+                @GlossarySection @Run
+
+        }
 
         def @IndexPart
 	    named @Tag {}
@@ -497,6 +544,7 @@ def @ReportSetup
 	    //@SectionGap	@ReferencesBeforeAppendices @NoDo {
 				    @MakeReferences @Do @ReferencesPart
 				}
+	    //			@MakeGlossary @Do @GlossaryPart
 	    //			@MakeIndexA @Do @IndexAPart
 	    //			@MakeIndexB @Do @IndexBPart
 	    //			@MakeIndex  @Do @IndexPart
@@ -526,6 +574,7 @@ def @ReportSetup
 				}
 	    //@SectionGap	@EndFigureList
 	    //@SectionGap	@EndNoteList 1
+	    //			@MakeGlossary @Do @GlossaryPart
 	    //			@MakeIndexA @Do @IndexAPart
 	    //			@MakeIndexB @Do @IndexBPart
 	    //			@MakeIndex  @Do @IndexPart

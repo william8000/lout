@@ -4,7 +4,18 @@
 @Begin
 @PP
 The @Code "@Cell" symbol offers a few options for changing the appearance
-cell.option @Index { cell options in tables }
+tables. @RawIndex { tables }
+tables.paint @SubIndex { @Code "paint" option }
+paint. @RawIndex { @Code "paint" option }
+paint.in.tables @SubIndex { in tables }
+tables. @RawIndex { tables }
+tables.font @SubIndex { @Code "font" option }
+font.option. @RawIndex { @Code "font" option }
+font.option.in.tables @SubIndex { in tables }
+tables. @RawIndex { tables }
+tables.break @SubIndex { @Code "break" option }
+break. @RawIndex { @Code "break" option }
+break.tables @SubIndex { in tables }
 of entries placed in it.  Like all options, these
 appear immediately after the @Code "@Cell" symbol, with their values in braces:
 @ID @OneRow @Code @Verbatim {
@@ -29,9 +40,61 @@ Do not throw stones at this notice
 }
 with a light grey background, Italic font, and
 @Code "clines" paragraph breaking style.  The paint colour
-may be any colour from Section {@NumberOf colour}.  Another option,
-{@Code background}, allows an arbitrary object to be placed in the
-background of the cell, in front of any paint but behind the entry.
+may be any colour from Section {@NumberOf colour}.
+@PP
+Wherever there is a @Code paint option in the standard packages, there
+is a neighbouring @Code texture option, which causes the paint to be
+tables. @RawIndex { tables }
+tables.texture @SubIndex { @Code "texture" option }
+texture.option. @RawIndex { @Code "texture" option }
+texture.option.in.tables @SubIndex { in tables }
+applied according to a given texture.  For a list of available
+textures, consult Section {@NumberOf textures}; for how the @Code texture
+option works, consult the description of the @Code texture option to the
+@Code "@Box" symbol in Section {@NumberOf boxes} (all @Code texture
+options work in the same way).  Here's an example:
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    width { 2f }
+    height { 2f }
+    aformat {
+@Cell paint { black } texture { brickwork } A | @Cell B |
+@Cell paint { black } texture { brickwork } C | @Cell D }
+    bformat {
+@Cell A | @Cell paint { black } texture { brickwork } B |
+@Cell C | @Cell paint { black } texture { brickwork } D }
+{
+@Rowa
+@Rowb
+@Rowa
+@Rowb
+}
+}
+produces
+@FootNote { If you can't see any textures here, the fault is probably
+with your PostScript viewer.  See Section {@NumberOf textures}. }
+@CD @OneRow
+@Tbl
+    width { 2f }
+    height { 2f }
+    aformat {
+@Cell paint { black } texture { brickwork } A | @Cell B |
+@Cell paint { black } texture { brickwork } C | @Cell D }
+    bformat {
+@Cell A | @Cell paint { black } texture { brickwork } B |
+@Cell C | @Cell paint { black } texture { brickwork } D }
+{
+@Rowa
+@Rowb
+@Rowa
+@Rowb
+}
+Another option, {@Code background}, allows an arbitrary object to be
+tables. @RawIndex { tables }
+tables.background @SubIndex { @Code "background" option }
+background.tables @Index { @Code "background" option (tables) }
+placed in the background of the cell, in front of any paint but behind
+the entry.
 @PP
 Later sections introduce other @Code "@Cell" options, for
 fixed-width columns, indented entries, margins, and rules.  It is also
@@ -92,6 +155,6 @@ setup file (Section {@NumberOf tbl_setu}), which if set will paint every
 table in the document.  When a more general setting of an option is
 contradicted by a more specific setting (e.g. when @Code "@Tbl" has
 @Code "paint { lightgrey }" but some cell or row has
-{@Code "paint { nopaint }"}), the more specific setting applies.  For a
+{@Code "paint { none }"}), the more specific setting applies.  For a
 precise description, see Section {@NumberOf tbl_summ}.
 @End @Section

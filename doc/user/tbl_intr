@@ -31,7 +31,9 @@ your own setup file, you may place the include commands within it, near the
 start.
 @PP
 To begin with a very simple example, the table
-tbl. @Index @Code "@Tbl"
+tables. @RawIndex { tables }
+tables.tbl @SubIndex { @Code "@Tbl" }
+tbl.tables @Index { @Code "@Tbl" (tables) }
 @CD
 @Tbl
     aformat { @Cell A  |  @Cell B  |  @Cell C }
@@ -70,7 +72,16 @@ is produced by the following input:
 }
 Immediately after the @Code "@Tbl" symbol, which introduces the table,
 comes a @I { format option }, {@Code "aformat"}, describing the format of
+tables. @RawIndex { tables }
+tables.aformat @SubIndex { @Code "aformat" option }
+aformat.tables @Index { @Code "aformat" option (tables) }
+tables. @RawIndex { tables }
+tables.format @SubIndex { format of }
+format.tables @Index { format of tables }
 each row.  It says that each row contains three cells:  {@Code "@Cell A"},
+tables. @RawIndex { tables }
+tables.cell @SubIndex { @Code "@Cell" }
+cell.tables @Index { @Code "@Cell" (tables) }
 {@Code "@Cell B"}, and {@Code "@Cell C"}.  The format option may have up
 to 26 cells, with names chosen freely from the upper-case letters from
 @Code A to {@Code Z}.  The symbol @Code "|" separates each cell from the next.
@@ -78,6 +89,9 @@ to 26 cells, with names chosen freely from the upper-case letters from
 After the format option comes the body of the table, enclosed in
 braces.  It consists entirely of a sequence of rows, each introduced by
 a @Code "@Rowa" symbol and containing one entry for each cell of the
+tables. @RawIndex { tables }
+tables.rowa @SubIndex { @Code "@Rowa" }
+rowa.tables @Index { @Code "@Rowa" (tables) }
 format option, as shown (the row may occupy any number of lines of the
 input file).  The entries may be arbitrary Lout objects, such as words,
 paragraphs, equations, figures, and so on without restriction.  An entry

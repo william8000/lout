@@ -4,7 +4,25 @@
 @Begin
 @PP
 There are options for placing captions above, below, left, and right of
+captions. @RawIndex { captions }
 captions.graphs @SubIndex { in graphs }
+graphs. @RawIndex { graphs (statistical) }
+graphs.captions @SubIndex { captions }
+graphs.abovecaption @SubIndex { @Code abovecaption option }
+abovecaption. @RawIndex { @Code "abovecaption" option }
+abovecaption.graph @SubIndex { in graphs }
+graphs. @RawIndex { graphs (statistical) }
+graphs.belowcaption @SubIndex { @Code belowcaption option }
+belowcaption. @RawIndex { @Code "belowcaption" option }
+belowcaption.graph @SubIndex { in graphs }
+graphs. @RawIndex { graphs (statistical) }
+graphs.leftcaption @SubIndex { @Code leftcaption option }
+leftcaption. @RawIndex { @Code "leftcaption" option }
+leftcaption.graph @SubIndex { in graphs }
+graphs. @RawIndex { graphs (statistical) }
+graphs.rightcaption @SubIndex { @Code rightcaption option }
+rightcaption. @RawIndex { @Code "rightcaption" option }
+rightcaption.graph @SubIndex { in graphs }
 the frame:
 @ID @OneRow @Code {
 "@Graph"
@@ -34,21 +52,37 @@ what happens if there is no data.
 @PP
 There are options for controlling the amount of space between each
 caption (when non-empty) and the frame.  Here they are with their
+graphs. @RawIndex { graphs (statistical) }
+graphs.abovegap @SubIndex { @Code abovegap option }
+abovegap. @RawIndex { @Code "abovegap" option }
+abovegap.graphs @SubIndex { in graphs }
+graphs. @RawIndex { graphs (statistical) }
+graphs.belowgap @SubIndex { @Code belowgap option }
+belowgap. @RawIndex { @Code "belowgap" option }
+belowgap.graphs @SubIndex { in graphs }
+graphs. @RawIndex { graphs (statistical) }
+graphs.leftgap @SubIndex { @Code leftgap option }
+leftgap. @RawIndex { @Code "leftgap" option }
+leftgap.graphs @SubIndex { in graphs }
+graphs. @RawIndex { graphs (statistical) }
+graphs.rightgap @SubIndex { @Code rightgap option }
+rightgap. @RawIndex { @Code "rightgap" option }
+rightgap.graphs @SubIndex { in graphs }
 default values:
-@ID @OneRow @Code {
-"@Graph"
-"    abovegap { 0.5 cm }"
-"    belowgap { 0.5 cm }"
-"    leftgap { 1.5 cm }"
-"    rightgap { 0.5 cm }"
-"{"
-"    ..."
-"}"
+@ID @OneRow @Code @Verbatim {
+@Graph
+    abovegap { 0.5c }
+    belowgap { 0.5c }
+    leftgap { 1.5c }
+    rightgap { 0.5c }
+{
+    ...
+}
 }
 This is particularly important in the case of {@Code "leftgap"} (and
 @Code "rightgap" if @Code rticks is used), because
 Lout has no idea how wide the ticks and labels attached to the y axis
-are; 1.5 cm is just a wild guess and often needs adjustment.  On the
+are; 1.5c is just a wild guess and often needs adjustment.  On the
 other hand, Lout does know how high the ticks and labels on the x axis
 are; it allows 1.7 times the current font size for them, and
 @Code "belowgap" is additional to this.
@@ -56,13 +90,17 @@ are; it allows 1.7 times the current font size for them, and
 When a graph is to be presented as a centred display, it is generally
 best if the centring is done with respect to the frame alone, not the
 captions, ticks, and labels.  The @Code "hidecaptions" option does this by
+graphs. @RawIndex { graphs (statistical) }
+graphs.hidecaptions @SubIndex { @Code hidecaptions option }
+hidecaptions. @RawIndex { @Code "hidecaptions" option }
+hidecaptions.in.graphs @SubIndex { in graphs }
 making the left and right captions and gaps seem to Lout to have zero width:
-@ID @OneRow @Code {
-"@Graph"
-"    hidecaptions { yes }"
-"{"
-"    ..."
-"}"
+@ID @OneRow @Code @Verbatim {
+@Graph
+    hidecaptions { yes }
+{
+    ...
+}
 }
 Actually @Code "yes" has been made the default value, since the vast
 majority of graphs are centred displays.  In the rare cases where

@@ -1,0 +1,150 @@
+
+###########################################################################
+#                                                                         #
+#   lengths                                                               #
+#                                                                         #
+#   Jeffrey H. Kingston                                                   #
+#   30 October 2002                                                       #
+#                                                                         #
+#   This file offers two symbols for converting between PostScript        #
+#   lengths and Lout lengths.  This has been a messy area and the two     #
+#   symbols in this file, @LoutLengths and @PSLengths, are my attempt     #
+#   to put a final end to the mess.                                       #
+#                                                                         #
+#   A Lout length is, and has always been, a number followed by           #
+#   a one-letter unit of measurement: i c p m s v f d.                    #
+#                                                                         #
+#   A PostScript length is, and has always been, a number followed        #
+#   by a space followed by a two-letter unit of measurement, one of       #
+#   in cm pt em sp vs ft dg.                                              #
+#                                                                         #
+#   To the ordinary user who reads the User's Guide, all lengths          #
+#   now look like Lout lengths.  However, internally some of these        #
+#   lengths are used by Lout and others are passed to PostScript.         #
+#   Based on the two symbols @PSLengths and @LoutLengths defined          #
+#   below, an option x which could contain a length of either kind        #
+#   can be classified as one of three types:                              #
+#                                                                         #
+#   Type of option                  How to handle it                      #
+#   -------------------------------------------------------------------   #
+#   Option was never advertised     named x { ... }                       #
+#   as taking a PostScript length                                         #
+#                                                                         #
+#   Option was advertised as        import @LoutLengths named x { ... }   #
+#   possibly taking a PostScript                                          #
+#   length, but its value is used                                         #
+#   by Lout                                                               #
+#                                                                         #
+#   Option whose value has to be    import @PSLengths named x { ... }     #
+#   passed to PostScript                                                  #
+#   -------------------------------------------------------------------   #
+#                                                                         #
+#   Either kind of import allows either kind of length to be given;       #
+#   @LoutLengths makes sure the final result is suitable for passing      #
+#   to Lout, while @PSLengths makes sure the final result is suitable     #
+#   for passing to PostScript.  If things had been done right from the    #
+#   start, there would be no need for @LoutLengths, but for backward      #
+#   compatibility we will continue to use it basically forever.           #
+#                                                                         #
+###########################################################################
+
+
+###########################################################################
+#                                                                         #
+#   @LoutLengths                                                          #
+#                                                                         #
+#   Convert PostScript lengths into Lout lengths.                         #
+#                                                                         #
+###########################################################################
+
+export in cm pt em sp vs ft dg
+def @LoutLengths
+{
+    def in left x { x"i" }
+    def cm left x { x"c" }
+    def pt left x { x"p" }
+    def em left x { x"m" }
+    def sp left x { x"s" }
+    def vs left x { x"b" }
+    def ft left x { x"f" }
+    def dg left x { x"d" }
+}
+
+
+###########################################################################
+#                                                                         #
+#   @PSLengths                                                            #
+#                                                                         #
+#   Convert Lout lengths into PostScript (also PDF) lengths.              #
+#   PDF is no longer supported but this code was there already so         #
+#   it's been carried over.                                               #
+#                                                                         #
+###########################################################################
+
+export i c p m s v f d
+def @PSLengths
+{
+    def i left x {
+	@BackEnd @Case {
+	    PostScript @Yield { x" in" }
+	    PDF        @Yield { "__mul(__in, "x")" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def c left x {
+	@BackEnd @Case {
+	    PostScript @Yield { x" cm" }
+	    PDF        @Yield { "__mul(__cm, "x")" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def p left x {
+	@BackEnd @Case {
+	    PostScript @Yield { x" pt" }
+	    PDF        @Yield { "__mul(__pt, "x")" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def m left x {
+	@BackEnd @Case {
+	    PostScript @Yield { x" em" }
+	    PDF        @Yield { "__mul(__em, "x")" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def s left x {
+	@BackEnd @Case {
+	    PostScript @Yield { x" sp" }
+	    PDF        @Yield { "__mul(__louts, "x")" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def v left x {
+	@BackEnd @Case {
+	    PostScript @Yield { x" vs" }
+	    PDF        @Yield { "__mul(__loutv, "x")" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def f left x {
+	@BackEnd @Case {
+	    PostScript @Yield { x" ft" }
+	    PDF        @Yield { "__mul(__loutf, "x")" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def d left x {
+	@BackEnd @Case {
+	    PostScript @Yield { x" dg" }
+	    PDF        @Yield { "__mul(__loutd, "x")" }
+	    PlainText  @Yield ""
+	}
+    }
+}

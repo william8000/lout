@@ -74,12 +74,12 @@ the default value of {@Code "@IntroPageNumbers"}.
 @PP
 Let's summarize the five options so far by looking at their values in
 the @Code book setup file, which was used to produce the present document:
-@ID @OneRow @Code {
-"@PageHeaders { Titles }"
-"@PageNumbers { Arabic }"
-"@FirstPageNumber { 1 }"
-"@IntroPageNumbers { Roman }"
-"@IntroFirstPageNumber { 1 }"
+@ID @OneRow @Code @Verbatim {
+@PageHeaders { Titles }
+@PageNumbers { Arabic }
+@FirstPageNumber { 1 }
+@IntroPageNumbers { Roman }
+@IntroFirstPageNumber { 1 }
 }
 The remainder of this section goes beyond these basic choices to explain
 how to change the detailed appearance of page headers
@@ -109,36 +109,36 @@ These classifications are quite independent of each other:  a page
 could be a non-intro start odd page, or an intro non-start even page,
 and so on.  This makes eight (@Eq { 2 times 2 times 2 }) possibilities
 altogether.  Depending on the type of document there may also be pages
-that Lout will never place a page header or footer on.  For example, no page
-headers or footers will appear on pages containing part titles in books.
+that Lout will never place a page header or footer on (e.g. pages
+containing part titles in books).
 @PP
 If you choose {@Code "@PageHeaders { None }"}, there are no page headers
 or footers, so there is nothing more to say.  If you choose
 {@Code "@PageHeaders { Simple }"}, then eight options become relevant
 for controlling the page headers on each of the eight kinds of
 pages.  Here they are with their default values:
-@ID @OneRow @Code {
-"@OddTop { @Centre { - @PageNum - } }"
-"@EvenTop { @Centre { - @PageNum - } }"
-"@StartOddTop { @Null }"
-"@StartEvenTop { @Null }"
-"@IntroOddTop { @Null }"
-"@IntroEvenTop { @Null }"
-"@IntroStartOddTop { @Null }"
-"@IntroStartEvenTop { @Null }"
+@ID @OneRow @Code @Verbatim {
+@OddTop { @Centre { - @PageNum - } }
+@EvenTop { @Centre { - @PageNum - } }
+@StartOddTop { @Null }
+@StartEvenTop { @Null }
+@IntroOddTop { @Null }
+@IntroEvenTop { @Null }
+@IntroStartOddTop { @Null }
+@IntroStartEvenTop { @Null }
 }
 If the word @Code Start is missing from an option name, the option
 applies to non-start pages; if @Code Intro is missing, it applies to
 non-intro pages.  Another eight options control footers in the same way:
-@ID @OneRow @Code {
-"@OddFoot { @Null }"
-"@EvenFoot { @Null }"
-"@StartOddFoot { @Null }"
-"@StartEvenFoot { @Null }"
-"@IntroOddFoot { @Centre @PageNum }"
-"@IntroEvenFoot { @Null }"
-"@IntroStartOddFoot { @Centre @PageNum }"
-"@IntroStartEvenFoot { @Null }"
+@ID @OneRow @Code @Verbatim {
+@OddFoot { @Null }
+@EvenFoot { @Null }
+@StartOddFoot { @Null }
+@StartEvenFoot { @Null }
+@IntroOddFoot { @Centre @PageNum }
+@IntroEvenFoot { @Null }
+@IntroStartOddFoot { @Centre @PageNum }
+@IntroStartEvenFoot { @Null }
 }
 The value of the option is an object which becomes the header or
 footer.  It may be any object, but there are some peculiarities that
@@ -197,30 +197,30 @@ odd pages, and so on.
 A different set of sixteen options applies when @Code "@PageHeaders"
 is set to @Code Titles or {@Code "NoTitles"}.  Here are the eight
 options for headers, with their default values:
-@ID @OneRow @Code {
-"@RunningOddTop { @I { @MinorNum @DotSep @MinorTitle }"
-"       @Right @B @PageNum }"
-"@RunningEvenTop { @B @PageNum"
-"       @Right @I { @MajorNum @DotSep @MajorTitle } }"
-"@RunningStartOddTop { @Null }"
-"@RunningStartEvenTop { @Null }"
-"@RunningIntroOddTop { @Null }"
-"@RunningIntroEvenTop { @Null }"
-"@RunningIntroStartOddTop { @Null }"
-"@RunningIntroStartEvenTop { @Null }"
+@ID @OneRow @Code @Verbatim {
+@RunningOddTop { @I { @MinorNum @DotSep @MinorTitle }
+       @Right @B @PageNum }
+@RunningEvenTop { @B @PageNum
+       @Right @I { @MajorNum @DotSep @MajorTitle } }
+@RunningStartOddTop { @Null }
+@RunningStartEvenTop { @Null }
+@RunningIntroOddTop { @Null }
+@RunningIntroEvenTop { @Null }
+@RunningIntroStartOddTop { @Null }
+@RunningIntroStartEvenTop { @Null }
 }
 Some options occupy two lines, but only because they are long:  as
 usual, the end of a line is the same as one space.  Here are the
 options for footers:
-@ID @OneRow @Code {
-"@RunningOddFoot { @Null }"
-"@RunningEvenFoot { @Null }"
-"@RunningStartOddFoot { @Centre { Bold 0.8f } @Font @PageNum }"
-"@RunningStartEvenFoot { @Centre { Bold 0.8f } @Font @PageNum }"
-"@RunningIntroOddFoot { @Right @PageNum  }"
-"@RunningIntroEvenFoot { @PageNum }"
-"@RunningIntroStartOddFoot { @Null }"
-"@RunningIntroStartEvenFoot { @Null }"
+@ID @OneRow @Code @Verbatim {
+@RunningOddFoot { @Null }
+@RunningEvenFoot { @Null }
+@RunningStartOddFoot { @Centre { Bold 0.8f } @Font @PageNum }
+@RunningStartEvenFoot { @Centre { Bold 0.8f } @Font @PageNum }
+@RunningIntroOddFoot { @Right @PageNum  }
+@RunningIntroEvenFoot { @PageNum }
+@RunningIntroStartOddFoot { @Null }
+@RunningIntroStartEvenFoot { @Null }
 }
 All these options are similar to the earlier ones, in providing one
 option for each of the eight kinds of pages.  The names are the same

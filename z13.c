@@ -1,9 +1,9 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -48,7 +48,7 @@ static int debug_depth_max = 5;
 
 static void BreakJoinedGroup(OBJECT start, OBJECT stop, OBJECT m,
 CONSTRAINT *c, FULL_LENGTH *res_back, FULL_LENGTH *res_fwd)
-{ OBJECT y, link;  FULL_LENGTH b, f, sb, sf;  CONSTRAINT yc;
+{ OBJECT y = nilobj, link;  FULL_LENGTH b, f, sb, sf;  CONSTRAINT yc;
   debug1(DOB, DD, "[ BreakJoinedGroup(start, stop, m, %s, -, -)",
     EchoConstraint(c));
 
@@ -117,7 +117,8 @@ CONSTRAINT *c, FULL_LENGTH *res_back, FULL_LENGTH *res_fwd)
 /*****************************************************************************/
 
 static OBJECT BreakVcat(OBJECT x, CONSTRAINT *c)
-{ OBJECT y, link, start_group, m;  FULL_LENGTH b, f, dble_fwd;  CONSTRAINT tc;
+{ OBJECT y, link, start_group, m = nilobj;
+  FULL_LENGTH b, f, dble_fwd;  CONSTRAINT tc;
   BOOLEAN dble_found;
   debug1(DOB, DD, "[ BreakVcat(x, %s)", EchoConstraint(c));
   assert(Down(x) != x, "BreakVcat: Down(x) == x!" );
@@ -220,8 +221,8 @@ static OBJECT BreakVcat(OBJECT x, CONSTRAINT *c)
 static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 { FULL_LENGTH bwidth, fwidth;	/* running back(x) and fwd(x)		     */
   int    bcount, fcount;	/* running no. of components		     */
-  OBJECT mlink, my;		/* minimum-width unbroken component	     */
-  BOOLEAN ratm;			/* TRUE when my has a mark to its right      */
+  OBJECT mlink = nilobj, my;	/* minimum-width unbroken component	     */
+  BOOLEAN ratm = FALSE;		/* TRUE when my has a mark to its right      */
   int    mside;			/* side of the mark my is on: BACK, ON, FWD  */
   FULL_LENGTH msize;		/* size of my (minimal among unbroken)	     */
   CONSTRAINT mc;		/* desirable constraint for my		     */
@@ -232,7 +233,7 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 				/* if they are all assigned equal width      */
   FULL_LENGTH fwd_max, back_max;/* maximum space available forward of or     */
 				/* back of the mark, when columns are even   */
-  FULL_LENGTH col_size;		/* the column size actually used in breaking */
+  FULL_LENGTH col_size = 0;	/* the column size actually used in breaking */
   FULL_LENGTH prev_col_size;	/* previous column size (try to keep equal)  */
   FULL_LENGTH beffect, feffect;	/* the amount bwidth, fwidth must increase   */
 				/* when my is broken			     */
@@ -544,6 +545,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	small_caps(save_style(y)) = FALSE;
 	font(save_style(y)) = word_font(x);
 	colour(save_style(y)) = word_colour(x);
+	texture(save_style(y)) = word_texture(x);
 	outline(save_style(y)) = word_outline(x);
 	language(save_style(y)) = word_language(x);
 	baselinemark(save_style(y)) = word_baselinemark(x);
@@ -694,10 +696,14 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
     case BEGIN_HEADER:
     case SET_HEADER:
     
-      Child(y, LastDown(x));
-      y = BreakObject(y, c);
-      back(x, COLM) = back(y, COLM);
-      fwd(x, COLM) = fwd(y, COLM);
+      /* multiple copies, remember */
+      for( link = NextDown(Down(x));  link != x;  link = NextDown(link) )
+      {
+        Child(y, link);
+        y = BreakObject(y, c);
+        back(x, COLM) = back(y, COLM);
+        fwd(x, COLM) = fwd(y, COLM);
+      }
       debug3(DOB, D, "BreakObject(%s, COLM) = (%s, %s)", Image(type(x)),
 	EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)));
       break;
@@ -707,6 +713,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     
       Child(y, LastDown(x));

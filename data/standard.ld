@@ -551,6 +551,30 @@
   }
 }
 
+{ glossary @Word @CurrLang @Case {
+    Croatian	@Yield { ?? }
+    Czech	@Yield { ?? }
+    Danish	@Yield { ?? }
+    Dutch       @Yield { ?? }
+    English	@Yield { Glossary }
+    EnglishUK	@Yield { Glossary }
+    Finnish	@Yield { ?? }
+    French	@Yield { ?? }
+    German	@Yield { Glossar }
+    Hungarian	@Yield { ?? }
+    Italian	@Yield { ?? }
+    Norwegian   @Yield { ?? }
+    Polish	@Yield { ?? }
+    Portuguese  @Yield { ?? }
+    Russian	@Yield { ?? }
+    Slovak	@Yield { ?? }
+    Slovenian   @Yield { ?? }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { ?? }
+    UpperSorbian @Yield { ?? }
+  }
+}
+
 { index @Word @CurrLang @Case {
     Croatian	@Yield { Indeks }
     Czech	@Yield { Rejst{@Char rcaron}{@Char iacute}k }

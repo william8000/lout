@@ -4,6 +4,9 @@
 @Begin
 @PP
 It is possible to embed Lout text inside program comments.  How this
+programs. @RawIndex { programs }
+programs.loutcode @SubIndex { Lout code embedded in }
+loutcode.programs @Index { Lout code embedded in programs }
 is done could in principle vary from language to language, but in
 every language supported so far it is done by starting off the comment
 with an @Code "@" character.  If the language has several ways to get
@@ -19,7 +22,56 @@ for more on this.)  Or, to make a heading in an Eiffel program, do this:
 line.)  Other possible uses for this feature include index entries and
 margin notes.  Incredible as it may seem, you can even write
 @ID @Code "/*@ @CD @Heading { Function @CP { treeprint() } } */"
-with a @Code "@CP" symbol and some C code inside the Lout code
-inside the C code.  You probably can't go further, however, at least
-not in C, since that would require a C comment inside a C comment.
+with @Code "@CP" and C code inside the Lout code inside the C code.  You
+probably can't go further, however, at least not in C, since that would
+require a C comment inside a C comment.
+@PP
+It's possible to get quite long Lout insertions, with a bit of
+care.  For example, here's how to get a filled paragraph of text
+into a computer program:
+@ID @OneRow @Code @Verbatim {
+@Eiffel {
+--@@ID ragged @Break {
+--@This program is free software; you can redistribute
+--@it and"/"or modify it under the terms of the
+--@@B { GNU General Public License } as published by
+--@the Free Software Foundation; either Version 2, or
+--@(at your option) any later version.
+--@}
+
+launch(x: APPLICATION) is
+        -- launch the application
+    deferred
+}
+}
+produces
+@ID @OneRow @Eiffel {
+--@@ID ragged @Break {
+--@This program is free software; you can redistribute
+--@it and"/"or modify it under the terms of the
+--@@B { GNU General Public License } as published by
+--@the Free Software Foundation; either Version 2, or
+--@(at your option) any later version.
+--@}
+
+launch(x: APPLICATION) is
+        -- launch the application
+    deferred
+}
+This example relies on the fact that @Code prg2lout passes
+escape comments like these through to Lout absolutely
+untouched.  Notice the use of both a display symbol ({@Code "@ID"})
+and a change to the break style ({@Code "ragged @Break"}).  If
+the change of break style had been omitted, the break
+style of the surrounding program, {@Code "lines @Break"},
+would have been applied to the displayed paragraph.  The
+display symbol is needed because without it the paragraph
+would be an integral part of the surrounding program (which
+is actually considered by Lout to be one paragraph), making
+the @Code "ragged @Break" ineffective since you can't change
+the paragraph style in the middle of a paragraph.
+@PP
+Clearly, use of such escape comments in conjunction with line
+numbers is going to be problematic.  No promise is made
+that the result of doing that will make sense.
 @End @Section

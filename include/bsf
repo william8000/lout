@@ -1,10 +1,11 @@
 
 ###############################################################################
 #                                                                             #
-#  Lout @BasicSetup package (Version 3.13)                                    #
+#  Lout @BasicSetup package                                                   #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
 #  5 February 1999                                                            #
+#  Modified 30 October 2002 - reorganization of colours, textures, lengths    #
 #                                                                             #
 #  Based on the first part of the @DocumentLayout package, version 3.11.      #
 #                                                                             #
@@ -15,7 +16,9 @@
 #                                                                             #
 ###############################################################################
 
-@SysPrependGraphic { "bsf.lpg" }   # rules, boxes, margin note setup
+@SysInclude { lengths }		# @PSLengths
+@SysInclude { coltex }		# @ColourCommand and @TextureCommand
+@SysPrependGraphic { bsf.lpg }	# rules, boxes, margin note setup
 
 
 ###############################################################################
@@ -38,73 +41,55 @@ def @OrIfPlain
 
 ###########################################################################
 #                                                                         #
-#   @ColourCommand, @Colour, @Color                                       #
+#   @Colour, @Color                                                       #
 #                                                                         #
 ###########################################################################
 
-@SysInclude { ccommand }
+def @Colour @Color left col right y { {@ColourCommand col} @SetColour y }
 
-    def @Colour @Color left col right y { {@ColourCommand col} @SetColour y }
 
-    export i c p m s v f
-    def @LengthUnits
-    {
-	def i left x {
-	    @BackEnd @Case {
-		PostScript @Yield { x" in" }
-		PDF        @Yield { "__mul(__in, "x")" }
-		PlainText  @Yield ""
-	    }
-	}
+###########################################################################
+#                                                                         #
+#   @Texture                                                              #
+#                                                                         #
+###########################################################################
 
-	def c left x {
-	    @BackEnd @Case {
-		PostScript @Yield { x" cm" }
-		PDF        @Yield { "__mul(__cm, "x")" }
-		PlainText  @Yield ""
-	    }
-	}
 
-	def p left x {
-	    @BackEnd @Case {
-		PostScript @Yield { x" pt" }
-		PDF        @Yield { "__mul(__pt, "x")" }
-		PlainText  @Yield ""
-	    }
-	}
-
-	def m left x {
-	    @BackEnd @Case {
-		PostScript @Yield { x" em" }
-		PDF        @Yield { "__mul(__em, "x")" }
-		PlainText  @Yield ""
-	    }
-	}
-
-	def s left x {
-	    @BackEnd @Case {
-		PostScript @Yield { x" sp" }
-		PDF        @Yield { "__mul(__louts, "x")" }
-		PlainText  @Yield ""
-	    }
-	}
-
-	def v left x {
-	    @BackEnd @Case {
-		PostScript @Yield { x" vs" }
-		PDF        @Yield { "__mul(__loutv, "x")" }
-		PlainText  @Yield ""
-	    }
-	}
-
-	def f left x {
-	    @BackEnd @Case {
-		PostScript @Yield { x" ft" }
-		PDF        @Yield { "__mul(__loutf, "x")" }
-		PlainText  @Yield ""
-	    }
-	}
-    }
+def @Texture
+    left type
+                      named scale	{ 1	}
+                      named hscale	{ 1	}
+                      named vscale	{ 1	}
+    import @PSLengths named angle	{ 0d	}
+    import @PSLengths named hshift	{ 0i	}
+    import @PSLengths named vshift	{ 0i	}
+    import @PSLengths named width	{ "dft"	}
+    import @PSLengths named height	{ "dft"	}
+    import @PSLengths named gap		{ "dft"	}
+    import @PSLengths named radius	{ "dft"	}
+    import @PSLengths named linewidth	{ "dft"	}
+                      named font	{ "dft"	}
+    import @PSLengths named size	{ "dft"	}
+                      named value	{ "dft"	}
+    right x
+{
+    { type @TextureCommand
+	scale		{ scale		}
+	hscale		{ hscale	}
+	vscale		{ vscale	}
+	angle		{ angle		}
+	hshift		{ hshift	}
+	vshift		{ vshift	}
+	width		{ width		}
+	height		{ height	}
+	gap		{ gap		}
+	radius		{ radius	}
+	linewidth	{ linewidth	}
+	font		{ font		}
+	size		{ size		}
+	value		{ value	}
+    } @SetTexture x
+}
 
 
 ###############################################################################
@@ -733,40 +718,28 @@ def @BasicSetup
 
     ###########################################################################
     #                                                                         #
-    #   @AddPaint, @LineWidth (obsolete), @StrokeCommand                      #
+    #   @AddPaint, @StrokeCommand                                             #
     #                                                                         #
     ###########################################################################
 
-    def @AddPaint right col
+    def @AddPaint
+        left col
+	right texture
     {
 	col @Case {
 	    none @Yield ""
 	    nochange @Yield {
 		@BackEnd @Case {
-		    PostScript @Yield "gsave fill grestore"
-		    PDF        @Yield "q f Q"
-		    PlainText  @Yield ""
+		    PostScript @Yield { "gsave" texture "fill grestore" }
+		    PDF        @Yield { "q f Q" }
+		    PlainText  @Yield { "" }
 		}
 	    }
 	    else @Yield {
 		@BackEnd @Case {
-		    PostScript @Yield {"gsave" @ColourCommand col "fill grestore"}
+		    PostScript @Yield {"gsave" @ColourCommand col texture "fill grestore"}
 		    PDF        @Yield { "q" @ColourCommand col "f Q" }
-		    PlainText  @Yield ""
-		}
-	    }
-	}
-    }
-
-    def @LineWidth right lw
-    {
-	lw @Case {
-	    "" @Yield ""
-	    else @Yield {
-		@BackEnd @Case {
-		    PostScript @Yield { lw "setlinewidth" }
-		    PDF        @Yield { lw "w" }
-		    PlainText  @Yield ""
+		    PlainText  @Yield { "" }
 		}
 	    }
 	}
@@ -802,7 +775,7 @@ def @BasicSetup
     ###########################################################################
 
     def @FullWidthRule
-	import @LengthUnits named linewidth {}
+	import @PSLengths named linewidth {}
     {
 	@BackEnd @Case {
 
@@ -819,7 +792,7 @@ def @BasicSetup
     }
 
     def @LocalWidthRule
-	import @LengthUnits named linewidth {}
+	import @PSLengths named linewidth {}
     {
 	@BackEnd @Case {
 
@@ -837,21 +810,22 @@ def @BasicSetup
 
     def @Box
 	named margin { 0.3f }
-	import @LengthUnits named linewidth {}
+	import @PSLengths named linewidth {}
 	named paint { none }
+	import @TextureImport named texture {}
 	right x
     {
 	@BackEnd @Case {
 
 	    PostScript @Yield @VContract @HContract 0c @HShift {
-		{"LoutBox" @AddPaint paint @StrokeCommand linewidth }
+		{"LoutBox" paint @AddPaint texture @StrokeCommand linewidth }
 		@Graphic
 		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
 	    }
 
 	    PDF @Yield @VContract @HContract 0c @HShift {
 		{ "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"
-		@AddPaint paint @StrokeCommand linewidth } @Graphic
+		paint @AddPaint texture @StrokeCommand linewidth } @Graphic
 		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
 	    }
 
@@ -863,8 +837,9 @@ def @BasicSetup
 
     def @CurveBox
 	named margin { 0.3f }
-	import @LengthUnits named linewidth {}
+	import @PSLengths named linewidth {}
 	named paint { none }
+	import @TextureImport named texture {}
 	right x
     {
 	def @PDFStuff
@@ -887,13 +862,13 @@ def @BasicSetup
 	    "__div(__mul(11, __xmark), 24) 0"
 	    "__xmark 0 c"
 	    "h"
-	    @AddPaint paint @StrokeCommand linewidth
+	    paint @AddPaint texture @StrokeCommand linewidth
 	}
 
 	@VContract @HContract 0c @HShift @BackEnd @Case {
 
 	    PostScript @Yield {
-		{"LoutCurveBox" @AddPaint paint @StrokeCommand linewidth }
+		{"LoutCurveBox" paint @AddPaint texture @StrokeCommand linewidth }
 		@Graphic
 		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
 	    }
@@ -911,8 +886,9 @@ def @BasicSetup
 
     def @ShadowBox
 	named margin { 0.3f }
-	import @LengthUnits named linewidth {}
+	import @PSLengths named linewidth {}
 	named paint { none }
+	import @TextureImport named texture {}
 	named shadow { 0.2f }
 	right x
     {
@@ -921,14 +897,22 @@ def @BasicSetup
 	    PostScript @Yield {
 		"LoutShadowBox fill" @Graphic
 		{ ^/shadow ^|shadow 0c @HShift
-		      @Box margin {margin} paint {paint} linewidth {linewidth} x
+		      @Box
+			  margin {margin}
+			  paint {paint}
+			  texture { texture }
+			  linewidth {linewidth} x
 		      |shadow /shadow
 		}
 	    }
 
 	    PlainText @Yield {
 		^/shadow ^|shadow 0c @HShift
-		@Box margin {margin} paint {paint} linewidth {linewidth} x
+		@Box
+		    margin { margin }
+		    paint { paint }
+		    texture { texture }
+		    linewidth {linewidth} x
 		|shadow /shadow
 	    } 
 
@@ -942,7 +926,11 @@ def @BasicSetup
 		}
 		@Graphic
 		{ ^/shadow ^|shadow 0c @HShift
-		  @Box margin {margin} paint {paint} linewidth {linewidth} x
+		  @Box
+		      margin { margin }
+		      paint { paint }
+		      texture { texture }
+		      linewidth { linewidth } x
 		  |shadow /shadow
 		}
 	    }
@@ -957,13 +945,13 @@ def @BasicSetup
     ###########################################################################
 
     def @BoundaryMarks
-	import @LengthUnits named linewidth { 0.2p }
-	import @LengthUnits named length { 0.5c }
-	import @LengthUnits named gap { 0.5c }
-	import @LengthUnits named lout { 0c }
-	import @LengthUnits named rout { 0c }
-	import @LengthUnits named uout { 0c }
-	import @LengthUnits named dout { 0c }
+	import @PSLengths named linewidth { 0.2p }
+	import @PSLengths named length { 0.5c }
+	import @PSLengths named gap { 0.5c }
+	import @PSLengths named lout { 0c }
+	import @PSLengths named rout { 0c }
+	import @PSLengths named uout { 0c }
+	import @PSLengths named dout { 0c }
     {
 	def @UpStroke    { "0" gap       "rmoveto" "0" length     "rlineto" }
 	def @DownStroke  { "0" gap "neg" "rmoveto" "0" length "neg rlineto" }
@@ -1074,7 +1062,7 @@ def @BasicSetup
     def @PageMark
 	right tag
     {
-	@Null & tag @LinkDest & @PageMarker&&preceding @Tagged tag
+	tag @LinkDest @Null & @PageMarker&&preceding @Tagged tag
     }
 
     def @NoLinkPageMark

@@ -1,9 +1,9 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -226,9 +226,9 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
   OBJECT target_index;		/* the index of target                       */
   OBJECT target_galley;		/* the body of target, made into a galley    */
   OBJECT tg_inners;		/* inner galleys of target_galley            */
-  BOOLEAN need_precedes;	/* true if destination lies before galley    */
+  BOOLEAN need_precedes = FALSE;/* true if destination lies before galley    */
   OBJECT recs;			/* list of recursive definite objects        */
-  OBJECT link, y;		/* for scanning through the components of hd */
+  OBJECT link, y = nilobj;	/* for scanning through the components of hd */
   CONSTRAINT c;			/* temporary variable holding a constraint   */
   OBJECT env, n1, tmp, zlink, z, sym;	/* placeholders and temporaries	     */
   BOOLEAN was_sized;		/* true if sized(hd) initially               */
@@ -323,7 +323,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     New(target_galley, HEAD);
     force_gall(target_galley) = FALSE;
     enclose_obj(target_galley) = limiter(target_galley) = nilobj;
-    headers(target_galley) = dead_headers(target_galley) = nilobj;
+    ClearHeaders(target_galley);
     opt_components(target_galley) = opt_constraints(target_galley) = nilobj;
     gall_dir(target_galley) = external_hor(target) ? COLM : ROWM;
     FposCopy(fpos(target_galley), fpos(target));
@@ -565,6 +565,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	case GRAPHIC:
 	case LINK_SOURCE:
 	case LINK_DEST:
+	case LINK_DEST_NULL:
 	case LINK_URL:
 	case ACAT:
 	case HCAT:

@@ -49,8 +49,9 @@
   # translate		{			}
   # outlinestyle	{ solid			}
   # outlinedashlength	{ 0.2f			}
-  # outlinewidth	{ 0.02f			}
-  # paint		{ nopaint		}
+  # outlinewidth	{ thin			}
+  # paint		{ none			}
+  # texture		{ solid			}
   # font		{			}
   # break		{			}
   # format		{ @Body			}
@@ -74,8 +75,8 @@
   # nodelabelbreak	{ ragged nohyphen	}
   # nodelabelformat	{ @Body			}
   # nodelabelpos	{			}
-  # nodelabelprox	{ outside		}
   # nodelabelangle	{ horizontal		}
+  # nodelabelprox	{ outside		}
   # nodelabelctr	{ no			}
   # nodelabeladjust	{ 0 0			}
   # alabel		{			}
@@ -84,8 +85,8 @@
   # alabelbreak		{			}
   # alabelformat	{			}
   # alabelpos		{ NE			}
-  # alabelprox		{			}
   # alabelangle		{			}
+  # alabelprox		{			}
   # alabelctr		{ 			}
   # alabeladjust	{			}
   # blabel		{			}
@@ -94,8 +95,8 @@
   # blabelbreak		{			}
   # blabelformat	{			}
   # blabelpos		{ NW			}
-  # blabelprox		{			}
   # blabelangle		{			}
+  # blabelprox		{			}
   # blabelctr		{ 			}
   # blabeladjust	{			}
   # clabel		{			}
@@ -104,8 +105,8 @@
   # clabelbreak		{			}
   # clabelformat	{			}
   # clabelpos		{ SW			}
-  # clabelprox		{			}
   # clabelangle		{			}
+  # clabelprox		{			}
   # clabelctr		{ 			}
   # clabeladjust	{			}
   # dlabel		{			}
@@ -114,8 +115,8 @@
   # dlabelbreak		{			}
   # dlabelformat	{			}
   # dlabelpos		{ SE			}
-  # dlabelprox		{			}
   # dlabelangle		{			}
+  # dlabelprox		{			}
   # dlabelctr		{ 			}
   # dlabeladjust	{			}
 
@@ -133,8 +134,9 @@
   # atranslate		{			}
   # aoutlinestyle	{ solid			}
   # aoutlinedashlength	{ 0.2f			}
-  # aoutlinewidth	{ 0.02f			}
-  # apaint		{ nopaint		}
+  # aoutlinewidth	{ thin			}
+  # apaint		{ none			}
+  # atexture		{ solid			}
   # afont		{			}
   # abreak		{			}
   # aformat		{ @Body			}
@@ -158,8 +160,8 @@
   # anodelabelbreak	{ ragged nohyphen	}
   # anodelabelformat	{ @Body			}
   # anodelabelpos	{			}
-  # anodelabelprox	{ outside		}
   # anodelabelangle	{ horizontal		}
+  # anodelabelprox	{ outside		}
   # anodelabelctr	{ no			}
   # anodelabeladjust	{ 0 0			}
   # aalabel		{			}
@@ -168,8 +170,8 @@
   # aalabelbreak	{			}
   # aalabelformat	{			}
   # aalabelpos		{ NE			}
-  # aalabelprox		{			}
   # aalabelangle	{			}
+  # aalabelprox		{			}
   # aalabelctr		{ 			}
   # aalabeladjust	{			}
   # ablabel		{			}
@@ -178,8 +180,8 @@
   # ablabelbreak	{			}
   # ablabelformat	{			}
   # ablabelpos		{ NW			}
-  # ablabelprox		{			}
   # ablabelangle	{			}
+  # ablabelprox		{			}
   # ablabelctr		{ 			}
   # ablabeladjust	{			}
   # aclabel		{			}
@@ -188,8 +190,8 @@
   # aclabelbreak	{			}
   # aclabelformat	{			}
   # aclabelpos		{ SW			}
-  # aclabelprox		{			}
   # aclabelangle	{			}
+  # aclabelprox		{			}
   # aclabelctr		{ 			}
   # aclabeladjust	{			}
   # adlabel		{			}
@@ -198,8 +200,8 @@
   # adlabelbreak	{			}
   # adlabelformat	{			}
   # adlabelpos		{ SE			}
-  # adlabelprox		{			}
   # adlabelangle	{			}
+  # adlabelprox		{			}
   # adlabelctr		{ 			}
   # adlabeladjust	{			}
 
@@ -217,8 +219,9 @@
   # btranslate		{			}
   # boutlinestyle	{ solid			}
   # boutlinedashlength	{ 0.2f			}
-  # boutlinewidth	{ 0.02f			}
-  # bpaint		{ nopaint		}
+  # boutlinewidth	{ thin			}
+  # bpaint		{ none			}
+  # btexture		{ solid			}
   # bfont		{			}
   # bbreak		{			}
   # bformat		{ @Body			}
@@ -242,8 +245,8 @@
   # bnodelabelbreak	{ ragged nohyphen	}
   # bnodelabelformat	{ @Body			}
   # bnodelabelpos	{			}
-  # bnodelabelprox	{ outside		}
   # bnodelabelangle	{ horizontal		}
+  # bnodelabelprox	{ outside		}
   # bnodelabelctr	{ no			}
   # bnodelabeladjust	{ 0 0			}
   # balabel		{			}
@@ -252,8 +255,8 @@
   # balabelbreak	{			}
   # balabelformat	{			}
   # balabelpos		{ NE			}
-  # balabelprox		{			}
   # balabelangle	{			}
+  # balabelprox		{			}
   # balabelctr		{ 			}
   # balabeladjust	{			}
   # bblabel		{			}
@@ -262,8 +265,8 @@
   # bblabelbreak	{			}
   # bblabelformat	{			}
   # bblabelpos		{ NW			}
-  # bblabelprox		{			}
   # bblabelangle	{			}
+  # bblabelprox		{			}
   # bblabelctr		{ 			}
   # bblabeladjust	{			}
   # bclabel		{			}
@@ -272,8 +275,8 @@
   # bclabelbreak	{			}
   # bclabelformat	{			}
   # bclabelpos		{ SW			}
-  # bclabelprox		{			}
   # bclabelangle	{			}
+  # bclabelprox		{			}
   # bclabelctr		{ 			}
   # bclabeladjust	{			}
   # bdlabel		{			}
@@ -282,8 +285,8 @@
   # bdlabelbreak	{			}
   # bdlabelformat	{			}
   # bdlabelpos		{ SE			}
-  # bdlabelprox		{			}
   # bdlabelangle	{			}
+  # bdlabelprox		{			}
   # bdlabelctr		{ 			}
   # bdlabeladjust	{			}
 
@@ -301,8 +304,9 @@
   # ctranslate		{			}
   # coutlinestyle	{ solid			}
   # coutlinedashlength	{ 0.2f			}
-  # coutlinewidth	{ 0.02f			}
-  # cpaint		{ nopaint		}
+  # coutlinewidth	{ thin			}
+  # cpaint		{ none			}
+  # ctexture		{ solid			}
   # cfont		{			}
   # cbreak		{			}
   # cformat		{ @Body			}
@@ -326,8 +330,8 @@
   # cnodelabelbreak	{ ragged nohyphen	}
   # cnodelabelformat	{ @Body			}
   # cnodelabelpos	{			}
-  # cnodelabelprox	{ outside		}
   # cnodelabelangle	{ horizontal		}
+  # cnodelabelprox	{ outside		}
   # cnodelabelctr	{ no			}
   # cnodelabeladjust	{ 0 0			}
   # calabel		{			}
@@ -336,8 +340,8 @@
   # calabelbreak	{			}
   # calabelformat	{			}
   # calabelpos		{ NE			}
-  # calabelprox		{			}
   # calabelangle	{			}
+  # calabelprox		{			}
   # calabelctr		{ 			}
   # calabeladjust	{			}
   # cblabel		{			}
@@ -346,8 +350,8 @@
   # cblabelbreak	{			}
   # cblabelformat	{			}
   # cblabelpos		{ NW			}
-  # cblabelprox		{			}
   # cblabelangle	{			}
+  # cblabelprox		{			}
   # cblabelctr		{ 			}
   # cblabeladjust	{			}
   # cclabel		{			}
@@ -356,8 +360,8 @@
   # cclabelbreak	{			}
   # cclabelformat	{			}
   # cclabelpos		{ SW			}
-  # cclabelprox		{			}
   # cclabelangle	{			}
+  # cclabelprox		{			}
   # cclabelctr		{ 			}
   # cclabeladjust	{			}
   # cdlabel		{			}
@@ -366,8 +370,8 @@
   # cdlabelbreak	{			}
   # cdlabelformat	{			}
   # cdlabelpos		{ SE			}
-  # cdlabelprox		{			}
   # cdlabelangle	{			}
+  # cdlabelprox		{			}
   # cdlabelctr		{ 			}
   # cdlabeladjust	{			}
 
@@ -388,22 +392,27 @@
   # radius		{ 1.0f			}
   # xindent		{ 0.8f			}
   # zindent		{ 0.8f			}
+  # frompt		{ 0 0			}
+  # topt		{ 0 0			}
   # pathstyle		{ solid			}
   # pathdashlength	{ 0.2f			}
-  # pathwidth		{ 0.02f			}
-  # pathgap		{ 0.04f			}
+  # pathwidth		{ thin			}
+  # pathgap		{ thin			}
   # arrow		{ no			}
   # arrowstyle		{ solid			}
-  # arrowwidth		{ 0.45f			}
-  # arrowlength		{ 0.6f			}
+  # arrowwidth		{ 0.3f			}
+  # arrowlength		{ 0.5f			}
+  # backarrowstyle	{ solid			}
+  # backarrowwidth	{ 0.3f			}
+  # backarrowlength	{ 0.5f			}
   # linklabel		{			}
   # linklabelmargin	{ 0.2f			}
   # linklabelfont	{ "-2p"			}
   # linklabelbreak	{ ragged nohyphen	}
   # linklabelformat	{ @Body			}
   # linklabelpos	{			}
-  # linklabelprox	{ above			}
   # linklabelangle	{ horizontal		}
+  # linklabelprox	{ above			}
   # linklabelctr	{ no			}
   # linklabeladjust	{ 0 0			}
   # xlabel		{			}
@@ -412,8 +421,8 @@
   # xlabelbreak		{			}
   # xlabelformat	{			}
   # xlabelpos		{ LFROM			}
-  # xlabelprox		{			}
   # xlabelangle		{			}
+  # xlabelprox		{			}
   # xlabelctr		{			}
   # xlabeladjust	{			}
   # ylabel		{			}
@@ -422,8 +431,8 @@
   # ylabelbreak		{			}
   # ylabelformat	{			}
   # ylabelpos		{ LMID			}
-  # ylabelprox		{			}
   # ylabelangle		{			}
+  # ylabelprox		{			}
   # ylabelctr		{ yes			}
   # ylabeladjust	{			}
   # zlabel		{			}
@@ -432,8 +441,8 @@
   # zlabelbreak		{			}
   # zlabelformat	{			}
   # zlabelpos		{ LTO			}
-  # zlabelprox		{			}
   # zlabelangle		{			}
+  # zlabelprox		{			}
   # zlabelctr		{			}
   # zlabeladjust	{			}
   # fromlabel		{			}
@@ -442,8 +451,8 @@
   # fromlabelbreak	{ ragged nohyphen	}
   # fromlabelformat	{ @Body			}
   # fromlabelpos	{ FROM			}
-  # fromlabelprox	{ E			}
   # fromlabelangle	{ antiparallel		}
+  # fromlabelprox	{ W			}
   # fromlabelctr	{ no			}
   # fromlabeladjust	{ 0 0			}
   # tolabel		{			}
@@ -452,8 +461,8 @@
   # tolabelbreak	{ ragged nohyphen	}
   # tolabelformat	{ @Body			}
   # tolabelpos		{ TO			}
-  # tolabelprox		{ E			}
   # tolabelangle	{ parallel		}
+  # tolabelprox		{ W			}
   # tolabelctr		{ no			}
   # tolabeladjust	{ 0 0			}
 

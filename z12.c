@@ -1,9 +1,9 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -77,7 +77,8 @@ static FULL_LENGTH KernLength(FONT_NUM fnum, FULL_CHAR ch1, FULL_CHAR ch2)
 /*****************************************************************************/
 
 static BOOLEAN BuildSpanner(OBJECT x)
-{ OBJECT link, prnt, y, hspanner, vspanner, end_link, t, hprnt, vprnt, spanobj;
+{ OBJECT link, prnt, y, hspanner = nilobj, vspanner = nilobj, end_link, t;
+  OBJECT hprnt, vprnt, spanobj;
   BOOLEAN need_hspanner, need_vspanner;
   debug1(DSF, DD, "BuildSpanner(%s)", EchoObject(x));
   assert( type(x) == START_HVSPAN || type(x) == START_HSPAN ||
@@ -250,7 +251,7 @@ static BOOLEAN FindSpannerGap(OBJECT thr, unsigned dim, unsigned cat_op,
 void SpannerAvailableSpace(OBJECT y, int dim, FULL_LENGTH *resb,
 					      FULL_LENGTH *resf)
 { OBJECT slink, s, thr, gp, prevthr;
-  FULL_LENGTH b, f;
+  FULL_LENGTH b = 0, f = 0;  /* initial values not used */
   unsigned thr_type, cat_type;
 
   assert( type(y) == HSPANNER || type(y) == VSPANNER, "SpannerAvail!");
@@ -317,6 +318,70 @@ void SpannerAvailableSpace(OBJECT y, int dim, FULL_LENGTH *resb,
 } /* end SpannerAvailableSpace */
 
 
+/*@@**************************************************************************/
+/*                                                                           */
+/*  FULL_CHAR *IndexType(index)                                              */
+/*                                                                           */
+/*  Return some string that will give a meaningful idea to end users of      */
+/*  what this index is pointing at.                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+static FULL_CHAR *IndexType(OBJECT index)
+{ FULL_CHAR *res;
+  debug1(DVH, DD, "IndexType(%s)", Image(type(index)));
+  switch( type(index) )
+  {
+    case DEAD:
+    case UNATTACHED:
+    case GALL_PREC:
+    case GALL_FOLL:
+    case GALL_FOLL_OR_PREC:
+    case RECEPTIVE:
+    case RECEIVING:
+    case PRECEDES:
+    case FOLLOWS:
+    case GALL_TARG:
+
+      res = AsciiToFull("galley or galley target");
+      break;
+
+
+    case RECURSIVE:
+
+      res = AsciiToFull("recursive symbol");
+      break;
+
+
+    case SCALE_IND:
+    case COVER_IND:
+    case EXPAND_IND:
+    case PAGE_LABEL_IND:
+
+      res = Image(type(actual(index)));
+      break;
+
+
+    case CROSS_TARG:
+    case CROSS_PREC:
+    case CROSS_FOLL:
+    case CROSS_FOLL_OR_PREC:
+
+      res = AsciiToFull("cross reference or cross reference target");
+      break;
+
+
+    default:
+
+      assert1(FALSE, "IndexType: unknown index", Image(type(index)));
+      res = STR_EMPTY;
+      break;
+  }
+  debug1(DVH, DD, "IndexType returning %s", res);
+  return res;
+} /* end IndexType */
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  OBJECT MinSize(x, dim, extras)                                           */
@@ -327,7 +392,7 @@ void SpannerAvailableSpace(OBJECT y, int dim, FULL_LENGTH *resb,
 /*****************************************************************************/
 
 OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
-{ OBJECT y, z, link, prev, t, g, full_name;
+{ OBJECT y, z, link, prev, t, g, full_name, catch_extras;
   FULL_LENGTH b, f, dble_fwd;
   BOOLEAN dble_found, found, will_expand, cp;
   FILE *fp;
@@ -597,6 +662,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case END_HEADER:
     case CLEAR_HEADER:
 
+      /* remember, these have a dummy child for threads to attach to */
       back(x, dim) = fwd(x, dim) = 0;
       Child(y, Down(x));
       back(y, dim) = fwd(y, dim) = 0;
@@ -606,10 +672,23 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case BEGIN_HEADER:
     case SET_HEADER:
     
-      Child(y, LastDown(x));
-      y = MinSize(y, dim, extras);
-      back(x, dim) = back(y, dim);
-      fwd(x, dim)  = fwd(y, dim);
+      /* remember, there are multiple copies of each header */
+      for( link = NextDown(Down(x));  link != x;  link = NextDown(link) )
+      {
+        Child(y, link);
+        New(catch_extras, ACAT)
+        y = MinSize(y, dim, &catch_extras);
+        if( Down(catch_extras) != catch_extras )
+        {
+	  /* we can't handle things that generate extras inside headers */
+	  Child(z, Down(catch_extras));
+	  Error(12, 16, "%s contains object of illegal type: %s",
+	    FATAL, &fpos(x), Image(type(x)), IndexType(z));
+        }
+	DisposeObject(catch_extras);
+        back(x, dim) = back(y, dim);
+        fwd(x, dim)  = fwd(y, dim);
+      }
       debug4(DSF, D, "MinSize(%s, %s) := (%s, %s)", Image(type(x)),
 	dimen(dim), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
       break;
@@ -619,6 +698,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     
       Child(y, LastDown(x));
@@ -876,6 +956,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		z = MakeWord(WORD, STR_EMPTY, &fpos(g));
 		word_font(z) = font(save_style(x));
 		word_colour(z) = colour(save_style(x));
+		word_texture(z) = texture(save_style(x));
 		word_outline(z) = outline(save_style(x));
 		word_language(z) = language(save_style(x));
 		word_baselinemark(z) = baselinemark(save_style(x));
@@ -966,6 +1047,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		    mode(gap(g)) == EDGE_MODE && !mark(gap(g)) &&
 		    word_font(prev) == word_font(y) &&
 		    word_colour(prev) == word_colour(y) &&
+		    word_texture(prev) == word_texture(y) &&
 		    word_outline(prev) == word_outline(y) &&
 		    word_language(prev) == word_language(y) &&
 		    word_baselinemark(prev) == word_baselinemark(y) &&
@@ -984,6 +1066,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		  y = MakeWordTwo(typ, string(prev), string(y), &fpos(prev));
 		  word_font(y) = word_font(prev);
 		  word_colour(y) = word_colour(prev);
+		  word_texture(y) = word_texture(prev);
 		  word_outline(y) = word_outline(prev);
 		  word_language(y) = word_language(prev);
 		  word_baselinemark(y) = word_baselinemark(prev);

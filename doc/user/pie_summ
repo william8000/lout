@@ -1,0 +1,187 @@
+@Section
+   @Title { Summary }
+   @Tag { pie_summ }
+@Begin
+@PP
+Here are the options of the @Code "@Pie" symbol,
+piegraphs. @RawIndex { pie graphs }
+piegraphs.summary @SubIndex { summary }
+with their default values and allowed values:
+@ID @Tab
+   hmargin { 0.15c }
+   vmargin { 0.47vx }
+   @Fmta { @Col @Code { "    "A } ! @Col @Code "{" ! @Col @Code B !
+	   @Col @Code "}" ! @Col ! @Col ! @Col C }
+   @Fmtb { @Col @Code A ! @Col ! @Col ! @Col ! @Col ! @Col ! @Col }
+{
+@Rowb
+    A { "@Pie" }
+@Rowa
+    A { save }
+    B { no }
+    C { {@Code no} or {@Code yes} }
+@Rowa
+    A { totalweight }
+    B { 100 }
+    C { any positive number }
+@Rowa
+    A { radius }
+    B { 2.5c }
+    C { any length }
+@Rowa
+    A { initialangle }
+    B { 0d }
+    C { any angle (@Code {90d} etc.) }
+@Rowa
+    A { leftextra }
+    B { 0c }
+    C { any length }
+@Rowa
+    A { rightextra }
+    B { 0c }
+    C { any length }
+@Rowa
+    A { aboveextra }
+    B { 0c }
+    C { any length }
+@Rowa
+    A { belowextra }
+    B { 0c }
+    C { any length }
+@Rowa
+    A { leftcaption }
+    B { }
+    C { any Lout object }
+@Rowa
+    A { rightcaption }
+    B { }
+    C { any Lout object }
+@Rowa
+    A { abovecaption }
+    B { }
+    C { any Lout object }
+@Rowa
+    A { belowcaption }
+    B { }
+    C { any Lout object }
+@Rowa
+    A { leftgap }
+    B { 0.5c }
+    C { any length }
+@Rowa
+    A { rightgap }
+    B { 0.5c }
+    C { any length }
+@Rowa
+    A { abovegap }
+    B { 0.5c }
+    C { any length }
+@Rowa
+    A { belowgap }
+    B { 0.5c }
+    C { any length }
+@Rowa
+    A { hidecaptions }
+    B { yes }
+    C { @Code no or @Code yes }
+@Rowa
+    A { weight }
+    B { 10 }
+    C { Any positive number }
+@Rowa
+    A { paint }
+    B { none }
+    C { @Code none or any colour (Section @NumberOf { colour }) }
+@Rowa
+    A { texture }
+    B { solid }
+    C { Any texture (Section @NumberOf { textures }) }
+@Rowa
+    A { outlinestyle }
+    B { solid }
+    C { {@Code solid}, @Code {dashed}, @Code {cdashed}, @Code { dotted },
+or @Code { noline } }
+@Rowa
+    A { outlinedashlength }
+    B { 0.2f }
+    C { any length }
+@Rowa
+    A { outlinewidth }
+    B { thin }
+    C { @Code { thin }, @Code { medium }, @Code { thick }, or any length }
+@Rowa
+    A { detach }
+    B { no }
+    C { {@Code no}, {@Code yes}, or any non-negative number }
+@Rowa
+    A { label }
+    B { }
+    C { any Lout object }
+@Rowa
+    A { labelfont }
+    B { -2p }
+    C { any font as given to @Code "@Font" }
+@Rowa
+    A { labelbreak }
+    B { clines }
+    C { any break style as given to @Code "@Break" }
+@Rowa
+    A { labelmargin }
+    B { 0.2f }
+    C { any length }
+@Rowa
+    A { labelformat }
+    B { "@Body" }
+    C { any Lout object, usually including @Code "@Body" }
+@Rowa
+    A { labelradius }
+    B { internal }
+    C { {@Code internal}, {@Code external}, or any positive number }
+@Rowa
+    A { labeladjust }
+    B { 0c 0c }
+    C { any point (pair of lengths) }
+@Rowa
+    A { finger }
+    B { no }
+    C { @Code no or @Code yes }
+@Rowa
+    A { fingerstyle }
+    B { solid }
+    C { {@Code solid}, @Code {dashed}, @Code {cdashed}, @Code { dotted },
+or @Code { noline } }
+@Rowa
+    A { fingerdashlength }
+    B { 0.2f }
+    C { any length }
+@Rowa
+    A { fingerwidth }
+    B { thin }
+    C { @Code { thin }, @Code { medium }, @Code { thick }, or any length }
+@Rowa
+    A { fingerradius }
+    B { 0.7 }
+    C { any positive number }
+@Rowa
+    A { fingeradjust }
+    B { 0c  0c }
+    C { a point (pair of lengths) }
+@Rowa
+    A { fingerarrow }
+    B { no }
+    C { @Code no or @Code yes }
+@Rowa
+    A { fingerarrowlength }
+    B { 0.6f }
+    C { any length }
+@Rowa
+    A { fingerarrowwidth }
+    B { 0.45f }
+    C { any length }
+}
+The options from @Code "weight" downwards are also the complete
+set of options of the @Code "@Slice" symbol.  The value of an
+option is the value given at the @Code "@Slice" symbol, if any;
+otherwise, the value at the enclosing @Code "@Pie" is used
+if any; if it is not given there, the setup file value is used.
+@End @Section

@@ -4,8 +4,13 @@
 @Begin
 @PP
 @I Ticks are the short lines that mark off intervals along the axes, and
+graphs. @RawIndex { graphs (statistical) }
+graphs.ticks @SubIndex { ticks }
 ticks.graph @Index { ticks in graphs }
-labels.graph @Index { labels in graphs }
+graphs. @RawIndex { graphs (statistical) }
+graphs.labels @SubIndex { labels }
+labels. @RawIndex { labels }
+labels.in.graphs @SubIndex { in graphs }
 @I labels are the numbers appearing near the ticks (not to be confused
 with captions).  {@Code "@Graph"} produces ticks and labels automatically
 with some care, so it is probably best not to worry about them unless the
@@ -13,6 +18,15 @@ result is not pleasing, in which case there are options for controlling them.
 @PP
 One simple way to control the production of x ticks is with the
 {@Code xmin}, {@Code xmax}, and {@Code xticksep} options to @Code
+graphs. @RawIndex { graphs (statistical) }
+graphs.xmin @SubIndex { @Code xmin option }
+xmin.graph @Index { @Code "xmin" option (graphs) }
+graphs. @RawIndex { graphs (statistical) }
+graphs.xmax @SubIndex { @Code xmax option }
+xmax.graph @Index { @Code "xmax" option (graphs) }
+graphs. @RawIndex { graphs (statistical) }
+graphs.xticksep @SubIndex { @Code xticksep option }
+xticksep.graph @Index { @Code "xticksep" option (graphs) }
 "@Graph".  For example,
 @ID @OneRow @Code {
 "@Graph"
@@ -27,7 +41,9 @@ suitable values will be inferred from the data as usual.
 @PP
 Alternatively, complete control over the appearance of x ticks and labels
 is provided by the @Code "xticks" option.  For example,
-xticks.graph @Index { @Code "xticks" option to @Code "@Graph" }
+graphs. @RawIndex { graphs (statistical) }
+graphs.xticks @SubIndex { @Code xticks option }
+xticks.graph @Index { @Code "xticks" option (graphs) }
 @ID @OneRow @Code {
 "@Graph"
 "    xticks { 0@  5  10@  15  20@ }"
@@ -60,7 +76,7 @@ In fact, the labels inserted automatically when @Code xticks is omitted have
 exponents when the axis is logarithmic, so @Code xticks is hardly necessary
 in this example.  Anyway the result is
 @CD @Graph
-    height { 3 cm }
+    height { 3c }
     xlog { 10 }
     xticks { 1 (1)  10 (10)  100 (10^2)  1000 (10^3)  10000 (10^4)  100000 (10^5) }
 {
@@ -74,17 +90,37 @@ same as omitting {@Code xticks}).
 @PP
 Similar options control ticks and labels on the y axis:  {@Code "ymin"},
 {@Code "ymax"}, {@Code "yticksep"}, and {@Code "yticks"}.  There are
-yticks.graph @Index { @Code "yticks" option to @Code "@Graph" }
+graphs. @RawIndex { graphs (statistical) }
+graphs.ymin @SubIndex { @Code ymin option }
+ymin.graph @Index { @Code "ymin" option (graphs) }
+graphs. @RawIndex { graphs (statistical) }
+graphs.ymax @SubIndex { @Code ymax option }
+ymax.graph @Index { @Code "ymax" option (graphs) }
+graphs. @RawIndex { graphs (statistical) }
+graphs.yticksep @SubIndex { @Code yticksep option }
+yticksep.graph @Index { @Code "yticksep" option (graphs) }
+graphs. @RawIndex { graphs (statistical) }
+graphs.yticks @SubIndex { @Code yticks option }
+yticks.graph @Index { @Code "yticks" option (graphs) }
 also @Code "xticklength" and @Code "yticklength" options which set
 the length of ticks:
+graphs. @RawIndex { graphs (statistical) }
+graphs.xticklength @SubIndex { @Code xticklength option }
+xticklength.graph @Index { @Code "xticklength" option (graphs) }
+graphs. @RawIndex { graphs (statistical) }
+graphs.yticklength @SubIndex { @Code yticklength option }
+yticklength.graph @Index { @Code "yticklength" option (graphs) }
 @ID @OneRow @Code {
 "@Graph"
-"    xticklength { 0.5 ft }"
-"    yticklength { 0.5 ft }"
+"    xticklength { 0.5f }"
+"    yticklength { 0.5f }"
 }
 shows the default values, half the current font size in both cases.
 @PP
 There is also an {@Code "rticks"} option which is similar to
+graphs. @RawIndex { graphs (statistical) }
+graphs.rticks @SubIndex { @Code rticks option }
+rticks.graph @Index { @Code "rticks" option (graphs) }
 {@Code "yticks"} except that the ticks it controls appear on the
 right-hand side of the frame (this option is relevant only when
 the @Code style option is {@Code frame}).  Unlike @Code "xticks" and
@@ -98,9 +134,9 @@ y ticks:
 @Graph
     style { frame }
     width { 6c }
-    height { 8c }
-    xextra { 0 cm }
-    yextra { 0 cm }
+    height { 6c }
+    xextra { 0c }
+    yextra { 0c }
     rightcaption { -90d @Rotate { Precipitation mm } }
     rightgap { 3.0f }
     hidecaptions { no }
@@ -109,28 +145,28 @@ y ticks:
     ymin { 0 }
     ymax { 450 }
     xticks { }
-    xticklength { 0 cm }
+    xticklength { 0c }
     rticks { 0@ 50@ 100@ 150@ 200@ 250@ 300@ 350@ 400@ 450@ }
     yticks {}
 {
     @Data
-	pairs { filledyhisto }
-	colour { blue }
-	linewidth { 1 pt }
+        pairs { filledyhisto }
+        colour { blue }
+        linewidth { 1 pt }
     {
-	0 340
-	1 410
-	2 430
-	3 340
-	4 290
-	5 175
-	6 140
-	7 125
-	8 110
-	9 100
-	10 85
-	11 175
-	12 0
+        0 340
+        1 410
+        2 430
+        3 340
+        4 290
+        5 175
+        6 140
+        7 125
+        8 110
+        9 100
+        10 85
+        11 175
+        12 0
     }
 }
 
@@ -139,9 +175,9 @@ y ticks:
 @Graph
     style { frame }
     width { 6c }
-    height { 8c }
-    xextra { 0 cm }
-    yextra { 0 cm }
+    height { 6c }
+    xextra { 0c }
+    yextra { 0c }
     leftcaption { 90d @Rotate { Temperature {@Degree}C } }
     leftgap { 2.5f }
     hidecaptions { no }
@@ -163,13 +199,13 @@ y ticks:
        10.5 (N)
        11.5 (D)
     }
-    xticklength { 0 cm }
+    xticklength { 0c }
     yticks { -30@ -20@ -10@ 0@ 10@ 20@ 30@ 40@ }
 {
     @Data
-	pairs { solid }
-	colour { red }
-	linewidth { 1 pt }
+        pairs { solid }
+        colour { red }
+        linewidth { 1 pt }
     {
         0.0 24
         1.0 24
@@ -193,8 +229,63 @@ Here the first graph has
 "rticks { 0@ 50@ 100@ 150@ 200@ 250@ 300@ 350@ 400@ 450@ }"
 "yticks {}"
 }
-for its ticks.
-@PP
+for its ticks.  This graph uses other features that we have not
+come to yet, but anyway its source is:
+@ID 0.95 @Scale -1px @Break @OneRow @Code @Verbatim {
+@Graph
+    style { frame }
+    width { 6c }
+    height { 6c }
+    xextra { 0c }
+    yextra { 0c }
+    rightcaption { -90d @Rotate { Precipitation mm } }
+    rightgap { 3.0f }
+    hidecaptions { no }
+    xmin { 0 }
+    xmax { 12 }
+    ymin { 0 }
+    ymax { 450 }
+    xticks { }
+    xticklength { 0c }
+    rticks { 0@ 50@ 100@ 150@ 200@ 250@ 300@ 350@ 400@ 450@ }
+    yticks {}
+{
+    @Data pairs { filledyhisto } colour { blue } linewidth { 1 pt }
+    {
+        0 340 1 410 2 430 3 340 4 290 5 175 6 140
+        7 125 8 110 9 100 10 85 11 175 12 0
+    }
+}
+
+@OverStrike
+
+@Graph
+    style { frame }
+    width { 6c }
+    height { 6c }
+    xextra { 0c }
+    yextra { 0c }
+    leftcaption { 90d @Rotate { Temperature {@Degree}C } }
+    leftgap { 2.5f }
+    hidecaptions { no }
+    xmin { 0 }
+    xmax { 12 }
+    ymin { -30 }
+    ymax { 50 }
+    xticks {
+        0.5 (J) 1.5 (F) 2.5 (M) 3.5 (A) 4.5 (M) 5.5 (J)
+        6.5 (J) 7.5 (A) 8.5 (S) 9.5 (O) 10.5 (N) 11.5 (D)
+    }
+    xticklength { 0c }
+    yticks { -30@ -20@ -10@ 0@ 10@ 20@ 30@ 40@ }
+{
+    @Data pairs { solid } colour { red } linewidth { 1 pt }
+    {
+        0.0 24 1.0 24 2.0 25 3.0 26 4.0 26 5.0 26 6.0
+       26 7.0 27 8.0 26 9.0 27 10.0 28 11.0 28 12.0 26
+    }
+}
+}
 Lout has only a hazy idea of how much space is occupied by ticks and
 labels.  Unless @Code "xticks" is empty, Lout allows 1.7 times the
 current font size below the graph for x ticks and labels, which is

@@ -4,13 +4,15 @@
 @Begin
 @PP
 Occasionally the vertical alignment of a table with objects to its left
+tables. @RawIndex { tables }
+tables.vertical.alignment @SubIndex { vertical alignment of }
 vertical.alignment @Index { vertical alignment of tables }
 and right becomes an issue.  Examples are hard to find, but let's say
 that we need to construct a symbol
 @ID @AmberLight
 and include it in running text.  The obvious first attempt at a table
 with three rows is
-@ID @OneRow @Code @Verbatim {
+@ID -1px @Break @OneRow @Code @Verbatim {
 @Tbl
    aformat { @Cell A }
    margin { 0i }
@@ -36,10 +38,13 @@ but this produces
 in running text, because vertical alignment is by default through the
 top boundary of the table.  To make the alignment pass through one of
 the rows, replace its @Code "@Row" symbol by a corresponding
+tables. @RawIndex { tables }
+tables.markrow @SubIndex { @Code "@MarkRow" symbols }
+thing.tables @Index { @Code "@MarkRow" symbols (tables) }
 @Code "@MarkRow" symbol.  Here is the revised table, enclosed in a
 definition for ease of use:
 amberlight @Index { @Code "@AmberLight" symbol }
-@ID @OneRow @Code @Verbatim {
+@ID -1px @Break @OneRow @Code @Verbatim {
 import @TblSetup
 def @AmberLight
 {

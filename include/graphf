@@ -10,8 +10,11 @@
 #                                                                             #
 ###############################################################################
 
+@SysInclude { graphf.etc }		# @GraphMath
+@SysInclude { lengths }			# @LoutLengths
+@SysInclude { coltex }			# @ColourCommand and @TextureCommand
 @SysPrependGraphic { graphf.lpg }
-@SysInclude { graphf.etc }
+
 
 def @GraphObj
     left p
@@ -43,15 +46,7 @@ def @GraphObj
 }
 
 def @GraphCross
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -66,7 +61,8 @@ def @GraphCross
 
     PDF @Yield {
 	@HContract @VContract
-	{"n [] 0 d 0 0 m __xsize __ysize l 0 __ysize m __xsize 0 l S"}	# uses S because PostScript version does NOT use closepath
+	{ "n [] 0 d 0 0 m __xsize __ysize l 0 __ysize m __xsize 0 l S"}
+	  # uses S because PostScript version does NOT use closepath
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
@@ -75,15 +71,7 @@ def @GraphCross
 }
 
 def @GraphPlus
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -98,7 +86,8 @@ def @GraphPlus
 
     PDF @Yield {
 	@HContract @VContract
-	{"n [] 0 d __xmark 0 m __xmark __ysize l 0 __ymark m __xsize __ymark l S"}	# uses S because PostScript version does NOT use closepath
+	{ "n [] 0 d __xmark 0 m __xmark __ysize l 0 __ymark m __xsize __ymark l S"}
+	  # uses S because PostScript version does NOT use closepath
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
     }
@@ -107,15 +96,7 @@ def @GraphPlus
 }
 
 def @GraphSquare
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -139,15 +120,7 @@ def @GraphSquare
 }
 
 def @GraphFilledSquare
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -171,15 +144,7 @@ def @GraphFilledSquare
 }
 
 def @GraphDiamond
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -203,15 +168,7 @@ def @GraphDiamond
 }
 
 def @GraphFilledDiamond
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -236,15 +193,7 @@ def @GraphFilledDiamond
 }
 
 def @GraphCircle
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -294,15 +243,7 @@ def @GraphCircle
 }
 
 def @GraphFilledCircle
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
     PostScript @Yield {
@@ -355,15 +296,7 @@ def @GraphFilledCircle
 }
 
 def @GraphTriangle
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -387,15 +320,7 @@ def @GraphTriangle
 }
 
 def @GraphFilledTriangle
-    named symbolsize
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 0.15 ft }
+    import @LoutLengths named symbolsize { 0.15f }
 {
   @BackEnd @Case {
 
@@ -419,33 +344,17 @@ def @GraphFilledTriangle
 }
 
 def @GraphNoLine
-    named dashlength { 0.2 ft }
-    named linewidth  { "currentlinewidth" }
-    named length
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 1.0 ft }
+    import @PSLengths named dashlength { 0.2f }
+    import @PSLengths named linewidth  { "currentlinewidth" }
+    import @LoutLengths named length { 1.0f }
 {
     length @Wide {}
 }
 
 def @GraphSolid
-    named dashlength { 0.2 ft }
-    named linewidth  { "currentlinewidth" }
-    named length
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 1.0 ft }
+    import @PSLengths named dashlength { 0.2f }
+    import @PSLengths named linewidth  { "currentlinewidth" }
+    import @LoutLengths named length { 1.0f }
 {
   @BackEnd @Case {
     PostScript @Yield {
@@ -463,17 +372,9 @@ def @GraphSolid
 }
 
 def @GraphDashed
-    named dashlength { 0.2 ft }
-    named linewidth  { "currentlinewidth" }
-    named length
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 1.0 ft }
+    import @PSLengths named dashlength { 0.2f }
+    import @PSLengths named linewidth  { "currentlinewidth" }
+    import @LoutLengths named length { 1.0f }
 {
   @BackEnd @Case {
     PostScript @Yield {
@@ -491,17 +392,9 @@ def @GraphDashed
 }
 
 def @GraphDotted
-    named dashlength { 0.2 ft }
-    named linewidth  { "currentlinewidth" }
-    named length
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-    { 1.0 ft }
+    import @PSLengths named dashlength { 0.2f }
+    import @PSLengths named linewidth  { "currentlinewidth" }
+    import @LoutLengths named length { 1.0f }
 {
   @BackEnd @Case {
     PostScript @Yield {
@@ -521,230 +414,111 @@ def @GraphDotted
 
 export @Data
 def @Graph
-    named save         { no       }
-    named style        { frame    }
-    named width
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-		       { 6.0 cm   }
-    named height
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-		       { 4.0 cm   }
-    named xextra       { "none"   }
-    named yextra       { "none"   }
-    named xdecreasing  { no       }
-    named ydecreasing  { no       }
-    named leftcaption  {          }
-    named rightcaption {          }
-    named abovecaption {          }
-    named belowcaption {          }
-    named leftgap
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-		       { 1.5 cm   }
-    named rightgap
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-		       { 0.5 cm   }
-    named abovegap
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-		       { 0.5 cm   }
-    named belowgap
-	named cm left x { x"c" }
-	named in left x { x"i" }
-	named em left x { x"m" }
-	named pt left x { x"p" }
-	named ft left x { x"f" }
-	named sp left x { x"s" }
-	named vs left x { x"v" }
-		       { 0.5 cm   }
-    named hidecaptions { yes       }
+    named save						{ no		}
+    named style						{ frame		}
+    import @LoutLengths named width			{ 6.0c		}
+    import @LoutLengths named height			{ 4.0c		}
+    import @PSLengths named xextra			{ "none"	}
+    import @PSLengths named yextra			{ "none"	}
+    named xdecreasing					{ no		}
+    named ydecreasing					{ no		}
+    named leftcaption					{		}
+    named rightcaption					{		}
+    named abovecaption					{		}
+    named belowcaption					{		}
+    import @LoutLengths named leftgap			{ 1.5c		}
+    import @LoutLengths named rightgap			{ 0.5c		}
+    import @LoutLengths named abovegap			{ 0.5c		}
+    import @LoutLengths named belowgap			{ 0.5c		}
+    named hidecaptions					{ yes		}
     named objects
 	named @NW
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "xsize neg ysize" } margin { margin } x }
 	named @SW
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "xsize neg 0" } margin { margin } x }
 	named @SE
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "0 0" } margin { margin } x }
 	named @NE
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "0 ysize" } margin { margin } x }
 	named @W
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "xsize neg ysize 2 div" } margin { margin } x }
 	named @S
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "xsize neg 2 div 0" } margin { margin } x }
 	named @E
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "0 ysize 2 div" } margin { margin } x }
 	named @N
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "xsize neg 2 div ysize" } margin { margin } x }
 	named @CTR
 	    import @GraphMath named at { 0 0 }
-	    named margin
-		named cm left x { x"c" }
-		named in left x { x"i" }
-		named em left x { x"m" }
-		named pt left x { x"p" }
-		named ft left x { x"f" }
-		named sp left x { x"s" }
-		named vs left x { x"v" }
-	    { 0.3 ft }
+	    import @LoutLengths named margin { 0.3f }
 	    right x
 	{ at @GraphObj adj { "xsize neg 2 div ysize 2 div" } margin {margin} x }
 		       {}
-    named xorigin  named none { "false" }           { none           }
-    named yorigin  named none { "false" }           { none           }
-    named xlog     named none { "0" }               { none           }
-    named ylog     named none { "0" }               { none           }
-    named points   named none { "none" }            { none           }
-    named pairs    named none { "none" }            { none           }
-    named colour color  named none { "none" }            { none           }
-    named paint    named none { "none"  }           { none           }
-    named xmin     named none { "false" }           { none           }
-    named xmax     named none { "false" }           { none           }
-    named ymin     named none { "false" }           { none           }
-    named ymax     named none { "false" }           { none           }
-    named xticksep named none { "0" }               { none           }
-    named yticksep named none { "0" }               { none           }
-    named rticksep named none { "0" }               { none           }
+    named xorigin  named none { "false" }		{ none		}
+    named yorigin  named none { "false" }		{ none		}
+    named xlog     named none { "0" }			{ none		}
+    named ylog     named none { "0" }			{ none		}
+    named points   named none { "none" }		{ none		}
+    named pairs    named none { "none" }		{ none		}
+    named colour color  named none { "none" }		{ none		}
+    named paint    named none { "none" }		{ none		}
+    import @TextureImport named texture    		{ solid		}
+    named xmin     named none { "false" }		{ none		}
+    named xmax     named none { "false" }		{ none		}
+    named ymin     named none { "false" }		{ none		}
+    named ymax     named none { "false" }		{ none		}
+    named xticksep named none { "0" }			{ none		}
+    named yticksep named none { "0" }			{ none		}
+    named rticksep named none { "0" }			{ none		}
     import @GraphMath named xticks
-	named none                                  { "false"        }
-	named auto                                  { "false"        }
-	named "@"                                   { " lgen"        }
-	named "^"                                   { "^"            }
-		       { false    }
+	named none { "false" }
+	named auto { "false" }
+	named "@"  { " lgen" }
+	named "^"  { "^" }
+							{ false		}
     import @GraphMath named yticks
-	named none                                  { "false"        }
-	named auto                                  { "false"        }
-	named "@"                                   { " lgen"        }
-	named "^"                                   { "^"            }
-		       { false    }
+	named none { "false" }
+	named auto { "false" }
+	named "@"  { " lgen" }
+	named "^"  { "^" }
+							{ false		}
     import @GraphMath named rticks
-	named none                                  { "false"        }
-	named auto                                  { "false"        }
-	named "@"                                   { " lgen"        }
-	named "^"                                   { "^"            }
-		       { }
-    named xticklength                               { 0.5 ft   }
-    named yticklength                               { 0.5 ft   }
-    named rticklength                               { 0.5 ft   }
-    named dataformat                                { xandy    }
-    named dashlength                                { 0.2 ft   }
-    named linewidth				    { "currentlinewidth"   }
-    named symbolsize                                { 0.15 ft  }
+	named none { "false" }
+	named auto { "false" }
+	named "@"  { " lgen" }
+	named "^"  { "^" }
+							{		}
+    import @PSLengths named xticklength			{ 0.5f		}
+    import @PSLengths named yticklength			{ 0.5f		}
+    import @PSLengths named rticklength			{ 0.5f		}
+    named dataformat					{ xandy		}
+    import @PSLengths named dashlength			{ 0.2f		}
+    import @PSLengths named linewidth			{ "currentlinewidth" }
+    import @PSLengths named symbolsize			{ 0.15f		}
     body @Body
 @Begin
 
@@ -817,11 +591,12 @@ def @Graph
     def @Data
 	named points   named none { "none" }            { points     }
 	named pairs    named none { "none" }            { pairs      }
-	named colour color   named none { "none" }            { colour     }
+	named colour color   named none { "none" }      { colour     }
 	named paint    named none { "none" }            { paint      }
-	named dashlength                                { dashlength }
-	named linewidth                                 { linewidth  }
-	named symbolsize                                { symbolsize }
+	import @TextureImport named texture    		{ texture    }
+	import @PSLengths named dashlength              { dashlength }
+	import @PSLengths named linewidth               { linewidth  }
+	import @PSLengths named symbolsize              { symbolsize }
 	named dataformat                                { dataformat }
 	body data
     {
@@ -945,9 +720,6 @@ def @Graph
 	    }
         }
 
-# include @ColourCommand symbol
-@SysInclude { ccommand }
-
 	def @Paint
 	{
 	    paint @Case {
@@ -963,6 +735,7 @@ def @Graph
 	  "  /linewidth"  linewidth  "def" @ColourCommand colour
 	  "  /symbolsize" symbolsize "def }"
 	  "{" @Paint "}"
+	  "{" texture "}"
        "]"
     }
 

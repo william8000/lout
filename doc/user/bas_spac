@@ -72,7 +72,8 @@ apply to all of it.  For example, leaving the braces out of
 {@Code "Hello"}.
 @PP
 When an object-consuming symbol like @Code "@I" is followed by an
-braces. @Index { braces, effect of }
+braces. @RawIndex { braces }
+braces.in.lout @SubIndex { in Lout text }
 object enclosed in braces, that is the object consumed.  For example,
 @ID @Code "This is @I { absolutely necessary }, since otherwise ..."
 produces

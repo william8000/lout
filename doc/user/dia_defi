@@ -4,6 +4,10 @@
 @Begin
 @PP
 @@Diag permits you to create your own node outlines and link paths, by
+diagrams. @RawIndex { diagrams }
+diagrams.definitions @SubIndex { definitions }
+definitions. @RawIndex { definitions }
+definitions.use.with.diagrams @SubIndex { use with diagrams }
 giving non-standard values to the @Code outline and @Code path
 options.  This section shows how to do this for very simple shapes
 only; the following section introduces the large repertoire of geometrical
@@ -34,14 +38,14 @@ corner, and @Eq { (xsize, ysize) } at the top right:
 The value of the @Code outline option is a sequence of points defined in
 this coordinate system:
 @ID {
-@Code {
-"@Node"
-"    outline {"
-"        0 0"
-"        xsize 0"
-"        0 ysize"
-"        0 0"
-"    }"
+@Code @Verbatim {
+@Node
+    outline {
+        0 0
+        xsize 0
+        0 ysize
+        0 0
+    }
 }
 ||7ct
 @Diag {
@@ -64,20 +68,21 @@ As shown, the resulting outline is created by joining each point to the
 next with a straight line.  It is conventional to proceed anticlockwise
 around the outline, but you may start anywhere.
 @PP
-The {@Code paint}, {@Code outlinestyle}, {@Code outlinedashlength},
-and {@Code outlinewidth} options of @Code "@Node" work for user-defined
-outlines exactly as they do for the standard ones:
+The {@Code paint}, {@Code texture}, {@Code outlinestyle},
+{@Code outlinedashlength}, and {@Code outlinewidth} options of
+@Code "@Node" work for user-defined outlines exactly as they do
+for the standard ones:
 @ID {
-@Code {
-"@Node"
-"    outline {"
-"        0 0"
-"        xsize 0"
-"        0 ysize"
-"        0 0"
-"    }"
-"    paint { lightgrey }"
-"    outlinestyle { solid dashed }"
+@Code @Verbatim {
+@Node
+    outline {
+        0 0
+        xsize 0
+        0 ysize
+        0 0
+    }
+    paint { lightgrey }
+    outlinestyle { solid dashed }
 }
 ||7ct
 @Diag {
@@ -104,15 +109,15 @@ Two points may also be separated by {@Code "["}{@I point}{@Code "]"},
 where @I point stands for any point.  This causes the two points to be
 joined by an arc whose centre is at the given point:
 @ID {
-@Code {
-"@Node"
-"    outline {"
-"        0 0"
-"        ysize 0"
-"        [ 0 0 ]"
-"        0 ysize"
-"        0 0"
-"    }"
+@Code @Verbatim {
+@Node
+    outline {
+        0 0
+        ysize 0
+        [ 0 0 ]
+        0 ysize
+        0 0
+    }
 }
 ||7ct
 @Diag {
@@ -181,13 +186,13 @@ neatly onto Bezier curves as they do onto lines and arcs.
 Tags (Section {@NumberOf dia_tags}) may be assigned to points within
 the outline option, like this:
 @ID {
-@Code {
-"@Node"
-"    outline {"
-"        LR:: { xsize 0 }"
-"        UL:: { 0 ysize }"
-"        0 0  LR  UL  0 0"
-"    }"
+@Code @Verbatim {
+@Node
+    outline {
+        LR:: { xsize 0 }
+        UL:: { 0 ysize }
+        0 0  LR  UL  0 0
+    }
 }
 ||7ct
 @Diag {
@@ -226,15 +231,15 @@ example) and in the angle step if the label is aligned, perpendicular,
 parallel, or antiparallel.  A direction is given using the
 @Code ":<" symbol within an outline:
 @ID {
-@Code {
-"@Node"
-"    outline {"
-"        LR:: { xsize 0 }"
-"        LR:< 0d"
-"        UL:: { 0 ysize }"
-"        UL:< 270d"
-"        0 0 LR UL 0 0"
-"    }"
+@Code @Verbatim {
+@Node
+    outline {
+        LR:: { xsize 0 }
+        LR:< 0d
+        UL:: { 0 ysize }
+        UL:< 270d
+        0 0 LR UL 0 0
+    }
 }
 ||7ct
 @Diag {
@@ -271,13 +276,13 @@ Within a link path, the symbols @Code from and @Code to denote the
 values of the link's @Code from and @Code to options, and these
 form the basis of constructing the link path:
 @ID {
-@Code {
-"@Link"
-"    path {"
-"        FROM:: from"
-"        TO:: to"
-"        FROM TO"
-"    }"
+@Code @Verbatim {
+@Link
+    path {
+        FROM:: from
+        TO:: to
+        FROM TO
+    }
 }
 ||7ct
 {
@@ -309,33 +314,33 @@ Once the outline or path is complete, unless it is really a one-off
 production the best thing to do with it is to add it to your
 extend. @Index { @Code extend keyword }
 @Code "mydefs" file in the following form:
-@ID @OneRow @Code {
-"extend @DiagSetup @Diag"
-"macro @MyNode {"
-"    @Node"
-"        outline {"
-"            LR:: { xsize 0 }"
-"            LR:< 0d"
-"            UL:: { 0 ysize }"
-"            UL:< 270d"
-"            0 0 LR UL 0 0"
-"        }"
-"}"
+@ID @OneRow @Code @Verbatim {
+extend @DiagSetup @Diag
+macro @MyNode {
+    @Node
+        outline {
+            LR:: { xsize 0 }
+            LR:< 0d
+            UL:: { 0 ysize }
+            UL:< 270d
+            0 0 LR UL 0 0
+        }
+}
 }
 This says that we are `extending' the @@Diag symbol by adding a new
 symbol, {@Code "@MyNode"}, which stands for what follows it between
 braces.  @Code "@MyNode" will then behave exactly like @Code "@Circle"
 and the other standard node symbols.  The same pattern works for links:
-@ID @OneRow @Code {
-"extend @DiagSetup @Diag"
-"macro @MyLink {"
-"    @Link"
-"        path {"
-"            FROM:: from"
-"            TO:: to"
-"            FROM TO"
-"        }"
-"}"
+@ID @OneRow @Code @Verbatim {
+extend @DiagSetup @Diag
+macro @MyLink {
+    @Link
+        path {
+            FROM:: from
+            TO:: to
+            FROM TO
+        }
+}
 }
 If it is worth the effort to construct a new outline or link path, it
 is worth packaging it like this and thinking up a good name for it,
@@ -343,15 +348,15 @@ for then it will be available, easily, forever.
 @PP
 This same approach is also useful to define common combinations of
 options, even when there is no new outline or path:
-@ID @OneRow @Code {
-"extend @DiagSetup @Diag"
-"macro @BigOctagon {"
-"    @Polygon"
-"        sides { 8 }"
-"        hsize { 5c }"
-"        vsize { 5c }"
-"        font { Bold }"
-"}"
+@ID @OneRow @Code @Verbatim {
+extend @DiagSetup @Diag
+macro @BigOctagon {
+    @Polygon
+        sides { 8 }
+        hsize { 5c }
+        vsize { 5c }
+        font { Bold }
+}
 }
 Such definitions are very useful if the combinations occur
 frequently.  Any options not mentioned have their usual default values,

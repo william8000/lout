@@ -4,10 +4,18 @@
 @Begin
 @PP
 To make a cell span across several columns, precede the @Code "@Cell"
+tables. @RawIndex { tables }
+tables.span @SubIndex { spanning columns and rows }
 spanning.columns @Index { spanning columns and rows in tables }
 symbol with @Code "@StartHSpan" and replace each spanned cell's
+tables. @RawIndex { tables }
+tables.starthspan @SubIndex { @Code "@StartHSpan" option }
+starthspan.tables @Index { @Code "@StartHSpan" option (tables) }
 @Code "@Cell" symbol with {@Code "@HSpan"}, like this:
-@ID @OneRow @Code @Verbatim {
+tables. @RawIndex { tables }
+tables.hspan @SubIndex { @Code "@HSpan" option }
+hspan.tables @Index { @Code "@HSpan" option (tables) }
+@ID @OneRow -1px @Break @Code @Verbatim {
 @Tbl
     rule { yes }
     aformat { @StartHSpan @Cell indent { ctr } @B A | @HSpan | @HSpan }
@@ -51,8 +59,14 @@ but actually has a use (Section {@NumberOf tbl_alig}).
 @PP
 Spanning rows work in the same way; the spanning cell is preceded by
 {@Code "@StartVSpan"}, and the spanned cells are replaced by
+tables. @RawIndex { tables }
+tables.startvspan @SubIndex { @Code "@StartVSpan" option }
+startvspan.tables @Index { @Code "@StartVSpan" option (tables) }
+tables. @RawIndex { tables }
+tables.vspan @SubIndex { @Code "@VSpan" option }
+vspan.tables @Index { @Code "@VSpan" option (tables) }
 {@Code "@VSpan"}:
-@ID @OneRow @Code @Verbatim {
+@ID @OneRow -1px @Break @Code @Verbatim {
 @Tbl
     rule { yes }
     aformat { @StartVSpan @Cell @I A | @Cell B | @Cell C }
@@ -96,7 +110,7 @@ The result of this is
     C { Introductory Computer Science }
 }
 Here is a notorious larger example, the `spiral':
-@ID @OneRow @Code @Verbatim {
+@ID @OneRow -1px @Break @Code @Verbatim {
 @QuotedDisplay @Tbl
     rule { yes }
 {
@@ -131,17 +145,14 @@ It is important when constructing mind-boggling tables like this one
 to ensure that every format has exactly the same number of @Code "|"
 symbols.  Otherwise the number of columns will differ from row to row.
 The names given to the entries ({@Code "A"}, {@Code "B"}, {@Code "C"},
-etc.) are quite irrelevant:  having a @Code "@Cell D" in one row and a
-@Code "@Cell D" in another does not mean that the cells will appear in
-the same column.
-# @PP
-# There is an asymmetry in the spiral above:  the first column
-# occupies slightly more space than the other two.  This arises
-# because the left margin of the leftmost column is excluded from the
-# calculation of how much space is available.  This anomaly might be
-# corrected some day.
+etc.) are quite irrelevant:  having a @Code "@Cell D" in one row and
+a @Code "@Cell D" in another does not mean that the cells will appear
+in the same column.
 @PP
 There is a @Code "@StartHVSpan" symbol which combines the effects
+tables. @RawIndex { tables }
+tables.starthvspan @SubIndex { @Code "@StartHVSpan" option }
+starthvspan.tables @Index { @Code "@StartHVSpan" option (tables) }
 of @Code "@StartHSpan" and {@Code "@StartVSpan"}.  You need to
 use it in this arrangement:
 @ID @OneRow @Tbl

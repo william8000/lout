@@ -1,0 +1,35 @@
+@Section
+   @Title { Errors }
+   @Tag { pie_erro }
+@Begin
+@PP
+Lout normally produces output that will print without mishap on
+errors. @RawIndex { errors }
+errors.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.errors @SubIndex { errors }
+any PostScript device.  However, some of the options of @Code "@Pie"
+and @Code "@Slice" are passed through Lout without checking.  Any
+errors in this material will not be detected until the file is printed.
+@PP
+When an error is detected, the offending page is printed up to the
+point where the error occurred, with a message nearby describing
+the error.  Printing of the document is then aborted.  The problem
+is usually easy to locate since it lies in whatever should have
+been printed next.
+@PP
+Like {@Code "@Diag"} and {@Code "@Graph"}, @Code "@Pie" has a
+@Code "save" option which causes the memory used by the pie graph
+save. @RawIndex { @Code "save" option }
+save.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.save @SubIndex { @Code "save" option }
+to be reclaimed as soon as it is printed:
+@ID @OneRow @Code @Verbatim {
+@Pie
+    save { yes }
+...
+}
+However @Code "@Pie" uses very little memory and so this option is
+probably not going to be needed.
+@End @Section

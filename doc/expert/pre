@@ -10,6 +10,7 @@
 @Include { pre_spac }
 @Include { pre_yuni }
 @Include { pre_colo }
+@Include { pre_text }
 @Include { pre_outl }
 @Include { pre_lang }
 @Include { pre_oner }

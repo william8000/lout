@@ -5,6 +5,8 @@
 @PP
 Every equation and every object within every equation has an
 @I axis running through it which is used to position it vertically
+equations. @RawIndex { equations }
+equations.axis @SubIndex { axis of }
 axis @Index { axis of equation }
 with respect to nearby objects.  In the Expert's Guide to Lout
 @Cite { $kingston1995lout.expert } this is called a @I { row mark },
@@ -105,14 +107,20 @@ axis shifted }
 }
 To supply these possibilities, the @Code "matrix" symbol and all
 its variants (@Code "pmatrix" etc.) have two options whose
+equations. @RawIndex { equations }
+equations.userow @SubIndex { @Code "userow" option }
+userow.equations @Index { @Code "userow" option (equations) }
+equations. @RawIndex { equations }
+equations.shiftdelim @SubIndex { @Code "shiftdelim" option }
+shiftdelim.equations @Index { @Code "shiftdelim" option (equations) }
 values may be {@Code "yes"} or {@Code "no"}:
-@ID @Code {
-"matrix"
-"    userow { no }"
-"    shiftdelim { yes }"
-"{"
-"    ..."
-"}"
+@ID @Code @Verbatim {
+matrix
+    userow { no }
+    shiftdelim { yes }
+{
+    ...
+}
 }
 The @Code "userow" option determines whether the axis of the
 matrix will use a row axis; the default is not to, i.e. to
@@ -126,6 +134,9 @@ which row's axis to use to make the overall axis.  If you
 do nothing, the first (or only) row's axis becomes the
 overall axis.  To select some other row instead, replace
 the @Code "row" symbol that precedes the row by {@Code "axisrow"}:
+equations. @RawIndex { equations }
+equations.axisrow @SubIndex { @Code "axisrow" symbol }
+axisrow.equations @Index { @Code "axisrow" symbol (equations) }
 @ID @Code @Tab
   vmargin { 0.5vx }
   hmargin { 1s }

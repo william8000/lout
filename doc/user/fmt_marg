@@ -4,8 +4,8 @@
 @Begin
 @PP
 There are six options for setting the top and bottom margins on each
-margins. @RawIndex { margins }
-margins.in.pages @SubIndex { in pages }
+margin.options @RawIndex { margin options }
+margin.options.in.pages @SubIndex { in pages }
 top.margin @Index @Code "@TopMargin"
 foot.margin @Index @Code "@FootMargin"
 odd.left.margin @Index @Code "@OddLeftMargin"
@@ -14,13 +14,13 @@ even.left.margin @Index @Code "@EvenLeftMargin"
 even.right.margin @Index @Code "@EvenRightMargin"
 page, and the left and right margins on odd and even pages.  Here they
 are with their default values:
-@ID @OneRow @Code {
-"@TopMargin { 2.50c }"
-"@FootMargin { 2.50c }"
-"@OddLeftMargin { 2.50c }"
-"@OddRightMargin { 2.50c }"
-"@EvenLeftMargin { 2.50c }"
-"@EvenRightMargin { 2.50c }"
+@ID @OneRow @Code @Verbatim {
+@TopMargin { 2.50c }
+@FootMargin { 2.50c }
+@OddLeftMargin { 2.50c }
+@OddRightMargin { 2.50c }
+@EvenLeftMargin { 2.50c }
+@EvenRightMargin { 2.50c }
 }
 When setting these options you must ensure that
 @ID @Eq { @Code "@OddLeftMargin" + @Code "@OddRightMargin" =
@@ -31,11 +31,11 @@ even pages.
 In addition, four options are provided which add extra left and right
 margins to the page @I body (that is, everything but the running headers
 and footers):
-@ID @OneRow @Code {
-"@OddLeftBodyMargin { 0c }"
-"@OddRightBodyMargin { 0c }"
-"@EvenLeftBodyMargin { 0c }"
-"@EvenRightBodyMargin { 0c }"
+@ID @OneRow @Code @Verbatim {
+@OddLeftBodyMargin { 0c }
+@OddRightBodyMargin { 0c }
+@EvenLeftBodyMargin { 0c }
+@EvenRightBodyMargin { 0c }
 }
 The default is to add no page body margins, as shown.  Most people who
 use page body margins would change only @Code "@OddRightBodyMargin" and
@@ -46,12 +46,12 @@ be the same on odd and even pages.  Margin notes
 @PP
 You can have a box drawn around each page if you wish.  Here are the
 relevant options and their default values:
-@ID @OneRow @Code {
-"@PageBoxType { None }"
-"@PageBoxMargin { 1.00c }"
-"@PageBoxLineWidth {}"
-"@PageBoxPaint { None }"
-"@PageBoxShadow { 0.06c }"
+@ID @OneRow @Code @Verbatim {
+@PageBoxType { None }
+@PageBoxMargin { 1.00c }
+@PageBoxLineWidth {}
+@PageBoxPaint { None }
+@PageBoxShadow { 0.06c }
 }
 You get boxes by changing the @Code "@PageBoxType" option:
 page.box.type @Index @Code "@PageBoxType"
@@ -83,10 +83,10 @@ The {@Code "@PageBoxMargin"}, {@Code "@PageBoxLineWidth"},
 the page box exactly as the {@Code margin}, {@Code linewidth},
 {@Code paint}, and {@Code shadow} options described
 for other boxes in Section {@NumberOf boxes} do.  For example,
-@ID @OneRow @Code {
-"@PageBoxType { CurveBox }"
-"@PageBoxMargin { 1.0c }"
-"@PageBoxPaint { grey }"
+@ID @OneRow @Code @Verbatim {
+@PageBoxType { CurveBox }
+@PageBoxMargin { 1.0c }
+@PageBoxPaint { grey }
 }
 draws a curved box, painted grey, around each page, with a one
 centimetre margin between its boundary and the page contents.  If the
@@ -138,13 +138,13 @@ produces something like this around each page:
 The @Code "@BoundaryMarks" symbol has options for controlling the
 line width (thickness), the line length, and the gap between the
 ends of the lines and the corner of the text area:
-@ID @OneRow @Code {
-"@PageBackground {"
-"    @BoundaryMarks"
-"        linewidth { 0.2p }"
-"        length { 0.5c }"
-"        gap { 0.5c }"
-"}"
+@ID @OneRow @Code @Verbatim {
+@PageBackground {
+    @BoundaryMarks
+        linewidth { 0.2p }
+        length { 0.5c }
+        gap { 0.5c }
+}
 }
 This shows the default values:  0.2 points for line width,
 0.5 centimetres for the others.

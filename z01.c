@@ -1,9 +1,9 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -126,46 +126,77 @@ BOOLEAN xleft, BOOLEAN xright, BOOLEAN xindef, unsigned char xprec)
 /*****************************************************************************/
 /*                                                                           */
 /*  static void PrintUsage(fp)                                               */
+/*  static void PrintVersion(lib, fp)                                        */
 /*                                                                           */
-/*  Print usage information on file fp.                                      */
+/*  Print usage information / version information on file fp.                */
 /*                                                                           */
 /*****************************************************************************/
-#define lput(str) fprintf(fp, "%s\n", str)
+#define lputnl fputs( (char *) STR_NEWLINE, fp)
+#define lput0(fmt)                { fprintf(fp,fmt);                 lputnl; }
+#define lput1(fmt, p1)            { fprintf(fp,fmt, p1);             lputnl; }
+#define lput2(fmt, p1, p2)        { fprintf(fp,fmt, p1, p2);         lputnl; }
+#define lput3(fmt, p1, p2, p3)    { fprintf(fp,fmt, p1, p2, p3);     lputnl; }
+#define lput4(fmt, p1, p2, p3, p4){ fprintf(fp,fmt, p1, p2, p3, p4); lputnl; }
 
 static void PrintUsage(FILE *fp)
 {
-  lput(""								    );
-  lput("usage:  lout options files"					    );
-  lput(""								    );
-  lput("  -s              suppress access to cross reference database"	    );
-  lput("  -EPS            EPS (Encapsulated PostScript) output"		    );
-  lput("  -PDF or -Z      PDF (Adobe Portable Document Format) output"      );
-  lput("  -p              plain text output instead of PostScript"	    );
-  lput("  -P              like -p but with form-feed char between pages"    );
-  lput("  -S              safe execution (disable calls to system(3))"	    );
-  lput("  -U              unsafe execution (allow calls to system(3))"	    );
-  lput("  -l              ASCII collation order when sorting indexes etc."  );
-  lput("  -L              locale collation order when sorting indexes etc." );
-  lput("  -o file         output to file instead of stdout"		    );
-  lput("  -e file         error messages to file instead of stderr"	    );
-  lput("  -a              alternative error format:  file:line:col ..."	    );
-  lput("  -w              print total number of words in output"	    );
-  lput("  -i file         like @SysInclude { file }; not recommended"	    );
-  lput("  -I directory    add directory to include file search path"	    );
-  lput("  -C directory    add directory to LCM file search path"	    );
-  lput("  -F directory    add directory to font metrics file search path"   );
-  lput("  -H directory    add directory to hyphenation file search path"    );
-  lput("  -D directory    add directory to database file search path"	    );
-  lput("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'" );
-  lput("  -c file         use file.li instead of lout.li for crossrefs"	    );
-  lput("  -M              save memory (don't read in database indexes)"     );
-  lput("  -x              initializing run, not for ordinary use"	    );
-  lput("  -u              print this usage message on stderr and exit"	    );
-  lput("  -V              print version and configuration information"	    );
-  lput("  -               a file name denoting standard input"		    );
-  lput(""								    );
-
+  lputnl;
+  lput0("usage:  lout options files"					    );
+  lputnl;
+  lput0("  -s              suppress access to cross reference database"	    );
+  lput0("  -EPS            EPS (Encapsulated PostScript) output"	    );
+  lput0("  -PDF or -Z      PDF (Adobe Portable Document Format) output"     );
+  lput0("  -p              plain text output instead of PostScript"	    );
+  lput0("  -P              like -p but with form-feed char between pages"   );
+  lput0("  -S              safe execution (disable calls to system(3))"	    );
+  lput0("  -U              unsafe execution (allow calls to system(3))"	    );
+  lput0("  -l              ASCII collation order when sorting indexes etc." );
+  lput0("  -L              locale collation order when sorting indexes etc.");
+  lput0("  -o file         output to file instead of stdout"		    );
+  lput0("  -e file         error messages to file instead of stderr"	    );
+  lput0("  -a              alternative error format:  file:line:col ..."    );
+  lput0("  -w              print total number of words in output"	    );
+  lput0("  -i file         like @SysInclude { file }; not recommended"	    );
+  lput0("  -I directory    add directory to include file search path"	    );
+  lput0("  -C directory    add directory to LCM file search path"	    );
+  lput0("  -F directory    add directory to font metrics file search path"  );
+  lput0("  -H directory    add directory to hyphenation file search path"   );
+  lput0("  -D directory    add directory to database file search path"	    );
+  lput0("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'");
+  lput0("  -c file         use file.li instead of lout.li for crossrefs"    );
+  lput0("  -M              save memory (don't read in database indexes)"    );
+  lput0("  -x              initializing run, not for ordinary use"	    );
+  lput0("  -u              print this usage message on stderr and exit"	    );
+  lput0("  -V              print version and configuration information"	    );
+  lput0("  -               a file name denoting standard input"		    );
+  lputnl;
 } /* end PrintUsage */
+
+static void PrintVersion(FULL_CHAR *lib, FILE *fp)
+{
+  lput1("%s", LOUT_VERSION);
+  lput2("%-28s %s",
+    "Basser Lout written by:", "Jeffrey H. Kingston (jeff@it.usyd.edu.au)");
+  lput2("%-28s %s",
+    "Free source available from:", "ftp://ftp.cs.usyd.edu.au/jeff/lout");
+  lput3("%-28s %s %s",
+    "This executable compiled:", __TIME__, __DATE__);
+  lput4("%-28s %s%s%s", "System include directory:", lib, STR_DIR, INCL_DIR);
+  lput4("%-28s %s%s%s", "System database directory:", lib, STR_DIR, DATA_DIR);
+  lput1("Database index files created afresh automatically:%s",
+    USE_STAT ? " yes" : " no");
+  lput1("Safe execution (disabling system()) is default:%s",
+    SAFE_DFT ? " yes" : " no");
+  lput1("strcoll() used for sorting by default:%s", COLLATE ? " yes" : " no");
+  lput1("PDF compression on:%s", PDF_COMPRESSION ? " yes" : " no");
+  lput1("Debugging (-d, -dd, -ddd flags) available:%s", DEBUG_ON ?" yes":" no");
+  lputnl;
+  lput0("Basser Lout comes with ABSOLUTELY NO WARRANTY.");
+  lput0("This is free software, and you are welcome to");
+  lput0("redistribute it under certain conditions.  For");
+  lput0("details on both points, consult the GNU General");
+  lput0("Public License (distributed with this software).");
+} /* end PrintVersion */
 
 
 /*@::GetArg(), main()@********************************************************/
@@ -417,33 +448,7 @@ int main(int argc, char *argv[])
 
       case CH_FLAG_VERSION:
      
-	fprintf(stderr, "%s\n", LOUT_VERSION);
-	fprintf(stderr, "%-28s %s\n",
-	  "Basser Lout written by:", "Jeffrey H. Kingston (jeff@cs.usyd.edu.au)");
-	fprintf(stderr, "%-28s %s\n",
-	  "Free source available from:", "ftp://ftp.cs.usyd.edu.au/jeff/lout");
-	fprintf(stderr, "%-28s %s %s\n",
-	  "This executable compiled:", __TIME__, __DATE__);
-	fprintf(stderr, "%-28s %s%s%s\n", "System include directory:",
-	  lib, STR_DIR, INCL_DIR);
-	fprintf(stderr, "%-28s %s%s%s\n", "System database directory:",
-	  lib, STR_DIR, DATA_DIR);
-	fprintf(stderr, "Database index files created afresh automatically:%s\n",
-	  USE_STAT ? " yes" : " no");
-	fprintf(stderr, "Safe execution (disabling system()) is default:%s\n",
-	  SAFE_DFT ? " yes" : " no");
-	fprintf(stderr, "strcoll() used for sorting by default:%s\n",
-	  COLLATE ? " yes" : " no");
-	fprintf(stderr, "PDF compression on:%s\n",
-	  PDF_COMPRESSION ? " yes" : " no");
-	fprintf(stderr, "Debugging (-d, -dd, -ddd flags) available:%s\n",
-	  DEBUG_ON ? " yes" : " no");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Basser Lout comes with ABSOLUTELY NO WARRANTY.\n");
-	fprintf(stderr, "This is free software, and you are welcome to\n");
-	fprintf(stderr, "redistribute it under certain conditions.  For\n");
-	fprintf(stderr, "details on both points, consult the GNU General\n");
-	fprintf(stderr, "Public License (distributed with this software).\n");
+	PrintVersion(lib, stderr);
 	exit(0);
 	break;
 
@@ -530,7 +535,8 @@ int main(int argc, char *argv[])
 
 	sscanf(argv[i], "-m%ld", &MemCheckLong);
 	MemCheck = (POINTER) MemCheckLong;
-	fprintf(stderr, "checking memory location %ld\n", (long) MemCheck);
+	fprintf(stderr, "checking memory location %ld%s",
+	  (long) MemCheck, (char *) STR_NEWLINE);
 	break;
 
 
@@ -561,7 +567,8 @@ int main(int argc, char *argv[])
 	{
 	  case ' ':
 	  case '\t':
-	  case '\n':
+	  case CH_CR:
+	  case CH_LF:
 	  case '{':
 	  case '}':
 
@@ -651,14 +658,14 @@ int main(int argc, char *argv[])
     out_fp = stdout;
   }
   else
-  { out_fp = StringFOpen(outfile,
-		BackEnd->code == PLAINTEXT ? WRITE_TEXT : WRITE_BINARY);
+  { out_fp = StringFOpen(outfile, WRITE_FILE);
     if( out_fp == null )
       Error(1, 27, "cannot open output file %s", FATAL, no_fpos, outfile);
   }
 
   /* initialize miscellaneous modules */
   ColourInit();
+  TextureInit();
   LanguageInit();
   BackEnd->PrintInitialize(out_fp);
 
@@ -728,6 +735,7 @@ int main(int argc, char *argv[])
   load(KW_UNDERLINE,    UNDERLINE,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_COLOUR,       COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_COLOR,        COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_TEXTURE,      TEXTURE,        TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_OUTLINE,      OUTLINE,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_LANGUAGE,     LANGUAGE,       TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_CURR_LANG,    CURR_LANG,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
@@ -820,12 +828,24 @@ int main(int argc, char *argv[])
   /* initialise lexical analyser */
   LexPush(FirstFile(SOURCE_FILE), 0, SOURCE_FILE, 1, FALSE);
 
+  /* alternative processing which tests running time of lexer+parser only */
+  /* ***
+  if( TRUE )
+  {
+    InitParser(cross_db);
+    t = NewToken(BEGIN, no_fpos, 0, 0, BEGIN_PREC, StartSym);
+    res = Parse(&t, StartSym, TRUE, FALSE);
+    exit(0);
+    return 0;
+  }
+  *** */
+
   /* process input files */
   InitParser(cross_db);
   t = NewToken(BEGIN, no_fpos, 0, 0, BEGIN_PREC, StartSym);
   res = Parse(&t, StartSym, TRUE, TRUE);
-  debug0(DGT, D, "calling TransferEnd(res) from main()");
   DisposeObject(CommandOptions);
+  debug0(DGT, D, "calling TransferEnd(res) from main()");
   TransferEnd(res);
   TransferClose();
 

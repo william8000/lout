@@ -4,10 +4,11 @@
 @Begin
 @PP
 To cite one or more references, use the @Code "@Cite" symbol like this:
-citing @Index { citing references }
-cite. @Index @Code "@Cite"
-@ID @Code {
-"This feature is beyond our scope @Cite { $kingston1995lout.expert, page 97 }."
+references. @RawIndex { references }
+references.cite @SubIndex { @Code "@Cite" }
+cite.references @Index { @Code "@Cite" (references) }
+@ID @Code @Verbatim {
+This feature is beyond our scope @Cite { $kingston1995lout.expert, page 97 }.
 }
 The following object must be enclosed in braces.  It may be an arbitrary
 object as usual.  Within it the @Code "$" character is a symbol with a
@@ -29,7 +30,9 @@ tag and labelled with Arabic numbers, although this can be changed by
 setting options in the setup file (Section {@NumberOf changeref}).
 @PP
 If you are making a book, there is a @Code "@ChapCite" symbol which is
-chap.cite @Index @Code "@ChapCite"
+references. @RawIndex { references }
+references.chap.cite @SubIndex { @Code "@ChapCite" }
+chap.cite.references @Index { @Code "@ChapCite" (references) }
 the same as @Code "@Cite" except that its references come out at the
 end of the current preface, introduction, chapter, or appendix, rather
 than at the end of the document.
@@ -46,7 +49,9 @@ list at the end of the chapter), the reference will come out in the wrong list.
 Although it is frowned upon by the authorities, some people include
 references which are not cited anywhere in the body of their document.  For
 this there is {@Code "@NoCite"}:
-no.cite @Index @Code "@NoCite"
+references. @RawIndex { references }
+references.no.cite @SubIndex { @Code "@NoCite" }
+no.cite.references @Index { @Code "@NoCite" (references) }
 @ID @Code {
 "... our scope @NoCite { $kingston1995lout.expert $kingston1993lout.design }."
 }
@@ -59,34 +64,38 @@ references will nevertheless appear in the reference list as usual.  Note
 that if you put commas between the references inside @Code "@NoCite" you
 will get commas in the output (so don't).  There
 is a @Code "@NoChapCite" symbol that combines @Code "@NoCite" and
-no.chap.cite @Index @Code "@NoChapCite"
+references. @RawIndex { references }
+references.no.chap.cite @SubIndex { @Code "@NoChapCite" }
+no.chap.cite.references @Index { @Code "@NoChapCite" (references) }
 {@Code "@ChapCite"}.  For compatibility with previous versions of Lout,
 there is a @Code "@Ref" symbol:
-ref. @Index @Code "@Ref"
+ref. @Index { @Code "@Ref" (references) }
 @ID @Code "@Ref kingston1995lout.expert"
 is the same as @Code "@Cite { $kingston1995lout.expert }" without the
 brackets.  There are analogous {@Code "@ChapRef"}, {@Code "@NoRef"},
 and {@Code "@NoChapRef"}
-chap.ref @Index @Code "@ChapRef"
-no.ref @Index @Code "@NoRef"
-no.chap.ref @Index @Code "@NoChapRef"
+chap.ref @Index { @Code "@ChapRef" (references) }
+no.ref @Index { @Code "@NoRef" (references) }
+no.chap.ref @Index { @Code "@NoChapRef" (references) }
 symbols, which are not recommended.
 @PP
 The @Code "@RefPrint" symbol will print a reference on the spot:
-ref.print @Index @Code "@RefPrint"
 resume. @Index { resumes }
 curriculum. @Index { curriculum vitae }
+references. @RawIndex { references }
+references.refprint @SubIndex { @Code "@RefPrint" }
+refprint.references @Index { @Code "@RefPrint" (references) }
 @ID @Code "@RefPrint kingston1995lout.expert"
 has result
 @ID @RefPrint kingston1995lout.expert
 unrelated to any reference list.  For example,
-@ID @OneRow @Code {
-"@Heading { Journal Articles }"
-"@NumberedList"
-"@LI @RefPrint kingston1985tree"
-"..."
-"@LI @RefPrint kingston1993lout.design"
-"@EndList"
+@ID @OneRow @Code @Verbatim {
+@Heading { Journal Articles }
+@NumberedList
+@LI @RefPrint kingston1985tree
+...
+@LI @RefPrint kingston1993lout.design
+@EndList
 }
 might appear in someone's resume.
 @End @Section

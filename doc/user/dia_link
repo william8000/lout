@@ -4,15 +4,26 @@
 @Begin
 @PP
 @Code "@Diag" has one basic symbol for creating links, called
-link. @Index { @Code "@Link" symbol from @Code "@Diag" }
+diagrams. @RawIndex { diagrams }
+diagrams.link @SubIndex { @Code "@Link" symbol }
+link.diagrams @Index { @Code "@Link" symbol (diagrams) }
 {@Code "@Link"}.  It draws a link between two points or nodes
 given by {@Code from} and {@Code to} options, along a path
+diagrams. @RawIndex { diagrams }
+diagrams.from @SubIndex { @Code "from" option }
+from.diagrams @Index { @Code "from" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.to @SubIndex { @Code "to" option }
+to.diagrams @Index { @Code "to" option (diagrams) }
 given by a {@Code path} option:
-@ID @Code {
-"@Link"
-"    path { ... }"
-"    from { ... }"
-"    to { ... }"
+diagrams. @RawIndex { diagrams }
+diagrams.path @SubIndex { @Code "path" option }
+path.diagrams @Index { @Code "path" option (diagrams) }
+@ID @Code @Verbatim {
+@Link
+    path { ... }
+    from { ... }
+    to { ... }
 }
 Unlike {@Code "@Node"}, {@Code "@Link"} has no following object.
 @PP
@@ -72,6 +83,13 @@ relative to each other, except that no promise of a sensible result is
 made for two nodes very close together.
 @PP
 @Code "@Link" has two options, @Code bias and {@Code radius}, that may be
+diagrams. @RawIndex { diagrams }
+diagrams.bias @SubIndex { @Code "bias" option }
+bias.diagrams @Index { @Code "bias" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.radius @SubIndex { @Code "radius" option }
+radius. @RawIndex { @Code "radius" option }
+radius.in.diagrams @SubIndex { in diagrams }
 used to fine-tune the path.  The @Code "bias" option determines the
 maximum distance that a curve is permitted to stray:
 @CD @Tab
@@ -108,10 +126,10 @@ a semicircle at the right in an {@Code rvlcurve}.
 Lout has no idea where the path is wandering, and cannot take it into
 account when placing a diagram on the page:
 @ID {
-@Code {
-"@Link"
-"    path { ccurve }"
-"    bias { 2c }"
+@Code @Verbatim {
+@Link
+    path { ccurve }
+    bias { 2c }
 }
 ||7ct
 @Diag vstrut { no } {
@@ -130,6 +148,15 @@ in the setup file, where they apply to every link in every diagram of the
 document, unless overridden.
 @PP
 There are {@Code pathstyle}, {@Code pathdashlength} and {@Code pathwidth}
+diagrams. @RawIndex { diagrams }
+diagrams.pathstyle @SubIndex { @Code "pathstyle" option }
+pathstyle.diagrams @Index { @Code "pathstyle" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.pathdashlength @SubIndex { @Code "pathdashlength" option }
+pathdashlength.diagrams @Index { @Code "pathdashlength" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.pathwidth @SubIndex { @Code "pathwidth" option }
+pathwidth.diagrams @Index { @Code "pathwidth" option (diagrams) }
 options which affect the appearance of the path in the same way as the
 {@Code outlinestyle}, {@Code outlinedashlength} and {@Code outlinewidth}
 options of {@Code "@Node"} affect the outline.  When {@Code pathstyle}
@@ -137,15 +164,20 @@ contains just one value (as opposed to a sequence of values) @Code "@Diag"
 tries to divide the path into fewer segments than it would otherwise, to
 make dashed and dotted paths look as good as possible.  There is also
 a {@Code pathgap} option which affects only @Code doubleline paths; it
+diagrams. @RawIndex { diagrams }
+diagrams.pathgap @SubIndex { @Code "pathgap" option }
+pathgap.diagrams @Index { @Code "pathgap" option (diagrams) }
 determines the gap between the centres of the two lines.
 @PP
 The @Code "@Link" symbol has an @Code arrow option, which adds an
-arrow. @Index { arrows }
+diagrams. @RawIndex { diagrams }
+diagrams.arrow.opt @SubIndex { @Code "arrow" option }
+arrow.opt.diagrams @Index { @Code "arrow" option (diagrams) }
 arrowhead to the end of the link:
 @ID {
-@Code {
-"@Link"
-"    arrow { yes }"
+@Code @Verbatim {
+@Link
+    arrow { yes }
 }
 ||7ct
 @Diag {
@@ -160,9 +192,9 @@ arrowhead to the end of the link:
 Its value may be {@Code no} (the default), {@Code yes}, {@Code forward}
 (which is the same as {@Code yes}), {@Code back}, or {@Code both}:
 @ID {
-@Code {
-"@Link"
-"    arrow { both }"
+@Code @Verbatim {
+@Link
+    arrow { both }
 }
 ||7ct
 @Diag {
@@ -177,17 +209,26 @@ Its value may be {@Code no} (the default), {@Code yes}, {@Code forward}
 @Code "@Link" has three options for controlling the appearance of
 arrowheads:  {@Code arrowstyle}, {@Code arrowwidth}, and
 {@Code arrowlength}.  Although every link symbol has these options, for
+diagrams. @RawIndex { diagrams }
+diagrams.arrowstyle @SubIndex { @Code "arrowstyle" option }
+arrowstyle.diagrams @Index { @Code "arrowstyle" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.arrowwidth @SubIndex { @Code "arrowwidth" option }
+arrowwidth.diagrams @Index { @Code "arrowwidth" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.arrowlength @SubIndex { @Code "arrowlength" option }
+arrowlength.diagrams @Index { @Code "arrowlength" option (diagrams) }
 consistency it is almost always better to set the corresponding options
 to the @Code "@Diag" symbol, which applies them to every arrow in the
 diagram:
-@ID @Code {
-"@Diag"
-"    arrowstyle { solid }"
-"    arrowwidth { 0.3f }"
-"    arrowlength { 0.5f }"
-"{"
-"    ..."
-"}"
+@ID @Code @Verbatim {
+@Diag
+    arrowstyle { solid }
+    arrowwidth { 0.3f }
+    arrowlength { 0.5f }
+{
+    ...
+}
 }
 This shows the default values:  a solid arrowhead like the ones above,
 @Code "0.3f" wide (across) and @Code "0.5f" long.  The @Code "arrowwidth"
@@ -245,15 +286,55 @@ base to its point, and hence can and does ensure that the link path does
 not overstrike and thicken the point of the arrow.
 }
 @PP
-It is possible to place an arbitrary object at the beginning or
+Corresponding with {@Code arrowstyle}, {@Code arrowwidth}, and
+{@Code arrowlength}, there are {@Code backarrowstyle},
+{@Code backarrowwidth}, and {@Code backarrowlength} options which
+diagrams. @RawIndex { diagrams }
+diagrams.backarrowstyle @SubIndex { @Code "backarrowstyle" option }
+backarrowstyle.diagrams @Index { @Code "backarrowstyle" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.backarrowwidth @SubIndex { @Code "backarrowwidth" option }
+backarrowwidth.diagrams @Index { @Code "backarrowwidth" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.backarrowlength @SubIndex { @Code "backarrowlength" option }
+backarrowlength.diagrams @Index { @Code "backarrowlength" option (diagrams) }
+determine the style and size of the back arrow; it doesn't have
+to be the same style or size as the forward arrow:
+@ID {
+@Code @Verbatim {
+@Link
+    arrow { both }
+    backarrowstyle { circle }
+}
+||7ct
+@Diag {
+1c @High 3c @Wide
+//
+@Link
+    from { 0,0 }
+    to { 1,1 }
+    arrow { both }
+    backarrowstyle { circle }
+}
+}
+It is also possible to place an arbitrary object at the beginning or
 end of a link, using the @Code "fromlabel" and @Code "tolabel" options
 of Section {@NumberOf dia_labe}.
 @PP
 To save time in common cases, @Code "@Diag" provides link symbols,
 each of which is just @Code "@Link" with one of the standard paths
 already set:  {@Code "@Line"}, {@Code "@Curve"}, {@Code "@CCurve"},
+diagrams. @RawIndex { diagrams }
+diagrams.line @SubIndex { @Code "@Line" symbol }
+line.diagrams @Index { @Code "@Line" symbol (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.curve @SubIndex { @Code "@Curve" symbol }
+curve.diagrams @Index { @Code "@Curve" symbol (diagrams) }
 {@Code "@RVLCurve"}, and so on.  There are also symbols in which
 the @Code "arrow" option is set to @Code yes in addition:  {@Code "@Arrow"},
+diagrams. @RawIndex { diagrams }
+diagrams.arrow.sym @SubIndex { @Code "@Arrow" symbol }
+arrow.sym.diagrams @Index { @Code "@Arrow" symbol (diagrams) }
 {@Code "@CurveArrow"}, {@Code "@CCurveArrow"}, {@Code "@RVLCurveArrow"},
 and so on.  See the summary (Section {@NumberOf dia_summ}) for the
 full list of these symbols.  You will still need the @Code "arrow" option

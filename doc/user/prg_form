@@ -4,6 +4,9 @@
 @Begin
 @PP
 The formfeed (Control-L) character is traditionally taken to be a
+programs. @RawIndex { programs }
+programs.formfeeds @SubIndex { formfeed characters in }
+formfeeds.programs @Index { formfeed characters in programs }
 request to start a new page.  This is explicitly recognized by the
 formal definition of the C language and many others, which treat
 this character as white space from a language point of view, with

@@ -144,33 +144,67 @@
   # @RefListBreak	{        		} # break style of ref list
   # @RefListLabelWidth 	{ @ListLabelWidth	} # Labels column width
   # @RefListSortKey	{ @Tag			} # sorting key
+  # @MakeGlossary	{ No			} # make glossary? Yes or No
+  # @GlossaryText	{ @Null			} # glossary initial text
+  # @GlossaryFont	{			} # glossary entries font
+  # @GlossaryBreak	{			} # glossary entries break
+  # @GlossaryFormat	{ +3p @Font @S @Name	  # glossary entries format
+  #			  @Right @I { @Word&&page @PageNum }
+  #			  @DP @RawIndentedDisplay @Body }
+  # @GlossaryGap	{ @DisplayGap		} # gap between glossary entries
+  # @GlossaryColumnNumber{ 2			} # glossary columns (1 to 10)
+  # @GlossaryColumnGap	{ 1.00c @OrIfPlain 6s	} # glossary column gap
+  # @InGlossaryFont	{ smallcaps		} # font for @InGlossary
+  # @InGlossaryFormat	{ @Body			} # format for @InGlossary
+  # @MakeIndex		{ No			} # make index? Yes or No
   # @MakeIndex		{ No			} # make index? Yes or No
   # @IndexText		{ @Null			} # index initial text
   # @IndexFont		{			} # index entries font
   # @IndexBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
+  # @IndexFormat	{ @Body			} # @Index format
+  # @SubIndexFormat	{ {1f @Wide}@Body	} # @SubIndex format
+  # @SubSubIndexFormat	{ {2f @Wide}@Body	} # @SubSubIndex format
   # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
   # @IndexColumnGap	{ 1.00c	@OrIfPlain 6s	} # index column gap
   # @IndexCtd		{ Yes			} # include (ctd.) lines
   # @IndexCtdWord	{ continued		} # "ctd." in current lang.
   # @IndexCtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
+  # @IndexSpacerAbove	{ 2v			} # space above index spacer
+  # @IndexSpacerBelow	{ 1v			} # space below index spacer
+  # @IndexSpacerFont	{ +3p			} # font of index spacer
+  # @IndexSpacerFormat	{ @Body			} # format of index spacer
   # @MakeIndexA		{ No 			} # make index A? Yes or No
   # @IndexAText		{ @Null			} # index A initial text
   # @IndexAFont		{			} # index A entries font
   # @IndexABreak	{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
+  # @IndexAFormat	{ @Body			} # @IndexA format
+  # @SubIndexAFormat	{ {1f @Wide}@Body	} # @SubIndexA format
+  # @SubSubIndexAFormat	{ {2f @Wide}@Body	} # @SubSubIndexA format
   # @IndexAColumnNumber	{ 2			} # index A columns (1 to 10)
   # @IndexAColumnGap	{ 1.00c	@OrIfPlain 6s	} # index A column gap
   # @IndexACtd		{ Yes			} # include (ctd.) lines
   # @IndexACtdWord	{ continued		} # "ctd." in current lang.
   # @IndexACtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
+  # @IndexASpacerAbove	{ 2v			} # space above index A spacer
+  # @IndexASpacerBelow	{ 1v			} # space below index A spacer
+  # @IndexASpacerFont	{ +3p			} # font of index A spacer
+  # @IndexASpacerFormat	{ @Body			} # format of index A spacer
   # @MakeIndexB		{ No 			} # make index B? Yes or No
   # @IndexBText		{ @Null			} # index B initial text
   # @IndexBFont		{			} # index B entries font
   # @IndexBBreak	{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
+  # @IndexBFormat	{ @Body			} # @IndexB format
+  # @SubIndexBFormat	{ {1f @Wide}@Body	} # @SubIndexB format
+  # @SubSubIndexBFormat	{ {2f @Wide}@Body	} # @SubSubIndexB format
   # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)
   # @IndexBColumnGap	{ 1.00c	@OrIfPlain 6s	} # index B column gap
   # @IndexBCtd		{ Yes			} # include (ctd.) lines
   # @IndexBCtdWord	{ continued		} # "ctd." in current lang.
   # @IndexBCtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
+  # @IndexBSpacerAbove	{ 2v			} # space above index B spacer
+  # @IndexBSpacerBelow	{ 1v			} # space below index B spacer
+  # @IndexBSpacerFont	{ +3p			} # font of index B spacer
+  # @IndexBSpacerFormat	{ @Body			} # format of index B spacer
   # @TopGap		{ 0.75c	@OrIfPlain 2f	} # gap between figures
   # @MidGap		{ 0.75c	@OrIfPlain 2f	} # gap above/below body text
   # @FootNoteNumbers	{ Arabic		} # footnote numbers

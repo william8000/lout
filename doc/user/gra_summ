@@ -4,8 +4,10 @@
 @Begin
 @PP
 The options to the @Code "@Graph" symbol, their default values, and
+graphs. @RawIndex { graphs (statistical) }
+graphs.summary @SubIndex { summary of all options }
 their possible values are:
-@ID -2.1px @Break -1p @Font @Tab
+@ID -2.5px @Break -1p @Font @Tab
    hmargin { 0.15c }
    @Fmta { @Col @Code { "    "A } ! @Col @Code "{" ! @Col @Code B !
 	   @Col @Code "}" ! @Col ! @Col ! @Col C }
@@ -19,20 +21,20 @@ their possible values are:
     C { {@Code frame}, {@Code axes}, or {@Code none} }
 @Rowa
     A { width }
-    B { 6.0 cm }
+    B { 6.0c }
     C { any @I distance }
 @Rowa
     A { height }
-    B { 4.0 cm }
+    B { 4.0c }
     C { any @I distance }
 @Rowa
     A { xextra }
-    B { 0.5 cm }
-    C { any @I distance ({@Code axes} and {@Code none} default is {@Code "0 cm"}) }
+    B { 0.5c }
+    C { any @I distance ({@Code axes} and {@Code none} default is {@Code "0c"}) }
 @Rowa
     A { yextra }
-    B { 0.5 cm }
-    C { any @I distance ({@Code axes} and {@Code none} default is {@Code "0 cm"}) }
+    B { 0.5c }
+    C { any @I distance ({@Code axes} and {@Code none} default is {@Code "0c"}) }
 @Rowa
     A { xdecreasing }
     B { no }
@@ -59,19 +61,19 @@ their possible values are:
     C { any Lout object }
 @Rowa
     A { leftgap }
-    B { 1.5 cm }
+    B { 1.5c }
     C { any @I distance }
 @Rowa
     A { rightgap }
-    B { 0.5 cm }
+    B { 0.5c }
     C { any @I distance }
 @Rowa
     A { abovegap }
-    B { 0.5 cm }
+    B { 0.5c }
     C { any @I distance }
 @Rowa
     A { belowgap }
-    B { 0.5 cm }
+    B { 0.5c }
     C { any @I distance }
 @Rowa
     A { hidecaptions }
@@ -138,15 +140,15 @@ automatic }
 automatic }
 @Rowa
     A { xticklength }
-    B { 0.5 ft }
+    B { 0.5f }
     C { any @I distance }
 @Rowa
     A { yticklength }
-    B { 0.5 ft }
+    B { 0.5f }
     C { any @I distance }
 @Rowa
     A { rticklength }
-    B { 0.5 ft }
+    B { 0.5f }
     C { any @I distance }
 @Rowa
     A { objects }
@@ -174,53 +176,30 @@ automatic }
     B { no }
     C { {@Code no} or {@Code yes} }
 @Rowa
+    A { texture }
+    B { solid }
+    C { any texture from Section {@NumberOf textures} }
+@Rowa
     A { dataformat }
     B { xandy }
     C { {@Code xandy}, {@Code yonly}, {@Code xonly}, {@Code swapxandy} }
 @Rowa
     A { dashlength }
-    B { 0.2 ft }
+    B { 0.2f }
     C { any @I distance }
 @Rowa
     A { linewidth }
-    B { 0.5 pt }
+    B { 0.5p }
     C { any @I distance }
 @Rowa
     A { symbolsize }
-    B { 0.15 ft }
+    B { 0.15f }
     C { any @I distance }
 }
 @I Number means an ordinary decimal number; @I distance means a number
-followed by at least one space followed by any one of the following
-units of measurement:
-@ID @Tab
-    vmargin { 0.5vx }
-    @Fmta { @Col @Code A ! @Col B }
-{
-@Rowa
-    A { cm }
-    B { centimetres }
-@Rowa
-    A { in }
-    B { inches }
-@Rowa
-    A { em }
-    B { Ems (12 ems = 1 inch) }
-@Rowa
-    A { pt }
-    B { Points (72 points = 1 inch) }
-@Rowa
-    A { ft }
-    B { @Code "1 ft" is the size of the current font }
-@Rowa
-    A { sp }
-    B { @Code "1 sp" is the width of the space character in the current font }
-@Rowa
-    A { vs }
-    B { @Code "1 vs" is the current inter-line spacing }
-}
-In general, numbers denote x or y values while distances denote lengths
-on the printed result.
+with a unit of measurement (Section {@NumberOf objects}), such as
+@Code { 5c } or {@Code 0.5f}.  In general, numbers denote x or y
+values while distances denote lengths on the printed result.
 @PP
 The minimum plottable x value is the minimum of all the x data,
 {@Code xticks}, {@Code xorigin}, {@Code xmin}, and {@Code xmax} whenever
@@ -248,7 +227,7 @@ the following:
 }
 where @I object is an arbitrary Lout object.  Each of these nine symbols
 also has a @Code "margin" option whose value may be any non-negative
-distance, with default value {@Code "0.3 ft"}.
+distance, with default value {@Code "0.3f"}.
 @PP
 The options to the @Code "@Data" symbol, their default values, and
 their possible values are:
@@ -277,6 +256,9 @@ their possible values are:
 @Rowa
     A { paint }
     C { {@Code no} or {@Code yes} }
+@Rowa
+    A { texture }
+    C { Any texture from Section {@NumberOf textures} }
 @Rowa
     A { dataformat }
     C { {@Code xandy}, {@Code yonly}, {@Code xonly} }

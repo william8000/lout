@@ -100,7 +100,7 @@ between words (Section {@NumberOf spaces}), but it will mimic the spacing rules
 of two other systems, troff and @TeX, if you prefer (Section {@NumberOf white}).
 @PP
 When Lout runs, you might see some error messages containing the words
-error.messages @Index { error messages }
+errors. @Index { errors }
 `unresolved cross reference' and `no destination point' -- not on file
 @Code "intro" above, but on more complicated ones (anything with a footnote,
 for example).  These just mean that you have to run the @Code "lout" command

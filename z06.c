@@ -1,9 +1,9 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -44,6 +44,7 @@ static	int		otop = -1;		/* top of obj_stack          */
 static	OBJECT		tok_stack[MAX_STACK];	/* stack of tokens           */
 static	int		ttop = -1;		/* top of tok_stack          */
 static	int		unknown_count = 0;	/* no. of unknown symbols    */
+	BOOLEAN		InDefinitions = TRUE;	/* TRUE when in definitions  */
 #if DEBUG_ON
 static	BOOLEAN		debug_now = FALSE;	/* TRUE when want to debug   */
 #endif
@@ -147,7 +148,7 @@ OBJECT OptimizeCase(OBJECT x)
 /*****************************************************************************/
 
 static void HuntCommandOptions(OBJECT x)
-{ OBJECT colink, coname, coval, opt, y, link, sym;  BOOLEAN found;
+{ OBJECT colink, coname, coval, opt = nilobj, y = nilobj, link, sym;  BOOLEAN found;
   debug1(DOP, DD, "HuntCommandOptions(%s)", SymName(actual(x)));
   sym = actual(x);
   for( colink = Down(CommandOptions);  colink != CommandOptions;
@@ -440,6 +441,7 @@ static BOOLEAN Reduce(void)
     case BREAK:
     case UNDERLINE:
     case COLOUR:
+    case TEXTURE:
     case OUTLINE:
     case LANGUAGE:
     case CURR_LANG:
@@ -889,6 +891,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 #if DEBUG_ON
       debug_now = TRUE;
 #endif
+      InDefinitions = FALSE;
       debugcond4(DOP, DD, debug_now, "[ Parse (first) (%s, %s, %s, %s)",
 	EchoToken(*token), SymName(encl), bool(defs_allowed),
 	bool(transfer_allowed));
@@ -1032,6 +1035,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case BREAK:
       case UNDERLINE:
       case COLOUR:
+      case TEXTURE:
       case OUTLINE:
       case LANGUAGE:
       case CURR_LANG:

@@ -4,6 +4,9 @@
 @Begin
 @PP
 The Perl programming language
+programs. @RawIndex { programs }
+programs.perl @SubIndex { Perl problems }
+perl.programs @Index { Perl problems (programs) }
 @FootNote { My thanks to Mark Summerfield for help with Perl and Pod. }
 is quite a difficult one for the @Code { prg2lout } program to deal with,
 and our boast that programs can be included with `absolutely no
@@ -82,6 +85,9 @@ space before the semicolon.
 Further work may eliminate some of these problems.
 @PP
 The Pod language is used by Perl programmers for creating documentation,
+programs. @RawIndex { programs }
+programs.pod @SubIndex { Pod problems }
+pod.programs @Index { Pod problems (programs) }
 and may be found within Perl programs or standing alone.  Lout supports
 both arrangements without any special action by the user.  At the
 beginning of the @Code perl setup line, the following line has been placed:

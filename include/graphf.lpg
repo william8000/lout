@@ -173,26 +173,49 @@ lgraphdict begin
   linewidth setlinewidth stroke
 } def
 
+% % pre-texture versions
+% % stroke a filled y histogram: - filledyhisto -
+% /filledyhisto
+% {
+%   linewidth setlinewidth
+%   xprev yleft trpoint exch currentlinewidth 2 div add exch yextra sub moveto
+%   xprev yprev trpoint exch currentlinewidth 2 div add exch lineto
+%   xcurr yprev trpoint exch currentlinewidth 2 div sub exch lineto
+%   xcurr yleft trpoint exch currentlinewidth 2 div sub exch yextra sub lineto 
+%   closepath fill
+% } def
+
+% % stroke a filled x histogram: - filledxhisto -
+% /filledxhisto
+% {
+%   linewidth setlinewidth
+%   xleft yprev trpoint currentlinewidth 2 div add exch xextra sub exch moveto
+%   xcurr yprev trpoint currentlinewidth 2 div add lineto
+%   xcurr ycurr trpoint currentlinewidth 2 div sub lineto
+%   xleft ycurr trpoint currentlinewidth 2 div sub exch xextra sub exch lineto 
+%   closepath fill
+% } def
+
 % stroke a filled y histogram: - filledyhisto -
 /filledyhisto
 {
   linewidth setlinewidth
-  xprev yleft trpoint exch currentlinewidth 2 div add exch yextra sub moveto
-  xprev yprev trpoint exch currentlinewidth 2 div add exch lineto
-  xcurr yprev trpoint exch currentlinewidth 2 div sub exch lineto
-  xcurr yleft trpoint exch currentlinewidth 2 div sub exch yextra sub lineto 
-  closepath fill
+  xprev yleft trpoint exch currentlinewidth 1.3 mul add exch yextra sub moveto
+  xprev yprev trpoint exch currentlinewidth 1.3 mul add exch lineto
+  xcurr yprev trpoint exch currentlinewidth 1.3 mul sub exch lineto
+  xcurr yleft trpoint exch currentlinewidth 1.3 mul sub exch yextra sub lineto 
+  gsave texture fill grestore stroke
 } def
 
 % stroke a filled x histogram: - filledxhisto -
 /filledxhisto
 {
   linewidth setlinewidth
-  xleft yprev trpoint currentlinewidth 2 div add exch xextra sub exch moveto
-  xcurr yprev trpoint currentlinewidth 2 div add lineto
-  xcurr ycurr trpoint currentlinewidth 2 div sub lineto
-  xleft ycurr trpoint currentlinewidth 2 div sub exch xextra sub exch lineto 
-  closepath fill
+  xleft yprev trpoint currentlinewidth 1.3 mul add exch xextra sub exch moveto
+  xcurr yprev trpoint currentlinewidth 1.3 mul add lineto
+  xcurr ycurr trpoint currentlinewidth 1.3 mul sub lineto
+  xleft ycurr trpoint currentlinewidth 1.3 mul sub exch xextra sub exch lineto 
+  gsave texture fill grestore stroke
 } def
 
 
@@ -315,13 +338,6 @@ lgraphdict begin
   } if
 } def
 
-% % trpoint: transform (x, y) in graph space into (x', y') in print space
-% % x y trpoint x' y'
-% /trpoint
-% { exch xtr trxmin sub trxmax trxmin sub div xwidth mul xextra add
-%   exch ytr trymin sub trymax trymin sub div ywidth mul yextra add
-% } def
-
 
 % trpoint: transform (x, y) in graph space into (x', y') in print space
 % x y trpoint x' y'
@@ -358,7 +374,7 @@ lgraphdict begin
 % [ data ] xandy [ data ]
 /xandy {} def
 
-% swapxandy: no interpolation of x or y values
+% swapxandy: swap x and y values
 % [ data ] swapxandy [ data ]
 /swapxandy
 { dup /tmp exch def
@@ -730,7 +746,8 @@ lgraphdict begin
 /rundata
 { alldata
   { gsave
-    dup dup dup dup
+    dup dup dup dup dup
+    5 get /texture exch def
     4 get /dopaint exch def
     3 get /initrun exch def
     2 get /pairs exch def
@@ -738,7 +755,9 @@ lgraphdict begin
     0 get /data exch def
     dopaint
     { data length 4 ge
-      { initrun
+      {
+	gsave
+	initrun
 	newpath
 	data 0 get ymin trpoint yextra sub moveto
 	0 2 data length 2 sub
@@ -748,7 +767,8 @@ lgraphdict begin
 	  xcurr ycurr trpoint lineto
 	} for
 	data dup length 2 sub get ymin trpoint yextra sub lineto
-	closepath fill
+	closepath texture fill
+	grestore
       } if
     } if
     initrun

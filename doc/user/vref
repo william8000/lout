@@ -1,1 +1,7 @@
-vi ref ref_sett ref_cite ref_labe ref_entr ref_chan ref_crea
+gvim ref
+gvim ref_sett
+gvim ref_cite
+gvim ref_labe
+gvim ref_entr
+gvim ref_chan
+gvim ref_crea

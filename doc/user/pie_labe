@@ -1,0 +1,382 @@
+@Section
+   @Title { Labels }
+   @Tag { pie_labe }
+@Begin
+@PP
+labels. @RawIndex { labels }
+labels.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.labels @SubIndex { labels }
+Labels are short messages printed inside the slices,
+identifying them.  We've already seen the @Code label
+option, in which we place the label, which can be an
+arbitrary Lout object.  In this section we'll show how
+to change the format and position of these labels.
+@PP
+For changing the format of a label there are four options:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Slice
+    labelfont { -2p }
+    labelbreak { clines }
+    labelmargin { 0.2f }
+    labelformat { @Body }
+}
+This shows the default values of these options.
+@PP
+The @Code labelfont option determines the font in which the
+labelfont. @RawIndex { @Code "labelfont" options }
+labelfont.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.labelfont @SubIndex { @Code "labelfont" option }
+label will be printed.  The default value shown above calls
+for the current font to be used, two points smaller than it
+otherwise would have been.  Any value acceptable to the
+@Code "@Font" symbol from Section {@NumberOf fonts} is
+acceptable here, including changing the family and face.
+@PP
+The @Code labelbreak option determines how paragraph breaking
+labelbreak. @RawIndex { @Code "labelbreak" options }
+labelbreak.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.labelbreak @SubIndex { @Code "labelbreak" option }
+within the label will be carried out.  Any value acceptable to
+the @Code "@Break" symbol from Section {@NumberOf paras} is
+acceptable here.  The default value shown above causes each
+line of the label to be one line of the result, with each
+line centred with respect to the longest line.
+@PP
+The @Code labelmargin option places a margin around the
+labelmargin. @RawIndex { @Code "labelmargin" options }
+labelmargin.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.labelmargin @SubIndex { @Code "labelmargin" option }
+label.  The default value shown makes a margin of width
+0.2 times the current font size.  This margin has no effect
+on the appearance or position of the label (in particular,
+it is drawn outside @Code "labelformat" below, not inside).
+It is only needed for adjusting the appearance of fingers,
+as described as the end of this section.
+@PP
+The @Code labelformat option allows more radical changes
+labelformat. @RawIndex { @Code "labelformat" options }
+labelformat.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.labelformat @SubIndex { @Code "labelformat" option }
+to the label format.  Its value may be an arbitrary
+object.  Within it, the symbol @Code "@Body" stands for
+the value of the @Code "label" option:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Slice
+    labelformat { @ShadowBox @Body }
+}
+will cause the text of the label to appear within a
+shadow box.  Of course, we could get this effect by
+placing these symbols in the label itself, like this:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Slice
+    label { @ShadowBox { Admin (20%) } }
+}
+However, like all @Code "@Slice" options, @Code labelformat
+may be given to @Code "@Pie" as well, like this:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+    labelformat { @ShadowBox @Body }
+}
+and there it affects every label in the pie graph:
+@CD @Pie
+    labelformat { @ShadowBox @Body }
+{
+    @Slice
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        label { Teaching (40%) }
+}
+When the labels all have the same format, this is much faster
+and less error-prone than formatting each label independently,
+especially when experimenting with different formats.
+@PP
+Two options are available for changing the positions of
+labels:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Slice
+    labelradius { internal }
+    labeladjust { 0c 0c }
+}
+Each label occupies a rectangular area, and these options
+determine the position of the centre of the rectangle.
+@PP
+The @Code labelradius option determines how far the
+labelradius.pie @Index { @Code "labelradius" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.labelradius @SubIndex { @Code "labelradius" option }
+centre of the label is from the point of the slice
+(usually the same as the centre of the pie graph,
+but not when the slice is detached).  The default value
+of {@Code labelradius} shown above, {@Code internal},
+is a synonym for 0.6, so it causes the centre of the label
+to appear 60% of the way from the point of the slice to
+its outside boundary.  The angular position of the label
+centre will be halfway around the arc of the slice.  No
+attempt is made to fit the label into the interior of
+the slice; it lands where these rules say irrespective
+of what might be overstruck when it does.  It is printed
+after its slice's outline and paint, so it can't be
+hidden by them; but if it strays into the next slice it
+will be buried under any paint in that slice.
+@PP
+For fine adjustments, the @Code labeladjust option
+labeladjust. @RawIndex { @Code "labeladjust" options }
+labeladjust.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.labeladjust @SubIndex { @Code "labeladjust" option }
+may be used to move the label centre any distance in
+the x and y directions.  For example,
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Slice
+    labeladjust { 0.2c -0.1c }
+}
+will move the label centre 0.2 centimetres further to
+the right and 0.1 centimetres down from where it would
+otherwise have appeared.
+@PP
+The recommended procedure for getting internal labels
+to look good is to first try them without any adjustment.
+Next, consider rearranging the label layout.  Our running
+example has poorly positioned labels, but they can be
+improved just by breaking each label over two lines:
+@CD @Pie
+    # abovecaption { Ideal breakdown of academic workload }
+    aboveextra { 1f }
+{
+    @Slice
+        detach { yes }
+        weight { 20 }
+        label { Admin @LLP (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research @LLP (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching @LLP (40%) }
+}
+Finally, the @Code labeladjust option is there as a last resort.
+@PP
+To get a label outside its slice, use
+externallabels.pie @Index { external labels in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.externallabels @SubIndex { external labels }
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Slice
+    labelradius { external }
+}
+Again, @Code external is just a synonym for the number
+1.4, meaning that the label centre is to be placed 140%
+of the pie chart's radius away from the point of the
+slice.  It can be replaced by any number.
+@PP
+Two issues arise when labels are placed externally.
+The first issue is that Lout does not know where these labels
+are being printed and so cannot leave space for them.
+Section {@NumberOf pie_over} has already explained how to
+handle this problem using the {@Code leftextra},
+{@Code rightextra}, {@Code aboveextra}, and {@Code belowextra}
+options of {@Code "@Pie"}.  Our running example, converted
+to external labels, might be entered like this:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+    abovecaption { Ideal breakdown of academic workload }
+    labelradius { external }
+    aboveextra { 0.7c }
+    belowextra { 1.3c }
+{
+    @Slice
+        detach { yes }
+        weight { 20 }
+        label { Admin @LLP (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research @LLP (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching @LLP (40%) }
+}
+}
+which produces this:
+@CD @Pie
+    abovecaption { Ideal breakdown of academic workload }
+    labelradius { external }
+    aboveextra { 0.7c }
+    belowextra { 1.3c }
+{
+    @Slice
+        detach { yes }
+        weight { 20 }
+        label { Admin @LLP (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research @LLP (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching @LLP (40%) }
+}
+The amount of extra space to add has to be worked out by
+experiment.  It can help to temporarily remove all
+captions and enclose the @Code "@Pie" symbol in a box
+with zero margin:
+@ID -1px @Break @Code @Verbatim { @Box margin { 0i } @Pie ... }
+to show clearly how much space the @Code extra options
+are covering.
+@PP
+The second issue raised by external labels is how to
+visually connect each label with its slice, when this
+fingers.pie @Index { fingers in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.fingers @SubIndex { fingers }
+seems necessary.  @Code "@Pie" can do this with short
+line segments that we will call {@I fingers}:
+@CD @Pie
+    abovecaption { Ideal breakdown of academic workload }
+    labelradius { external }
+    aboveextra { 1.3f }
+    belowextra { 3f }
+    finger { yes }
+{
+    @Slice
+        detach { yes }
+        weight { 20 }
+        label { Admin @LLP (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research @LLP (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching @LLP (40%) }
+}
+These were made by adding @Code "finger { yes }" as
+another option to the @Code "@Pie" symbol.
+@PP
+Each slice has several options which control the
+appearance of its own finger.  Here is the full set,
+showing their default values:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Slice
+    finger { no }
+    fingerstyle { solid }
+    fingerdashlength { 0.2f }
+    fingerwidth { thin }
+    fingerradius { 0.7 }
+    fingeradjust { 0c 0c }
+}
+The @Code "finger" option may be @Code "no" or @Code "yes"
+finger.pie @Index { @Code "finger" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.finger @SubIndex { @Code "finger" option }
+and determines whether a finger will be drawn or not.
+@PP
+The {@Code fingerstyle}, {@Code fingerdashlength}, and
+{@Code fingerwidth} options are exactly analogous to
+fingerstyle.pie @Index { @Code "fingerstyle" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.fingerstyle @SubIndex { @Code "fingerstyle" option }
+fingerdashlength.pie @Index { @Code "fingerdashlength" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.fingerdashlength @SubIndex { @Code "fingerdashlength" option }
+fingerwidth.pie @Index { @Code "fingerwidth" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.fingerwidth @SubIndex { @Code "fingerwidth" option }
+the {@Code outlinestyle}, {@Code outlinedashlength}, and
+{@Code outlinewidth} options.  They take the same range
+of values, and determine the style of the line segment
+drawn to make the finger (solid, dashed, etc.).
+@PP
+The {@Code fingerradius} and {@Code fingeradjust} options
+are exactly analogous to the {@Code labelradius} and
+{@Code labeladjust} options, except that instead of
+determining the position of the centre of the label they
+determine the position of the inner endpoint of the
+finger.  The default values place it 70% of the way
+from the point of the slice to its outer edge.  The
+@I outer endpoint of the finger always terminates on
+the bounding box of the label, with the line pointing
+through the centre of the label, and this cannot be
+changed, although the @Code labelmargin option
+(see the start of this section) may be used to decrease
+or increase the margin around the label, thus causing
+the finger to terminate closer to the label or further away.
+@PP
+Fingers may have arrowheads on their inner ends:
+@ID @OneRow @Code @Verbatim {
+@Pie
+    labelradius { 1.6 }
+    aboveextra { 2f }
+    belowextra { 4f }
+    finger { yes }
+    fingerarrow { yes }
+    fingerradius { 1 }
+{
+    @Slice
+        detach { yes }
+        weight { 20 }
+        label { Admin @LLP (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research @LLP (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching @LLP (40%) }
+}
+}
+produces
+@CD @Pie
+    labelradius { 1.6 }
+    aboveextra { 2f }
+    belowextra { 4f }
+    finger { yes }
+    fingerarrow { yes }
+    fingerradius { 1 }
+{
+    @Slice
+        detach { yes }
+        weight { 20 }
+        label { Admin @LLP (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research @LLP (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching @LLP (40%) }
+}
+The point of the arrowhead coincides with the inner
+endpoint of the finger, so @Code "fingerradius" would
+usually be set to @Code 1 when arrowheads are used.
+@PP
+Although @Code "@Pie" does not offer the elegant selection
+of arrowhead styles of {@Code "@Diag"}, it is possible
+to change the length and width of the arrowheads
+with these options:
+@ID @OneRow @Code @Verbatim {
+@Slice
+    fingerarrowlength { 0.6f }
+    fingerarrowwidth { 0.45f }
+}
+This example shows the default values of these options.
+These options may of course be given to @Code "@Pie" and
+also in the setup file as usual.
+@End @Section

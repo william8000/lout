@@ -1,9 +1,9 @@
 /*@z39.c:String Handler:AsciiToFull(), StringEqual(), etc.@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -26,10 +26,9 @@
 /*  MODULE:       String Handler                                             */
 /*  EXTERNS:      AsciiToFull(), StringEqual(),                              */
 /*                StringCat(), StringCopy(), StringLength(),                 */
-/*                StringFOpen(), StringFPuts(), StringFGets(),               */
-/*                StringRemove(), StringRename(), StringBeginsWith(),        */
-/*                StringContains(), StringInt(), StringFiveInt(),            */
-/*                StringQuotedWord()                                         */
+/*                StringFOpen(), StringFPuts(), StringRemove(),              */
+/*                StringRename(), StringBeginsWith(), StringContains(),      */
+/*                StringInt(), StringFiveInt(), StringQuotedWord()           */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs.h"
@@ -44,7 +43,6 @@
 /*          StringLength(a)           Length of string a                     */
 /*          StringFOpen(str, mode)    Equivalent to fopen(str, mode)         */
 /*          StringFPuts(str, fp)      Equivalent to fputs(str, fp)           */
-/*          StringFGets(str, n, fp)   Equivalent to fgets(str, n, fp)        */
 /*          StringRemove(a)           Equivalent to remove(a)                */
 /*          StringRename(a, b)        Equivalent to rename(a, b)             */
 /*                                                                           */
@@ -79,7 +77,8 @@ int strcollcmp(char *a, char *b)
 *** */
 
 int strcollcmp(char *a, char *b)
-{ char a1[100], a2[100], a3[100], b1[100], b2[100], b3[100];
+{ char a1[MAX_BUFF], a2[MAX_BUFF], a3[MAX_BUFF];
+  char b1[MAX_BUFF], b2[MAX_BUFF], b3[MAX_BUFF];
   int order;
   a1[0] = a2[0] = a3[0] = '\0';
   sscanf(a, "%[^\t]\t%[^\t]\t%[^\t]", a1, a2, a3);

@@ -14,8 +14,11 @@ changing it.
 For general information about how to make your own setup file, consult
 Section {@NumberOf setup}.  The options that determine the default
 values are in the @Code "@Use" clause which occupies most of the setup
+programs. @RawIndex { programs }
+programs.setup @SubIndex { setup files for }
+setup.files. @RawIndex { setup files }
+setup.files.for.programs @SubIndex { for programs }
 file.  Here is part of the @Code "@Use" clause from {@Code cprint}:
-cprint. @Index @Code "@CPSetup"
 @ID @Code @Tbl
    mv { 0.5vx }
    aformat { @Cell A | @Cell B | @Cell C }
@@ -96,9 +99,9 @@ symbols, including {@Code "@Box"} and {@Code "@I"}.  If you want to use
 these symbols here, you must include your setup file @I after
 @Code "@SysInclude { doc }" or whatever, the reverse of the usual
 arrangement, so that they are defined before Lout reads your setup
-file.  This reversal is carried out automatically when formatting
-programs independently of any document, so you can use these symbols
-in a setup file given by a @Code { -S } command line flag.
+file.  This is always done when formatting programs independently of
+any document, so you can use these symbols in a setup file given by
+a @Code { -S } command line flag.
 }  If you do use exotic formats, remember that in some programming languages,
 comments and even strings may occupy more than one line:  {@Code "@Box"},
 for example, will give a logical but probably unwanted result when

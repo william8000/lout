@@ -1,0 +1,117 @@
+@Section
+   @Title { Changing the overall appearance of the pie graph }
+   @Tag { pie_over }
+@Begin
+@PP
+We've already seen that all @Code "@Slice" options may be given
+piegraphs. @RawIndex { pie graphs }
+piegraphs.overall @SubIndex { overall appearance }
+to @Code "@Pie" as well.  In addition to those, @Code "@Pie" has
+its own options that affect the overall appearance of the pie graph:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+    radius { 2.5c }
+    initialangle { 0d }
+    leftextra { 0c }
+    rightextra { 0c }
+    aboveextra { 0c }
+    belowextra { 0c }
+}
+This example shows these options with their default values.
+@PP
+The @Code radius option determines the radius of the pie
+radius. @RawIndex { @Code "radius" option }
+radius.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.radius @SubIndex { @Code "radius" option }
+graph.  As shown, the default radius is 2.5 centimetres, giving a diameter
+of 5 centimetres.
+@PP
+The @Code initialangle option determines the angle that the first
+initialangle.pie @Index { @Code "initialangle" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.initialangle @SubIndex { @Code "initialangle" option }
+slice begins at.  Following mathematical convention, the default angle
+@Code 0d is directly to the right of the centre of the pie graph, and
+as the value of @Code initialangle is increased the initial angle moves
+anticlockwise.  The slices are placed in anticlockwise order immediately
+adjacent to each other.  If you need a gap between two slices, use a
+slice with no outline, no paint, and no label.
+@PP
+Lout thinks that the whole pie graph occupies a square space
+tightly fitting around the given radius, as we can verify by
+drawing a box with zero margin around an example pie graph:
+@CD @Box margin { 0i } @Pie
+{
+    @Slice
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching (40%) }
+}
+Detached slices (Section {@NumberOf pie_slic}) and external
+labels (Section {@NumberOf pie_labe}) can be printed outside
+this square region without Lout's knowledge, and this is
+likely to spoil the layout:
+@CD @Box margin { 0i } @Pie
+{
+    @Slice
+	detach { yes }
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching (40%) }
+}
+The {@Code leftextra}, {@Code rightextra}, {@Code aboveextra}, and
+leftextra.pie @Index { @Code "leftextra" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.leftextra @SubIndex { @Code "leftextra" option }
+rightextra.pie @Index { @Code "rightextra" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.rightextra @SubIndex { @Code "rightextra" option }
+aboveextra.pie @Index { @Code "aboveextra" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.aboveextra @SubIndex { @Code "aboveextra" option }
+belowextra.pie @Index { @Code "belowextra" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.belowextra @SubIndex { @Code "belowextra" option }
+{@Code belowextra} options are used to tell Lout to leave extra
+space to the left, right, above, and below, so as to correct these
+problems:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+    aboveextra { 0.7c }
+}
+We have not added extra space at the right as well, since we prefer
+to centre the pie graph horizontally without regard to detached
+slices.  The result occupies 0.7 cm extra at the top:
+@CD @Box margin { 0i } @Pie aboveextra { 0.7c }
+{
+    @Slice
+	detach { yes }
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching (40%) }
+}
+We'll see these options again when we come to external labels in
+Section {@NumberOf pie_labe}.
+@End @Section

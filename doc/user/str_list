@@ -8,13 +8,13 @@ lists. @Index { lists }
 list. @Index @Code "@List"
 l. @Index @Code "@L"
 made into a displayed list:
-@ID @OneRow @Code {
-"preceding text"
-"@List"
-"@ListItem @I Emma"
-"@ListItem @I { Mansfield Park }"
-"@EndList"
-"following text"
+@ID @OneRow @Code @Verbatim {
+preceding text
+@List
+@ListItem @I Emma
+@ListItem @I { Mansfield Park }
+@EndList
+following text
 }
 After the initial @Code "@List" symbol, each item is introduced by
 list.item. @Index @Code "@ListItem"
@@ -51,13 +51,13 @@ Other list symbols generate a @I label for each item.  For example,
 @Code "@NumberedList" causes the items to be numbered:
 numberedlist. @Index @Code "@NumberedList"
 nl. @Index @Code "@NL"
-@ID @OneRow @Code {
-"@Heading { Quiz }"
-"@NumberedList"
-"@ListItem { Which American statesman owned a two-storey clock? }"
-"@ListItem { Which Yankee commander from the Civil War cut a"
-"swathe of destruction through the State of Georgia? }"
-"@EndList"
+@ID @OneRow @Code @Verbatim {
+@Heading { Quiz }
+@NumberedList
+@ListItem { Which American statesman owned a two-storey clock? }
+@ListItem { Which Yankee commander from the Civil War cut a
+swathe of destruction through the State of Georgia? }
+@EndList
 }
 has result
 @ID @OneRow {
@@ -146,18 +146,18 @@ tagitem. @Index @Code "@TagItem"
 ti. @Index @Code "@TI"
 {@Code "@ListItem"}.  Since such labels tend to be quite wide,
 there are @Code "@WideTaggedList" and @Code "@VeryWideTaggedList" symbols
-widetaggedlist @Index @Code "@WideTaggedList"
+widezzztaggedlist @Index @Code "@WideTaggedList"
 wtl. @Index @Code "@WTL"
 verywidetaggedlist @Index @Code "@VeryWideTaggedList"
 vwtl. @Index @Code "@VWTL"
 which leave extra space for them:
-@ID @OneRow @Code {
-"@WideTaggedList"
-"@TagItem { 9 a.m. } { Breakfast in the Ipamena Lounge,"
-"served with Irish coffee and fresh croissants. }"
-"@TagItem { 10 a.m. } { Prof. A. Smith"
-"speaks on `The Wealth of Nations.' }"
-"@EndList"
+@ID @OneRow @Code @Verbatim {
+@WideTaggedList
+@TagItem { 9 a.m. } { Breakfast in the Ipamena Lounge,
+served with Irish coffee and fresh croissants. }
+@TagItem { 10 a.m. } { Prof. A. Smith
+speaks on `The Wealth of Nations.' }
+@EndList
 }
 Each @Code "@TagItem" symbol is followed by the desired label between
 braces, and then the item proper.  The label may be empty, but still its
@@ -197,15 +197,15 @@ raw.list. @Index @Code "@RawList"
 raw.end.list. @Index @Code "@RawEndList"
 @Code "@EndList" has a raw version which omits the following
 space.  These are mainly used when an item is itself a list:
-@ID @OneRow @Code {
-"@ParenNumberedList"
-"@ListItem {"
-"   @RawParenRomanList"
-"   @ListItem { MV Nominees,"
-"hereinafter called the vendor, ... }"
-"   @RawEndList"
-"}"
-"@EndList"
+@ID @OneRow @Code @Verbatim {
+@ParenNumberedList
+@ListItem {
+   @RawParenRomanList
+   @ListItem { MV Nominees,
+hereinafter called the vendor, ... }
+   @RawEndList
+}
+@EndList
 }
 produces
 @ID @OneRow {
@@ -242,12 +242,12 @@ any kind of list.
 @PP
 Another special list item is {@Code "@ListInterruptItem"}.  This
 prints its content without any numbering or formatting:
-@ID @OneRow @Code {
-"@NumberedList"
-"@ListItem { This is the first list item. }"
-"@ListInterruptItem { This is an interruption to the list. }"
-"@ListItem { This is the second list item. }"
-"@EndList"
+@ID @OneRow @Code @Verbatim {
+@NumberedList
+@ListItem { This is the first list item. }
+@ListInterruptItem { This is an interruption to the list. }
+@ListItem { This is the second list item. }
+@EndList
 }
 produces
 @ID @OneRow {
@@ -273,15 +273,15 @@ Expert users will be interested to learn that all of the list symbols
 described in this section are derived from the two basic ones,
 @Code "@List" and {@Code "@RawList"}, merely by setting options.  Here
 are all the options, together with their default values:
-@ID @OneRow @Code {
-"@List"
-"    type { num }"
-"    style { num }"
-"    labelwidth { 2f }"
-"    indent { 0c }"
-"    rightindent { 0c }"
-"    gap { 1v }"
-"    start { 1 }"
+@ID @OneRow @Code @Verbatim {
+@List
+    type { num }
+    style { num }
+    labelwidth { 2f }
+    indent { 0c }
+    rightindent { 0c }
+    gap { 1v }
+    start { 1 }
 }
 These options may be used with all of the list and raw list symbols,
 except that some combinations don't make sense, for example @Code "indent"
@@ -295,14 +295,14 @@ determines the format of the label, any @Code "num" symbol within it
 being replaced by the number (in Arabic, Roman, etc. as determined by the
 @Code "type" option) of the item.  For example, @Code "@ParenNumberedList"
 is just
-@ID @OneRow @Code {
-"@List"
-"    style { (num) }"
+@ID @OneRow @Code @Verbatim {
+@List
+    style { (num) }
 }
 and @Code "@BulletList" is just
-@ID @OneRow @Code {
-"@List"
-"    style { @Bullet }"
+@ID @OneRow @Code @Verbatim {
+@List
+    style { @Bullet }
 }
 with @Code "num" not mentioned since no number is wanted.  The
 @Code "@TaggedList" symbol and its variants also have the
@@ -336,9 +336,9 @@ setup file option, described below.
 @PP
 The @Code "start" option is the number assigned to the first
 item.  It must be decimal:
-@ID @OneRow @Code {
-"@ParenRomanList"
-"    start { 25 }"
+@ID @OneRow @Code @Verbatim {
+@ParenRomanList
+    start { 25 }
 }
 looks strange, but it is the correct way to number the first
 item (xxv).
@@ -346,18 +346,18 @@ item (xxv).
 Here is a larger example of these options in action.  Setting both
 @Code "indent" and @Code "rightindent" to @Code "@DisplayIndent"
 produces an effect similar to {@Code "@QuotedDisplay"}:
-@ID @OneRow @Code {
-"preceding text"
-"@List"
-"    style { @I {Item num}: }"
-"    indent { @DisplayIndent }"
-"    rightindent { @DisplayIndent }"
-"    labelwidth { @WideIndent }"
-"    start { 10 }"
-"@ListItem { The vendor ... in the case of accident.  }"
-"@ListItem { The vendor ... adjacent to the facility. }"
-"@EndList"
-"following text"
+@ID @OneRow @Code @Verbatim {
+preceding text
+@List
+    style { @I {Item num}: }
+    indent { @DisplayIndent }
+    rightindent { @DisplayIndent }
+    labelwidth { @WideIndent }
+    start { 10 }
+@ListItem { The vendor ... in the case of accident.  }
+@ListItem { The vendor ... adjacent to the facility. }
+@EndList
+following text
 }
 The result is
 @ID @OneRow {
@@ -387,8 +387,8 @@ You can change the @I default values of the {@Code "labelwidth"},
 by setting options called {@Code "@ListTagWidth"}, {@Code "@ListIndent"},
 {@Code "@ListRightIndent"}, and {@Code "@ListGap"} in the setup
 file (Section {@NumberOf setup}).  These default values will then apply
-automatically to every list in the document unless overridden by an option,
-just as the usual default values do.  The setup file also has a
-{@Code "@ListOuterGap"} option which determines the gap before the first
-and after the last list item in non-raw lists.
+to every list in the document unless overridden by an option,
+just like the usual default values.  The setup file also has a
+{@Code "@ListOuterGap"} option which determines the gap before
+the first and after the last list item in non-raw lists.
 @End @Section

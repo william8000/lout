@@ -4,6 +4,10 @@
 @Begin
 @PP
 Diagrams often contain small @I labels adjacent to their nodes and links:
+diagrams. @RawIndex { diagrams }
+diagrams.labels @SubIndex { labels }
+labels. @RawIndex { labels }
+labels.in.diagrams @SubIndex { in diagrams }
 @CD @Diag
     nodelabelformat { @I @Body }
 {
@@ -23,20 +27,27 @@ Diagrams often contain small @I labels adjacent to their nodes and links:
 @Arrow from { B } to { C } ylabel { 20 }
 }
 Each node may have up to four labels, called {@Code alabel}, {@Code blabel},
-label.  @Index { label options in @Code "@Diag" }
-alabel. @Index { @Code alabel option in @Code "@Diag" }
-blabel. @Index { @Code blabel option in @Code "@Diag" }
-clabel. @Index { @Code clabel option in @Code "@Diag" }
-dlabel. @Index { @Code dlabel option in @Code "@Diag" }
+diagrams. @RawIndex { diagrams }
+diagrams.alabel @SubIndex { @Code "alabel" option }
+alabel.diagrams @Index { @Code "alabel" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.blabel @SubIndex { @Code "blabel" option }
+blabel.diagrams @Index { @Code "blabel" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.clabel @SubIndex { @Code "clabel" option }
+clabel.diagrams @Index { @Code "clabel" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.dlabel @SubIndex { @Code "dlabel" option }
+dlabel.diagrams @Index { @Code "dlabel" option (diagrams) }
 {@Code clabel}, and {@Code dlabel}:
 @ID {
-@Code {
-"@Ellipse"
-"    alabel { a }"
-"    blabel { b }"
-"    clabel { c }"
-"    dlabel { d }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Ellipse
+    alabel { a }
+    blabel { b }
+    clabel { c }
+    dlabel { d }
+{ Hello, world }
 }
 ||7ct
 @VContract @Diag {
@@ -49,14 +60,29 @@ dlabel. @Index { @Code dlabel option in @Code "@Diag" }
 }
 }
 Links also have labels, five in fact:
+diagrams. @RawIndex { diagrams }
+diagrams.fromlabel @SubIndex { @Code "fromlabel" option }
+fromlabel.diagrams @Index { @Code "fromlabel" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.xlabel @SubIndex { @Code "xlabel" option }
+xlabel.diagrams @Index { @Code "xlabel" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.ylabel @SubIndex { @Code "ylabel" option }
+ylabel.diagrams @Index { @Code "ylabel" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.zlabel @SubIndex { @Code "zlabel" option }
+zlabel.diagrams @Index { @Code "zlabel" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.tolabel @SubIndex { @Code "tolabel" option }
+tolabel.diagrams @Index { @Code "tolabel" option (diagrams) }
 @ID {
-@Code {
-"@Link"
-"    fromlabel { f }"
-"    xlabel { x }"
-"    ylabel { y }"
-"    zlabel { z }"
-"    tolabel { t }"
+@Code @Verbatim {
+@Link
+    fromlabel { f }
+    xlabel { x }
+    ylabel { y }
+    zlabel { z }
+    tolabel { t }
 }
 ||7ct
 @VContract @Diag {
@@ -77,9 +103,9 @@ over the endpoints of the link, and {@Code fromlabel} is by default printed
 at a funny angle, because these labels are the means of attaching
 arrowheads to links:
 @ID {
-@Code {
-"@Link"
-"    tolabel { @SolidArrowHead }"
+@Code @Verbatim {
+@Link
+    tolabel { @SolidArrowHead }
 }
 ||7ct
 @VContract @Diag {
@@ -109,14 +135,22 @@ labels.  These are described below mainly for {@Code alabel}, but there
 are corresponding options for all nine labels.
 @PP
 The {@Code alabelfont} and {@Code alabelbreak} options determine the
+diagrams. @RawIndex { diagrams }
+diagrams.labelfont @SubIndex { @Code "labelfont" options }
+labelfont. @RawIndex { @Code "labelfont" options }
+labelfont.in.diagrams @SubIndex { in diagrams }
+diagrams. @RawIndex { diagrams }
+diagrams.labelbreak @SubIndex { @Code "labelbreak" options }
+labelbreak. @RawIndex { @Code "labelbreak" options }
+labelbreak.in.diagrams @SubIndex { in diagrams }
 font and paragraph breaking style of the label:
 @ID {
-@Code {
-"@Ellipse"
-"    alabel { a }"
-"    alabelfont { -2p }"
-"    alabelbreak { ragged nohyphen }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Ellipse
+    alabel { a }
+    alabelfont { -2p }
+    alabelbreak { ragged nohyphen }
+{ Hello, world }
 }
 ||7ct
 @VContract @Diag {
@@ -130,13 +164,17 @@ font and paragraph breaking style of the label:
 This example shows the default values of these two options; @Code "-2p"
 explains why the labels in earlier examples were printed in a smaller
 font size.  There is also an {@Code alabelformat} option which allows
+diagrams. @RawIndex { diagrams }
+diagrams.labelformat @SubIndex { @Code "labelformat" options }
+labelformat. @RawIndex { @Code "labelformat" options }
+labelformat.in.diagrams @SubIndex { in diagrams }
 for more radical changes in appearance:
 @ID {
-@Code {
-"@Ellipse"
-"    alabel { a }"
-"    alabelformat { @Box @I @Body }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Ellipse
+    alabel { a }
+    alabelformat { @Box @I @Body }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -155,13 +193,13 @@ Nodes also have {@Code nodelabelfont}, {@Code nodelabelbreak}, and
 {@Code nodelabelformat} options which work in the same way but affect all
 of the node labels, not just one:
 @ID {
-@Code {
-"@Ellipse"
-"    nodelabelformat"
-"        { @Box @I @Body }"
-"    alabel { a }"
-"    blabel { b }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Ellipse
+    nodelabelformat
+        { @Box @I @Body }
+    alabel { a }
+    blabel { b }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -179,19 +217,19 @@ Links similarly have {@Code linklabelfont}, {@Code linklabelbreak}, and
 results that people do not expect.)  The @Code "@Diag" symbol also has
 these options, in the usual way, and they are extremely useful there:
 @ID {
-@Code {
-"@Diag"
-"    nodelabelfont { Slope -2p }"
-"    linklabelformat { \"/\"@Body\"/\" }"
-"    hsize { 1.8c }"
-"{"
-"    A:: @Ellipse alabel { a } { OK }"
-"    @DP"
-"    @DP"
-"    B:: @Ellipse alabel { b } { FAULT }"
-"    //"
-"    @Arrow from { A } to { B } ylabel { sig }"
-"}"
+@Code @Verbatim {
+@Diag
+    nodelabelfont { Slope -2p }
+    linklabelformat { \/\@Body\/\ }
+    hsize { 1.8c }
+{
+    A:: @Ellipse alabel { a } { OK }
+    @DP
+    @DP
+    B:: @Ellipse alabel { b } { FAULT }
+    //
+    @Arrow from { A } to { B } ylabel { sig }
+}
 }
 ||7ct
 @VContract @Diag
@@ -225,15 +263,18 @@ Each label inhabits its own characteristic region of the node or
 link:  {@Code alabel} in the north-east corner of the node,
 {@Code ylabel} halfway along the link, and so on.  This general
 location of the label is defined by the {@Code alabelpos} option.  Here
+diagrams. @RawIndex { diagrams }
+diagrams.labelpos @SubIndex { @Code "labelpos" options }
+labelpos.diagrams @Index { @Code "labelpos" options (diagrams) }
 are the default values for all nine labels:
 @IL
 @LI {
-@Code {
-"@Node"
-"    alabelpos { NE }"
-"    blabelpos { NW }"
-"    clabelpos { SW }"
-"    dlabelpos { SE }"
+@Code @Verbatim {
+@Node
+    alabelpos { NE }
+    blabelpos { NW }
+    clabelpos { SW }
+    dlabelpos { SE }
 }
 ||7ct
 @VContract @Diag {
@@ -242,13 +283,13 @@ are the default values for all nine labels:
 }
 }
 @LI {
-@Code {
-"@Link"
-"    fromlabelpos { FROM }"
-"    xlabelpos { LFROM }"
-"    ylabelpos { LMID }"
-"    zlabelpos { LTO }"
-"    tolabelpos { TO }"
+@Code @Verbatim {
+@Link
+    fromlabelpos { FROM }
+    xlabelpos { LFROM }
+    ylabelpos { LMID }
+    zlabelpos { LTO }
+    tolabelpos { TO }
 }
 ||7ct
 @VContract @Diag {
@@ -268,15 +309,21 @@ node by setting this option in the @Code "@Diag" symbol, as was done for
 the formatting options above.
 @PP
 In a similar vein, there is an @Code { xindent } option which controls how
+diagrams. @RawIndex { diagrams }
+diagrams.xindent @SubIndex { @Code "xindent" option }
+xindent.diagrams @Index { @Code "xindent" option (diagrams) }
 far from the start of the link the @Code "LFROM" tag, and hence the
 {@Code xlabel}, will appear.  A similar option, @Code { zindent }, determines
+diagrams. @RawIndex { diagrams }
+diagrams.zindent @SubIndex { @Code "zindent" option }
+zindent.diagrams @Index { @Code "zindent" option (diagrams) }
 how far from the end of the link the @Code "LTO" tag and hence the
 {@Code zlabel} will appear:
 @ID {
-@Code {
-"@Link"
-"    xindent { 1f }"
-"    zindent { 2f }"
+@Code @Verbatim {
+@Link
+    xindent { 1f }
+    zindent { 2f }
 }
 ||7ct
 @VContract @Diag {
@@ -293,6 +340,9 @@ how far from the end of the link the @Code "LTO" tag and hence the
 Both options have default value {@Code 0.8f}.
 @PP
 The @Code alabelangle option determines the angle at which the label is
+diagrams. @RawIndex { diagrams }
+diagrams.labelangle @SubIndex { @Code "labelangle" options }
+labelangle.diagrams @Index { @Code "labelangle" options (diagrams) }
 printed:
 @ID @Tab
     @Fmta { @Col @Code A ! @Col B }
@@ -308,6 +358,9 @@ printed:
     B { Perpendicular to the outline or link path }
 }
 The @Code "alabelprox" option determines where in the proximity of
+diagrams. @RawIndex { diagrams }
+diagrams.labelprox @SubIndex { @Code "labelprox" options }
+labelprox.diagrams @Index { @Code "labelprox" options (diagrams) }
 @Code alabelpos the label is printed:
 @ID @Tab
     @Fmta { @Col @Code A ! @Col B }
@@ -334,14 +387,18 @@ going from @Code from to @Code to }
 going from @Code from to @Code to (the default for node labels) }
 }
 The {@Code alabelmargin} option adds a margin around all four sides of
+diagrams. @RawIndex { diagrams }
+diagrams.labelmargin @SubIndex { @Code "labelmargin" options }
+labelmargin. @RawIndex { @Code "labelmargin" options }
+labelmargin.in.diagrams @SubIndex { in diagrams }
 the label, thereby moving it away from {@Code alabelpos} irrespective of
 which direction it happens to lie in:
 @ID {
-@Code {
-"@Ellipse"
-"    alabel { a }"
-"    alabelmargin { 0f }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Ellipse
+    alabel { a }
+    alabelmargin { 0f }
+{ Hello, world }
 }
 ||7ct
 @VContract @Diag {
@@ -371,7 +428,7 @@ the one closest to {@Code 0d}.
 @PP
 The @Code alabelprox option may be {@Code N},
 {@Code S}, {@Code E}, {@Code W}, {@Code NE}, {@Code SE}, {@Code NW},
-{@Code SW}, or {@Code CTR}:
+{@Code SW}, {@Code NNW}, {@Code NNE}, {@Code SSW}, {@Code SSE}, or {@Code CTR}:
 @CD @Diag {
 //1f
 @ShowTags @Box margin { 0.5c } { 24p @Font grey @Colour @I label }
@@ -400,6 +457,9 @@ through {@Code alabelpos} at the angle of {@Code alabelpos}.  The corner
 or side midpoint slides up or down this line to the point which
 minimises the distance from {@Code alabelpos} to the centre of the
 label.  Only @Code ylabelctr has @Code "yes" for its default value; the
+diagrams. @RawIndex { diagrams }
+diagrams.labelctr @SubIndex { @Code "labelctr" options }
+labelctr.diagrams @Index { @Code "labelctr" options (diagrams) }
 @Code y label often looks better centred when this adjustment is made,
 particularly on lines with shallow but non-zero slope:
 @CD @Tab
@@ -426,6 +486,10 @@ since it is then the centre of the label which is centred on the link,
 rather than one of its corners.
 @PP
 Finally, when all else fails there is an {@Code alabeladjust} option
+diagrams. @RawIndex { diagrams }
+diagrams.labeladjust @SubIndex { @Code "labeladjust" options }
+labeladjust. @RawIndex { @Code "labeladjust" options }
+labeladjust.in.diagrams @SubIndex { in diagrams }
 which translates the label by an arbitrary amount:
 @ID @Code "alabeladjust { -0.5c 1.5c }"
 causes the label to appear 0.5 centimetres to the left of and 1.5 centimetres

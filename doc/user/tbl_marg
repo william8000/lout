@@ -4,8 +4,10 @@
 @Begin
 @PP
 The @Code "@Cell" symbol offers a @Code margin option for changing the
-margins @RawIndex { margins }
-margins.in.tables @SubIndex { margins in tables }
+tables. @RawIndex { tables }
+tables.margin @SubIndex { @Code "margin" options }
+margin.options @RawIndex { margin options }
+margin.options.in.tables @SubIndex { in tables }
 amount of margin left between the entry and the boundary of the cell:
 @ID @Code "@Cell margin { 0.3f }"
 The default values are different for horizontal and vertical margins,

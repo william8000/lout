@@ -1,0 +1,203 @@
+@Section
+   @Title { Changing the appearance of slices }
+   @Tag { pie_slic }
+@Begin
+@PP
+The @Code "@Slice" symbol has options for controlling the
+slice. @Index { @Code "@Slice" symbol (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.slice @SubIndex { @Code "@Slice" symbol }
+appearance of the slice it makes:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Slice
+    weight { 10 }
+    paint { none }
+    texture { solid }
+    outlinestyle { solid }
+    outlinedashlength { 0.2f }
+    outlinewidth { thin }
+    detach { no }
+}
+This example shows the default values of the options.
+@PP
+The @Code weight option is the weight (angular extent) of
+weight.pie @Index { @Code "weight" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.weight @SubIndex { @Code "weight" option }
+the slice.  By default, the total weight of the complete
+pie graph is 100, so a slice of weight 10, say, would occupy
+10% of the pie area, or in other words an angular extent
+of (10"/"100) @Multiply 360 degrees.  You can change the
+@I total weight by setting an option to the @Code "@Pie" symbol:
+totalweight.pie @Index { @Code "totalweight" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.totalweight @SubIndex { @Code "totalweight" option }
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+    totalweight { 360 }
+}
+The value 360 would be useful if you wanted your weights to
+correspond with degrees.  It would be good to get @Code "@Pie"
+to add up all the weights of its constituent slices and use
+that for the total weight, but problems behind the scenes
+prevent this.  As it is, if the total weight of all slices
+is less than {@Code totalweight}, the leftover angular
+extent will be blank; and if it exceeds {@Code totalweight},
+later slices will overstrike earlier ones.
+@PP
+The @Code paint option defines the colour of the interior
+paint. @RawIndex { @Code "paint" option }
+paint.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.paint @SubIndex { @Code "paint" option }
+of the slice.  Any colour acceptable to the {@Code "@Colour"}
+symbol (Section {@NumberOf colour}) is allowed, plus the
+default value {@Code none}, meaning no paint.  As always,
+alongside the @Code "paint" option there is a @Code "texture"
+texture.option. @RawIndex { @Code "texture" option }
+texture.option.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.texture @SubIndex { @Code "texture" option }
+option:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+    paint { grey }
+{
+    @Slice
+        weight { 20 }
+        texture { striped }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        texture { striped angle { 45d } }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        texture { striped angle { 90d } }
+        label { Teaching (40%) }
+}
+}
+produces
+@CD
+@Pie
+    paint { grey }
+{
+    @Slice
+        weight { 20 }
+        texture { striped }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        texture { striped angle { 45d } }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        texture { striped angle { 90d } }
+        label { Teaching (40%) }
+}
+Textures might work better in black and white prints.
+@PP
+The next three options affect the outline drawn around each
+slice.  The @Code outlinestyle option
+outlinestyle. @RawIndex { @Code "outlinestyle" option }
+outlinestyle.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.outlinestyle @SubIndex { @Code "outlinestyle" option }
+may be {@Code solid} (the default) which
+draws a solid line, {@Code dashed} which draws a dashed
+line, {@Code cdashed} which draws a dashed line with
+half-size dashes at the ends (this often looks better
+than {@Code dashed}), @Code "dotted" which draws a dotted line,
+and @Code noline which draws no outline at all.  The
+@Code outlinedashlength option determines the dash length
+outlinedashlength. @RawIndex { @Code "outlinedashlength" option }
+outlinedashlength.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.outlinedashlength @SubIndex { @Code "outlinedashlength" option }
+if @Code outlinestyle is @Code dashed or {@Code cdashed}, and
+the distance between dots if @Code outlinestyle is
+{@Code dotted}.  The length will be varied a little to ensure
+that the dashes or dots fit evenly on each segment of the
+outline.  The @Code "outlinewidth" option determines the width
+outlinewidth. @RawIndex { @Code "outlinewidth" option }
+outlinewidth.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.outlinewidth @SubIndex { @Code "outlinewidth" option }
+of the outline, or the diameter of the dots if @Code outlinestyle
+is {@Code dotted}.
+@PP
+You can give three values to {@Code outlinestyle}, like this:
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+{   red @Colour @Slice
+        weight { 75 }
+        outlinestyle { dashed cdashed dotted }
+        label { Bad debts }
+}
+}
+and the first will apply to the first straight segment,
+the second to the curved segment, and the third to the
+second straight segment:
+@CD @Pie
+{   red @Colour @Slice
+        weight { 75 }
+        outlinestyle { dashed cdashed dotted }
+        label { Bad debts }
+}
+There is no option to change the colour of the outline,
+but you can change the colour of the whole slice using
+the {@Code "@Colour"} symbol from Section {@NumberOf colour}
+as shown.  It colours the label as well, but you can
+fix that by enclosing the contents of your label in
+another {@Code "@Colour"} symbol if you need to.
+@PP
+The @Code detach option pulls its slice radially out of the
+detach.pie @Index { @Code "detach" option (pie graphs) }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.detach @SubIndex { @Code "detach" option }
+pie, without affecting any other slice:
+@CD @Pie
+    # abovecaption { Ideal breakdown of academic workload }
+    aboveextra { 0.7c }
+{
+    @Slice
+        detach { yes }
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching (40%) }
+}
+is produced by
+@ID -1px @Break @OneRow @Code @Verbatim {
+@Pie
+    aboveextra { 0.7c }
+{
+    @Slice
+        detach { yes }
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching (40%) }
+}
+}
+We've used the @Code aboveextra option
+(Section {@NumberOf pie_over}) to compensate for Lout's
+ignorance of where the slice actually ended up.
+The value of @Code detach may be {@Code no} (the
+default), {@Code yes}, or any number, which defines
+the fraction of the pie radius that the slice is
+pulled out by.  For example, @Code yes is just another
+name for {@Code 0.5}.
+@End @Section

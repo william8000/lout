@@ -4,6 +4,10 @@
 @Begin
 @PP
 Lout normally produces output that will print without mishap on
+graphs. @RawIndex { graphs (statistical) }
+graphs.errors @SubIndex { errors }
+errors. @RawIndex { errors }
+errors.in.graphs @SubIndex { in graphs }
 any PostScript device.  However, some of the options of @Code "@Graph"
 and all of the data and labels are passed through Lout without
 checking.  Any errors in this material will not be detected
@@ -27,10 +31,14 @@ has run out of memory.  All the data is stored in the printer while the
 graph is being printed, and it remains there until the end of the current
 page, when it is discarded and all memory consumed by the graph is
 reclaimed.  If you do run out of memory, one option is to try
-@ID @Code {
-"@Graph"
-"    save { yes }"
-"..."
+graphs. @RawIndex { graphs (statistical) }
+graphs.save @SubIndex { @Code save option }
+save. @RawIndex { @Code "save" option }
+save.in.graphs @SubIndex { in graphs }
+@ID @Code @Verbatim {
+@Graph
+    save { yes }
+...
 }
 This causes the memory used by the graph to be reclaimed as soon as
 the graph is printed, which might well solve your problem if you have

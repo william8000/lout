@@ -110,4 +110,15 @@ terminated by the start of the range of the next.
 All four symbols yield the value @@Null where they appear.  If they
 do not occupy entire components of their galley, they are silently
 ignored.
+@PP
+Owing to limitations in the way header components are implemented, the
+following object types are not allowed inside them, and Basser Lout will
+complain and quit if it finds any of them:  galleys, receptive or
+recursive symbols, cross references, @@PageLabel, @@HExpand, @@VExpand,
+@@HCover, @@VCover, and @@Scale when it has an empty left parameter.
+In addition, if more than three copies of the same running header are
+printed on the same page, their horizontal positions will become
+confused, probably resulting in the apparent disappearance of all but the
+last three copies.  (The magic number 3 can be increased by recompiling
+the Lout source with the @F MAX_HCOPIES constant increased.)
 @End @Section

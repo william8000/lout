@@ -93,14 +93,14 @@ Fortunately, each display symbol has a `raw' version, which
 means that no space is inserted above or below the display.  Instead,
 raw.displays @Index { raw displays }
 you must insert it yourself using paragraph symbols:
-@ID @OneRow @Code {
-"preceding text"
-"@DP"
-"@RawAlignedDisplay @Eq { ... }"
-"@DP"
-"@RawAlignedNumberedDisplay @Eq { ... }"
-"@DP"
-"following text"
+@ID @OneRow @Code @Verbatim {
+preceding text
+@DP
+@RawAlignedDisplay @Eq { ... }
+@DP
+@RawAlignedNumberedDisplay @Eq { ... }
+@DP
+following text
 }
 You get the right spacing by placing {@Code "@DP"} symbols before,
 between, and after each display; and you get to use the specialized

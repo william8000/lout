@@ -4,7 +4,7 @@
 /*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
 /*  COPYRIGHT (C) 2000 Jeffrey H. Kingston                                   */
 /*                                                                           */
-/*  Version 2.2, 17 September 2001                                           */
+/*  Version 2.3, November 2002                                               */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -134,11 +134,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define	FALSE			0
 #define	TRUE			1
 #define	BOOLEAN			unsigned
 #define MAX_CHAR		256
 #define is_whitespace(ch) ((ch)==' ' || (ch)=='\t' || (ch)=='\n' || (ch)=='\f')
+#define U (unsigned char *)
 
 /*****************************************************************************/
 /*                                                                           */
@@ -165,15 +167,15 @@
 /*****************************************************************************/
 
 typedef struct {
-  char *first;
-  char *second;
+  unsigned char *first;
+  unsigned char *second;
 } CHAR_PAIR;
 
 CHAR_PAIR pairs[] = {
-  { "(", ")" },
-  { "{", "}" },
-  { "[", "]" },
-  { "<", ">" },
+  { (unsigned char *) "(", (unsigned char *) ")" },
+  { (unsigned char *) "{", (unsigned char *) "}" },
+  { (unsigned char *) "[", (unsigned char *) "]" },
+  { (unsigned char *) "<", (unsigned char *) ">" },
   { NULL, NULL }
 };
 
@@ -189,60 +191,68 @@ CHAR_PAIR pairs[] = {
 
 #define AllCharacters	NULL	/* code will recognize NULL and do this */
 
-char AllPrintable[] = 
+unsigned char AllPrintable[] = 
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ;
 
-char AllPrintablePlusNL[] =
+unsigned char AllPrintablePlusNL[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n" ;
 
-char AllPrintablePlusTab[] =
+unsigned char AllPrintablePlusTab[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\t" ;
 
-char AllPrintableTabNL[] =
+unsigned char AllPrintableTabNL[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t" ;
 
-char AllPrintableTabNLFF[] =
+unsigned char AllPrintableTabNLFF[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t\f" ;
 
-char Letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ;
+unsigned char Letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ;
 
-char Letter_Digit[] =
+unsigned char Letter_Digit[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789" ;
 
 #define SepLetters 							\
-"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",	\
-"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",	\
-"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",	\
-"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+U "A", U "B", U "C", U "D", U "E", U "F", U "G", U "H", U "I", U "J",	\
+U "K", U "L", U "M", U "N", U "O", U "P", U "Q", U "R", U "S", U "T",	\
+U "U", U "V", U "W", U "X", U "Y", U "Z",				\
+U "a", U "b", U "c", U "d", U "e", U "f", U "g", U "h", U "i", U "j",	\
+U "k", U "l", U "m", U "n", U "o", U "p", U "q", U "r", U "s", U "t",	\
+U "u", U "v", U "w", U "x", U "y", U "z"
 
-#define SepDigits "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+#define SepDigits							\
+U "0", U "1", U "2", U "3", U "4", U "5", U "6", U "7", U "8", U "9"
 
-#define HexDigits "A", "a", "B", "b", "C", "c", "D", "d", "E", "e", "F", "f"
+#define HexDigits							\
+U "A", U "a", U "B", U "b", U "C", U "c", U "D", U "d", U "E", U "e",	\
+U "F", U "f"
 
-#define SepPunct  "/", "(", "[", "{", "<", "!", "%", "#", "|", ",",	\
-		  ":", ";", "$", "\"","^", "&", "*", "-", "=", "+",	\
-		  "~", "'", "@", "?", ".", "`"
+#define SepPunct							\
+U "/", U "(", U "[", U "{",  U "<", U "!", U "%", U "#", U "|", U ",",	\
+U ":", U ";", U "$", U "\"", U "^", U "&", U "*", U "-", U "=", U "+",	\
+U "~", U "'", U "@", U "?",  U ".", U "`"
 
-#define BktPunct  "",  "(", "[", "{", "<", "",  "",  "",  "",  "",	\
-		  "",  "",  "",  "",  "",  "",  "",  "",  "",  "",	\
-		  "",  "",  "",  "",  "",  ""
+#define BktPunct							\
+U "",  U "(", U "[", U "{",  U "<", U "",  U "",  U "",  U "",  U "",	\
+U "",  U "",  U "",  U "",   U "",  U "",  U "",  U "",  U "",  U "",	\
+U "",  U "",  U "",  U "",   U "",  U ""
 
-#define EndPunct  "/", ")", "]", "}", ">", "!", "%", "#", "|", ",",	\
-		  ":", ";", "$", "\"","^", "&", "*", "-", "=", "+",	\
-		  "~", "'", "@", "?", ".", "`"
+#define EndPunct							\
+U "/", U ")", U "]", U "}",  U ">", U "!", U "%", U "#", U "|", U ",",	\
+U ":", U ";", U "$", U "\"", U "^", U "&", U "*", U "-", U "=", U "+",	\
+U "~", U "'", U "@", U "?",  U ".", U "`"
 
 #define	PercentLetters							\
-"%A", "%B", "%C", "%D", "%E", "%F", "%G", "%H", "%I", "%J", "%K",	\
-"%L", "%M", "%N", "%O", "%P", "%Q", "%R", "%S", "%T", "%U", "%V",	\
-"%W", "%X", "%Y", "%Z",							\
-"%a", "%b", "%c", "%d", "%e", "%f", "%g", "%h", "%i", "%j", "%k",	\
-"%l", "%m", "%n", "%o", "%p", "%q", "%r", "%s", "%t", "%u", "%v",	\
-"%w", "%x", "%y", "%z", "%_"
+U "%A", U "%B", U "%C", U "%D", U "%E", U "%F", U "%G", U "%H", U "%I",	\
+U "%J", U "%K", U "%L", U "%M", U "%N", U "%O", U "%P", U "%Q", U "%R",	\
+U "%S", U "%T", U "%U", U "%V", U "%W", U "%X", U "%Y", U "%Z",		\
+U "%a", U "%b", U "%c", U "%d", U "%e", U "%f", U "%g", U "%h", U "%i",	\
+U "%j", U "%k", U "%l", U "%m", U "%n", U "%o", U "%p", U "%q", U "%r",	\
+U "%s", U "%t", U "%u", U "%v", U "%w", U "%x", U "%y", U "%z", U "%_"
 
 
 /*****************************************************************************/
@@ -476,209 +486,211 @@ char Letter_Digit[] =
 #define	PRINT_COMMAND_ONLY	6
 
 typedef struct token_rec {
-  char *name;
+  unsigned char *name;
   int print_style;
-  char *command, *alternate_command, *following_command;
+  unsigned char *command, *alternate_command, *following_command;
   BOOLEAN start_line_only;
-  char *starts[MAX_STARTS];
-  char *starts2[MAX_STARTS2];
-  char *brackets2[MAX_STARTS2];
-  char *ends2[MAX_STARTS2];
-  char *legal;
-  char *escape;
-  char *escape_legal;
-  char *inner_escape;
-  char *end_inner_escape;
-  char *bracket_delimiter;
-  char *end_delimiter;
+  unsigned char *starts[MAX_STARTS];
+  unsigned char *starts2[MAX_STARTS2];
+  unsigned char *brackets2[MAX_STARTS2];
+  unsigned char *ends2[MAX_STARTS2];
+  unsigned char *legal;
+  unsigned char *escape;
+  unsigned char *escape_legal;
+  unsigned char *inner_escape;
+  unsigned char *end_inner_escape;
+  unsigned char *bracket_delimiter;
+  unsigned char *end_delimiter;
   BOOLEAN end_start_line_only;
   BOOLEAN want_two_ends;
 
   /* The following options are initialized by the program, so don't you      */
-  char chtype[MAX_CHAR];  	  /* character types within token            */
-  char escape_chtype[MAX_CHAR];	  /* character types after escape            */
+  unsigned char chtype[MAX_CHAR];		/* char types within token   */
+  unsigned char escape_chtype[MAX_CHAR];	/* char types after escape   */
 } TOKEN;
 
 
 /*****************************************************************************/
 /*                                                                           */
 /*  Tokens defining strings and literal characters in non-Perl languages.    */
+/*  NB "U" is a cast to (unsigned char *)                                    */
 /*                                                                           */
 /*****************************************************************************/
 
 TOKEN CStringToken = {
-  "string",		/* used by error messages involving this token      */
+  U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",		/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "\"" },		/* strings begin with a " character                 */
+  { U "\"" },		/* strings begin with a " character                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintable,		/* inside, any printable is OK		            */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllPrintablePlusNL,	/* after escape char, any printable char or nl OK   */
-  "",			/* strings do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "\"",			/* strings end with a " character                   */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "\"",		/* strings end with a " character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN CCharacterToken = {
-  "character",		/* used by error messages involving this token      */
+  U "character",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PC",		/* Lout command for formatting characters           */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PC",		/* Lout command for formatting characters           */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "'" },		/* characters begin with a ' character              */
+  { U "'" },		/* characters begin with a ' character              */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintable,		/* inside, any printable character is OK            */
-  "\\",			/* within characters, \\ is the escape character    */
+  U "\\",		/* within characters, \\ is the escape character    */
   AllPrintable,		/* after escape char, any printable char is OK      */
-  "",			/* characters do not permit "inner escapes"         */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "'",			/* characters end with a ' character                */
+  U "",			/* characters do not permit "inner escapes"         */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "'",		/* characters end with a ' character                */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 
 TOKEN EiffelStringToken = {
-  "string",		/* used by error messages involving this token      */
+  U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",			/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "\"" },		/* strings begin with a " character                 */
+  { U "\"" },		/* strings begin with a " character                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintable,		/* inside, any printable except " is OK             */
-  "%",			/* within strings, % is the escape character        */
-  AllPrintable,		/* after escape char, any printable char is OK      */ "",			/* strings do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "\"",			/* strings end with a " character                   */
+  U "%",		/* within strings, % is the escape character        */
+  AllPrintable,		/* after escape char, any printable char is OK      */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "\"",		/* strings end with a " character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN EiffelCharacterToken = {
-  "character",		/* used by error messages involving this token      */
+  U "character",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PC",		/* Lout command for formatting characters           */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PC",		/* Lout command for formatting characters           */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "'" },		/* characters begin with a ' character              */
+  { U "'" },		/* characters begin with a ' character              */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintable,		/* inside, any printable except ' is OK             */
-  "%",			/* within characters, % is the escape character     */
+  U "%",		/* within characters, % is the escape character     */
   AllPrintable,		/* after escape char, any printable char is OK      */
-  "",			/* characters do not permit "inner escapes"         */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "'",			/* characters end with a ' character                */
+  U "",			/* characters do not permit "inner escapes"         */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "'",		/* characters end with a ' character                */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 
 TOKEN PythonDblStringToken = {
-  "string",		/* used by error messages involving this token      */
+  U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",			/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "\"" },		/* strings begin with a " character                 */
+  { U "\"" },		/* strings begin with a " character                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintable,		/* inside, any printable is OK		            */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllPrintablePlusNL,	/* after escape char, any printable char or nl OK   */
-  "",			/* strings do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "\"",			/* strings end with a " character                   */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "\"",		/* strings end with a " character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PythonSnglStringToken = {
-  "string",		/* used by error messages involving this token      */
+  U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",		/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "'" },		/* strings begin with a ' character                 */
+  { U "'" },		/* strings begin with a ' character                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintable,		/* inside, any printable is OK		            */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",			/* within strings, \\ is the escape character       */
   AllPrintablePlusNL,	/* after escape char, any printable char or nl OK   */
-  "",			/* strings do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "'",			/* strings end with a ' character                   */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "'",			/* strings end with a ' character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PythonTriSnglStringToken = {
-  "string",		/* used by error messages involving this token      */
+  U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",		/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "'''" },		/* strings begin with '''                 */
+  { U "'''" },		/* strings begin with '''                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintableTabNL,	/* inside, any printable is OK		            */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllPrintableTabNL,	/* after escape char, any printable char or nl OK   */
-  "",			/* strings do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "'''",		/* strings end with '''                   */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "'''",		/* strings end with '''                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PythonTriDblStringToken = {
-  "string",		/* used by error messages involving this token      */
+  U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",			/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "\"\"\"" },		/* strings begin with """                 */
+  { U "\"\"\"" },	/* strings begin with """                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
-  AllPrintableTabNL,		/* inside, any printable is OK		            */
-  "\\",			/* within strings, \\ is the escape character       */
+  AllPrintableTabNL,	/* inside, any printable is OK		            */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllPrintableTabNL,	/* after escape char, any printable char or nl OK   */
-  "",			/* strings do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "\"\"\"",			/* strings end with """                    */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "\"\"\"",		/* strings end with """                    */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -693,23 +705,23 @@ TOKEN PythonTriDblStringToken = {
 /*****************************************************************************/
 
 TOKEN IdentifierToken = {
-  "identifier",		/* used by error messages involving this token      */
+  U "identifier",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PI",			/* Lout command for formatting identifiers          */
-  "@PK",			/* Alternate command (for keywords)                 */
-  "",			/* no following command                             */
+  U "@PI",		/* Lout command for formatting identifiers          */
+  U "@PK",		/* Alternate command (for keywords)                 */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { SepLetters, "_" },	/* identifiers begin with any letter or _           */
+  { SepLetters, U "_" }, /* identifiers begin with any letter or _          */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   Letter_Digit,		/* inside, letters, underscores, digits are OK      */
-  "",			/* no escape character within identifiers           */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* identifiers do not permit "inner escapes"        */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* identifiers do not end with a delimiter          */
+  U "",			/* no escape character within identifiers           */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* identifiers do not permit "inner escapes"        */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* identifiers do not end with a delimiter          */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -722,23 +734,23 @@ TOKEN IdentifierToken = {
 /*****************************************************************************/
 
 TOKEN NumberToken = {
-  "number",		/* used by error messages involving this token      */
+  U "number",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PN",		/* Lout command for formatting numbers              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PN",		/* Lout command for formatting numbers              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
   { SepDigits },	/* numbers must begin with a digit                  */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
-  "0123456789.eE",	/* inside, digits, decimal point, exponent          */
-  "",			/* no escape character within numbers               */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* numbers do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* numbers do not end with a delimiter              */
+  U "0123456789.eE",	/* inside, digits, decimal point, exponent          */
+  U "",			/* no escape character within numbers               */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* numbers do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* numbers do not end with a delimiter              */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -751,112 +763,112 @@ TOKEN NumberToken = {
 /*****************************************************************************/
 
 TOKEN CCommentToken = {
-  "comment",		/* used by error messages involving this token      */
+  U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PC",		/* Lout command for formatting comments             */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PC",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "/*" },		/* comments begin with this character pair          */
+  { U "/*" },		/* comments begin with this character pair          */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintableTabNLFF,	/* inside, any printable char, tab, nl, ff is OK    */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* C comments do not permit "inner escapes"         */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "*/",			/* comments end with this character pair            */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* C comments do not permit "inner escapes"         */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "*/",		/* comments end with this character pair            */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN CPPCommentToken = {
-  "comment",		/* used by error messages involving this token      */
+  U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PC",		/* Lout command for formatting comments             */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PC",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "//" },		/* comments begin with this character pair          */
+  { U "//" },		/* comments begin with this character pair          */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK (not NL)        */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* C comments do not permit "inner escapes"         */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no end delimiter (end of line will end it)       */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* C comments do not permit "inner escapes"         */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no end delimiter (end of line will end it)       */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 
 TOKEN EiffelCommentToken = {
-  "comment",		/* used by error messages involving this token      */
+  U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PC",		/* Lout command for formatting comments             */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PC",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "--" },		/* comments begin with this character pair          */
+  { U "--" },		/* comments begin with this character pair          */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK                 */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "`",			/* start of "inner escape" in Eiffel comment        */
-  "'",			/* end of "inner escape" in Eiffel comment          */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no ending delimiter; end of line will end it     */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "`",		/* start of "inner escape" in Eiffel comment        */
+  U "'",		/* end of "inner escape" in Eiffel comment          */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no ending delimiter; end of line will end it     */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN BlueCommentToken = {
-  "comment",		/* used by error messages involving this token      */
+  U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PC",		/* Lout command for formatting comments             */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PC",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "==", "--" },	/* comments begin with this character pair          */
+  { U "==", U "--" },	/* comments begin with this character pair          */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK                 */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "`",			/* start of "inner escape" in Blue comment          */
-  "'",			/* end of "inner escape" in Blue comment            */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no ending delimiter; end of line will end it     */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "`",		/* start of "inner escape" in Blue comment          */
+  U "'",		/* end of "inner escape" in Blue comment            */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no ending delimiter; end of line will end it     */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PythonCommentToken = {
-  "comment",		/* used by error messages involving this token      */
+  U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PC",		/* Lout command for formatting comments             */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PC",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "#" },		/* comments begin with this character pair          */
+  { U "#" },		/* comments begin with this character pair          */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK (not NL)        */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* C comments do not permit "inner escapes"         */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no end delimiter (end of line will end it)       */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* Python comments do not permit "inner escapes"    */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no end delimiter (end of line will end it)       */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -871,90 +883,112 @@ TOKEN PythonCommentToken = {
 /*****************************************************************************/
 
 TOKEN CCommentEscapeToken = {
-  "Lout escape",	/* used by error messages involving this token      */
+  U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
-  "",			/* no Lout command since we are printing raw        */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "",			/* no Lout command since we are printing raw        */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "/*@" },		/* escape comments begin with this delimiter        */
+  { U "/*@" },		/* escape comments begin with this delimiter        */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintableTabNLFF,	/* inside, any printable char, tab, nl, ff is OK    */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* no "inner escape" in escape comments             */
-  "",			/* so no end of "inner escape" either               */
-  "",			/* no bracketing delimiter			    */
-  "*/",			/* comments end with this character pair            */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* no "inner escape" in escape comments             */
+  U "",			/* so no end of "inner escape" either               */
+  U "",			/* no bracketing delimiter			    */
+  U "*/",		/* comments end with this character pair            */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN CPPCommentEscapeToken = {
-  "Lout escape",	/* used by error messages involving this token      */
+  U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED, /* print this token unformatted                  */
-  "",			/* no Lout command since we are printing raw        */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "",			/* no Lout command since we are printing raw        */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "//@" },		/* escape comments begin with this delimiter        */
+  { U "//@" },		/* escape comments begin with this delimiter        */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK                 */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* no "inner escape" in escape comments             */
-  "",			/* so no end of "inner escape" either               */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no end delimiter (end of line will end it)       */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* no "inner escape" in escape comments             */
+  U "",			/* so no end of "inner escape" either               */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no end delimiter (end of line will end it)       */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 
 TOKEN EiffelCommentEscapeToken = {
-  "Lout escape",	/* used by error messages involving this token      */
+  U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
-  "",			/* no Lout command since we are printing raw        */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "",			/* no Lout command since we are printing raw        */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "--@" },		/* escape comments begin with this delimiter        */
+  { U "--@" },		/* escape comments begin with this delimiter        */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK                 */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* no "inner escape" in escape comments             */
-  "",			/* so no end of "inner escape" either               */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no ending delimiter; end of line will end it     */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* no "inner escape" in escape comments             */
+  U "",			/* so no end of "inner escape" either               */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no ending delimiter; end of line will end it     */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN BlueCommentEscapeToken = {
-  "Lout escape",	/* used by error messages involving this token      */
+  U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
-  "",			/* no Lout command since we are printing raw        */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "",			/* no Lout command since we are printing raw        */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "==@", "--@" },	/* escape comments begin with these delimiters      */
+  { U "==@", U "--@" },	/* escape comments begin with these delimiters      */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK                 */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* no "inner escape" in escape comments             */
-  "",			/* so no end of "inner escape" either               */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no ending delimiter; end of line will end it     */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* no "inner escape" in escape comments             */
+  U "",			/* so no end of "inner escape" either               */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no ending delimiter; end of line will end it     */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN PythonCommentEscapeToken = {
+  U "Lout escape",	/* used by error messages involving this token      */
+  PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
+  U "",			/* no Lout command since we are printing raw        */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { U "#@" },		/* escape comments begin with this delimiter        */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintablePlusTab,	/* inside, any printable char is OK (not NL)        */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* no "inner escape" in escape comments             */
+  U "",			/* so no end of "inner escape" either               */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no ending delimiter; end of line will end it     */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -969,21 +1003,21 @@ TOKEN BlueCommentEscapeToken = {
 
 #define FixedToken(str, command) /* define fixed-string token */	\
 {									\
-  str,			/* name used for debugging only       */	\
+  U str,		/* name used for debugging only       */	\
   PRINT_WHOLE_QUOTED,	/* print this token as usual          */	\
-  command,		/* Lout command for formatting this   */	\
-  "",			/* no alternate command               */	\
-  "",			/* no following command               */	\
+  U command,		/* Lout command for formatting this   */	\
+  U "",			/* no alternate command               */	\
+  U "",			/* no following command               */	\
   FALSE,		/* token not just start of line       */	\
-  { str },		/* token begins (and ends!) with this */	\
+  { U str },		/* token begins (and ends!) with this */	\
   { NULL },		/* no start2 needed		      */	\
   { NULL },		/* so no brackets2 either	      */	\
   { NULL },		/* so no end2 either		      */	\
-  "",			/* nothing inside, since no inside    */	\
-  "", "",		/* no escape character                */	\
-  "", "",		/* no inner escape; no end inner esc  */	\
-  "",			/* no bracketing delimiter	      */	\
-  "",			/* no ending delimiter                */	\
+  U "",			/* nothing inside, since no inside    */	\
+  U "", U "",		/* no escape character                */	\
+  U "", U "",		/* no inner escape; no end inner esc  */	\
+  U "",			/* no bracketing delimiter	      */	\
+  U "",			/* no ending delimiter                */	\
   FALSE,		/* end not have to be at line start   */	\
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
@@ -1032,21 +1066,21 @@ TOKEN ImpliesToken		= FixedToken("=>", "implies @A @PO");
 
 #define NoParameterToken(str, command) /* define fixed-string token */	\
 {									\
-  str,			/* name used for debugging only       */	\
+  U str,		/* name used for debugging only       */	\
   PRINT_COMMAND_ONLY,	/* print only the command             */	\
-  command,		/* Lout command for formatting this   */	\
-  "",			/* no alternate command               */	\
-  "",			/* no following command               */	\
+  U command,		/* Lout command for formatting this   */	\
+  U "",			/* no alternate command               */	\
+  U "",			/* no following command               */	\
   FALSE,		/* token not just start of line       */	\
-  { str },		/* token begins (and ends!) with this */	\
+  { U str },		/* token begins (and ends!) with this */	\
   { NULL },		/* no start2 needed		      */	\
   { NULL },		/* so no bracket2 either	      */	\
   { NULL },		/* so no end2 either		      */	\
-  "",			/* nothing inside, since no inside    */	\
-  "", "",		/* no escape character                */	\
-  "", "",		/* no inner escape; no end inner esc  */	\
-  "",			/* no bracketing delimiter            */	\
-  "",			/* no ending delimiter                */	\
+  U "",			/* nothing inside, since no inside    */	\
+  U "", U "",		/* no escape character                */	\
+  U "", U "",		/* no inner escape; no end inner esc  */	\
+  U "",			/* no bracketing delimiter            */	\
+  U "",			/* no ending delimiter                */	\
   FALSE,		/* end not have to be at line start   */	\
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
@@ -1115,109 +1149,109 @@ TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" ) ;
 
 
 TOKEN PerlSingleQuoteStringToken = {
-  "''-string",		/* used by error messages involving this token      */
+  U "''-string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",		/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "'" },		/* strings begin with a ' character                 */
+  { U "'" },		/* strings begin with a ' character                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* inside, any character at all is OK               */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllCharacters,	/* after escape, any character is OK (trust us)     */
-  "", "",		/* no "inner escapes"; no end innner escape         */
-  "",			/* no bracketing delimiter			    */
-  "\'",			/* strings end with a ' character                   */
+  U "", U "",		/* no "inner escapes"; no end innner escape         */
+  U "",			/* no bracketing delimiter			    */
+  U "\'",		/* strings end with a ' character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PerlDoubleQuoteStringToken = {
-  "\"\"-string",	/* used by error messages involving this token      */
+  U "\"\"-string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",		/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "\"" },		/* strings begin with a " character                 */
+  { U "\"" },		/* strings begin with a " character                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* inside, any character at all is OK               */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllCharacters,	/* after escape char, any character at all is OK    */
-  "", "",		/* no "inner escapes"; no end innner escape         */
-  "",			/* no bracketing delimiter			    */
-  "\"",			/* strings end with a " character                   */
+  U "", U "",		/* no "inner escapes"; no end innner escape         */
+  U "",			/* no bracketing delimiter			    */
+  U "\"",			/* strings end with a " character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PerlBackQuoteStringToken = {
-  "``-string",		/* used by error messages involving this token      */
+  U "``-string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",			/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "`" },		/* strings begin with a ` character                 */
+  { U "`" },		/* strings begin with a ` character                 */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* inside, any character at all is OK               */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllCharacters,	/* after escape char, any character at all is OK    */
-  "", "",		/* no "inner escapes"; no end innner escape         */
-  "",			/* no bracketing delimiter			    */
-  "`",			/* strings end with a ` character                   */
+  U "", U "",		/* no "inner escapes"; no end innner escape         */
+  U "",			/* no bracketing delimiter			    */
+  U "`",		/* strings end with a ` character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 
 TOKEN PerlQTypeStringToken = {
-  "q-type string",	/* used by error messages involving this token      */
+  U "q-type string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",		/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "q", "qq", "qx", "qw", "qr", "m" },	/* q-type strings begin with these  */
+  { U "q", U "qq", U "qx", U "qw", U "qr", U "m" },/* q-type string begins  */
   { SepPunct },		/* start2 can be any punctuation character	    */
   { BktPunct },		/* bracketing delimiters to match SepPunct	    */
   { EndPunct },		/* end2 must match start2			    */
   AllCharacters,	/* inside, any character at all is OK               */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllCharacters,	/* after escape char, any character at all is OK    */
-  "",			/* strings do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* will be using bracket2 for bracket delimiter     */
-  "",			/* will be using end2 for the end delimiter here    */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* will be using bracket2 for bracket delimiter     */
+  U "",			/* will be using end2 for the end delimiter here    */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PerlSTypeStringToken = {
-  "s-type string",	/* used by error messages involving this token      */
+  U "s-type string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",		/* Lout command for formatting strings              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "s", "y", "tr" },	/* s-type strings begin with these		    */
+  { U "s", U "y", U "tr" }, /* s-type strings begin with these		    */
   { SepPunct },		/* start2 can be any punctuation character	    */
   { BktPunct },		/* bracketing delimiters to match SepPunct	    */
   { EndPunct },		/* end2 must match start2			    */
   AllCharacters,	/* inside, any character at all is OK               */
-  "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllCharacters,	/* after escape char, any character at all is OK    */
-  "",			/* strings do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* will be using bracket2 for bracket delimiter     */
-  "",			/* will be using end2 for the end delimiter here    */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* will be using bracket2 for bracket delimiter     */
+  U "",			/* will be using end2 for the end delimiter here    */
   FALSE,		/* end delimiter does not have to be at line start  */
   TRUE,			/* need to see end delimiter twice to stop	    */
 };
@@ -1237,23 +1271,23 @@ TOKEN PerlSTypeStringToken = {
 
 #define PerlREToken(start, com)						\
 {									\
-  "regex",		/* used by error messages                 */	\
+  U "regex",		/* used by error messages                 */	\
   PRINT_NODELIMS_QUOTED,/* no delims since we supply them         */	\
-  com,			/* the command                            */	\
-  "",			/* no alternate command                   */	\
-  "@PS{\"/\"}",		/* following command (final /)            */	\
+  U com,			/* the command                    */	\
+  U "",			/* no alternate command                   */	\
+  U "@PS{\"/\"}",		/* following command (final /)    */	\
   FALSE,		/* token allowed not just start of line   */	\
-  { start },		/* preceding token in this case           */	\
-  { "/", " /", "\t/", "  /", " \t/", "\t /", "\t\t/" }, /* start2 */	\
-  { "",  "",   "",    "",    "",     "",     ""      }, /* bracket2 */	\
-  { "/",  "/", "/",   "/",   "/",    "/",    "/"     }, /* end2   */	\
+  { U start },		/* preceding token in this case           */	\
+  { U "/", U " /", U "\t/", U "  /", U " \t/", U "\t /", U "\t\t/" },	\
+  { U "",  U "",   U "",    U "",    U "",     U "",     U ""      },	\
+  { U "/", U  "/", U "/",   U "/",   U "/",    U "/",    U "/"     },	\
   AllCharacters,	/* any character OK inside                */	\
-  "\\",			/* \\ is the escape character             */	\
+  U "\\",		/* \\ is the escape character             */	\
   AllCharacters,	/* after escape char, any is OK           */	\
-  "",			/* no inner escapes                       */	\
-  "",			/* no end innner escape either            */	\
-  "",			/* will be using bracket2 here            */	\
-  "",			/* will be using end2 here                */	\
+  U "",			/* no inner escapes                       */	\
+  U "",			/* no end innner escape either            */	\
+  U "",			/* will be using bracket2 here            */	\
+  U "",			/* will be using end2 here                */	\
   FALSE,		/* no need to end at line start           */	\
   FALSE,		/* don't want end delimiter twice         */	\
 }
@@ -1279,23 +1313,23 @@ TOKEN PerlRegExpWhile   = PerlREToken("while",  "@PK{while} @PS{\"/\"}@PS");
 
 TOKEN PerlRegExpStartLineToken =
 {
-  "regex",		/* used by error messages                 */
+  U "regex",		/* used by error messages                 */
   PRINT_WHOLE_QUOTED,	/* we can print the whole thing this time */
-  "@PS",		/* the command                            */
-  "",			/* no alternate command                   */
-  "",			/* no following command                   */
+  U "@PS",		/* the command                            */
+  U "",			/* no alternate command                   */
+  U "",			/* no following command                   */
   TRUE,			/* token allowed only at start of line    */
-  { "/" },		/* starting delimiter (so easy!)          */
+  { U "/" },		/* starting delimiter (so easy!)          */
   { NULL },		/* no start2				  */
   { NULL },		/* so no bracket2 either		  */
   { NULL },		/* so no end2 either			  */
   AllCharacters,	/* any character OK inside                */
-  "\\",			/* \\ is the escape character             */
+  U "\\",		/* \\ is the escape character             */
   AllCharacters,	/* after escape char, any is OK           */
-  "",			/* no inner escapes                       */
-  "",			/* no end innner escape either            */
-  "",			/* no bracketing delimiter                */
-  "/",			/* ending delimiter                       */
+  U "",			/* no inner escapes                       */
+  U "",			/* no end innner escape either            */
+  U "",			/* no bracketing delimiter                */
+  U "/",		/* ending delimiter                       */
   FALSE,		/* no need to end at line start           */
   FALSE,		/* don't want end delimiter twice         */
 };
@@ -1370,21 +1404,21 @@ TOKEN HereBLAbq = X("<<``",     "\n",    "@PO{<<}@PS{\"``\"}@PS",         sBLA);
 
 #define HereToken(startstr, endstr)					\
 {									\
-  "here-document",	/* used by error messages                 */	\
+  U "here-document",	/* used by error messages                 */	\
   PRINT_WHOLE_QUOTED,	/* as usual                               */	\
-  "@PS",		/* here documents are strings             */	\
-  "",			/* no alternate command                   */	\
-  "",			/* no following command                   */	\
+  U "@PS",		/* here documents are strings             */	\
+  U "",			/* no alternate command                   */	\
+  U "",			/* no following command                   */	\
   FALSE,		/* token allowed not just start of line   */	\
-  { startstr },		/* starting delimiter                     */	\
+  { U startstr },	/* starting delimiter                     */	\
   { NULL },		/* no start2				  */	\
   { NULL },		/* no bracket2				  */	\
   { NULL },		/* no end2				  */	\
   AllCharacters,	/* any character OK inside                */	\
-  "", "",		/* no escape character                    */	\
-  "", "",		/* no inner escapes                       */	\
-  "",			/* no bracketing delimiter		  */	\
-  endstr,		/* token ends with this                   */	\
+  U "", U "",		/* no escape character                    */	\
+  U "", U "",		/* no inner escapes                       */	\
+  U "",			/* no bracketing delimiter		  */	\
+  U endstr,		/* token ends with this                   */	\
   TRUE,			/* must be found at line start		  */	\
   FALSE,		/* don't want end delimiter twice         */	\
 }
@@ -1432,34 +1466,34 @@ TOKEN HereBLAbq = HereToken("<<``",     "\n");
 /*****************************************************************************/
 
 TOKEN PerlIdentifierToken = {
-  "identifier",		/* used by error messages involving this token      */
+  U "identifier",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PI",		/* Lout command for formatting identifiers          */
-  "@PK",		/* Alternate command (for keywords)                 */
-  "",			/* no following command                             */
+  U "@PI",		/* Lout command for formatting identifiers          */
+  U "@PK",		/* Alternate command (for keywords)                 */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { SepLetters, "_", "$", "@", PercentLetters},	/* identifier starts        */
+  { SepLetters, U "_", U "$", U "@", PercentLetters},	/* ident. starts    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   Letter_Digit,		/* inside, letters, underscores, digits are OK      */
-  "",			/* no escape character within identifiers           */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* identifiers do not permit "inner escapes"        */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* identifiers do not end with a delimiter          */
+  U "",			/* no escape character within identifiers           */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* identifiers do not permit "inner escapes"        */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* identifiers do not end with a delimiter          */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 
 TOKEN PerlSpecialIdentifierToken = {
-  "special variable",	/* used by error messages involving this token      */
+  U "special variable",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PI",		/* Lout command for formatting identifiers          */
-  "",			/* Alternate command (for keywords)                 */
-  "",			/* no following command                             */
+  U "@PI",		/* Lout command for formatting identifiers          */
+  U "",			/* Alternate command (for keywords)                 */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
   {
     /* Taken from 5.6.0's perlvar.pod */
@@ -1468,22 +1502,24 @@ TOKEN PerlSpecialIdentifierToken = {
     /* wrinkle. We only list the first 9 regex match variables.            */
 
     /* Only the ones not recognized elsewhere are being kept now */
-    "$&", "$`", "$'", "$+", "@+", "$*", "$.", "$/", "$|", "$,", "$\\", "$\"",
-    "$;", "$#", "$%", "$=", "$-", "@-", "$~", "$^", "$:", "$^L", "$^A", "$?",
-    "$!", "$^E", "$@", "$$", "$<", "$>", "$(", "$)", "$0", "$[", "$]", "$^C",
-    "$^D", "$^F", "$^H", "%^H", "$^I", "$^M", "$^O", "$^P", "$^R", "$^S",
-    "$^T", "$^V", "$^W", "${^WARNING_BITS}", "${^WIDE_SYSTEM_CALLS}", "$^X",
+    U "$&",  U "$`",  U "$'",  U "$+",  U "@+",  U "$*",  U "$.",  U "$/",
+    U "$|",  U "$,",  U "$\\", U "$\"", U "$;",  U "$#",  U "$%",  U "$=",
+    U "$-",  U "@-",  U "$~",  U "$^",  U "$:",  U "$^L", U "$^A", U "$?",
+    U "$!",  U "$^E", U "$@",  U "$$",  U "$<",  U "$>",  U "$(",  U "$)",
+    U "$0",  U "$[",  U "$]",  U "$^C", U "$^D", U "$^F", U "$^H", U "%^H",
+    U "$^I", U "$^M", U "$^O", U "$^P", U "$^R", U "$^S", U "$^T", U "$^V",
+    U "$^W", U "${^WARNING_BITS}", U "${^WIDE_SYSTEM_CALLS}", U "$^X",
   },
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  "",			/* nothing allowed inside, since ends after start   */
-  "",			/* no escape character within identifiers           */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* identifiers do not permit "inner escapes"        */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* identifiers do not end with a delimiter          */
+  U "",			/* nothing allowed inside, since ends after start   */
+  U "",			/* no escape character within identifiers           */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* identifiers do not permit "inner escapes"        */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* identifiers do not end with a delimiter          */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1509,68 +1545,68 @@ TOKEN PerlSpecialIdentifierToken = {
 /*****************************************************************************/
 
 TOKEN PerlLiteralNumberToken = {
-  "number",		/* used by error messages involving this token      */
+  U "number",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PN",		/* Lout command for formatting numbers              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PN",		/* Lout command for formatting numbers              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
   { SepDigits },	/* numbers must begin with a digit                  */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  "0123456789.eE_",	/* inside, digits, point, exponent, underscore      */
-  "",			/* no escape character within numbers               */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* numbers do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* numbers do not end with a delimiter              */
+  U "0123456789.eE_",	/* inside, digits, point, exponent, underscore      */
+  U "",			/* no escape character within numbers               */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* numbers do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* numbers do not end with a delimiter              */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PerlHexNumberToken = {
-  "number",		/* used by error messages involving this token      */
+  U "number",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PN",		/* Lout command for formatting numbers              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PN",		/* Lout command for formatting numbers              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "0x" },		/* hex numbers must begin with 0x		    */
+  { U "0x" },		/* hex numbers must begin with 0x		    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  "0123456789AaBbCcDdEeFf",	/* inside, hexadecimal digits		    */
-  "",			/* no escape character within numbers               */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* numbers do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* numbers do not end with a delimiter              */
+  U "0123456789AaBbCcDdEeFf",	/* inside, hexadecimal digits		    */
+  U "",			/* no escape character within numbers               */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* numbers do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* numbers do not end with a delimiter              */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 
 TOKEN PerlBinaryNumberToken = {
-  "number",		/* used by error messages involving this token      */
+  U "number",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PN",		/* Lout command for formatting numbers              */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PN",		/* Lout command for formatting numbers              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "0b" },		/* binary numbers must begin with 0b		    */
+  { U "0b" },		/* binary numbers must begin with 0b		    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  "01",	        	/* inside, binary digits			    */
-  "",			/* no escape character within numbers               */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* numbers do not permit "inner escapes"            */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* numbers do not end with a delimiter              */
+  U "01",        	/* inside, binary digits			    */
+  U "",			/* no escape character within numbers               */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* numbers do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* numbers do not end with a delimiter              */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1587,45 +1623,45 @@ TOKEN PerlBinaryNumberToken = {
 /*****************************************************************************/
 
 TOKEN PerlCommentToken = {
-  "comment",		/* used by error messages involving this token      */
+  U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PC",		/* Lout command for formatting comments             */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "@PC",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "#" },		/* comments begin with this character		    */
+  { U "#" },		/* comments begin with this character		    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK (not NL)        */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* C comments do not permit "inner escapes"         */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no end delimiter (end of line will end it)       */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* C comments do not permit "inner escapes"         */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no end delimiter (end of line will end it)       */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PerlCommentEscapeToken = {
-  "Lout escape",	/* used by error messages involving this token      */
+  U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED, /* print this token unformatted                  */
-  "",			/* no Lout command since we are printing raw        */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "",			/* no Lout command since we are printing raw        */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { "#@" },		/* comments begin with this character pair	    */
+  { U "#@" },		/* comments begin with this character pair	    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char is OK                 */
-  "",			/* no escape character within comments              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* no "inner escape" in escape comments             */
-  "",			/* so no end of "inner escape" either               */
-  "",			/* no bracketing delimiter			    */
-  "",			/* no end delimiter (end of line will end it)       */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* no "inner escape" in escape comments             */
+  U "",			/* so no end of "inner escape" either               */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no end delimiter (end of line will end it)       */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1647,23 +1683,23 @@ TOKEN PerlCommentEscapeToken = {
 /*****************************************************************************/
 
 TOKEN PerlPodToken = {
-  "perl-pod",		/* used by error messages involving this token      */
+  U "perl-pod",		/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* unquoted but with a command enclosing it     */
-  "@DP @Pod",		/* Lout command for formatting Pod                  */
-  "",			/* no alternate command                             */
-  "@DP\n",		/* following command                                */
+  U "@DP @Pod",		/* Lout command for formatting Pod                  */
+  U "",			/* no alternate command                             */
+  U "@DP\n",		/* following command                                */
   TRUE,			/* token allowed at start of line only              */
-  { "=", "=pod" },	/* pod insert begins with either of these	    */
+  { U "=", U "=pod" },	/* pod insert begins with either of these	    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* inside, any character at all is OK               */
-  "",			/* no escape character within pod comments          */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* pod comments do not permit "inner escapes"       */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter			    */
-  "=cut",		/* pod comments end with this string                */
+  U "",			/* no escape character within pod comments          */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* pod comments do not permit "inner escapes"       */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "=cut",		/* pod comments end with this string                */
   TRUE,			/* end delimiter must be at line start		    */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1701,21 +1737,21 @@ TOKEN PerlRange3Token           = FixedToken( "...", "@PO" ) ;
 
 #define FlagToken(str, command) /* define fixed-string token */	\
 {									\
-  str,			/* name used for debugging only       */	\
+  U str,		/* name used for debugging only       */	\
   PRINT_WHOLE_QUOTED,	/* print this token as usual          */	\
-  command,		/* Lout command for formatting this   */	\
-  "",			/* no alternate command               */	\
-  "",			/* no following command               */	\
+  U command,		/* Lout command for formatting this   */	\
+  U "",			/* no alternate command               */	\
+  U "",			/* no following command               */	\
   FALSE,		/* token not just start of line       */	\
-  { str },		/* token begins (and ends!) with this */	\
-  { " ", "\t" },	/* plus a white space char	      */	\
-  { "",  ""   },	/* no bracket2 though  		      */	\
-  { "",  ""   },	/* no end2 though   		      */	\
-  "",			/* nothing inside, since no inside    */	\
-  "", "",		/* no escape character                */	\
-  "", "",		/* no inner escape; no end inner esc  */	\
-  "",			/* no bracketing delimiter            */	\
-  "",			/* no ending delimiter                */	\
+  { U str },		/* token begins (and ends!) with this */	\
+  { U " ", U "\t" },	/* plus a white space char	      */	\
+  { U "",  U ""   },	/* no bracket2 though  		      */	\
+  { U "",  U ""   },	/* no end2 though   		      */	\
+  U "",			/* nothing inside, since no inside    */	\
+  U "", U "",		/* no escape character                */	\
+  U "", U "",		/* no inner escape; no end inner esc  */	\
+  U "",			/* no bracketing delimiter            */	\
+  U "",			/* no ending delimiter                */	\
   FALSE,		/* end not have to be at line start   */	\
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
@@ -1776,39 +1812,39 @@ TOKEN PerlFileTestCToken        = FlagToken( "-C",  "@PO" ) ;
 /*****************************************************************************/
 
 TOKEN PodVerbatimLineToken = {
-  "verbatim-para",	/* used by error messages involving this token      */
+  U "verbatim-para",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* printing the whole paragraph quoted		    */
-  "@PV ",		/* Lout command for formatting verbatim line        */
-  "", "",		/* no alternate command; no following command       */
+  U "@PV ",		/* Lout command for formatting verbatim line        */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { "\t", " " },	/* command begins with this                   	    */
+  { U "\t", U " " },	/* command begins with this                   	    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintablePlusTab,	/* inside, any printable char except newline is OK  */
-  "", "",		/* no escape character within verbatim lines        */
-  "", "",		/* no "inner escapes" within verbatim lines         */
-  "",			/* no bracketing delimiter                          */
-  "",			/* ends at end of line                              */
+  U "", U "",		/* no escape character within verbatim lines        */
+  U "", U "",		/* no "inner escapes" within verbatim lines         */
+  U "",			/* no bracketing delimiter                          */
+  U "",			/* ends at end of line                              */
   FALSE,		/* don't need to be at start of line to end it      */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PodEmptyLineToken = {
-  "pod-empty-line",	/* used by error messages involving this token      */
+  U "pod-empty-line",	/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
-  "@PPG\n",		/* Lout command for formatting Pod empty line       */
-  "", "",		/* no alternate command; no following command       */
+  U "@PPG\n",		/* Lout command for formatting Pod empty line       */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { "\n" },		/* command begins with this                   	    */
+  { U "\n" },		/* command begins with this                   	    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  "",			/* nothing inside                                   */
-  "", "",		/* no escape character                              */
-  "", "",		/* no inner escape                                  */
-  "",			/* no bracketing delimiter                          */
-  "",			/* token will end with the end of the line          */
+  U "",			/* nothing inside                                   */
+  U "", U "",		/* no escape character                              */
+  U "", U "",		/* no inner escape                                  */
+  U "",			/* no bracketing delimiter                          */
+  U "",			/* token will end with the end of the line          */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1837,23 +1873,23 @@ TOKEN PodEmptyLineToken = {
 /*****************************************************************************/
 
 TOKEN PodIgnoreToken = {
-  "pod-cut",		/* used by error messages involving this token      */
+  U "pod-cut",		/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
-  "",			/* Lout command for formatting Pod cut (nothing)    */
-  "",			/* no alternate command                             */
-  "",			/* no following command                             */
+  U "",			/* Lout command for formatting Pod cut (nothing)    */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
   TRUE,			/* token allowed at start of line only              */
-  { "=pod", "=cut" },	/* command begins with this                   	    */
+  { U "=pod", U "=cut" }, /* command begins with this                  	    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* anything at all can be inside                    */
-  "",			/* no escape character                              */
-  "",			/* so nothing legal after escape char either        */
-  "",			/* cut tokens do not permit "inner escapes"         */
-  "",			/* and so there is no end innner escape either      */
-  "",			/* no bracketing delimiter                          */
-  "\n",			/* token will end with the end of the line          */
+  U "",			/* no escape character                              */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* cut tokens do not permit "inner escapes"         */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter                          */
+  U "\n",			/* token will end with the end of the line          */
   TRUE,			/* end delimiter (\n) has to be at a line start     */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1866,58 +1902,58 @@ TOKEN PodIgnoreToken = {
 /*****************************************************************************/
 
 TOKEN PodHeading1Token = {
-  "=head1",		/* used by error messages involving this token      */
+  U "=head1",		/* used by error messages involving this token      */
   PRINT_NODELIMS_INNER,	/* print without delimiters, formatting inner       */
-  "@PHA",		/* Lout command for formatting Pod heading          */
-  "", "",		/* no alternate command; no following command       */
+  U "@PHA",		/* Lout command for formatting Pod heading          */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  {"=head1","head1"},	/* command begins with this                   	    */
-  { " ", "\t" },	/* helps to skip following white space		    */
-  { "",  ""   },	/* no bracket2                        		    */
-  { "\n", "\n" },	/* token ends at end of line			    */
+  {U "=head1", U "head1"}, /* command begins with this                 	    */
+  { U " ",  U "\t" },	/* helps to skip following white space		    */
+  { U "",   U ""   },	/* no bracket2                        		    */
+  { U "\n", U "\n" },	/* token ends at end of line			    */
   AllCharacters,	/* anything in the heading			    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "",			/* no bracketing delimiter                          */
-  "\n\n",		/* token will end with the first blank line         */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "",			/* no bracketing delimiter                          */
+  U "\n\n",		/* token will end with the first blank line         */
   FALSE,		/* end delimiter (\n) has to be at a line start     */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PodHeading2Token = {
-  "=head2",		/* used by error messages involving this token      */
+  U "=head2",		/* used by error messages involving this token      */
   PRINT_NODELIMS_INNER,	/* print without delimiters, formatting inner       */
-  "@PHB",		/* Lout command for formatting Pod heading          */
-  "", "",		/* no alternate command; no following command       */
+  U "@PHB",		/* Lout command for formatting Pod heading          */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { "=head2" },		/* command begins with this                   	    */
-  { " ", "\t" },	/* helps to skip following white space		    */
-  { "",  ""   },	/* no bracket2                        		    */
-  { "\n", "\n" },	/* token ends at end of line			    */
+  { U "=head2" },	/* command begins with this                   	    */
+  { U " ",  U "\t" },	/* helps to skip following white space		    */
+  { U "",   U ""   },	/* no bracket2                        		    */
+  { U "\n", U "\n" },	/* token ends at end of line			    */
   AllCharacters,	/* anything in the heading			    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "",			/* no bracketing delimiter                          */
-  "\n\n",		/* token will end with the first blank line         */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "",			/* no bracketing delimiter                          */
+  U "\n\n",		/* token will end with the first blank line         */
   FALSE,		/* end delimiter (\n) has to be at a line start     */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PodHeading3Token = {
-  "=head3",		/* used by error messages involving this token      */
+  U "=head3",		/* used by error messages involving this token      */
   PRINT_NODELIMS_INNER,	/* print without delimiters, formatting inner       */
-  "@PHC",		/* Lout command for formatting Pod heading          */
-  "", "",		/* no alternate command; no following command       */
+  U "@PHC",		/* Lout command for formatting Pod heading          */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { "=head3" },		/* command begins with this                   	    */
-  { " ", "\t" },	/* helps to skip following white space		    */
-  { "",  ""   },	/* no bracket2                        		    */
-  { "\n", "\n" },	/* token ends at end of line			    */
+  { U "=head3" },	/* command begins with this                   	    */
+  { U " ",  U "\t" },	/* helps to skip following white space		    */
+  { U "",   U ""   },	/* no bracket2                        		    */
+  { U "\n", U "\n" },	/* token ends at end of line			    */
   AllCharacters,	/* anything in the heading			    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "",			/* no bracketing delimiter                          */
-  "\n\n",		/* token will end with the first blank line         */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "",			/* no bracketing delimiter                          */
+  U "\n\n",		/* token will end with the first blank line         */
   FALSE,		/* end delimiter (\n) has to be at a line start     */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1930,59 +1966,59 @@ TOKEN PodHeading3Token = {
 /*****************************************************************************/
 
 TOKEN PodOverToken = {
-  "=over",		/* used by error messages involving this token      */
+  U "=over",		/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED, /* just a number after =over, so this is safe    */
-  "@RawTaggedList gap{@PLG}indent{@PLI}rightindent{@PLRI}labelwidth{@PLLW ",
-  "",			/* no alternate command                             */
-  "} // {",		/* open brace to match } at first item              */
+  U "@RawTaggedList gap{@PLG}indent{@PLI}rightindent{@PLRI}labelwidth{@PLLW ",
+  U "",			/* no alternate command                             */
+  U "} // {",		/* open brace to match } at first item              */
   TRUE,			/* token allowed at start of line only              */
-  { "=over" },		/* command begins with this                   	    */
+  { U "=over" },	/* command begins with this                   	    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* inside, any printable char is OK		    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "",			/* no bracketing delimiter                          */
-  "\n",			/* token will end with the end of the line          */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "",			/* no bracketing delimiter                          */
+  U "\n",		/* token will end with the end of the line          */
   TRUE,			/* end delimiter (\n) has to be at a line start     */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PodItemToken = {
-  "=item",		/* used by error messages involving this token      */
+  U "=item",		/* used by error messages involving this token      */
   PRINT_NODELIMS_INNER,	/* printing just what follows =item on the line     */
-  "@Null //}\n@DTI {@PLL", /* Lout command for formatting Pod item           */
-  "",			/* no alternate command                             */
-  "} {",		/* open brace to enclose the item content           */
+  U "@Null //}\n@DTI {@PLL", /* Lout command for formatting Pod item        */
+  U "",			/* no alternate command                             */
+  U "} {",		/* open brace to enclose the item content           */
   TRUE,			/* token allowed at start of line only              */
-  { "=item" },		/* command begins with this                   	    */
-  { " ", "\t" },	/* helps to skip following white space		    */
-  { "",  ""   },	/* no bracket2                        		    */
-  { "\n\n", "\n\n"  },	/* token will end at blank line			    */
+  { U "=item" },	/* command begins with this                   	    */
+  { U " ",    U "\t" },	/* helps to skip following white space		    */
+  { U "",     U ""   },	/* no bracket2                        		    */
+  { U "\n\n", U "\n\n"},/* token will end at blank line			    */
   AllPrintableTabNL,	/* any printable inside				    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "", "",		/* see brackets2[]; see ends2[]                     */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "", U "",		/* see brackets2[]; see ends2[]                     */
   FALSE,		/* end delimiter (\n) must already be at start      */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PodBackToken = {
-  "=back",		/* used by error messages involving this token      */
+  U "=back",		/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
-  "@Null // }\n@EndList\n", /* Lout command for formatting Pod back         */
-  "", "",		/* no alternate command; no following command       */
+  U "@Null // }\n@EndList\n", /* Lout command for formatting Pod back       */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { "=back" },		/* command begins with this                   	    */
+  { U "=back" },	/* command begins with this                   	    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* anything inside (in principle)   		    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "",			/* no bracketing delimiter                          */
-  "\n",			/* token will end with the next blank line          */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "",			/* no bracketing delimiter                          */
+  U "\n",		/* token will end with the next blank line          */
   TRUE,			/* end delimiter (\n) has to be at a line start     */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1996,21 +2032,21 @@ TOKEN PodBackToken = {
 
 #define PodNarrowItemToken(tag, command)				\
 {									\
-  "=item",		/* used by error messages		 */	\
+  U "=item",		/* used by error messages		 */	\
   PRINT_NODELIMS_INNER,	/* printing just what follows =item      */	\
-  command,		/* Lout command for formatting Pod item  */	\
-  "",			/* no alternate command                  */	\
-  "}} {",		/* open brace to enclose the item content*/	\
+  U command,		/* Lout command for formatting Pod item  */	\
+  U "",			/* no alternate command                  */	\
+  U "}} {",		/* open brace to enclose the item content*/	\
   TRUE,			/* token allowed at start of line only   */	\
-  { "=item", "=item ", "=item\t",	/* starts                */	\
-    "=item  ", "=item \t", "=item\t ", "=item\t\t" },	    /*   */	\
-  { tag },		/* the tag we recognize               	 */	\
-  { "" },		/* no bracket2                        	 */	\
-  { "\n\n", "\n\n"  },	/* token will end at blank line		 */	\
+  { U "=item", U "=item ", U "=item\t",	/* starts                */	\
+    U "=item  ", U "=item \t", U "=item\t ", U "=item\t\t" }, /* */	\
+  { U tag },		/* the tag we recognize               	 */	\
+  { U "" },		/* no bracket2                        	 */	\
+  { U "\n\n", U "\n\n"  },	/* token will end at blank line  */	\
   AllPrintableTabNL,	/* any printable inside			 */	\
-  "", "",		/* no escape character                   */	\
-  "", "",		/* no inner escapes; no end inner escape */	\
-  "", "",		/* see brackets2[]; see ends2[]          */	\
+  U "", U "",		/* no escape character                   */	\
+  U "", U "",		/* no inner escapes; no end inner escape */	\
+  U "", U "",		/* see brackets2[]; see ends2[]          */	\
   FALSE,		/* end delimiter (\n) already at start   */	\
   FALSE,		/* don't need to see end delimiter twice */	\
 }
@@ -2039,55 +2075,55 @@ TOKEN PodItem9      = PodNarrowItemToken("9", "@Null //}\n@TI {@PLL {9");
 /*****************************************************************************/
 
 TOKEN PodForToken = {
-  "=for",		/* used by error messages involving this token      */
+  U "=for",		/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
-  "",			/* Lout command for formatting Pod for (nothing)    */
-  "", "",		/* no alternate command; no following command       */
+  U "",			/* Lout command for formatting Pod for (nothing)    */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { "=for" },		/* command begins with this                   	    */
+  { U "=for" },		/* command begins with this                   	    */
   { NULL }, { NULL },	/* no start2 needed; so no bracket2 either	    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* anything inside 				    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "",			/* no bracketing delimiter                          */
-  "\n",			/* token will end with the end of the line          */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "",			/* no bracketing delimiter                          */
+  U "\n",		/* token will end with the end of the line          */
   TRUE,			/* end delimiter (\n) has to be at a line start     */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PodBeginToken = {
-  "=begin",		/* used by error messages involving this token      */
+  U "=begin",		/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
-  "",			/* Lout command for formatting Pod for (nothing)    */
-  "", "",		/* no alternate command; no following command       */
+  U "",			/* Lout command for formatting Pod for (nothing)    */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { "=begin" },		/* command begins with this                   	    */
+  { U "=begin" },	/* command begins with this                   	    */
   { NULL }, { NULL },	/* no start2 needed; so no bracket2 either	    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* anything inside 				    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "",			/* no bracketing delimiter                          */
-  "=end",		/* token will end with =end character               */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "",			/* no bracketing delimiter                          */
+  U "=end",		/* token will end with =end character               */
   TRUE,			/* end delimiter has to be at a line start          */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 TOKEN PodBeginLoutToken = {
-  "=begin lout",	/* used by error messages involving this token      */
+  U "=begin lout",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,/* this is a Lout escape, no delims or quotes     */
-  "",			/* Lout command for formatting Pod for (nothing)    */
-  "", "",		/* no alternate command; no following command       */
+  U "",			/* Lout command for formatting Pod for (nothing)    */
+  U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { "=begin lout", "=begin Lout" },	/* command begins with this   	    */
+  { U "=begin lout", U "=begin Lout" },	/* command begins with this   	    */
   { NULL }, { NULL },	/* no start2 needed; so no bracket2 either	    */
   { NULL },		/* so no end2 either				    */
   AllCharacters,	/* anything inside 				    */
-  "", "",		/* no escape character; nothing legal after escape  */
-  "", "",		/* no inner escapes; no end inner escape            */
-  "",			/* no bracketing delimiter                          */
-  "=end",		/* token will end with =end character               */
+  U "", U "",		/* no escape character; nothing legal after escape  */
+  U "", U "",		/* no inner escapes; no end inner escape            */
+  U "",			/* no bracketing delimiter                          */
+  U "=end",		/* token will end with =end character               */
   TRUE,			/* end delimiter has to be at a line start          */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -2122,20 +2158,20 @@ TOKEN PodBeginLoutToken = {
 
 #define RecursiveToken(str, command) /* Pod recursive token */		\
 {									\
-  str,			/* name used for debugging only       */	\
+  U str,			/* name used for debugging only       */	\
   PRINT_NODELIMS_INNER,	/* recursively format the inside      */	\
-  command,		/* Lout command for formatting this   */	\
-  "", "",		/* no alternate command; no following */	\
+  U command,		/* Lout command for formatting this   */	\
+  U "", U "",		/* no alternate command; no following */	\
   FALSE,		/* token not just start of line       */	\
-  { str },		/* token begins with this	      */	\
-  { "<", "<< ", "<<< ", "<<<< " }, /* start2		      */	\
-  { "",  "",    "",     ""      }, /* no bracket2             */	\
-  { ">", " >>", " >>>", " >>>>" }, /* end2		      */	\
+  { U str },		/* token begins with this	      */	\
+  { U "<", U "<< ", U "<<< ", U "<<<< " }, /* start2	      */	\
+  { U "",  U "",    U "",     U ""      }, /* no bracket2     */	\
+  { U ">", U " >>", U " >>>", U " >>>>" }, /* end2	      */	\
   AllCharacters,	/* anything inside (in fact, not used)*/	\
-  "", "",		/* no escape character                */	\
-  "", "",		/* no inner escape; no end inner esc  */	\
-  "",			/* will use brackets2 here            */	\
-  "",			/* will use end2 here                 */	\
+  U "", U "",		/* no escape character                */	\
+  U "", U "",		/* no inner escape; no end inner esc  */	\
+  U "",			/* will use brackets2 here            */	\
+  U "",			/* will use end2 here                 */	\
   FALSE,		/* end not have to be at line start   */	\
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
@@ -2162,20 +2198,20 @@ TOKEN PodCodeToken	= RecursiveToken("C", "@PFC");
 
 #define InteriorToken(str, command, style) /* Pod delimited token */	\
 {									\
-  str,			/* name used for debugging only       */	\
+  U str,		/* name used for debugging only       */	\
   style,		/* print this token unquoted          */	\
-  command,		/* Lout command for formatting this   */	\
-  "", "",		/* no alternate command; no following */	\
+  U command,		/* Lout command for formatting this   */	\
+  U "", U "",		/* no alternate command; no following */	\
   FALSE,		/* token not just start of line       */	\
-  { str },		/* token begins with this	      */	\
-  { "<", "<< ", "<<< ", "<<<< " }, /* start2		      */	\
-  { "",  "",    "",     ""      }, /* no bracket2             */	\
-  { ">", " >>", " >>>", " >>>>" }, /* end2		      */	\
+  { U str },		/* token begins with this	      */	\
+  { U "<", U "<< ", U "<<< ", U "<<<< " }, /* start2	      */	\
+  { U "",  U "",    U "",     U ""      }, /* no bracket2     */	\
+  { U ">", U " >>", U " >>>", U " >>>>" }, /* end2	      */	\
   AllCharacters,	/* anything inside                    */	\
-  "", "",		/* no escape character                */	\
-  "", "",		/* no inner escape; no end inner esc  */	\
-  "",			/* will use brackets2 here            */	\
-  "",			/* will use end2 here                 */	\
+  U "", U "",		/* no escape character                */	\
+  U "", U "",		/* no inner escape; no end inner esc  */	\
+  U "",			/* will use brackets2 here            */	\
+  U "",			/* will use end2 here                 */	\
   FALSE,		/* end not have to be at line start   */	\
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
@@ -2205,42 +2241,42 @@ TOKEN PodZeroToken	= InteriorToken("Z", "",        PRINT_COMMAND_ONLY);
 /*****************************************************************************/
 
 TOKEN PodNumCharToken = {
-  "E<>",		/* used by error messages involving this token      */
+  U "E<>",		/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,/* we're doing these manually, since they're funny*/
-  "\"\\",		/* precede character number with \"                 */
-  "",			/* no alternate command                             */
-  "\"",			/* follow character number with "                   */
+  U "\"\\",		/* precede character number with \"                 */
+  U "",			/* no alternate command                             */
+  U "\"",		/* follow character number with "                   */
   FALSE,		/* token allowed at start of line only              */
-  { "E<" },		/* command begins with this              	    */
+  { U "E<" },		/* command begins with this              	    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  "0123456789",		/* digits inside 				    */
-  "", "",		/* no escape character                              */
-  "", "",		/* no "inner escapes"                               */
-  "",			/* no bracketing delimiter                          */
-  ">",			/* token will end with > character                  */
+  U "0123456789",	/* digits inside 				    */
+  U "", U "",		/* no escape character                              */
+  U "", U "",		/* no "inner escapes"                               */
+  U "",			/* no bracketing delimiter                          */
+  U ">",		/* token will end with > character                  */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
 #define PodEscapeToken(str, command) /* Pod delimited token */		\
 {									\
-  str,			/* name used for debugging only       */	\
+  U str,		/* name used for debugging only       */	\
   PRINT_COMMAND_ONLY,	/* print this token unquoted          */	\
-  command,		/* Lout command for formatting this   */	\
-  "",			/* no alternate command               */	\
-  "",			/* no following command               */	\
+  U command,		/* Lout command for formatting this   */	\
+  U "",			/* no alternate command               */	\
+  U "",			/* no following command               */	\
   FALSE,		/* token not just start of line       */	\
-  { str },		/* token begins with this	      */	\
+  { U str },		/* token begins with this	      */	\
   { NULL },		/* start2			      */	\
   { NULL },		/* bracket2			      */	\
   { NULL },		/* end2				      */	\
-  "",			/* nothing inside                     */	\
-  "", "",		/* no escape character                */	\
-  "", "",		/* no inner escape either             */	\
-  "",			/* no bracketing delimiter            */	\
-  "",			/* no ending delimiter                */	\
+  U "",			/* nothing inside                     */	\
+  U "", U "",		/* no escape character                */	\
+  U "", U "",		/* no inner escape either             */	\
+  U "",			/* no bracketing delimiter            */	\
+  U "",			/* no ending delimiter                */	\
   FALSE,		/* end not have to be at line start   */	\
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
@@ -2431,6 +2467,13 @@ LANGUAGE CLanguage = {
     "short", "signed", "sizeof", "static", "struct", "switch", "template",
     "this", "throw", "try", "typedef", "union", "unsigned", "virtual",
     "void", "volatile", "while", 
+
+    /* these contributed by Isaac To <kkto@csis.hku.hk> */
+    "bool", "wchar_t", "typeid", "typename", "false", "true", "const_cast",
+    "dynamic_cast", "reinterpret_cast", "static_cast", "namespace", "using",
+    "and", "and_eq", "bitand", "bitor", "compl", "not", "not_eq", "or",
+    "or_eq", "xor", "xor_eq", "explicit", "export", "mutable",
+
   }
 };
 
@@ -2444,8 +2487,8 @@ LANGUAGE PythonLanguage = {
   { &BackSlashToken,
     &PythonDblStringToken, &PythonSnglStringToken, 
     &PythonTriSnglStringToken, &PythonTriDblStringToken,
-    &PythonCommentToken, &IdentifierToken, &NumberToken,
-    &PlusToken, &MinusToken, &StarToken, &PythonPowerToken,
+    &PythonCommentToken, &PythonCommentEscapeToken, &IdentifierToken,
+    &NumberToken, &PlusToken, &MinusToken, &StarToken, &PythonPowerToken,
     &SlashToken, &PercentToken, &PythonBitLeftShiftToken,
     &PythonBitRightShiftToken, &AmpersandToken, &BarToken,
     &HatToken, &CircumToken, &LessToken, &GreaterToken,
@@ -2831,7 +2874,7 @@ LANGUAGE *languages[] = {
 #define	MAX_LINE	1024
 
 static char	file_name[MAX_LINE];	/* current input file name           */
-static char	curr_line[MAX_LINE];	/* current input line                */
+static unsigned char curr_line[MAX_LINE]; /* current input line              */
 static int	line_num;		/* current input line number         */
 static int	line_pos;		/* current input column number       */
 static BOOLEAN	raw_seen;		/* TRUE if -r (raw mode)             */
@@ -2949,7 +2992,7 @@ void NextChar()
   else if( curr_line[line_pos+1] != '\0' )
   {
     /* we've already read in the next line; it's at &curr_line[line_pos+1] */
-    strcpy(&curr_line[1], &curr_line[line_pos+1]);
+    strcpy((char *) &curr_line[1], (char *) &curr_line[line_pos+1]);
     line_num++;
     line_pos = 1;
   }
@@ -2958,7 +3001,7 @@ void NextChar()
     /* we need to read in the new line */
     line_num++;
     line_pos = 1;
-    if( fgets(&curr_line[1], MAX_LINE-2, in_fp) == (char *) NULL )
+    if( fgets((char *) &curr_line[1], MAX_LINE-2, in_fp) == (char *) NULL )
       curr_line[1] = '\0';
   }
   if( DEBUG_NEXTCHAR )
@@ -2976,14 +3019,14 @@ void NextChar()
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN InputMatches(char *pattern)
-{ char *p, *q;
+BOOLEAN InputMatches(unsigned char *pattern)
+{ unsigned char *p, *q;
   for(p = &curr_line[line_pos], q = pattern;  *q != '\0';  p++, q++ )
   {
     if( *p == '\0' )
     {
       /* attempt to read another line of input, since we are off the end */
-      if( fgets(p, MAX_LINE-2-(p - curr_line), in_fp) == (char *) NULL )
+      if( fgets((char *) p, MAX_LINE-2-(p - curr_line), in_fp) == (char *) NULL )
       *p = '\0';
     }
     if( *p != *q )
@@ -3022,7 +3065,7 @@ typedef struct trie_node {
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN TrieInsert(TRIE *T, char *str, TOKEN *val)
+BOOLEAN TrieInsert(TRIE *T, unsigned char *str, TOKEN *val)
 { BOOLEAN res;
   if( DEBUG_TRIE )
     fprintf(stderr, "[ TrieInsert(T, %s, %s)\n", str, EchoToken(val));
@@ -3056,7 +3099,7 @@ BOOLEAN TrieInsert(TRIE *T, char *str, TOKEN *val)
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN *TrieRetrieve(TRIE T, char *str, int *len)
+TOKEN *TrieRetrieve(TRIE T, unsigned char *str, int *len)
 { TOKEN *res;  int i;
   if( DEBUG_TRIE )
     fprintf(stderr, "[ TrieRetrieve(T, %s, len)\n", str);
@@ -3111,7 +3154,7 @@ void HashInsert(char *str)
       ErrorHeader());
     abort();
   }
-  for( i = hash(str);  HashTable[i] != (char *) NULL;  i = (i+1) % MAX_SYM );
+  for( i=hash(str); HashTable[i]!=(char *) NULL;  i = (i+1)%MAX_SYM );
   HashTable[i] = str;
   HashTableCount++;
   if( DEBUG_SETUP )
@@ -3120,8 +3163,8 @@ void HashInsert(char *str)
 
 BOOLEAN HashRetrieve(char *str)
 { int i;
-  for( i = hash(str);  HashTable[i] != (char *) NULL;  i = (i+1) % MAX_SYM )
-    if( strcmp(HashTable[i], str) == 0 )
+  for( i=hash(str); HashTable[i]!=(char *) NULL; i = (i+1)%MAX_SYM )
+    if( strcmp( (char *) HashTable[i], (char *) str) == 0 )
       return TRUE;
   return FALSE;
 }
@@ -3134,11 +3177,12 @@ BOOLEAN HashRetrieve(char *str)
 /*  This is the code that actually prints the output file.                   */
 /*  To emit one token, the call sequence should be as follows:               */
 /*                                                                           */
-/*     StartEmit(LANGUAGE *lang, TOKEN *current_token, char *start_delim, l) */
-/*     Emit(TOKEN *current_token, char ch)                                   */
+/*     StartEmit(LANGUAGE *lang, TOKEN *current_token,                       */
+/*       unsigned char *start_delim, l)                                      */
+/*     Emit(TOKEN *current_token, unsigned char ch)                          */
 /*     ...                                                                   */
-/*     Emit(TOKEN *current_token, char ch)                                   */
-/*     EndEmit(TOKEN *current_token, char *end_delim)                        */
+/*     Emit(TOKEN *current_token, unsigned char ch)                          */
+/*     EndEmit(TOKEN *current_token, unsigned char *end_delim)               */
 /*                                                                           */
 /*  The back end will then take care of all print styles automatically,      */
 /*  including checking for keywords.  When emitting white space each space   */
@@ -3148,7 +3192,7 @@ BOOLEAN HashRetrieve(char *str)
 /*                                                                           */
 /*****************************************************************************/
 
-static char	save_value[MAX_LINE];		/* the token text            */
+static unsigned char save_value[MAX_LINE];	/* the token text            */
 static int	save_len;                       /* index of \0 in save_value */
 static BOOLEAN	save_on = FALSE;		/* TRUE when saving          */
 static LANGUAGE	*save_language;			/* the current language      */
@@ -3157,7 +3201,7 @@ static BOOLEAN	out_linestart = TRUE;		/* TRUE if out line start    */
 static BOOLEAN	out_formfeed = FALSE;		/* TRUE if last was formfeed */
 static int	brace_depth;			/* brace depth in verbatim   */
 
-extern void Emit(TOKEN *current_token, char ch);
+extern void Emit(TOKEN *current_token, unsigned char ch);
 
 /*****************************************************************************/
 /*                                                                           */
@@ -3210,7 +3254,7 @@ void EmitTab()
 /*                                                                           */
 /*****************************************************************************/
 
-void EmitRaw(char ch)
+void EmitRaw(unsigned char ch)
 {
 
   if( DEBUG_EMIT )
@@ -3292,7 +3336,8 @@ void EmitRaw(char ch)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  StartEmit(LANGUAGE *lang, TOKEN *current_token, char *start_delim, len)  */
+/*  StartEmit(LANGUAGE *lang, TOKEN *current_token,                          */
+/*    unsigned char *start_delim, len)                                       */
 /*                                                                           */
 /*  Start the emission of a token.  If it is a PRINT_WHOLE_QUOTED, it has    */
 /*  to be saved since it might be a keyword.                                 */
@@ -3301,7 +3346,8 @@ void EmitRaw(char ch)
 /*                                                                           */
 /*****************************************************************************/
 
-void StartEmit(LANGUAGE *lang, TOKEN *current_token, char *start_delim, int len)
+void StartEmit(LANGUAGE *lang, TOKEN *current_token,
+  unsigned char *start_delim, int len)
 { int i;
   if( save_on )
   {
@@ -3393,15 +3439,15 @@ void StartEmit(LANGUAGE *lang, TOKEN *current_token, char *start_delim, int len)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  EndEmit(TOKEN *current_token, char *end_delim)                           */
+/*  EndEmit(TOKEN *current_token, unsigned char *end_delim)                  */
 /*                                                                           */
 /*  End emitting the current token.  Its ending delimiter was end_delim.     */
 /*                                                                           */
 /*****************************************************************************/
 #define at_start_line(s, i) ((i) == 0 || s[(i)-1] == '\n' || s[(i)-1] == '\f' )
 
-void EndEmit(TOKEN *current_token, char *end_delim)
-{ char *com;
+void EndEmit(TOKEN *current_token, unsigned char *end_delim)
+{ unsigned char *com;
   int i;
   BOOLEAN quoted_now = FALSE;
   switch( current_token->print_style )
@@ -3418,7 +3464,8 @@ void EndEmit(TOKEN *current_token, char *end_delim)
     case PRINT_NODELIMS_QUOTED:
 
       /* work out whether we are printing the command or its alternative */
-      com=(current_token->alternate_command[0]!='\0'&&HashRetrieve(save_value)?
+      com=(current_token->alternate_command[0]!='\0' &&
+	HashRetrieve( (char *) save_value)?
 	current_token->alternate_command : current_token->command);
 
       /* print command, opening brace */
@@ -3508,7 +3555,7 @@ void EndEmit(TOKEN *current_token, char *end_delim)
     case PRINT_WHOLE_UNQUOTED:
 
       /* print end delimiter, verbatim */
-      fputs(end_delim, out_fp);
+      fputs( (char *) end_delim, out_fp);
       /* NB NO BREAK */
 
 
@@ -3569,7 +3616,7 @@ void EndEmit(TOKEN *current_token, char *end_delim)
 /*                                                                           */
 /*****************************************************************************/
 
-void Emit(TOKEN *current_token, char ch)
+void Emit(TOKEN *current_token, unsigned char ch)
 {
   switch( current_token->print_style )
   {
@@ -3583,9 +3630,9 @@ void Emit(TOKEN *current_token, char ch)
       if( ch == '\n' || ch == '\f' )
       {
 	/* could save newline too, but uses less memory if print now */
-	EndEmit(current_token, "");
+	EndEmit(current_token, U "");
 	EmitRaw(ch);
-	StartEmit(save_language, current_token, "", 0);
+	StartEmit(save_language, current_token, U "", 0);
       }
       else if( save_len < MAX_LINE - 1 )
       {
@@ -3648,14 +3695,14 @@ void Emit(TOKEN *current_token, char ch)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  EmitProtected(char ch)                                                   */
+/*  EmitProtected(unsigned char ch)                                          */
 /*                                                                           */
 /*  Emit one character of the current token.  If the character is a special  */
 /*  one in Lout, protect it with quotes.                                     */
 /*                                                                           */
 /*****************************************************************************/
 
-void EmitProtected(char ch)
+void EmitProtected(unsigned char ch)
 {
   switch( ch )
   {
@@ -3703,10 +3750,11 @@ void EmitProtected(char ch)
 /*                                                                           */
 /*****************************************************************************/
 
-char *clone2strings(char *s1, char *s2)
-{ char *res;
-  res = (char *) malloc( (strlen(s1) + strlen(s2) + 1) * sizeof(char));
-  sprintf(res, "%s%s", s1, s2);
+unsigned char *clone2strings(unsigned char *s1, unsigned char *s2)
+{ unsigned char *res;
+  res = (unsigned char *) malloc(
+    (strlen( (char *) s1) + strlen( (char *) s2) + 1) * sizeof(unsigned char));
+  sprintf( (char *) res, "%s%s", s1, s2);
   if( DEBUG_SETUP )
     fprintf(stderr, "clone2strings(%s, %s) = %s\n", s1, s2, res);
   return res;
@@ -3793,7 +3841,7 @@ void SetupOneToken(TOKEN *t)
   }
 
   /* load the opening delimiters of this token into the trie */
-  for( j = 0;  t->starts[j] != (char *) NULL;  j++ )
+  for( j = 0;  t->starts[j] != (unsigned char *) NULL;  j++ )
   { if( !TrieInsert(t->start_line_only ? &StartLineTrie:&Trie,t->starts[j],t) )
     { if( *(t->starts[j]) == '\0' )
 	fprintf(err_fp, "%s: empty starting delimiter\n", ErrorHeader());
@@ -3852,7 +3900,7 @@ void SetupLanguage(LANGUAGE *lang)
   }
 
   /* load the keyword hash table */
-  for( j = 0;  lang->keywords[j] != (char *) NULL;  j++ )
+  for( j = 0;  lang->keywords[j] != NULL;  j++ )
     HashInsert(lang->keywords[j]);
 
   if( DEBUG_SETUP )
@@ -3862,15 +3910,15 @@ void SetupLanguage(LANGUAGE *lang)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  BOOLEAN Printable(char ch)                                               */
+/*  BOOLEAN Printable(unsigned char ch)                                      */
 /*                                                                           */
 /*  TRUE if ch is a printable character.  Used only by error messages so     */
 /*  can be slow.                                                             */
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN Printable(char ch)
-{ char *p;
+BOOLEAN Printable(unsigned char ch)
+{ unsigned char *p;
   for( p = AllPrintable;  *p != '\0' && *p != ch;  p++ );
   return (*p == ch);
 } /* end Printable */
@@ -3915,15 +3963,16 @@ int Matching()
   for( i = 0; pairs[i].first != NULL && !InputMatches(pairs[i].first); i++ );
   if( DEBUG_PROCESS )
     fprintf(stderr, "Matching() = %d (\"%s\", \"%s\")\n", i,
-      pairs[i].first  == NULL ? "NULL" : pairs[i].first,
-      pairs[i].second == NULL ? "NULL" : pairs[i].second);
+      pairs[i].first  == NULL ? "NULL" : (char *) pairs[i].first,
+      pairs[i].second == NULL ? "NULL" : (char *) pairs[i].second);
   return i;
 }
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)   */
+/*  Process(LANGUAGE *lang, TOKEN *outer_token,                              */
+/*    unsigned char *outer_end_delimiter)                                    */
 /*                                                                           */
 /*  Process a sequence of input tokens.  If we are currently recursing       */
 /*  inside some other token, outer_token is non-null and is that token,      */
@@ -3952,10 +4001,11 @@ char *debug_state(int s)
   }
 }
 
-void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
-{ TOKEN *current_token; int len, i, state;
-  int end_delimiter_depth, end_delimiter_count;
-  char *curr_end_delim, *curr_bracket_delim;
+void Process(LANGUAGE *lang, TOKEN *outer_token,
+  unsigned char *outer_end_delimiter)
+{ TOKEN *current_token = (TOKEN *) NULL; int len, i, state;
+  int end_delimiter_depth = 0, end_delimiter_count = 0;
+  unsigned char *curr_end_delim = U "", *curr_bracket_delim = U "";
   if( DEBUG_PROCESS )
     fprintf(stderr, "[ Process(%s, -, -, -, -)\n", lang->names[0]);
 
@@ -3984,7 +4034,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
 	    curr_line[line_pos] == outer_end_delimiter[0] &&
 	    InputMatches(outer_end_delimiter) )
 	{
-	  len = strlen(outer_end_delimiter);
+	  len = strlen( (char *) outer_end_delimiter);
 	  for( i = 0;  i < len;  i++ )
 	    NextChar();
 	  state = STOP;
@@ -4007,7 +4057,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
 	  if( current_token->print_style == PRINT_NODELIMS_INNER )
 	  {
 	    Process(lang, current_token, current_token->end_delimiter);
-	    EndEmit(current_token, "");
+	    EndEmit(current_token, U "");
 	  }
 	  else
 	  {
@@ -4079,7 +4129,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
 	    if( end_delimiter_count == 0 )
 	    {
 	      /* seen all the end delimiters we need, so token ends */
-	      len = strlen(curr_end_delim);
+	      len = strlen( (char *) curr_end_delim);
 	      for( i = 0;  i < len;  i++ )
 	        NextChar();
 	      EndEmit(current_token, curr_end_delim);
@@ -4129,7 +4179,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
 
 	    case INNER_ESCAPE:
 
-	      EndEmit(current_token, "");
+	      EndEmit(current_token, U "");
 	      NextChar();
 	      Process(lang, current_token, current_token->end_inner_escape);
 	      state = IN_TOKEN_AFTER_INNER_ESCAPE;
@@ -4166,7 +4216,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
 	      else
 	      {
 	        /* normal termination after last legal character */
-	        EndEmit(current_token, "");
+	        EndEmit(current_token, U "");
 	        state = START;
 	      }
 	      break;
@@ -4242,7 +4292,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
       case IN_TOKEN_AFTER_INNER_ESCAPE:
 
 	/* ending delimiter of inner escape has been read over */
-	StartEmit(lang, current_token, "", 0);
+	StartEmit(lang, current_token, U "", 0);
 	state = IN_TOKEN;
 	break;
 
@@ -4278,7 +4328,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
 	else
 	  fprintf(err_fp, "%s: %s token ended within %s\n",
 	    ErrorHeader(), outer_token->name, current_token->name);
-	EndEmit(current_token, "");
+	EndEmit(current_token, U "");
       }
       break;
 
@@ -4292,7 +4342,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
       else
 	fprintf(err_fp, "%s: %s token ended within %s\n",
 	  ErrorHeader(), outer_token->name, current_token->name);
-      EndEmit(current_token, "");
+      EndEmit(current_token, U "");
       break;
 
 
@@ -4301,7 +4351,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token, char *outer_end_delimiter)
       /* we stopped after the escape character */
       fprintf(err_fp, "%s: skipping %c at end of program text\n",
 	ErrorHeader(), current_token->escape[0]);
-      EndEmit(current_token, "");
+      EndEmit(current_token, U "");
       break;
 
 
@@ -4475,7 +4525,6 @@ int main(int argc, char *argv[])
 	    ErrorHeader(), outfilename);
 	  exit(1);
 	}
-	/* setbuf(out_fp, (char *) NULL); */
 	break;
 
 
@@ -4653,7 +4702,8 @@ int main(int argc, char *argv[])
 	{
 	  if( languages[i]->names[j] == (char *) NULL )
 	    i++, j = 0;
-	  else if( strcmp(languages[i]->names[j], language_option) == 0 )
+	  else if( strcmp( (char *) languages[i]->names[j],
+		(char *) language_option) == 0 )
 	    lang = languages[i];
 	  else
 	    j++;
@@ -4713,7 +4763,7 @@ int main(int argc, char *argv[])
     curr_line[line_pos] = '\n';  /* forces line read */
     line_num = 0;
     NextChar();
-    Process(lang, (TOKEN *) NULL, "");
+    Process(lang, (TOKEN *) NULL, U "");
   }
   else if( file_count > 0 )
   { int ch;

@@ -227,26 +227,39 @@ ldiagdict begin
 { pop pop
 } def
 
+% shape and labels of the @Box symbol
+% ldiagbox <shape>
 /ldiagbox
 {
    0     0         /SW  ldiagpointdef
    xsize 0         /SE  ldiagpointdef
    xsize ysize     /NE  ldiagpointdef
    0     ysize     /NW  ldiagpointdef
+
+   xsize 0.25 mul ysize /NNW ldiagpointdef
+   xsize 0.75 mul ysize /NNE ldiagpointdef
+   xsize 0.25 mul     0 /SSW ldiagpointdef
+   xsize 0.75 mul     0 /SSE ldiagpointdef
+
    SE 0.5 ldiagpmul /S   ldiagpointdef
    NW 0.5 ldiagpmul /W   ldiagpointdef
    W SE ldiagpadd   /E   ldiagpointdef
    S NW ldiagpadd   /N   ldiagpointdef
+
    NE 0.5 ldiagpmul /CTR ldiagpointdef
 
-     0 dg /S@ANGLE  ldiagangledef
-    45 dg /SE@ANGLE ldiagangledef
-    90 dg /E@ANGLE  ldiagangledef
-   135 dg /NE@ANGLE ldiagangledef
-   180 dg /N@ANGLE  ldiagangledef
-   225 dg /NW@ANGLE ldiagangledef
-   270 dg /W@ANGLE  ldiagangledef
-   315 dg /SW@ANGLE ldiagangledef
+     0 dg /SSW@ANGLE  ldiagangledef
+     0 dg /S@ANGLE    ldiagangledef
+     0 dg /SSE@ANGLE  ldiagangledef
+    45 dg /SE@ANGLE   ldiagangledef
+    90 dg /E@ANGLE    ldiagangledef
+   135 dg /NE@ANGLE   ldiagangledef
+   180 dg /NNE@ANGLE  ldiagangledef
+   180 dg /N@ANGLE    ldiagangledef
+   180 dg /NNW@ANGLE  ldiagangledef
+   225 dg /NW@ANGLE   ldiagangledef
+   270 dg /W@ANGLE    ldiagangledef
+   315 dg /SW@ANGLE   ldiagangledef
 
    [ CTR NE ldiagpsub /ldiagboxcircum cvx ] ldiagcircumdef
    SW SE NE NW SW

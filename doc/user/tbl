@@ -38,7 +38,7 @@ Section {@NumberOf tbl_alig} for the details.
 @BeginSections
 
 @Include { tbl_intr } # introduction
-@Include { tbl_cell } # basic cell formatting: font, break, width, paint
+@Include { tbl_cell } # cell formatting: font, break, width, paint
 @Include { tbl_rows } # row formats and the @Row symbol
 @Include { tbl_rule } # rules
 @Include { tbl_marg } # margins

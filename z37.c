@@ -1,9 +1,9 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -231,8 +231,8 @@ static void FontDebug(void)
     }
   }
   for( i = 1;  i <= font_count;  i++ )
-    fprintf(stderr, "  finfo[%d].font_table = %s\n", i,
-      EchoObject(finfo[i].font_table));
+    fprintf(stderr, "  finfo[%d].font_table = %s%s", i,
+      EchoObject(finfo[i].font_table), STR_NEWLINE);
 } /* end FontDebug */
 
 
@@ -278,13 +278,13 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
   FULL_CHAR *lig, int *ligtop, FILE_NUM fnum, struct metrics *fnt,
   int *lnum, FILE *fp)
 { FULL_CHAR buff[MAX_BUFF], command[MAX_BUFF], ch, ligchar;
-  int i, wx, llx, lly, urx, ury;
+  int i, wx = 0, llx = 0, lly = 0, urx = 0, ury = 0;
   float fl_wx, fl_llx, fl_lly, fl_urx, fl_ury;
   BOOLEAN wxfound, bfound;
   OBJECT AFMfilename;
 
   Child(AFMfilename, NextDown(Down(face)));
-  while( StringFGets(buff, MAX_BUFF, fp) != NULL &&
+  while( ReadOneLine(fp, buff, MAX_BUFF) != 0 &&
 	 !StringBeginsWith(buff, AsciiToFull("EndCharMetrics")) &&
 	 !StringBeginsWith(buff, AsciiToFull("EndExtraCharMetrics")) )
   {
@@ -293,7 +293,7 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
     (*lnum)++;  ch = '\0';  
     wxfound = bfound = FALSE;
     i = 0;  while( buff[i] == ' ' )  i++;
-    while( buff[i] != '\n' )
+    while( buff[i] != '\0' )
     {
       debug2(DFT, DDD, "  ch = %d, &buff[i] = %s", ch, &buff[i]);
       sscanf( (char *) &buff[i], "%s", command);
@@ -321,7 +321,7 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
 	lig[(*ligtop)++] = ch;
 	i++;  /* skip L */
 	while( buff[i] == ' ' )  i++;
-	while( buff[i] != ';' && buff[i] != '\n' )
+	while( buff[i] != ';' && buff[i] != '\0' )
 	{ sscanf( (char *) &buff[i], "%s", command);
 	  ligchar = MapCharEncoding(command, font_mapping(face));
 	  if( ligchar != '\0' )  lig[(*ligtop)++] = ligchar;
@@ -338,7 +338,7 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
 	}
 	lig[(*ligtop)++] = '\0';
       }
-      while( buff[i] != ';' && buff[i] != '\n' )  i++;
+      while( buff[i] != ';' && buff[i] != '\0' )  i++;
       if( buff[i] == ';' )
       { i++;  while( buff[i] == ' ' ) i++;
       }
@@ -392,13 +392,13 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
 static void ReadCompositeMetrics(OBJECT face, OBJECT Extrafilename,
   FILE_NUM extra_fnum, int *lnum, unsigned short composite[],
   COMPOSITE cmp[], int *cmptop, FILE *fp)
-{ char *status;
+{ int status;
   FULL_CHAR buff[MAX_BUFF], composite_name[100], name[100];
   int composite_num, x_offset, y_offset, i, count;
   FULL_CHAR composite_code, code;
 
   /* build composites */
-  while( (status = StringFGets(buff, MAX_BUFF, fp)) != (char *) NULL
+  while( (status = ReadOneLine(fp, buff, MAX_BUFF)) != 0
 		&& StringBeginsWith(buff, AsciiToFull("CC")) )
   {
     (*lnum)++;
@@ -408,7 +408,7 @@ static void ReadCompositeMetrics(OBJECT face, OBJECT Extrafilename,
     if( sscanf((char *)buff, "CC %s %d ", composite_name, &composite_num) != 2 )
       Error(37, 5, "syntax error in extra font file %s (line %d)",
 	FATAL, &fpos(Extrafilename), FileName(extra_fnum), *lnum);
-    for( i = 0;  buff[i] != ';' && buff[i] != '\n' && buff[i] != '\0'; i++ );
+    for( i = 0;  buff[i] != ';' && buff[i] != '\0'; i++ );
     if( buff[i] != ';' )
       Error(37, 5, "syntax error in extra font file %s (line %d)",
 	FATAL, &fpos(Extrafilename), FileName(extra_fnum), *lnum);
@@ -428,7 +428,7 @@ static void ReadCompositeMetrics(OBJECT face, OBJECT Extrafilename,
       if( sscanf((char *)&buff[i]," PCC %s %d %d",name,&x_offset,&y_offset)!=3 )
 	Error(37, 5, "syntax error in extra font file %s (line %d)",
 	  FATAL, &fpos(Extrafilename), FileName(extra_fnum), *lnum);
-      for( ; buff[i] != ';' && buff[i] != '\n' && buff[i] != '\0'; i++ );
+      for( ; buff[i] != ';' && buff[i] != '\0'; i++ );
       if( buff[i] != ';' )
 	Error(37, 5, "syntax error in extra font file %s (line %d)",
 	  FATAL, &fpos(Extrafilename), FileName(extra_fnum), *lnum);
@@ -452,7 +452,7 @@ static void ReadCompositeMetrics(OBJECT face, OBJECT Extrafilename,
     cmp[*cmptop].char_code = (FULL_CHAR) '\0';
     (*cmptop)++;
   }
-  if( status == (char *) NULL ||
+  if( status == 0 ||
 	!StringBeginsWith(buff, AsciiToFull("EndBuildComposites")) )
     Error(37, 9, "missing EndBuildComposites in extra font file %s (line %d)",
       FATAL, &fpos(Extrafilename), FileName(extra_fnum), *lnum);
@@ -481,7 +481,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   OBJECT family, face, font_name, AFMfilename, Extrafilename, LCMfilename;
   OBJECT recode, first_size;
   FULL_CHAR buff[MAX_BUFF], command[MAX_BUFF], ch;
-  char *status;
+  int status;
   int xheight2, i, lnum, ligtop, cmptop;
   float fl_xheight2, fl_under_pos, fl_under_thick;
   int under_pos, under_thick;
@@ -559,35 +559,35 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
     }
     else if( actual(y) == fd_name )
     { Child(font_name, Down(y));
-      font_name = ReplaceWithTidy(font_name, TRUE);
+      font_name = ReplaceWithTidy(font_name, WORD_TIDY);
       if( !is_word(type(font_name)) )
 	Error(37, 14, "illegal font name (quotes needed?)",
 	    FATAL, &fpos(font_name));
     }
     else if( actual(y) == fd_metrics )
     { Child(AFMfilename, Down(y));
-      AFMfilename = ReplaceWithTidy(AFMfilename, TRUE);
+      AFMfilename = ReplaceWithTidy(AFMfilename, WORD_TIDY);
       if( !is_word(type(AFMfilename)) )
 	Error(37, 15, "illegal font metrics file name (quotes needed?)",
 	  FATAL, &fpos(AFMfilename));
     }
     else if( actual(y) == fd_extra_metrics )
     { Child(Extrafilename, Down(y));
-      Extrafilename = ReplaceWithTidy(Extrafilename, TRUE);
+      Extrafilename = ReplaceWithTidy(Extrafilename, WORD_TIDY);
       if( !is_word(type(Extrafilename)) )
 	Error(37, 16, "illegal font extra metrics file name (quotes needed?)",
 	  FATAL, &fpos(Extrafilename));
     }
     else if( actual(y) == fd_mapping )
     { Child(LCMfilename, Down(y));
-      LCMfilename = ReplaceWithTidy(LCMfilename, TRUE);
+      LCMfilename = ReplaceWithTidy(LCMfilename, WORD_TIDY);
       if( !is_word(type(LCMfilename)) )
 	Error(37, 17, "illegal mapping file name (quotes needed?)",
 	  FATAL, &fpos(LCMfilename));
     }
     else if( actual(y) == fd_recode )
     { Child(recode, Down(y));
-      recode = ReplaceWithTidy(recode, TRUE);
+      recode = ReplaceWithTidy(recode, WORD_TIDY);
       if( !is_word(type(recode)) )
 	Error(37, 18, "illegal value of %s", FATAL, &fpos(recode),
 	  SymName(fd_recode));
@@ -704,7 +704,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
       FileName(fnum));
 
   /* check that the AFM file begins, as it should, with "StartFontMetrics" */
-  if( StringFGets(buff, MAX_BUFF, fp) == NULL ||
+  if( ReadOneLine(fp, buff, MAX_BUFF) == 0 ||
 	sscanf( (char *) buff, "%s", command) != 1 ||
 	!StringEqual(command, "StartFontMetrics")  )
   { debug1(DFT, DD, "first line of AFM file:%s", buff);
@@ -760,8 +760,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   kv = (unsigned char *) NULL;
   ks = (SHORT_LENGTH *) NULL;
   font_name_found = FALSE;  lnum = 1;
-  while( (status = StringFGets(buff, MAX_BUFF, fp)) != (char *) NULL &&
-    !(buff[0] == 'E' && StringEqual(buff, AsciiToFull("EndFontMetrics\n"))) )
+  while( (status = ReadOneLine(fp, buff, MAX_BUFF)) != 0 &&
+    !(buff[0] == 'E' && StringEqual(buff, AsciiToFull("EndFontMetrics"))) )
   {
     lnum++;
     if( sscanf( (char *) buff, "%s", command) != EOF ) switch( command[0] )
@@ -868,7 +868,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	    num_pairs * sizeof(SHORT_LENGTH)));
 	  ks = (SHORT_LENGTH *) malloc(num_pairs * sizeof(SHORT_LENGTH));
 	  last_ch1 = '\0';
-	  while( StringFGets(buff, MAX_BUFF, fp) == (char *) buff &&
+	  while( ReadOneLine(fp, buff, MAX_BUFF) != 0 &&
 	    !StringBeginsWith(buff, AsciiToFull("EndKernPairs")) )
 	  {
 	    debug1(DFT, DD, "FontRead reading %s", buff);
@@ -952,7 +952,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   }
 
   /* make sure we terminated the font metrics file gracefully */
-  if( status == (char *) NULL )
+  if( status == 0 )
     Error(37, 38, "EndFontMetrics missing from font file %s",
       FATAL, &fpos(AFMfilename), FileName(fnum));
   fclose(fp);
@@ -981,7 +981,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	&fpos(Extrafilename), FileName(extra_fnum));
     lnum = 0;
 
-    while( StringFGets(buff, MAX_BUFF, extra_fp) != (char *) NULL )
+    while( ReadOneLine(extra_fp, buff, MAX_BUFF) != 0 )
     {
       debug1(DFT, D, "  Extra: %s", buff);
       lnum++;
@@ -1054,8 +1054,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 void FontChange(STYLE *style, OBJECT x)
 { /* register */ int i;
   OBJECT requested_family, requested_face, requested_size;
-  OBJECT par[3], family, face, fsize, y, link, new, old, tmpf;
-  GAP gp;  SHORT_LENGTH flen;  int num, c;  unsigned inc;
+  OBJECT par[3], family, face, fsize, y = nilobj, link, new, old, tmpf;
+  GAP gp;  SHORT_LENGTH flen = 0;  int num, c;  unsigned inc;
   struct metrics *newfnt, *oldfnt;
   FULL_CHAR *lig;
   int cmptop;
@@ -1625,7 +1625,8 @@ void FontWordSize(OBJECT x)
 /*                                                                           */
 /*  FULL_LENGTH FontSize(fnum, x)                                            */
 /*                                                                           */
-/*  Return the size of this font.  x is for error messages only.             */
+/*  Return the size of this font.  x is for error messages only, and may be  */
+/*  nilobj if fnum is certain not to be NO_FONT.                             */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -1772,17 +1773,18 @@ void FontPrintAll(FILE *fp)
       Child(first_size, NextDown(NextDown(Down(face))));
       assert( is_word(type(first_size)), "FontPrintAll: first_size!" );
       if( font_recoded(face) )
-      { fprintf(fp, "/%s%s %s /%s LoutRecode\n",
+      { fprintf(fp, "/%s%s %s /%s LoutRecode%s",
 	  string(ps_name), string(first_size),
-	  MapEncodingName(font_mapping(face)), string(ps_name));
-	fprintf(fp, "/%s { /%s%s LoutFont } def\n", string(first_size),
-	  string(ps_name), string(first_size));
+	  MapEncodingName(font_mapping(face)), string(ps_name),
+	  (char *) STR_NEWLINE);
+	fprintf(fp, "/%s { /%s%s LoutFont } def%s", string(first_size),
+	  string(ps_name), string(first_size), (char *) STR_NEWLINE);
       }
-      else fprintf(fp, "/%s { /%s LoutFont } def\n", string(first_size),
-	  string(ps_name));
+      else fprintf(fp, "/%s { /%s LoutFont } def%s", string(first_size),
+	  string(ps_name), (char *) STR_NEWLINE);
     }
   }
-  fputs("\n", fp);
+  fputs((char *) STR_NEWLINE, fp);
   debug0(DFT, DD, "FontPrintAll returning.");
 } /* end FontPrintAll */
 
@@ -1915,8 +1917,9 @@ BOOLEAN FontNeeded(FILE *fp)
     { Child(face, flink);
       Child(ps_name, Down(face));
       assert( is_word(type(ps_name)), "FontPrintPageResources: ps_name!" );
-      fprintf(fp, "%s font %s\n",
-	first_need ? "%%DocumentNeededResources:" : "%%+", string(ps_name));
+      fprintf(fp, "%s font %s%s",
+	first_need ? "%%DocumentNeededResources:" : "%%+", string(ps_name),
+	(char *) STR_NEWLINE);
       first_need = FALSE;
     }
   }

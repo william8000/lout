@@ -4,23 +4,66 @@
 @Begin
 @PP
 A @I key to a graph is an explanation of what each data set
-key. @Index { key in graph }
+graphs. @RawIndex { graphs (statistical) }
+graphs.keys @SubIndex { keys }
+keys.graph @Index { keys in graphs }
 represents.  To assist you in constructing a key, some extra symbols
 are provided in addition to {@Code "@Graph"}:
-graph.cross @Index @Code "@GraphCross"
-graph.plus @Index @Code "@GraphPlus"
-graph.square @Index @Code "@GraphSquare"
-graph.filled.square @Index @Code "@GraphFilledSquare"
-graph.diamond @Index @Code "@GraphDiamond"
-graph.filled.diamond @Index @Code "@GraphFilledDiamond"
-graph.circle @Index @Code "@GraphCircle"
-graph.filled.circle @Index @Code "@GraphFilledCircle"
-graph.triangle @Index @Code "@GraphTriangle"
-graph.filled.triangle @Index @Code "@GraphFilledTriangle"
-graph.noline @Index @Code "@GraphNoLine"
-graph.solid @Index @Code "@GraphSolid"
-graph.dashed @Index @Code "@GraphDashed"
-graph.dotted @Index @Code "@GraphDotted"
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphcross @SubIndex { @Code "@GraphCross" symbol }
+{ graphacross } @Index { @Code "@GraphCross" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphplus @SubIndex { @Code "@GraphPlus" symbol }
+{ graphaplus } @Index { @Code "@GraphPlus" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphsquare @SubIndex { @Code "@GraphSquare" symbol }
+{ graphasquare } @Index { @Code "@GraphSquare" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphfilled.square @SubIndex { @Code "@GraphFilledSquare" symbol }
+{ graphafilled.square } @Index { @Code "@GraphFilledSquare" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphdiamond @SubIndex { @Code "@GraphDiamond" symbol }
+{ graphadiamond } @Index { @Code "@GraphDiamond" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphfilled.diamond @SubIndex { @Code "@GraphFilledDiamond" symbol }
+{ graphafilled.diamond } @Index { @Code "@GraphFilledDiamond" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphcircle @SubIndex { @Code "@GraphCircle" symbol }
+{ graphacircle } @Index { @Code "@GraphCircle" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphfilled.circle @SubIndex { @Code "@GraphFilledCircle" symbol }
+{ graphafilled.circle } @Index { @Code "@GraphFilledCircle" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphtriangle @SubIndex { @Code "@GraphTriangle" symbol }
+{ graphatriangle } @Index { @Code "@GraphTriangle" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphfilled.triangle @SubIndex { @Code "@GraphFilledTriangle" symbol }
+{ graphafilled.triangle } @Index { @Code "@GraphFilledTriangle" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphnoline @SubIndex { @Code "@GraphNoLine" symbol }
+{ graphanoline } @Index { @Code "@GraphNoLine" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphsolid @SubIndex { @Code "@GraphSolid" symbol }
+{ graphasolid } @Index { @Code "@GraphSolid" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphdashed @SubIndex { @Code "@GraphDashed" symbol }
+{ graphadashed } @Index { @Code "@GraphDashed" symbol (graphs) }
+
+graphs. @RawIndex { graphs (statistical) }
+graphs.graphdotted @SubIndex { @Code "@GraphDotted" symbol }
+{ graphadotted } @Index { @Code "@GraphDotted" symbol (graphs) }
 @ID @Tab
     @Fmta { @Col @Code A ! @Col B ! @Col @Code C ! @Col D }
 {
@@ -66,14 +109,16 @@ graph.dotted @Index @Code "@GraphDotted"
 These extra symbols may be used anywhere in your document except within
 the right parameter of {@Code "@Graph"}; they are commonly used within
 the caption options of {@Code "@Graph"}:
-@ID @OneRow @Code {
-"@Graph"
-"    rightcaption {"
-"@GraphPlus @GraphSolid @GraphPlus  Boston"
-"@GraphPlus @GraphDashed @GraphPlus  New York"
-"@GraphPlus @GraphDotted @GraphPlus  Philadelphia"
-"}"
+@ID @OneRow @Code @Verbatim {
+@Graph
+    rightcaption {
+@GraphPlus @GraphSolid @GraphPlus  Boston
+@GraphPlus @GraphDashed @GraphPlus  New York
+@GraphPlus @GraphDotted @GraphPlus  Philadelphia
 }
+}
+(You can also use them within the @Code objects option, which
+is the way to place your key within the graph itself.)
 Recall that unlike the other captions, @Code rightcaption is set using
 the @Code "lines @Break" style rather than {@Code "clines @Break"}
 (Section {@NumberOf captions}).  Adding this caption to the graph
@@ -96,9 +141,9 @@ from Section {@NumberOf data}, the complete result is
 
 }
 The first eight symbols have a @Code "symbolsize" option with the
-usual meaning and the usual default value ({@Code "0.15 ft"}).  The
+usual meaning and the usual default value ({@Code "0.15f"}).  The
 last four symbols have @Code "dashlength" and @Code "linewidth" options
-with the usual default values, {@Code "0.2 ft"} and {@Code "0.5 pt"}
+with the usual default values, {@Code "0.2f"} and {@Code "0.5p"}
 respectively, and a @Code "length" option, which determines the length
-of the line drawn by each symbol; its default value is {@Code "1.0 ft"}.
+of the line drawn by each symbol; its default value is {@Code "1.0f"}.
 @End @Section

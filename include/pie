@@ -1,0 +1,109 @@
+###############################################################################
+#                                                                             #
+#   Lout setup file for pie charts                                            #
+#                                                                             #
+#   Jeffrey H. Kingston                                                       #
+#   16 October 2002                                                           #
+#                                                                             #
+###############################################################################
+
+
+###############################################################################
+#                                                                             #
+#  The @SysInclude { pief } line                                              #
+#                                                                             #
+#  This line causes Lout to read the definitions for pie charts, and should   #
+#  not be touched.                                                            #
+#                                                                             #
+###############################################################################
+
+@SysInclude { pief }
+
+
+###############################################################################
+#                                                                             #
+#  The @PieSetup @Use clause                                                  #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
+#                                                                             #
+###############################################################################
+
+@Use { @PieSetup
+
+  #############################################################################
+  #                                                                           #
+  #  General options                                                          #
+  #                                                                           #
+  #############################################################################
+
+  # save		{ no			}
+  # totalweight		{ 100			}
+  # radius		{ 2.5c			}
+  # initialangle	{ 0d			}
+  # leftextra		{ 0i			}
+  # rightextra		{ 0i			}
+  # aboveextra		{ 0i			}
+  # belowextra		{ 0i			}
+
+  #############################################################################
+  #                                                                           #
+  #  Caption options                                                          #
+  #                                                                           #
+  #############################################################################
+
+  # leftcaption		{ 			}
+  # rightcaption	{ 			}
+  # abovecaption	{ 			}
+  # belowcaption	{ 			}
+  # leftgap		{ 0.5c			}
+  # rightgap		{ 0.5c			}
+  # abovegap		{ 0.5c			}
+  # belowgap		{ 0.5c			}
+  # hidecaptions	{ yes			}
+
+  #############################################################################
+  #                                                                           #
+  #  Slice options                                                            #
+  #                                                                           #
+  #############################################################################
+
+  # weight		{ 1			}
+  # paint		{ none			}
+  # texture		{ solid			}
+  # outlinestyle	{ solid			}
+  # outlinedashlength	{ 0.2f			}
+  # outlinewidth	{ thin  		}
+  # detach              { no		        }
+
+  #############################################################################
+  #                                                                           #
+  #  Label options                                                            #
+  #                                                                           #
+  #############################################################################
+
+  # label		{ 			}
+  # labelfont		{ -2p			}
+  # labelbreak		{ clines		}
+  # labelmargin		{ 0.2f			}
+  # labelformat		{ @Body			}
+  # labelradius		{ internal		}
+  # labeladjust		{ 0 0			}
+
+  #############################################################################
+  #                                                                           #
+  #  finger options                                                           #
+  #                                                                           #
+  #############################################################################
+
+  # finger		{ no			}
+  # fingerstyle		{ solid			}
+  # fingerdashlength	{ 0.2f			}
+  # fingerwidth		{ thin			}
+  # fingerradius	{ 0.7			}
+  # fingeradjust	{ 0 0			}
+  # fingerarrow		{ no			}
+  # fingerarrowlength	{ 0.6f			}
+  # fingerarrowwidth	{ 0.45f			}
+
+}

@@ -1,0 +1,53 @@
+@Chapter
+  @Title { Pie Graphs }
+  @Tag { pie }
+@Begin
+@LP
+This chapter describes how to draw pie graphs, using the @Code "@Pie"
+piegraphs. @Index { pie graphs }
+pie. @Index { @Code "@Pie" symbol }
+symbol.  For example,
+@ID @OneRow -1px @Break @Code @Verbatim {
+@Pie
+{
+    @Slice
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching (40%) }
+}
+}
+produces the pie graph
+@CD @Pie
+{
+    @Slice
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching (40%) }
+}
+This example shows off most of what @Code "@Pie" can do.
+# there are many options, but for the most part they offer
+# detailed adjustments, not additional features.
+@BeginSections
+@Include { pie_intr }
+@Include { pie_slic }
+@Include { pie_over }
+@Include { pie_capt }
+@Include { pie_labe }
+@Include { pie_erro }
+@Include { pie_summ }
+@EndSections
+@End @Chapter

@@ -1,9 +1,9 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -30,6 +30,10 @@
 /*  Implementation note:  this fast and cryptic lexical analyser is adapted  */
 /*  from Waite, W. M.: The Cost of Lexical Analysis, in Software - Practice  */
 /*  and Experience, v16, pp473-488 (May 1986).                               */
+/*                                                                           */
+/*  Converted 8 November 2002 to handle DOS etc. line endings.  The end of   */
+/*  a line is now taken to be the second end-of-line character when there    */
+/*  are two of them.  With this rule it's quite easy to do the conversion.   */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs.h"
@@ -143,7 +147,7 @@ static void initchtbl(val, str)
 int val;  FULL_CHAR *str;
 { int i;
   for( i = 0;  str[i] != '\0';  i++ )
-	chtbl[ str[i] ] = val;
+    chtbl[ str[i] ] = val;
 } /* end initchtbl */
 
 void LexInit(void)
@@ -165,7 +169,8 @@ void LexInit(void)
   initchtbl(CSPACE,  STR_SPACE);
   initchtbl(FORMFEED,STR_FORMFEED);
   initchtbl(TAB,     STR_TAB);
-  initchtbl(NEWLINE, STR_NEWLINE);
+  chtbl[CH_LF] = NEWLINE;
+  chtbl[CH_CR] = NEWLINE;
   chtbl['\0'] = ENDFILE;
   stack_free = -1;
 } /* end LexInit */
@@ -237,7 +242,7 @@ void LexPush(FILE_NUM x, int offs, int ftyp, int lnum, BOOLEAN same)
     Error(2, 3, "run out of memory when opening file %s",
       FATAL, PosOfFile(x), FullFileName(x));
   buf = chpt = &mem_block[MAX_LINE];
-  last_char = CH_NEWLINE;
+  last_char = CH_CR;
   this_file = x;  offset = offs;
   first_line_num = lnum;  same_file = same;
   ftype = ftyp;  next_token = nilobj;
@@ -301,8 +306,8 @@ void LexPop(void)
 #define setword(typ, res, file_pos, str, len)				\
 { NewWord(res, typ, len, &file_pos);					\
   FposCopy(fpos(res), file_pos);					\
-  for( c = 0;  c < len;  c++ ) string(res)[c] = str[c];			\
-  string(res)[c] = '\0';						\
+  for( ch = 0;  ch < len;  ch++ ) string(res)[ch] = str[ch];		\
+  string(res)[ch] = '\0';						\
 }
 
 
@@ -336,13 +341,16 @@ long LexNextTokenPos(void)
    * need this workaround (I haven't tried compiling lout with gcc
    * though, as the result will need cygwin.dll to run).
    */
+
+/* *** retired by JeffK 2002-11-08 since now reading in binary mode
   {
     register FULL_CHAR *p;
     for (p = chpt; p < limit; ++p) {
-      if (*p == (FULL_CHAR) CH_NEWLINE)
+      if (*p == (FULL_CHAR) CH_LF)
         --res;
     }
   }
+*** */
 #endif /* DB_FIX */
 
   debug1(DLA, DD, "LexNextTokenPos() returning %ld", res);
@@ -368,7 +376,7 @@ static void srcnext(void)
   if( blksize != 0 && chpt < limit )
   { debugcond0(DLA, DD, stack_free <= 1, "srcnext: transferring.");
     col = buf;
-    while( (*--col = *--limit) != CH_NEWLINE );
+    while( chtbl[(*--col = *--limit)] != NEWLINE );
     frst = col + 1;  limit++;  blksize = 0;
   }
 
@@ -384,11 +392,11 @@ static void srcnext(void)
     blksize = fread( (char *) buf, sizeof(char), BUFFER_SIZE, fp);
     if( blksize > 0 )
       last_char = *(buf + blksize - 1);
-    if( blksize < BUFFER_SIZE && last_char != CH_NEWLINE )
+    if( blksize < BUFFER_SIZE && chtbl[last_char] != NEWLINE )
     {
-      /* at end of file since blksize = 0; so add missing newline char */
+      /* at end of file since blksize < BUFFER_SIZE; add missing newline char */
       blksize++;
-      last_char = *(buf+blksize-1) = CH_NEWLINE;
+      last_char = *(buf+blksize-1) = CH_LF;
 
       /* this adjustment breaks LexNextTokenPos, so fatal error if database */
       if( ftype == DATABASE_FILE )
@@ -401,7 +409,7 @@ static void srcnext(void)
     debugcond4(DLA, DD, stack_free <= 1,
       "srcnext: %d = fread(0x%x, %d, %d, fp)",
       blksize, buf, sizeof(char), BUFFER_SIZE);
-    frst = buf;  limit = buf + blksize;  *limit = CH_NEWLINE;
+    frst = buf;  limit = buf + blksize;  *limit = CH_LF;
   }
 
   /* if nothing more to read, make this clear */
@@ -427,7 +435,7 @@ OBJECT LexGetToken(void)
 {
 	   FULL_CHAR *startpos;		/* where the latest token started    */
   register FULL_CHAR *p, *q;		/* pointer to current input char     */
-  register int      c;			/* temporary character (really char) */
+  register int      ch;			/* temporary character (really char) */
   OBJECT   res;				/* result token                      */
   int vcount, hcount;			/* no. of newlines and spaces seen   */
 
@@ -445,7 +453,7 @@ OBJECT LexGetToken(void)
   {
       case ESCAPE:
       
-	if( ftype==DATABASE_FILE && *p>='a' && *p<='z' && *(p+1) == '{' /*}*/ )
+	if( ftype==DATABASE_FILE && *p>='a' && *p<='z' && *(p+1) == '{' )
 	{ res = NewToken(LBR, &file_pos, 0, 0, (unsigned) *p, StartSym);
 	  p += 2;
 	}
@@ -461,9 +469,21 @@ OBJECT LexGetToken(void)
       case COMMENT:
       
 	debug1(DLA, DDD, "LexGetToken%s: comment", EchoFilePos(&file_pos));
-	while( (c = *p++) != CH_NEWLINE && c != '\0' );
-	if( c == CH_NEWLINE )
+	while( chtbl[(ch = *p++)] != NEWLINE && ch != '\0' );
+	if( chtbl[ch] == NEWLINE )
 	{
+	  /* skip over second newline character if any */
+	  if( ch == CH_LF )
+	  {
+	    if( *p == CH_CR )
+	      p++;
+	  }
+	  else /* ch == CH_CR */
+	  {
+	    if( *p == CH_LF )
+	      p++;
+	  }
+
 	  /* do NEWLINE action, only preserve existing horizontal space */
 	  /* and don't count the newline in the vcount. */
 	  chpt = p;  srcnext();
@@ -493,6 +513,19 @@ OBJECT LexGetToken(void)
 
       case NEWLINE:
       
+	/* skip over second newline character if any */
+	if( *(p-1) == CH_LF )
+	{
+	  if( *p == CH_CR )
+	    p++;
+	}
+	else /* *(p-1) == CH_CR */
+	{
+	  if( *p == CH_LF )
+	    p++;
+	}
+
+	/* do newline action */
 	chpt = p;  srcnext();
 	line_num(file_pos)++;
 	col_num(file_pos) = 0;
@@ -533,7 +566,7 @@ OBJECT LexGetToken(void)
 	    line_num(file_pos) = first_line_num;
 	  }
 	  frst = limit = chpt = buf;
-	  blksize = 0;  last_char = CH_NEWLINE;
+	  blksize = 0;  last_char = CH_LF;
 	  srcnext();
 	  startline = (p = chpt) - 1;
 	  hcount = 0;
@@ -557,9 +590,6 @@ OBJECT LexGetToken(void)
 	  
 	    /* input ends with "@End @FilterOut" */
 	    res = NewToken(END, &file_pos, 0, 0, END_PREC, FilterOutSym);
-	    /* ***
-	    next_token = NewToken(CLOSURE,&file_pos,0,0,NO_PREC,FilterOutSym);
-	    *** */
 	    --p;  startline = p;
 	    break;
 
@@ -585,11 +615,12 @@ OBJECT LexGetToken(void)
       
 	col_num(file_pos) = (startpos = p-1) - startline;
 	while( chtbl[*p++] == OTHER );
-	c = p - startpos - 1;
+	/* using ch as a real int here, not a char */
+	ch = p - startpos - 1;
 	do
-	{ res = SearchSym(startpos, c);
-	  --c; --p;
-	} while( c > 0 && res == nilobj );
+	{ res = SearchSym(startpos, ch);
+	  --ch; --p;
+	} while( ch > 0 && res == nilobj );
 	goto MORE;  /* 7 lines down */
 
 
@@ -635,7 +666,7 @@ OBJECT LexGetToken(void)
 	    New(t, LBR);
 	  }
 	  fname = Parse(&t, nilobj, FALSE, FALSE);
-	  fname = ReplaceWithTidy(fname, FALSE);
+	  fname = ReplaceWithTidy(fname, ACAT_TIDY);
 	  if( scope_suppressed ) SuppressScope();
 	  if( !is_word(type(fname)) )
 	  { Error(2, 10, "name of include file expected here",
@@ -647,15 +678,31 @@ OBJECT LexGetToken(void)
 	  len = StringLength(string(fname)) - StringLength(SOURCE_SUFFIX);
 	  if( len >= 0 && StringEqual(&string(fname)[len], SOURCE_SUFFIX) )
 	    StringCopy(&string(fname)[len], STR_EMPTY);
-	  debug0(DFS, D, "  calling DefineFile from LexGetToken");
-	  fnum = DefineFile(string(fname), STR_EMPTY, &fpos(fname),
+	  if( !InDefinitions ||
+	      (FileNum(string(fname), STR_EMPTY) == NO_FILE &&
+	      FileNum(string(fname), SOURCE_SUFFIX) == NO_FILE) )
+	  {
+	    /* need to define and read this include file */
+	    debug1(DFS, D, "  calling DefineFile %s from LexGetToken",
+	      string(fname));
+	    fnum = DefineFile(string(fname), STR_EMPTY, &fpos(fname),
 	      INCLUDE_FILE,
 	      predefined(res)==INCLUDE ? INCLUDE_PATH : SYSINCLUDE_PATH);
-	  Dispose(fname);
-	  LexPush(fnum, 0, INCLUDE_FILE, 1, FALSE);
-	  res = LexGetToken();
-	  vcount++; /** TEST ADDITION! **/
-	  p = chpt;
+	    Dispose(fname);
+	    LexPush(fnum, 0, INCLUDE_FILE, 1, FALSE);
+	    res = LexGetToken();
+	    vcount++; /** TEST ADDITION! **/
+	    p = chpt;
+	  }
+	  else
+	  {
+	    debug1(DFS, D, "  skipping DefineFile %s from LexGetToken",
+	      string(fname));
+	    res = nilobj;
+	    p = chpt;
+	    Dispose(fname);
+	    break;
+	  }
 	}
 	else if( predefined(res) == END )
 	  res = NewToken(predefined(res), &file_pos,0,0,precedence(res),nilobj);
@@ -728,9 +775,14 @@ OBJECT LexGetToken(void)
   chpt = p;
   vspace(res) = vcount;
   hspace(res) = hcount;
+  debug5(DLA, DD, "LexGetToken%s returning %s %s %d.%d",
+    EchoFilePos(&file_pos), Image(type(res)), EchoToken(res),
+    vspace(res), hspace(res));
+  /* ***
   debugcond5(DLA, DD, stack_free <= 1, "LexGetToken%s returning %s %s %d.%d",
     EchoFilePos(&file_pos), Image(type(res)), EchoToken(res),
     vspace(res), hspace(res));
+  *** */
   return res;
 } /* end LexGetToken */
 
@@ -745,8 +797,21 @@ OBJECT LexGetToken(void)
 /*  terminate at matching right brace.                                       */
 /*                                                                           */
 /*  If lessskip is true it means that we should skip only up to and          */
-/*  including the first newline character, as opposed to the usual           */
+/*  including the first newline character sequence, as opposed to the usual  */
 /*  skipping of all initial white space characters.                          */
+/*                                                                           */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/*                                                                           */
+/*  print(ch)                                                                */
+/*                                                                           */
+/*  Add ch to the result of the verbatim scan.  If chtbl[ch] == NEWLINE,     */
+/*  this means to add whatever sequence of characters counts as the end      */
+/*  of line sequence in today's operating system.  Otherwise, just add ch.   */
+/*                                                                           */
+/*  The code that calls print() ensures that only one character is passed    */
+/*  to print() per newline sequence; this could be either CH_LF or CH_CR.    */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -755,30 +820,77 @@ OBJECT LexGetToken(void)
   if( fp == NULL )							\
   { if( bufftop < MAX_BUFF )						\
     { if( chtbl[ch] == NEWLINE )					\
-      { res = BuildLines(res, buff, &bufftop);				\
+      { res = BuildLines(res, buff, &bufftop, hs_lnum_overshoot);	\
       }									\
       else buff[bufftop++] = ch;					\
     }									\
   }									\
-  else putc(ch, fp);							\
+  else if( chtbl[ch] != NEWLINE )					\
+    putc(ch, fp);							\
+  else									\
+    StringFPuts(STR_NEWLINE, fp);					\
 }
 
-#define clear()								\
-{ int i;								\
-  for( i = 0;  i < hs_top;  i++ )  print(hs_buff[i]);			\
-  hs_top = 0;								\
-}
+/*****************************************************************************/
+/*                                                                           */
+/*  hold(ch)                                                                 */
+/*                                                                           */
+/*  At this point we are thinking about print(ch) but we are not certain     */
+/*  yet, so ch is held pending a decision.                                   */
+/*                                                                           */
+/*  The code that calls hold() ensures that only one character is passed     */
+/*  to hold() per newline sequence; this could be either CH_LF or CH_CR.     */
+/*                                                                           */
+/*****************************************************************************/
 
 #define hold(ch)							\
 { if( hs_top == MAX_BUFF )  clear();					\
   hs_buff[hs_top++] = ch;						\
+  if( chtbl[ch] == NEWLINE )						\
+    hs_lnum_overshoot++;						\
 }
 
-static OBJECT BuildLines(OBJECT current, FULL_CHAR *buff, int *bufftop)
-{ OBJECT wd, res, gp, gpword;  int c;
+/*****************************************************************************/
+/*                                                                           */
+/*  clear()                                                                  */
+/*                                                                           */
+/*  A decision has been made that all currently held characters are now      */
+/*  to be printed.                                                           */
+/*                                                                           */
+/*****************************************************************************/
+
+#define clear()								\
+{ int i;								\
+  for( i = 0;  i < hs_top;  i++ )					\
+  { print(hs_buff[i]);							\
+    if( chtbl[hs_buff[i]] == NEWLINE )					\
+      hs_lnum_overshoot--;						\
+  }									\
+  hs_top = 0;								\
+  assert(hs_lnum_overshoot == 0, "clear(): hs_lnum_overshoot!");	\
+}
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT BuildLines(current, buff, bufftop, ladj)                          */
+/*                                                                           */
+/*  Add one line containing word buff to the growing set of verbatim lines.  */
+/*  Adjust the line number of file_pos by ladj to account for extra lines    */
+/*  that we may be holding, which would otherwise cause us to overestimate   */
+/*  which line we are on.                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+static OBJECT BuildLines(OBJECT current, FULL_CHAR *buff, int *bufftop, int ladj)
+{ OBJECT wd, res, gp, gpword;  int ch;  FILE_POS xfp;
+
+  /* adjust file position since we may have been holding stuff */
+  file_num(xfp) = file_num(file_pos);
+  line_num(xfp) = line_num(file_pos) - ladj;
+  col_num(xfp) = 1;
 
   /* build a new word and reset the buffer */
-  setword(WORD, wd, file_pos, buff, *bufftop);
+  setword(WORD, wd, xfp, buff, *bufftop);
   debug1(DLA, D, "BuildLines(current, %s)", EchoObject(wd));
   *bufftop = 0;
 
@@ -801,8 +913,8 @@ static OBJECT BuildLines(OBJECT current, FULL_CHAR *buff, int *bufftop)
     New(gp, GAP_OBJ);
     mark(gap(gp)) = FALSE;
     join(gap(gp)) = FALSE;
-    FposCopy(fpos(gp), file_pos);
-    gpword = MakeWord(WORD, AsciiToFull("1vx"), &file_pos);
+    FposCopy(fpos(gp), xfp);
+    gpword = MakeWord(WORD, AsciiToFull("1vx"), &xfp);
     Link(gp, gpword);
     Link(res, gp);
     Link(res, wd);
@@ -820,6 +932,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
   BOOLEAN skipping;			/* TRUE when skipping initial spaces */
   FULL_CHAR hs_buff[MAX_BUFF];		/* hold spaces here in case last     */
   int hs_top;				/* next free spot in hs_buff         */
+  int hs_lnum_overshoot = 0;		/* subtract this from lnum           */
   FULL_CHAR buff[MAX_BUFF];		/* hold line here if not to file     */
   int bufftop;				/* top of buff                       */
   OBJECT res = nilobj;			/* result object if not to file      */
@@ -857,8 +970,23 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
 
       case NEWLINE:
       
+	/* skip over second newline character if any */
+	if( *(p-1) == CH_LF )
+	{
+	  if( *p == CH_CR )
+	    p++;
+	}
+	else /* c == CH_CR */
+	{
+	  if( *p == CH_LF )
+	    p++;
+	}
+
+	/* sort out skipping and holding */
 	if( !skipping )  hold(*(p-1));
 	if( lessskip ) skipping = FALSE;
+
+	/* perform newline action */
 	chpt = p;  srcnext();
 	line_num(file_pos)++;
 	col_num(file_pos) = 0;
@@ -925,7 +1053,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
 		FATAL, &fpos(t), KW_LBR, sysinc ? KW_SYSINCLUDE : KW_INCLUDE);
 	    incl_fname = Parse(&t, nilobj, FALSE, FALSE);
 	    p = chpt;
-	    incl_fname = ReplaceWithTidy(incl_fname, FALSE);
+	    incl_fname = ReplaceWithTidy(incl_fname, ACAT_TIDY);
 	    if( !is_word(type(incl_fname)) )
 	      Error(2, 19, "expected file name here", FATAL,&fpos(incl_fname));
 	    debug0(DFS, D, "  calling DefineFile from LexScanVerbatim");
@@ -960,7 +1088,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
 	break;
 
   };
-  print('\n');
+  print(CH_LF);
 
   if( p - startline >= MAX_LINE )
   { col_num(file_pos) = 1;

@@ -1,9 +1,9 @@
 /*@z03.c:File Service:Declarations, no_fpos@******************************** */
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -136,30 +136,38 @@ static OBJECT ftab_retrieve(FULL_CHAR *str, FILE_TABLE S)
 } /* end ftab_retrieve */
 
 #if DEBUG_ON
-static void ftab_debug(FILE_TABLE S, FILE *fp)
+static void ftab_debug(FILE_TABLE S)
 { int i;  OBJECT x, link, y;
-  fprintf(fp, "  table size: %d;  current number of files: %d\n",
+  FULL_CHAR buff[MAX_BUFF];
+  debug2(DFS, D, "  table size: %d;  current number of files: %d",
     ftab_size(S), ftab_count(S));
   for( i = 0;  i < ftab_size(S);  i++ )
   { x = ftab_num(S, i);
-    fprintf(fp, "  ftab_num(S, %d) = %s\n", i,
+    debug2(DFS, D, "  ftab_num(S, %d) = %s", i,
       x == nilobj ? AsciiToFull("<nilobj>") :
       !is_word(type(x)) ? AsciiToFull("not WORD!") : string(x) );
   }
-  fprintf(fp, "\n");
+  debug0(DFS, D, "");
   for( i = 0;  i < ftab_size(S);  i++ )
   { x = ftab_name(S, i);
-    fprintf(fp, "  ftab_name(S, %d) =", i);
     if( x == nilobj )
-      fprintf(fp, " <nilobj>");
-    else if( type(x) != ACAT )
-      fprintf(fp, " not ACAT!");
-    else for( link = Down(x);  link != x;  link = NextDown(link) )
-    { Child(y, link);
-      fprintf(fp, " %s",
-	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
+    {
+      debug1(DFS, D, "  ftab_name(S, %d) = <nilobj>", i);
     }
-    fprintf(fp, "\n");
+    else if( type(x) != ACAT )
+    {
+      debug1(DFS, D, "  ftab_name(S, %d) = not ACAT!>", i);
+    }
+    else
+    {
+      StringCopy(buff, STR_EMPTY);
+      for( link = Down(x);  link != x;  link = NextDown(link) )
+      { Child(y, link);
+	StringCat(buff, STR_SPACE);
+	StringCat(buff, is_word(type(y)) ? string(y):AsciiToFull("not-WORD!"));
+      }
+      debug2(DFS, D, "  ftab_name(S, %d) =%s", i, buff);
+    }
   }
 } /* end ftab_debug */
 
@@ -174,9 +182,11 @@ static	OBJECT		empty_path;		/* file path with just "" in */
 static	FILE_TABLE	file_tab;		/* the file table            */
 static	OBJECT		file_type[MAX_TYPES];	/* files of each type        */
 static	OBJECT		file_path[MAX_PATHS];	/* the search paths          */
+/* ***don't need these any more
 static	char		*file_mode[MAX_TYPES] =
 { READ_TEXT, READ_TEXT, READ_TEXT, READ_BINARY, READ_TEXT,
   READ_TEXT, READ_TEXT, READ_BINARY, READ_TEXT, READ_TEXT };
+*** */
 
 
 /*****************************************************************************/
@@ -230,6 +240,9 @@ void AddToPath(int fpath, OBJECT dirname)
 /*  Declare a file whose name is str plus suffix and whose fpos is xfpos.    */
 /*  The file type is ftype, and its search path is fpath.                    */
 /*                                                                           */
+/*  If ignore_dup is TRUE, any repeated definition of the same file with     */
+/*  the same type will be ignored.  The result in that case will be the      */
+/*                                                                           */
 /*****************************************************************************/
 
 FILE_NUM DefineFile(FULL_CHAR *str, FULL_CHAR *suffix,
@@ -260,7 +273,7 @@ FILE_POS *xfpos, int ftype, int fpath)
   used_suffix(fname) = FALSE;
   ftab_insert(fname, &file_tab);
   debug1(DFS, DD, "DefineFile returning %s", string(fname));
-  ifdebug(DFS, DD, ftab_debug(file_tab, stderr));
+  ifdebug(DFS, DD, ftab_debug(file_tab));
   return file_number(fname);
 } /* end DefineFile */
 
@@ -332,6 +345,7 @@ FILE_NUM FileNum(FULL_CHAR *str, FULL_CHAR *suffix)
     i == NO_FILE ? STR_NONE : FileName( (FILE_NUM) i));
   return (FILE_NUM) i;
 } /* end FileNum */
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -449,6 +463,23 @@ FULL_CHAR *FullFileName(FILE_NUM fnum)
     return string(x);
   }
 } /* end FullFileName */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  int FileType(FILE_NUM fnum)                                              */
+/*                                                                           */
+/*  Return the type of file fnum.                                            */
+/*                                                                           */
+/*****************************************************************************/
+
+int FileType(FILE_NUM fnum)
+{ OBJECT x;
+  x = ftab_num(file_tab, fnum);
+  assert( x != nilobj, "FileType: x == nilobj!" );
+  if( Down(x) != x )  Child(x, Down(x));
+  return type_of_file(x);
+} /* end FileType */
 
 
 /*****************************************************************************/
@@ -630,7 +661,7 @@ static FILE *SearchPath(FULL_CHAR *str, OBJECT fpath, BOOLEAN check_ld,
 BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode,
 BOOLEAN *used_source_suffix)
 { FULL_CHAR buff[MAX_BUFF], buff2[MAX_BUFF];
-  OBJECT link, y, cpath;  FILE *fp, *fp2;
+  OBJECT link, y = nilobj, cpath;  FILE *fp, *fp2;
   debug4(DFS, DD, "[ SearchPath(%s, %s, %s, %s, -)", str, EchoObject(fpath),
 	bool(check_ld), bool(check_lt));
 
@@ -676,7 +707,7 @@ BOOLEAN *used_source_suffix)
         StringCopy(buff2, buff);
         StringCopy(&buff2[StringLength(buff2) - StringLength(INDEX_SUFFIX)],
 	  DATA_SUFFIX);
-        fp2 = StringFOpen(buff2, READ_TEXT);
+        fp2 = StringFOpen(buff2, READ_FILE);
         debug1(DFS, DD, fp2 == null ? "  fail %s" : "  succeed %s", buff2);
         if( fp2 != null )
         { fclose(fp2);
@@ -730,7 +761,7 @@ BOOLEAN *used_source_suffix)
     {
       StringCopy(buff2, buff);
       StringCat(buff2, SOURCE_SUFFIX);
-      fp2 = StringFOpen(buff2, READ_TEXT);
+      fp2 = StringFOpen(buff2, READ_FILE);
       debug1(DFS, DD, fp2 == null ? "  fail %s" : "  succeed %s", buff2);
       if( fp2 != null )
       { if( fp != null )
@@ -773,13 +804,19 @@ FILE *OpenFile(FILE_NUM fnum, BOOLEAN check_ld, BOOLEAN check_lt)
   fname = ftab_num(file_tab, fnum);
   if( Down(fname) != fname )
   { Child(y, Down(fname));
-    fp = StringFOpen(string(y), file_mode[type_of_file(fname)]);
+    /* fp = StringFOpen(string(y), file_mode[type_of_file(fname)]); */
+    fp = StringFOpen(string(y), READ_FILE);
     debug1(DFS,DD,fp==null ? "  failed on %s" : "  succeeded on %s", string(y));
   }
   else
-  { fp = SearchPath(string(fname), file_path[path(fname)], check_ld,
+  {
+    /* ***
+    fp = SearchPath(string(fname), file_path[path(fname)], check_ld,
 	   check_lt, &full_name, &fpos(fname), file_mode[type_of_file(fname)],
 	   &used_source_suffix);
+    *** */
+    fp = SearchPath(string(fname), file_path[path(fname)], check_ld, check_lt,
+	   &full_name, &fpos(fname), READ_FILE, &used_source_suffix);
     if( full_name != nilobj )  Link(fname, full_name);
     used_suffix(fname) = used_source_suffix;
   }
@@ -811,7 +848,7 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
   assert( typ == INCGRAPHIC || typ == SINCGRAPHIC, "OpenIncGraphicFile!" );
   p = (typ == INCGRAPHIC ? INCLUDE_PATH : SYSINCLUDE_PATH);
   fp = SearchPath(str, file_path[p], FALSE, FALSE, full_name, xfpos,
-	READ_TEXT, &used_source_suffix);
+	READ_FILE, &used_source_suffix);
   if( *full_name == nilobj )  *full_name = MakeWord(WORD, str, xfpos);
 
   if( fp == null )
@@ -840,7 +877,7 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
       else
       {
         system(buff);
-        fp = fopen(LOUT_EPS, READ_TEXT);
+        fp = fopen(LOUT_EPS, READ_FILE);
         *compressed = TRUE;
       }
     }

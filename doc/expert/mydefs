@@ -22,8 +22,6 @@
    def @@Case                 { @Code "@Case"                 }
    def @@Char                 { @Code "@Char"                 }
    def @@ClearHeaderComponent { @Code "@ClearHeaderComponent" }
-   def @@Colour               { @Code "@Colour"               }
-   def @@Color                { @Code "@Color"                }
    def @@Common               { @Code "@Common"               }
    def @@CurrLang             { @Code "@CurrLang"             }
    def @@CurrFamily           { @Code "@CurrFamily"           }
@@ -94,6 +92,7 @@
    def @@SysPrependGraphic    { @Code "@SysPrependGraphic"    }
    def @@Tag                  { @Code "@Tag"                  }
    def @@Tagged               { @Code "@Tagged"               }
+   def @@SetTexture           { @Code "@SetTexture"           }
    def @@Underline            { @Code "@Underline"            }
    def @@URLLink              { @Code "@URLLink"              }
    def @@Use                  { @Code "@Use"                  }

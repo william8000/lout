@@ -4,6 +4,8 @@
 @Begin
 @PP
 This summary applies to all @Code "@Tbl" options except the @Code format
+tables. @RawIndex { tables }
+tables.summary @SubIndex { summary of all options }
 options described in Section {@NumberOf tbl_rows}.  Here is the complete
 list of these options, one option per line, showing its alternative
 spellings, default values (PostScript and PDF, and plain text) from the setup
@@ -47,8 +49,12 @@ plain text }
     rulebelow { yes }
 @Rowa
     A { paint  p }
-    B { nopaint }
+    B { none }
     D { any colour from Section {@NumberOf colour} }
+@Rowa
+    A { texture  t }
+    B { solid }
+    D { any texture from Section {@NumberOf textures} }
 @Rowa
     A { background  bg }
     D { any object }

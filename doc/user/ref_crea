@@ -10,13 +10,16 @@ can add your own reference types and change the formatting of existing types.
 To do this you must be using your own setup file, as explained in
 Section {@NumberOf setup}.  At the end of the setup file you will find
 this line:
-reference.print @Index { reference printing style }
-ref.style @Index @Code "@RefStyle"
+references. @RawIndex { references }
+references.refstyle @SubIndex { @Code "@RefStyle" }
+refstyle.references @Index { @Code "@RefStyle" (references) }
 @ID @Code "@SysDatabase @RefStyle { refstyle }"
 This tells Lout to consult a database file of reference styles called
 {@Code "refstyle.ld"}.  These are not references, they are formatting
 styles, one for each reference type.  The @Code "Sys" in @Code "@SysDatabase"
-sys.database @Index @Code "@SysDatabase"
+references. @RawIndex { references }
+references.sysdatabase @SubIndex { @Code "@SysDatabase" }
+sysdatabase.references @Index { @Code "@SysDatabase" }
 means that this file is stored in the @I { Lout system database directory },
 system.database.dir @Index { system database directory }
 refstyle.ld.file @Index { @Code "refstyle.ld" file}
@@ -50,19 +53,19 @@ searches only the system directory.
 In practice you will probably want to store your database of reference
 styles in some library directory, so that it can be used by
 many documents.  A Unix pathname is appropriate for this:
-@ID @Code "@Database @RefStyle { \"/usr/jeff/lib/mystyle\" }"
+@ID @Code @Verbatim { @Database @RefStyle { "/usr/jeff/lib/mystyle" } }
 Quotes are needed because of the @Code "/" characters.
 @PP
 The database entries within @Code "refstyle.ld" and @Code "mystyle.ld"
 might look something like this:
-@ID @OneRow @Code {
-"{ Book @RefStyle @Style"
-"  {  @Reference&&reftag @Open"
-"     {"
-"        @Author.  @I @Title.  @Publisher, @Year."
-"     }"
-"  }"
-"}"
+@ID @OneRow @Code @Verbatim {
+{ Book @RefStyle @Style
+  {  @Reference&&reftag @Open
+     {
+        @Author.  @I @Title.  @Publisher, @Year.
+     }
+  }
+}
 }
 The meaning of the first two lines is beyond our scope, except that
 @Code "Book" on the first line means that this is the entry which
@@ -113,14 +116,9 @@ to great lengths to do the right thing when options are omitted:
 @Rowa A { "}" }
 }
 The meaning is that each object to the left of an @Code "@If" will be
-if. @Index @Code "@If"
 printed only if the condition to the right of the @Code "@If" is
 true.  The condition may contain options, which are considered to be
 true if they are not omitted (non-empty), and it may contain {@Code "@And"},
-and. @Index @Code "@And"
-or. @Index @Code "@Or"
-not. @Index @Code "@Not"
-true. @Index @Code "@True"
 {@Code "@Or"}, {@Code "@Not"}, and @Code "@True" with the usual precedence
 and meaning.  Sub-conditions may be enclosed in braces if desired, although
 it is best to keep the conditions as simple as possible given the

@@ -1,9 +1,9 @@
 /*@z27.c:Debug Service:Debug flags@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -84,6 +84,7 @@ struct dbs  dbg[] = {
     {"po",    {0, 0, 0}},		/* PostScript Back End       */
     {"pf",    {0, 0, 0}},		/* PDF Back End              */
     {"pt",    {0, 0, 0}},		/* Plain Text Back End       */
+    {"tx",    {0, 0, 0}},		/* Texture Service           */
     {"pp",    {0, 0, 0}},		/* Profiling                 */
     {"",      {0, 0, 0}},		/* any                       */
 };
@@ -121,14 +122,17 @@ void Debug(int category, int urgency, char *str, ...)
 { static BOOLEAN first_message = TRUE;
   va_list ap;
   if( first_message )
-  { fprintf(stderr, "\nLout Debug Output:\n");
+  {
+    fprintf(stderr, "%s", STR_NEWLINE);
+    fprintf(stderr, "Lout Debug Output:");
+    fprintf(stderr, "%s", STR_NEWLINE);
     first_message = FALSE;
   }
   fprintf(stderr, "%2s: ", dbg[category].flag);
   va_start(ap, str);
   vfprintf(stderr, str, ap);
   va_end(ap);
-  fprintf(stderr, "\n");
+  fprintf(stderr, "%s", STR_NEWLINE);
   fflush(stderr);
 } /* end Debug */
 
@@ -158,7 +162,10 @@ void ProfileOn(char *str)
   for( i = 0;  i < proftop;  i++ )
   { if( strcmp(profstack[i].label, str) == 0 )
     { for( i = 0;  i < proftop;  i++ )
-	fprintf(stderr, "profstack[%d] = %s\n", i, profstack[i].label);
+      {
+	fprintf(stderr, "profstack[%d] = %s", i, profstack[i].label);
+	fprintf(stderr, "%s", STR_NEWLINE);
+      }
       assert1(FALSE, "ProfileOn: restarted", str);
     }
   }
@@ -204,9 +211,10 @@ void ProfileOff(char *str)
 void ProfilePrint(void)
 { int i;
   for( i = 0;  i < profsize;  i++ )
-  { fprintf(stderr, "Profile %-20s  %6ld secs, %3d calls, %6.2f secs/call\n",
+  { fprintf(stderr, "Profile %-20s  %6ld secs, %3d calls, %6.2f secs/call",
 	profstore[i].label, profstore[i].time, profstore[i].calls,
 	(float) profstore[i].time / profstore[i].calls );
+    fprintf(stderr, "%s", STR_NEWLINE);
   }
 } /* end ProfilePrint */
 #endif

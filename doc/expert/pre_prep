@@ -21,4 +21,10 @@ diagrams.  It saves a lot of space to include them just once at the
 start like this, rather than with every diagram.  @@PrependGraphic and
 @@SysPrependGraphic search for the file in the same places as @@Include and
 @@SysInclude respectively.
+@PP
+If the same file name appears in two @@PrependGraphic or
+@@SysPrependGraphic symbols, the second occurrence is
+silently ignored.  This allows several packages to share
+PostScript resources:  each includes the appropriate prepend file,
+but in the end only one copy ot it is printed to Lout's output.
 @End @Section

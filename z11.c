@@ -1,9 +1,9 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -41,6 +41,7 @@
 
 FULL_CHAR *EchoStyle(STYLE *style)
 { static FULL_CHAR res[100];
+  static char buff[100];
   static char *hyphwords[] = { "hyph_undef", "hyph_off", "hyph_on" };
   static char *fillwords[] = { "fill_undef", "fill_off", "fill_on" };
   static char *spacewords[] = { "lout", "comp", "troff", "tex" };
@@ -80,6 +81,8 @@ FULL_CHAR *EchoStyle(STYLE *style)
   }
   if( nobreakfirst(*style) ) StringCat(res, AsciiToFull(":NBF"));
   if( nobreaklast(*style) ) StringCat(res, AsciiToFull(":NBL"));
+  sprintf(buff, ":C%d:P%d", colour(*style), texture(*style));
+  StringCat(res, AsciiToFull(buff));
   StringCat(res, AsciiToFull("]"));
   return res;
 } /* end EchoStyle */

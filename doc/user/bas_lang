@@ -14,23 +14,6 @@ language. @Index @Code "@Language"
 Changing language is quite analogous to changing font using the
 @Code "@Font" symbol.
 @PP
-Since accented characters (Section {@NumberOf characters}) are always
-available irrespective of the language, at first sight it might seem
-that there is no need to bother informing Lout what language you are
-writing in.  However, words are hyphenated differently depending on the
-hyphenation.languages @SubIndex { in languages other than English }
-language, and some symbols have different results in different
-languages.  For example,
-@ID @Code "Danish @Language @Date"
-produces
-@ID { Danish @Language @Date }
-date.languages @SubIndex { in languages other than English }
-time.languages @SubIndex { in languages other than English }
-lists.languages @SubIndex { in languages other than English }
-and the alphabetic list symbols of Section {@NumberOf lists} also
-vary with the current language.  So it's worth doing for the sake of
-knowing that non-English parts will appear as they should.
-@PP
 At the time of writing, the following languages were available:
 @ID @OneRow @Code {
 Croatian Hrvatski
@@ -59,6 +42,23 @@ list of known languages.  As shown, most languages have alternative
 names, all equally acceptable to the @Code "@Language"
 symbol.  @Code "EnglishUK" differs from @Code "English" only by applying
 hyphenation rules said to be more appropriate for British English.
+@PP
+Since accented characters (Section {@NumberOf characters}) are always
+available irrespective of the language, at first sight it might seem
+that there is no need to bother informing Lout what language you are
+writing in.  However, words are hyphenated differently depending on the
+hyphenation.languages @SubIndex { in languages other than English }
+language, and some symbols have different results in different
+languages.  For example,
+@ID @Code "Danish @Language @Date"
+produces
+@ID { Danish @Language @Date }
+date.languages @SubIndex { in languages other than English }
+time.languages @SubIndex { in languages other than English }
+lists.languages @SubIndex { in languages other than English }
+and the alphabetic list symbols of Section {@NumberOf lists} also
+vary with the current language.  So it's worth doing for the sake of
+knowing that non-English parts will appear as they should.
 @PP
 If your entire document is in a language other than English, you need
 to change the @Code "@InitialLanguage" option:

@@ -1,9 +1,9 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -112,26 +112,27 @@ void FlushGalley(OBJECT hd)
   CONSTRAINT dest_perp_constr;	/* the perpendicular size constraint on dest */
   int pb, pf, f;		/* candidate replacement sizes for dest      */
 
-  OBJECT dest_encl;		/* the VCAT or ACAT enclosing dest, if any   */
+  OBJECT dest_encl = nilobj;	/* the VCAT or ACAT enclosing dest, if any   */
   int    dest_side;		/* if dest_encl != nilobj, side dest is on   */
-  BOOLEAN need_adjust;		/* TRUE as soon as dest_encl needs adjusting */
-  FULL_LENGTH dest_back, dest_fwd; /* the current size of dest_encl or dest  */
-  FULL_LENGTH frame_size;	/* the total constraint of dest_encl         */
+  BOOLEAN need_adjust = FALSE;	/* TRUE as soon as dest_encl needs adjusting */
+  FULL_LENGTH dest_back = 0;    /* the current back size of dest_encl or dest*/
+  FULL_LENGTH dest_fwd = 0;     /* the current fwd size of dest_encl or dest */
+  FULL_LENGTH frame_size = 0;	/* the total constraint of dest_encl         */
   OBJECT prec_gap;		/* the gap preceding dest if any else nilobj */
   OBJECT prec_def;		/* the component preceding dest, if any      */
   OBJECT succ_gap;		/* the gap following dest if any else nilobj */
   OBJECT succ_def;		/* the component following dest, if any      */
   OBJECT stop_link;		/* most recently seen gap link of hd         */
-  FULL_LENGTH stop_back;        /* back(dest_encl) incl all before stop_link */
-  FULL_LENGTH stop_fwd;         /* fwd(dest_encl) incl. all before stop_link */
-  FULL_LENGTH stop_perp_back;   /* back(dest_encl) in other direction        */
-  FULL_LENGTH stop_perp_fwd;    /* fwd(dest_encl) in other direction         */
+  FULL_LENGTH stop_back = 0;    /* back(dest_encl) incl all before stop_link */
+  FULL_LENGTH stop_fwd = 0;     /* fwd(dest_encl) incl. all before stop_link */
+  FULL_LENGTH stop_perp_back=0; /* back(dest_encl) in other direction        */
+  FULL_LENGTH stop_perp_fwd=0;  /* fwd(dest_encl) in other direction         */
   BOOLEAN prnt_flush;		/* TRUE when the parent of hd needs a flush  */
   BOOLEAN target_is_internal;   /* TRUE if flushing into an internal target  */
   BOOLEAN headers_seen;		/* TRUE if a header is seen at all           */
   OBJECT zlink, z, tmp, prnt;  int attach_status;  BOOLEAN remove_target;
   OBJECT why;
-  FULL_LENGTH perp_back, perp_fwd;  /* current perp size of dest_encl        */
+  FULL_LENGTH perp_back = 0, perp_fwd = 0; /* current perp size of dest_encl */
 
   debug1(DGF, D, "[ FlushGalley %s (hd)", SymName(actual(hd)));
   prnt_flush = FALSE;
@@ -396,7 +397,7 @@ void FlushGalley(OBJECT hd)
   {
     Child(y, link);
     if( type(y) == SPLIT )  Child(y, DownDim(y, dim));
-    debug2(DGF, DD, "  examining %s %s", Image(type(y)), EchoObject(y));
+    debug2(DGF, D, "  examining %s %s", Image(type(y)), EchoObject(y));
     switch( type(y) )
     {
 
@@ -532,6 +533,7 @@ void FlushGalley(OBJECT hd)
       case GRAPHIC:
       case LINK_SOURCE:
       case LINK_DEST:
+      case LINK_DEST_NULL:
       case LINK_URL:
       case ACAT:
       case HCAT:
@@ -800,9 +802,10 @@ void FlushGalley(OBJECT hd)
     /* reject this component and move to a new dest; at this point, link is */
     /* the link to the rejected component; its child is either y or else it */
     /* is a SPLIT whose child is y                                          */
-    debug3(DGF, D, "at REJECT now (stop_link %s); headers(%s) = %s",
+    debug4(DGF, D, "at REJECT now (stop_link %s); headers(%s, %d) = %s",
       stop_link != nilobj ? "non-nil" : "nil",
-      SymName(actual(hd)), EchoObject(headers(hd)));
+      SymName(actual(hd)), head_next(hd),
+      EchoObject(headers(hd, head_next(hd))));
     assert(actual(dest) != PrintSym, "FlushGalley: reject print!");
     if( inners != nilobj )  DisposeObject(inners);
     if( stop_link != nilobj )
@@ -838,15 +841,17 @@ void FlushGalley(OBJECT hd)
     }
 
     /* now, if there are headers, dump them into the galley */
-    if( headers(hd) != nilobj )
-    { int headers_count;
+    if( headers(hd, head_next(hd)) != nilobj )
+    { int i, headers_count;
+      debug0(DGS, D, "  [ FlushGalley/REJECT dumping headers");
 
       /* dump new copy of headers into top of galley */
-      assert(Down(headers(hd))!=headers(hd), "FlushGalley/REJECT: headers!");
+      i = head_next(hd);
+      assert(Down(headers(hd, i))!=headers(hd, i), "FlushGalley/REJECT: headers!");
       tmp = Down(hd);
       assert( tmp != hd, "FlushGalley/REJECT: first_link!" );
       headers_count = 0;
-      for( link=Down(headers(hd)); link != headers(hd); link=NextDown(link) )
+      for( link=Down(headers(hd, i)); link != headers(hd, i); link=NextDown(link) )
       { Child(y, link);
         debug2(DGS, D, "FlushGalley(%s)/REJECT linking %s",
 	  SymName(actual(hd)), EchoObject(y));
@@ -855,6 +860,10 @@ void FlushGalley(OBJECT hd)
 	headers_count++;
       }
       assert(headers_count % 2 == 0, "FlushGalley/REJECT: headers_count!");
+
+      /* now increase head_next(hd) to make sure we don't resuse these soon */
+      head_next(hd) = (head_next(hd) + 1) % MAX_HCOPIES;
+      debug0(DGS, D, "  ] end FlushGalley/REJECT dumping headers");
     }
 
     /* now detach and resume */
@@ -911,7 +920,7 @@ void FlushGalley(OBJECT hd)
       SetTarget(hd2);
       foll_or_prec(hd2) = GALL_FOLL;
       enclose_obj(hd2) = (has_enclose(actual(hd2)) ? BuildEnclose(hd2) : nilobj);
-      headers(hd2) = dead_headers(hd2) = nilobj;
+      ClearHeaders(hd2);
       Link(Up(y), index2);
 
       /* set up the next ready galley for reading next time */

@@ -4,6 +4,9 @@
 @Begin
 @PP
 @@Diag has many options whose values contain lengths, angles, and
+diagrams. @RawIndex { diagrams }
+diagrams.geometry @SubIndex { geometry }
+geometry.diagrams @Index { geometry in diagrams }
 points.  Options such as @Code margin and {@Code vsize}, which affect the
 size or appearance of the base of a node, may contain only the kinds of
 lengths described in Section {@NumberOf objects}; but in all other cases
@@ -46,23 +49,23 @@ These remarks on safety do not apply within the @Code outline option of
 specified.  Vector operations, with the aid of a few well-chosen tags,
 can greatly simplify the production of outlines:
 @ID {
-@Code {
-"@Node"
-"   outline {"
-"      SB:: {0 ysize} ** 0.4"
-"      ST:: {0 ysize} ** 0.6"
-"      HB:: {xsize 0} ** 0.7"
-"      SB"
-"      SB ++ HB"
-"      HB"
-"      xsize  ysize * 0.5"
-"      HB ++ {0 ysize}"
-"      HB ++ ST"
-"      ST"
-"      SB"
-"   }"
-"   paint { grey }"
-"{ 6c @Wide 2c @High }"
+@Code @Verbatim {
+@Node
+   outline {
+      SB:: {0 ysize} ** 0.4
+      ST:: {0 ysize} ** 0.6
+      HB:: {xsize 0} ** 0.7
+      SB
+      SB ++ HB
+      HB
+      xsize  ysize * 0.5
+      HB ++ {0 ysize}
+      HB ++ ST
+      ST
+      SB
+   }
+   paint { grey }
+{ 6c @Wide 2c @High }
 }
 ||7ct
 @Diag {
@@ -96,8 +99,6 @@ can be a length or angle, or even a sequence of values.  It is
 permissible to change the value assigned to a tag by reassigning.
 @PP
 Two very useful symbols, {@Code angleto} and {@Code atangle}, bring
-angleto. @Index { @Code angleto symbol in @Code "@Diag" }
-atangle. @Index { @Code atangle symbol in @Code "@Diag" }
 angles into the algebra.  The {@Code angleto} symbol finds the angle
 from one point to another.  For example,
 @ID @Code "SB angleto ST"
@@ -109,21 +110,20 @@ is the point {@Code "1f 1f"}, and
 is the point @Code 2f from {@Code "B@NE"} to its northwest.
 @PP
 There is a @Code prev symbol, used only within {@Code outline} and
-prev. @Index { @Code prev symbol in @Code "@Diag" }
 {@Code path}, which returns the previous point on the outline or
 path, ignoring points within {@Code "[]"}.  It makes relative movements
 very easy:
 @ID {
-@Code {
-"   outline {"
-"      0 0"
-"      { 2c atangle 30d }"
-"      prev ++ { 2c atangle 90d }"
-"      prev ++ { 2c atangle 150d }"
-"      prev ++ { 2c atangle 210d }"
-"      prev ++ { 2c atangle 270d }"
-"      0 0"
-"   }"
+@Code @Verbatim {
+   outline {
+      0 0
+      { 2c atangle 30d }
+      prev ++ { 2c atangle 90d }
+      prev ++ { 2c atangle 150d }
+      prev ++ { 2c atangle 210d }
+      prev ++ { 2c atangle 270d }
+      0 0
+   }
 }
 ||7ct
 @Diag { ||2.5c
@@ -145,8 +145,6 @@ shrink with the base as it should.  Such outlines, while tempting, are
 always regretted later.
 @PP
 There are {@Code xcoord} and {@Code ycoord} symbols for finding the
-xcoord. @Index { @Code xcoord symbol in @Code "@Diag" }
-ycoord. @Index { @Code ycoord symbol in @Code "@Diag" }
 @I x and @I y coordinates of a point:
 @ID @Code {
 "{xcoord P1} min {xcoord P2}"   "{ycoord P1} max {ycoord P2}"
@@ -168,9 +166,9 @@ The solution is based on a symbol called {@Code boundaryatangle},
 whose preceding object should be either a point or else the tag
 of a node with one of the standard shapes, and whose following object
 is an angle:
-@ID @Code {
-"{ xsize ysize*0.5 } boundaryatangle 45d"
-"A boundaryatangle 45d"
+@ID @Code @Verbatim {
+{ xsize ysize*0.5 } boundaryatangle 45d
+A boundaryatangle 45d
 }
 In the first case the result is the point, regardless of the
 angle.  In the second case, the result is the point on the boundary of
@@ -191,13 +189,13 @@ either node tags or points.  In either case a suitable direction for the
 line to take is
 @ID @Code "from??CTR angleto to??CTR"
 and so the desired path is
-@ID @Code {
-"path {"
-"    FROM:: from boundaryatangle { from??CTR angleto to??CTR }"
-"    TO:: to boundaryatangle { to??CTR angleto from??CTR }"
-"    FROM"
-"    TO"
-"}"
+@ID @Code @Verbatim {
+path {
+    FROM:: from boundaryatangle { from??CTR angleto to??CTR }
+    TO:: to boundaryatangle { to??CTR angleto from??CTR }
+    FROM
+    TO
+}
 }
 The first line defines point @Code FROM to be on the boundary of
 @Code from at the appropriate angle, if @Code "from" is a node tag;

@@ -5,7 +5,7 @@
 @PP
 As mentioned briefly in Section {@NumberOf start}, each Lout document
 begins with an instruction to include (i.e. to read) a @I { setup file }:
-setup.file @Index { setup file }
+setup.files. @Index { setup files }
 sysinclude. @Index @Code "@SysInclude"
 system.include @Index { system include directory }
 doc.file @Index { @Code "doc" file }
@@ -105,11 +105,13 @@ than we've shown; the display above just shows the first
 few.  You change the overall format of your document by changing
 these options.
 @PP
-As it stands, the options are all hidden within comments, so the
-default values (shown within braces) are in force.  To change an
-option, delete the @Code "#" and change the value between
-braces.  For example, to set the document in Helvetica 10 point
-font, change the @Code { "@InitialFont" } line to
+A @Code "#" causes Lout to ignore that character and the rest of the
+line (such ignored parts are called {@I comments} and @Code "#" is
+the @I { comment character }).  As it stands, then, the options are
+all hidden within comments, so their default values (shown within braces
+in the comments) are in force.  To change an option, delete the @Code "#"
+and change the value between braces.  For example, to set the document
+in Helvetica 10 point font, change the @Code { "@InitialFont" } line to
 @ID @Code "@InitialFont { Helvetica Base 10p }"
 We won't go through all the options now, since they are the subject of
 following sections.
@@ -124,15 +126,15 @@ options you can leave the @Code "@OrIfPlain" symbol there and change
 one or both of the alternative values as you wish.
 @PP
 Next comes a similar @Code "@Use" clause, for the DocumentSetup package:
-@ID @OneRow @Code {
-"@Use { @DocumentSetup"
-"  # @PageType { A4 @OrIfPlain Other }"
-"  # @PageWidth { 80s }"
-"  # @PageHeight { 66f }"
-"  # @PageOrientation { Portrait }"
-"  # @PageBackground {}"
-"  # @TopMargin { 2.5c @OrIfPlain 6f }"
-"}"
+@ID @OneRow @Code @Verbatim {
+@Use { @DocumentSetup
+  # @PageType { A4 @OrIfPlain Other }
+  # @PageWidth { 80s }
+  # @PageHeight { 66f }
+  # @PageOrientation { Portrait }
+  # @PageBackground {}
+  # @TopMargin { 2.5c @OrIfPlain 6f }
+}
 }
 This one has many options, starting with options for page
 layout as shown, then going on to figures and tables, tables of
@@ -145,28 +147,27 @@ main variation is that in some files, some options are already set.  The
 so that overhead transparencies will have a large font size.  However,
 now comes a third @Code "@Use" clause whose symbol and options depend
 on the document type.  For ordinary documents (i.e. in the @Code "doc"
-setup file) this clause is
-@ID @OneRow @Code {
-"@Use { @OrdinarySetup"
-"  # @IndexWord { index }"
-"  # @AppendixWord { appendix }"
-"  # @SectionNumbers { Arabic }"
-"  # @AppendixNumbers { UCAlpha }"
-"  # @SectionHeadingFont { Bold }"
-"}"
+setup file) this clause is (once again we show just some of the options):
+@ID @OneRow @Code @Verbatim {
+@Use { @OrdinarySetup
+  # @IndexWord { index }
+  # @AppendixWord { appendix }
+  # @SectionNumbers { Arabic }
+  # @AppendixNumbers { UCAlpha }
+  # @SectionHeadingFont { Bold }
 }
-Once again this is just some of the options.  In the @Code slides
-setup file for overhead transparencies, we find this:
-@ID @OneRow @Code {
-"@Use { @OverheadSetup"
-"  # @DateLine { No }"
-"  # @ContentsWord { contents }"
-"  # @FirstOverheadNumber { 1 }"
-"  # @OverheadNumbers { Arabic }"
-"  # @TitlePageFont { Helvetica Base 1.5f }"
-"  # @OverheadHeadingFont { Bold }"
-"  # @OverheadInContents { No }"
-"}"
+}
+In the @Code slides setup file for overhead transparencies, we find this:
+@ID @OneRow @Code @Verbatim {
+@Use { @OverheadSetup
+  # @DateLine { No }
+  # @ContentsWord { contents }
+  # @FirstOverheadNumber { 1 }
+  # @OverheadNumbers { Arabic }
+  # @TitlePageFont { Helvetica Base 1.5f }
+  # @OverheadHeadingFont { Bold }
+  # @OverheadInContents { No }
+}
 }
 In general this third @Code "@Use" clause assigns values to options
 specific to the document type we are using, whereas the first and

@@ -1,9 +1,9 @@
 /*@z43.c:Language Service:LanguageChange, LanguageString@*********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -122,8 +122,8 @@ static OBJECT ltab_retrieve(FULL_CHAR *str, LANGUAGE_TABLE S)
 #if DEBUG_ON
 static void ltab_debug(LANGUAGE_TABLE S, FILE *fp)
 { int i;  OBJECT x, link, y;
-  fprintf(fp, "  table size: %d;  current number of keys: %d\n",
-    ltab_size(S), ltab_count(S));
+  fprintf(fp, "  table size: %d;  current number of keys: %d%s",
+    ltab_size(S), ltab_count(S), STR_NEWLINE);
   for( i = 0;  i < ltab_size(S);  i++ )
   { x = ltab_item(S, i);
     fprintf(fp, "ltab_item(S, %d) =", i);
@@ -136,7 +136,7 @@ static void ltab_debug(LANGUAGE_TABLE S, FILE *fp)
       fprintf(fp, " %s",
 	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
     }
-    fprintf(fp, "\n");
+    fprintf(fp, "%s", STR_NEWLINE);
   }
 } /* end ltab_debug */
 #endif

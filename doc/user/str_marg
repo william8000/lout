@@ -86,7 +86,7 @@ place. @Index @Code "@Place"
 page is provided by the @Code "@Place" symbol:
 @ID @OneRow @Code {
 "@Place"
-"    x { right - 1 cm - xsize }"
+"    x { right - 1c - xsize }"
 "    y { { foot + top } / 2 }"
 "{"
 "    @Box { Hello }"
@@ -97,15 +97,15 @@ box whose @I x (horizontal) position is such that its right edge is one
 centimetre from the right edge of the page, and whose @I y (vertical)
 position is halfway up &
 @Place
-    x { right - 1 cm - xsize }
+    x { right - 1c - xsize }
     y { { foot + top } / 2 }
 {
     @Box { Hello }
 }
 the page.
 @PP
-In addition to numbers, Lout lengths (Section {@NumberOf objects}),
-and Diag lengths (Section {@NumberOf dia_summ}), the following symbols
+In addition to numbers, with or without units of measurement
+(Section {@NumberOf objects}), the following symbols
 may be used inside the @Code "x" and @Code "y" options:
 @ID @Tab
     @Fmta { @Col @Code A ! @Col B }

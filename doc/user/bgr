@@ -3,12 +3,15 @@
     @Tag { graphics }
 @Begin
 @LP
-This chapter introduces some basic graphics symbols for colour, rotation,
-scaling, and included illustrations.  These are all from the standard
-BasicLayout package, so no @Code "@SysInclude" line is needed to
-get them.
+This chapter introduces some basic graphics symbols for colour, texture,
+graphics. @Index { graphics (basic) }
+graphics.see @RawSubIndex { @I { see also } diagrams, graphs, pie graphs }
+rotation, scaling, and included illustrations.  These are all from the
+standard BasicLayout package, so no @Code "@SysInclude" line is needed to
+get them beyond the usual @Code "@SysInclude { doc }" or whatever.
 @BeginSections
 @Include { bgr_colo }
+@Include { bgr_text }
 @Include { bgr_boxs }
 @Include { bgr_outl }
 @Include { bgr_rota }

@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.26                          #
+#  Make file for installing Basser Lout Version 3.27                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
 #  undated                                                                    #
@@ -47,7 +47,12 @@
 #                                                                             #
 #      These should appear like this below.                                   #
 #                                                                             #
-#  (3) This may be the trickiest step of all.  On some systems, for example   #
+#  (3) This step is about to become obsolete.  This version of Lout is not    #
+#      affected by the value of DBFIX, and if beta testing shows that the     #
+#      changes that have made DBFIX unnecessary actually work, then this step #
+#      will be deleted in subsequent releases.                                #
+#                                                                             #
+#      This may be the trickiest step of all.  On some systems, for example   #
 #      NT under Visual C++, Lout's use of the system ftell() call causes      #
 #      a problem.  This problem typically manifests itself on the *second*    #
 #      pass over a large document such as the Lout User's Guide: a message    #
@@ -270,11 +275,11 @@ DBFIX   = 0
 USESTAT = 1
 SAFEDFT = 0
 
-# DEBUGGING = 0
-# TRACING =
+DEBUGGING = 0
+TRACING =
 
-DEBUGGING = 1
-TRACING = -g
+# DEBUGGING = 1
+# TRACING = -g
 
 BINDIR	= /home/jeff/bin
 LIBDIR	= /home/jeff/lout.lib
@@ -306,7 +311,6 @@ CC	= gcc
 RCOPY	= cp -r
 
 COPTS	= -ansi -pedantic -Wall -O3
-# COPTS	= -ansi -pedantic -Wall
 
 CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
 	  -DOS_DOS=$(OSDOS)					\
@@ -337,7 +341,7 @@ OBJS	= z01.o z02.o z03.o z04.o z05.o z06.o z07.o z08.o	\
 	  z25.o z26.o z27.o z28.o z29.o z30.o z31.o z32.o	\
 	  z33.o z34.o z35.o z36.o z37.o z38.o z39.o z40.o	\
 	  z41.o z42.o z43.o z44.o z45.o z46.o z47.o z48.o	\
-	  z49.o z50.o z51.o
+	  z49.o z50.o z51.o z52.o
 
 lout:	$(OBJS)
 	$(CC) -o lout $(OBJS) $(ZLIB) -lm

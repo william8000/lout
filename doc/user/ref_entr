@@ -144,6 +144,9 @@ give the full four digits of the year to avoid trouble in the year
 2000.  Multi-word tags are possible but not recommended.
 @PP
 Unusually for Lout, you can have unquoted @Code "/" and @Code "~"
+references. @RawIndex { references }
+references.url @SubIndex { @Code "@URL" }
+url.references @Index { @Code "@URL" (references) }
 characters inside the @Code "@URL" option:
 @ID @Code "@URL { ftp://ftp.cs.su.oz.au/jeff/lout }"
 In fact it is better not to use quotes because then Lout will
@@ -153,25 +156,27 @@ since URLs tend to be long and prone to causing bad line breaks.
 Since the types within each broad category are similar, our plan is to
 give one example of each and briefly note how the others differ.  Here
 is a @Code Book entry showing all its options:
-book.ref.type @Index { @Code Book reference type }
-@ID @OneRow @Code {
-"{ @Reference"
-"     @Tag { homer.odyssey }"
-"     @Type { Book }"
-"     @Author { Homer }"
-"     @Title { The Odyssey }"
-"     @TitleNote { Translated by E. V. Rieu }"
-"     @Pinpoint { Chapter VI }"
-"     @Pages { 102--111 }"
-"     @Page { 102 }"
-"     @Publisher { Penguin Books }"
-"     @Address { Harmondsworth, Middlesex }"
-"     @Edition { Penguin Classics Edition }"
-"     @Month { August }"
-"     @Year { 1942 }"
-"     @Note { The date of composition is unknown,"
-"but is thought to be about the tenth century BC. }"
-"}"
+references. @RawIndex { references }
+references.book @SubIndex { @Code Book reference type }
+book.references @Index { @Code "Book" reference type }
+@ID @OneRow @Code @Verbatim {
+{ @Reference
+     @Tag { homer.odyssey }
+     @Type { Book }
+     @Author { Homer }
+     @Title { The Odyssey }
+     @TitleNote { Translated by E. V. Rieu }
+     @Pinpoint { Chapter VI }
+     @Pages { 102--111 }
+     @Page { 102 }
+     @Publisher { Penguin Books }
+     @Address { Harmondsworth, Middlesex }
+     @Edition { Penguin Classics Edition }
+     @Month { August }
+     @Year { 1942 }
+     @Note { The date of composition is unknown,
+but is thought to be about the tenth century BC. }
+}
 }
 And here is what it produces:
 @ID @RefPrint homer.odyssey
@@ -182,7 +187,9 @@ right thing when you omit others.  A basic book would have just
 {@Code "@Publisher"}, and {@Code "@Year"} options.
 @PP
 @Code Proceedings is similar, except you
-proceedings.ref.type @Index { @Code Proceedings reference type }
+references. @RawIndex { references }
+references.proceedings @SubIndex { @Code Proceedings reference type }
+proceedings.references @Index { @Code "Proceedings" reference type }
 may have an @Code "@Organization" or @Code "@Institution" option for
 the sponsoring organization if you wish, and the author will either be
 absent or an editor:
@@ -190,27 +197,31 @@ absent or an editor:
 There is no option specifically for editors, translators, and so forth.
 @PP
 @Code PhDThesis is very similar again, with @Code "@Institution"
-phdthesis.ref.type @Index { @Code PhDThesis reference type }
+references. @RawIndex { references }
+references.phdthesis @SubIndex { @Code PhDThesis reference type }
+phdthesis.references @Index { @Code "PhDThesis" reference type }
 instead of {@Code "@Publisher"}, and the phrase `Ph.D. thesis'
 appearing by magic in the right spot.  Like all words and phrases
 introduced automatically by Lout, it will be translated into the current
 language if this is not English.
 @PP
 Moving now to the second broad category, here is a typical {@Code TechReport}:
-techreport.ref.type @Index { @Code TechReport reference type }
-@ID @OneRow @Code {
-"{ @Reference"
-"     @Tag { christofides1976tsp }"
-"     @Type { TechReport }"
-"     @Author { Christofides, N. }"
-"     @Title { Worst-case analysis of a new heuristic"
-"for the travelling salesman problem }"
-"     @Number { 388 }"
-"     @Institution { Graduate School of Industrial"
-"Administration, Carnegie-Mellon University }"
-"     @Address { Pittsburgh, PA }"
-"     @Year { 1976 }"
-"}"
+references. @RawIndex { references }
+references.techreport @SubIndex { @Code TechReport reference type }
+techreport.references @Index { @Code "TechReport" reference type }
+@ID @OneRow @Code @Verbatim {
+{ @Reference
+     @Tag { christofides1976tsp }
+     @Type { TechReport }
+     @Author { Christofides, N. }
+     @Title { Worst-case analysis of a new heuristic
+for the travelling salesman problem }
+     @Number { 388 }
+     @Institution { Graduate School of Industrial
+Administration, Carnegie-Mellon University }
+     @Address { Pittsburgh, PA }
+     @Year { 1976 }
+}
 }
 Here is the result:
 @ID @RefPrint christofides1976tsp
@@ -220,27 +231,33 @@ need some other phrase instead, use the @Code "@TRType" option:
 @ID @Code "@TRType { Programmer's Manual }"
 or whatever.  The phrase will be `Master's Thesis' in the
 current language for type {@Code MastersThesis}, and absent in type
-mastersthesis.ref.type @Index { @Code MastersThesis reference type }
-misc.ref.type @Index { @Code Misc reference type }
+references. @RawIndex { references }
+references.mastersthesis @SubIndex { @Code MastersThesis reference type }
+mastersthesis.references @Index { @Code "MastersThesis" reference type }
+references. @RawIndex { references }
+references.misc @SubIndex { @Code Misc reference type }
+misc.references @Index { @Code "Misc" reference type }
 {@Code Misc}.  You may use the pinpointing options ({@Code "@Pinpoint"},
 {@Code "@Page"}, and {@Code "@Pages"}) and {@Code "@TitleNote"},
 {@Code "@Month"}, and {@Code "@Note"} in the same way as for books.
 @PP
 Journal articles are referenced by journal name, volume, number, and
 page(s):
-article.ref.type @Index { @Code Article reference type }
-@ID @OneRow @Code {
-"{ @Reference"
-"     @Tag { kingston1993lout.design }"
-"     @Type { Article }"
-"     @Author { Jeffrey H. Kingston }"
-"     @Title { The design and implementation of the"
-"Lout document formatting language }"
-"     @Journal { Software---Practice and Experience }"
-"     @Volume { 23 }"
-"     @Pages { 1001--1041 }"
-"     @Year { 1993 }"
-"}"
+references. @RawIndex { references }
+references.article @SubIndex { @Code Article reference type }
+article.references @Index { @Code "Article" reference type }
+@ID @OneRow @Code @Verbatim {
+{ @Reference
+     @Tag { kingston1993lout.design }
+     @Type { Article }
+     @Author { Jeffrey H. Kingston }
+     @Title { The design and implementation of the
+Lout document formatting language }
+     @Journal { Software---Practice and Experience }
+     @Volume { 23 }
+     @Pages { 1001--1041 }
+     @Year { 1993 }
+}
 }
 The result of this is
 @ID @RefPrint kingston1993lout.design
@@ -249,25 +266,29 @@ refer to the whole article so are not available for pinpointing here,
 but you may still use {@Code "@Pinpoint"}.
 @PP
 Finally, small works that appear within large works have @Code "@Author"
-inbook.ref.type @Index { @Code InBook reference type }
+references. @RawIndex { references }
+references.inbook @SubIndex { @Code InBook reference type }
+inbook.references @Index { @Code "InBook" reference type }
 and @Code "@Title" options for the work itself, and @Code "@InAuthor" and
 @Code "@InTitle" for the work that it appears within:
-@ID @OneRow @Code {
-"{ @Reference"
-"     @Tag { rieu1942intro }"
-"     @Type { InBook }"
-"     @Author { E. V. Rieu }"
-"     @Title { Introduction to @I { The Odyssey } }"
-"     @InAuthor { Homer }"
-"     @InTitle { The Odyssey }"
-"     @Publisher { Penguin }"
-"     @Year { 1942 }"
-"}"
+@ID @OneRow @Code @Verbatim {
+{ @Reference
+     @Tag { rieu1942intro }
+     @Type { InBook }
+     @Author { E. V. Rieu }
+     @Title { Introduction to @I { The Odyssey } }
+     @InAuthor { Homer }
+     @InTitle { The Odyssey }
+     @Publisher { Penguin }
+     @Year { 1942 }
+}
 }
 @Code "@InAuthor" would often be absent or an editor.  The result is
 @ID @RefPrint rieu1942intro
 The other options are as for large works.  Type @Code InProceedings is
-inproceedings.ref.type @Index { @Code InProceedings reference type }
+references. @RawIndex { references }
+references.inproceedings @SubIndex { @Code InProceedings reference type }
+inproceedings.references @Index { @Code "InProceedings" reference type }
 similar to {@Code InBook}.
 @PP
 A database usually has a long life, and some day it might find itself
@@ -275,17 +296,17 @@ used in a document whose language is not the one its original compiler
 had in mind.  For this reason, a truly meticulous compiler of database
 entries would enclose @I all language-specific options in
 @Code "@Language" symbols:
-@ID @OneRow @Code {
-"{ @Reference"
-"    @Tag { zimand1986size.sets.strings }"
-"    @Type { Article }"
-"    @Author { French @Language { M. Zimand } }"
-"    @Title { English @Language { On the topological size of sets of random strings } }"
-"    @Journal { German @Language { Zeitschr. f. math. Logik und Grundlagen d. Math. } }"
-"    @Volume { 32 }"
-"    @Pages { 81--88 }"
-"    @Year { 1986 }"
-"}"
+@ID @OneRow @Code @Verbatim {
+{ @Reference
+    @Tag { zimand1986size.sets.strings }
+    @Type { Article }
+    @Author { French @Language { M. Zimand } }
+    @Title { English @Language { On the topological size of sets of random strings } }
+    @Journal { German @Language { Zeitschr. f. math. Logik und Grundlagen d. Math. } }
+    @Volume { 32 }
+    @Pages { 81--88 }
+    @Year { 1986 }
+}
 }
 (My apologies to M. Zimand if he or she is not French.)  This ensures
 correct hyphenation whatever the language of the document in which the

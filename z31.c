@@ -1,9 +1,9 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -56,6 +56,7 @@ static	char	*usage_strings[] = {
 			"hyphenation pattern tables",
 			"character mappings",
 			"colour tables",
+			"texture tables",
 			"language tables",
 };
 
@@ -232,6 +233,7 @@ void MemInit(void)
   zz_lengths[ BREAK        ] =
   zz_lengths[ UNDERLINE    ] =
   zz_lengths[ COLOUR       ] =
+  zz_lengths[ TEXTURE      ] =
   zz_lengths[ OUTLINE      ] =
   zz_lengths[ LANGUAGE     ] =
   zz_lengths[ CURR_LANG    ] =
@@ -266,6 +268,7 @@ void MemInit(void)
   zz_lengths[ GRAPHIC      ] =
   zz_lengths[ LINK_SOURCE  ] =
   zz_lengths[ LINK_DEST    ] =
+  zz_lengths[ LINK_DEST_NULL] =
   zz_lengths[ LINK_URL     ] =
 	ceiling(sizeof(struct closure_type), sizeof(ALIGN));
 

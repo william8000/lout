@@ -4,8 +4,10 @@
 @Begin
 @PP
 Tables work well with plain text output (Section {@NumberOf plain}):
+tables. @RawIndex { tables }
+tables.plaintext @SubIndex { plain text output }
 plain.text.tables @Index { plain text tables }
-@CD @OneRow -1px @Break @F @Verbatim {
+@CD @OneRow 0.9 @Scale 1.0fx @Break @F @Verbatim {
 ...................................................
 .                .                                .
 . Johnson        . Johnson suddenly uttered, in   .
@@ -48,7 +50,7 @@ document.
 @PP
 @Code "@Tbl" changes the default values of several options when used
 in a plain text document:
-@ID @Code @Verbatim {
+@ID @OneRow @Code @Verbatim {
 @Tbl
     marginvertical { 2f }
     marginhorizontal { 2s }
@@ -62,6 +64,9 @@ multiples of {@Code "1f"}, and horizontal distances whole multiples of
 {@Code "1s"}, since this avoids fractional spacing which cannot be successful
 in plain text files and produces quite messy results.  There is also a
 @Code ruleplainchar option for changing the character used to
+tables. @RawIndex { tables }
+tables.ruleplainchar @SubIndex { @Code "ruleplainchar" option }
+ruleplainchar.tables @Index { @Code "ruleplainchar" option (tables) }
 draw rules.  For example,
 @ID @Code @Verbatim {
 @Tbl

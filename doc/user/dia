@@ -4,7 +4,8 @@
 @Begin
 @LP
 This chapter describes how to use the @@Diag symbol
-diag. @Index { @@Diag }
+diagrams. @RawIndex { diagrams }
+diag.diagrams @Index { @Code "@Diag" (diagrams) }
 @FootNote {
 Starting with Version 3.18 of Lout, the @@Diag symbol was enhanced with
 the {@Code "@ANode"}, {@Code "@BNode"}, and {@Code "@CNode"} symbols

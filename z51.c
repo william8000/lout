@@ -1,9 +1,9 @@
 /*@z51.c:Plain Text Back End:Plain_BackEnd@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -196,7 +196,7 @@ static void Plain_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v,
     putc('+', out_fp);
     for( j = 0;  j < hsize;  j++ )  putc('-', out_fp);
     putc('+', out_fp);
-    putc('\n', out_fp);
+    fputs((char *) STR_NEWLINE, out_fp);
   );
   for( i = vsize - 1;  i >= 0;  i-- )
   { ifdebug(DPT, D, putc('|', out_fp));
@@ -205,13 +205,13 @@ static void Plain_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v,
     for( j = 0;  j <= jmax;  j++ )
       putc(page[i*hsize + j], out_fp);
     ifdebug(DPT, D, putc('|', out_fp));
-    putc('\n', out_fp);
+    fputs((char *) STR_NEWLINE, out_fp);
   }
   ifdebug(DPT, D,
     putc('+', out_fp);
     for( j = 0;  j < hsize;  j++ )  putc('-', out_fp);
     putc('+', out_fp);
-    putc('\n', out_fp);
+    fputs((char *) STR_NEWLINE, out_fp);
   );
 
   /* separate the page from the next one with a form-feed if required */
@@ -286,7 +286,7 @@ static void Plain_PrintWord(OBJECT x, int hpos, int vpos)
 
 static void Plain_PrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
   FULL_LENGTH ymk, OBJECT z)
-{ int i, len, starth, startv, stoph, stopv, h, v;
+{ int i, len, starth, startv, stoph, stopv, h = 0, v = 0;
   debug2(DPT, D, "Plain_PrintPlainGraphic(x, xmk %s, ymk %s)",
     EchoLength(xmk), EchoLength(ymk));
 
@@ -336,7 +336,7 @@ static void Plain_PrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
 
 /*****************************************************************************/
 /*                                                                           */
-/*  Plain_PrintUnderline(fnum, col, xstart, xstop, ymk)                      */
+/*  Plain_PrintUnderline(fnum, col, pat, xstart, xstop, ymk)                 */
 /*                                                                           */
 /*  Draw an underline suitable for font fnum, in colour col, from xstart to  */
 /*  xstop at the appropriate distance below mark ymk.                        */
@@ -344,7 +344,7 @@ static void Plain_PrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
 /*****************************************************************************/
 
 static void Plain_PrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
-  FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
+  TEXTURE_NUM pat, FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
 {
 
   debug5(DPT, DD, "Plain_PrintUnderline(fnum %d, col %d, xstart %s, xstop %s, ymk %s )",
@@ -373,7 +373,7 @@ static void Plain_PrintAfterLastPage(void)
       putc('+', out_fp);
       for( j = 0;  j < hsize;  j++ )  putc('-', out_fp);
       putc('+', out_fp);
-      putc('\n', out_fp);
+      fputs((char *) STR_NEWLINE, out_fp);
     );
     for( i = vsize - 1;  i >= 0;  i-- )
     { ifdebug(DPT, D, putc('|', out_fp));
@@ -382,13 +382,13 @@ static void Plain_PrintAfterLastPage(void)
       for( j = 0;  j <= jmax;  j++ )
         putc(page[i*hsize + j], out_fp);
       ifdebug(DPT, D, putc('|', out_fp));
-      putc('\n', out_fp);
+      fputs((char *) STR_NEWLINE, out_fp);
     }
     ifdebug(DPT, D,
       putc('+', out_fp);
       for( j = 0;  j < hsize;  j++ )  putc('-', out_fp);
       putc('+', out_fp);
-      putc('\n', out_fp);
+      fputs((char *) STR_NEWLINE, out_fp);
     );
   }
 } /* end Plain_PrintAfterLastPage */

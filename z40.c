@@ -1,9 +1,9 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -73,7 +73,7 @@ OBJECT FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos)
   FposCopy(fpos(res), *xfpos);
   ++filter_count;
   sprintf( (char *) buff, "%s%d", FILTER_IN, filter_count);
-  fp = StringFOpen(buff, WRITE_TEXT);
+  fp = StringFOpen(buff, WRITE_FILE);
   if( fp == NULL )
     Error(40, 1, "cannot open temporary filter file %s", FATAL, xfpos, buff);
   x = MakeWord(WORD, buff, xfpos);
@@ -128,7 +128,7 @@ void FilterSetFileNames(OBJECT x)
 /*****************************************************************************/
 
 OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
-{ int status;  OBJECT t, res, scope_snapshot;  char line[MAX_LINE];
+{ int status;  OBJECT t, res, scope_snapshot;  FULL_CHAR line[MAX_LINE];
   FILE *err_fp;  FILE_NUM filter_out_file;
 
   assert( type(x) == FILTERED, "FilterExecute: type(x)!" );
@@ -150,13 +150,10 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
   {
     /* execute the command, echo error messages, and exit if status problem */
     status = system( (char *) command);
-    err_fp = StringFOpen(FILTER_ERR, READ_TEXT);
+    err_fp = StringFOpen(FILTER_ERR, READ_FILE);
     if( err_fp != NULL )
-    { while( fgets(line, MAX_LINE, err_fp) != NULL )
-      { if( line[strlen(line)-1] == '\n' )
-	  line[strlen(line)-1] = '\0';
+    { while( ReadOneLine(err_fp, line, MAX_LINE) != 0 )
         Error(40, 3, "%s", WARN, &fpos(x), line);
-      }
       fclose(err_fp);
       StringRemove(FILTER_ERR);
     }
@@ -165,11 +162,6 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
         FATAL, &fpos(x), command);
 
     /* read in output of system command as a Lout object */
-    /* *** using scope snapshot now
-    SwitchScope(nilobj);
-    count = 0;
-    SetScope(env, &count, TRUE);
-    *** */
     Child(scope_snapshot, LastDown(x));
     LoadScopeSnapshot(scope_snapshot);
     debug0(DFS, D, "  calling DefineFile from FilterExecute");
@@ -180,10 +172,6 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
     t = NewToken(BEGIN, &fpos(x), 0, 0, BEGIN_PREC, FilterOutSym);
     res = Parse(&t, nilobj, FALSE, FALSE);
     LexPop();
-    /* *** using scope snapshot now
-    for( i = 1;  i <= count;  i++ )  PopScope();
-    UnSwitchScope(nilobj);
-    *** */
     ClearScopeSnapshot(scope_snapshot);
     StringRemove(string(sym_body(FilterOutSym)));
     sym_body(FilterOutSym) = filter_out_filename;
@@ -208,34 +196,42 @@ void FilterWrite(OBJECT x, FILE *fp, int *linecount)
   assert( type(x) == FILTERED, "FilterWrite: type(x)!" );
   debug2(DFH, D, "[ FilterWrite(%d %s, fp)", (int) x, EchoObject(x));
   Child(y, Down(x));
-  in_fp = StringFOpen(string(y), READ_TEXT);
+  in_fp = StringFOpen(string(y), READ_FILE);
   if( in_fp == NULL )
     Error(40, 5, "cannot read filter temporary file %s",
       FATAL, &fpos(x), string(y));
   if( filter_use_begin(y) )
-  { StringFPuts(KW_BEGIN, fp);
-    StringFPuts("\n", fp);
-    *linecount += 1;
-    while( (ch = getc(in_fp)) != EOF )
-    { putc(ch, fp);
-      if( ch == '\n' )  *linecount += 1;
+    StringFPuts(KW_BEGIN, fp);
+  else
+    StringFPuts(KW_LBR, fp);
+  StringFPuts(STR_NEWLINE, fp);
+  *linecount += 1;
+  while( (ch = getc(in_fp)) != EOF )
+  { putc(ch, fp);
+    if( ch == CH_CR )
+    {
+      ch = getc(in_fp);
+      if( ch != CH_LF )
+	ungetc(ch, in_fp);
+      *linecount += 1;
     }
+    else if( ch == CH_LF )
+    {
+      ch = getc(in_fp);
+      if( ch != CH_CR )
+	ungetc(ch, in_fp);
+      *linecount += 1;
+    }
+  }
+  if( filter_use_begin(y) )
+  {
     StringFPuts(KW_END, fp);
     StringFPuts(" ", fp);
     StringFPuts(SymName(filter_actual(y)), fp);
   }
   else
-  { StringFPuts(KW_LBR, fp);
-    StringFPuts("\n", fp);
-    *linecount += 1;
-    while( (ch = getc(in_fp)) != EOF )
-    { putc(ch, fp);
-      ifdebug(DFH, D, putc(ch, stderr));
-      if( ch == '\n' )  *linecount += 1;
-    }
     StringFPuts(KW_RBR, fp);
-  }
-  StringFPuts("\n", fp);
+  StringFPuts(STR_NEWLINE, fp);
   *linecount += 1;
   fclose(in_fp);
   debug0(DFH, D, "] FilterWrite returning.");

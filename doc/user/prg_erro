@@ -5,6 +5,10 @@
 @PP
 In order to understand the error messages produced by program
 printing, it is necessary to understand that Lout's first step when
+programs. @RawIndex { programs }
+programs.errors @SubIndex { errors }
+errors. @RawIndex { errors }
+errors.in.programs @SubIndex { in program formatting }
 given a program text is to pass it to the separate {@Code prg2lout}
 program for analysis.  This separate program is the source of most
 of the error messages associated with program printing.

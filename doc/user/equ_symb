@@ -45,17 +45,27 @@ Some symbols join objects together in mathematical ways:
 @Eq { x sub 2 }
 }
 Here the @Code "sub" symbol has taken the object just to its left, and
-sub. @Index { @Code "sub" in equations }
+equations. @RawIndex { equations }
+equations.sub @SubIndex { @Code "sub" symbol }
+sub.sym.equations @Index { @Code "sub" symbol (equations) }
 the object just to its right, and joined them into one object in the
 form of a subscript.  The two objects are called the left and right
 parameters of {@Code "sub"}, and they may be arbitrary Lout objects.
 @PP
 Other symbols of a similar kind include {@Code "sup"} for
-sup. @Index { @Code "sup" in equations }
+equations. @RawIndex { equations }
+equations.sup @SubIndex { @Code "sup" symbol }
+sup.equations @Index { @Code "sup" symbol (equations) }
 superscripting, @Code "over" for built-up fractions, and @Code "from"
-over.eq. @Index { @Code "over" in equations }
-from. @Index { @Code "from" in equations }
-to. @Index { @Code "to" in equations }
+equations. @RawIndex { equations }
+equations.over @SubIndex { @Code "over" symbol }
+over.equations @Index { @Code "over" symbol (equations) }
+equations. @RawIndex { equations }
+equations.from @SubIndex { @Code "from" symbol }
+from.equations @Index { @Code "from" symbol (equations) }
+equations. @RawIndex { equations }
+equations.to @SubIndex { @Code "to" symbol }
+to.equations @Index { @Code "to" symbol (equations) }
 and @Code "to" for the lower and upper limits of sums, products,
 etc.  These symbols may be used together to produce complicated
 equations very easily:
@@ -73,8 +83,12 @@ Here @Code "sum" is just the @Eq { summation } symbol; @Code "from" and
 @Code "to" do all the work of placing the limits.  They are quite
 independent, so either or both may be omitted.  To get a superscript
 directly over a subscript, use the @Code "supp" and @Code "on" symbols:
-supp. @Index { @Code "supp" in equations }
-on. @Index { @Code "on" in equations }
+equations. @RawIndex { equations }
+equations.supp @SubIndex { @Code "supp" symbol }
+supp.equations @Index { @Code "supp" symbol (equations) }
+equations. @RawIndex { equations }
+equations.on @SubIndex { @Code "on" symbol }
+on.equations @Index { @Code "on" symbol (equations) }
 @ID {
 @Code "A supp b on a"
 |7ct
@@ -98,6 +112,12 @@ can fix this by using `tucked' subscripts, like this:
 }
 @EndList
 The @Code "tsub" and @Code "ton" symbols are exactly like @Code "sub"
+equations. @RawIndex { equations }
+equations.tsub @SubIndex { @Code "tsub" symbol }
+tsub.equations @Index { @Code "tsub" symbol (equations) }
+equations. @RawIndex { equations }
+equations.ton @SubIndex { @Code "ton" symbol }
+ton.equations @Index { @Code "ton" symbol (equations) }
 and @Code "on" except for this tucking-in effect.  However, the
 @Code "sub" symbol itself does a certain amount of tucking in; the
 amount is determined by kerning information in the font files and
@@ -121,6 +141,9 @@ There are two possible interpretations for this:
 @EndList
 @Code "@Eq" chooses between them in the following way.  Every symbol that
 takes a parameter also has a {@I precedence}, which is a number.  For
+equations. @RawIndex { equations }
+equations.precedence @SubIndex { precedence of symbols }
+precedence.equations @Index { precedence of symbols in equations }
 example, @Code "sup" has precedence 60 and @Code "over" has precedence
 54.  The symbol with the highest precedence wins the object lying between
 them, so in the above case the first interpretation is chosen.  If two
@@ -170,17 +193,19 @@ to have only left associative symbols.  The summary at the end of this
 chapter gives the precedence of every symbol.
 @PP
 The @Code matrix symbol {@PageMark matrix} builds an array of objects:
-matrix. @Index { @Code "matrix" in equations }
+equations. @RawIndex { equations }
+equations.matrix @SubIndex { @Code "matrix" symbol }
+matrix.equations @Index { @Code "matrix" symbol (equations) }
 @ID {
-@Code {
-"matrix"
-"   atleft { blpar }"
-"   atright { brpar }"
-"{"
-"  row col x sup 2 col y sup 2 col z sup 2"
-"  row col x col y col z"
-"  row col 1 col 1 col 1"
-"}"
+@Code @Verbatim {
+matrix
+   atleft { blpar }
+   atright { brpar }
+{
+  row col x sup 2 col y sup 2 col z sup 2
+  row col x col y col z
+  row col 1 col 1 col 1
+}
 }
 ||9ct
 @Eq {
@@ -195,17 +220,29 @@ matrix
 }
 }
 The @Code atleft and @Code atright options place vertically scaled
+equations. @RawIndex { equations }
+equations.atleft @SubIndex { @Code "atleft" option }
+atleft.equations @Index { @Code "atleft" option (equations) }
+equations. @RawIndex { equations }
+equations.atright @SubIndex { @Code "atright" option }
+atright.equations @Index { @Code "atright" option (equations) }
 versions of their values at each side; if either is omitted the value
 is taken to be an empty object of zero width by default.  Although
 we have used @Code blpar and @Code brpar here, since the options are
 vertically scaled to the correct size some people prefer simply
-@ID @OneRow @Code {
-"matrix"
-"   atleft { ( }"
-"   atright { ) }"
+@ID @OneRow @Code @Verbatim {
+matrix
+   atleft { ( }
+   atright { ) }
 }
 The right parameter of @Code matrix is the array itself.  It must be
 enclosed in braces, and it is a sequence of rows introduced by
+equations. @RawIndex { equations }
+equations.row @SubIndex { @Code "row" symbol }
+row.equations @Index { @Code "row" symbol (equations) }
+equations. @RawIndex { equations }
+equations.col @SubIndex { @Code "col" symbol }
+col.equations @Index { @Code "col" symbol (equations) }
 @Code row symbols; each row is a sequence of objects introduced by
 @Code col symbols.
 @FootNote {
@@ -220,8 +257,20 @@ them in braces.
 @PP
 Entries built with the @Code col symbol have their objects centred in
 the column.  Also available are @Code lcol for left-justified entries,
+equations. @RawIndex { equations }
+equations.lcol @SubIndex { @Code "lcol" symbol }
+lcol.equations @Index { @Code "lcol" symbol (equations) }
 @Code ccol meaning the same as {@Code col}, @Code rcol for
+equations. @RawIndex { equations }
+equations.ccol @SubIndex { @Code "ccol" symbol }
+ccol.equations @Index { @Code "ccol" symbol (equations) }
+equations. @RawIndex { equations }
+equations.rcol @SubIndex { @Code "rcol" symbol }
+rcol.equations @Index { @Code "rcol" symbol (equations) }
 right-justified entries, and @Code mcol for alignment along column
+equations. @RawIndex { equations }
+equations.mcol @SubIndex { @Code "mcol" symbol }
+mcol.equations @Index { @Code "mcol" symbol (equations) }
 marks.  Each column may contain entries of different kinds, except
 that @Code mcol does not work well with any other sort.
 @PP
@@ -253,6 +302,10 @@ matrix
 }
 To assist in resolving this problem, the @Code "matrix" symbol has
 a @Code "strut" option, which causes a strut to be inserted into
+equations. @RawIndex { equations }
+equations.strut @SubIndex { @Code "strut" option }
+strut.option. @RawIndex { @Code "strut" option }
+strut.option.in.equations @SubIndex { in equations }
 every row, guaranteeing that every row has height at least equal
 to the height of the strut.  By using
 @ID @Code {
@@ -304,27 +357,51 @@ and, on the right, the result produced:
 @Rowa
     A { "pmatrix" }
     B { "matrix atleft { ( } atright { ) } { M }" }
-    C { @Eq { pmatrix { M } } }
+    C { @Eq { pmatrix { M } }
+equations. @RawIndex { equations }
+equations.pmatrix @SubIndex { @Code "pmatrix" symbol }
+pmatrix.equations @Index { @Code "pmatrix" symbol (equations) }
+}
 @Rowa
     A { "bmatrix" }
     B { "matrix atleft { blbrack } atright { brbrack } { M }" }
-    C { @Eq { bmatrix { M } } }
+    C { @Eq { bmatrix { M } }
+equations. @RawIndex { equations }
+equations.bmatrix @SubIndex { @Code "bmatrix" symbol }
+bmatrix.equations @Index { @Code "bmatrix" symbol (equations) }
+}
 @Rowa
     A { "brmatrix" }
     B { "matrix atleft { blbrace } atright { brbrace } { M }" }
-    C { @Eq { brmatrix { M } } }
+    C { @Eq { brmatrix { M } }
+equations. @RawIndex { equations }
+equations.brmatrix @SubIndex { @Code "brmatrix" symbol }
+brmatrix.equations @Index { @Code "brmatrix" symbol (equations) }
+}
 @Rowa
     A { "fmatrix" }
     B { "matrix atleft { blfloor } atright { brfloor } { M }" }
-    C { @Eq { fmatrix { M } } }
+    C { @Eq { fmatrix { M } }
+equations. @RawIndex { equations }
+equations.fmatrix @SubIndex { @Code "fmatrix" symbol }
+fmatrix.equations @Index { @Code "fmatrix" symbol (equations) }
+}
 @Rowa
     A { "cmatrix" }
     B { "matrix atleft { blceil } atright { brceil } { M }" }
-    C { @Eq { cmatrix { M } } }
+    C { @Eq { cmatrix { M } }
+equations. @RawIndex { equations }
+equations.cmatrix @SubIndex { @Code "cmatrix" symbol }
+cmatrix.equations @Index { @Code "cmatrix" symbol (equations) }
+}
 @Rowa
     A { "amatrix" }
     B { "matrix atleft { blangle } atright { brangle } { M }" }
-    C { @Eq { amatrix { M } } }
+    C { @Eq { amatrix { M } }
+equations. @RawIndex { equations }
+equations.amatrix @SubIndex { @Code "amatrix" symbol }
+amatrix.equations @Index { @Code "amatrix" symbol (equations) }
+}
 }
 For example:
 @ID {
@@ -340,6 +417,9 @@ As this example shows, these symbols are very useful for getting large
 scaled delimiters around things that aren't necessarily matrices at all.
 @PP
 Each of the @Code "@Eq" symbols that takes parameters also has a @Code gap
+equations. @RawIndex { equations }
+equations.gap @SubIndex { @Code "gap" option }
+gap.equations @Index { @Code "gap" option (equations) }
 option, which controls the amount of space inserted by the symbol:
 @IL
 @LI {

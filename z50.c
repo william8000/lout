@@ -1,9 +1,9 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -38,6 +38,7 @@
 /*****************************************************************************/
 #define	NO_FONT		0		/* actually stolen from z37.c        */
 #define	NO_COLOUR	0
+#define	NO_TEXTURE	0
 #define	MAX_GS		50		/* maximum depth of graphics states  */
 
 static FILE		*out_fp;	/* file to print PDF on              */
@@ -47,6 +48,7 @@ typedef struct
   FONT_NUM	gs_font;		/* font number of this state         */
   BOOLEAN	gs_baselinemark;	/* TRUE if baseline mark             */
   COLOUR_NUM	gs_colour;		/* colour number of this state       */
+  TEXTURE_NUM	gs_texture;		/* texture number of this state      */
   BOOLEAN	gs_cpexists;		/* TRUE if a current point exists    */
   FULL_LENGTH	gs_currenty;		/* if cpexists, its y coordinate     */
   short		gs_xheight2;		/* of font exists, half xheight      */
@@ -58,6 +60,7 @@ static int		gs_stack_top;	/* top of graphics state stack       */
 static FONT_NUM		currentfont;	/* font of most recent atom          */
 static BOOLEAN		currentbaselinemark;	/* baseline mark in use      */
 static COLOUR_NUM	currentcolour;	/* colour of most recent atom        */
+static TEXTURE_NUM	currenttexture;	/* texture of most recent atom       */
 static short		currentxheight2;/* half xheight in current font      */
 static BOOLEAN		cpexists;	/* true if a current point exists    */
 static FULL_LENGTH	currenty;	/* if cpexists, its y coordinate     */
@@ -104,6 +107,7 @@ static void PDF_PrintInitialize(FILE *fp)
   currentfont = NO_FONT;
   currentbaselinemark = FALSE;
   currentcolour = NO_COLOUR;
+  currentcolour = NO_TEXTURE;
   cpexists = FALSE;
   wordcount = pagecount = 0;
   New(needs, ACAT);
@@ -145,7 +149,7 @@ static void PDF_PrintPageSetupForFont(OBJECT face, int font_curr_page,
   FULL_CHAR *font_name, FULL_CHAR *first_size_str)
 {
   FULL_CHAR *enc = NULL;
-  fprintf(out_fp, "%%%%IncludeResource: font %s\n", font_name);
+  fprintf(out_fp, "%%%%IncludeResource: font %s%s", font_name, STR_NEWLINE);
   /***
   PDFFont_AddFont(out_fp, first_size_str, font_name,
     MapEncodingName(font_mapping(face)));
@@ -190,7 +194,8 @@ static void PDF_PrintMapping(MAPPING m)
 { MAP_VEC map = MapTable[m]; int i;
   PDFFile_BeginFontEncoding(out_fp, (char*) string(map->name));
   for( i = 0;  i < MAX_CHARS;  i++ )
-    fprintf(out_fp, "/%s%c", string(map->vector[i]), (i+1)%8 != 0 ? ' ' : '\n');
+    fprintf(out_fp, "/%s%s", string(map->vector[i]),
+      (i+1)%8 != 0 ? STR_SPACE : STR_NEWLINE);
   PDFFile_EndFontEncoding(out_fp);
 } /* end PDF_PrintMapping */
 
@@ -304,7 +309,9 @@ static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)
 static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
 { FULL_CHAR *p, *q, *a, *b, *lig, *unacc;
   int ksize;  char *command;  MAPPING m;
-  unsigned short *composite; COMPOSITE *cmp; /* currently unused - JeffK */
+  /* *** currently unused
+  unsigned short *composite; COMPOSITE *cmp;
+  *** */
   static int last_hpos;	/* does not need to be initialised */
   static int next_hpos = -1;
 #if 0
@@ -330,6 +337,8 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
     PDFFont_Set(out_fp, FontSize(currentfont, x), FontName(currentfont));
   }
 
+  /* PDF textures not implemented */
+
   /* if colour is different to previous word then print change */
   if( word_colour(x) != currentcolour )
   {
@@ -340,6 +349,8 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
       PDFPage_Write(out_fp, str);
     }
   }
+
+  /* PDF textures not implemented */
 
   /* move to coordinate of x */
   debug1(DPF, DDD, "  currentxheight2 = %d", currentxheight2);
@@ -483,7 +494,7 @@ static void PDF_PrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
 /*****************************************************************************/
 
 static void PDF_PrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
-  FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
+  TEXTURE_NUM pat, FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
 {
   debug5(DPF, DD, "PDF_PrintUnderline(ft %d, co %d, xstrt %s, xstp %s, ymk %s)",
     fnum, col, EchoLength(xstart), EchoLength(xstop), EchoLength(ymk));
@@ -529,7 +540,7 @@ static void PDF_CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
     PDFPage_Translate(out_fp, xdist, ydist);
 #else
     char	temp_str[64];
-    sprintf(temp_str, "1 0 0 1 %d %d cm\n", xdist, ydist);
+    sprintf(temp_str, "1 0 0 1 %d %d cm%s", xdist, ydist, STR_NEWLINE);
     PDFPage_Write(out_fp, temp_str);
 #endif
   }
@@ -579,7 +590,7 @@ static void PDF_CoordScale(float hfactor, float vfactor)
     PDFPage_Scale(out_fp, hfactor, vfactor);
 #else
     char temp_str[64];
-    sprintf(temp_str, "%.2f 0 0 %.2f 0 0 cm\n", hfactor, vfactor);
+    sprintf(temp_str, "%.2f 0 0 %.2f 0 0 cm%s", hfactor, vfactor, STR_NEWLINE);
     PDFPage_Write(out_fp, temp_str);
 #endif
   }
@@ -607,6 +618,7 @@ void PDF_SaveGraphicState(OBJECT x)
   gs_stack[gs_stack_top].gs_font	= currentfont;
   gs_stack[gs_stack_top].gs_baselinemark	= currentbaselinemark;
   gs_stack[gs_stack_top].gs_colour	= currentcolour;
+  gs_stack[gs_stack_top].gs_texture	= currenttexture;
   gs_stack[gs_stack_top].gs_cpexists	= cpexists;
   gs_stack[gs_stack_top].gs_currenty	= currenty;
   gs_stack[gs_stack_top].gs_xheight2	= currentxheight2;
@@ -636,6 +648,7 @@ void PDF_RestoreGraphicState(void)
   currentfont	  = gs_stack[gs_stack_top].gs_font;
   currentbaselinemark	  = gs_stack[gs_stack_top].gs_baselinemark;
   currentcolour	  = gs_stack[gs_stack_top].gs_colour;
+  currenttexture  = gs_stack[gs_stack_top].gs_texture;
   cpexists	  = gs_stack[gs_stack_top].gs_cpexists;
   currenty	  = gs_stack[gs_stack_top].gs_currenty;
   currentxheight2 = gs_stack[gs_stack_top].gs_xheight2;
@@ -671,7 +684,7 @@ void PDF_PrintGraphicObject(OBJECT x)
       {	Child(y, link);
 	if( type(y) == GAP_OBJ )
 	{
-	  if( vspace(y) > 0 )  PDFPage_Write(out_fp, "\n");
+	  if( vspace(y) > 0 )  PDFPage_Write(out_fp, (char *) STR_NEWLINE);
 	  else if( hspace(y) > 0 ) PDFPage_Write(out_fp, " ");
 	}
 	else if( is_word(type(y)) || type(y) == ACAT )
@@ -730,6 +743,8 @@ void PDF_DefineGraphicNames(OBJECT x)
       PDFFont_Set(out_fp, FontSize(currentfont, x), FontName(currentfont));
     }
   }
+
+  /* PDF textures not implemented */
 
   /* if colour is different to previous word then print change */
   if( colour(save_style(x)) != currentcolour )

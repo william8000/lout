@@ -4,6 +4,8 @@
 @Begin
 @PP
 Columns of numbers are often presented with decimal points aligned:
+tables. @RawIndex { tables }
+tables.aligned @SubIndex { aligned columns }
 aligned.columns @Index { aligned columns in tables }
 @CD @OneRow @Tbl
     marginvertical { 0.5vx }

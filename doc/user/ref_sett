@@ -4,31 +4,41 @@
 @Begin
 @PP
 The basic idea is to store your references in a separate
-database.file @Index { database file }
+references. @RawIndex { references }
+references.database.files @SubIndex { database.files }
+database.files.references @Index { database files of references }
 @I { database file }, in a form which does not include formatting
 details such as font changes.  This makes it easy to use the same
 references in many documents, and it leaves the formatting to Lout.  Here
 is an example of a reference as it would appear in a database file:
-@ID @OneRow @Code {
-"{ @Reference"
-"    @Tag { vanleunen1992 }"
-"    @Type { Book }"
-"    @Author { Mary-Claire van Leunen }"
-"    @Title { A Handbook for Scholars }"
-"    @Publisher { Oxford }"
-"    @Edition { Revised Edition }"
-"    @Year { 1992 }"
-"}"
+@ID @OneRow @Code @Verbatim {
+{ @Reference
+    @Tag { vanleunen1992 }
+    @Type { Book }
+    @Author { Mary-Claire van Leunen }
+    @Title { A Handbook for Scholars }
+    @Publisher { Oxford }
+    @Edition { Revised Edition }
+    @Year { 1992 }
 }
-reference. @Index @Code "@Reference"
+}
+references. @RawIndex { references }
+references.reference @SubIndex { @Code "@Reference" }
+reference.references @Index { @Code "@Reference" (references) }
 @Code "@Reference" is a symbol, and {@Code "@Tag"}, {@Code "@Type"},
 {@Code "@Author"}, and so on are its options.  The database file as
 a whole consists of a sequence of references, each enclosed in braces
 as shown.
 @PP
 The @Code "@Tag" option is compulsory:  since you cite a reference by
+references. @RawIndex { references }
+references.tag @SubIndex { @Code "@Tag" }
+tag.option. @RawIndex { @Code "@Tag" option }
+tag.option.in.references @SubIndex { in references }
 giving its tag, there must be one.  The @Code "@Type" option is also
-type. @Index { @Code "@Type" option }
+references. @RawIndex { references }
+references.type @SubIndex { @Code "@Type" option }
+type.references @Index { @Code "@Type" (references) }
 compulsory, since it says whether the reference is to a book, a journal
 article, or whatever, and this determines what other options are
 required.  Section {@NumberOf entries} describes all the types provided
@@ -41,7 +51,9 @@ refs.ld.file @Index { @Code "refs.ld" file }
 @Code "refs.ld" and put it in the same directory as your document.  Next,
 place
 @ID @Code "@Database @Reference { refs }"
-database. @Index @Code "@Database"
+references. @RawIndex { references }
+references.database @SubIndex { @Code "@Database" }
+database.references @Index { @Code "@Database" (references) }
 at the start of your document, just before {@Code "@Doc"},
 {@Code "@Document"}, {@Code "@Report"}, or whatever.  Alternatively,
 you may place it at the end of your setup file.  It informs Lout that
@@ -56,6 +68,8 @@ or whatever.  Quotes are needed because of the @Code "/" characters.
 @PP
 With the database file created and the @Code "@Database" line in place,
 you are ready to start citing references.  The first time that the
+references. @RawIndex { references }
+references.database.index.file @SubIndex { database index file }
 database.index.file @Index { database index file }
 index.file @Index { index file }
 database is used, Lout will create an @I { index file } whose purpose

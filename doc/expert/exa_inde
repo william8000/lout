@@ -15,7 +15,7 @@ show that they will be handled correctly too, provided they
 do not overlap with other entries with the same key.  The
 effect of such overlaps is undefined, leaving us nothing to
 prove.  We also assume that every entry with a given
-key has the same label, including any indent (that is, the same
+key has the same label, including any format (that is, the same
 initial part before the page number).  If labels differ the
 result is undefined and there is nothing to prove.
 @PP
@@ -98,8 +98,7 @@ that @Code y has this form.  Clearly, this meld gives a
 value equal to @Code { y }, which is the correct result.
 @PP
 If @Code { x } is non-raw and @Code { y } is raw, the
-@@Meld in the discriminant melds two values typified
-by
+@@Meld in the discriminant melds two values typified by
 @ID @Code "label &0.03fu {}{@OneCol ,} pn1{@OneCol ,} pn2"
 and
 @ID @Code "label &0.03fu {}"

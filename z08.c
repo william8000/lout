@@ -1,9 +1,9 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -97,28 +97,34 @@ static OBJECT insert_split(OBJECT x, OBJECT bthr[2], OBJECT fthr[2])
 
 /*@::ReplaceWithTidy()@*******************************************************/
 /*                                                                           */
-/*  OBJECT ReplaceWithTidy(x, one_word)                                      */
+/*  OBJECT ReplaceWithTidy(x, spacing)                                       */
 /*                                                                           */
 /*  Replace object x with a tidier version in which juxtapositions are       */
 /*  folded.  If this is not possible, return the original object.            */
 /*                                                                           */
-/*  If one_word is TRUE, the result is to be a single QWORD with inter-      */
-/*  word spaces converted to single space characters.  Otherwise an ACAT     */
-/*  is the preferred result.                                                 */
+/*  Spacing can have value 0, 1, or 2, with the following meaning:           */
 /*                                                                           */
-/*  *** Meaning changed, now interword spaces are converted to the same      */
-/*  number of spaces to assist construction of sorting keys.                 */
+/*     ACAT_TIDY    An ACAT is the preferred result                          */
+/*                                                                           */
+/*     WORD_TIDY    The result is to be a single QWORD with interword spaces */
+/*                  converted to as many space characters as there were.     */
+/*                                                                           */
+/*     PARA_TIDY    The result is to be a single QWORD with interword spaces */
+/*                  replaced by single spaces, and line ends marked by       */
+/*                  newline characters.                                      */
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT ReplaceWithTidy(OBJECT x, BOOLEAN one_word)
-{ static FULL_CHAR	buff[MAX_BUFF];		/* the growing current word */
+OBJECT ReplaceWithTidy(OBJECT x, int spacing)
+{ static FULL_CHAR	buff[MAX_WORD];		/* the growing current word */
   static int		buff_len;		/* length of current word   */
   static FILE_POS	buff_pos;		/* filepos of current word  */
   static unsigned	buff_typ;		/* WORD or QWORD of current */
   OBJECT                link, y, tmp, res;	/* temporaries              */
   int i;
-  debug2(DOM, DD, "ReplaceWithTidy(%s, %s)", EchoObject(x), bool(one_word));
+  debug2(DOM, DD, "ReplaceWithTidy(%s, %s)", EchoObject(x),
+    spacing == ACAT_TIDY ? "ACAT_TIDY" :
+    spacing == WORD_TIDY ? "WORD_TIDY" : "PARA_TIDY");
   switch( type(x) )
   {
     case ACAT:
@@ -135,8 +141,9 @@ OBJECT ReplaceWithTidy(OBJECT x, BOOLEAN one_word)
       for( link = Down(x); link != x; link = NextDown(link) )
       {	Child(y, link);
 	if( is_word(type(y)) )
-	{ if( buff_len + StringLength(string(y)) >= MAX_BUFF )
-	    Error(8, 1, "word is too long", WARN, &fpos(y));
+	{ if( buff_len + StringLength(string(y)) >= MAX_WORD )
+	    Error(8, 1, "word is too long (%d characters)", WARN, &fpos(y),
+	     buff_len + StringLength(string(y)));
 	  else
 	  { if( buff_len == 0 )  FposCopy(buff_pos, fpos(y));
 	    StringCopy(&buff[buff_len], string(y));
@@ -146,25 +153,60 @@ OBJECT ReplaceWithTidy(OBJECT x, BOOLEAN one_word)
 	}
 	else if( type(y) == GAP_OBJ )
 	{ if( Down(y) != y || hspace(y) + vspace(y) > 0 )
-	  { if( one_word )
-	    { if( buff_len + hspace(y) + vspace(y) >= MAX_BUFF )
-		Error(8, 2, "word is too long", WARN, &fpos(y));
-	      else
-	      { for( i = 0;  i < hspace(y) + vspace(y);  i++ )
-		{ StringCopy(&buff[buff_len], AsciiToFull(" "));
-		  buff_len++;
-		}
-		buff_typ = QWORD;
-	      }
-	    }
-	    else
-	    { tmp = MakeWord(buff_typ, buff, &buff_pos);
-	      buff_len = 0;  buff_typ = WORD;
-	      if( res == nilobj )
-	      { New(res, ACAT);
-		FposCopy(fpos(res), fpos(x));
-	      }
-	      Link(res, tmp);  Link(res, y);
+	  {
+	    switch( spacing )
+	    {
+	      case WORD_TIDY:
+		      
+	        if( buff_len + hspace(y) + vspace(y) >= MAX_WORD )
+		  Error(8, 2, "word is too long (%d characters)", WARN, &fpos(y),
+		   buff_len + hspace(y) + vspace(y) );
+	        else
+	        { for( i = 0;  i < hspace(y) + vspace(y);  i++ )
+		  { StringCopy(&buff[buff_len], AsciiToFull(" "));
+		    buff_len++;
+		  }
+		  buff_typ = QWORD;
+	        }
+		break;
+
+
+	      case ACAT_TIDY:
+
+	        tmp = MakeWord(buff_typ, buff, &buff_pos);
+	        buff_len = 0;  buff_typ = WORD;
+	        if( res == nilobj )
+	        { New(res, ACAT);
+		  FposCopy(fpos(res), fpos(x));
+	        }
+	        Link(res, tmp);  Link(res, y);
+	        break;
+
+
+	      case PARA_TIDY:
+
+	        if( buff_len + hspace(y) + vspace(y) >= MAX_WORD )
+		  Error(8, 2, "word is too long (%d characters)", WARN, &fpos(y),
+		   buff_len + hspace(y) + vspace(y));
+	        else
+	        {
+		  for( i = 0;  i < vspace(y);  i++ )
+		  { StringCopy(&buff[buff_len], STR_NEWLINE);
+		    buff_len++;
+		  }
+		  for( i = 0;  i < hspace(y);  i++ )
+		  { StringCopy(&buff[buff_len], STR_SPACE);
+		    buff_len++;
+		  }
+		  buff_typ = QWORD;
+	        }
+		break;
+
+
+	      default:
+
+		assert(FALSE, "bad spacing type in ReplaceWithTidy");
+		break;
 	    }
 	  }
 	}
@@ -300,7 +342,7 @@ OBJECT *enclose, BOOLEAN fcr)
     debug1(DOM, DD, "manifesting gap, style = %s", EchoStyle(style));
     z = Manifest(z, env, &new_style, nbt, nft, &ntarget, crs, FALSE, FALSE, enclose, fcr);
     debug1(DOM, DD, "replacing with tidy, style = %s", EchoStyle(style));
-    z = ReplaceWithTidy(z, FALSE);
+    z = ReplaceWithTidy(z, ACAT_TIDY);
     debug1(DOM, DD, "calling GetGap, style = %s", EchoStyle(style));
     GetGap(z, style, &gap(g), &res_inc);
     if( bt[perp] )  Link(bt[perp], g);
@@ -402,7 +444,7 @@ static OBJECT ManifestCase(OBJECT x, OBJECT env, STYLE *style, OBJECT bthr[2],
 OBJECT fthr[2], OBJECT *target,  OBJECT *crs, BOOLEAN ok, BOOLEAN need_expand,
 OBJECT *enclose, BOOLEAN fcr)
 { OBJECT y, tag, ylink, yield, ytag, zlink;
-  OBJECT res, z, firsttag, firstres;
+  OBJECT res, z, firsttag, firstres = nilobj;
 
   /* make sure left parameter (the tag) is in order */
   debug0(DOM, DD, "  manifesting CASE now");
@@ -410,7 +452,7 @@ OBJECT *enclose, BOOLEAN fcr)
   debug1(DOM, DD, "  manifesting CASE tag %s now", EchoObject(tag));
   tag = Manifest(tag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
   &nenclose, fcr);
-  tag = ReplaceWithTidy(tag, FALSE);
+  tag = ReplaceWithTidy(tag, ACAT_TIDY);
 
   /* make sure the right parameter is an ACAT */
   Child(y, LastDown(x));
@@ -441,7 +483,7 @@ OBJECT *enclose, BOOLEAN fcr)
     Child(ytag, Down(yield));
     ytag = Manifest(ytag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
       &nenclose, fcr);
-    ytag = ReplaceWithTidy(ytag, FALSE);
+    ytag = ReplaceWithTidy(ytag, ACAT_TIDY);
     if( is_word(type(ytag)) )
     { if( firsttag == nilobj )
       {	firsttag = ytag;
@@ -554,7 +596,7 @@ OBJECT *enclose, BOOLEAN fcr)
   }
   Child(z, NextDown(Down(y)));
   z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-  z = ReplaceWithTidy(z, FALSE);
+  z = ReplaceWithTidy(z, ACAT_TIDY);
   if( is_word(type(z)) && StringEqual(string(z), KW_PRECEDING) )
     cross_type(y) = CROSS_PREC;
   else if( is_word(type(z)) && StringEqual(string(z), KW_FOLLOWING) )
@@ -573,7 +615,7 @@ OBJECT *enclose, BOOLEAN fcr)
   /* make sure second argument (the new key) is ok */
   Child(tag, LastDown(x));
   tag = Manifest(tag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-  tag = ReplaceWithTidy(tag, TRUE); /* && */
+  tag = ReplaceWithTidy(tag, WORD_TIDY); /* && */
   if( !is_word(type(tag)) )
   { Error(8, 17, "right parameter of %s must be a simple word",
       WARN, &fpos(tag), KW_TAGGED);
@@ -647,7 +689,7 @@ OBJECT *enclose, BOOLEAN fcr)
     {
       if( is_tag(actual(y)) || is_key(actual(y)) )
       {	z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-	z = ReplaceWithTidy(z, TRUE);
+	z = ReplaceWithTidy(z, WORD_TIDY);
 	if( !is_word(type(z)) )
 	{
 	  debug2(ANY, D, "z = %s %s", Image(type(z)), EchoObject(z));
@@ -657,7 +699,7 @@ OBJECT *enclose, BOOLEAN fcr)
       }
       else if( type(z) == NEXT )
       {	z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-	z = ReplaceWithTidy(z, FALSE);
+	z = ReplaceWithTidy(z, ACAT_TIDY);
       }
       else if( type(z) == CLOSURE && is_par(type(actual(z))) )
       {
@@ -673,34 +715,6 @@ OBJECT *enclose, BOOLEAN fcr)
       }
     }
 
-    /*  now check z to see whether it is either a word or and ACAT of words */
-    /* ***
-    if( type(z) == ACAT )
-    { int i = 0;  OBJECT t, tlink, g;
-      tlink = Down(z);
-      for( ; tlink != z && symbol_free;  tlink = NextDown(tlink), i++ )
-      { Child(t, tlink);
-	switch( type(t) )
-	{
-	  case WORD:
-	  case QWORD:	if( i > 20 )  symbol_free = FALSE;
-			break;
-
-	  case GAP_OBJ:	if( Down(t) != t )
-			{ Child(g, Down(t));
-			  if( !is_word(type(g)) )  symbol_free = FALSE;
-			}
-			break;
-
-	  default:	symbol_free = FALSE;
-			break;
-
-	}
-      }
-    }
-    else
-    *** */
-    
     if( !is_word(type(z)) )
     { symbol_free = FALSE;
     }
@@ -714,7 +728,6 @@ OBJECT *enclose, BOOLEAN fcr)
     if( y != nilobj && type(y) == CLOSURE )
     { OBJECT prntenv;
       Parent(prntenv, Up(y));
-      if( type(prntenv) != ENV )  fprintf(stderr, "%s\n", Image(type(prntenv)));
       assert(type(prntenv) == ENV, "Manifest: prntenv!");
       if( Down(prntenv) == LastDown(prntenv) )
       { env = prntenv;
@@ -755,7 +768,7 @@ OBJECT *enclose, BOOLEAN fcr)
     AttachEnv(env, x);
     SetTarget(hd);
     enclose_obj(hd) = (has_enclose(sym) ? BuildEnclose(hd) : nilobj);
-    headers(hd) = dead_headers(hd) = nilobj;
+    ClearHeaders(hd);
     x = hd;
     threaded(x) = bthr[COLM] != nilobj || fthr[COLM] != nilobj;
     ReplaceWithSplit(x, bthr, fthr);
@@ -786,7 +799,7 @@ OBJECT *enclose, BOOLEAN fcr)
       actual(command) = filter(enclosing(sym));
       FilterSetFileNames(x);
       command = Manifest(command,env,style,nbt,nft,&ntarget,crs,FALSE,FALSE, &nenclose, fcr);
-      command = ReplaceWithTidy(command, TRUE);
+      command = ReplaceWithTidy(command, WORD_TIDY);
       if( !is_word(type(command)) )
 	Error(8, 19, "filter parameter of %s symbol is not simple",
 	  FATAL, &fpos(command), SymName(enclosing(sym)));
@@ -881,10 +894,10 @@ OBJECT *enclose, BOOLEAN fcr)
 OBJECT Manifest(OBJECT x, OBJECT env, STYLE *style, OBJECT bthr[2],
 OBJECT fthr[2], OBJECT *target, OBJECT *crs, BOOLEAN ok, BOOLEAN need_expand,
 OBJECT *enclose, BOOLEAN fcr)
-{ OBJECT bt[2], ft[2], y, link, gaplink, g;  register FULL_CHAR *p;
-  OBJECT res, res_env, res_env2, hold_env, hold_env2, z, prev;
+{ OBJECT bt[2], ft[2], y, link, nextlink, gaplink, g;  register FULL_CHAR *p;
+  OBJECT res = nilobj, res_env, res_env2, hold_env, hold_env2, z, prev;
   OBJECT link1, link2, x1, x2, y1, y2;
-  int par, num1, num2;  GAP res_gap;  unsigned res_inc;  STYLE new_style;
+  int i, par, num1, num2;  GAP res_gap;  unsigned res_inc;  STYLE new_style;
   BOOLEAN done, multiline;  FULL_CHAR ch;  float scale_factor;
   static int depth = 0;
 #if DEBUG_ON
@@ -955,7 +968,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, TRUE);
+      y = ReplaceWithTidy(y, WORD_TIDY);
       ReplaceWithSplit(x, bthr, fthr);
       break;
 
@@ -1007,6 +1020,7 @@ OBJECT *enclose, BOOLEAN fcr)
       if( !ok || *crs == nilobj )
       {	word_font(x) = font(*style);
 	word_colour(x) = colour(*style);
+	word_texture(x) = texture(*style);
 	word_outline(x) = outline(*style);
 	word_language(x) = language(*style);
 	word_baselinemark(x) = baselinemark(*style);
@@ -1040,6 +1054,7 @@ OBJECT *enclose, BOOLEAN fcr)
       if( is_word(type(y)) )
       { word_font(y) = font(*style);
 	word_colour(y) = colour(*style);
+	word_texture(y) = texture(*style);
 	word_outline(y) = outline(*style);
 	word_language(y) = language(*style);
 	word_baselinemark(y) = baselinemark(*style);
@@ -1078,6 +1093,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	if( is_word(type(y)) )
 	{ word_font(y) = font(*style);
 	  word_colour(y) = colour(*style);
+	  word_texture(y) = texture(*style);
 	  word_outline(y) = outline(*style);
 	  word_language(y) = language(*style);
 	  word_baselinemark(y) = baselinemark(*style);
@@ -1095,7 +1111,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  /* explicit & operator whose value is the child of g */
 	  Child(z, Down(g));
 	  z = Manifest(z, env, &new_style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-	  z = ReplaceWithTidy(z, FALSE);
+	  z = ReplaceWithTidy(z, ACAT_TIDY);
 	  GetGap(z, style, &gap(g), &res_inc);
 	  vspace(g) = hspace(g) = 0;
 	}
@@ -1210,6 +1226,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	    prev != nilobj && is_word(type(prev)) && !mark(gap(g)) &&
 	    word_font(prev) == word_font(y) &&
 	    word_colour(prev) == word_colour(y) &&
+	    word_texture(prev) == word_texture(y) &&
 	    word_outline(prev) == word_outline(y) &&
 	    word_language(prev) == word_language(y) &&
 	    word_baselinemark(prev) == word_baselinemark(y) )
@@ -1217,7 +1234,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	{ unsigned typ;
 	  assert( underline(prev) == UNDER_OFF, "Manifest/ACAT: underline(prev)!" );
 	  assert( underline(y) == UNDER_OFF, "Manifest/ACAT: underline(y)!" );
-	  if( StringLength(string(prev))+StringLength(string(y)) >= MAX_BUFF )
+	  if( StringLength(string(prev))+StringLength(string(y)) >= MAX_WORD )
 	    Error(8, 24, "word %s%s is too long",
 	      FATAL, &fpos(prev), string(prev), string(y));
 	  z = y;
@@ -1225,6 +1242,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  y = MakeWordTwo(typ, string(prev), string(y), &fpos(prev));
 	  word_font(y) = word_font(prev);
 	  word_colour(y) = word_colour(prev);
+	  word_texture(y) = word_texture(prev);
 	  word_outline(y) = word_outline(prev);
 	  word_language(y) = word_language(prev);
 	  word_baselinemark(y) = word_baselinemark(prev);
@@ -1248,90 +1266,6 @@ OBJECT *enclose, BOOLEAN fcr)
 	  *crs = nilobj;
 	}
       }
-
-      /* implement FILL_OFF break option if required */
-      /* *** this has been moved now to MinSize, z12.c *** */
-
-      /* ***
-      if( ok && multiline && fill_style(*style) == FILL_UNDEF )
-	Error(8, 25, "missing %s symbol or option", FATAL, &fpos(x), KW_BREAK);
-      if( ok && multiline && fill_style(*style) == FILL_OFF )
-      {	OBJECT prev_acat, new_acat;  BOOLEAN jn;
-
-	%* compress any ACAT children of ACAT x *%
-	for( link = x;  NextDown(link) != x;  link = NextDown(link) )
-	{ Child(y, NextDown(link));
-	  if( type(y) == ACAT )
-	  { TransferLinks(Down(y), y, NextDown(link));
-	    DisposeChild(Up(y));
-	    link = PrevDown(link);
-	  }
-	}
-
-	%* do line breaks now *%
-	prev_acat = x;
-	New(x, VCAT);
-	adjust_cat(x) = FALSE;
-	ReplaceNode(x, prev_acat);
-	Link(x, prev_acat);
-	FirstDefinite(prev_acat, link, y, jn);
-	if( link != prev_acat )
-	{
-	  NextDefiniteWithGap(prev_acat, link, y, g, jn);
-	  while( link != prev_acat )
-	  {
-	    if( mode(gap(g)) != NO_MODE && line_breaker(g) )
-	    { OBJECT glink = PrevDown(Up(g));
-	      debug2(DOM, DD, "lines gap just before definite %s at %s",
-		Image(type(y)), EchoFilePos(&fpos(y)));
-	      MoveLink(NextDown(glink), x, PARENT);
-	      GapCopy(gap(g), line_gap(*style));
-	      width(gap(g)) *= find_max(1, vspace(g));
-	      New(new_acat, ACAT);
-	      adjust_cat(new_acat) = padjust(*style);
-	      FposCopy(fpos(new_acat), fpos(g));
-	      if( hspace(g) > 0 )
-	      { z = MakeWord(WORD, STR_EMPTY, &fpos(g));
-	        word_font(z) = font(*style);
-	        word_colour(z) = colour(*style);
-	        word_outline(z) = outline(*style);
-	        word_language(z) = language(*style);
-	        word_baselinemark(z) = baselinemark(*style);
-	        word_hyph(z) = hyph_style(*style) == HYPH_ON;
-		underline(z) = UNDER_OFF;
-	        Link(new_acat, z);
-	        New(z, GAP_OBJ);
-	        hspace(z) = hspace(g);
-	        vspace(z) = 0;
-	        underline(z) = UNDER_OFF;
-	        GapCopy(gap(z), space_gap(*style));
-	        width(gap(z)) *= hspace(z);
-	        Link(new_acat, z);
-	      }
-	      TransferLinks(NextDown(glink), prev_acat, new_acat);
-	      StyleCopy(save_style(new_acat), *style);
-	      Link(x, new_acat);
-	      prev_acat = new_acat;
-	      glink = prev_acat;
-	    }
-	    NextDefiniteWithGap(prev_acat, link, y, g, jn);
-	  }
-	}
-
-	%* remove any singleton ACAT objects under x, if they are VCATs *%
-	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
-	  if( type(y) == ACAT && Down(y) == LastDown(y) )
-	  { Child(z, Down(y));
-	    if( type(z) == VCAT )
-	    { MoveLink(link, z, CHILD);
-	      DisposeObject(y);
-	    }
-	  }
-	}
-      }
-      *** */
-
       ReplaceWithSplit(x, bthr, fthr);
       break;
 
@@ -1349,7 +1283,7 @@ OBJECT *enclose, BOOLEAN fcr)
     
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, FALSE);
+      y = ReplaceWithTidy(y, ACAT_TIDY);
       GetGap(y, style, &res_gap, &res_inc);
       if( res_inc != GAP_ABS || mode(res_gap) != EDGE_MODE ||
 	units(res_gap) != FIXED_UNIT )
@@ -1368,7 +1302,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, FALSE);
+      y = ReplaceWithTidy(y, ACAT_TIDY);
       GetGap(y, style, &shift_gap(x), &res_inc);
       shift_type(x) = res_inc;
       if( mode(shift_gap(x)) != EDGE_MODE || 
@@ -1414,16 +1348,31 @@ OBJECT *enclose, BOOLEAN fcr)
     case SET_HEADER:
 
       /* first manifest gap, which is left parameter */
+      debug1(DGS, D, "[ Manifest(%s)", EchoObject(x));
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
 	&nenclose, fcr);
-      y = ReplaceWithTidy(y, FALSE);
+      y = ReplaceWithTidy(y, ACAT_TIDY);
       GetGap(y, style, &line_gap(save_style(x)), &res_inc);
 
-      /* now the right parameter */
+      /* attach MAX_HCOPIES-1 new copies of the right parameter as children */
       Child(y, LastDown(x));
-      y = Manifest(y, env, style, bthr, fthr, target, crs, ok, need_expand,
-	enclose, fcr);
+      for( i = 1;  i < MAX_HCOPIES;  i++ )
+      {
+	z = CopyObject(y, &fpos(y));
+	Link(x, z);
+      }
+      ifdebug(DGS, D, DebugObject(x));
+      
+      /* manifest all MAX_HCOPIES copies of the right parameter */
+      for( link = NextDown(Down(x));  link != x;  link = nextlink )
+      {
+	nextlink = NextDown(link);
+	Child(y, link);
+        y = Manifest(y, env, style, bthr, fthr, target, crs, ok, need_expand,
+	  enclose, fcr);
+      }
+      debug0(DGS, D, "] Manifest returning.");
       break;
 
 
@@ -1451,7 +1400,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, FALSE);
+      y = ReplaceWithTidy(y, ACAT_TIDY);
       GetGap(y, style, &res_gap, &res_inc);
       if( res_inc != GAP_ABS || mode(res_gap) != EDGE_MODE ||
 		units(res_gap) != DEG_UNIT )
@@ -1496,7 +1445,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, FALSE);
+      y = ReplaceWithTidy(y, ACAT_TIDY);
       if( is_word(type(y)) && StringEqual(string(y), STR_EMPTY) )
       {
 	/* missing scale factor, meaning to be inserted automatically */
@@ -1579,7 +1528,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, FALSE);
+      y = ReplaceWithTidy(y, ACAT_TIDY);
       if( !is_word(type(y)) )
       {	Error(8, 30, "%s dropped (parameter is not a simple word)",
 	  WARN, &fpos(y), KW_XCHAR);
@@ -1664,13 +1613,16 @@ OBJECT *enclose, BOOLEAN fcr)
     case ZUNIT:
     case BREAK:
     case COLOUR:
+    case TEXTURE:
     case LANGUAGE:
     
       assert( Down(x) != x && NextDown(Down(x)) != x, "Manifest: FONT!" );
       StyleCopy(new_style, *style);
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, type(x) == COLOUR);
+      y = ReplaceWithTidy(y,
+        type(x) == COLOUR ? WORD_TIDY :
+	type(x) == TEXTURE ? PARA_TIDY : ACAT_TIDY);
       switch( type(x) )
       {
 	case FONT:	FontChange(&new_style, y);
@@ -1689,6 +1641,9 @@ OBJECT *enclose, BOOLEAN fcr)
 			break;
 	
 	case COLOUR:	ColourChange(&new_style, y);
+			break;
+
+	case TEXTURE:	TextureChange(&new_style, y);
 			break;
 
 	case LANGUAGE:	LanguageChange(&new_style, y);
@@ -1935,14 +1890,14 @@ OBJECT *enclose, BOOLEAN fcr)
 
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, FALSE);
+      y = ReplaceWithTidy(y, ACAT_TIDY);
       Child(z, NextDown(Down(x)));
       z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      z = ReplaceWithTidy(z, FALSE);
+      z = ReplaceWithTidy(z, ACAT_TIDY);
       if( is_word(type(y)) && sscanf( (char *) string(y), "%d", &num1) == 1 &&
           is_word(type(z)) && sscanf( (char *) string(z), "%d", &num2) == 1 )
       {
-	FULL_CHAR buff[MAX_BUFF];
+	FULL_CHAR buff[MAX_WORD];
 	sprintf( (char *) buff, "%d", type(x) == PLUS ? num1+num2 : num1-num2);
 	res = MakeWord(WORD, buff, &fpos(x));
       }
@@ -2031,10 +1986,12 @@ OBJECT *enclose, BOOLEAN fcr)
       Child(y, LastDown(x));
       y = Manifest(y, env, style, nbt, nft, target, crs, ok,FALSE,enclose,fcr);
       StyleCopy(save_style(x), *style);
+      if( type(x) == LINK_DEST && is_indefinite(type(y)) )
+	type(x) = LINK_DEST_NULL;
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
 	&nenclose, fcr);
-      y = ReplaceWithTidy(y, TRUE);
+      y = ReplaceWithTidy(y, WORD_TIDY);
       ReplaceWithSplit(x, bthr, fthr);
       break;
 	
@@ -2047,7 +2004,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	EchoObject(x), EchoStyle(&save_style(x)));
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y, FALSE);
+      y = ReplaceWithTidy(y, WORD_TIDY);
       if( !is_word(type(y)) )
       { Error(8, 37, "%s deleted (invalid right parameter)", WARN, &fpos(y),
 	  type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC);

@@ -1,9 +1,9 @@
 /*@z44.c:Vertical Hyphenation:VerticalHyphenate()@****************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -84,7 +84,7 @@
 /*****************************************************************************/
 
 static OBJECT FindTarget(OBJECT index)
-{ OBJECT res;
+{ OBJECT res = nilobj;
   debug1(DVH, DD, "FindTarget(%s)", Image(type(index)));
   switch( type(index) )
   {
@@ -263,8 +263,8 @@ static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
 /*****************************************************************************/
 
 BOOLEAN VerticalHyphenate(OBJECT y)
-{ OBJECT large_comp, index, z, link, g;
-  OBJECT row_thread, s1, s2, sh, sv, shp, prev, nxt, large_comp_split;
+{ OBJECT large_comp, index, z, link, g, large_comp_split = nilobj;
+  OBJECT row_thread, s1, s2, sh, sv, shp, prev = nilobj, nxt = nilobj;
   FULL_LENGTH rump_fwd;
   debug1(DVH, D, "[ VerticalHyphenate(y: %s), y =", EchoLength(size(y, ROWM)));
   ifdebug(DVH, D, DebugObject(y));
@@ -415,7 +415,7 @@ BOOLEAN VerticalHyphenate(OBJECT y)
 /*****************************************************************************/
 
 static OBJECT BuildMergeTree(int n, OBJECT x, OBJECT *lenv, OBJECT *lact)
-{ OBJECT res, merge, link, y, l, r, env, act, left_par, right_par;
+{ OBJECT res, merge, link, y = nilobj, l, r, env, act, left_par, right_par;
   debug2(DHY, DD, "BuildMergeTree(%d, %s, -. -)", n, EchoObject(x));
 
   if( n == 1 )
@@ -506,7 +506,7 @@ OBJECT ConvertGalleyList(OBJECT x)
 /*****************************************************************************/
 
 OBJECT BuildEnclose(OBJECT hd)
-{ OBJECT sym, parsym, x, y, link, par, val, env, res;
+{ OBJECT sym = nilobj, parsym, x, y, link, par, val, env, res;
   debug1(DOM, D, "BuildEnclose(%s)", SymName(actual(hd)));
 
   /* find @Enclose symbol and check that it has just one parameter */

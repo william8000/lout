@@ -4,7 +4,6 @@
 @Begin
 @PP
 A @I font is a collection of characters that may be printed.  For
-font. @Index { font }
 example, here is the Times Roman font:
 @ID @OneRow { Times Base } @Font 0.05c @Space {
 { @Char space }
@@ -574,7 +573,7 @@ to have a @Code { Slope } face that is guaranteed to exist no matter which
 family is used.
 @PP
 The @Code "@Font" symbol changes the font of the following object.  For
-font.sym @Index @Code "@Font"
+font.sym @Index { @Code "@Font" symbol }
 example,
 @ID @Code "{ Helvetica Slope } @Font { Hello World }"
 produces
@@ -607,7 +606,7 @@ through the baseline, causing this awkward alignment.  This was done
 because it makes equation formatting easy, and examples like the above
 look poor anyway.  However, if you want to do this and so require
 alignment through the baseline, you can get it, with the @Code baselinemark
-option to the @Code "@Font" symbol like this:
+option to the @Code "@Font" symbol:
 @ID @Code "baselinemark @Font { Here's a 20p @Font big word }"
 which produces
 @ID @Code { baselinemark @Font { Here's a 20p @Font big word } }
@@ -615,20 +614,18 @@ If you want it this way throughout your document, you can put
 @Code { baselinemark } in your initial font (see below).  Lout's
 equation formatter contains the opposite option, which is
 @Code "xheight2mark @Font { ... }"
-(meaning that the alignment goes through a point half the height of
+(which aligns through a point half the height of
 an x character) so you won't disrupt equation formatting if you do
-this, although you will have a problem if you put an equation inside
-a paragraph, since its axis will be aligned with the baseline of
-the adjacent words.
+this, although if you put an equation inside a paragraph, its
+axis will be aligned with the baseline of the adjacent words.
 @PP
-For the convenience of people who use fixed width fonts such as
-Courier, there is an @Code "@F" symbol which switches to a
-fixed width font family:
+There is an @Code "@F" symbol which switches to a fixed width font
+family:
 @ID @Code "@F { Hello world }"
-produces
+produces the equivalent of @Code "{ Courier Base -1p } @Font ...",
+like this:
 @ID @F { Hello world }
-It is the same as writing @Code "{ Courier Base -1p } @Font ..."
-with the @Code "-1p" included to compensate for the relatively
+The @Code "-1p" is included to compensate for the relatively
 large appearance of the Courier font.
 @PP
 The document as a whole will be set in @Code { Times Base 12p }.  To

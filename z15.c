@@ -1,9 +1,9 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -311,7 +311,7 @@ static void CatConstrained(OBJECT x, CONSTRAINT *xc, BOOLEAN ratm,
 OBJECT y, int dim, OBJECT *why)
 { int side;			/* the size of y that x is on: BACK, ON, FWD */
   CONSTRAINT yc;		/* constraints on y                          */
-  FULL_LENGTH backy, fwdy;	/* back(y), fwd(y) would be if x was (0, 0)  */
+  FULL_LENGTH backy=0, fwdy=0;	/* back(y), fwd(y) would be if x was (0, 0)  */
   FULL_LENGTH be, fe;		/* amount back(x), fwd(x) can be for free    */
   FULL_LENGTH beffect, feffect;	/* scratch variables for calculations        */
   FULL_LENGTH seffect;		/* scratch variables for calculations        */
@@ -481,6 +481,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     case KERN_SHRINK:
     case BEGIN_HEADER:
@@ -770,6 +771,7 @@ void DebugConstrained(OBJECT x)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     case KERN_SHRINK:
     case WORD:

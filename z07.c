@@ -1,9 +1,9 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -195,7 +195,9 @@ OBJECT MakeWordThree(FULL_CHAR *s1, FULL_CHAR *s2, FULL_CHAR *s3)
 /*                                                                           */
 /*  OBJECT CopyObject(x, pos)                                                */
 /*                                                                           */
-/*  Make a copy of unsized object x, setting all file positions to *pos.     */
+/*  Make a copy of unsized object x, setting all file positions to *pos,     */
+/*  unless *pos is no_fpos, in which case set all file positions to what     */
+/*  they are in the object being copied.                                     */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -279,6 +281,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case BREAK:
     case UNDERLINE:
     case COLOUR:
+    case TEXTURE:
     case OUTLINE:
     case LANGUAGE:
     case CURR_LANG:
@@ -302,6 +305,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     case VCAT:
     case HCAT:
@@ -453,6 +457,7 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     case ROTATE:
     case BACKGROUND:
@@ -518,7 +523,7 @@ OBJECT Meld(OBJECT x, OBJECT y)
   OBJECT xcomp[MAX_MELD], ycomp[MAX_MELD];
   OBJECT xgaps[MAX_MELD], ygaps[MAX_MELD];
   BOOLEAN is_equal;
-  OBJECT link, z, g;  BOOLEAN jn;
+  OBJECT link, z = nilobj, g;  BOOLEAN jn;
   int xlen, ylen, xi, yi;
   debug2(DOS, D, "Meld(%s, %s)", EchoObject(x), EchoObject(y));
   assert(type(x) == ACAT, "Meld: type(x) != ACAT");
@@ -816,6 +821,7 @@ BOOLEAN EqualManifested(OBJECT x, OBJECT y)
     case GRAPHIC:
     case PLAIN_GRAPHIC:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     case INCGRAPHIC:
     case SINCGRAPHIC:

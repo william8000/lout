@@ -1,9 +1,9 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -44,7 +44,7 @@ static OBJECT RootCross = nilobj;		/* header for all crs        */
 /*  a mapping (symbol x file) -> current tag.                                */
 /*                                                                           */
 /*     crtab_getnext(sym, fnum, S)   Get next value associated with sym,fnum */
-/*     crtab_debug(S, fp)            Debug print of table S to file fp       */
+/*     crtab_debug(S)                Debug print of table S to file fp       */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -136,21 +136,23 @@ static int crtab_getnext(OBJECT sym, FILE_NUM fnum, CROSSREF_TABLE *S)
 } /* end crtab_getnext */
 
 #if DEBUG_ON
-static void crtab_debug(CROSSREF_TABLE S, FILE *fp)
+static void crtab_debug(CROSSREF_TABLE S)
 { int i;  CROSSREF_ENTRY x;
   if( S == NULL )
-  { fprintf(fp, "  null table\n");
+  {
+    debug0(DCR, D, "  null table");
     return;
   }
-  fprintf(fp, "  table size: %d;  current count: %d\n",
+  debug2(DCR, D, "  table size: %d;  current count: %d",
     crtab_size(S), crtab_count(S));
   for( i = 0;  i < crtab_size(S);  i++ )
-  { fprintf(fp, "crtab_chain(S, %d) =", i);
+  {
+    debug1(DCR, D, "crtab_chain(S, %d) =", i);
     for( x = crtab_chain(S, i);  x != NULL;  x = x->crtab_next )
-    { fprintf(fp, " %s:%s,%d",
+    {
+      debug3(DCR, D, "  %s:%s,%d",
 	SymName(x->crtab_sym), FileName(x->crtab_fnum), x->crtab_value);
     }
-    fprintf(fp, "\n");
   }
 } /* end crtab_debug */
 #endif
@@ -248,7 +250,7 @@ static OBJECT CrossGenTag(OBJECT x)
   seq = crtab_getnext(sym, fnum, &crossref_tab);
   debug3(DCR, DDD, "%d = crtab_getnext(%s, %s, S); S =",
     seq, SymName(sym), FileName(fnum));
-  ifdebug(DCR, DDD, crtab_debug(crossref_tab, stderr));
+  ifdebug(DCR, DDD, crtab_debug(crossref_tab));
   if( StringLength(file_name) + 20 >= MAX_BUFF )
     Error(10, 3, "automatically generated tag is too long (contains %s)",
       FATAL, &fpos(x), file_name);
@@ -362,7 +364,7 @@ OBJECT *crs, OBJECT *res_env)
   debug0(DOM, D, "  [ calling Manifest from CrossExpand");
   tag = Manifest(tag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, FALSE);
   debug0(DOM, D, "  ] returning from Manifest");
-  tag = ReplaceWithTidy(tag, TRUE);   /* && */
+  tag = ReplaceWithTidy(tag, WORD_TIDY);   /* && */
 
   /* extract sym (the symbol name) and tag (the tag value) from x */
   Child(y, Down(x));
@@ -610,7 +612,7 @@ void CrossSequence(OBJECT x)
 	    key = Manifest(key, env, &save_style(val), nbt, nft,
 	      &ntarget, &crs, FALSE, TRUE, &nenclose, FALSE);
 	    debug0(DOM, D, "  ] returning from Manifest");
-	    key = ReplaceWithTidy(key, TRUE);
+	    key = ReplaceWithTidy(key, WORD_TIDY);
 	    DeleteLink(Down(env));
 	    DisposeObject(hold_env);
 	  }
@@ -814,7 +816,7 @@ void CrossSequence(OBJECT x)
 	  {
 	    /* sort out the value of this tag now */
 	    Child(tag, Down(par));
-	    tag = ReplaceWithTidy(tag, TRUE);  /* && */
+	    tag = ReplaceWithTidy(tag, WORD_TIDY);  /* && */
 	    if( !is_word(type(tag)) )
 	    { Error(10, 15, "tag of %s is not a simple word",
 	        WARN, &fpos(tag), SymName(actual(target_val(cs))));
@@ -1073,5 +1075,5 @@ void CrossClose(void)
   DbConvert(NewCrossDb, TRUE);
 
   debug0(DCR, D, "] CrossClose returning.");
-  ifdebug(DCR, DD, crtab_debug(crossref_tab, stderr));
+  ifdebug(DCR, DD, crtab_debug(crossref_tab));
 } /* end CrossClose */

@@ -4,6 +4,9 @@
 @Begin
 @PP
 Here is the complete list of standard node outlines that may be given
+diagrams. @RawIndex { diagrams }
+diagrams.summary @SubIndex { summary of all options }
+summary.diagrams @Index { summary of all options for diagrams }
 to the @Code "@Node" symbol.  Each shows the outline name, any extra
 options relevant to this outline, base (shown as a grey
 box), segments (shown using {@Code "outlinestyle { solid dashed }"}),
@@ -262,8 +265,12 @@ any outline }
   C { {@Code thin}, {@Code medium}, {@Code thick}, or any @I length }
 @Rowa
   A { "   paint"     }
-  B { nopaint }
-  C { @Code nopaint or any colour from Section {@NumberOf colour} }
+  B { none }
+  C { @Code none or any colour from Section {@NumberOf colour} }
+@Rowa
+  A { "   texture"     }
+  B { solid }
+  C { Any texture from Section {@NumberOf textures} }
 @Rowa
   A { "   font"     }
   B { }
@@ -320,6 +327,10 @@ length from Section {@NumberOf objects} }
   C { {@Code "left"}, {@Code "ctr"}, {@Code "mctr"}, {@Code "right"}, or any
 length from Section {@NumberOf objects} }
 @Rowa
+  A { "   hstrut"}
+  B { no }
+  C { {@Code no}, {@Code yes}, or any length from Section {@NumberOf objects} }
+@Rowa
   A { "   hmargin"    }
   B { margin }
   C { any length from Section {@NumberOf objects} }
@@ -331,10 +342,6 @@ length from Section {@NumberOf objects} }
   A { "   rightmargin"    }
   B { hmargin }
   C { any length from Section {@NumberOf objects} }
-@Rowa
-  A { "   hstrut"}
-  B { no }
-  C { {@Code no}, {@Code yes}, or any length from Section {@NumberOf objects} }
 @Rowa
   A { "   nodelabel"}
   B {  }
@@ -369,7 +376,8 @@ length from Section {@NumberOf objects} }
   B { outside }
   C { {@Code above}, {@Code below}, {@Code left}, {@Code right},
 {@Code inside}, or {@Code outside}; {@Code CTR}, {@Code N}, {@Code S},
-{@Code E}, {@Code W}, {@Code NE}, {@Code NW}, {@Code SW}, or {@Code SE}
+{@Code E}, {@Code W}, {@Code NE}, {@Code NW}, {@Code SW}, {@Code SE},
+{@Code NNW}, {@Code NNE}, {@Code SSW}, or {@Code SSE}
 }
 @Rowa
   A { "   nodelabelctr"}
@@ -1210,6 +1218,19 @@ or {@Code both} }
   B { 0.5f }
   C { any @I length }
 @Rowa
+  A { "   backarrowstyle"}
+  B { solid }
+  C { {@Code solid}, {@Code halfopen}, {@Code open}, {@Code curvedsolid},
+{@Code curvedhalfopen}, or {@Code curvedopen} }
+@Rowa
+  A { "   backarrowwidth"}
+  B { 0.3f }
+  C { any @I length }
+@Rowa
+  A { "   backarrowlength"}
+  B { 0.5f }
+  C { any @I length }
+@Rowa
   A { "   linklabel"}
   B {  }
   C { any object }
@@ -1243,7 +1264,8 @@ or {@Code both} }
   B { above }
   C { {@Code above}, {@Code below}, {@Code left}, {@Code right},
 {@Code inside}, or {@Code outside}; {@Code CTR}, {@Code N}, {@Code S},
-{@Code E}, {@Code W}, {@Code NE}, {@Code NW}, {@Code SW}, or {@Code SE}
+{@Code E}, {@Code W}, {@Code NE}, {@Code NW}, {@Code SW}, {@Code SE},
+{@Code NNW}, {@Code NNE}, {@Code SSW}, or {@Code SSE}
 }
 @Rowa
   A { "   linklabelctr"}
@@ -1279,7 +1301,7 @@ or {@Code both} }
   C { any length from Section {@NumberOf objects} }
 @Rowa
   A { "   fromlabelfont"}
-  B {     }
+  B { "-2p" }
   C { Any value suitable for the @Code "@Font" symbol }
 @Rowa
   A { "   fromlabelbreak"}
@@ -1303,7 +1325,8 @@ or {@Code both} }
   B { W }
   C { {@Code above}, {@Code below}, {@Code left}, {@Code right},
 {@Code inside}, or {@Code outside}; {@Code CTR}, {@Code N}, {@Code S},
-{@Code E}, {@Code W}, {@Code NE}, {@Code NW}, {@Code SW}, or {@Code SE}
+{@Code E}, {@Code W}, {@Code NE}, {@Code NW}, {@Code SW}, {@Code SE},
+{@Code NNW}, {@Code NNE}, {@Code SSW}, or {@Code SSE}
 }
 @Rowa
   A { "   fromlabelctr"}
@@ -1323,7 +1346,7 @@ or {@Code both} }
   C { any length from Section {@NumberOf objects} }
 @Rowa
   A { "   tolabelfont"}
-  B {     }
+  B { "-2p" }
   C { Any value suitable for the @Code "@Font" symbol }
 @Rowa
   A { "   tolabelbreak"}
@@ -1347,7 +1370,8 @@ or {@Code both} }
   B { W }
   C { {@Code above}, {@Code below}, {@Code left}, {@Code right},
 {@Code inside}, or {@Code outside}; {@Code CTR}, {@Code N}, {@Code S},
-{@Code E}, {@Code W}, {@Code NE}, {@Code NW}, {@Code SW}, or {@Code SE}
+{@Code E}, {@Code W}, {@Code NE}, {@Code NW}, {@Code SW}, {@Code SE},
+{@Code NNW}, {@Code NNE}, {@Code SSW}, or {@Code SSE}
 }
 @Rowa
   A { "   tolabelctr"}

@@ -1,9 +1,9 @@
 /*@z05.c:Read Definitions:ReadLangDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -65,7 +65,7 @@ static void ReadLangDef(OBJECT encl)
     return;
   }
   inside = Parse(&t, encl, FALSE, FALSE);
-  inside = ReplaceWithTidy(inside, FALSE);
+  inside = ReplaceWithTidy(inside, ACAT_TIDY);
   LanguageDefine(names, inside);
   return;
 } /* end ReadLangDef */
@@ -75,12 +75,15 @@ static void ReadLangDef(OBJECT encl)
 /*                                                                           */
 /*  ReadPrependDef(typ, encl)                                                */
 /*                                                                           */
-/*  Read @Prepend { <filename> } and record its presence.                    */
+/*  Read @PrependGraphic { <filename> } and record its presence, unless it   */
+/*  is there already; we allow multiple occurrences but only want to print   */
+/*  the file once.                                                           */
 /*                                                                           */
 /*****************************************************************************/
 
 void ReadPrependDef(unsigned typ, OBJECT encl)
 { OBJECT t, fname;
+  FILE_NUM fnum;
   t = LexGetToken();
   if( type(t) != LBR )
   { Error(5, 5, "left brace expected here in %s declaration",
@@ -89,14 +92,16 @@ void ReadPrependDef(unsigned typ, OBJECT encl)
     return;
   }
   fname = Parse(&t, encl, FALSE, FALSE);
-  fname = ReplaceWithTidy(fname, FALSE);
+  fname = ReplaceWithTidy(fname, ACAT_TIDY);
   if( !is_word(type(fname)) )
   { Error(5, 6, "name of %s file expected here", WARN, &fpos(fname),KW_PREPEND);
     DisposeObject(fname);
     return;
   }
   debug0(DFS, D, "  calling DefineFile from ReadPrependDef");
-  DefineFile(string(fname), STR_EMPTY, &fpos(fname), PREPEND_FILE,
+  fnum = FileNum(string(fname), STR_EMPTY);
+  if( fnum == NO_FILE || FileType(fnum) != PREPEND_FILE )
+    DefineFile(string(fname), STR_EMPTY, &fpos(fname), PREPEND_FILE,
 	   typ == PREPEND ? INCLUDE_PATH : SYSINCLUDE_PATH);
 
 } /* end ReadPrependDef */
@@ -120,7 +125,7 @@ void ReadIncGRepeatedDef(unsigned typ, OBJECT encl)
     return;
   }
   fname = Parse(&t, encl, FALSE, FALSE);
-  fname = ReplaceWithTidy(fname, FALSE);
+  fname = ReplaceWithTidy(fname, ACAT_TIDY);
   if( !is_word(type(fname)) )
   { Error(5, 6, "name of %s file expected here", WARN, &fpos(fname),
       KW_INCG_REPEATED);
@@ -166,7 +171,7 @@ void ReadDatabaseDef(unsigned typ, OBJECT encl)
       WARN, &fpos(t), KW_DATABASE);
   }
   fname = Parse(&t, encl, FALSE, FALSE);
-  fname = ReplaceWithTidy(fname, FALSE);
+  fname = ReplaceWithTidy(fname, ACAT_TIDY);
   if( !is_word(type(fname)) )
   { Error(5, 10, "name of %s file expected here", WARN, &fpos(fname),
       KW_DATABASE);
@@ -270,6 +275,7 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case BREAK:
     case UNDERLINE:
     case COLOUR:
+    case TEXTURE:
     case OUTLINE:
     case LANGUAGE:
     case CURR_LANG:
@@ -292,6 +298,7 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     case NOT_REVEALED:
 

@@ -145,31 +145,12 @@
 	}
    }
 
-   def @ShowHMark
-      named linewidth  { 0.015 cm }
-      named linestyle  { dashed   }
-      named dashlength { 0.15 cm  }
-      named paint      { light    }
-      right x
+   def @ShowHMark right x
    {
-      @Fig
       {
-         @Figure
-                 shape {
-                   @BackEnd @Case {
-                     PostScript @Yield {
-                         -0.3 cm ymark
-                         {xsize ymark} ++ {0.3 cm 0}
-                     }
-                     PDF @Yield { ""    #       VT: PDF currently has no output
-                     }
-                   }
-                 }
-                 linewidth { linewidth }
-                 linestyle { linestyle }
-                 dashlength { dashlength }
-         x
-      }
+        "-0.3 cm ymark moveto xsize 0.3 cm add ymark lineto"
+        "[ 0.1 cm ] 0 setdash stroke"
+      } @Graphic x
    }
  
    def @ZeroWidth right x { @OneCol { |0io x |0io } }
@@ -211,4 +192,30 @@ which many will start:  `Patriotism is the last refuge of a scoundrel.'
        2.7c @Wide @StartUp    x ||0.3c
        2.7c @Wide @StartLeft  x ||0.3c
        2.2c @Wide @StartDown  x
+   }
+
+   import @BasicSetup
+   def @TextureSample right x
+   {
+      @Box margin { 0i }
+      x @Texture @Box margin { 2.0f } paint { black } {}
+   }
+
+   import @BasicSetup
+   def @XRGBTest right col
+   {
+      def @Thing {
+	@HContract @VContract { 0.9c @Wide 0.5f @High ^/ 0.5f @High }
+      }
+
+      @HContract {
+          @Box paint { @Xrgb col } margin { 0i } @Thing
+          &0.2c
+          2.8c @Wide downifneeded @Scale @Code col
+      }
+   }
+
+   def @XRGBNoTest
+   {
+      @HContract { 0.9c @Wide &0.2c 2.8c @Wide {} }
    }

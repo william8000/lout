@@ -38,14 +38,19 @@ export
     @Ref @NoRef @ChapRef @NoChapRef
     @Cite @NoCite @ChapCite @NoChapCite
 
-    @IndexA @SubIndexA @SubSubIndexA @RawIndexA
-    @RawSubIndexA @RawSubSubIndexA @IndexABlanks
+    @Glossary @InGlossary
 
-    @IndexB @SubIndexB @SubSubIndexB @RawIndexB
-    @RawSubIndexB @RawSubSubIndexB @IndexBBlanks
+    @IndexA @SubIndexA @SubSubIndexA
+    @RawIndexA @RawSubIndexA @RawSubSubIndexA
+    @IndexABlanks @IndexASpacer @InitialIndexASpacer @IndexALetters
 
-    @Index @SubIndex @SubSubIndex @RawIndex
-    @RawSubIndex @RawSubSubIndex @IndexBlanks
+    @IndexB @SubIndexB @SubSubIndexB
+    @RawIndexB @RawSubIndexB @RawSubSubIndexB
+    @IndexBBlanks @IndexBSpacer @InitialIndexBSpacer @IndexBLetters
+
+    @Index @SubIndex @SubSubIndex
+    @RawIndex @RawSubIndex @RawSubSubIndex
+    @IndexBlanks @IndexSpacer @InitialIndexSpacer @IndexLetters
 
     @BypassContentsEntry @BypassMajorContentsEntry
     @BypassFigureContentsEntry @BypassTableContentsEntry
@@ -73,7 +78,7 @@ def @DocumentSetup
     named @EvenRightBodyMargin	{ 0c			} # extra margin for page body
     named @PageBoxType		{ None			} # None Box CurveBox ShadowBox
     named @PageBoxMargin	{ 1.00c			} # page box margin
-    import @LengthUnits named @PageBoxLineWidth
+    import @PSLengths named @PageBoxLineWidth
 				{			} # page box line thickness
     named @PageBoxPaint		{  none			} # page box paint
     named @PageBoxShadow	{  0.60c		} # shadow margin if ShadowBox
@@ -236,10 +241,32 @@ def @DocumentSetup
 	named ":"	    { "\037" }
 				{  @Tag			} # sorting key
 
+    named @MakeGlossary		{  No			} # make glossary? Yes or No
+    named @GlossaryText		{  @Null		} # initial glossary text
+    named @GlossaryFont		{			} # font for glossary
+    named @GlossaryBreak	{			} # break style for glossary
+    named @GlossaryFormat				  # format for glossary
+	named @Name {}
+	named @PageNum {}
+	named @Body {}
+				{  +3p @Font @S @Name
+				   @Right @I { @Word&&page @PageNum }
+				   @DP @RawIndentedDisplay @Body }
+    named @GlossaryGap		{  @DisplayGap		} # gap between glossary items
+    named @GlossaryColumnNumber	{  2			} # glossary columns (1 to 10)
+    named @GlossaryColumnGap	{  1.00c @OrIfPlain 6s	} # glossary column gap
+    named @InGlossaryFont	{  smallcaps		} # font for @InGlossary
+    named @InGlossaryFormat right @Body { @Body	}	# format for @InGlossary
     named @MakeIndex		{  No			} # make index? Yes or No
     named @IndexText		{  @Null		} # initial index text
     named @IndexFont		{			} # index entries font
     named @IndexBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index entries break
+    named @IndexFormat
+	right @Body		{  @Body		} # @Index format
+    named @SubIndexFormat
+	right @Body		{  {1f @Wide}@Body	} # @SubIndex format
+    named @SubSubIndexFormat
+	right @Body		{  {2f @Wide}@Body	} # @SubSubIndex format
     named @IndexColumnNumber	{  2			} # index columns (1 to 10)
     named @IndexColumnGap	{  1.00c @OrIfPlain 6s	} # index column gap
     named @IndexCtd		{  Yes			} # include (ctd.) lines
@@ -248,10 +275,21 @@ def @DocumentSetup
 	left @Body
 	right @CtdWord
 				{  @Body @I (@CtdWord)	} # (ctd.) format
+    named @IndexSpacerAbove	{  2v			} # space above index spacer
+    named @IndexSpacerBelow	{  1v			} # space below index spacer
+    named @IndexSpacerFont	{  +3p 			} # font of index spacer
+    named @IndexSpacerFormat
+	right @Body		{  @Body		} # format of index spacer
     named @MakeIndexA		{  No			} # make index A? Yes or No
     named @IndexAText		{  @Null		} # initial index text
     named @IndexAFont		{			} # index A entries font
     named @IndexABreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index A entries break
+    named @IndexAFormat
+	right @Body		{  @Body		} # @IndexA format
+    named @SubIndexAFormat
+	right @Body		{  {1f @Wide}@Body	} # @SubIndexA format
+    named @SubSubIndexAFormat
+	right @Body		{  {2f @Wide}@Body	} # @SubSubIndexA format
     named @IndexAColumnNumber	{  2			} # index A columns (1 to 10)
     named @IndexAColumnGap	{  1.00c @OrIfPlain 6s	} # index A column gap
     named @IndexACtd		{  Yes			} # include (ctd.) lines
@@ -260,10 +298,21 @@ def @DocumentSetup
 	left @Body
 	right @CtdWord
 				{  @Body @I (@CtdWord)	} # (ctd.) format
+    named @IndexASpacerAbove	{  2v			} # space above index A spacer
+    named @IndexASpacerBelow	{  1v			} # space below index A spacer
+    named @IndexASpacerFont	{  +3p 			} # font of index A spacer
+    named @IndexASpacerFormat
+	right @Body		{  @Body		} # format of index A spacer
     named @MakeIndexB		{  No			} # make index B? Yes or No
     named @IndexBText		{  @Null		} # initial index text
     named @IndexBFont		{			} # index B entries font
     named @IndexBBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index B entries break
+    named @IndexBFormat
+	right @Body		{  @Body		} # @IndexB format
+    named @SubIndexBFormat
+	right @Body		{  {1f @Wide}@Body	} # @SubIndexB format
+    named @SubSubIndexBFormat
+	right @Body		{  {2f @Wide}@Body	} # @SubSubIndexB format
     named @IndexBColumnNumber	{  2			} # index B columns (1 to 10)
     named @IndexBColumnGap	{  1.00c @OrIfPlain 6s	} # index B column gap
     named @IndexBCtd		{  Yes			} # include (ctd.) lines
@@ -272,6 +321,11 @@ def @DocumentSetup
 	left @Body
 	right @CtdWord
 				{  @Body @I (@CtdWord)	} # (ctd.) format
+    named @IndexBSpacerAbove	{  2v			} # space above index B spacer
+    named @IndexBSpacerBelow	{  1v			} # space below index B spacer
+    named @IndexBSpacerFont	{  +3p 			} # font of index B spacer
+    named @IndexBSpacerFormat
+	right @Body		{  @Body		} # format of index B spacer
     named @TopGap		{  0.75c @OrIfPlain 2f	} # gap between figures
     named @MidGap		{  0.75c @OrIfPlain 2f	} # gap above/below body text
 
@@ -785,7 +839,7 @@ def @DocumentSetup
     ###########################################################################
     #                                                                         #
     #  Definitions for page headers and footers.  There are 16 symbols here,  #
-    #  in the following pattern:                                              #
+    #  in the following arrangement:                                          #
     #                                                                         #
     #     @(- | Running)(- | Intro)(Odd | Even)(Top | Foot)Header             #
     #                                                                         #
@@ -807,6 +861,7 @@ def @DocumentSetup
 	named @Prefix     {}
 	named @Tag        {}
     { @Null
+      # "(@Runner:"@Start":"@MajorTitle")"
     }
 
     def @DupRunner # duplicate previous runner
@@ -1168,6 +1223,7 @@ def @DocumentSetup
     def @IntroOddFullPlace	{ @Galley }
     def @IntroEvenFullPlace	{ @Galley }
     def @IntroColPlace		{ @Galley }
+    def @GlossaryPlace		{ @Galley }
     def @IndexPlace		{ @Galley }
     def @IndexAPlace		{ @Galley }
     def @IndexBPlace		{ @Galley }
@@ -1359,6 +1415,11 @@ def @DocumentSetup
 	@HExpand num @ColsOf @EqualWidth 0c @High @IntroColPlace
     }
     
+    def @GlossaryColList right num
+    {
+	@HExpand num @ColsOf gap { @GlossaryColumnGap } @EqualWidth @VExpand @GlossaryPlace
+    }
+    
     def @IndexColList right num
     {
 	@HExpand num @ColsOf gap { @IndexColumnGap } @EqualWidth @VExpand @IndexPlace
@@ -1479,7 +1540,7 @@ def @DocumentSetup
     ###########################################################################
     #                                                                         #
     #  Definitions for page lists.  There are four symbols here, in the       #
-    #  following pattern:                                                     #
+    #  following arrangement:                                                 #
     #                                                                         #
     #    @(Simple | Running)(- | Intro)PageList                               #
     #                                                                         #
@@ -1502,6 +1563,7 @@ def @DocumentSetup
 	@OneOf
 	{
 	    @ColList colnum
+	    @GlossaryColList @GlossaryColumnNumber
 	    @IndexAColList @IndexAColumnNumber
 	    @IndexBColList @IndexBColumnNumber
 	    @IndexColList  @IndexColumnNumber
@@ -1513,6 +1575,7 @@ def @DocumentSetup
 	@OneOf
 	{
 	    @IntroColList colnum
+	    @GlossaryColList @GlossaryColumnNumber
 	    @IndexAColList @IndexAColumnNumber
 	    @IndexBColList @IndexBColumnNumber
 	    @IndexColList  @IndexColumnNumber
@@ -2141,7 +2204,9 @@ def @DocumentSetup
 	named postgap { 0c }
 	named protect { No }
     {
-	def @Leaders { @ContentsLeader &@ContentsLeaderGap @Leaders }
+#	def @Leaders { @ContentsLeader &@ContentsLeaderGap @Leaders }
+
+	def @Leaders { @ContentsLeaderGap @Wide {} & @ContentsLeader & @Leaders }
 
 	def @OptionalCrossLink right x
 	{
@@ -2158,10 +2223,20 @@ def @DocumentSetup
 	    }
 	}
 
+#	def @Item
+#	{
+#	    |indent @OptionalCrossLink number @ContentsFormat @HExpand {
+#	        title & @ContentsLeaderGap @Wide &1rt @OneCol {
+#		    @Leaders & @RightPart &0io
+#	        }
+#	    }
+#	    |@ContentsRightWidth
+#	}
+
 	def @Item
 	{
 	    |indent @OptionalCrossLink number @ContentsFormat @HExpand {
-	        title & @ContentsLeaderGap @Wide &1rt @OneCol {
+	        title &1rt @OneCol {
 		    @Leaders & @RightPart &0io
 	        }
 	    }
@@ -2537,45 +2612,45 @@ def @DocumentSetup
 # but since the point of @Place is to output a matrix (?), I have not implemented this change
 #
     def @Place
-      named x
+      import @PSLengths named x
 	named "+" precedence 96 associativity left left a right b { a b "add" }
 	named "-" precedence 96 associativity left left a right b { a b "sub" }
 	named "/" precedence 97 associativity left left a right b { a b "div" }
 	named "*" precedence 98 associativity left left a right b { a b "mul" }
-	named c   precedence 99                    left a         { a "cm"    }
-	named i   precedence 99                    left a         { a "in"    }
-	named e   precedence 99                    left a         { a "em"    }
-	named p   precedence 99                    left a         { a "pt"    }
-	named f   precedence 99                    left a         { a "ft"    }
-	named s   precedence 99                    left a         { a "sp"    }
-	named v   precedence 99                    left a         { a "vs"    }
-	named cm  precedence 99                    left a         { a "cm"    }
-	named in  precedence 99                    left a         { a "in"    }
-	named em  precedence 99                    left a         { a "em"    }
-	named pt  precedence 99                    left a         { a "pt"    }
-	named ft  precedence 99                    left a         { a "ft"    }
-	named sp  precedence 99                    left a         { a "sp"    }
-	named vs  precedence 99                    left a         { a "vs"    }
+	# named c   precedence 99                    left a         { a "cm"    }
+	# named i   precedence 99                    left a         { a "in"    }
+	# named e   precedence 99                    left a         { a "em"    }
+	# named p   precedence 99                    left a         { a "pt"    }
+	# named f   precedence 99                    left a         { a "ft"    }
+	# named s   precedence 99                    left a         { a "sp"    }
+	# named v   precedence 99                    left a         { a "vs"    }
+	# named cm  precedence 99                    left a         { a "cm"    }
+	# named in  precedence 99                    left a         { a "in"    }
+	# named em  precedence 99                    left a         { a "em"    }
+	# named pt  precedence 99                    left a         { a "pt"    }
+	# named ft  precedence 99                    left a         { a "ft"    }
+	# named sp  precedence 99                    left a         { a "sp"    }
+	# named vs  precedence 99                    left a         { a "vs"    }
 	{ 0 }
-      named y
+      import @PSLengths named y
 	named "+" precedence 96 associativity left left a right b { a b "add" }
 	named "-" precedence 96 associativity left left a right b { a b "sub" }
 	named "/" precedence 97 associativity left left a right b { a b "div" }
 	named "*" precedence 98 associativity left left a right b { a b "mul" }
-	named c   precedence 99                    left a         { a "cm"    }
-	named i   precedence 99                    left a         { a "in"    }
-	named e   precedence 99                    left a         { a "em"    }
-	named p   precedence 99                    left a         { a "pt"    }
-	named f   precedence 99                    left a         { a "ft"    }
-	named s   precedence 99                    left a         { a "sp"    }
-	named v   precedence 99                    left a         { a "vs"    }
-	named cm  precedence 99                    left a         { a "cm"    }
-	named in  precedence 99                    left a         { a "in"    }
-	named em  precedence 99                    left a         { a "em"    }
-	named pt  precedence 99                    left a         { a "pt"    }
-	named ft  precedence 99                    left a         { a "ft"    }
-	named sp  precedence 99                    left a         { a "sp"    }
-	named vs  precedence 99                    left a         { a "vs"    }
+	# named c   precedence 99                    left a         { a "cm"    }
+	# named i   precedence 99                    left a         { a "in"    }
+	# named e   precedence 99                    left a         { a "em"    }
+	# named p   precedence 99                    left a         { a "pt"    }
+	# named f   precedence 99                    left a         { a "ft"    }
+	# named s   precedence 99                    left a         { a "sp"    }
+	# named v   precedence 99                    left a         { a "vs"    }
+	# named cm  precedence 99                    left a         { a "cm"    }
+	# named in  precedence 99                    left a         { a "in"    }
+	# named em  precedence 99                    left a         { a "em"    }
+	# named pt  precedence 99                    left a         { a "pt"    }
+	# named ft  precedence 99                    left a         { a "ft"    }
+	# named sp  precedence 99                    left a         { a "sp"    }
+	# named vs  precedence 99                    left a         { a "vs"    }
 	{ 0 }
       right val
     {
@@ -3988,6 +4063,59 @@ def @DocumentSetup
 
     ###########################################################################
     #                                                                         #
+    #  Glossary.                                                              #
+    #                                                                         #
+    ###########################################################################
+
+    def @GlossaryList { @Galley //@GlossaryGap @GlossaryList }
+
+    def @GlossarySection into { @GlossaryPlace&&following }
+	right etc
+    {
+	// @GlossaryList
+	// etc
+	//1rt
+    }
+
+    def @DoGlossary into { @GlossaryList&&following }
+	left @Key
+	named name {}
+	named pnum {}
+	right body
+    {
+	@GlossaryFont @Font @GlossaryBreak @Break @GlossaryFormat
+	    @Name { name }
+	    @PageNum { pnum }
+	    @Body { body }
+    }
+
+    def @Glossary
+	left name
+	named sortkey { dft }
+	right body
+    {
+	def key { sortkey @Dft name }
+
+	@MakeGlossary @Case {
+	    { Yes yes } @Yield { @PageMark key &
+		key @DoGlossary name { name } pnum { @PageOf key } body
+	    }
+	    else @Yield @Null
+	}
+    }
+
+    def @InGlossary
+	right x
+    {
+	@MakeGlossary @Case {
+	    { Yes yes } @Yield { @InGlossaryFormat @InGlossaryFont @Font x }
+	    else @Yield x
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
     #  Index.                                                                 #
     #                                                                         #
     ###########################################################################
@@ -4002,39 +4130,47 @@ def @DocumentSetup
 	// @IndexBreak @Break @BypassIndexList
 	// @ClearHeaderComponent
 	// etc
+	//1rt
     }
 
     def @DoIndex into { @IndexList&&following }
-	left @Key
-	named indent { 0f }
-	named stem {}
-	right @Body
+	left @Key			# sort key
+	named pgrange {}		# page numbers, or empty if none
+	named depth {}			# 0, 1, or 2 (@Index, @Sub, or @SubSub)
+	right body			# body, not including any prefix
     {
+	def @Body
+	{
+	    depth @Case {
+		0 @Yield @IndexFormat body
+		1 @Yield @SubIndexFormat body
+		2 @Yield @SubSubIndexFormat body
+	    }
+	}
+
 	def @Enclose right x
 	{
-	    @IndexCtd.indent @Case {
+	    @IndexCtd.depth @Case {
 
-		Yes.0f @Yield {
+		Yes.0 @Yield {
 		    @ClearHeaderComponent
 		    //1vx
 		    x
 		    //1vx
 		    1vx @SetHeaderComponent {
-			indent @Wide &
-			stem @IndexCtdFormat {continued @WordVal @IndexCtdWord}
+			@Body @IndexCtdFormat {continued @WordVal @IndexCtdWord}
 		    }
 		    //1vx
 		    1vx @BeginHeaderComponent (unused)
 		}
 
-		Yes.1f @Yield {
+		Yes.1 @Yield {
 		    @EndHeaderComponent
 		    //1vx
 		    x
 		    //1vx
 		    1vx @BeginHeaderComponent {
-			indent @Wide &
-			stem @IndexCtdFormat {continued @WordVal @IndexCtdWord}
+			@Body @IndexCtdFormat {continued @WordVal @IndexCtdWord}
 		    }
 		}
 
@@ -4043,46 +4179,43 @@ def @DocumentSetup
 	    }
 	}
 
-	def @Merge left x right y
+	def @Merge left lpart right rpart
 	{
-	    { x @Rump { x @Meld y } } @Case
+	    { lpart @Rump { lpart @Meld rpart } } @Case
 	    {
-	        ""      @Yield  x
-		else    @Yield  { { x{@OneCol ,} } @Meld y }
+	        ""      @Yield  lpart
+		else    @Yield  { { lpart{@OneCol ,} } @Meld rpart }
 	    }
 
 	}
 
-	@IndexFont @Font @IndexBreak @Break { indent @Wide & @Body }
+	@IndexFont @Font @IndexBreak @Break pgrange @Case {
+	    ""   @Yield { @Body &"0.03fu" {}			}
+	    else @Yield { @Body &"0.03fu" {}{@OneCol ,} pgrange }
+
+	}
     }
 
     def @RawIndex
-	left x
-	named @Tag {}
-	named indent { 0f }
-	right y
+	left lpart
+	named depth { 0 }
+	right rpart
     {
 	@MakeIndex @Case {
-	    Yes  @Yield {
-		@PageMark @Tag &
-		x @DoIndex stem { y } indent { indent }
-		{
-	            y &"0.03fu" {}
-		}
-	    }
+	    Yes  @Yield { lpart @DoIndex depth { depth } rpart }
 	    else @Yield @Null
 	}
     }
 
-    macro @RawSubIndex    { @RawIndex indent { "1f" } }
-    macro @RawSubSubIndex { @RawIndex indent { "2f" } }
+    macro @RawSubIndex    { @RawIndex depth { 1 } }
+    macro @RawSubSubIndex { @RawIndex depth { 2 } }
 
     def @Index
-	left x
+	left lpart
 	named @Tag {}
-	named indent { 0f }
+	named depth { 0 }
 	named to {}
-	right y
+	right rpart
     {
 	def @PgMk right tag
 	{
@@ -4104,21 +4237,16 @@ def @DocumentSetup
 	    }
 	}
 
-
 	@MakeIndex @Case {
 	    Yes @Yield {
-	        @PageMark @Tag &
-	        x @DoIndex stem { y } indent { indent }
-	        {
-	            y &"0.03fu" {}{@OneCol ,} @PgRange
-	        }
-	    }
+		@PageMark @Tag &
+		lpart @DoIndex depth { depth } pgrange { @PgRange } rpart }
 	    else @Yield @Null
 	}
     }
 
-    macro @SubIndex { @Index indent { "1f" } }
-    macro @SubSubIndex { @Index indent { "2f" } }
+    macro @SubIndex    { @Index depth { 1 } }
+    macro @SubSubIndex { @Index depth { 2 } }
 
     def @IndexBlanks
     {
@@ -4129,6 +4257,44 @@ def @DocumentSetup
 	r @RawIndex {} s @RawIndex {} t @RawIndex {} u @RawIndex {}
 	v @RawIndex {} w @RawIndex {} x @RawIndex {} y @RawIndex {}
 	z @RawIndex {}
+    }
+
+    def @IndexSpacer
+	left lpart
+	named above { @IndexSpacerAbove }
+	named below { @IndexSpacerBelow }
+	named font { @IndexSpacerFont }
+	named format right @Body { @IndexSpacerFormat @Body }
+	right rpart
+    {
+	def @Send into { @IndexList&&following }
+	    right @Key
+	{
+	    @ClearHeaderComponent
+	    //
+	    //above
+	    @CNP
+	    @OneRow { font @Font format rpart //below }
+	}
+
+	@MakeIndex @Case {
+	    Yes  @Yield @Send lpart
+	    else @Yield @Null
+	}
+    }
+
+    macro @InitialIndexSpacer { @IndexSpacer above { 0i } }
+
+    def @IndexLetters
+    {
+	a @InitialIndexSpacer A
+	b @IndexSpacer B c @IndexSpacer C d @IndexSpacer D e @IndexSpacer E
+	f @IndexSpacer F g @IndexSpacer G h @IndexSpacer H i @IndexSpacer I
+	j @IndexSpacer J k @IndexSpacer K l @IndexSpacer L m @IndexSpacer M
+	n @IndexSpacer N o @IndexSpacer O p @IndexSpacer P q @IndexSpacer Q
+	r @IndexSpacer R s @IndexSpacer S t @IndexSpacer T u @IndexSpacer U
+	v @IndexSpacer V w @IndexSpacer W x @IndexSpacer X y @IndexSpacer Y
+	z @IndexSpacer Z
     }
 
     def @BypassBeginIndexPlace { @Galley }
@@ -4157,40 +4323,51 @@ def @DocumentSetup
     def @IndexASection into { @IndexAPlace&&following }
 	right etc
     {
-	// @IndexABreak @Break @IndexAList // etc
-	// @IndexABreak @Break @BypassIndexAList // etc
+	// @IndexABreak @Break @IndexAList
+	// @IndexABreak @Break @BypassIndexAList
+	// @ClearHeaderComponent
+	// etc
+	//1rt
     }
 
     def @DoIndexA into { @IndexAList&&following }
-	left @Key
-	named indent { 0f }
-	right @Body
+	left @Key			# sort key
+	named pgrange {}		# page numbers, or empty if none
+	named depth {}			# 0, 1, or 2 (@IndexA, @Sub, or @SubSub)
+	right body			# body, not including any prefix
     {
+	def @Body
+	{
+	    depth @Case {
+		0 @Yield @IndexAFormat body
+		1 @Yield @SubIndexAFormat body
+		2 @Yield @SubSubIndexAFormat body
+	    }
+	}
+
 	def @Enclose right x
 	{
-	    @IndexACtd.indent @Case {
+	    @IndexACtd.depth @Case {
 
-		Yes.0f @Yield {
+		Yes.0 @Yield {
 		    @ClearHeaderComponent
 		    //1vx
 		    x
 		    //1vx
 		    1vx @SetHeaderComponent {
-			indent @Wide &
-			stem @IndexACtdFormat {continued @WordVal @IndexACtdWord}
+			@Body @IndexACtdFormat {continued @WordVal @IndexACtdWord}
 		    }
 		    //1vx
 		    1vx @BeginHeaderComponent (unused)
 		}
 
-		Yes.1f @Yield {
+		Yes.1 @Yield {
 		    @EndHeaderComponent
 		    //1vx
 		    x
 		    //1vx
 		    1vx @BeginHeaderComponent {
-			indent @Wide &
-			stem @IndexACtdFormat {continued @WordVal @IndexACtdWord}
+			@Body @IndexACtdFormat {continued @WordVal @IndexACtdWord}
 		    }
 		}
 
@@ -4199,46 +4376,43 @@ def @DocumentSetup
 	    }
 	}
 
-	def @Merge left x right y
+	def @Merge left lpart right rpart
 	{
-	    { x @Rump { x @Meld y } } @Case
+	    { lpart @Rump { lpart @Meld rpart } } @Case
 	    {
-	        ""      @Yield  x
-		else    @Yield  { { x{@OneCol ,} } @Meld y }
+	        ""      @Yield  lpart
+		else    @Yield  { { lpart{@OneCol ,} } @Meld rpart }
 	    }
 
 	}
 
-	@IndexAFont @Font @IndexABreak @Break { indent @Wide & @Body }
+	@IndexAFont @Font @IndexABreak @Break pgrange @Case {
+	    ""   @Yield { @Body &"0.03fu" {}			}
+	    else @Yield { @Body &"0.03fu" {}{@OneCol ,} pgrange }
+
+	}
     }
 
     def @RawIndexA
-	left x
-	named @Tag {}
-	named indent { 0f }
-	right y
+	left lpart
+	named depth { 0 }
+	right rpart
     {
 	@MakeIndexA @Case {
-	    Yes  @Yield {
-		@PageMark @Tag &
-		x @DoIndexA stem { y } indent { indent }
-		{
-	            y &"0.03fu" {}
-		}
-	    }
+	    Yes  @Yield { lpart @DoIndexA depth { depth } rpart }
 	    else @Yield @Null
 	}
     }
 
-    macro @RawSubIndexA    { @RawIndexA indent { "1f" } }
-    macro @RawSubSubIndexA { @RawIndexA indent { "2f" } }
+    macro @RawSubIndexA    { @RawIndexA depth { 1 } }
+    macro @RawSubSubIndexA { @RawIndexA depth { 2 } }
 
     def @IndexA
-	left x
+	left lpart
 	named @Tag {}
-	named indent { 0f }
+	named depth { 0 }
 	named to {}
-	right y
+	right rpart
     {
 	def @PgMk right tag
 	{
@@ -4262,19 +4436,14 @@ def @DocumentSetup
 
 	@MakeIndexA @Case {
 	    Yes @Yield {
-	        @PageMark @Tag &
-	        x @DoIndexA stem { y } indent { indent }
-	        {
-	            y &"0.03fu" {}{@OneCol ,} @PgRange
-	        }
-	    }
+		@PageMark @Tag &
+		lpart @DoIndexA depth { depth } pgrange { @PgRange } rpart }
 	    else @Yield @Null
 	}
-
     }
 
-    macro @SubIndexA { @IndexA indent { "1f" } }
-    macro @SubSubIndexA { @IndexA indent { "2f" } }
+    macro @SubIndexA    { @IndexA depth { 1 } }
+    macro @SubSubIndexA { @IndexA depth { 2 } }
 
     def @IndexABlanks
     {
@@ -4285,6 +4454,44 @@ def @DocumentSetup
 	r @RawIndexA {} s @RawIndexA {} t @RawIndexA {} u @RawIndexA {}
 	v @RawIndexA {} w @RawIndexA {} x @RawIndexA {} y @RawIndexA {}
 	z @RawIndexA {}
+    }
+
+    def @IndexASpacer
+	left lpart
+	named above { @IndexASpacerAbove }
+	named below { @IndexASpacerBelow }
+	named font { @IndexASpacerFont }
+	named format right @Body { @IndexASpacerFormat @Body }
+	right rpart
+    {
+	def @Send into { @IndexAList&&following }
+	    right @Key
+	{
+	    @ClearHeaderComponent
+	    //
+	    //above
+	    @CNP
+	    @OneRow { font @Font format rpart //below }
+	}
+
+	@MakeIndexA @Case {
+	    Yes  @Yield @Send lpart
+	    else @Yield @Null
+	}
+    }
+
+    macro @InitialIndexASpacer { @IndexASpacer above { 0i } }
+
+    def @IndexALetters
+    {
+	a @InitialIndexASpacer A
+	b @IndexASpacer B c @IndexASpacer C d @IndexASpacer D e @IndexASpacer E
+	f @IndexASpacer F g @IndexASpacer G h @IndexASpacer H i @IndexASpacer I
+	j @IndexASpacer J k @IndexASpacer K l @IndexASpacer L m @IndexASpacer M
+	n @IndexASpacer N o @IndexASpacer O p @IndexASpacer P q @IndexASpacer Q
+	r @IndexASpacer R s @IndexASpacer S t @IndexASpacer T u @IndexASpacer U
+	v @IndexASpacer V w @IndexASpacer W x @IndexASpacer X y @IndexASpacer Y
+	z @IndexASpacer Z
     }
 
     def @BypassBeginIndexAPlace { @Galley }
@@ -4313,40 +4520,51 @@ def @DocumentSetup
     def @IndexBSection into { @IndexBPlace&&following }
 	right etc
     {
-	// @IndexBBreak @Break @IndexBList // etc
-	// @IndexBBreak @Break @BypassIndexBList // etc
+	// @IndexBBreak @Break @IndexBList
+	// @IndexBBreak @Break @BypassIndexBList
+	// @ClearHeaderComponent
+	// etc
+	//1rt
     }
 
     def @DoIndexB into { @IndexBList&&following }
-	left @Key
-	named indent { 0f }
-	right @Body
+	left @Key			# sort key
+	named pgrange {}		# page numbers, or empty if none
+	named depth {}			# 0, 1, or 2 (@IndexB, @Sub, or @SubSub)
+	right body			# body, not including any prefix
     {
+	def @Body
+	{
+	    depth @Case {
+		0 @Yield @IndexBFormat body
+		1 @Yield @SubIndexBFormat body
+		2 @Yield @SubSubIndexBFormat body
+	    }
+	}
+
 	def @Enclose right x
 	{
-	    @IndexBCtd.indent @Case {
+	    @IndexBCtd.depth @Case {
 
-		Yes.0f @Yield {
+		Yes.0 @Yield {
 		    @ClearHeaderComponent
 		    //1vx
 		    x
 		    //1vx
 		    1vx @SetHeaderComponent {
-			indent @Wide &
-			stem @IndexBCtdFormat {continued @WordVal @IndexBCtdWord}
+			@Body @IndexBCtdFormat {continued @WordVal @IndexBCtdWord}
 		    }
 		    //1vx
 		    1vx @BeginHeaderComponent (unused)
 		}
 
-		Yes.1f @Yield {
+		Yes.1 @Yield {
 		    @EndHeaderComponent
 		    //1vx
 		    x
 		    //1vx
 		    1vx @BeginHeaderComponent {
-			indent @Wide &
-			stem @IndexBCtdFormat {continued @WordVal @IndexBCtdWord}
+			@Body @IndexBCtdFormat {continued @WordVal @IndexBCtdWord}
 		    }
 		}
 
@@ -4355,46 +4573,43 @@ def @DocumentSetup
 	    }
 	}
 
-	def @Merge left x right y
+	def @Merge left lpart right rpart
 	{
-	    { x @Rump { x @Meld y } } @Case
+	    { lpart @Rump { lpart @Meld rpart } } @Case
 	    {
-	        ""      @Yield  x
-		else    @Yield  { { x{@OneCol ,} } @Meld y }
+	        ""      @Yield  lpart
+		else    @Yield  { { lpart{@OneCol ,} } @Meld rpart }
 	    }
 
 	}
 
-	@IndexBFont @Font @IndexBBreak @Break { indent @Wide & @Body }
+	@IndexBFont @Font @IndexBBreak @Break pgrange @Case {
+	    ""   @Yield { @Body &"0.03fu" {}			}
+	    else @Yield { @Body &"0.03fu" {}{@OneCol ,} pgrange }
+
+	}
     }
 
     def @RawIndexB
-	left x
-	named @Tag {}
-	named indent { 0f }
-	right y
+	left lpart
+	named depth { 0 }
+	right rpart
     {
 	@MakeIndexB @Case {
-	    Yes  @Yield {
-		@PageMark @Tag &
-		x @DoIndexB stem { y } indent { indent }
-		{
-	            y &"0.03fu" {}
-		}
-	    }
+	    Yes  @Yield { lpart @DoIndexB depth { depth } rpart }
 	    else @Yield @Null
 	}
     }
 
-    macro @RawSubIndexB    { @RawIndexB indent { "1f" } }
-    macro @RawSubSubIndexB { @RawIndexB indent { "2f" } }
+    macro @RawSubIndexB    { @RawIndexB depth { 1 } }
+    macro @RawSubSubIndexB { @RawIndexB depth { 2 } }
 
     def @IndexB
-	left x
+	left lpart
 	named @Tag {}
-	named indent { 0f }
+	named depth { 0 }
 	named to {}
-	right y
+	right rpart
     {
 	def @PgMk right tag
 	{
@@ -4418,19 +4633,14 @@ def @DocumentSetup
 
 	@MakeIndexB @Case {
 	    Yes @Yield {
-	        @PageMark @Tag &
-	        x @DoIndexB stem { y } indent { indent }
-	        {
-	            y &"0.03fu" {}{@OneCol ,} @PgRange
-	        }
-	    }
+		@PageMark @Tag &
+		lpart @DoIndexB depth { depth } pgrange { @PgRange } rpart }
 	    else @Yield @Null
 	}
-
     }
 
-    macro @SubIndexB { @IndexB indent { "1f" } }
-    macro @SubSubIndexB { @IndexB indent { "2f" } }
+    macro @SubIndexB    { @IndexB depth { 1 } }
+    macro @SubSubIndexB { @IndexB depth { 2 } }
 
     def @IndexBBlanks
     {
@@ -4441,6 +4651,44 @@ def @DocumentSetup
 	r @RawIndexB {} s @RawIndexB {} t @RawIndexB {} u @RawIndexB {}
 	v @RawIndexB {} w @RawIndexB {} x @RawIndexB {} y @RawIndexB {}
 	z @RawIndexB {}
+    }
+
+    def @IndexBSpacer
+	left lpart
+	named above { @IndexBSpacerAbove }
+	named below { @IndexBSpacerBelow }
+	named font { @IndexBSpacerFont }
+	named format right @Body { @IndexBSpacerFormat @Body }
+	right rpart
+    {
+	def @Send into { @IndexBList&&following }
+	    right @Key
+	{
+	    @ClearHeaderComponent
+	    //
+	    //above
+	    @CNP
+	    @OneRow { font @Font format rpart //below }
+	}
+
+	@MakeIndexB @Case {
+	    Yes  @Yield @Send lpart
+	    else @Yield @Null
+	}
+    }
+
+    macro @InitialIndexBSpacer { @IndexBSpacer above { 0i } }
+
+    def @IndexBLetters
+    {
+	a @InitialIndexBSpacer A
+	b @IndexBSpacer B c @IndexBSpacer C d @IndexBSpacer D e @IndexBSpacer E
+	f @IndexBSpacer F g @IndexBSpacer G h @IndexBSpacer H i @IndexBSpacer I
+	j @IndexBSpacer J k @IndexBSpacer K l @IndexBSpacer L m @IndexBSpacer M
+	n @IndexBSpacer N o @IndexBSpacer O p @IndexBSpacer P q @IndexBSpacer Q
+	r @IndexBSpacer R s @IndexBSpacer S t @IndexBSpacer T u @IndexBSpacer U
+	v @IndexBSpacer V w @IndexBSpacer W x @IndexBSpacer X y @IndexBSpacer Y
+	z @IndexBSpacer Z
     }
 
     def @BypassBeginIndexBPlace { @Galley }
@@ -4471,7 +4719,7 @@ def @DocumentSetup
 	named type {}			# MajorIntro, Major, VeryMajor, or Minor
 	named initiallanguage {}	# its language
 	named title {}			# its full title
-	named runningtitle {}		# its running title
+	named runningtitle { dft }	# its running title Jeffk 12/11/02 from {}
 	named aboveheadinggap { 0f }	# gap above heading
 	named headingfont {}		# its heading font
 	named headingbreak {}		# its heading break
@@ -4526,6 +4774,21 @@ def @DocumentSetup
 	def @ShortTitle
 	{
 	    initiallanguage @Language { runningtitle @Dft title }
+	}
+
+	def @IfMajor right x
+	{
+	    type @Case {
+		{ MajorIntro Major ExtraMajor ExtraMajorIntro } @Yield x
+		else @Yield @Null
+	    }
+	}
+
+	def @StartIfMajor {
+	    type @Case {
+		{ MajorIntro Major ExtraMajor ExtraMajorIntro VeryMajor } @Yield Start
+		else @Yield NonStart
+	    }
 	}
 
         def @Run right start
@@ -4613,6 +4876,7 @@ def @DocumentSetup
 		Minor @Yield {
 		    headingfont @Font
 		    headingbreak @Break @Protect {@LongNum headingformat title}
+		    // @Run @StartIfMajor
 		    // @PageMark tag
 		    @DP headingtext
 		}
@@ -4622,6 +4886,7 @@ def @DocumentSetup
 		    //aboveheadinggap
 		    headingfont @Font
 		    headingbreak @Break { @LongNum headingformat title }
+		    // @Run @StartIfMajor
 		    // @PageMark tag
 		    @DP headingtext
 		    }
@@ -4631,25 +4896,11 @@ def @DocumentSetup
 		    //aboveheadinggap
 		    headingfont @Font
 		    headingbreak @Break { bypassnumber headingformat title }
+		    // @Run @StartIfMajor
 		    // @PageMark tag
 		    @DP headingtext
 		    }
 		}
-	    }
-	}
-
-	def @IfMajor right x
-	{
-	    type @Case {
-		{ MajorIntro Major ExtraMajor ExtraMajorIntro } @Yield x
-		else @Yield @Null
-	    }
-	}
-
-	def @StartIfMajor {
-	    type @Case {
-		{ MajorIntro Major ExtraMajor ExtraMajorIntro VeryMajor } @Yield Start
-		else @Yield NonStart
 	    }
 	}
 
@@ -4663,7 +4914,7 @@ def @DocumentSetup
 		  attachnum & @NumberMarker @Tag { tag } @Value { @ShortNum }
 		}
 	    //  @IfMajor { @FootNoteThrough @Do @BeginFootNoteCounter }
-            //  @Run @StartIfMajor
+            # //  @Run @StartIfMajor
             //  @ContentsStuff
 	    //  @TitleMarker @Tag { tag } @Value { title }
             //  intheorems @BeginAllCounters @ShortNum

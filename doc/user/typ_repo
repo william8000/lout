@@ -9,7 +9,7 @@ reports. @Index { reports }
 technical.reports. @Index { technical reports }
 report. @Index @Code "@Report"
 file and the @Code "@Report" symbol:
-@ID @OneRow @Code {
+@ID @OneRow -1px @Break @Code {
 "@SysInclude { report }"
 "@Report"
 "    @Title {}"
@@ -31,20 +31,17 @@ file and the @Code "@Report" symbol:
 "    @AbstractDisplay { Yes }"
 "    @AbstractTitle { Abstract }"
 "    @Abstract {}"
+"    @GlossaryText { @Null }"
+"    @IndexText { @Null }"
+"    @IndexAText { @Null }"
+"    @IndexBText { @Null }"
 "//"
 }
 This shows all the options of {@Code "@Report"}
 @FootNote {
-Version 3.13 of Lout is not completely upwardly compatible with
-previous versions in its handling of technical reports.  The change
-concerns the abstract, and if you see the error message
-@ID @Code "symbol @Abstract unknown or misspelt"
-you probably need to convert your document.  To convert an older
-document to Version 3.13, move any @Code "@Abstract" from after the
-@Code "//" to before it, delete any options to the @Code "@Abstract"
-symbol, and delete any initial paragraph symbol within the abstract.
-You can use the @Code "@AbstractTitle" option described in this section
-to change the title of the abstract.
+Before Version 3.13, @Code "@Abstract" followed "//" rather than
+preceded it, and had some options that are now withdrawn.  Old
+documents may therefore need some superficial rearrangement.
 }
 with their default values.  As usual with options, they may be given in
 any order, and only the ones whose values need to be changed need be
@@ -186,6 +183,11 @@ in the current language.  Finally, @Code "@Abstract" contains the
 abstract. @Index @Code "@Abstract"
 abstract itself; it may be empty or absent, in which case there will
 be no abstract.  The abstract may contain footnotes in the usual way.
+@PP
+The {@Code "@GlossaryText"}, {@Code "@IndexText"}, {@Code "@IndexAText"},
+and {@Code "@IndexBText"} symbols allow you to insert some arbitrary
+text after the title of the glossary, index, etc., and before the
+entries.
 @PP
 After the compulsory {@Code "//"} comes the report body in the
 form of a sequence of sections:

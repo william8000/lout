@@ -12,7 +12,7 @@ produces
 @ID grey @Colour { Hello, world }
 The @Code "@Colour" symbol will accept any of the following colours:
 @QD @HAdjust @Tab
-    vmargin { 0.7vx }
+    vmargin { 0.5vx }
     hmargin { 0.2c }
     @Fmta { @Col A @Colour @FilledBox ! @Col @Code A ! @Col !
             @Col B @Colour @FilledBox ! @Col @Code B ! @Col !
@@ -32,11 +32,13 @@ The @Code "@Colour" symbol will accept any of the following colours:
 @Rowb A { black    	} B { white		}
 }
 Monochrome output devices will render them as shades of grey.  Colouring
-something @Code white makes it invisible (unless it is being printed
-on a coloured background), which is sometimes useful.
+something @Code white makes it invisible (unless printed on a coloured
+background), which is sometimes useful.  See Appendix {@NumberOf morecolours}
+to get many more colour names, using the @Code xrgb include file
+and its @Code "@Xrgb" symbol.
 @PP
 In addition to the list of colours given above, there is a special
-colour called {@Code nochange} which produces whatever colour you already
+{@Code nochange} colour which produces whatever colour you already
 happen to be using; you can also use an empty object to ask for this.  And
 you can get lots more colours by specifying them using numbers, like this:
 @ID @Code "{ rgb 0.5 0.5 1.0 } @Colour { Hello, world }"
@@ -44,8 +46,7 @@ which means use red at intensity 0.5, green at intensity 0.5, and
 blue at intensity 1.0, producing
 @ID { rgb 0.5 0.5 1.0 } @Colour { Hello, world }
 In the strange world of colour coordinates, in which 0 is dark and 1 is
-light, this is a light blue.  You can also use the CMYK system if you
-know what that is:
+light, this is a light blue.  You can also use the CMYK system:
 @ID @Code "{ cmyk 0.5 0.5 1.0 1.0 } @Colour { Hello, world }"
 produces
 @ID { cmyk 0.5 0.5 1.0 1.0 } @Colour { Hello, world }
@@ -53,7 +54,7 @@ Wherever in this document it says that that you can use any colour
 from this section, it means any of the names above, or {@Code nochange},
 or an object beginning with @Code "rgb" or @Code "cmyk" as shown.
 @PP
-Whether or not the colours produced by @Code "@Colour" actually
+Whether the colours produced by @Code "@Colour" actually
 correspond with the names depends on the output device; the same
 nominal colour can look quite different on screen and on paper.
 @End @Section

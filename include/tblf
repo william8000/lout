@@ -11,7 +11,7 @@
 #                                                                             #
 ###############################################################################
 
-# obsoloete now @SysPrependGraphic { tblf.lpg }
+@SysInclude { coltex }
 
 export @OrIfPlain
 def @TOIP {
@@ -29,7 +29,8 @@ def @TOIP {
 
 export @Tbl
 def @TblSetup
-    import @TOIP named paint		p	{ nopaint }
+    import @TOIP named paint		p	{ none }
+    import @TextureImport named texture	t	{ solid }
     import @TOIP named background	bg	{}
     import @TOIP named font		f	{}
     import @TOIP named break		b	{}
@@ -98,6 +99,7 @@ def @TblSetup
     ###########################################################################
 
     def setupp    { p   }
+    def setupt    { t   }
     def setupbg   { bg  }
     def setupf    { f   }
     def setupb    { b   }
@@ -206,6 +208,7 @@ def @TblSetup
 
 	# parameters for formatting the entire table
 	named paint			p	{}
+	import @TextureImport named texture t	{}
 	named background		bg	{}
 	named font			f	{}
 	named break			b	{}
@@ -254,6 +257,7 @@ def @TblSetup
 
 	# parameters for formatting @Rowa rows
 	named apaint			ap	{}
+	import @TextureImport named atexture at	{}
 	named abackground		abg	{}
 	named afont			af	{}
 	named abreak			ab	{}
@@ -308,6 +312,7 @@ def @TblSetup
 	    named Z {}
 	    named @Cell
 		named paint			p	{}
+		import @TextureImport named texture t	{}
 		named background		bg	{}
 		named font			f	{}
 		named break			b	{}
@@ -359,6 +364,7 @@ def @TblSetup
 
 	# parameters for formatting @Rowb rows
 	named bpaint			bp	{}
+	import @TextureImport named btexture bt	{}
 	named bbackground		bbg	{}
 	named bfont			bf	{}
 	named bbreak			bb	{}
@@ -413,6 +419,7 @@ def @TblSetup
 	    named Z {}
 	    named @Cell
 		named paint			p	{}
+		import @TextureImport named texture t	{}
 		named background		bg	{}
 		named font			f	{}
 		named break			b	{}
@@ -464,6 +471,7 @@ def @TblSetup
 
 	# parameters for formatting @Rowc rows
 	named cpaint			cp	{}
+	import @TextureImport named ctexture ct	{}
 	named cbackground		cbg	{}
 	named cfont			cf	{}
 	named cbreak			cb	{}
@@ -518,6 +526,7 @@ def @TblSetup
 	    named Z {}
 	    named @Cell
 		named paint			p	{}
+		import @TextureImport named texture t	{}
 		named background		bg	{}
 		named font			f	{}
 		named break			b	{}
@@ -569,6 +578,7 @@ def @TblSetup
 
 	# parameters for formatting @Rowd rows
 	named dpaint			dp	{}
+	import @TextureImport named dtexture dt	{}
 	named dbackground		dbg	{}
 	named dfont			df	{}
 	named dbreak			db	{}
@@ -623,6 +633,7 @@ def @TblSetup
 	    named Z {}
 	    named @Cell
 		named paint			p	{}
+		import @TextureImport named texture t	{}
 		named background		bg	{}
 		named font			f	{}
 		named break			b	{}
@@ -674,6 +685,7 @@ def @TblSetup
 
 	# parameters for formatting @Rowe rows
 	named epaint			ep	{}
+	import @TextureImport named etexture et	{}
 	named ebackground		ebg	{}
 	named efont			ef	{}
 	named ebreak			eb	{}
@@ -728,6 +740,7 @@ def @TblSetup
 	    named Z {}
 	    named @Cell
 		named paint			p	{}
+		import @TextureImport named texture t	{}
 		named background		bg	{}
 		named font			f	{}
 		named break			b	{}
@@ -779,6 +792,7 @@ def @TblSetup
 
 	# parameters for formatting @Rowf rows
 	named fpaint			fp	{}
+	import @TextureImport named ftexture ft	{}
 	named fbackground		fbg	{}
 	named ffont			ff	{}
 	named fbreak			fb	{}
@@ -833,6 +847,7 @@ def @TblSetup
 	    named Z {}
 	    named @Cell
 		named paint			p	{}
+		import @TextureImport named texture t	{}
 		named background		bg	{}
 		named font			f	{}
 		named break			b	{}
@@ -884,6 +899,7 @@ def @TblSetup
 
 	# parameters for formatting @Rowg rows
 	named gpaint			gp	{}
+	import @TextureImport named gtexture gt	{}
 	named gbackground		gbg	{}
 	named gfont			gf	{}
 	named gbreak			gb	{}
@@ -938,6 +954,7 @@ def @TblSetup
 	    named Z {}
 	    named @Cell
 		named paint			p	{}
+		import @TextureImport named texture t	{}
 		named background		bg	{}
 		named font			f	{}
 		named break			b	{}
@@ -989,6 +1006,7 @@ def @TblSetup
 
 	# parameters for formatting @Rowh rows
 	named hpaint			hp	{}
+	import @TextureImport named htexture ht	{}
 	named hbackground		hbg	{}
 	named hfont			hf	{}
 	named hbreak			hb	{}
@@ -1043,6 +1061,7 @@ def @TblSetup
 	    named Z {}
 	    named @Cell
 		named paint			p	{}
+		import @TextureImport named texture t	{}
 		named background		bg	{}
 		named font			f	{}
 		named break			b	{}
@@ -1103,6 +1122,7 @@ def @TblSetup
 	#######################################################################
 
 	def tblp    { p				@Else setupp   }
+	def tblt    { t				@Else setupt   }
 	def tblbg   { bg			@Else setupbg  }
 	def tblf    { f				@Else setupf   }
 	def tblb    { b				@Else setupb   }
@@ -1137,6 +1157,7 @@ def @TblSetup
 
 	def @DoCell
 	    named compulsory p    {}
+	    named compulsory t    {}
 	    named compulsory bg   {}
 	    named compulsory f    {}
 	    named compulsory b    {}
@@ -1180,9 +1201,6 @@ def @TblSetup
 		@OneRow { /0io x /0io }
 	    }
 
-# include @ColourCommand symbol
-@SysInclude { ccommand }
-
 	    def @PDFBox
 	    {
 		"0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"
@@ -1210,15 +1228,6 @@ def @TblSetup
 		PostScript @Yield { {"LoutBox" @PSAddPaint col } @Graphic x }
 		PDF        @Yield { { @PDFBox @PDFAddPaint col "S" } @Graphic x }
 		PlainText  @Yield { rpc @PlainGraphic x }
-	      }
-	    }
-
-	    def @PaintBox left col right x
-	    {
-	      @BackEnd @Case {
-		PostScript @Yield { {"LoutBox" @PSAddPaint col } @Graphic x }
-		PDF        @Yield { { @PDFBox @PDFAddPaint col "S" } @Graphic x }
-		PlainText  @Yield { x }
 	      }
 	    }
 
@@ -1327,12 +1336,21 @@ def @TblSetup
 		}
 	    }
 
+	    def @PaintBox right x
+	    {
+	      @BackEnd @Case {
+		PostScript @Yield { {"LoutBox" @ColourCommand p t "fill"} @Graphic x }
+		PDF        @Yield { { @PDFBox @PDFAddPaint col "S" } @Graphic x }
+		PlainText  @Yield { x }
+	      }
+	    }
+
 	    def @AddPaint
 		right x
 	    {
 		p @Case {
 		    { none nopaint no } @Yield x
-		    else                @Yield { p @PaintBox x }
+		    else                @Yield { @PaintBox x }
 		}
 	    }
 
@@ -1405,6 +1423,7 @@ def @TblSetup
 	# symbol for producing @Row rows
 	def @DoRow
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -1459,6 +1478,7 @@ def @TblSetup
 		named Z {}
 		named @Cell
 		    named paint			p	{}
+		    import @TextureImport named texture t {}
 		    named background		bg	{}
 		    named font			f	{}
 		    named break			b	{}
@@ -1522,6 +1542,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tblp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tblbg  }
 	    def rowf    { f				@Else tblf   }
 	    def rowb    { b				@Else tblb   }
@@ -1570,6 +1591,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }
@@ -1608,6 +1630,7 @@ def @TblSetup
 	# symbol for producing @Rowa rows
 	def @DoRowa
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -1668,6 +1691,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def tbxp    { ap				@Else tblp   }
+	    def tbxt    { at				@Else tblt   }
 	    def tbxbg   { abg				@Else tblbg  }
 	    def tbxf    { af				@Else tblf   }
 	    def tbxb    { ab				@Else tblb   }
@@ -1706,6 +1730,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tbxp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tbxbg  }
 	    def rowf    { f				@Else tbxf   }
 	    def rowb    { b				@Else tbxb   }
@@ -1754,6 +1779,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }
@@ -1792,6 +1818,7 @@ def @TblSetup
 	# symbol for producing @Rowb rows
 	def @DoRowb
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -1852,6 +1879,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def tbxp    { bp				@Else tblp   }
+	    def tbxt    { bt				@Else tblt   }
 	    def tbxbg   { bbg				@Else tblbg  }
 	    def tbxf    { bf				@Else tblf   }
 	    def tbxb    { bb				@Else tblb   }
@@ -1890,6 +1918,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tbxp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tbxbg  }
 	    def rowf    { f				@Else tbxf   }
 	    def rowb    { b				@Else tbxb   }
@@ -1938,6 +1967,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }
@@ -1976,6 +2006,7 @@ def @TblSetup
 	# symbol for producing @Rowc rows
 	def @DoRowc
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -2036,6 +2067,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def tbxp    { cp				@Else tblp   }
+	    def tbxt    { ct				@Else tblt   }
 	    def tbxbg   { cbg				@Else tblbg  }
 	    def tbxf    { cf				@Else tblf   }
 	    def tbxb    { cb				@Else tblb   }
@@ -2074,6 +2106,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tbxp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tbxbg  }
 	    def rowf    { f				@Else tbxf   }
 	    def rowb    { b				@Else tbxb   }
@@ -2122,6 +2155,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }
@@ -2160,6 +2194,7 @@ def @TblSetup
 	# symbol for producing @Rowd rows
 	def @DoRowd
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -2220,6 +2255,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def tbxp    { dp				@Else tblp   }
+	    def tbxt    { dt				@Else tblt   }
 	    def tbxbg   { dbg				@Else tblbg  }
 	    def tbxf    { df				@Else tblf   }
 	    def tbxb    { db				@Else tblb   }
@@ -2258,6 +2294,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tbxp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tbxbg  }
 	    def rowf    { f				@Else tbxf   }
 	    def rowb    { b				@Else tbxb   }
@@ -2306,6 +2343,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }
@@ -2344,6 +2382,7 @@ def @TblSetup
 	# symbol for producing @Rowe rows
 	def @DoRowe
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -2404,6 +2443,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def tbxp    { ep				@Else tblp   }
+	    def tbxt    { et				@Else tblt   }
 	    def tbxbg   { ebg				@Else tblbg  }
 	    def tbxf    { ef				@Else tblf   }
 	    def tbxb    { eb				@Else tblb   }
@@ -2442,6 +2482,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tbxp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tbxbg  }
 	    def rowf    { f				@Else tbxf   }
 	    def rowb    { b				@Else tbxb   }
@@ -2490,6 +2531,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }
@@ -2528,6 +2570,7 @@ def @TblSetup
 	# symbol for producing @Rowf rows
 	def @DoRowf
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -2588,6 +2631,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def tbxp    { fp				@Else tblp   }
+	    def tbxt    { ft				@Else tblt   }
 	    def tbxbg   { fbg				@Else tblbg  }
 	    def tbxf    { ff				@Else tblf   }
 	    def tbxb    { fb				@Else tblb   }
@@ -2626,6 +2670,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tbxp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tbxbg  }
 	    def rowf    { f				@Else tbxf   }
 	    def rowb    { b				@Else tbxb   }
@@ -2674,6 +2719,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }
@@ -2712,6 +2758,7 @@ def @TblSetup
 	# symbol for producing @Rowg rows
 	def @DoRowg
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -2772,6 +2819,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def tbxp    { gp				@Else tblp   }
+	    def tbxt    { gt				@Else tblt   }
 	    def tbxbg   { gbg				@Else tblbg  }
 	    def tbxf    { gf				@Else tblf   }
 	    def tbxb    { gb				@Else tblb   }
@@ -2810,6 +2858,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tbxp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tbxbg  }
 	    def rowf    { f				@Else tbxf   }
 	    def rowb    { b				@Else tbxb   }
@@ -2858,6 +2907,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }
@@ -2896,6 +2946,7 @@ def @TblSetup
 	# symbol for producing @Rowh rows
 	def @DoRowh
 	    named paint			p	{}
+	    import @TextureImport named texture t {}
 	    named background		bg	{}
 	    named font			f	{}
 	    named break			b	{}
@@ -2956,6 +3007,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def tbxp    { hp				@Else tblp   }
+	    def tbxt    { ht				@Else tblt   }
 	    def tbxbg   { hbg				@Else tblbg  }
 	    def tbxf    { hf				@Else tblf   }
 	    def tbxb    { hb				@Else tblb   }
@@ -2994,6 +3046,7 @@ def @TblSetup
 	    ###################################################################
 
 	    def rowp    { p				@Else tbxp   }
+	    def rowt    { t				@Else tblt   }
 	    def rowbg   { bg				@Else tbxbg  }
 	    def rowf    { f				@Else tbxf   }
 	    def rowb    { b				@Else tbxb   }
@@ -3042,6 +3095,7 @@ def @TblSetup
 			#######################################################
 
 			p    { p			@Else rowp   }
+			t    { t			@Else rowt   }
 			bg   { bg			@Else rowbg  }
 			f    { f			@Else rowf   }
 			b    { b			@Else rowb   }

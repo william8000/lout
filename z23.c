@@ -1,9 +1,9 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -35,6 +35,48 @@
 
 /*****************************************************************************/
 /*                                                                           */
+/*  FirstDefiniteLDN(x, link, y, jn, ymk, dim, sp, pg)                       */
+/*  NextDefiniteWithGapLDN(x, link, y, g, jn, ymk, dim, sp, pg)              */
+/*                                                                           */
+/*  Like FirstDefinite and NextDefiniteWithGap but during the scan, if a     */
+/*  LINK_DEST_NULL is encountered, call FixAndPrintObject on it before       */
+/*  continuing on to find the next definite object.                          */
+/*                                                                           */
+/*****************************************************************************/
+
+#define FirstDefiniteLDN(x, link, y, jn, ymk, dim, sp, pg)		\
+{ jn = TRUE;								\
+  for( link = Down(x);  link != x;  link = NextDown(link) )		\
+  { Child(y, link);							\
+    if( type(y) == GAP_OBJ )  jn = jn && join(gap(y));			\
+    else if( type(y)==SPLIT ? SplitIsDefinite(y) : is_definite(type(y)))\
+      break;								\
+    else if( type(y) == LINK_DEST_NULL )				\
+      FixAndPrintObject(y, ymk, 0, 0, dim, sp, pg, 0, &aback, &afwd);	\
+  }									\
+} /* end FirstDefiniteLDN */
+
+#define NextDefiniteWithGapLDN(x, link, y, g, jn, ymk, dim, sp, pg)	\
+{ g = nilobj;  jn = TRUE;						\
+  for( link = NextDown(link);  link != x;  link = NextDown(link) )	\
+  { Child(y, link);							\
+    if( type(y) == GAP_OBJ )  g = y, jn = jn && join(gap(y));		\
+    else if( type(y)==SPLIT ? SplitIsDefinite(y):is_definite(type(y)) )	\
+    {									\
+      debug2(DFS, D, "  NextDefiniteWithGap at %s %s",			\
+	Image(type(y)), EchoObject(y));					\
+      assert( g != nilobj, "NextDefiniteWithGap: g == nilobj!" );	\
+      break;								\
+    }									\
+    else if( type(y) == LINK_DEST_NULL )				\
+      FixAndPrintObject(y, ymk, 0, 0, dim, sp, pg, 0, &aback, &afwd);	\
+  }									\
+} /* end NextDefiniteWithGapLDN */
+
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  static float ScaleFactor(avail_size, inner_size)                         */
 /*                                                                           */
 /*  Return the scale factor for this scaling, or 0 if impossible.            */
@@ -59,7 +101,7 @@ static float ScaleFactor(FULL_LENGTH avail_size, FULL_LENGTH inner_size)
 /*****************************************************************************/
 
 static FULL_LENGTH FindAdjustIncrement(OBJECT x, FULL_LENGTH frame_size,int dim)
-{ OBJECT y, link, prev, g;
+{ OBJECT y = nilobj, link, prev = nilobj, g;
   int adjustable_gaps;  BOOLEAN jn;
   FULL_LENGTH inc, mk, actual_size;
 
@@ -131,7 +173,7 @@ static FULL_LENGTH FindAdjustIncrement(OBJECT x, FULL_LENGTH frame_size,int dim)
 OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
   FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg, int count,
   FULL_LENGTH *actual_back, FULL_LENGTH *actual_fwd)
-{ OBJECT y, link, prev, g, z, face, thr, res, uplink;
+{ OBJECT y = nilobj, link, prev = nilobj, g, z, face, thr, res, uplink;
   /* OBJECT fixed_thr, tmp; */
   FULL_LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
   FULL_LENGTH aback, afwd;
@@ -590,6 +632,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     
       CountChild(y, LastDown(x), count);
@@ -606,6 +649,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    break;
 
 	  case LINK_DEST:
+	  case LINK_DEST_NULL:
 
 	    BackEnd->LinkDest(z, save_mark(x) - back(x, COLM),
 	      (pg - xmk) - xf, save_mark(x) + fwd(x, COLM), (pg - xmk) + xb);
@@ -668,7 +712,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    Image(type(x)), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
 	    EchoLength(xmk), EchoLength(xb), EchoLength(xf));
 
-	FirstDefinite(x, link, prev, jn);
+	FirstDefiniteLDN(x, link, prev, jn, xmk, dim, NO_SUPPRESS, pg);
 	if( link != x )
 	{
 
@@ -680,7 +724,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  /*                                                                 */
 	  /*******************************************************************/
 
-	  NextDefiniteWithGap(x, link, y, g, jn);
+	  NextDefiniteWithGap(x, link, y, g, jn); /* not LDN since will redo */
 	  if( link != x && mode(gap(g)) == TAB_MODE &&
 	      units(gap(g)) == AVAIL_UNIT && width(gap(g)) == 0 )
 	  {
@@ -692,7 +736,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    mode(gap(g)) = EDGE_MODE;
 	    units(gap(g)) = FIXED_UNIT;
 	  }
-	  FirstDefinite(x, link, prev, jn);
+	  FirstDefinite(x, link, prev, jn);  /* not LDN since already done */
 
 	  /*******************************************************************/
 	  /*                                                                 */
@@ -724,7 +768,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  /*                                                                 */
 	  /*******************************************************************/
 
-	  NextDefiniteWithGap(x, link, y, g, jn);
+	  NextDefiniteWithGapLDN(x, link, y, g, jn, mk, dim, NO_SUPPRESS, pg);
 	  while( link != x )
 	  {
 	    if( mode(gap(g)) == TAB_MODE && units(gap(g)) == AVAIL_UNIT &&
@@ -749,7 +793,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    mk += ActualGap(afwd, back(y, dim), fwd(y, dim), &gap(g),
 		    frame_size, mk - back_edge);
 	    prev = y;
-	    NextDefiniteWithGap(x, link, y, g, jn);
+	    NextDefiniteWithGapLDN(x, link, y, g, jn, mk, dim, NO_SUPPRESS, pg);
 	  }
 
 	  /*******************************************************************/
@@ -792,7 +836,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	FULL_LENGTH b, f, dlen;
 	start_group = nilobj;  dble_found = FALSE;  dlen = 0;
 	debug0(DGP, DD, "  groups beginning.");
-	FirstDefinite(x, link, y, jn);
+	FirstDefiniteLDN(x, link, y, jn, xmk, dim, NO_SUPPRESS, pg);
 	if( link != x )
 	{
 	  /* start first group, with or without join */
@@ -805,7 +849,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    Image(type(y)), dble_found ? "" : "not ",
 	    EchoLength(b), EchoLength(f));
 	
-	  NextDefiniteWithGap(x, link, y, g, jn);
+	  NextDefiniteWithGapLDN(x, link, y, g, jn, xmk, dim, NO_SUPPRESS, pg);
 	  while( link != x )
 	  {
 	    if( !jn )
@@ -845,7 +889,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 		EchoLength(b), EchoLength(f));
 	    }
 
-	    NextDefiniteWithGap(x, link, y, g, jn);
+	    NextDefiniteWithGapLDN(x, link, y, g, jn, xmk, dim, NO_SUPPRESS, pg);
 	  }
 	  assert( start_group != nilobj, "FAPO: final start_group!" );
 
@@ -892,11 +936,13 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
       if( dim == COLM )
       { BOOLEAN will_adjust, adjusting;
-	FULL_LENGTH actual_size,
-	adjust_indent, frame_size, back_edge, adjust_inc, inc, adjust_sofar;
-	int adjustable_gaps, gaps_sofar;
-	BOOLEAN underlining; int underline_xstart;
-	FONT_NUM underline_font;  COLOUR_NUM underline_colour;
+	FULL_LENGTH actual_size, adjust_indent, frame_size, back_edge;
+	FULL_LENGTH adjust_inc, inc = 0, adjust_sofar = 0;
+	int adjustable_gaps, gaps_sofar = 0;
+	BOOLEAN underlining; int underline_xstart = 0;
+	FONT_NUM underline_font = 0;
+	COLOUR_NUM underline_colour = 0;
+	TEXTURE_NUM underline_texture = 0;
 	OBJECT urec, last_bad_gap;
       
 
@@ -916,7 +962,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	/*                                                                   */
 	/*********************************************************************/
 
-	FirstDefinite(x, link, y, jn);
+	FirstDefinite(x, link, y, jn);  /* no LDN since this is initial pass */
 	if( link == x )
 	{
 	  *actual_back = back(x, dim); *actual_fwd = fwd(x, dim);
@@ -938,7 +984,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	mk = back_edge + back(y, dim);
 	frame_size = xb + xf;
 	prev = y;
-	NextDefiniteWithGap(x, link, y, g, jn);
+	NextDefiniteWithGap(x, link, y, g, jn);  /* no LDN, initial pass */
 	while( link != x )
 	{
 	  save_actual_gap(g) = ActualGap(fwd(prev, dim), back(y, dim),
@@ -951,7 +997,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  }
 	  else if( width(gap(g)) > 0 )  adjustable_gaps++;
 	  prev = y;
-	  NextDefiniteWithGap(x, link, y, g, jn);
+	  NextDefiniteWithGap(x, link, y, g, jn);  /* no LDN, initial pass */
 	}
 	actual_size = mk + fwd(prev, dim) - back_edge;
 
@@ -1111,10 +1157,10 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 	  underlining = FALSE;
 	  adjusting = will_adjust && last_bad_gap == nilobj;
-	  FirstDefinite(x, link, y, jn);
+	  FirstDefiniteLDN(x, link, y, jn, xmk, dim, NO_SUPPRESS, pg);
 	  prev = y;
 	  mk = xmk - back(x, dim) + back(y, dim) + adjust_indent;
-	  NextDefiniteWithGap(x, link, y, g, jn);
+	  NextDefiniteWithGapLDN(x, link, y, g, jn, mk, dim, NO_SUPPRESS, pg);
 	  while( link != x )
 	  {
 	    /* check for underlining */
@@ -1128,10 +1174,18 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	        underlining = TRUE;
 	        debug2(DGP, DD, "underlining begins at %s %s",
 		  Image(type(prev)), EchoObject(prev));
-	        underline_font = is_word(type(prev)) ? word_font(prev) :
-		    font(save_style(x));
-		underline_colour = is_word(type(prev)) ? word_colour(prev) :
-		    colour(save_style(x));
+		if( is_word(type(prev)) )
+		{
+	          underline_font = word_font(prev);
+		  underline_colour = word_colour(prev);
+		  underline_texture = word_texture(prev);
+		}
+		else
+		{
+	          underline_font = font(save_style(x));
+		  underline_colour = colour(save_style(x));
+		  underline_texture = texture(save_style(x));
+		}
 	        underline_xstart = mk - back(prev, dim);
 	      }
 	      if( underline(g) == UNDER_OFF )
@@ -1142,8 +1196,9 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	        New(urec, UNDER_REC);
 	        back(urec, COLM) = underline_xstart;
 	        fwd(urec, COLM) = mk + fwd(prev, dim);
-	        back(urec, ROWM) = underline_font;
-	        fwd(urec, ROWM) = underline_colour;
+	        word_font(urec) = underline_font;
+	        word_colour(urec) = underline_colour;
+	        word_texture(urec) = underline_texture;
 	        underlining = FALSE;
 	        Link(Up(prev), urec);
 	      }
@@ -1173,7 +1228,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    if( !adjusting && will_adjust && g == last_bad_gap )
 	      adjusting = TRUE;
 
-	    NextDefiniteWithGap(x, link, y, g, jn);
+	    NextDefiniteWithGapLDN(x, link, y, g, jn, mk, dim, NO_SUPPRESS, pg);
 	  }
 
 	  /* check for underlining */
@@ -1193,10 +1248,18 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	      debug2(DGP, DD, "underlining begins at %s %s",
 	        Image(type(prev)), EchoObject(prev));
 	      underlining = TRUE;
-	      underline_font = is_word(type(prev)) ? word_font(prev) :
-		    font(save_style(x));
-	      underline_colour = is_word(type(prev)) ? word_colour(prev) :
-		    colour(save_style(x));
+	      if( is_word(type(prev)) )
+	      {
+	        underline_font = word_font(prev);
+	        underline_colour = word_colour(prev);
+	        underline_texture = word_texture(prev);
+	      }
+	      else
+	      {
+	        underline_font = font(save_style(x));
+	        underline_colour = colour(save_style(x));
+	        underline_texture = texture(save_style(x));
+	      }
 	      underline_xstart = mk - back(prev, dim);
 	    }
 
@@ -1206,8 +1269,9 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    New(urec, UNDER_REC);
 	    back(urec, COLM) = underline_xstart;
 	    fwd(urec, COLM) = mk + fwd(prev, dim);
-	    back(urec, ROWM) = underline_font;
-	    fwd(urec, ROWM) = underline_colour;
+	    word_font(urec) = underline_font;
+	    word_colour(urec) = underline_colour;
+	    word_texture(urec) = underline_texture;
 	    underlining = FALSE;
 	    Link(Up(prev), urec);
 	  }
@@ -1221,11 +1285,11 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       }
       else for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
-	if( !is_definite(type(y)) )
+	if( !is_definite(type(y)) && type(y) != LINK_DEST_NULL )
 	{
 	  if( type(y) == UNDER_REC )   /* generate an underline now */
-	  { BackEnd->PrintUnderline(back(y, ROWM), fwd(y, ROWM), back(y, COLM),
-	      fwd(y, COLM), pg - xmk);
+	  { BackEnd->PrintUnderline(word_font(y),word_colour(y),
+              word_colour(y), back(y, COLM), fwd(y, COLM), pg - xmk);
 	    link = PrevDown(link);     /* remove all trace of underlining */
 	    DisposeChild(Up(y));       /* in case we print this object again */
 	  }
@@ -1251,7 +1315,13 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	Image(type(x)),
 	EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
 	i, Image(type(y)), EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
+
+      /* This line seems to have been an optimization.  It won't
+       * work if we are inside a running header, since subsequent
+       * passes will have forgotten the thread.  JeffK 13/11/02
       MoveLink(uplink, link, CHILD);  DeleteLink(link);
+       */
+
       assert( type(y) != GAP_OBJ, "FAPO: THR!");
 
       if( thr_state(x) != FINALSIZE )

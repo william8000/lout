@@ -34,7 +34,7 @@ is usually equal to {@Code "@DP"}.
 The {@Code "@NP"} `new page' symbol causes the following paragraph to
 page. @Index { page, skipping to next }
 new.page @Index { new page }
-np. @Index @Code "@NP"
+np. @Index { @Code "@NP" (new page) }
 begin on a new page or column.  Of course, Lout starts a new page or
 column automatically when the old one is full, so @Code "@NP" is needed
 only rarely.

@@ -4,7 +4,8 @@
 @Begin
 @PP
 A variant of the @@Diag symbol, called {@Code "@SyntaxDiag"},
-syntax.diag @Index { @Code "@SyntaxDiag" symbol }
+diagrams. @RawIndex { diagrams }
+diagrams.syntax @SubIndex { syntax diagrams }
 syntax.diagrams @Index { syntax diagrams }
 railroad.diagrams @Index { railroad diagrams }
 produces syntax diagrams (sometimes called railroad diagrams):

@@ -1,1 +1,5 @@
-vi fmt fmt_setu fmt_size fmt_marg fmt_head
+gvim fmt
+gvim fmt_setu
+gvim fmt_size
+gvim fmt_marg
+gvim fmt_head

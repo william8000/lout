@@ -12,6 +12,7 @@
 @Include { str_larg }
 @Include { str_cros }
 @Include { str_cont }
+@Include { str_glos }
 @Include { str_indx }
 @Include { str_colu }
 @Include { str_defs }

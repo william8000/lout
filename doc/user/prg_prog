@@ -4,6 +4,9 @@
 @Begin
 @PP
 The standard reference for the Eiffel language @Cite { $meyer1992eiffel }
+programs. @RawIndex { programs }
+programs.programtext @SubIndex { program text in comments }
+programtext.programs @Index { program text in program comments }
 specifies that identifiers within comments may or should be enclosed
 in ` and ' so that they may be noticed and printed in an italic
 font:

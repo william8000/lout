@@ -17,12 +17,11 @@ you want equations, like this:
 }
 This shows what to do if you want both tables and equations, but you
 may leave out the line for tables if you don't want them.  Setup files
-for specialized packages, such as like {@Code "tab"} and {@Code "eq"},
+for specialized packages, such as {@Code "tab"} and {@Code "eq"},
 are best included before the main setup file, but may be included in
 any order.
 @PP
 With the @Code "eq" file included, you may write
-eq. @Index { @Code "@Eq" }
 @ID @Code "@Eq { ... }"
 at any point in your document, and the symbols of @Code "@Eq" will be
 available between the braces.  Any symbols available outside continue
@@ -38,7 +37,9 @@ at the desired point.  To make the optimal paragraph breaker work hard to
 arrange the paragraph so that the equation does not spread over two
 lines, use {@Code "@OneCol @Eq { ... }"}.  This is needed so frequently
 that a symbol @Code "@E" is defined in @Code "eq" along with @Code "@Eq"
-e. @Index { @Code "@E" }
+equations. @RawIndex { equations }
+equations.e @SubIndex { @Code "@E" }
+eaaa.equations @Index { @Code "@E" (equations) }
 which is an abbreviation for {@Code "@OneCol @Eq"}.
 @PP
 To display an equation, use a display symbol like @Code "@IndentedDisplay"

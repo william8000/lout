@@ -12,7 +12,7 @@
 #                                                                             #
 #  The @SysInclude { tblf } line                                              #
 #                                                                             #
-#  This line causes Lout to read the definitions for diagrams, and should     #
+#  This line causes Lout to read the definitions for tables, and should       #
 #  not be touched.                                                            #
 #                                                                             #
 ###############################################################################
@@ -30,7 +30,8 @@
 ###############################################################################
 
 @Use { @TblSetup
-    # paint                { nopaint            } # colour of background
+    # paint                { none	        } # colour of background
+    # texture              { solid	        } # texture of paint background
     # background           {                    } # object in background
     # font                 {                    } # font
     # break                {                    } # paragraph breaking style

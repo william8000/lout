@@ -64,7 +64,7 @@ sufficient space. }
     A { EvenPageTop }
     B { Like @Code PageTop except that the first page of the figure
 or table will be an even-numbered (left-hand or verso) page -- useful
-for double-pace spreads.  }
+for double-page spreads.  }
 @Rowa
     A { FullPage }
     B { Like {@Code PageTop} except that nothing else will appear on the
@@ -269,7 +269,7 @@ in your setup file to get a smaller font size in your captions.
 @PP
 The @Code "@FigureCaptionFormat" option determines the format of the
 caption.  Within it, the symbol @Code word stands for the `Figure'
-word as defined by {@Code "@FigureWord"}); the @Code number
+word as defined by {@Code "@FigureWord"}; the @Code number
 symbol stands for the number of the figure; and @Code caption stands
 for the body of the caption.  The default value shown above prints
 the word and number and a period in bold, inserted together with a

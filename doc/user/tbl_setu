@@ -4,7 +4,10 @@
 @Begin
 @PP
 All of the options apart from the @Code format options can be changed
-setup.files.tables @Index { setup files for tables }
+tables. @RawIndex { tables }
+tables.setup @SubIndex { setup file }
+setup.files. @RawIndex { setup files }
+setup.files.for.tables @SubIndex { for tables }
 in the @Code { tbl } setup file, in which case the new values become
 the default values for every table in the document.  This section
 explains how to do it.  Changing options in the setup file can save a
@@ -37,7 +40,7 @@ of the @Code tbl package, so it should not be changed.  After it comes
 the @Code "@TblSetup" @Code "@Use" clause, which looks like this:
 @ID @OneRow @Code @Verbatim {
 @Use { @TblSetup
-    # paint { nopaint }
+    # paint { none }
     # font { }
     # break { }
 }
@@ -48,7 +51,7 @@ example, suppose you want all table entries two points smaller than the
 surrounding text:
 @ID @OneRow @Code @Verbatim {
 @Use { @TblSetup
-    # paint { nopaint }
+    # paint { none }
     font { -2p }
     # break { }
 }

@@ -1,9 +1,9 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -373,9 +373,9 @@ FILE *fp)
 { int i;
   fprintf(fp, "key:    ");
   for( i = start;  i < stop;  i++ )  fprintf(fp, " %c", key[i]);
-  fprintf(fp, "\nrate:");
+  fprintf(fp, "%srate:", STR_NEWLINE);
   for( i = 0;  rate[i] != '\0';  i++ )  fprintf(fp, " %c", rate[i]);
-  fprintf(fp, "\n");
+  fprintf(fp, "%s", STR_NEWLINE);
 } /* end ShowRate */
 
 
@@ -411,7 +411,7 @@ static void DoTriePrint(TRIE T, int node, int len, FILE *fp)
 	pos++;
       }
       AltUncompressValue(&(T->string_mem[pos]), str);
-      fprintf(fp, " %s\n", str);
+      fprintf(fp, " %s%s", str, STR_NEWLINE);
     }
 
     /* else if next_node > 0 have a child node to explore */
@@ -442,10 +442,11 @@ static void TriePrint(TRIE T, FILE *fp)
     for( ch = 0;  ch < MAX_CHAR;  ch++ )
       if( T->class[ch] == i )  fprintf(fp, "%c", ch);
   }
-  fprintf(fp, "\n");
-  fprintf(fp, "Node space: %d capacity, %d used\n", T->node_lim, T->node_free);
-  fprintf(fp, "String space: %d capacity, %d used\n", T->string_lim,
-	T->string_lim - T->string_first);
+  fprintf(fp, "%s", STR_NEWLINE);
+  fprintf(fp, "Node space: %d capacity, %d used%s", T->node_lim, T->node_free,
+    STR_NEWLINE);
+  fprintf(fp, "String space: %d capacity, %d used%s", T->string_lim,
+    T->string_lim - T->string_first, STR_NEWLINE);
   prefix[0] = '\0';
   DoTriePrint(T, 0, 0, fp);
 } /* end TriePrint */
@@ -681,9 +682,9 @@ static int BePutInt(FILE *fp, int v)
 static void CompressTrie(TRIE T)
 { FULL_CHAR *p, *q;  int len, i;
   debug0(DHY, DD, "CompressTrie(T), T =");
-  debug2(DHY, DD, "Node space: %d capacity, %d used\n",
+  debug2(DHY, DD, "Node space: %d capacity, %d used",
     T->node_lim, T->node_free);
-  debug2(DHY, DD, "String space: %d capacity, %d used\n",
+  debug2(DHY, DD, "String space: %d capacity, %d used",
     T->string_lim, T->string_lim - T->string_first);
   ifdebug(DHY, DD, TriePrint(T, stderr));
   T->node_lim = T->node_free;
@@ -774,15 +775,15 @@ static TRIE TrieRead(LANGUAGE_NUM lnum, BOOLEAN *success)
     }
 
     /* check that first line contains magic header or stub */
-    if( StringFGets(str, MAX_BUFF, unpacked_fp) == NULL ||
-        ( !StringEqual(str, AsciiToFull("Lout hyphenation information\n")) &&
-	  !StringEqual(str, AsciiToFull("Lout hyphenation placeholder\n")) )
+    if( ReadOneLine(unpacked_fp, str, MAX_BUFF) == 0 ||
+        ( !StringEqual(str, AsciiToFull("Lout hyphenation information")) &&
+	  !StringEqual(str, AsciiToFull("Lout hyphenation placeholder")) )
       )
       Error(36, 9, "header line of hyphenation file %s missing",
 	FATAL, no_fpos, FileName(unpacked_fnum));
 
     /* if file is just a placeholder, exit silently with success */
-    if( !StringEqual(str, AsciiToFull("Lout hyphenation information\n")) )
+    if( !StringEqual(str, AsciiToFull("Lout hyphenation information")) )
     { *success = TRUE;
       return (TRIE) NULL;
     }
@@ -792,7 +793,7 @@ static TRIE TrieRead(LANGUAGE_NUM lnum, BOOLEAN *success)
     state = START_STATE;
     hline_num = 1;
     length_limit = 0;
-    while( StringFGets(buff, MAX_BUFF, unpacked_fp) != NULL )
+    while( ReadOneLine(unpacked_fp, buff, MAX_BUFF) != 0 )
     {
       hline_num++;  bpos = 0;
       while( sscanf( (char *) &buff[bpos], "%s%n", str, &bcount) == 1 &&
@@ -915,7 +916,7 @@ static TRIE TrieRead(LANGUAGE_NUM lnum, BOOLEAN *success)
     StringCopy(buff, FileName(unpacked_fnum));
     StringCopy(&buff[StringLength(buff) - StringLength(HYPH_SUFFIX)],
       HYPH_PACKED_SUFFIX);
-    packed_fp = StringFOpen(buff, WRITE_BINARY);
+    packed_fp = StringFOpen(buff, WRITE_FILE);
     if( packed_fp == NULL )
       Error(36, 14, "cannot write to hyphenation file %s", FATAL,no_fpos,buff);
     BePutInt(packed_fp, T->magic);
@@ -1080,6 +1081,8 @@ OBJECT Hyphenate(OBJECT x)
       z = MakeWord(WORD, &key[stop+1], &fpos(y));
       word_font(z) = word_font(y);
       word_colour(z) = word_colour(y);
+      word_texture(z) = word_texture(y);
+      word_texture(z) = word_texture(y);
       word_outline(z) = word_outline(y);
       word_language(z) = word_language(y);
       word_baselinemark(z) = word_baselinemark(y);
@@ -1123,7 +1126,7 @@ OBJECT Hyphenate(OBJECT x)
       ifdebug(DHY, DD,
 	fprintf(stderr, "trying suffix \"");
 	for( p = ss; *p != 0;  p++ )  fprintf(stderr, "%c", findrep(*p, T));
-	fprintf(stderr, "\"\n");
+	fprintf(stderr, "\"%s", STR_NEWLINE);
       );
 	
       /* accumulate all prefixes of ss */
@@ -1196,6 +1199,7 @@ OBJECT Hyphenate(OBJECT x)
       {	z = MakeWord(WORD, &key[start+i-1], &fpos(y));
 	word_font(z) = word_font(y);
 	word_colour(z) = word_colour(y);
+	word_texture(z) = word_texture(y);
 	word_outline(z) = word_outline(y);
 	word_language(z) = word_language(y);
 	word_baselinemark(z) = word_baselinemark(y);

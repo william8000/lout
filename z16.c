@@ -1,9 +1,9 @@
 /*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -41,7 +41,7 @@
 /*****************************************************************************/
 
 FULL_LENGTH FindShift(OBJECT x, OBJECT y, int dim)
-{ FULL_LENGTH len, res;
+{ FULL_LENGTH len = 0, res = 0;  /* initial values unused */
   debug4(DSF, DD, "FindShift(%s, %s %s, %s)", Image(type(x)),
     Image(type(y)), EchoObject(y), dimen(dim));
 
@@ -157,7 +157,7 @@ OBJECT y, int dim)
 { OBJECT link;
   OBJECT pg, prec_def, sg, sd;
   FULL_LENGTH beffect, feffect, seffect;  int side;
-  int bb, ff;
+  int bb = 0, ff = 0;  /* initial values unused */
 
   debug6(DSA, DD, "CatAdjustSize(%s x, %s, %s, %s, %s y, %s)", Image(type(x)),
     EchoLength(*b), EchoLength(*f), bool(ratm), Image(type(y)), dimen(dim));
@@ -400,6 +400,7 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
       case GRAPHIC:
       case LINK_SOURCE:
       case LINK_DEST:
+      case LINK_DEST_NULL:
       case LINK_URL:
       case KERN_SHRINK:
       case BACKGROUND:

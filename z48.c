@@ -1,9 +1,9 @@
 /*@z48.c:PDF back end@********************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -1044,7 +1044,7 @@ void PDFFont_AddFont(FILE* in_fp, const FULL_CHAR* in_short_font_name,
   t_font_list_entry_ptr entry = PDFFont_FindListEntry(in_real_font_name);
   debug4(DPD, D, "PDFFont_AddFont(-, %s, %s, %s) [new = %s]",
     in_short_font_name, in_real_font_name,
-    (in_font_encoding_name ? in_font_encoding_name : ""),
+    (in_font_encoding_name != (FULL_CHAR *) NULL ? in_font_encoding_name : ""),
     bool(entry == NULL));
   /* *** this attempted bug fix by Jeff K. problem may be multiple font
 	 entries for the same font
@@ -3484,7 +3484,7 @@ void PDFFile_Cleanup(FILE* in_fp)
   PDF_FILE_OFFSET xref_start;	/* file offset of start of xref table */
   PDF_OBJECT_NUM catalog_obj_num;
   PDF_OBJECT_NUM info_obj_num;
-  PDF_OBJECT_NUM dests_obj_num;
+  PDF_OBJECT_NUM dests_obj_num = 0;
 
   /* write out any unresolved link annotations.  This could be done earlier  */
   /* (in fact, it can be done as each new target is defined) but I've        */

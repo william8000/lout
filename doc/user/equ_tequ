@@ -4,6 +4,7 @@
 @Begin
 @PP
 There is an alternative version of the @Code "@Eq" symbol that
+tex. @RawIndex { @TeX }
 tex.mathfonts @SubIndex { mathematical fonts }
 uses fonts taken from the @TeX document formatting
 system.  These fonts are said to produce better-looking
@@ -12,6 +13,7 @@ standard @Code "@Eq" symbol.
 @PP
 The fonts were converted from @TeX form to PostScript form by
 Basil K. Malyshev, who has attached a license to them permitting
+malyshev @Index { Malyshev, Basil K. }
 non-commercial use only.  This is a much more stringent license
 than the one attached to Lout itself.  For this reason, the files
 needed to use these @TeX fonts are distributed separately from the
@@ -24,10 +26,11 @@ Once these files are installed, you change from the standard
 absolutely nothing else.
 @PP
 Unfortunately, the @TeX fonts are not usually resident on PostScript
-printing devices, which means that Lout is obliged to include them in its
-PostScript output file.  You don't have to do anything to make this
-happen, but the cost is fairly large:  changing to @Code "@SysInclude { teq }"
-increases the size of the PostScript output file by 252 kilobytes.
+printing devices, which means that Lout is obliged to include them in
+its PostScript output file.  You don't have to do anything to make this
+happen, but the cost is fairly large:  changing to
+@Code "@SysInclude { teq }" increases the size of the PostScript
+output file by 252 kilobytes.
 @PP
 It is possible to gain access to characters in the @TeX
 fonts that are not accessible directly from {@Code "@Eq"}, mainly

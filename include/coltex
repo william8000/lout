@@ -1,0 +1,417 @@
+
+###########################################################################
+#                                                                         #
+#   coltex                                                                #
+#                                                                         #
+#   Jeffrey H. Kingston                                                   #
+#   30 October 2002                                                       #
+#                                                                         #
+#   Include file providing @ColourCommand and @TextureCommand symbols.    #
+#                                                                         #
+###########################################################################
+
+@SysInclude { lengths }		# @PSLengths (needed for @TextureCommand)
+
+
+###########################################################################
+#                                                                         #
+#   @ColourCommand                                                        #
+#                                                                         #
+#   Jeff Kingston                                                         #
+#   19 October 2001                                                       #
+#   Updated for compatibility with textures 28 October 2002.              #
+#                                                                         #
+#   @ColourCommand converts a colour expressed in a manner that the       #
+#   ordinary user can comprehend into the PostScript or PDF command       #
+#   needed to obtain that colour, suitable for passing to @SetColour      #
+#   or including in the left parameter of @Graphic.                       #
+#                                                                         #
+#   This symbol is needed in various places so I've taken the coward's    #
+#   way out and @SysIncluded it at those places.                          #
+#                                                                         #
+#   Examples of behaviour for the PostScript back end:                    #
+#                                                                         #
+#       Parameter                 Result                                  #
+#       ------------------------------------------------------------      #
+#       black                     "0.0 0.0 0.0 LoutSetRGBColor"           #
+#       darkblue                  "0.0 0.0 0.5 LoutSetRGBColor"           #
+#       white                     "1.0 1.0 1.0 LoutSetRGBColor"           #
+#       none                      ""                                      #
+#       nochange                  ""                                      #
+#       ""                        ""                                      #
+#       rgb <red> <blue> <green>  "<red> <blue> <green> LoutSetRGBColor"  #
+#       cymk <c> <y> <m> <k>      "<c> <y> <m> <k> LoutSetCMYKColor"      #
+#       ------------------------------------------------------------      #
+#                                                                         #
+#   See the Expert's Guide for the use of LoutSetRGBColor and             #
+#   LoutSetCMYKColor rather than setrgbcolor and setcmykcolor.            #
+#                                                                         #
+#   @ColourCommand also does the right thing for the PDF back end;        #
+#   its result is always empty for the PlainText back end.                #
+#                                                                         #
+###########################################################################
+
+def @ColourCommand right @Body
+{
+    def @RGB right coords
+    {
+	@BackEnd @Case {
+	    PostScript @Yield { coords "LoutSetRGBColor" }
+	    PDF        @Yield { coords "rg" coords "RG" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def @CMYK right coords
+    {
+	@BackEnd @Case {
+	    PostScript @Yield { coords "LoutSetCMYKColor" }
+	    PDF        @Yield { coords "k" coords "K" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def @RGBElse right alt
+    {
+	{ "rgb" @Common @Body } @Case {
+	    "rgb" @Yield @RGB { "rgb" @Rump @Body }
+	    else  @Yield alt
+	}
+    }
+
+    def @CMYKElse right alt
+    {
+	{ "cmyk" @Common @Body } @Case {
+	    "cmyk" @Yield @CMYK { "cmyk" @Rump @Body }
+	    else  @Yield alt
+	}
+    }
+
+    def @NoChangeElse right alt
+    {
+	@Body @Case {
+	    { "nochange" "none" "" } @Yield ""
+	    else              @Yield alt
+	}
+    }
+
+    def @RGBCoords
+    {
+	@Body @Case {
+	    black	@Yield	{ 0.0 0.0 0.0 }
+	    darkblue	@Yield	{ 0.0 0.0 0.5 }
+	    blue	@Yield	{ 0.0 0.0 1.0 }
+	    lightblue	@Yield	{ 0.5 0.5 1.0 }
+	    darkgreen	@Yield	{ 0.0 0.5 0.0 }
+	    green	@Yield	{ 0.0 1.0 0.0 }
+	    lightgreen	@Yield	{ 0.5 1.0 0.5 }
+	    darkred	@Yield	{ 0.5 0.0 0.0 }
+	    red		@Yield	{ 1.0 0.0 0.0 }
+	    lightred	@Yield	{ 1.0 0.5 0.5 }
+	    darkcyan	@Yield	{ 0.0 0.5 0.5 }
+	    cyan	@Yield	{ 0.0 1.0 1.0 }
+	    lightcyan	@Yield	{ 0.5 1.0 1.0 }
+	    darkmagenta	@Yield	{ 0.5 0.0 0.5 }
+	    magenta	@Yield	{ 1.0 0.0 1.0 }
+	    lightmagenta @Yield	{ 1.0 0.5 1.0 }
+	    darkyellow	@Yield	{ 0.5 0.5 0.0 }
+	    yellow	@Yield	{ 1.0 1.0 0.0 }
+	    lightyellow	@Yield	{ 1.0 1.0 0.5 }
+	    darkgray	@Yield	{ 0.2 0.2 0.2 }
+	    gray	@Yield	{ 0.5 0.5 0.5 }
+	    lightgray	@Yield	{ 0.8 0.8 0.8 }
+	    darkgrey	@Yield	{ 0.2 0.2 0.2 }
+	    grey	@Yield	{ 0.5 0.5 0.5 }
+	    lightgrey	@Yield	{ 0.8 0.8 0.8 }
+	    white	@Yield	{ 1.0 1.0 1.0 }
+	}
+    }
+
+    @RGBElse @CMYKElse @NoChangeElse @RGB @RGBCoords
+}
+
+
+###########################################################################
+#                                                                         #
+#   @TextureCommand                                                       #
+#                                                                         #
+#   @TextureCommand converts a texture expressed in a manner that the     #
+#   ordinary user can comprehend into the PostScript texture dictionary   #
+#   needed to obtain that texture, suitable for passing to @SetTexture    #
+#   or including in the left parameter of @Graphic.                       #
+#                                                                         #
+###########################################################################
+
+def @TextureCommand
+    left type
+                      named scale	{ 1	}
+                      named hscale	{ 1	}
+                      named vscale	{ 1	}
+    import @PSLengths named angle	{ 0d	}
+    import @PSLengths named hshift	{ 0i	}
+    import @PSLengths named vshift	{ 0i	}
+    import @PSLengths named width	{ "dft"	}
+    import @PSLengths named height	{ "dft"	}
+    import @PSLengths named gap		{ "dft"	}
+    import @PSLengths named radius	{ "dft"	}
+    import @PSLengths named linewidth	{ "dft"	}
+                      named font	{ "dft"	}
+    import @PSLengths named size	{ "dft"	}
+                      named value	{ "dft"	}
+{
+    def @Dft left x right y
+    {
+	y @Case {
+	    "dft" @Yield x
+	    else  @Yield y
+	}
+    }
+
+    def @SolidTexture
+    {
+        "null LoutSetTexture"
+    }
+
+    def @StripedTexture
+    {
+	def @Width { "1 pt" @Dft width }
+	def @Gap   { "1 pt" @Dft gap   }
+
+	scale hscale vscale angle hshift vshift
+	"2"
+	"[ 0 0" @Width @Gap "add dup ]"
+	@Width @Gap "add dup"
+	"{"
+	   "pop 0 0 moveto"
+	   @Width @Gap "add 0 lineto"
+	   "0" @Width "rlineto"
+	   "0" @Width "lineto"
+	   "closepath fill"
+	"}"
+        "LoutMakeTexture LoutSetTexture"
+    }
+
+    def @GridTexture
+    {
+	def @Width { "1 pt" @Dft width }
+	def @Gap   { "1 pt" @Dft gap   }
+
+	scale hscale vscale angle hshift vshift
+	"2"
+	"[ 0 0" @Width @Gap "add dup ]"
+	@Width @Gap "add dup"
+	"{"
+	   "pop 0 0 moveto"
+	   @Width @Gap "add 0 lineto"
+	   "0" @Width "rlineto"
+	   @Gap "neg 0 rlineto"
+	   "0" @Gap "rlineto"
+	   @Width "neg 0 rlineto"
+	   "closepath fill"
+	"}"
+        "LoutMakeTexture LoutSetTexture"
+    }
+
+    def @DottedTexture
+    {
+	def @Radius { "0.5 pt" @Dft radius }
+	def @Gap    { "2 pt"   @Dft gap    }
+
+	scale hscale vscale angle hshift vshift
+	"2"
+	"[ 0 0" @Gap "dup ]"
+	@Gap "dup"
+	"{"
+	   "pop" @Gap "2 div dup" @Radius "0 360 arc fill"
+	"}"
+        "LoutMakeTexture LoutSetTexture"
+    }
+
+    def @ChessboardTexture
+    {
+	def @Width { "2 pt" @Dft width }
+
+	scale hscale vscale angle hshift vshift
+	"2"
+	"[ 0 0" @Width "2 mul dup ]"
+	@Width "2 mul dup"
+	"{"
+	    "pop 0 0 moveto"
+	    @Width "0 rlineto"
+	    "0" @Width "rlineto"
+	    @Width "neg 0 rlineto"
+	    closepath
+	    @Width @Width "moveto"
+	    @Width "0 rlineto"
+	    "0" @Width "rlineto"
+	    @Width "neg 0 rlineto"
+	    "closepath fill"
+	"}"
+        "LoutMakeTexture LoutSetTexture"
+    }
+
+    def @BrickworkTexture
+    {
+	def @Width     { "6 pt"   @Dft width     }
+	def @Height    { "2 pt"   @Dft height    }
+	def @Linewidth { "0.5 pt" @Dft linewidth }
+
+	scale hscale vscale angle hshift vshift
+	"2"
+	"[ 0 0" @Width @Height "2 mul ]"
+	@Width @Height "2 mul"
+	"{"
+	    "pop 0 0 moveto" @Width "0 rlineto"
+	    "0" @Height "moveto" @Width "0 rlineto"
+	    "0" @Height "2 mul moveto" @Width "0 rlineto"
+	    "0 0 moveto 0" @Height "rlineto"
+	    @Width "0 moveto 0" @Height "rlineto"
+	    @Width "2 div" @Height "moveto 0" @Height "rlineto"
+	    "[] 0 setdash" @Linewidth "setlinewidth stroke"
+	"}"
+        "LoutMakeTexture LoutSetTexture"
+    }
+
+    def @HoneycombTexture
+    {
+	def @R         { "2.0 pt" @Dft radius    }
+	def @Linewidth { "0.5 pt" @Dft linewidth }
+
+	def @X { @R "0.5 mul" }
+	def @Y { @R "0.886 mul" }
+	def @NegX { @X "neg" }
+	def @NegY { @Y "neg" }
+	def @NegR { @R "neg" }
+	def @BoxWidth { @R @X "add 2 mul" }
+	def @BoxHeight { @Y "2 mul" }
+
+	scale hscale vscale angle hshift vshift
+	"2"
+	"[ 0 0" @BoxWidth @BoxHeight "]"
+	@BoxWidth @BoxHeight
+	"{"
+	    "pop"
+	    @X "0 moveto"
+	    @R "0 rlineto"
+	    @X @Y "rlineto"
+	    @R "0 rlineto"
+	    @NegR "0 rlineto"
+	    @NegX @Y "rlineto"
+	    @NegR "0 rlineto"
+	    @NegX @NegY "rlineto"
+	    "closepath"
+	    "[] 0 setdash" @Linewidth "setlinewidth stroke"
+	"}"
+        "LoutMakeTexture LoutSetTexture"
+    }
+
+    def @TriangularTexture
+    {
+	def @R         { "4.0 pt" @Dft radius    }
+	def @Linewidth { "0.5 pt" @Dft linewidth }
+
+	def @X { @R "0.5 mul" }
+	def @Y { @R "0.886 mul" }
+	def @BoxWidth { @R }
+	def @BoxHeight { @Y "2 mul" }
+
+	scale hscale vscale angle hshift vshift
+	"2"
+	"[ 0 0" @BoxWidth @BoxHeight "]"
+	@BoxWidth @BoxHeight
+	"{"
+	    "pop"
+	    "0 0 moveto"
+	    @R "0 lineto"
+	    "0" @Y "2 mul lineto"
+	    @R "0 rlineto"
+	    "closepath"
+	    "0" @Y "moveto"
+	    @R "0 rlineto"
+	    "[] 0 setdash" @Linewidth "setlinewidth stroke"
+	"}"
+        "LoutMakeTexture LoutSetTexture"
+    }
+
+    def @StringTexture
+    {
+	def @Width  { "12 pt"       @Dft width  }
+        def @Height { "12 pt"       @Dft height }
+	def @Font   { "Times-Roman" @Dft font   }
+	def @Size   { "10 pt"       @Dft size   }
+        def @Value  { "*"           @Dft value }
+
+	scale hscale vscale angle hshift vshift
+	"2"
+	"[ 0 0" @Width @Height "]"
+	@Width @Height
+	"{"
+	   "pop /"@Font "findfont" @Size "scalefont setfont"
+	   "("@Value") dup false 0 0 moveto charpath flattenpath"
+	   "pathbbox pop pop neg exch neg exch moveto show"
+	   
+	"}"
+        "LoutMakeTexture LoutSetTexture"
+    }
+
+    type @Case
+    {
+	"solid"       @Yield @SolidTexture
+	"striped"     @Yield @StripedTexture
+	"grid"        @Yield @GridTexture
+	"dotted"      @Yield @DottedTexture
+	"chessboard"  @Yield @ChessboardTexture
+	"brickwork"   @Yield @BrickworkTexture
+	"honeycomb"   @Yield @HoneycombTexture
+	"triangular"  @Yield @TriangularTexture
+	"string"      @Yield @StringTexture
+	else          @Yield type
+    }
+}
+
+###########################################################################
+#                                                                         #
+#   @TextureImport                                                        #
+#                                                                         #
+#   Used as an import for texture options.                                #
+#                                                                         #
+#   We cleverly replace @Texture by nothing inside those options,         #
+#   and replace the known types by themselves plus @TextureCommand.       #
+#   This allows the user to type                                          #
+#                                                                         #
+#      texture { striped }                                                #
+#      texture { striped @Texture }                                       #
+#      texture { striped angle { 45d } }                                  #
+#      texture { striped @Texture angle { 45d } }                         #
+#                                                                         #
+#   and it all winds up being a call to @TextureCommand.                  #
+#                                                                         #
+###########################################################################
+
+export 
+
+    solid
+    striped
+    grid
+    dotted
+    chessboard
+    brickwork
+    honeycomb
+    triangular
+    string
+    @Texture
+
+def @TextureImport
+{
+    macro solid       { "solid"      @TextureCommand }
+    macro striped     { "striped"    @TextureCommand }
+    macro grid        { "grid"       @TextureCommand }
+    macro dotted      { "dotted"     @TextureCommand }
+    macro chessboard  { "chessboard" @TextureCommand }
+    macro brickwork   { "brickwork"  @TextureCommand }
+    macro honeycomb   { "honeycomb"  @TextureCommand }
+    macro triangular  { "triangular"  @TextureCommand }
+    macro string      { "string"     @TextureCommand }
+
+    macro @Texture    {				     }
+}

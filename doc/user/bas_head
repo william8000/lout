@@ -25,8 +25,7 @@ change this by changing the @Code "@HeadingFont" option in the setup
 headingfont. @Index @Code "@HeadingFont"
 file (Section {@NumberOf setup}).
 @PP
-The @Code "@Heading" symbol may be used with any type of document, but it
-is really intended only for simple ones.  In complex documents, large-scale
-structure symbols (Section {@NumberOf largescale}) are usually more
-appropriate.
+In complex documents, large-scale structure symbols
+(Section {@NumberOf largescale}) are usually more appropriate
+than the @Code "@Heading" symbol.
 @End @Section

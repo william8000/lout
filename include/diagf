@@ -10,8 +10,10 @@
 #                                                                             #
 ###############################################################################
 
+@SysInclude { diagf.etc }		# @Geometry
+@SysInclude { coltex }			# @ColourCommand and @TextureCommand
 @SysPrependGraphic { diagf.lpg }
-@SysInclude { diagf.etc }
+
 
 ###############################################################################
 #                                                                             #
@@ -59,7 +61,8 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
-    named paint                 	{ nopaint       	}
+    named paint                 	{ none		       	}
+    import @TextureImport named texture	{ solid			}
     named font				{			}
     named break				{			}
     named format right @Body    	{ @Body         	}
@@ -92,8 +95,8 @@ def @DiagSetup
     named nodelabelbreak		{ ragged nohyphen	}
     named nodelabelformat right @Body	{ @Body			}
     import @Geometry named nodelabelpos	{ 			}
-    named nodelabelprox			{ outside		}
     import @Geometry named nodelabelangle  { horizontal		}
+    named nodelabelprox			{ outside		}
     named nodelabelctr			{ no			}
     import @Geometry named nodelabeladjust { 0 0		}
 
@@ -103,8 +106,8 @@ def @DiagSetup
     named alabelbreak			{ 			}
     named alabelformat right @Body	{ 			}
     import @Geometry named alabelpos	{ NE			}
-    named alabelprox			{ 			}
     import @Geometry named alabelangle	{ 			}
+    named alabelprox			{ 			}
     named alabelctr			{ 			}
     import @Geometry named alabeladjust	{ 			}
 
@@ -114,8 +117,8 @@ def @DiagSetup
     named blabelbreak			{ 			}
     named blabelformat right @Body	{ 			}
     import @Geometry named blabelpos	{ NW			}
-    named blabelprox			{ 			}
     import @Geometry named blabelangle	{ 			}
+    named blabelprox			{ 			}
     named blabelctr			{ 			}
     import @Geometry named blabeladjust	{ 			}
 
@@ -125,8 +128,8 @@ def @DiagSetup
     named clabelbreak			{ 			}
     named clabelformat right @Body	{ 			}
     import @Geometry named clabelpos	{ SW			}
-    named clabelprox			{ 			}
     import @Geometry named clabelangle	{ 			}
+    named clabelprox			{ 			}
     named clabelctr			{ 			}
     import @Geometry named clabeladjust	{ 			}
 
@@ -136,8 +139,8 @@ def @DiagSetup
     named dlabelbreak			{ 			}
     named dlabelformat right @Body	{ 			}
     import @Geometry named dlabelpos	{ SE			}
-    named dlabelprox			{ 			}
     import @Geometry named dlabelangle	{ 			}
+    named dlabelprox			{ 			}
     named dlabelctr			{ 			}
     import @Geometry named dlabeladjust	{ 			}
 
@@ -171,7 +174,8 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
-    named apaint                 	{ nopaint       	}
+    named apaint                 	{ none		       	}
+    import @TextureImport named atexture{ solid			}
     named afont				{			}
     named abreak			{			}
     named aformat right @Body    	{ @Body         	}
@@ -204,8 +208,8 @@ def @DiagSetup
     named anodelabelbreak		{ ragged nohyphen	}
     named anodelabelformat right @Body	{ @Body			}
     import @Geometry named anodelabelpos{ 			}
-    named anodelabelprox		{ outside		}
     import @Geometry named anodelabelangle  { horizontal	}
+    named anodelabelprox		{ outside		}
     named anodelabelctr			{ no			}
     import @Geometry named anodelabeladjust { 0 0		}
 
@@ -215,8 +219,8 @@ def @DiagSetup
     named aalabelbreak			{ 			}
     named aalabelformat right @Body	{ 			}
     import @Geometry named aalabelpos	{ NE			}
-    named aalabelprox			{ 			}
     import @Geometry named aalabelangle	{ 			}
+    named aalabelprox			{ 			}
     named aalabelctr			{ 			}
     import @Geometry named aalabeladjust{ 			}
 
@@ -226,8 +230,8 @@ def @DiagSetup
     named ablabelbreak			{ 			}
     named ablabelformat right @Body	{ 			}
     import @Geometry named ablabelpos	{ NW			}
-    named ablabelprox			{ 			}
     import @Geometry named ablabelangle	{ 			}
+    named ablabelprox			{ 			}
     named ablabelctr			{ 			}
     import @Geometry named ablabeladjust{ 			}
 
@@ -237,8 +241,8 @@ def @DiagSetup
     named aclabelbreak			{ 			}
     named aclabelformat right @Body	{ 			}
     import @Geometry named aclabelpos	{ SW			}
-    named aclabelprox			{ 			}
     import @Geometry named aclabelangle	{ 			}
+    named aclabelprox			{ 			}
     named aclabelctr			{ 			}
     import @Geometry named aclabeladjust{ 			}
 
@@ -248,8 +252,8 @@ def @DiagSetup
     named adlabelbreak			{ 			}
     named adlabelformat right @Body	{ 			}
     import @Geometry named adlabelpos	{ SE			}
-    named adlabelprox			{ 			}
     import @Geometry named adlabelangle	{ 			}
+    named adlabelprox			{ 			}
     named adlabelctr			{ 			}
     import @Geometry named adlabeladjust{ 			}
 
@@ -283,7 +287,8 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
-    named bpaint                 	{ nopaint       	}
+    named bpaint                 	{ none		       	}
+    import @TextureImport named btexture{ solid			}
     named bfont				{			}
     named bbreak			{			}
     named bformat right @Body    	{ @Body         	}
@@ -316,8 +321,8 @@ def @DiagSetup
     named bnodelabelbreak		{ ragged nohyphen	}
     named bnodelabelformat right @Body	{ @Body			}
     import @Geometry named bnodelabelpos{ 			}
-    named bnodelabelprox		{ outside		}
     import @Geometry named bnodelabelangle  { horizontal	}
+    named bnodelabelprox		{ outside		}
     named bnodelabelctr			{ no			}
     import @Geometry named bnodelabeladjust { 0 0		}
 
@@ -395,7 +400,8 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
-    named cpaint                 	{ nopaint       	}
+    named cpaint                 	{ none		       	}
+    import @TextureImport named ctexture{ solid			}
     named cfont				{			}
     named cbreak			{			}
     named cformat right @Body    	{ @Body         	}
@@ -428,8 +434,8 @@ def @DiagSetup
     named cnodelabelbreak		{ ragged nohyphen	}
     named cnodelabelformat right @Body	{ @Body			}
     import @Geometry named cnodelabelpos{ 			}
-    named cnodelabelprox		{ outside		}
     import @Geometry named cnodelabelangle  { horizontal	}
+    named cnodelabelprox		{ outside		}
     named cnodelabelctr			{ no			}
     import @Geometry named cnodelabeladjust { 0 0		}
 
@@ -439,8 +445,8 @@ def @DiagSetup
     named calabelbreak			{ 			}
     named calabelformat right @Body	{ 			}
     import @Geometry named calabelpos	{ NE			}
-    named calabelprox			{ 			}
     import @Geometry named calabelangle	{ 			}
+    named calabelprox			{ 			}
     named calabelctr			{ 			}
     import @Geometry named calabeladjust{ 			}
 
@@ -450,8 +456,8 @@ def @DiagSetup
     named cblabelbreak			{ 			}
     named cblabelformat right @Body	{ 			}
     import @Geometry named cblabelpos	{ NW			}
-    named cblabelprox			{ 			}
     import @Geometry named cblabelangle	{ 			}
+    named cblabelprox			{ 			}
     named cblabelctr			{ 			}
     import @Geometry named cblabeladjust{ 			}
 
@@ -461,8 +467,8 @@ def @DiagSetup
     named cclabelbreak			{ 			}
     named cclabelformat right @Body	{ 			}
     import @Geometry named cclabelpos	{ SW			}
-    named cclabelprox			{ 			}
     import @Geometry named cclabelangle	{ 			}
+    named cclabelprox			{ 			}
     named cclabelctr			{ 			}
     import @Geometry named cclabeladjust{ 			}
 
@@ -472,8 +478,8 @@ def @DiagSetup
     named cdlabelbreak			{ 			}
     named cdlabelformat right @Body	{ 			}
     import @Geometry named cdlabelpos	{ SE			}
-    named cdlabelprox			{ 			}
     import @Geometry named cdlabelangle	{ 			}
+    named cdlabelprox			{ 			}
     named cdlabelctr			{ 			}
     import @Geometry named cdlabeladjust{ 			}
 
@@ -498,6 +504,7 @@ def @DiagSetup
 	named topt {}
 	named arrow {}
 	named arrowlength {}
+	named backarrowlength {}
 					{ line			}
     import @Geometry named from		{ 0,0			}
     import @Geometry named to		{ 1,1			}
@@ -533,6 +540,9 @@ def @DiagSetup
     named arrowstyle             	{ solid			}
     named arrowwidth             	{ 0.3f			}
     named arrowlength            	{ 0.5f			}
+    named backarrowstyle             	{ solid			}
+    named backarrowwidth             	{ 0.3f			}
+    named backarrowlength            	{ 0.5f			}
 
     named linklabel			{			}
     named linklabelmargin		{ 0.2f			}
@@ -540,8 +550,8 @@ def @DiagSetup
     named linklabelbreak		{ ragged nohyphen	}
     named linklabelformat right @Body	{ @Body			}
     import @Geometry named linklabelpos	{ 			}
-    named linklabelprox			{ above			}
     import @Geometry named linklabelangle  { horizontal		}
+    named linklabelprox			{ above			}
     named linklabelctr			{ no			}
     import @Geometry named linklabeladjust { 0 0		}
 
@@ -551,8 +561,8 @@ def @DiagSetup
     named xlabelbreak			{ 			}
     named xlabelformat right @Body	{ 			}
     import @Geometry named xlabelpos	{ LFROM			}
-    named xlabelprox			{ 			}
     import @Geometry named xlabelangle	{ 			}
+    named xlabelprox			{ 			}
     named xlabelctr			{			}
     import @Geometry named xlabeladjust	{ 			}
 
@@ -562,8 +572,8 @@ def @DiagSetup
     named ylabelbreak			{ 			}
     named ylabelformat right @Body	{ 			}
     import @Geometry named ylabelpos	{ LMID			}
-    named ylabelprox			{ 			}
     import @Geometry named ylabelangle	{ 			}
+    named ylabelprox			{ 			}
     named ylabelctr			{ yes			}
     import @Geometry named ylabeladjust	{ 			}
 
@@ -573,8 +583,8 @@ def @DiagSetup
     named zlabelbreak			{ 			}
     named zlabelformat right @Body	{ 			}
     import @Geometry named zlabelpos	{ LTO			}
-    named zlabelprox			{ 			}
     import @Geometry named zlabelangle	{ 			}
+    named zlabelprox			{ 			}
     named zlabelctr			{			}
     import @Geometry named zlabeladjust	{ 			}
 
@@ -584,8 +594,8 @@ def @DiagSetup
     named fromlabelbreak		{ ragged nohyphen	}
     named fromlabelformat right @Body	{ @Body			}
     import @Geometry named fromlabelpos	{ FROM			}
-    named fromlabelprox			{ W			}
     import @Geometry named fromlabelangle  { antiparallel	}
+    named fromlabelprox			{ W			}
     named fromlabelctr			{ no			}
     import @Geometry named fromlabeladjust { 0 0		}
 
@@ -595,8 +605,8 @@ def @DiagSetup
     named tolabelbreak			{ ragged nohyphen	}
     named tolabelformat right @Body	{ @Body			}
     import @Geometry named tolabelpos	{ TO			}
-    named tolabelprox			{ W			}
     import @Geometry named tolabelangle	{ parallel		}
+    named tolabelprox			{ W			}
     named tolabelctr			{ no			}
     import @Geometry named tolabeladjust { 0 0			}
 
@@ -707,6 +717,7 @@ def @DiagSetup
 	    named thick  { 0.12 ft }
 						{ outlinewidth     	}
         named paint                 		{ paint         	}
+	import @TextureImport named texture	{ texture		}
 	named font				{ font			}
 	named break				{ break			}
         named format right @Body    		{ format @Body  	}
@@ -768,6 +779,7 @@ def @DiagSetup
 	    named thick  { 0.12 ft }
 						{ aoutlinewidth     	}
         named apaint                 		{ apaint         	}
+	import @TextureImport named atexture	{ atexture		}
 	named afont				{ afont			}
 	named abreak				{ abreak		}
         named aformat right @Body    		{ aformat @Body  	}
@@ -829,6 +841,7 @@ def @DiagSetup
 	    named thick  { 0.12 ft }
 						{ boutlinewidth     	}
         named bpaint                 		{ bpaint         	}
+	import @TextureImport named btexture	{ btexture		}
 	named bfont				{ bfont			}
 	named bbreak				{ bbreak		}
         named bformat right @Body    		{ bformat @Body  	}
@@ -890,6 +903,7 @@ def @DiagSetup
 	    named thick  { 0.12 ft }
 						{ coutlinewidth     	}
         named cpaint                 		{ cpaint         	}
+	import @TextureImport named ctexture	{ ctexture		}
 	named cfont				{ cfont			}
 	named cbreak				{ cbreak		}
         named cformat right @Body    		{ cformat @Body  	}
@@ -935,6 +949,7 @@ def @DiagSetup
 	    named topt {}
 	    named arrow {}
 	    named arrowlength {}
+	    named backarrowlength {}
 						{ path
 						    from	{ from }
 						    to		{ to   }
@@ -950,6 +965,7 @@ def @DiagSetup
 						    topt	{ topt }
 						    arrow	{ arrow }
 						    arrowlength	{ arrowlength }
+						    backarrowlength{ backarrowlength }
 						}
 	import @Geometry named from		{ from			}
 	import @Geometry named to		{ to			}
@@ -985,6 +1001,9 @@ def @DiagSetup
 	named arrowstyle			{ arrowstyle		}
 	named arrowwidth			{ arrowwidth		}
 	named arrowlength			{ arrowlength		}
+	named backarrowstyle			{ backarrowstyle	}
+	named backarrowwidth			{ backarrowwidth	}
+	named backarrowlength			{ backarrowlength	}
 
 	named nodelabel				{ nodelabel		}
 	named nodelabelmargin			{ nodelabelmargin	}
@@ -1138,14 +1157,11 @@ def @DiagSetup
 	#                                                                     #
 	#######################################################################
 
-# include @ColourCommand symbol
-@SysInclude { ccommand }
-
-        def @PSAddPaint right col
+        def @PSAddPaint left col right tex
 	{
 	  col @Case {
-	    { "none" "nopaint" } @Yield "{}"
-	    else             @Yield { "{" @ColourCommand col "fill }" }
+	    { "no" "none" "nopaint" } @Yield "{}"
+	    else             @Yield { "{" @ColourCommand col tex "fill }" }
 	  }
 	}
 
@@ -2264,6 +2280,7 @@ def @DiagSetup
 		named thick  { 0.12 ft }
 						{ outlinewidth     	}
             named paint				{ paint         	}
+            import @TextureImport named texture	{ texture         	}
 	    named font				{ font			}
 	    named break				{ break			}
             named format right @Body		{ format @Body  	}
@@ -2517,7 +2534,7 @@ def @DiagSetup
 		    {
 			"ldiagnodebegin [" @OutLine "]"
 			outlinedashlength "[" outlinestyle "]"
-			outlinewidth @PSAddPaint paint "ldiagnodeend"
+			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -2607,6 +2624,7 @@ def @DiagSetup
 		named thick  { 0.12 ft }
 						{ aoutlinewidth     	}
             named paint				{ apaint         	}
+            import @TextureImport named texture	{ atexture         	}
 	    named font				{ afont			}
 	    named break				{ abreak			}
             named format right @Body		{ aformat @Body  	}
@@ -2860,7 +2878,7 @@ def @DiagSetup
 		    {
 			"ldiagnodebegin [" @OutLine "]"
 			outlinedashlength "[" outlinestyle "]"
-			outlinewidth @PSAddPaint paint "ldiagnodeend"
+			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -2950,6 +2968,7 @@ def @DiagSetup
 		named thick  { 0.12 ft }
 						{ boutlinewidth     	}
             named paint				{ bpaint         	}
+            import @TextureImport named texture	{ btexture         	}
 	    named font				{ bfont			}
 	    named break				{ bbreak			}
             named format right @Body		{ bformat @Body  	}
@@ -3203,7 +3222,7 @@ def @DiagSetup
 		    {
 			"ldiagnodebegin [" @OutLine "]"
 			outlinedashlength "[" outlinestyle "]"
-			outlinewidth @PSAddPaint paint "ldiagnodeend"
+			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -3293,6 +3312,7 @@ def @DiagSetup
 		named thick  { 0.12 ft }
 						{ coutlinewidth     	}
             named paint				{ cpaint         	}
+            import @TextureImport named texture	{ ctexture         	}
 	    named font				{ cfont			}
 	    named break				{ cbreak			}
             named format right @Body		{ cformat @Body  	}
@@ -3546,7 +3566,7 @@ def @DiagSetup
 		    {
 			"ldiagnodebegin [" @OutLine "]"
 			outlinedashlength "[" outlinestyle "]"
-			outlinewidth @PSAddPaint paint "ldiagnodeend"
+			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -3637,6 +3657,7 @@ def @DiagSetup
 	{
 	    @InsulatedNode
 		paint { nochange }
+		texture { solid }
 		outlinestyle { noline }
 		outlinewidth { pathwidth }
 		outline {
@@ -3662,6 +3683,7 @@ def @DiagSetup
 		outlinewidth { pathwidth }
 		outlinestyle { noline }
 		paint { nochange }
+		texture { solid }
 		outline {
 		  @BackEnd @Case {
 		    PostScript @Yield {
@@ -3696,6 +3718,7 @@ def @DiagSetup
 	{
 	    @InsulatedNode
 		paint { nochange }
+		texture { solid }
 		outlinestyle { noline }
 		outlinewidth { pathwidth }
 		outline {
@@ -3728,6 +3751,7 @@ def @DiagSetup
 	    @InsulatedNode
 		outlinestyle { noline }
 		paint { nochange }
+		texture { solid }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -3757,6 +3781,7 @@ def @DiagSetup
 	    @InsulatedNode
 		outlinestyle { noline }
 		paint { nochange }
+		texture { solid }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -3800,6 +3825,7 @@ def @DiagSetup
 	    @InsulatedNode
 		outlinestyle { noline }
 		paint { nochange }
+		texture { solid }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -3844,6 +3870,7 @@ def @DiagSetup
 	    @InsulatedNode
 		outlinestyle { noline }
 		paint { nochange }
+		texture { solid }
 		outlinewidth { pathwidth }
 		outline { circle }
 	    { length @Wide length @High }
@@ -3857,6 +3884,7 @@ def @DiagSetup
 	    @InsulatedNode
 		outlinestyle { noline }
 		paint { nochange }
+		texture { solid }
 		outlinewidth { pathwidth }
 		outline { box }
 	    { length @Wide width @High }
@@ -3919,6 +3947,7 @@ def @DiagSetup
                 named topt {}
                 named arrow {}
                 named arrowlength {}
+                named backarrowlength {}
             					{ path
 						    from { from }
 						    to { to }
@@ -3933,7 +3962,7 @@ def @DiagSetup
 						    frompt { frompt }
 						    topt { topt }
 						    arrow { arrow }
-						    arrowlength { arrowlength }
+						    backarrowlength { backarrowlength }
 						}
             import @Geometry named from		{ from			}
             import @Geometry named to		{ to			}
@@ -3946,7 +3975,7 @@ def @DiagSetup
             import @Geometry named xindent	{ xindent		}
             import @Geometry named zindent	{ zindent		}
             import @Geometry named frompt	{ frompt		}
-            import @Geometry named topt		{ topt		}
+            import @Geometry named topt		{ topt			}
             named pathstyle
 		named solid   { "/ldiagsolid"   }
 		named dashed  { "/ldiagdashed"  }
@@ -3970,6 +3999,9 @@ def @DiagSetup
             named arrowstyle			{ arrowstyle		}
             named arrowwidth			{ arrowwidth		}
             named arrowlength			{ arrowlength		}
+            named backarrowstyle		{ backarrowstyle	}
+            named backarrowwidth		{ backarrowwidth	}
+            named backarrowlength		{ backarrowlength	}
 
 	    named linklabel			{ linklabel		}
 	    named linklabelmargin		{ linklabelmargin	}
@@ -4091,9 +4123,9 @@ def @DiagSetup
 		arrow @Case {
 		    { back both } @Yield {
 			@ArrowHead
-			    style { arrowstyle }
-			    width { arrowwidth }
-			    length { arrowlength }
+			    style { backarrowstyle }
+			    width { backarrowwidth }
+			    length { backarrowlength }
 			    pathwidth { pathwidth }
 		    }
 		    else @Yield ""
@@ -4119,13 +4151,13 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	       {arrow @FromArrowLength arrowlength}
+	       {arrow @FromArrowLength backarrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
 	       xindent zindent "ldiaglinepath"
                # FROM	:< {from??CTR angleto to??CTR}
                # FROM	:: from boundaryatangle FROM@ANGLE
-               # 	++ {arrow @FromArrowLength arrowlength}atangle FROM@ANGLE
+               # 	++ {arrow @FromArrowLength backarrowlength}atangle FROM@ANGLE
                # TO  	:< FROM@ANGLE
                # TO  	:: to boundaryatangle { TO@ANGLE - 180d }
                # ++ {arrow @ToArrowLength arrowlength} atangle {TO@ANGLE - 180d}
@@ -4152,13 +4184,13 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	       {arrow @FromArrowLength arrowlength}
+	       {arrow @FromArrowLength backarrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
 	       xindent zindent pathgap "ldiagdoublelinepath"
                # FROM	:< {from??CTR angleto to??CTR}
                # FROM	:: from boundaryatangle FROM@ANGLE
-               # 	++ {arrow @FromArrowLength arrowlength}atangle FROM@ANGLE
+               # 	++ {arrow @FromArrowLength backarrowlength}atangle FROM@ANGLE
                # TO  	:< FROM@ANGLE
                # TO  	:: to boundaryatangle { TO@ANGLE - 180d }
                # ++ {arrow @ToArrowLength arrowlength} atangle {TO@ANGLE - 180d}
@@ -4185,7 +4217,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	       {arrow @FromArrowLength arrowlength}
+	       {arrow @FromArrowLength backarrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
 	       xindent zindent bias "ldiagacurvepath"
@@ -4199,7 +4231,7 @@ def @DiagSetup
                #  	     to??CTR   XTOP ldiaglinebetween ldiaglineintersect }
                #  FROM	:: aabout
                #  		circum { from }
-               #  		extra  { arrow @FromArrowLength arrowlength }
+               #  		extra  { arrow @FromArrowLength backarrowlength }
                #  		centre { CTR }
 	       #  FROM 	:< if cond { from??CTR distance FROM > 0 }
                #  	      then { from??CTR angleto FROM }
@@ -4241,7 +4273,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	       {arrow @FromArrowLength arrowlength}
+	       {arrow @FromArrowLength backarrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
 	       xindent zindent bias "ldiagccurvepath"
@@ -4255,7 +4287,7 @@ def @DiagSetup
               #              to??CTR   XTOP ldiaglinebetween ldiaglineintersect }
               #  FROM   :: cabout
               #                  circum { from }
-              #                  extra  { arrow @FromArrowLength arrowlength }
+              #                  extra  { arrow @FromArrowLength backarrowlength }
               #                  centre { CTR }
               #  FROM   :< if cond { from??CTR distance FROM > 0 }
               #               then { from??CTR angleto FROM }
@@ -4298,13 +4330,13 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	       {arrow @FromArrowLength arrowlength}
+	       {arrow @FromArrowLength backarrowlength}
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
 	       xindent zindent [ frompt ] [ topt ] "ldiagbezierpath"
               # FROM      :< from??CTR angleto frompt
               # FROM      :: from boundaryatangle FROM@ANGLE
-              # ++ {arrow @FromArrowLength arrowlength} atangle FROM@ANGLE
+              # ++ {arrow @FromArrowLength backarrowlength} atangle FROM@ANGLE
               # TO        :< topt angleto to??CTR
               # TO        :: to boundaryatangle { TO@ANGLE + 180d }
               # ++ {arrow @ToArrowLength arrowlength} atangle { TO@ANGLE + 180d }
@@ -4324,7 +4356,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent "ldiagvhlinepath"
@@ -4332,7 +4364,7 @@ def @DiagSetup
               # FANG    := from??CTR angleto CTR
               # TANG    := to??CTR angleto CTR
               # FROM    :: from boundaryatangle FANG
-              # ++ {arrow @FromArrowLength arrowlength} atangle FANG
+              # ++ {arrow @FromArrowLength backarrowlength} atangle FANG
               # FROM    :< FANG
               # TO      :: to boundaryatangle TANG
               # ++ {arrow @ToArrowLength arrowlength} atangle TANG
@@ -4359,7 +4391,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent radius "ldiagvhcurvepath"
@@ -4367,7 +4399,7 @@ def @DiagSetup
               # FANG    := from??CTR angleto CTR
               # TANG    := to??CTR angleto CTR
               # FROM    :: from boundaryatangle FANG
-              # ++ {arrow @FromArrowLength arrowlength} atangle FANG
+              # ++ {arrow @FromArrowLength backarrowlength} atangle FANG
               # FROM    :< FANG
               # TO      :: to boundaryatangle TANG
               # ++ {arrow @ToArrowLength arrowlength} atangle TANG
@@ -4408,7 +4440,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent "ldiaghvlinepath"
@@ -4416,7 +4448,7 @@ def @DiagSetup
               # FANG    := from??CTR angleto CTR
               # TANG    := to??CTR angleto CTR
               # FROM    :: from boundaryatangle FANG
-              # ++ {arrow @FromArrowLength arrowlength} atangle FANG
+              # ++ {arrow @FromArrowLength backarrowlength} atangle FANG
               # FROM    :< FANG
               # TO      :: to boundaryatangle TANG
               # ++ {arrow @ToArrowLength arrowlength} atangle TANG
@@ -4443,7 +4475,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent radius "ldiaghvcurvepath"
@@ -4451,7 +4483,7 @@ def @DiagSetup
               # FANG    := from??CTR angleto CTR
               # TANG    := to??CTR angleto CTR
               # FROM    :: from boundaryatangle FANG
-              # ++ {arrow @FromArrowLength arrowlength} atangle FANG
+              # ++ {arrow @FromArrowLength backarrowlength} atangle FANG
               # FROM    :< FANG
               # TO      :: to boundaryatangle TANG
               # ++ {arrow @ToArrowLength arrowlength} atangle TANG
@@ -4492,12 +4524,12 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent bias "ldiaglvrlinepath"
               # FROM    :: from boundaryatangle 180d
-              # ++ {arrow @FromArrowLength arrowlength} atangle 180d
+              # ++ {arrow @FromArrowLength backarrowlength} atangle 180d
               # FROM    :< 180d
               # TO      :: to boundaryatangle 180d
               # ++ {arrow @ToArrowLength arrowlength} atangle 180d
@@ -4527,12 +4559,12 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent bias radius "ldiaglvrcurvepath"
               # FROM    :: from boundaryatangle 180d
-              # ++ {arrow @FromArrowLength arrowlength} atangle 180d
+              # ++ {arrow @FromArrowLength backarrowlength} atangle 180d
               # FROM    :< 180d
               # TO      :: to boundaryatangle 180d
               # ++ {arrow @ToArrowLength arrowlength} atangle 180d
@@ -4579,12 +4611,12 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent bias "ldiagrvllinepath"
               # FROM    :: from boundaryatangle 0d
-              # ++ {arrow @FromArrowLength arrowlength} atangle 0d
+              # ++ {arrow @FromArrowLength backarrowlength} atangle 0d
               # FROM    :< 0d
               # TO      :: to boundaryatangle 0d
               # ++ {arrow @ToArrowLength arrowlength} atangle 0d
@@ -4614,12 +4646,12 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent bias radius "ldiagrvlcurvepath"
               # FROM    :: from boundaryatangle 0d
-              # ++ {arrow @FromArrowLength arrowlength} atangle 0d
+              # ++ {arrow @FromArrowLength backarrowlength} atangle 0d
               # FROM    :< 0d
               # TO      :: to boundaryatangle 0d
               # ++ {arrow @ToArrowLength arrowlength} atangle 0d
@@ -4667,7 +4699,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent hfrac hbias "ldiaghvhlinepath"
@@ -4676,7 +4708,7 @@ def @DiagSetup
 	      #	    180 { 180d } 180-270 { 180d } 270 { 180d } 270-360 { 0d }}
 	      # TODIRN  := {FRDIRN + 180d}
 	      # FROM    :: from boundaryatangle FRDIRN ++
-	      #     {arrow @FromArrowLength arrowlength} atangle FRDIRN
+	      #     {arrow @FromArrowLength backarrowlength} atangle FRDIRN
 	      # FROM    :< FRDIRN
 	      # TO      :: to boundaryatangle TODIRN ++
 	      #	    {arrow @ToArrowLength arrowlength} atangle TODIRN
@@ -4704,7 +4736,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent hfrac hbias radius "ldiaghvhcurvepath"
@@ -4713,7 +4745,7 @@ def @DiagSetup
 	      #     180 { 180d } 180-270 { 180d } 270 { 180d } 270-360 { 0d }}
 	      # TODIRN  := {FRDIRN + 180d}
 	      # FROM    :: from boundaryatangle FRDIRN ++
-	      #     {arrow @FromArrowLength arrowlength} atangle FRDIRN
+	      #     {arrow @FromArrowLength backarrowlength} atangle FRDIRN
 	      # FROM    :< FRDIRN
 	      # TO      :: to boundaryatangle TODIRN ++
 	      #     {arrow @ToArrowLength arrowlength} atangle TODIRN
@@ -4759,12 +4791,12 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent hfrac hbias "ldiagvhvlinepath"
               # FROM    :: from boundaryatangle 0d
-              # ++ {arrow @FromArrowLength arrowlength} atangle 0d
+              # ++ {arrow @FromArrowLength backarrowlength} atangle 0d
               # FROM    :< 0d
               # TO      :: to boundaryatangle 0d
               # ++ {arrow @ToArrowLength arrowlength} atangle 0d
@@ -4794,7 +4826,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent hfrac hbias radius "ldiagvhvcurvepath"
@@ -4851,14 +4883,14 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent bias fbias tbias "ldiagdwraplinepath"
               # DIRN	:= if cond { xcoord from??CTR < xcoord to??CTR }
               # 	      then { 180d } else { 0d }
               # FROM	:: from boundaryatangle DIRN
-              # ++ {arrow @FromArrowLength arrowlength} atangle DIRN
+              # ++ {arrow @FromArrowLength backarrowlength} atangle DIRN
               # FROM	:< DIRN
               # TO	:: to boundaryatangle { DIRN + 180d }
               # ++ {arrow @ToArrowLength arrowlength} atangle { DIRN + 180d }
@@ -4893,7 +4925,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent bias fbias tbias radius "ldiagdwrapcurvepath"
@@ -4902,7 +4934,7 @@ def @DiagSetup
               # CLOCK	:= if cond { xcoord from??CTR < xcoord to??CTR }
               # 	      then { anticlockwise } else { clockwise }
               # FROM	:: from boundaryatangle DIRN
-              # ++ {arrow @FromArrowLength arrowlength} atangle DIRN
+              # ++ {arrow @FromArrowLength backarrowlength} atangle DIRN
               # FROM	:< DIRN
               # TO	:: to boundaryatangle { DIRN + 180d }
               # ++ {arrow @ToArrowLength arrowlength} atangle { DIRN + 180d }
@@ -4976,14 +5008,14 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent bias fbias tbias "ldiaguwraplinepath"
               # DIRN	:= if cond { xcoord from??CTR < xcoord to??CTR }
               # 	      then { 180d } else { 0d }
               # FROM	:: from boundaryatangle DIRN
-              # ++ {arrow @FromArrowLength arrowlength} atangle DIRN
+              # ++ {arrow @FromArrowLength backarrowlength} atangle DIRN
               # FROM	:< DIRN
               # TO	:: to boundaryatangle { DIRN + 180d }
               # ++ {arrow @ToArrowLength arrowlength} atangle { DIRN + 180d }
@@ -5018,7 +5050,7 @@ def @DiagSetup
 	    {
 		@BackEnd @Case {
 		  PostScript @Yield {
-	      {arrow @FromArrowLength arrowlength}
+	      {arrow @FromArrowLength backarrowlength}
 	      {arrow @ToArrowLength arrowlength}
 	      "{" from "}" "{" to "}"
 	      xindent zindent bias fbias tbias radius "ldiaguwrapcurvepath"
@@ -5027,7 +5059,7 @@ def @DiagSetup
               # CLOCK	:= if cond { xcoord from??CTR < xcoord to??CTR }
               # 	      then { clockwise } else { anticlockwise }
               # FROM	:: from boundaryatangle DIRN
-              # ++ {arrow @FromArrowLength arrowlength} atangle DIRN
+              # ++ {arrow @FromArrowLength backarrowlength} atangle DIRN
               # FROM	:< DIRN
               # TO	:: to boundaryatangle { DIRN + 180d }
               # ++ {arrow @ToArrowLength arrowlength} atangle { DIRN + 180d }
@@ -5137,6 +5169,7 @@ def @DiagSetup
 			    topt { topt }
 			    arrow { arrow }
 			    arrowlength { arrowlength }
+			    backarrowlength { backarrowlength }
 		    }
 		}
 	    }
@@ -5233,6 +5266,7 @@ def @DiagSetup
                 named topt {}
                 named arrow {}
                 named arrowlength {}
+                named backarrowlength {}
             					{ path
 						    from { from }
 						    to { to }
@@ -5248,6 +5282,7 @@ def @DiagSetup
 						    topt { topt }
 						    arrow { arrow }
 						    arrowlength { arrowlength }
+						    backarrowlength { backarrowlength }
 						}
             import @Geometry named basefrom	{ 			}
             import @Geometry named baseto	{ 			}
@@ -5286,6 +5321,9 @@ def @DiagSetup
             named arrowstyle			{ arrowstyle		}
             named arrowwidth			{ arrowwidth		}
             named arrowlength			{ arrowlength		}
+            named backarrowstyle		{ backarrowstyle		}
+            named backarrowwidth		{ backarrowwidth		}
+            named backarrowlength		{ backarrowlength		}
 
 	    named linklabel			{ linklabel		}
 	    named linklabelmargin		{ linklabelmargin	}
@@ -5405,6 +5443,7 @@ def @DiagSetup
 						topt { topt }
 						arrow { arrow }
 						arrowlength { arrowlength }
+						backarrowlength { backarrowlength }
 					}
 			pathstyle	{ pathstyle		}
 			pathdashlength	{ pathdashlength	}
@@ -5414,6 +5453,9 @@ def @DiagSetup
 			arrowstyle	{ arrowstyle		}
 			arrowwidth	{ arrowwidth		}
 			arrowlength	{ arrowlength		}
+			backarrowstyle	{ backarrowstyle	}
+			backarrowwidth	{ backarrowwidth	}
+			backarrowlength	{ backarrowlength	}
 
 			linklabel	{ linklabel		}
 			linklabelmargin	{ linklabelmargin	}
@@ -6712,5 +6754,6 @@ def @DiagSetup
 	    chsize { 1f }
 
 	    arrowlength { 0.4f }
+	    backarrowlength { 0.4f }
     }
 }

@@ -51,7 +51,7 @@ exception is @@LinkSource, whose left parameter is ignored during
 equality testing, since otherwise there would be problems in the
 appearance of melded clickable index entries.
 @PP
-Style changing operations (@@Font, @@Colour etc.) are not considered
+Style changing operations (@@Font, @@SetColour etc.) are not considered
 in equality testing, since these have been processed and deleted by the
 time that the tests are done.  Also, Lout tries hard to get rid of
 redundant braces around concatenation objects, which is why
@@ -68,7 +68,7 @@ have the same style.  For example,
 would be treated internally as one word, whereas
 @ID @Code "{Hello}{yellow @Colour world}"
 would be treated as two adjacent words.  Thus, although @@Font,
-@@Colour, and the other style operators are ignored in equality
+@@SetColour, and the other style operators are ignored in equality
 testing, they may affect the structure of the objects they lie
 within.
 @PP

@@ -316,11 +316,28 @@ Changes and new features introduced in Version 3.26 [October 2002]
     Merged index entries completely reimplemented
     @DropTagItem (@DTI) now prevents page break after drop tag
 
-Things that ought to be done but haven't been done yet
+Changes and new features introduced in Version 3.27 [22 November 2002]
 
-    Fix bug in table running headers code
-    Fix bug in index header placement when there are multiple indexes
-    Column-width footnotes in full-width pages.
+    Fixes for all bugs, including table running headers and index headers
+    Repeated @PrependGraphic of same file allowed and ignored
+    Repeated @Include of same file of definitions allowed and ignored
+    Pie graphs (see new chapter of User's Guide)
+    Textures, a.k.a. patterns (see new section of Basic Graphics chapter,
+      and revisions to @Tbl, @Pie, @Diag, and @Graph chapters)
+    User's Guide no longer mentions @Diag lengths (1.2 cm, 0.5 ft etc),
+      although they are still available for backward compatibility
+    Arrowheads at opposite ends of a @Diag link now each have own style,
+      length, and width (NB this is marginally not upward compatible)
+    User's Guide now recommends "paint { none }" to get no paint, although
+      the old "nopaint" value is still available for backward compatibility
+    Any line anywhere can end in any of \n, \r, \r\n, or \n\r
+    26 more strings recognised as keywords in @CP C/C++ printing
+    Lots more named colours using Mark Summerfield's @Xrgb symbol
+    Glossaries, following a design by Thorsten Seitz
+    @IndexFormat, @SubIndexFormat, @SubSubIndexFormat options for
+      changing the format of index entries
+    @IndexSpacer and @IndexLetters - spacers (headers) within indexes
+    In @Diag, @Box and @ShadowBox now have NNW, NNE, SSW, and SSE tags
+    User's Guide has revised and larger (17-page) index
 
 Jeff Kingston
-undated

@@ -4,14 +4,19 @@
 @Begin
 @PP
 @Code "@Diag" has one basic symbol for creating nodes.  It is called
-node. @Index { @Code "@Node" }
+diagrams. @RawIndex { diagrams }
+diagrams.node @SubIndex { @Code "@Node" symbol }
+node.diagrams @Index { @Code "@Node" symbol (diagrams) }
 {@Code "@Node"}, and it takes the following object and encloses it in an
 outline whose shape is determined by the {@Code "outline"} option:
+diagrams. @RawIndex { diagrams }
+diagrams.outline @SubIndex { @Code "outline" option }
+outline.diagrams @Index { @Code "outline" option (diagrams) }
 @ID {
-@Code {
-"@Node"
-"    outline { curvebox }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Node
+    outline { curvebox }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -29,13 +34,16 @@ produce standard shapes:  {@Code box}, {@Code curvebox}, {@Code shadowbox},
 The shape of the outline is determined by the @Code outline option, but
 its size and position depend on the size and position of its
 {@I base}:  the following object with a small margin around it.  For
+diagrams. @RawIndex { diagrams }
+diagrams.base @SubIndex { base of a node }
+base.diagrams @Index { base of a node in diagrams }
 example, this is how a circle is positioned over its base (shown in
 grey):
 @ID @OneRow {
-@Code {
-"@Node"
-"    outline { circle }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Node
+    outline { circle }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -55,14 +63,14 @@ exception share the following very useful property:  they may be given
 to the @Code "@Diag" symbol as well, where they apply to every node in
 the diagram:
 @ID @OneRow {
-@Code {
-"@Diag"
-"    outline { circle }"
-"{"
-"    @Node @I a"
-"    @DP"
-"    @Node @I b"
-"}"
+@Code @Verbatim {
+@Diag
+    outline { circle }
+{
+    @Node @I a
+    @DP
+    @Node @I b
+}
 }
 ||7ct
 @Diag
@@ -88,9 +96,15 @@ its own combination of options (for example, the syntax diagrams of
 Section {@NumberOf dia_synt} have three node types).  To handle these
 cases there are three alternative versions of the @Code "@Node"
 symbol, called {@Code "@ANode"}, {@Code "@BNode"}, and
-anode.fig @Index { @Code "@ANode" in @Code "@Diag" }
-bnode.fig @Index { @Code "@BNode" in @Code "@Diag" }
-cnode.fig @Index { @Code "@CNode" in @Code "@Diag" }
+diagrams. @RawIndex { diagrams }
+diagrams.anode @SubIndex { @Code "@ANode" symbol }
+anode.diagrams @Index { @Code "@ANode" symbol (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.bnode @SubIndex { @Code "@BNode" symbol }
+bnode.diagrams @Index { @Code "@BNode" symbol (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.cnode @SubIndex { @Code "@CNode" symbol }
+cnode.diagrams @Index { @Code "@CNode" symbol (diagrams) }
 {@Code "@CNode"}.  These have exactly the same options as
 {@Code "@Node"}, but the @I default values of these options
 are different, in that they come from @Code "@Diag" options,
@@ -130,33 +144,55 @@ setup file is omitted.
 To save time in simple cases, @Code "@Diag" provides nine other
 node symbols called
 {@Code "@Box"},
-box.fig @Index { @Code "@Box" in @Code "@Diag" }
+diagrams. @RawIndex { diagrams }
+diagrams.box @SubIndex { @Code "@Box" symbol }
+boxzzz.diagrams @Index { @Code "@Box" symbol (diagrams) }
 {@Code "@CurveBox"},
-curvebox.fig @Index { @Code "@CurveBox" in @Code "@Diag" }
+diagrams. @RawIndex { diagrams }
+diagrams.curvebox @SubIndex { @Code "@CurveBox" symbol }
+curvebox.diagrams @Index { @Code "@CurveBox" symbol (diagrams) }
 {@Code "@ShadowBox"},
-shadowbox.fig @Index { @Code "@ShadowBox" in @Code "@Diag" }
+diagrams. @RawIndex { diagrams }
+diagrams.shadowbox @SubIndex { @Code "@ShadowBox" symbol }
+shadowbox.diagrams @Index { @Code "@ShadowBox" symbol (diagrams) }
 {@Code "@Square"},
-square. @Index @Code "@Square"
+diagrams. @RawIndex { diagrams }
+diagrams.square @SubIndex { @Code "@Square" symbol }
+square.diagrams @Index { @Code "@Square" symbol (diagrams) }
 {@Code "@Diamond"},
-diamond. @Index @Code "@Diamond"
+diagrams. @RawIndex { diagrams }
+diagrams.diamond @SubIndex { @Code "@Diamond" symbol }
+diamond.diagrams @Index { @Code "@Diamond" symbol (diagrams) }
 {@Code "@Polygon"},
+diagrams. @RawIndex { diagrams }
+diagrams.polygon @SubIndex { @Code "@Polygon" symbol }
 {@Code "@Isosceles"},
-isosceles. @Index @Code "@Isosceles"
+diagrams. @RawIndex { diagrams }
+diagrams.isosceles @SubIndex { @Code "@Isosceles" symbol }
+isosceles.diagrams @Index { @Code "@Isosceles" symbol (diagrams) }
 {@Code "@Ellipse"},
-ellipse. @Index @Code "@Ellipse"
+diagrams. @RawIndex { diagrams }
+diagrams.ellipse @SubIndex { @Code "@Ellipse" symbol }
+ellipse.diagrams @Index { @Code "@Ellipse" symbol (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.circle @SubIndex { @Code "@Circle" symbol }
+circle.diagrams @Index { @Code "@Circle" symbol (diagrams) }
 and {@Code "@Circle"}.  These are just abbreviations for @Code "@Node"
 with the appropriate value of {@Code outline}, nothing more.  They take
 the same options as {@Code "@Node"} (except that @Code outline is
 already fixed), and everything works in the same way.
 @PP
 There is a @Code shadow option which determines the depth of the shadow
+diagrams. @RawIndex { diagrams }
+diagrams.shadow @SubIndex { @Code "shadow" option }
+shadow.diagrams @Index { @Code "shadow" option (diagrams) }
 in shadow boxes:
 @ID {
-@Code {
-"@Node"
-"    outline { shadowbox }"
-"    shadow { 0.4f }"
-"{ WARNING }"
+@Code @Verbatim {
+@Node
+    outline { shadowbox }
+    shadow { 0.4f }
+{ WARNING }
 }
 ||7ct
 @Diag {
@@ -168,13 +204,19 @@ in shadow boxes:
 }
 This example shows the default value, 0.4 times the current font
 size.  For polygons there is a @Code sides option for specifying the number
-polygon. @Index @Code "@Polygon"
+diagrams. @RawIndex { diagrams }
+diagrams.sides @SubIndex { @Code "sides" option }
+sides.diagrams @Index { @Code "sides" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.angle @SubIndex { @Code "angle" option }
+angle.diagrams @Index { @Code "angle" option (diagrams) }
+polygon.diagrams @Index { @Code "@Polygon" (diagrams) }
 of sides, and an @Code angle option for rotating the outline:
 @IL
 @LI {
-@Code {
-"@Polygon"
-"   sides { 5 }"
+@Code @Verbatim {
+@Polygon
+   sides { 5 }
 }
 ||7ct
 @Diag {
@@ -185,10 +227,10 @@ of sides, and an @Code angle option for rotating the outline:
 }
 
 @LI {
-@Code {
-"@Polygon"
-"   sides { 5 }"
-"   angle { 0d }"
+@Code @Verbatim {
+@Polygon
+   sides { 5 }
+   angle { 0d }
 }
 ||7ct
 @Diag {
@@ -212,14 +254,26 @@ where they apply to every node as usual.  However, they only affect the
 appearance of shadow boxes and polygons, respectively.
 @PP
 The {@Code outlinestyle}, {@Code outlinedashlength}, and {@Code outlinewidth}
+diagrams. @RawIndex { diagrams }
+diagrams.outlinestyle @SubIndex { @Code "outlinestyle" option }
+outlinestyle. @RawIndex { @Code "outlinestyle" option }
+outlinestyle.in.diagrams @SubIndex { in diagrams }
+diagrams. @RawIndex { diagrams }
+diagrams.outlinedashlength @SubIndex { @Code "outlinedashlength" option }
+outlinedashlength. @RawIndex { @Code "outlinedashlength" option }
+outlinedashlength.in.diagrams @SubIndex { in diagrams }
+diagrams. @RawIndex { diagrams }
+diagrams.outlinewidth @SubIndex { @Code "outlinewidth" option }
+outlinewidth. @RawIndex { @Code "outlinewidth" option }
+outlinewidth.in.diagrams @SubIndex { in diagrams }
 options apply to any node and affect the appearance of the outline:
 @ID @OneRow {
-@Code {
-"@CurveBox"
-"   outlinestyle { solid }"
-"   outlinedashlength { 0.2f }"
-"   outlinewidth { thin }"
-"{ Hello, world }"
+@Code @Verbatim {
+@CurveBox
+   outlinestyle { solid }
+   outlinedashlength { 0.2f }
+   outlinewidth { thin }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -232,14 +286,27 @@ options apply to any node and affect the appearance of the outline:
 }
 This example shows the default values of these options.  The
 {@Code outlinestyle} option may be {@Code solid}, {@Code dashed},
-dashed. @Index { dashed lines }
-dotted. @Index { dotted lines }
+diagrams. @RawIndex { diagrams }
+diagrams.solid @SubIndex { @Code "solid" outlines }
+solid.diagrams @Index { @Code "solid" outlines (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.dashed @SubIndex { @Code "dashed" outlines }
+dashed.diagrams @Index { dashed outlines (diagrams) }
 {@Code cdashed}, {@Code dotted}, or {@Code noline}:
+diagrams. @RawIndex { diagrams }
+diagrams.cdashed @SubIndex { @Code "cdashed" outlines }
+cdashed.diagrams @Index { cdashed outlines (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.dotted @SubIndex { @Code "dotted" outlines }
+dotted.diagrams @Index { dotted outlines (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.noline @SubIndex { @Code "noline" outlines }
+noline.diagrams @Index { noline outlines (diagrams) }
 @ID @OneRow {
-@Code {
-"@CurveBox"
-"   outlinestyle { cdashed }"
-"{ Hello, world }"
+@Code @Verbatim {
+@CurveBox
+   outlinestyle { cdashed }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -262,10 +329,10 @@ The {@Code outlinestyle} option may contain a sequence of the values
 mentioned above, meaning that they are to be applied in turn to each
 segment of the outline:
 @ID @OneRow {
-@Code {
-"@CurveBox"
-"   outlinestyle { solid cdashed }"
-"{ Hello, world }"
+@Code @Verbatim {
+@CurveBox
+   outlinestyle { solid cdashed }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -289,14 +356,18 @@ options have been kept simple to reflect that.
 @PP
 Nodes may be painted any of the colours listed in Section
 {@NumberOf colour}, using the @Code "paint" option:
+diagrams. @RawIndex { diagrams }
+diagrams.paint @SubIndex { @Code "paint" option }
+paint. @RawIndex { @Code "paint" option }
+paint.in.diagrams @SubIndex { in diagrams }
 @ID @OneRow {
-@Code {
-"@Box"
-"   paint { grey }"
-"@Diamond"
-"   outlinestyle { noline }"
-"   paint { white }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Box
+   paint { grey }
+@Diamond
+   outlinestyle { noline }
+   paint { white }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -309,27 +380,42 @@ Nodes may be painted any of the colours listed in Section
 }
 }
 In this example the object following @Code "@Box" is a diamond containing
-{@Code "Hello, world"}.  The default value of @Code "paint" is
-{@Code nopaint}, a special value (not a colour) meaning don't use any paint.
+{@Code "Hello, world"}.  The default value of @Code "paint" is {@Code none},
+a special value (not a colour) meaning don't use any paint.  There is
+also a @Code "texture" option which causes this paint to be applied with a
+diagrams. @RawIndex { diagrams }
+diagrams.texture @SubIndex { @Code "texture" option }
+texture.option. @RawIndex { @Code "texture" option }
+texture.option.in.diagrams @SubIndex { in diagrams }
+given texture.  This works exacly like the @Code texture option described
+in Section {@NumberOf boxes}, so we'll say no more about it here.
 @PP
 When painting it is important to know what order things are done in, because
 anything put down earlier will disappear under the paint.  This is why
-@Code nopaint and @Code white are different.  Painting is done first, then
+@Code none and @Code white are different.  Painting is done first, then
 boundaries, and finally the following object.
 @PP
 Each node symbol has 
 @Code "font" and @Code "break" options which may be used to
+diagrams. @RawIndex { diagrams }
+diagrams.font @SubIndex { @Code "font" option }
+font.option. @RawIndex { @Code "font" option }
+font.option.in.diagrams @SubIndex { in diagrams }
+diagrams. @RawIndex { diagrams }
+diagrams.break @SubIndex { @Code "break" option }
+break. @RawIndex { @Code "break" option }
+break.diagrams @SubIndex { in diagrams }
 set the font and paragraph breaking style of the following object:
 @ID @OneRow {
-@Code {
-"@Box"
-"    font { Helvetica Base }"
-"    break { clines }"
-"{"
-"WARNING"
-"DANGEROUS"
-"PENGUINS"
-"}"
+@Code @Verbatim {
+@Box
+    font { Helvetica Base }
+    break { clines }
+{
+WARNING
+DANGEROUS
+PENGUINS
+}
 }
 ||7ct
 @Diag {
@@ -345,16 +431,19 @@ PENGUINS
 }
 Both options have empty default values, which leave the font and break
 style unchanged.  There is also a @Code "format" option for making more
+diagrams. @RawIndex { diagrams }
+diagrams.format @SubIndex { @Code "format" option }
+format.diagrams @Index { @Code "format" option (diagrams) }
 radical changes to the appearance of the following object:
 @ID @OneRow {
-@Code {
-"@Box"
-"    format {"
-"        {0.8 1.5} @Scale @S @Body"
-"    }"
-"{"
-"Dangerous Penguins"
-"}"
+@Code @Verbatim {
+@Box
+    format {
+        {0.8 1.5} @Scale @S @Body
+    }
+{
+Dangerous Penguins
+}
 }
 ||7ct
 @Diag {
@@ -368,26 +457,30 @@ Dangerous Penguins
 The result is the @Code "format" option with any @Code "@Body" symbol
 within it replaced by the following object.  These are very useful when
 attached to the @Code "@Diag" symbol:
-@ID @OneRow @Code {
-"@Diag"
-"    font { Helvetica Base }"
-"    break { clines }"
-"    format { { 0.8 1.5 } @Scale @S @Body }"
-"{"
-"    ..."
-"}"
+@ID @OneRow @Code @Verbatim {
+@Diag
+    font { Helvetica Base }
+    break { clines }
+    format { { 0.8 1.5 } @Scale @S @Body }
+{
+    ...
+}
 }
 since then they apply to every node, as usual, thereby eliminating
 a lot of tedious, error-prone duplication of formatting information
 at each node.
 @PP
 The @Code margin option determines the size of the margin added to
+diagrams. @RawIndex { diagrams }
+diagrams.margin @SubIndex { @Code "margin" option }
+margin.options @RawIndex { margin options }
+margin.options.in.diagrams @SubIndex { in diagrams }
 the following object:
 @ID @OneRow {
-@Code {
-"@Box"
-"    margin { 0c }"
-"{ Hello, world }"
+@Code @Verbatim {
+@Box
+    margin { 0c }
+{ Hello, world }
 }
 ||7ct
 @Diag {
@@ -411,16 +504,19 @@ are also {@Code leftmargin}, {@Code rightmargin},
 {@Code margin}, {@Code hmargin}, and {@Code vmargin}.
 @PP
 When nodes appear side by side, the {@Code valign} option is
+diagrams. @RawIndex { diagrams }
+diagrams.valign @SubIndex { @Code "valign" option }
+valign.diagrams @Index { @Code "valign" option (diagrams) }
 useful for controlling their vertical position with respect to each
 other.  For example,
 @ID @OneRow {
-@Code {
-"@Diag"
-"    valign { foot }"
-"{"
-"@Box font { 24p } Big"
-"@Box font { 8p } Small"
-"}"
+@Code @Verbatim {
+@Diag
+    valign { foot }
+{
+@Box font { 24p } Big
+@Box font { 8p } Small
+}
 }
 ||7ct
 @Diag
@@ -439,15 +535,18 @@ it may be {@Code top}, {@Code ctr}, or {@Code foot}, meaning alignment
 through the top, centre (the default value), or foot.
 @PP
 The {@Code vsize} option specifies a particular
+diagrams. @RawIndex { diagrams }
+diagrams.vsize @SubIndex { @Code "vsize" option }
+vsize.diagrams @Index { @Code "vsize" option (diagrams) }
 height for a node (not including margins):
 @ID @OneRow {
-@Code {
-"@Diag"
-"    vsize { 2f }"
-"{"
-"@Box font { 24p } Big"
-"@Box font { 8p } Small"
-"}"
+@Code @Verbatim {
+@Diag
+    vsize { 2f }
+{
+@Box font { 24p } Big
+@Box font { 8p } Small
+}
 }
 ||7ct
 @Diag
@@ -463,17 +562,20 @@ tall for the chosen height, Lout will print a warning message (`forced
 to enlarge {@Code "@High"}', probably) and enlarge the base.
 @PP
 There is a @Code vindent option which is effective only when @Code vsize
+diagrams. @RawIndex { diagrams }
+diagrams.vindent @SubIndex { @Code "vindent" option }
+vindent.diagrams @Index { @Code "vindent" option (diagrams) }
 is used.  It controls where in the vertical space the following object
 is to appear:
 @ID @OneRow {
-@Code {
-"@Diag"
-"    vsize { 3f }"
-"{"
-"@Box vindent { top } Top"
-"@Box Centre"
-"@Box vindent { foot } Foot"
-"}"
+@Code @Verbatim {
+@Diag
+    vsize { 3f }
+{
+@Box vindent { top } Top
+@Box Centre
+@Box vindent { foot } Foot
+}
 }
 ||7ct
 @Diag
@@ -493,12 +595,12 @@ for the @Code valign option.
 Small discrepancies in the size of nodes can be very annoying,
 particularly when the nodes appear side by side:
 @ID @OneRow {
-@Code {
-"@Diag"
-"{"
-"@Box Hole @Box in"
-"@Box my @Box pocket"
-"}"
+@Code @Verbatim {
+@Diag
+{
+@Box Hole @Box in
+@Box my @Box pocket
+}
 }
 ||7ct
 @Diag
@@ -511,13 +613,13 @@ These are caused by the slightly different heights of the objects within
 the nodes.  Selecting a fixed vertical size for all nodes goes some way
 towards solving this problem:
 @ID @OneRow {
-@Code {
-"@Diag"
-"    vsize { 1f }"
-"{"
-"@Box Hole @Box in"
-"@Box my @Box pocket"
-"}"
+@Code @Verbatim {
+@Diag
+    vsize { 1f }
+{
+@Box Hole @Box in
+@Box my @Box pocket
+}
 }
 ||7ct
 @Diag
@@ -533,14 +635,17 @@ deepest.  However, there is still a problem with the baselines of the words
 being misaligned.  A better solution is to insert a @I { vertical strut }
 into each node:  an invisible object with zero width and height equal to
 {@Code 1f}.  This is done using the @Code vstrut option:
+diagrams. @RawIndex { diagrams }
+diagrams.vstrut @SubIndex { @Code "vstrut" option }
+vstrut.diagrams @Index { @Code "vstrut" option (diagrams) }
 @ID @OneRow {
-@Code {
-"@Diag"
-"    vstrut { yes }"
-"{"
-"@Box Hole @Box in"
-"@Box my @Box pocket"
-"}"
+@Code @Verbatim {
+@Diag
+    vstrut { yes }
+{
+@Box Hole @Box in
+@Box my @Box pocket
+}
 }
 ||7ct
 @Diag
@@ -555,6 +660,18 @@ a length, meaning to insert a strut of this height.  So @Code "vstrut { yes }"
 is equivalent to {@Code "vstrut { 1.0f }"}.
 @PP
 There are {@Code halign}, {@Code hsize}, {@Code hindent}, and {@Code hstrut}
+diagrams. @RawIndex { diagrams }
+diagrams.halign @SubIndex { @Code "halign" option }
+halign.diagrams @Index { @Code "halign" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.hsize @SubIndex { @Code "hsize" option }
+hsize.diagrams @Index { @Code "hsize" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.hindent @SubIndex { @Code "hindent" option }
+hindent.diagrams @Index { @Code "hindent" option (diagrams) }
+diagrams. @RawIndex { diagrams }
+diagrams.hstrut @SubIndex { @Code "hstrut" option }
+hstrut.diagrams @Index { @Code "hstrut" option (diagrams) }
 options which work horizontally exactly as {@Code valign}, {@Code vsize},
 {@Code vindent}, and {@Code vstrut} work vertically, except that they
 use {@Code left} and {@Code right} where the vertical ones use

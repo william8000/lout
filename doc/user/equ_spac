@@ -19,9 +19,13 @@ simplest way to restore the effect of white space to part of an equation
 is to enclose that part in a @Code "@Font" symbol.)
 @PP
 Every symbol provided by {@Code "@Eq"} has a @I {full name}, which
+equations. @RawIndex { equations }
+equations.fullname @SubIndex { full name of symbol }
 full.name @Index { full name of equation symbol }
 denotes the symbol without any space attached.  Many symbols also
 have a @I {short name}, which denotes the same symbol with what
+equations. @RawIndex { equations }
+equations.shortname @SubIndex { short name of symbol }
 short.name @Index { short name of equation symbol }
 {@Code "@Eq"} considers to be an appropriate amount of space for that
 symbol attached to it.  For example, @Eq { lessequal } has full name
@@ -39,11 +43,17 @@ symbol attached to it.  For example, @Eq { lessequal } has full name
 }
 @EL
 {@Code "@Eq"} puts a thick space around relation symbols like {@Code "<="},
-relations @Index { relation symbols in equations }
+equations. @RawIndex { equations }
+equations.relation.symbols @SubIndex { relation symbols }
+relation.symbols @Index { relation symbols in equations }
 a medium space around binary operator symbols like {@Code "+"}, and a thin
-binary.op @Index { binary operators in equations }
+equations. @RawIndex { equations }
+equations.binaryoperators @SubIndex { binary operator symbols }
+binaryoperators @Index { binary operator symbols in equations }
 space after punctuation symbols (@Code ";" and {@Code ","}); except that
-punctuation @Index { punctuation in equations }
+equations. @RawIndex { equations }
+equations.punctuation @SubIndex { punctuation symbols }
+punctuation @Index { punctuation symbols in equations }
 in places where the symbols appear in a smaller size (superscripts,
 subscripts, etc.), these spaces are omitted.  No other horizontal space
 is ever inserted.
@@ -52,6 +62,9 @@ The short names have been carefully designed to produce good-looking
 mathematics most of the time.  It is best to rely on them in the first
 instance and only think about spacing when the result is not pleasing.  In
 that case, {@Code "@Eq"}'s space can be removed by using the full names,
+equations. @RawIndex { equations }
+equations.spacing @SubIndex { spacing symbols }
+spacing.equations @Index { spacing symbols in equations }
 and thin, medium and thick space can be added using the following symbols:
 @ID @Tab
     vmargin { 0.5vx }
@@ -72,10 +85,21 @@ precedence.  The @Code "&" symbol from raw Lout is also available;
 the @Code "s" unit has value 0 and so is not very useful, but one can
 write @Code "&2m" for example for a two em space.  The full names are
 tedious to remember, so {@Code "@Eq"} provides a @Code "non" symbol
-non. @Index { @Code "non" in equations }
+equations. @RawIndex { equations }
+equations.non @SubIndex { @Code "non" symbol }
+non.equations @Index { @Code "non" symbol (equations) }
 which removes spaces from its right parameter; thus @Code "non <=" is
 equivalent to {@Code "lessequal"}.  There are also {@Code "rel"},
+equations. @RawIndex { equations }
+equations.rel @SubIndex { @Code "rel" symbol }
+rel.equations @Index { @Code "rel" symbol (equations) }
 {@Code "bin"}, and {@Code "punct"} symbols for telling {@Code "@Eq"}
+equations. @RawIndex { equations }
+equations.bin @SubIndex { @Code "bin" symbol }
+bin.equations @Index { @Code "bin" symbol (equations) }
+equations. @RawIndex { equations }
+equations.punct @SubIndex { @Code "punct" symbol }
+punct.equations @Index { @Code "punct" symbol (equations) }
 to add space to the following symbol as though it was a relation symbol,
 binary operator, or punctuation symbol.
 @End @Section

@@ -1,9 +1,9 @@
 /*@z09.c:Closure Expansion:SearchEnv()@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -216,7 +216,7 @@ OBJECT *crs, OBJECT *res_env)
       /* fail only if there is no default value available */
       if( sym_body(actual(x)) == nilobj )
       {
-        debug3(DCE, D, "failing ClosureExpand( %s, crs, %s, %s, res_env )\n",
+        debug3(DCE, D, "failing ClosureExpand( %s, crs, %s, %s, res_env )",
 	  EchoObject(x), bool(crs_wanted), EchoObject(env));
         Error(9, 2, "no value for parameter %s of symbol %s:", WARN, &fpos(x),
 	  SymName(actual(x)), SymName(enclosing(actual(x))));

@@ -1,0 +1,409 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @Pie package for drawing pie charts                                   #
+#  Version 1.0 (October 2002)                                                 #
+#  Jeffrey H. Kingston                                                        #
+#                                                                             #
+###############################################################################
+
+@SysPrependGraphic { pief.lpg }
+@SysInclude { lengths }			# @PSLengths and @LoutLengths
+@SysInclude { coltex }			# @ColourCommand and @TextureCommand
+
+
+###############################################################################
+#                                                                             #
+#  @PieSetup symbol                                                           #
+#                                                                             #
+###############################################################################
+
+export @Pie
+def @PieSetup
+    named save		             	{ no	           	}
+    named totalweight			{ 100			}
+    named radius			{ 2.5c			}
+    import @PSLengths named initialangle{ 0d			}
+    named leftextra		       	{ 0i	           	}
+    named rightextra		       	{ 0i	           	}
+    named aboveextra		       	{ 0i	           	}
+    named belowextra		       	{ 0i	           	}
+    named leftcaption		       	{ 	           	}
+    named rightcaption		       	{ 	           	}
+    named abovecaption		       	{ 	           	}
+    named belowcaption		       	{ 	           	}
+    named leftgap			{ 0.5c	           	}
+    named rightgap			{ 0.5c	           	}
+    named abovegap			{ 0.5c	           	}
+    named belowgap			{ 0.5c	           	}
+    named hidecaptions		       	{ yes	           	}
+    named weight			{ 1			}
+    named paint                 	{ none		       	}
+    import @TextureImport named texture	{ solid		       	}
+    named outlinestyle
+	named solid   { "/lpiesolid"   }
+	named dashed  { "/lpiedashed"  }
+	named cdashed { "/lpiecdashed" }
+	named dotted  { "/lpiedotted"  }
+	named noline  { "/lpienoline"  }
+					{ solid         	}
+    import @PSLengths named outlinedashlength	{ 0.2f		}
+    import @PSLengths named outlinewidth
+	named thin   { 0.04f }
+	named medium { 0.08f }
+	named thick  { 0.12f }
+					{ thin	         	}
+    named detach
+	named yes Yes	{ 0.5	}
+	named no No	{ 0.0	}
+					{ no			}
+    named label				{			}
+    named labelfont			{ -2p			}
+    named labelbreak			{ clines		}
+    named labelmargin			{ 0.2f          	}
+    named labelformat right @Body    	{ @Body         	}
+    named labelradius
+	named internal { 0.6 }
+        named external { 1.4 }
+					{ internal		}
+    import @PSLengths named labeladjust	{ 0 0			}
+    named finger			{ no			}
+    named fingerstyle
+	named solid   { "/lpiesolid"   }
+	named dashed  { "/lpiedashed"  }
+	named cdashed { "/lpiecdashed" }
+	named dotted  { "/lpiedotted"  }
+	named noline  { "/lpienoline"  }
+					{ solid         	}
+    import @PSLengths named fingerdashlength { 0.2f		}
+    import @PSLengths named fingerwidth
+	named thin   { 0.04f }
+	named medium { 0.08f }
+	named thick  { 0.12f }
+					{ thin	         	}
+    named fingerradius			{ 0.7			}
+    import @PSLengths named fingeradjust{ 0 0			}
+    named fingerarrow			{ no			}
+    import @PSLengths named fingerarrowlength	{ 0.6f		}
+    import @PSLengths named fingerarrowwidth	{ 0.45f		}
+{
+
+    ###########################################################################
+    #                                                                         #
+    #  @Pie symbol                                                            #
+    #                                                                         #
+    ###########################################################################
+
+    export @Slice
+    def @Pie
+        named save		             	{ save	           	}
+	named totalweight			{ 100			}
+        named radius				{ radius		}
+        import @PSLengths named initialangle	{ initialangle		}
+	named leftextra			       	{ leftextra		}
+	named rightextra		       	{ rightextra		}
+	named aboveextra		       	{ aboveextra		}
+	named belowextra		       	{ belowextra		}
+	named leftcaption		       	{ leftcaption		}
+	named rightcaption		       	{ rightcaption		}
+	named abovecaption		       	{ abovecaption		}
+	named belowcaption		       	{ belowcaption		}
+	named leftgap				{ leftgap           	}
+	named rightgap				{ rightgap           	}
+	named abovegap				{ abovegap           	}
+	named belowgap				{ belowgap           	}
+	named hidecaptions		       	{ hidecaptions		}
+        named weight				{ weight		}
+        named paint                 		{ paint 	      	}
+	import @TextureImport named texture	{ texture	       	}
+        named outlinestyle
+	    named solid   { "/lpiesolid"   }
+	    named dashed  { "/lpiedashed"  }
+	    named cdashed { "/lpiecdashed" }
+	    named dotted  { "/lpiedotted"  }
+	    named noline  { "/lpienoline"  }
+						{ outlinestyle         	}
+        import @PSLengths named outlinedashlength{ outlinedashlength	}
+        import @PSLengths named outlinewidth
+	    named thin   { 0.04f }
+	    named medium { 0.08f }
+	    named thick  { 0.12f }
+						{ outlinewidth         	}
+        named detach
+	    named yes Yes	{ 0.5	}
+	    named no No		{ 0.0	}
+						{ detach		}
+        named label				{ label          	}
+        named labelfont				{ labelfont		}
+        named labelbreak			{ labelbreak		}
+        named labelmargin			{ labelmargin          	}
+        named labelformat right @Body  		{ labelformat @Body    	}
+        named labelradius
+	    named internal { 0.6 }
+            named external { 1.4 }
+						{ labelradius		}
+        import @PSLengths named labeladjust	{ labeladjust		}
+        named finger				{ finger		}
+        named fingerstyle
+	    named solid   { "/lpiesolid"   }
+	    named dashed  { "/lpiedashed"  }
+	    named cdashed { "/lpiecdashed" }
+	    named dotted  { "/lpiedotted"  }
+	    named noline  { "/lpienoline"  }
+						{ fingerstyle         	}
+        import @PSLengths named fingerdashlength{ fingerdashlength	}
+        import @PSLengths named fingerwidth
+	    named thin   { 0.04f }
+	    named medium { 0.08f }
+	    named thick  { 0.12f }
+						{ fingerwidth         	}
+        named fingerradius			{ fingerradius		}
+        import @PSLengths named fingeradjust	{ fingeradjust		}
+	named fingerarrow			{ fingerarrow		}
+	import @PSLengths named fingerarrowlength { fingerarrowlength	}
+	import @PSLengths named fingerarrowwidth  { fingerarrowwidth	}
+
+        body @Body
+    {
+
+
+	#######################################################################
+	#                                                                     #
+	#  Miscellaneous helper definitions                                   #
+	#                                                                     #
+	#######################################################################
+
+        def @AddPaint left col right texture
+	{
+	  col @Case {
+	    { "no" "none" "nopaint" } @Yield "{}"
+	    else                 @Yield { "{" @ColourCommand col texture "fill }" }
+	  }
+	}
+
+        # Like @Graphic, but affects the graphics state of right parameter
+        def @InnerGraphic
+            left ps
+            right x
+        {
+            { ps gsave // grestore } @Graphic x
+        }
+
+        def @ZeroWidth right x
+        {
+	    @HContract @VContract {
+            ^|0io @HContract @VContract x |0io
+	    }
+        }
+
+        def @ZeroSize right x
+        {
+	    @HContract @VContract {
+            ^/0io ^|0io @HContract @VContract x |0io /0io
+	    }
+        }
+
+
+	#######################################################################
+	#                                                                     #
+	#  @Slice                                                             #
+	#                                                                     #
+	#######################################################################
+
+        def @Slice
+	    named weight			{ weight		}
+	    named paint				{ paint			}
+	    import @TextureImport named texture	{ texture	       	}
+	    named outlinestyle
+		named solid   { "/lpiesolid"   }
+		named dashed  { "/lpiedashed"  }
+		named cdashed { "/lpiecdashed" }
+		named dotted  { "/lpiedotted"  }
+		named noline  { "/lpienoline"  }
+						{ outlinestyle		}
+	    import @PSLengths named outlinedashlength { outlinedashlength }
+	    import @PSLengths named outlinewidth
+		named thin   { 0.04f }
+		named medium { 0.08f }
+		named thick  { 0.12f }
+						{ outlinewidth		}
+            named detach
+	        named yes Yes	{ 0.5	}
+	        named no No	{ 0.0	}
+						{ detach		}
+	    named label				{ label			}
+            named labelfont			{ labelfont		}
+            named labelbreak			{ labelbreak		}
+            named labelmargin			{ labelmargin		}
+            named labelformat right @Body	{ labelformat @Body	}
+            named labelradius
+	        named internal { 0.6 }
+                named external { 1.4 }
+						{ labelradius		}
+            import @PSLengths named labeladjust	{ labeladjust		}
+	    named finger			{ finger		}
+            named fingerstyle
+	        named solid   { "/lpiesolid"   }
+	        named dashed  { "/lpiedashed"  }
+	        named cdashed { "/lpiecdashed" }
+	        named dotted  { "/lpiedotted"  }
+	        named noline  { "/lpienoline"  }
+						{ fingerstyle		}
+            import @PSLengths named fingerdashlength { fingerdashlength }
+            import @PSLengths named fingerwidth
+	        named thin   { 0.04 ft }
+	        named medium { 0.08 ft }
+	        named thick  { 0.12 ft }
+						{ fingerwidth		}
+            named fingerradius			{ fingerradius		}
+            import @PSLengths named fingeradjust{ fingeradjust		}
+	    named fingerarrow			{ fingerarrow		}
+	    import @PSLengths named fingerarrowlength { fingerarrowlength }
+	    import @PSLengths named fingerarrowwidth { fingerarrowwidth	}
+        {
+
+	    def @DrawSlice
+	    {
+		outlinedashlength "[" outlinestyle "]"
+		outlinewidth paint @AddPaint texture
+		weight detach
+	        "lpiebeginslice"
+		//
+		"lpieendslice"
+	    }
+
+	    def @TranslateLabelAndDrawFinger
+	    {   labeladjust labelradius "lpietranslatelabel"
+		finger @Case {
+		    { no No } @Yield ""
+		    { yes Yes } @Yield {
+			fingerdashlength "[" fingerstyle "]"
+			fingerwidth fingeradjust fingerradius
+			"lpiedrawfinger"
+			fingerarrow @Case {
+			    { no No } @Yield ""
+			    { yes Yes } @Yield {
+				fingerarrowlength fingerarrowwidth
+				"lpiedrawarrowhead"
+			    }
+			}
+		    }
+		}
+	    }
+
+	    def @AddMargins right x
+	    {
+		@HContract @VContract {
+		    //labelmargin ||labelmargin x ||labelmargin //labelmargin
+		}
+	    }
+
+	    @Null @ZeroSize @DrawSlice @Graphic
+		@TranslateLabelAndDrawFinger @InnerGraphic {
+	        @AddMargins labelfont @Font labelbreak @Break labelformat label
+	    } @Null
+
+	}
+
+	def @Above
+	{
+	    abovecaption @Case {
+		""   @Yield ""
+	        else @Yield @OneCol {
+		    ||0.5rt clines @Break abovecaption || //abovegap
+	    	}
+	    }
+	}
+
+	def @Below
+	{
+	    belowcaption @Case {
+		""   @Yield ""
+	        else @Yield @OneCol {
+	    	    //belowgap ||0.5rt clines @Break belowcaption ||
+		}
+	    }
+	}
+
+	def @Left
+	{
+	    leftcaption @Case {
+		""   @Yield ""
+	        else @Yield @OneRow {
+		    { //0.5rt clines @Break leftcaption // } ^||leftgap
+		}
+	    }
+	}
+
+	def @Right
+	{
+	    rightcaption @Case {
+	    	"" @Yield ""
+		else @Yield @OneRow {
+		    ||rightgap { //0.5rt lines @Break rightcaption // }
+		}
+	    }
+	}
+
+	def @HideWidth right x
+	{
+	    hidecaptions @Case {
+		{ No  no  } @Yield x
+		{ Yes yes } @Yield @OneCol { ||0io x ||0io }
+	    }
+	}
+
+	def @AddCaptions right x
+	{
+
+	    @HContract @VContract
+	    {
+	                           | @Above    |
+	        / @HideWidth @Left | &0.5rt x  | @HideWidth @Right
+	        /                  | @Below    |
+	    }
+	}
+
+	def @AddExtra right x
+	{
+	    @HContract @VContract
+	    {
+		/aboveextra |leftextra x |rightextra /belowextra
+	    }
+	}
+
+	def @GraphicSetup right x
+	{
+	    {
+	    save @Case {
+		{ yes Yes } @Yield {
+		    "grestore save gsave" totalweight initialangle "lpiebegin"
+		    //
+		    "lpieend restore"
+		}
+		{ no No }   @Yield {
+		    totalweight initialangle "lpiebegin"
+		    //
+		    "lpieend"
+		}
+	    }
+	    } @Graphic x
+	}
+
+	def @Base right x
+	{
+	    def @Square { radius @Wide radius @High {} }
+
+	    @HContract @VContract {
+		@Square ^| @Square
+		^/
+		@Square  | @Square
+		/
+		x
+	    }
+	}
+
+	@AddCaptions @AddExtra @GraphicSetup @Base @Body
+
+    }
+}

@@ -1,9 +1,9 @@
 /*@z46.c:Optimal Galleys:FindOptimize()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -76,7 +76,7 @@ BOOLEAN FindOptimize(OBJECT x, OBJECT env)
   bt[COLM] = ft[COLM] = bt[ROWM] = ft[ROWM] = ntarget = nenclose = crs = nilobj;
   res = Manifest(res, env, &save_style(x), bt, ft, &ntarget, &crs, TRUE, FALSE,
     &nenclose, FALSE);
-  res = ReplaceWithTidy(res, TRUE);
+  res = ReplaceWithTidy(res, WORD_TIDY);
   if( !is_word(type(res)) )
   { Error(46, 1, "unable to evaluate %s parameter, assuming value is No",
       WARN, &fpos(x), KW_OPTIMIZE);
@@ -133,7 +133,7 @@ void SetOptimize(OBJECT hd, STYLE *style)
     assert( type(y) == PAR, "SetOptimize: type(y) != PAR!" );
     Child(y, Down(y));
     assert( type(y) == ACAT, "SetOptimize: type(y) != ACAT!" );
-    y = ReplaceWithTidy(y, FALSE);
+    y = ReplaceWithTidy(y, ACAT_TIDY);
     opt_hyph(hd) = FALSE;
     assert( type(y) == ACAT, "SetOptimize: type(y) != ACAT (2)!" );
     for( link = y;  NextDown(link) != y;  link = NextDown(link) )
@@ -243,6 +243,7 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
     back(tmp, COLM) = fwd(tmp, COLM) = 0;
     back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
     word_font(tmp) = word_colour(tmp) = 0;
+    word_texture(tmp) = 1;
     word_outline(tmp) = FALSE;
     word_language(tmp) = word_hyph(tmp) = 0;
     word_baselinemark(tmp) = FALSE;
@@ -475,7 +476,7 @@ void DebugOptimize(OBJECT hd)
     { Child(y, link);
       fprintf(stderr, " %d", comp_count(y));
     }
-    fprintf(stderr, "\n");
+    fprintf(stderr, "%s", STR_NEWLINE);
   }
   debug0(DOG, D, "");
 } /* end DebugOptimize */

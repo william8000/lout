@@ -13,29 +13,33 @@ For a general introduction to setup files and their options, see
 Section {@NumberOf setup}.  Here we just describe the setup
 file options that relate to references.  Here they are, with their
 default values:
-@ID @OneRow @Code {
-"@MakeReferences { Yes }"
-"@RefCiteStyle { [cite] }"
-"@RefCiteLabels { @RefNum }"
-"@RefNumbers { Arabic }"
-"@RefListFormat { Labels }"
-"@RefListLabels { [@RefNum] }"
-"@RefListTitle { references }"
-"@ChapRefListTitle { references }"
-"@RefListIndent { 0c }"
-"@RefListRightIndent { 0c }"
-"@RefListGap { 1.00v }"
-"@RefListFont { }"
-"@RefListBreak { }"
-"@RefListLabelWidth { 2.00f }"
-"@RefListSortKey { @Tag }"
+@ID @OneRow @Code @Verbatim {
+@MakeReferences { Yes }
+@RefCiteStyle { [cite] }
+@RefCiteLabels { @RefNum }
+@RefNumbers { Arabic }
+@RefListFormat { Labels }
+@RefListLabels { [@RefNum] }
+@RefListTitle { references }
+@ChapRefListTitle { references }
+@RefListIndent { 0c }
+@RefListRightIndent { 0c }
+@RefListGap { 1.00v }
+@RefListFont { }
+@RefListBreak { }
+@RefListLabelWidth { 2.00f }
+@RefListSortKey { @Tag }
 }
-makereferences.sym @Index { @Code "@MakeReferences" }
+references. @RawIndex { references }
+references.makereferences @SubIndex { @Code "@MakeReferences" }
+makereferences.references @Index { @Code "@MakeReferences" (references) }
 Setting @Code "@MakeReferences" to @Code "No" will cause Lout to ignore
 all citation symbols and omit all reference lists.
 @PP
 @Code "@RefCiteStyle" and @Code "@RefCiteLabels" combine to
-refcitestyle.sym @Index { @Code "@RefCiteStyle" }
+references. @RawIndex { references }
+references.refcitestyle @SubIndex { @Code "@RefCiteStyle" }
+refcitestyle.references @Index { @Code "@RefCiteStyle" (references) }
 determine the appearance of citations.  The result of each @Code "@Cite"
 symbol is the value of @Code "@RefCiteStyle" with the @Code "cite"
 symbol replaced by the object following the @Code "@Cite" symbol.  For
@@ -44,7 +48,9 @@ brackets.  The @Code "cite" symbol must appear exactly once within
 {@Code "@RefCiteStyle"}.
 @PP
 @Code "@RefCiteLabels" determines the appearance of each label within
-refcitelabels.sym @Index { @Code "@RefCiteLabels" }
+references. @RawIndex { references }
+references.refcitelabels @SubIndex { @Code "@RefCiteLabels" }
+refcitelabels.references @Index { @Code "@RefCiteLabels" (references) }
 the citation.  Within it, the @Code "@RefNum" symbol will produce the
 number of the reference, and you may also use any of the options of the
 @Code "@Reference" symbol listed at the beginning of Section
@@ -68,7 +74,9 @@ if there is one, rather than the @Code "@Label" option of the reference;
 this @Code "label" option is explained in Section {@NumberOf labelled}.
 @PP
 @Code "@RefNumbers" determines the kind of numbering produced by the
-refnumbers.sym @Index { @Code "@RefNumbers" }
+references. @RawIndex { references }
+references.refnumbers @SubIndex { @Code "@RefNumbers" }
+refnumbers.references @Index { @Code "@RefNumbers" (references) }
 @Code "@RefNum" symbol used within @Code "@RefCiteLabels" above and
 @Code "@RefListLabels" below.  Its value may be {@Code Arabic},
 {@Code Roman}, {@Code UCRoman}, {@Code Alpha}, or {@Code UCAlpha}, as
@@ -77,7 +85,9 @@ usual for numbering in Lout.  If you don't use {@Code "@RefNum"},
 @PP
 The remaining eleven setup file options are all concerned with the
 appearance of the reference list.  The first, {@Code "@RefListFormat"},
-reflistformat.sym @Index { @Code "@RefListFormat" }
+references. @RawIndex { references }
+references.reflistformat @SubIndex { @Code "@RefListFormat" }
+reflistformat.references @Index { @Code "@RefListFormat" (references) }
 determines the overall format of the list.  Here is what its four
 @NoCite { $strunk1979style } possible values do:
 @ID @Tab
@@ -106,7 +116,9 @@ determines the overall format of the list.  Here is what its four
 labels and references, only with where they appear.
 @PP
 @Code "@RefListLabels" determines the appearance of the labels in the
-reflistlabels.sym @Index { @Code "@RefListLabels" }
+references. @RawIndex { references }
+references.reflistlabels @SubIndex { @Code "@RefListLabels" }
+reflistlabels.references @Index { @Code "@RefListLabels" (references) }
 reference list (and so has no effect if @Code "@RefListFormat" is
 {@Code "NoLabels"}).  It is a combination of @Code "@RefCiteStyle"
 and {@Code "@RefCiteLabels"}; you can use @Code "@RefNum" and all the
@@ -122,38 +134,54 @@ either use @Code "DropLabels" or else increase the
 @Code "@RefListLabelWidth" option described below.
 @PP
 @Code "@RefListTitle" determines the heading placed just before the
-reflisttitle.sym @Index { @Code "@RefListTitle" }
+references. @RawIndex { references }
+references.reflisttitle @SubIndex { @Code "@RefListTitle" }
+reflisttitle.references @Index { @Code "@RefListTitle" (references) }
 reference list at the end of the document:
 @ID @Code "@RefListTitle { Further Reading }"
 Two special values, @Code "references" and {@Code "bibliography"},
 produce References and Bibliography in English and their equivalents
 in other languages.  @Code "@ChapRefListTitle" is the same as
-chapreflisttitle.sym @Index { @Code "@ChapRefListTitle" }
+references. @RawIndex { references }
+references.chapreflisttitle @SubIndex { @Code "@ChapRefListTitle" }
+chapreflisttitle.references @Index { @Code "@ChapRefListTitle" (references) }
 {@Code "@RefListTitle"}, but applied to the reference list at the end
 of each chapter of a book when @Code "@ChapCite" is used.
 @PP
 {@Code "@RefListIndent"}, {@Code "@RefListRightIndent"}, and
-reflistindent.sym @Index { @Code "@RefListIndent" }
-reflistrightindent.sym @Index { @Code "@RefListRightIndent" }
-reflistgap.sym @Index { @Code "@RefListGap" }
+references. @RawIndex { references }
+references.reflistindent @SubIndex { @Code "@RefListIndent" }
+reflistindent.references @Index { @Code "@RefListIndent" (references) }
+references. @RawIndex { references }
+references.reflistrightindent @SubIndex { @Code "@RefListRightIndent" }
+reflistrightindent.references @Index { @Code "@RefListRightIndent" (references) }
 {@Code "@RefListGap"} determine the left indent, right indent, and gap
+references. @RawIndex { references }
+references.reflistgap @SubIndex { @Code "@RefListGap" }
+reflistgap.references @Index { @Code "@RefListGap" (references) }
 between reference list items, analogously to the {@Code "indent"},
 {@Code "rightindent"}, and {@Code "gap"} options of the @Code "@List"
 symbol (Section {@NumberOf lists}).  @Code "@RefListFont" and
+references. @RawIndex { references }
+references.reflistfont @SubIndex { @Code "@RefListFont" }
+reflistfont.references @Index { @Code "@RefListFont" (references) }
+references. @RawIndex { references }
+references.reflistbreak @SubIndex { @Code "@RefListBreak" }
+reflistbreak.references @Index { @Code "@RefListBreak" (references) }
 @Code "@RefListBreak" determine the font and
-reflistfont.sym @Index { @Code "@RefListFont" }
-reflistbreak.sym @Index { @Code "@RefListBreak" }
 paragraph breaking style of the reference list.  For example,
-@ID @OneRow @Code {
-"@RefListFont { -2p }"
-"@RefListBreak { 1.2fx outdent }"
+@ID @OneRow @Code @Verbatim {
+@RefListFont { -2p }
+@RefListBreak { 1.2fx outdent }
 }
 switches to a smaller size with outdented paragraphs (these work well
 with {@Code NoLabels}).  The empty default values produce the same
 font and break style as in the document as a whole.
 @PP
 @Code "@RefListLabelWidth" determines the distance from the left
-reflistlabelwidth.sym @Index { @Code "@RefListLabelWidth" }
+references. @RawIndex { references }
+references.reflistlabelwidth @SubIndex { @Code "@RefListLabelWidth" }
+reflistlabelwidth.references @Index { @Code "@RefListLabelWidth" (references) }
 edge of the labels to the left edge of the references, when
 @Code "@RefListFormat" is @Code Labels or {@Code DropLabels} (it
 has no effect when @Code "@RefListFormat" is @Code NoLabels or
@@ -169,11 +197,13 @@ changed to any length (Section {@NumberOf objects}).  Regrettably,
 Lout is not clever enough to choose a good value by itself.
 @PP
 Finally, @Code "@RefListSortKey" determines the sorting key used when
+references. @RawIndex { references }
+references.reflistsortkey @SubIndex { @Code "@RefListSortKey" }
+reflistsortkey.references @Index { @Code "@RefListSortKey" (references) }
 sort.ref @Index { sorting of reference lists }
-reflistsortkey.sym @Index { @Code "@RefListSortKey" }
 ordering the reference list.  The default value,
 @ID @Code "@RefListSortKey { @Tag }"
-sorts by tag.  Another popular possibility is to sort by the
+sorts by tag.  Another possibility is to sort by the
 @Code "@Label" option:
 @ID @Code "@RefListSortKey { @Label }"
 As usual @Code "@Label" will use the value of a @Code "label" option

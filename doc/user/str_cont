@@ -5,7 +5,7 @@
 @PP
 Lout takes note of the titles of all your large-scale structure symbols
 contents. @Index { contents, tables of }
-tables.of.contents. @Index { tables of contents }
+tables.zzz.of.contents. @Index { tables of contents }
 (Section {@NumberOf largescale}) and what pages they begin on, and it
 uses this information to produce a table of contents like the one at
 the start of the present document.  It is totally automatic; you do

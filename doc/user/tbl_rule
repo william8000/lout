@@ -4,6 +4,9 @@
 @Begin
 @PP
 There is a @Code "rule" option for drawing a rule around a cell:
+tables. @RawIndex { tables }
+tables.rule @SubIndex { @Code "rule" options }
+rule.tables @Index { @Code "rule" options (tables) }
 @ID @OneRow @Code "@Cell rule { yes }"
 Other values are {@Code no} (the default),
 {@Code single} (the same as {@Code yes}), and {@Code double} (for a

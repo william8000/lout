@@ -4,13 +4,36 @@
 @Begin
 @PP
 The tables produced by @Code "@Tbl" permit page breaks (including breaking
+tables. @RawIndex { tables }
+tables.multipage @SubIndex { multi-page }
 multi.page.tables @Index { multi-page tables }
 to a new column) between every two rows, except rows that have a
 vertically spanning cell in common.  Page breaks cannot occur
 within rows.  The choice of page breaks can either be left to Lout,
 or it can be forced by placing the new page symbol @Code "@NP" between two
-np.tables @Index { @Code "@NP" (new page) in tables }
+tables. @RawIndex { tables }
+tables.np @SubIndex { @Code "@NP" (new page) in }
+np. @RawIndex { @Code "@NP" (new page) }
+np.in.tables @SubIndex { in tables }
 rows.
+@PP
+To prevent page breaks within a table, precede the @Code "@Tbl"
+symbol by {@Code "@OneRow"}:
+@ID @Code "@CD @OneRow @Tbl ..."
+@Code "@OneRow" is a general Lout symbol which binds the following
+object into a single, unbreakable row.  Make sure your table is
+small enough to fit on one page when you do this, otherwise an error
+message will be printed and it will be scaled to fit.  Display symbols
+like @Code "@CD" often have this effect anyway.
+@PP
+To prevent a page break between two particular rows, but not in
+general, replace the @Code "@Row" symbol of the second row with
+tables. @RawIndex { tables }
+tables.nobreakrow @SubIndex { @Code "@NoBreakRow" symbols }
+nobreakrow.tables @Index { @Code "@NoBreakRow" symbols (tables) }
+the corresponding @Code "@NoBreakRow" symbol (@Code "@NoBreakRowa"
+instead of {@Code "@Rowa"}, @Code "@NoBreakRowb" instead of
+{@Code "@Rowb"}, and so on).
 @PP
 Some care is needed over where to put multi-page tables.  They can't go
 within any of the display symbols, because display symbols are not clever
@@ -34,14 +57,27 @@ rightmost column to the full page width; one way to prevent this is to add
 a @Code "|" after the last cell within each {@Code format} option, creating
 an empty extra column.
 @PP
-One practical problem with multi-page tables is that of getting a
+One practical problem in multi-page tables is getting the rules
+right.  The simplest way to do this is to set @Code "rulehorizontal"
+to {@Code yes}.  This places a rule above every row including the
+first on each page, and a rule below every row including the last
+on each page.  There is nothing equivalent to running headers
+(described below) at the bottom of the page -- nothing that would allow
+you to insert a rule after the last line of each page, but not
+elsewhere.  (However, if you are using the @Code "@Table"
+symbol, its @Code "@Format" option can be used to do this.)
+@PP
+Another practical problem with multi-page tables is that of getting a
 heading over every page after the first.  This is easy if you know where
 the page breaks are going to fall (if you are using {@Code "@NP"}, for
 example), but you usually don't.  To solve this problem, @Code {"@Tbl"}
 offers the @Code "@HeaderRowa" ... @Code "@HeaderRowh" and
+tables. @RawIndex { tables }
+tables.headerrow @SubIndex { @Code "@HeaderRow" symbols }
+headerrow.tables @Index { @Code "@HeaderRow" symbols (tables) }
 @Code "@EndHeaderRow" symbols.  For example, the multi-page table in
 Section {@NumberOf tbl_summ} is arranged like this:
-@ID @OneRow @Code @Verbatim {
+@ID -1px @Break @OneRow @Code @Verbatim {
 @Tbl
     ...
 {
@@ -59,7 +95,7 @@ Section {@NumberOf tbl_summ} is arranged like this:
     rulebelow { yes }
 @Rowa
     A { paint  p }
-    B { nopaint }
+    B { none }
     D { any colour from Section {@NumberOf colour} }
 ...
 @Rowa
@@ -70,24 +106,22 @@ Section {@NumberOf tbl_summ} is arranged like this:
 @EndHeaderRow
 }
 }
-where we have omitted a lot of irrelevant things.  @Code "@HeaderRowd"
-is exactly like {@Code "@Rowd"}, except that the row is not printed at
-all where it occurs; instead, it is saved up and used as a running header
-on subsequent pages.
+@Code "@HeaderRowd" is exactly like {@Code "@Rowd"}, except that the row is
+not printed at all where it occurs; instead, it is saved up and used as a
+running header on subsequent pages.
 @PP
 The @Code "@EndHeaderRow" symbol goes where a @Code "@Row" symbol might
 go.  Notice that it does not end with a letter between {@Code a} and
-{@Code h}, and that it has no options.  Its meaning is that the most
-recent running header is not wanted on pages after this point:  in other
-words, it cancels the previous @Code "@HeaderRowa" ... @Code "@HeaderRowh"
-symbol.  Forgetting @Code "@EndHeaderRow" is disastrous, because every page
-from this point on will then have the running header, even though the table
-ended long before.
+{@Code h}, and that it has no options.  Its effect is to cancel the
+closest preceding @Code "@HeaderRowa" ... @Code "@HeaderRowh" symbol.
+If you forget it, the result is bizarre:  the header row will remain
+in effect, and then every page from this point on will have the running
+header, even though the table ended long before.
 @PP
 There may be any number of header rows saved up at any moment, all to be
 printed at the top of subsequent pages.  Having @Code "@EndHeaderRow"
-allows them to be `nested.'  For example, just schematically,
-@ID @OneRow @Code @Verbatim {
+allows them to be `nested.'  For example,
+@ID -1px @Break @OneRow @Code @Verbatim {
 @HeaderRowa ...
 @HeaderRowb ...
 @EndHeaderRow
@@ -97,46 +131,24 @@ allows them to be `nested.'  For example, just schematically,
 }
 could be used in a table to say that the entire table has the first
 header row; and that the first part also has the second header row,
-but the second part of the table has a different second header row,
-but still the same first header row.
+but that subsequent parts of the table have their own, different
+second header row, but still the same first header row.
 @PP
-These header symbols have some peculiarities not likely to trouble the
-ordinary user, but worth pointing out.  Each copy of a running header
-will be identical to every other copy, so any attempt to use cross
-references to add (say) page numbers to the running header is doomed to
-disappointment.  (If you want to change the header, use
-@Code "@EndHeaderRow" followed by a new header row.)  Basser Lout
-copies running header rows into the table after each page break,
-with no check on whether the next page has enough space to
-accommodate them, so if your running headers are so high that
-there is no room for ordinary rows on the page after they are
-inserted, then the document will never end.  Finally, header
-rows are taken account of by Lout when deciding column widths,
-whether they are actually printed or not.
+Certain kinds of objects are not allowed in header rows, and Lout will
+complain and quit if you try to put them there.  Galleys
+(e.g. {@Code "@FootNote"} and {@Code "@Index"}) are not allowed, nor are
+cross references (e.g. {@Code "@NumberOf"} and {@Code "@PageOf"}), nor
+are {@Code "@HExpand"}, {@Code "@VExpand"}, or {@Code "@Scale"} in the
+form that works out its own scale factor.  Spanning symbols
+({@Code "@StartHSpan"}, {@Code "@StartVSpan"} etc.) work well in header
+row formats, however.
 @PP
-Another practical problem in multi-page tables is getting the rules
-right.  The simplest way to do this is to set @Code "rulehorizontal"
-to {@Code yes}.  This places a rule above every row including the
-first on each page, and a rule below every row including the last
-on each page.  There is nothing equivalent to running headers
-at the bottom of the page -- nothing that would allow you to
-insert a rule after the last line of each page, but not
-elsewhere.  (However, if you are using the @Code "@Table"
-symbol, its @Code "@Format" option can be used to do this.)
-@PP
-To prevent page breaks within a table, precede the @Code "@Tbl"
-symbol by {@Code "@OneRow"}:
-@ID @Code "@CD @OneRow @Tbl ..."
-@Code "@OneRow" is a general Lout symbol which binds the following
-object into a single, unbreakable row.  Make sure your table is
-small enough to fit on one page when you do this, otherwise an error
-message will be printed and it will be scaled to fit.  Of course, we
-said earlier that display symbols like @Code "@CD" do this anyway,
-but that might change some day.
-@PP
-To prevent a page break between two particular rows, but not in
-general, replace the @Code "@Row" symbol of the second row with
-the corresponding @Code "@NoBreakRow" symbol (@Code "@NoBreakRowa"
-instead of {@Code "@Rowa"}, @Code "@NoBreakRowb" instead of
-{@Code "@Rowb"}, and so on).
+Header rows have some other peculiarities, not likely to trouble
+the ordinary user but worth pointing out.  Header rows are taken
+account of by Lout when deciding column widths, whether they are
+actually printed or not.  Basser Lout copies running header rows
+into the table after each page break, with no check on whether the
+next page has enough space to accommodate them, so if your running
+headers are so high that there is no room for ordinary rows on the
+page after they are inserted, then the document will never end.
 @End @Section

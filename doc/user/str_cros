@@ -39,7 +39,6 @@ Inserting @Code "@PageMark decl.of.ind" will not affect the result,
 but Lout makes a note of the number of the page on which the word
 preceding it appears, and inserts that number in place of
 {@Code "@PageOf decl.of.ind"}.  The tag, {@Code "decl.of.ind"}, may be
-tag. @Index { tag }
 any simple word (actually Lout will accept a multi-word tag, but they
 are very inconvenient and better avoided).  The braces are there, as
 usual, to control grouping:  we don't want the following punctuation
@@ -58,7 +57,7 @@ option), as well as @Code { "@FootNote" }, @Code { "@EndNote" },
 symbols, and @Code "@ListItem" and @Code "@DropListItem" (but not
 @Code "@TagItem" and {@Code "@DropTagItem"}).  Each of these symbols
 has a @Code "@Tag" option:
-tag.sym @Index @Code "@Tag"
+tag.option. @Index { @Code "@Tag" option }
 @ID @OneRow @Code {
 "@Section"
 "   @Title { Cross references }"
@@ -88,8 +87,8 @@ there is also the @Code "@TitleOf" symbol:
 }
 produces
 @QD {
-"For further information on this point, please consult"
-"the @TitleOf { cross } section."
+For further information on this point, please consult
+the @TitleOf { cross } section.
 }
 But this symbol won't work for footnotes, list items, and other
 things without a title.

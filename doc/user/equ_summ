@@ -33,7 +33,11 @@ and full names.  The auxiliary symbols are:
     B { Remove spaces normally put into @Code x }
 @Rowa
     A { @Code "vctr x" }
-    B { Centre @Code x vertically }
+    B { Centre @Code x vertically
+equations. @RawIndex { equations }
+equations.vctr @SubIndex { @Code "vctr" symbol }
+vctr.equations @Index { @Code "vctr" symbol (equations) }
+}
 @Rowa
     A { @Code "big x" }
     B { Make @Code x larger }
@@ -63,48 +67,72 @@ examples of the other symbols:
 @Code "x dot"
 |7ct
 @Eq { x dot }
+equations. @RawIndex { equations }
+equations.dot @SubIndex { @Code "dot" symbol }
+dot.equations @Index { @Code "dot" symbol (equations) }
 }
 
 @LI {
 @Code "x dotdot"
 |7ct
 @Eq { x dotdot }
+equations. @RawIndex { equations }
+equations.dotdot @SubIndex { @Code "dotdot" symbol }
+dotdot.equations @Index { @Code "dotdot" symbol (equations) }
 }
 
 @LI {
 @Code "x hat"
 |7ct
 @Eq { x hat }
+equations. @RawIndex { equations }
+equations.hat @SubIndex { @Code "hat" symbol }
+hat.equations @Index { @Code "hat" symbol (equations) }
 }
 
 @LI {
 @Code "x tilde"
 |7ct
 @Eq { x tilde }
+equations. @RawIndex { equations }
+equations.tilde @SubIndex { @Code "tilde" symbol }
+tilde.equations @Index { @Code "tilde" symbol (equations) }
 }
 
 @LI {
 @Code "x vec"
 |7ct
 @Eq { x vec }
+equations. @RawIndex { equations }
+equations.vec @SubIndex { @Code "vec" symbol }
+vec.equations @Index { @Code "vec" symbol (equations) }
 }
 
 @LI {
 @Code "x dyad"
 |7ct
 @Eq { x dyad }
+equations. @RawIndex { equations }
+equations.dyad @SubIndex { @Code "dyad" symbol }
+dyad.equations @Index { @Code "dyad" symbol (equations) }
 }
 
 @LI {
 @Code "x+y overbar"
 |7ct
 @Eq { x+y overbar }
+equations. @RawIndex { equations }
+equations.overbar @SubIndex { @Code "overbar" symbol }
+overbar.equations @Index { @Code "overbar" symbol (equations) }
 }
 
 @LI {
 @Code "x+y underbar"
 |7ct
 @Eq { x+y underbar }
+equations. @RawIndex { equations }
+equations.underbar @SubIndex { @Code "underbar" symbol }
+underbar.equations @Index { @Code "underbar" symbol (equations) }
 }
 
 @EL
@@ -165,12 +193,18 @@ together as shown; @Code "tsub" and @Code "ton" are exactly like
 "{90d @Rotate blbrace}" }
 |7ct
 @Eq { {a, ... , z} widefrom {90d @Rotate blbrace} }
+equations. @RawIndex { equations }
+equations.widefrom @SubIndex { @Code "widefrom" symbol }
+widezzzfrom.equations @Index { @Code "widefrom" symbol (equations) }
 }
 
 @LI {
 @Code "{a, ... , z} wideto minus"
 |7ct
 @Eq { {a, ... , z} wideto minus }
+equations. @RawIndex { equations }
+equations.wideto @SubIndex { @Code "wideto" symbol }
+widezzzto.equations @Index { @Code "wideto" symbol (equations) }
 }
 
 @EL
@@ -183,12 +217,18 @@ to the width of the left.
 @Code "sqrt {x over y}"
 |7ct
 @Eq { sqrt {x over y} }
+equations. @RawIndex { equations }
+equations.sqrt @SubIndex { @Code "sqrt" symbol }
+sqrt.equations @Index { @Code "sqrt" symbol (equations) }
 }
 
 @LI {
 @Code "3 root {x over y}"
 |7ct
 @Eq { 3 root {x over y} }
+equations. @RawIndex { equations }
+equations.root @SubIndex { @Code "root" symbol }
+root.equations @Index { @Code "root" symbol (equations) }
 }
 
 @EL
@@ -200,24 +240,36 @@ four ways to denote division:
 @Code "2 over 3"
 |7ct
 @Eq { 2 over 3 }
+equations. @RawIndex { equations }
+equations.over @SubIndex { @Code "over" symbol }
+over.equations @Index { @Code "over" symbol (equations) }
 }
 
 @LI {
 @Code "2 frac 3"
 |7ct
 @Eq { 2 frac 3 }
+equations. @RawIndex { equations }
+equations.frac @SubIndex { @Code "frac" symbol }
+frac.equations @Index { @Code "frac" symbol (equations) }
 }
 
 @LI {
 @Code "2 div 3"
 |7ct
 @Eq { 2 div 3 }
+equations. @RawIndex { equations }
+equations.div @SubIndex { @Code "div" symbol }
+div.equations @Index { @Code "div" symbol (equations) }
 }
 
 @LI {
 @Code "2 slash 3"
 |7ct
 @Eq { 2 slash 3 }
+equations. @RawIndex { equations }
+equations.slash @SubIndex { @Code "slash" symbol }
+slash.equations @Index { @Code "slash" symbol (equations) }
 }
 
 @EL
@@ -286,6 +338,9 @@ ragged @Break {
 }
 @DP
 These can be negated by preceding them with {@Code "not"}, as in
+equations. @RawIndex { equations }
+equations.not @SubIndex { @Code "not" symbol }
+not.equations @Index { @Code "not" symbol (equations) }
 negation. @Index { negation of equation symbols }
 {@Code "not =="}, for example, which yields {@Eq { not == }}.  The
 following short names define binary operators (medium space on each side):

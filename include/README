@@ -1,86 +1,97 @@
 Directory lout/include
 
 This directory contains Lout source files for the standard packages.
-The following listing classifies them into types of files.
+The following listing classifies them into types of files.  Ordinary
+users only need to know about setup files, not source files.
 
 Setup files (containing mainly lists of options settable by the user)
 ---------------------------------------------------------------------
 
    Setup files for basic document types (choose one):
 
-       doc              The OrdinarySetup package
-       report           The ReportSetup package
-       book             The BookSetup package
-       slides           The OverheadsSetup package
-       picture          The IllustrationSetup package
+       doc              OrdinarySetup package
+       report           ReportSetup package
+       book             BookSetup package
+       slides           OverheadsSetup package
+       picture          IllustrationSetup package
 
    Setup files for special-purpose packages (choose any combination):
 
-       tbl              The Tbl table formatting package
-       tab              The Tab table formatting package (OBSOLETE, use tbl)
-       eq               The Eq equation formatting package
-       diag             The Diag diagram drawing package
-       fig              The Fig advanced graphics package (OBSOLETE, use diag)
-       graph            The Graph graph drawing package
-       pas              The Pas Pascal progam printing package
-       modula           The Modula Modula-2 progam printing package
-       latin2           The Latin2 (Eastern European characters) package
-       russian          The Russian language package
+       diag             Diag diagram drawing package
+       eq               Eq equation formatting package
+       graph            Graph graph drawing package
+       latin2           Latin2 (Eastern European characters) package
+       pie              Pie pie graph drawing package
+       russian          Russian language package
+       tbl              Tbl table formatting package
+       xrgb             @Xrgb symbol (extra named colours)
 
    Setup files for program formatting packages (choose any combination):
 
+       blue             Blue
        cprint           C and C++
        eiffel           Eiffel
-       blue             Blue
+       java             Java
+       modula           Modula-2 (quick hack, does not use prg2lout)
+       pas              Pascal (quick hack, does not use prg2lout)
        perl             Perl + Pod
        pod              Pod
        python           Python
 
-Source files (containing Lout and PostScript source code for the packages)
---------------------------------------------------------------------------
+Source files containing Lout and PostScript source code for the packages
+------------------------------------------------------------------------
 
-       bsf              The BasicSetup package
-       ccommand         Definition of the @ColourCommand symbol
+       bsf              BasicSetup package
        bsf.lpg          A PostScript prepend file needed by BasicSetup
-       dsf              The DocumentSetup package
-       docf             The OrdinarySetup package
-       reportf          The ReportSetup package
-       bookf            The BookSetup package
-       slidesf          The OverheadsSetup package
-       picturef         The IllustrationSetup package
+       dsf              DocumentSetup package
+       docf             OrdinarySetup package
+       reportf          ReportSetup package
+       bookf            BookSetup package
+       slidesf          OverheadsSetup package
+       picturef         IllustrationSetup package
 
-       tabf             The Tab table formatting package (OBSOLETE)
-       tabf.lpg         A PostScript prepend file needed by tabf (OBSOLETE)
-       tblf             The Tbl table formatting package
-       eqf              The Eq equation formatting package
-       figf             The Fig advanced graphics package (OBSOLETE)
-       figf.lpg         A PostScript prepend file needed by figf (OBSOLETE)
-       diagf            The Diag diagram drawing package
+       diagf            Diag diagram drawing package
        diagf.etc        A file included by diagf
        diagf.lpg        A PostScript prepend file needed by diagf
-       graphf           The Graph graph drawing package
+       eqf              Eq equation formatting package
+       graphf           Graph graph drawing package
        graphf.etc       A file included by graphf
        graphf.lpg       A PostScript prepend file needed by graphf
-       pasf             Pascal
-       modulaf          Modula-2
-       latin2.fd        Latin2 font definitions file (placeholder file)
+       pief             Pie diagram drawing package
+       pief.lpg         A PostScript prepend file needed by pief
        russian.fd       Russian font definitions file (placeholder file)
+       tblf             Tbl table formatting package
 
+       bluef            Blue
        cprintf          C and C++
        eiffelf          Eiffel
-       bluef            Blue
+       javaf            Java
+       modulaf          Modula-2
+       pasf             Pascal
        perlf            Perl
        podf             Pod
        pythonf          Python
 
-Miscellaneous
--------------
+Obsolete source files retained for backward compatibility
+---------------------------------------------------------
+
+       tab              Tab table formatting package (OBSOLETE, use tbl)
+       tabf             Tab table formatting package (OBSOLETE)
+       tabf.lpg         A PostScript prepend file needed by tabf (OBSOLETE)
+       fig              Fig advanced graphics package (OBSOLETE, use diag)
+       figf             Fig advanced graphics package (OBSOLETE)
+       figf.lpg         A PostScript prepend file needed by figf (OBSOLETE)
+
+Miscellaneous source files
+--------------------------
 
        langdefs         Standard language definitions file
+       lengths          Helper definitions: @PSLengths and @LoutLengths
+       coltex           Helper definitions: @ColourCommand and @TextureCommand
        mydefs           Empty file for if the user doesn't have a mydefs
        ts               The ToySetup package (an expert users' intro. example)
        init             A Lout source file used during installation (lout -x)
 
 
 Jeffrey H. Kingston
-21 October 2001
+30 October 2002

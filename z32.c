@@ -1,9 +1,9 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -61,6 +61,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
       y = MakeWord(type(x), buff, &fpos(x));
       word_font(y) = word_font(x);
       word_colour(y) = word_colour(x);
+      word_texture(y) = word_texture(x);
       word_outline(y) = word_outline(x);
       word_language(y) = word_language(x);
       word_baselinemark(y) = word_baselinemark(x);
@@ -120,6 +121,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     
       Child(y, LastDown(x));

@@ -1,9 +1,9 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -730,12 +730,14 @@ void CheckSymSpread(void)
     { fprintf(stderr, "+");
       usum += j;
     }
-    fprintf(stderr, "\n");
+    fprintf(stderr, "%s", STR_NEWLINE);
   }
-  fprintf(stderr, "average length counting duplicate names = %.1f\n",
+  fprintf(stderr, "average length counting duplicate names = %.1f",
 	(float) sum / sym_count);
-  fprintf(stderr, "average length not counting duplicate names = %.1f\n",
+  fprintf(stderr, "%s", STR_NEWLINE);
+  fprintf(stderr, "average length not counting duplicate names = %.1f",
 	(float) usum / sym_count);
+  fprintf(stderr, "%s", STR_NEWLINE);
 } /* end CheckSymSpread */
 
 

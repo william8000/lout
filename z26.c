@@ -1,9 +1,9 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -209,6 +209,7 @@ FULL_CHAR *Image(unsigned int c)
     case BREAK:			return  KW_BREAK;
     case UNDERLINE:		return  KW_UNDERLINE;
     case COLOUR:		return  KW_COLOUR;
+    case TEXTURE:		return  KW_TEXTURE;
     case OUTLINE:		return  KW_OUTLINE;
     case LANGUAGE:		return  KW_LANGUAGE;
     case CURR_LANG:		return  KW_CURR_LANG;
@@ -243,6 +244,7 @@ FULL_CHAR *Image(unsigned int c)
     case GRAPHIC:		return  KW_GRAPHIC;
     case LINK_SOURCE:		return  KW_LINK_SOURCE;
     case LINK_DEST:		return  KW_LINK_DEST;
+    case LINK_DEST_NULL:	return  KW_LINK_DEST;
     case LINK_URL:		return  KW_LINK_URL;
     case ACAT:			return  AsciiToFull("acat");
     case HCAT:			return  AsciiToFull("hcat");

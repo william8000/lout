@@ -1,9 +1,9 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -80,6 +80,7 @@ void TransferInit(OBJECT InitEnv)
   small_caps(InitialStyle)      = SMALL_CAPS_OFF;
   font(InitialStyle)            = 0;			/* i.e. undefined    */
   colour(InitialStyle)          = 0;			/* i.e. undefined    */
+  texture(InitialStyle)         = 1;			/* i.e. "null"       */
   outline(InitialStyle)         = FALSE;		/* i.e. not outlined */
   language(InitialStyle)        = 0;			/* i.e. undefined    */
   yunit(InitialStyle)           = 0;			/* i.e. zero         */
@@ -94,7 +95,7 @@ void TransferInit(OBJECT InitEnv)
   New(up_hd, HEAD);
   force_gall(up_hd) = FALSE;
   actual(up_hd) = enclose_obj(up_hd) = limiter(up_hd) = nilobj;
-  headers(up_hd) = dead_headers(up_hd) = nilobj;
+  ClearHeaders(up_hd);
   opt_components(up_hd) = opt_constraints(up_hd) = nilobj;
   gall_dir(up_hd) = ROWM;
   New(dest_index, RECEIVING);
@@ -112,7 +113,7 @@ void TransferInit(OBJECT InitEnv)
   New(root_galley, HEAD);
   force_gall(root_galley) = FALSE;
   enclose_obj(root_galley) = limiter(root_galley) = nilobj;
-  headers(root_galley) = dead_headers(root_galley) = nilobj;
+  ClearHeaders(root_galley);
   opt_components(root_galley) = opt_constraints(root_galley) = nilobj;
   gall_dir(root_galley) = ROWM;
   FposCopy(fpos(root_galley), *no_fpos);
@@ -155,7 +156,8 @@ void TransferInit(OBJECT InitEnv)
 /*****************************************************************************/
 
 OBJECT TransferBegin(OBJECT x)
-{ OBJECT xsym, index, y, link, env, new_env, hold_env, res, hd, target, why;
+{ OBJECT xsym, index, y, link, env, new_env, hold_env, res = nilobj;
+  OBJECT hd, target, why;
   CONSTRAINT c;
   debug1(DGT, D, "[ [ TransferBegin( %s )", EchoObject(x));
   ifdebug(DGT, DD, debug_targets());
@@ -180,7 +182,7 @@ OBJECT TransferBegin(OBJECT x)
     AttachEnv(env, y);
 
     /* now the new environment is y catenated with the old one */
-    debug0(DCR, DDD, "calling SetEnv from TransferBegin (a)");
+    debug0(DCR, DD, "calling SetEnv from TransferBegin (a)");
     new_env = SetEnv(y, nilobj);
   }
   else new_env = env;
@@ -203,7 +205,7 @@ OBJECT TransferBegin(OBJECT x)
   AttachEnv(env, x);
   SetTarget(hd);
   enclose_obj(hd) = (has_enclose(actual(hd)) ? BuildEnclose(hd) : nilobj);
-  headers(hd) = dead_headers(hd) = nilobj;
+  ClearHeaders(hd);
 
   /* search for destination for hd and release it */
   Link(Up(target), index);
@@ -302,7 +304,8 @@ void TransferComponent(OBJECT x)
   /* make the component into a galley */
   New(hd, HEAD);
   force_gall(hd) = FALSE;
-  enclose_obj(hd) = limiter(hd) = headers(hd) = dead_headers(hd) = nilobj;
+  ClearHeaders(hd);
+  enclose_obj(hd) = limiter(hd) = nilobj;
   opt_components(hd) = opt_constraints(hd) = nilobj;
   gall_dir(hd) = ROWM;
   FposCopy(fpos(hd), fpos(x));
@@ -406,7 +409,8 @@ void TransferEnd(OBJECT x)
   /* make the component into a galley */
   New(hd, HEAD);  FposCopy(fpos(hd), fpos(x));
   force_gall(hd) = FALSE;
-  enclose_obj(hd) = limiter(hd) = headers(hd) = dead_headers(hd) = nilobj;
+  ClearHeaders(hd);
+  enclose_obj(hd) = limiter(hd) = nilobj;
   opt_components(hd) = opt_constraints(hd) = nilobj;
   gall_dir(hd) = ROWM;
   actual(hd) = whereto(hd) = ready_galls(hd) = nilobj;

@@ -23,6 +23,8 @@ individual student's name be the work of that student alone.
 showing that a box may enclose an arbitrarily complicated object.
 @PP
 The @Code "@Box" symbol has a @Code margin option which determines the
+box. @RawIndex @Code "@Box"
+box.margin @SubIndex { @Code "margin" option }
 margin between the box and what it encloses.  For example,
 @ID @OneRow @Code {
 "@Box"
@@ -38,6 +40,7 @@ is very useful to tie the margin to the font size in this way, because
 large headings (in overhead transparencies, say) need large margins.
 @PP
 There is a @Code "linewidth" option which determines the width
+box.linewidth @SubIndex { @Code "linewidth" option }
 (thickness) of the line drawn around the boundary of the box:
 @ID @OneRow @Code {
 "@Box"
@@ -60,6 +63,7 @@ value @Code "none" for @Code "linewidth" ensures that no line is drawn
 around the box at all.
 @PP
 There is also a @Code "paint" option which paints a background of the
+box.paint @SubIndex { @Code "paint" option }
 nominated colour:
 @ID @Code "@Box paint { grey } WARNING!"
 has result
@@ -78,6 +82,61 @@ the moment, with white text inside:
 This works because the box is painted before the object it encloses
 is drawn on the page.
 @PP
+Wherever there is a @Code paint option in Lout for painting the background
+of something, there is always an accompanying @Code texture option for
+box.texture @SubIndex { @Code "texture" option }
+applying that paint with the textures described in
+Section {@NumberOf textures}.  For example,
+@ID @Code "@Box paint { black } texture { brickwork } 50p @Font WARNING!"
+produces
+@FootNote { As explained in Section {@NumberOf textures}, if you can't
+see any textures the problem is probably with your PostScript viewer. }
+@ID @Box paint { black } texture { brickwork } 50p @Font WARNING!
+If @Code paint is absent or @Code none then @Code texture will have no
+effect.  Since textures are naturally lighter than solid colour, you
+will usually need darker paint when using textures than when not.
+@PP
+To set options on a texture within a @Code "texture" option, you can write
+@ID @Code "texture { striped @Texture angle { 45d } scale { 2 } }"
+mimicking the @Code "@Texture" symbol from Section {@NumberOf textures},
+but without any following object.  However, it's clunky to have to type
+both @Code texture and {@Code "@Texture"}, so by special arrangement you
+can omit the @Code "@Texture" symbol within the @Code "texture" option:
+@ID @Code "texture { striped angle { 45d } scale { 2 } }"
+The value of the @Code "texture" option may also be an expert's texture
+as required by {@Code "@SetTexture"}.  Incidentally, there is no
+significance in our laying out all the options along one line.  As always
+in Lout, the end of a line and a space mean the same.  We've done it this
+way because we think it's the clearest way to lay out the @Code texture option.
+@PP
+Let's just summarize the painting and texturing possibilities for boxes.
+A box has three components: its outline, its background, and its content
+(what appears inside).  You can actually set the colour and texture of
+all three components independently of each other, with a little trouble:
+@ID @OneRow @Code @Verbatim {
+black @Colour striped @Texture angle { 45d }
+@Box
+    paint { lightgrey }
+    linewidth { 2p }
+    texture { striped angle { 90d } }
+darkgrey @Colour striped @Texture scale { 2 } 50p @Font ABC
+} 
+produces
+@CD {
+black @Colour striped @Texture angle { 45d }
+@Box
+    paint { lightgrey }
+    linewidth { 2p }
+    texture { striped angle { 90d } }
+darkgrey @Colour striped @Texture scale { 2 } 50p @Font ABC
+} 
+The outline colour and texture are the colour and texture from outside
+the box; the background colour and texture are always determined by the
+@Code paint and @Code texture options; and the colour and texture of
+the contents are inherited from outside the box, but can be changed as
+shown if desired.  Notice what happens when two textures overstrike:  the
+lower one shows through the unpainted parts of the upper one.
+@PP
 There are @Code "@CurveBox" and @Code "@ShadowBox" symbols that
 curvebox. @Index @Code "@CurveBox"
 shadowbox. @Index @Code "@ShadowBox"
@@ -89,9 +148,10 @@ produce other kinds of boxes:
     A { @CurveBox { A curve box } }
     B { @ShadowBox { A shadow box } }
 }
-These also have @Code "margin" and @Code "paint" options, and
-@Code "@ShadowBox" has a @Code "shadow" option which determines
-the thickness of the shadow (its default value is {@Code "0.2f"}).
+These also have {@Code "margin"}, {@Code "linewidth"}, {@Code "paint"},
+and @Code "texture" options, and @Code "@ShadowBox" has a @Code "shadow"
+option which determines the thickness of the shadow (its default value
+is {@Code "0.2f"}).
 @PP
 Boxes are quite at home inside paragraphs, as @Box { a box },
 @CurveBox { a curve box }, and @ShadowBox { a shadow box }
@@ -116,8 +176,28 @@ across the whole page:
 "@OddPageTop { { My lovely document @LP @LocalWidthRule } @Right @PageNum }"
 }
 will draw a rule under just the three words.  Of course, underlining using
-the @Code "@Underline" symbol might be a better way to do this.  Both
-symbols have a @Code "linewidth" option which works like the one for
-boxes described above.  In particular, Lout leaves zero space for the
-line, no matter how wide you make it.
+the @Code "@Underline" symbol might be a better way to do this.
+@PP
+These two rule symbols are handled behind the scenes like the outlines
+of boxes.  Both symbols have a @Code "linewidth" option which works
+like the one for boxes described above.  In particular, Lout leaves
+zero space for the line, no matter how wide you make it.  And to change
+the colour or texture of a rule, it must be enclosed in @Code "@Colour"
+and @Code "@Texture" symbols:
+@ID @Code "chessboard @Texture scale { 2 } @FullWidthRule linewidth { 8p }"
+produces
+@DP
+chessboard @Texture scale { 2 } @FullWidthRule linewidth { 8p }
+@DP
+Notice how we have made sure that the rule is wide enough to
+accommodate two rows of the chessboard texture.  The author's
+printer places a thin row of solid colour along the top of
+this pattern.  Logically it should not be there; it can be got
+rid of by reducing the line width:
+@ID @Code "chessboard @Texture scale { 2 } @FullWidthRule linewidth { 7.5p }"
+produces
+@DP
+chessboard @Texture scale { 2 } @FullWidthRule linewidth { 7.5p }
+@DP
+We can only guess that the problem might be roundoff error.
 @End @Section

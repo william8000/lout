@@ -1,9 +1,9 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -112,7 +112,9 @@ static FULL_CHAR NameRetrieve(FULL_CHAR *cname, MAP_VEC map)
 
 MAPPING MapLoad(OBJECT file_name, BOOLEAN recoded)
 { FILE *fp;  MAP_VEC map;  MAPPING res;
-  int i, m, curr_line_num, line_pos, prev_code, dc, oc, count;
+  int i, m, curr_line_num, line_pos, prev_code, dc, count;
+  unsigned int oc;
+  int status;
   FULL_CHAR buff[MAX_BUFF], cn[MAX_BUFF], ch, mapname[MAX_BUFF],
   mapval[MAX_BUFF];
   debug2(DCM,D, "MapLoad(%s, %s)", EchoObject(file_name), bool(recoded));
@@ -175,21 +177,21 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN recoded)
 
   /* first pass through the file; read character codes and names only */
   prev_code = -1;  curr_line_num = 0;
-  while( fgets( (char *) buff, MAX_BUFF, fp) == (char *) buff )
+  while( (status = ReadOneLine(fp, buff, MAX_BUFF)) != 0 ) 
   { 
     /* skip comment lines and blank lines */
     curr_line_num++;
     for( i = 0;  buff[i] == ' ' || buff[i] == '\t';  i++ );
-    if( buff[i] == '#' || buff[i] == '\n' || buff[i] == '\0' )  continue;
+    if( buff[i] == '#' || buff[i] == '\0' )  continue;
 
     /* parse line and check validity of decimal and octal character codes */
     count = sscanf( (char *) buff, "%d %o %s", &dc, &oc, cn);
     if( count < 2 )
       Error(38, 4, "character code(s) missing in mapping file (line %d)",
-	FATAL, &fpos(file_name));
+	FATAL, &fpos(file_name), curr_line_num);
     if( dc != oc )
       Error(38, 5, "decimal and octal codes disagree in mapping file (line %d)",
-	FATAL, &fpos(file_name));
+	FATAL, &fpos(file_name), curr_line_num);
     if( dc < 1 && !StringEqual(cn, STR_NOCHAR) )
       Error(38, 6, "code %d too small (min is 1) in mapping file (line %d)",
 	FATAL, &fpos(file_name), dc, curr_line_num);
@@ -219,16 +221,15 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN recoded)
   /* second pass through the file: read mappings */
   rewind(fp);
   curr_line_num = 0;
-  while( fgets( (char *) buff, MAX_BUFF, fp) == (char *) buff )
+  while( (status = ReadOneLine(fp, buff, MAX_BUFF)) != 0 ) 
   { 
     /* skip comment lines and blank lines */
     curr_line_num++;
     for( i = 0;  buff[i] == ' ' || buff[i] == '\t';  i++ );
-    if( buff[i] == '#' || buff[i] == '\n' || buff[i] == '\0' )  continue;
+    if( buff[i] == '#' || buff[i] == '\0' )  continue;
 
     /* parse line */
-    count = sscanf( (char *) buff, "%d %o %s%n",
-      &dc, &oc, cn, &line_pos);
+    count = sscanf( (char *) buff, "%d %o %s%n", &dc, &oc, cn, &line_pos);
 
     /* find and insert the maps */
     while( sscanf( (char *) &buff[line_pos], "%s %[^;];%n",
@@ -344,7 +345,7 @@ void MapPrintPSResources(FILE *fp)
 { MAPPING m;  MAP_VEC map;
   for( m = 1;  m < maptop;  m++ )  if( MapTable[m]->seen_recoded )
   { map = MapTable[m];
-    fprintf(fp, "%%%%+ encoding %s\n", string(map->name));
+    fprintf(fp, "%%%%+ encoding %s%s", string(map->name), (char *) STR_NEWLINE);
   }
 } /* end MapPrintPSResources */
 
@@ -363,6 +364,7 @@ static OBJECT DoWord(FULL_CHAR *buff, FULL_CHAR *q, OBJECT x, FONT_NUM fnum)
   res = MakeWord(type(x), buff, &fpos(x));
   word_font(res) = fnum;
   word_colour(res) = word_colour(x);
+  word_texture(res) = word_texture(x);
   word_outline(res) = word_outline(x);
   word_language(res) = word_language(x);
   word_baselinemark(res) = word_baselinemark(x);
@@ -430,9 +432,9 @@ static OBJECT		font_change_word = nilobj;
 static FULL_LENGTH	font_change_length = 0;
 
 OBJECT MapSmallCaps(OBJECT x, STYLE *style)
-{ MAPPING m;  int i;  OBJECT new_y, new_x, new_acat, tmp;
+{ MAPPING m;  int i;  OBJECT new_y, new_x = nilobj, new_acat = nilobj, tmp;
   FULL_CHAR buff[MAX_BUFF], *uc, *p, *q;
-  FONT_NUM small_font;  FULL_LENGTH vshift;  int state;  STYLE new_style;
+  FONT_NUM small_font = 0;  FULL_LENGTH vshift = 0;  int state;  STYLE new_style;
   assert( is_word(type(x)), "MapSmallCaps: !is_word(type(x))" );
   debug2(DCM, D, "MapSmallCaps(%s %s)", Image(type(x)), string(x));
 

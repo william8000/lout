@@ -1,9 +1,9 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -164,7 +164,7 @@ typedef struct {
 /*****************************************************************************/
 
 #define MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word)	\
-{ OBJECT newg, foll, tmp;						\
+{ OBJECT newg, foll = nilobj, tmp;					\
   BOOLEAN jn, unbreakable_at_right = FALSE;				\
   debug0(DOF, DDD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
 									\
@@ -220,6 +220,7 @@ typedef struct {
 	  { hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
 	    word_font(hyph_word) = 0;					\
 	    word_colour(hyph_word) = colour(save_style(x));		\
+	    word_texture(hyph_word) = texture(save_style(x));		\
 	    word_outline(hyph_word) = outline(save_style(x));		\
 	    word_language(hyph_word) = language(save_style(x));		\
 	    word_baselinemark(hyph_word) = baselinemark(save_style(x));	\
@@ -266,7 +267,7 @@ typedef struct {
 /*****************************************************************************/
 
 #define IntervalInit(I, x, max_width, etc_width, hyph_word)		\
-{ OBJECT rlink, right; BOOLEAN jn;					\
+{ OBJECT rlink, right = nilobj; BOOLEAN jn;				\
   debug0(DOF, DDD, "IntervalInit(I, x, -, -, hyph_word)");		\
   I.llink = x;								\
 									\
@@ -299,7 +300,7 @@ typedef struct {
 /*****************************************************************************/
 
 #define IntervalShiftRightEnd(I, x, hyph_word, max_width, etc_width) 	\
-{ OBJECT rlink, g, right;						\
+{ OBJECT rlink, g, right = nilobj;					\
   assert( I.class != AT_END, "IntervalShiftRightEnd: AT_END!" );	\
   rlink = I.rlink;							\
   if( rlink == x ) I.class = AT_END;					\
@@ -352,7 +353,7 @@ typedef struct {
 /*****************************************************************************/
 
 #define IntervalShiftLeftEnd(I, x, max_width, etc_width)		\
-{ OBJECT llink, left, lgap, y;  BOOLEAN jn;				\
+{ OBJECT llink, left = nilobj, lgap, y;  BOOLEAN jn;			\
   debug1(DOF, DDD, "IntervalShiftLeftEnd(%s)", IntervalPrint(I, x));	\
   assert( I.class != AT_END, "IntervalShiftLeftEnd: AT_END!" );		\
 									\
@@ -518,8 +519,9 @@ static FULL_CHAR *IntervalPrint(INTERVAL I, OBJECT x)
 
 OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   BOOLEAN allow_shrink, BOOLEAN extend_unbreakable, BOOLEAN *hyph_used)
-{ INTERVAL I, BestI;  OBJECT res, gp, tmp, z, y, link, ylink, prev, next;
-  int max_width, etc_width, outdent_margin, f;  BOOLEAN jn;  unsigned typ;
+{ INTERVAL I, BestI;
+  OBJECT res, gp, tmp, z = nilobj, y = nilobj, link, ylink, prev, next;
+  int max_width, etc_width, outdent_margin = 0, f;  BOOLEAN jn;  unsigned typ;
   static OBJECT hyph_word = nilobj;
   BOOLEAN hyph_allowed;	    /* TRUE when hyphenation of words is permitted  */
   assert( type(x) == ACAT, "FillObject: type(x) != ACAT!" );
@@ -527,7 +529,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   debug4(DOF, D, "FillObject(x, %s, can_hyph = %s, %s); %s",
     EchoConstraint(c), bool(can_hyphenate),
     multi == nilobj ? "nomulti" : "multi", EchoStyle(&save_style(x)));
-  ifdebug(DOF, DD, DebugObject(x); fprintf(stderr, "\n\n") );
+  ifdebug(DOF, DD, DebugObject(x));
 
   *hyph_used = FALSE;
 
@@ -553,6 +555,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       res = MakeWord(WORD, STR_EMPTY, &fpos(x));
       word_font(res) = font(save_style(x));
       word_colour(res) = colour(save_style(x));
+      word_texture(res) = texture(save_style(x));
       word_outline(res) = outline(save_style(x));
       word_language(res) = language(save_style(x));
       word_baselinemark(res) = baselinemark(save_style(x));
@@ -574,6 +577,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   back(tmp, COLM) = fwd(tmp, COLM) = back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
   word_font(tmp) = 0;
   word_colour(tmp) = 0;
+  word_texture(tmp) = 1;
   word_outline(tmp) = 0;
   word_language(tmp) = 0;
   word_baselinemark(tmp) = FALSE;
@@ -630,7 +634,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	if( IntervalClass(I) == EMPTY_INTERVAL ||
 	    IntervalBadness(BestI) <= IntervalBadness(I) )
 	      I = BestI;
-	debug1(DOF, DD, "BestI: %s\n", IntervalPrint(I, x));
+	debug1(DOF, DD, "BestI: %s", IntervalPrint(I, x));
+	debug0(DOF, DD, "");
 	/* NB no break */
 
 
@@ -749,6 +754,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	back(t1, COLM) = fwd(t1, COLM) = back(t1, ROWM) = fwd(t1, ROWM) = 0;
 	word_font(t1) = 0;
 	word_colour(t1) = 0;
+	word_texture(t1) = 1;
 	word_outline(t1) = 0;
 	word_language(t1) = 0;
 	word_baselinemark(t1) = FALSE;
@@ -782,7 +788,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 
 	/* add zero-width gap object */
         New(z, GAP_OBJ);
-	debug0(DOF, DD, "   adding hyphen\n");
+	debug0(DOF, DD, "   adding hyphen");
+	debug0(DOF, DD, "");
 	hspace(z) = vspace(z) = 0;
 	underline(z) = underline(tmp);
 	SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
@@ -792,6 +799,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	z = MakeWord(WORD, STR_HYPHEN, &fpos(y));
 	word_font(z) = word_font(tmp);
 	word_colour(z) = word_colour(tmp);
+	word_texture(z) = word_texture(tmp);
 	word_outline(z) = word_outline(tmp);
 	word_language(z) = word_language(tmp);
 	word_baselinemark(z) = word_baselinemark(tmp);
@@ -887,6 +895,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	    if( is_word(type(prev)) && is_word(type(next)) &&
 	        word_font(prev) == word_font(next) &&
 	        word_colour(prev) == word_colour(next) &&
+	        word_texture(prev) == word_texture(next) &&
 	        word_outline(prev) == word_outline(next) &&
 	        word_language(prev) == word_language(next) &&
 	        word_baselinemark(prev) == word_baselinemark(next) &&
@@ -898,6 +907,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	      tmp = MakeWordTwo(typ, string(prev), string(next), &fpos(prev));
 	      word_font(tmp) = word_font(prev);
 	      word_colour(tmp) = word_colour(prev);
+	      word_texture(tmp) = word_texture(prev);
 	      word_outline(tmp) = word_outline(prev);
 	      word_language(tmp) = word_language(prev);
 	      word_baselinemark(tmp) = word_baselinemark(prev);

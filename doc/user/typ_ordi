@@ -42,7 +42,6 @@ values.  As usual with options, the options of {@Code "@Document"}
 may be given in any order, and only the ones that need to be changed
 need be given at all.  Notice the @Code "//" after the last option.  Its
 meaning is beyond our
-"//" @Index { @Code "//" symbol }
 scope, but total disaster will ensue if it is forgotten.  The @Code "@Doc"
 symbol is an abbreviation for {@Code "@Document //"}, which is why you don't
 need @Code "//" with {@Code "@Doc"}.

@@ -1,9 +1,9 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -99,7 +99,7 @@ static void tab(int x)
 static void newline(void)
 { if( fp == null )  AppendString(STR_SPACE);
   else
-  { fputs("\n", fp);
+  { StringFPuts(STR_NEWLINE, fp);
     fflush(fp);
     for( col = 0;  col < indent;  col++ )  fputs(" ", fp);
   }
@@ -702,8 +702,6 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	break;
 
 
-    case BEGIN_HEADER:
-    case SET_HEADER:
     case ONE_COL:
     case ONE_ROW:
     case HCONTRACT:
@@ -740,6 +738,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_DEST_NULL:
     case LINK_URL:
     case ROTATE:
     case BACKGROUND:
@@ -755,6 +754,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case BREAK:
     case UNDERLINE:
     case COLOUR:
+    case TEXTURE:
     case OUTLINE:
     case LANGUAGE:
     case OPEN:
@@ -781,6 +781,35 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	CountChild(y, LastDown(x), count);
 	echo(y, type(x)==OPEN ? FORCE_PREC : find_max(outer_prec,DEFAULT_PREC),
 	  count);
+	if( braces_needed )  aprint(" "), cprint(KW_RBR);
+	break;
+
+
+    case BEGIN_HEADER:
+    case SET_HEADER:
+
+	/* print enclosing left brace if needed */
+	braces_needed = (DEFAULT_PREC <= outer_prec);
+	if( braces_needed )  cprint(KW_LBR), aprint(" ");
+
+	/* print left parameter */
+	if( Down(x) != LastDown(x) )
+	{ CountChild(y, Down(x), count);
+	  echo(y, find_max(outer_prec, DEFAULT_PREC), count);
+	  aprint(" ");
+	}
+
+	cprint(Image(type(x)));
+
+	/* print right parameter copies */
+	for( link = NextDown(Down(x)), i=1; link != x; link = NextDown(link), i++ )
+	{
+	  newline();
+	  printnum(i);
+	  aprint(": ");
+	  CountChild(y, link, count);
+	  echo(y, find_max(outer_prec,DEFAULT_PREC), count);
+	}
 	if( braces_needed )  aprint(" "), cprint(KW_RBR);
 	break;
 
@@ -938,7 +967,7 @@ void DebugObject(OBJECT x)
   limit  = 60;
   if( x == nilobj )  fprintf(stderr, "<nilobj>");
   else echo(x, type(x) == GAP_OBJ ? VCAT : 0, 1);
-  fprintf(stderr, "\n");
+  fprintf(stderr, "%s", STR_NEWLINE);
   debug0(DOE, D, "DebugObject returning");
 } /* end DebugObject */
 
@@ -1008,36 +1037,72 @@ FULL_CHAR *EchoIndex(OBJECT index)
 /*  Print overview of galley hd on stderr; mark pinpoint if found            */
 /*                                                                           */
 /*****************************************************************************/
-#define eprint(x, a, b, c) fprintf(stderr, "| %d %-7s %20s %s\n", x, a, b, c)
 
 void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
 { OBJECT link, y;  char istr[30];  int i;
   for( i = 0;  i < indent;  i++ )  istr[i] = ' ';
   istr[i] = '\0';
   if( type(hd) != HEAD )
-  { fprintf(stderr, "%shd is %s\n", istr, Image(type(hd)));
+  {
+    debug2(ANY, D, "%shd is %s", istr, Image(type(hd)));
     return;
   }
-  fprintf(stderr, "%sgalley %s into %s\n", istr,
+  debug3(ANY, D, "%sgalley %s into %s", istr,
     SymName(actual(hd)), SymName(whereto(hd)));
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
   { Child(y, link);
     if( y == pinpt || link == pinpt )
-    { fprintf(stderr, "++ %d %s ", (int) y, Image(type(y)));
+    {
+      debug2(ANY, D, "++ %d %s ", (int) y, Image(type(y)));
       DebugObject(y);
     }
     else
     if( type(y) == GAP_OBJ )
-      eprint((int) y, "gap_obj", Image(type(y)), EchoGap(&gap(y)));
+    {
+      debug4(ANY, D, "| %d %-7s %20s %s", (int) y, "gap_obj",
+	Image(type(y)), EchoGap(&gap(y)));
+    }
+    else if( type(y) == EXPAND_IND )
+    { OBJECT z = nilobj;
+      if( type(actual(y)) == VEXPAND || type(actual(y)) == HEXPAND )
+      {
+	Child(z, Down(actual(y)));
+	if( !is_word(type(z)) )
+	  z = nilobj;
+      }
+      if( z == nilobj )
+      {
+        debug4(ANY, D, "| %d %-7s %20s %s", (int) y, "index",
+	  Image(type(y)), Image(type(actual(y))));
+      }
+      else
+      {
+        debug5(ANY, D, "| %d %-7s %20s %s \"%s\"", (int) y, "index",
+	  Image(type(y)), Image(type(actual(y))), string(z));
+      }
+      assert( type(actual(y)) == VEXPAND || type(actual(y)) == HEXPAND,
+	"DebugGalley: type(actual(EXPAND_IND))!");
+    }
     else if( is_index(type(y)) )
-      eprint((int) y, "index", Image(type(y)), "");
+    {
+      debug4(ANY, D, "| %d %-7s %20s %s", (int) y, "index",
+	Image(type(y)), "");
+    }
     else if( is_definite(type(y)) )
-      eprint((int) y, "def_obj", Image(type(y)), is_word(type(y)) ? string(y):STR_EMPTY);
+    {
+      debug4(ANY, D, "| %d %-7s %20s %s", (int) y, "def_obj",
+	Image(type(y)), is_word(type(y)) ? string(y):STR_EMPTY);
+    }
     else if( is_indefinite(type(y)) )
-      eprint((int) y, "indefin", Image(type(y)),
-	type(y) == CLOSURE ? SymName(actual(y)) : STR_EMPTY);
+    {
+      debug4(ANY, D, "| %d %-7s %20s %s", (int) y, "indefin",
+	Image(type(y)), type(y) == CLOSURE ? SymName(actual(y)) : STR_EMPTY);
+    }
     else
-      eprint((int) y, "unknown", Image(type(y)), "");
+    {
+      debug4(ANY, D, "| %d %-7s %20s %s", (int) y, "unknown",
+	Image(type(y)), "");
+    }
   }
 } /* end DebugGalley */
 #endif

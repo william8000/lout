@@ -5,26 +5,31 @@
 @Begin
 @PP
 Lout ordinarily assigns a number to each reference, and prints this
-labelled.refs @Index { labelled references }
+references. @RawIndex { references }
+references.labelled @SubIndex { labelled }
+labelled.references @Index { labelled references }
 number beside the reference in the reference list and at the point(s)
 of citation.  There is a way to make Lout use a label of your choice
 instead of a number for each reference.  First change the following
 setup file options to the values shown (these options are explained
 in Section {@NumberOf changeref}):
-@ID @OneRow @Code {
-"@RefCiteLabels { @Label }"
-"@RefListLabels { @Label. }"
-"@RefListLabelWidth { 4.00f }"
-"@RefListSortKey { @Label }"
+@ID @OneRow @Code @Verbatim {
+@RefCiteLabels { @Label }
+@RefListLabels { @Label. }
+@RefListLabelWidth { 4.00f }
+@RefListSortKey { @Label }
 }
 Then make sure that every reference you cite has a {@Code "@Label"} option:
-@ID @OneRow @Code {
-"{ @Reference"
-"    @Tag { kingston1995lout.expert }"
-"    @Type { TechReport }"
-"    @Label { Kin94 }"
-"    ..."
-"}"
+references. @RawIndex { references }
+references.label @SubIndex { @Code "@Label" }
+label.references @Index { @Code "@Label" (references) }
+@ID @OneRow @Code @Verbatim {
+{ @Reference
+    @Tag { kingston1995lout.expert }
+    @Type { TechReport }
+    @Label { Kin94 }
+    ...
+}
 }
 @Code "@Label" may contain several words, and even font changes, but not
 an arbitrary object.

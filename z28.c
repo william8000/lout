@@ -1,9 +1,9 @@
 /*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -53,7 +53,7 @@ static int	mess_top = 0;			/* first free error message  */
 void ErrorInit(FULL_CHAR *str)
 { if( fp != NULL )
     Error(28, 1, "-e argument appears twice in command line", FATAL, no_fpos);
-  fp = StringFOpen(str, WRITE_TEXT);
+  fp = StringFOpen(str, WRITE_FILE);
   if( fp == NULL )
     Error(28, 2, "cannot open error file %s", FATAL, no_fpos, str);
 } /* end ErrorInit */
@@ -84,7 +84,7 @@ BOOLEAN ErrorSeen(void)
 static void PrintFileBanner(int fnum)
 { static int CurrentFileNum = -1;
   if( fnum != CurrentFileNum )
-  { fprintf(fp, "lout%s:\n", EchoFileSource(fnum));
+  { fprintf(fp, "lout%s:%s", EchoFileSource(fnum), (char *) STR_NEWLINE);
     CurrentFileNum = fnum;
   }
 } /* end PrintFileBanner */
@@ -178,16 +178,16 @@ POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
       if( AltErrorFormat )
       {
-        fprintf(fp, condcatgets(MsgCat, 28, 7, "%s internal error: %s\n"),
-	  EchoAltFilePos(pos), val);
-        /* for estrip's benefit: Error(28, 7, "%s internal error: %s\n") */
+        fprintf(fp, condcatgets(MsgCat, 28, 7, "%s internal error: %s%s"),
+	  EchoAltFilePos(pos), val, (char *) STR_NEWLINE);
+        /* for estrip's benefit: Error(28, 7, "%s internal error: %s%s") */
       }
       else
       {
         PrintFileBanner(file_num(*pos));
-        fprintf(fp, condcatgets(MsgCat, 28, 4, "  %6s internal error: %s\n"),
-	  EchoFileLine(pos), val);
-        /* for estrip's benefit: Error(28, 4, "  %6s internal error: %s\n") */
+        fprintf(fp, condcatgets(MsgCat, 28, 4, "  %6s internal error: %s%s"),
+	  EchoFileLine(pos), val, (char *) STR_NEWLINE);
+        /* for estrip's benefit: Error(28, 4, "  %6s internal error: %s%s") */
       }
 #if DEBUG_ON
       abort();
@@ -202,17 +202,17 @@ POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
       if( AltErrorFormat )
       {
-        fprintf(fp, condcatgets(MsgCat, 28, 8, "%s: fatal error: %s\n"),
-	  EchoAltFilePos(pos), val);
+        fprintf(fp, condcatgets(MsgCat, 28, 8, "%s: fatal error: %s%s"),
+	  EchoAltFilePos(pos), val, (char *) STR_NEWLINE);
       }
       else
       {
         PrintFileBanner(file_num(*pos));
-        fprintf(fp, condcatgets(MsgCat, 28, 5, "  %6s: fatal error: %s\n"),
-	  EchoFileLine(pos), val);
+        fprintf(fp, condcatgets(MsgCat, 28, 5, "  %6s: fatal error: %s%s"),
+	  EchoFileLine(pos), val, (char *) STR_NEWLINE);
       }
-      /* for estrip's benefit: Error(28, 5, "  %6s: fatal error: %s\n") */
-      /* for estrip's benefit: Error(28, 8, "%s: fatal error: %s\n") */
+      /* for estrip's benefit: Error(28, 5, "  %6s: fatal error: %s%s") */
+      /* for estrip's benefit: Error(28, 8, "%s: fatal error: %s%s") */
       exit(1);
       break;
 
@@ -223,24 +223,27 @@ POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...
       {
 	if( AltErrorFormat )
 	{
-	  fprintf(fp, "%s: %s\n", EchoAltFilePos(pos), val);
+	  fprintf(fp, "%s: %s%s", EchoAltFilePos(pos), val,
+	    (char *) STR_NEWLINE);
 	}
 	else
 	{
 	  PrintFileBanner(file_num(*pos));
-	  fprintf(fp, "  %6s: %s\n", EchoFileLine(pos), val);
+	  fprintf(fp, "  %6s: %s%s", EchoFileLine(pos), val,
+	    (char *) STR_NEWLINE);
 	}
       }
       else if( mess_top < MAX_ERRORS )
       {
 	if( AltErrorFormat )
 	{
-	  sprintf(message[mess_top++], "%s: %s\n", EchoAltFilePos(pos), val);
+	  sprintf(message[mess_top++], "%s: %s%s", EchoAltFilePos(pos), val,
+	    (char *) STR_NEWLINE);
 	}
 	else
 	{ message_fnum[mess_top] = file_num(*pos);
-	  sprintf(message[mess_top++], "  %6s: %s\n",
-	    EchoFileLine(pos), val);
+	  sprintf(message[mess_top++], "  %6s: %s%s",
+	    EchoFileLine(pos), val, (char *) STR_NEWLINE);
 	}
       }
       else Error(28, 6, "too many error messages", FATAL, pos);

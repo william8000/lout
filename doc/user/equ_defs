@@ -5,6 +5,10 @@
 Whenever you type particular equations or parts of equations repeatedly,
 you can save time by using definitions.  Definitions are the subject of
 Section {@NumberOf definitions}, so here we will just give a few examples
+equations. @RawIndex { equations }
+equations.definitions @SubIndex { definitions, use with }
+definitions. @RawIndex { definitions }
+definitions.use.with.equations @SubIndex { use with equations }
 of their use in equation formatting.
 @PP
 Suppose for example that @OneCol @Eq { p sub i ` log sub 2 ` p sub i }

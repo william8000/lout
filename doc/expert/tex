@@ -1,0 +1,383 @@
+@Appendix
+   @Title { Implementation of Textures }
+   @Tag { tex }
+@Begin
+The following notes detail how PostScript patterns have been
+used to produce textures.  See the PostScript Language
+Reference Manual, second edition (PLRM), especially Section 4.9.
+@PP
+PostScript patterns are implemented as color spaces, whereas
+from a logical point of view they are really separate entities
+in the graphics state, independent of color (except that a
+colored texture overrides any current color while it is in
+effect).  To ensure that Lout's @@SetTexture and @@SetColour
+symbols have this desired independence of each other, the
+following operators are defined in the Lout prologue:
+@CD @Tbl
+    mv { 0.5vx }
+    bfont { Italic }
+    bformat { @StartHSpan @Cell i { ctr } A | @HSpan | @HSpan | @Cell D }
+    aformat { @Cell i { right } @Code A | @Cell @Code B |
+              @Cell mr { 1c } @Code "-" | @Cell D }
+{
+@Rowb
+    ma { 0i }
+    A { Lout-defined operator }
+    D { What it replaces }
+    rb { yes }
+@Rowa
+    A { num } 
+    B { LoutSetGray }
+    D { setgray }
+@Rowa
+    A { num num num } 
+    B { LoutSetRGBColor }
+    D { setrgbcolor }
+@Rowa
+    A { num num num } 
+    B { LoutSetHSBColor }
+    D { sethsbcolor }
+@Rowa
+    A { num num num num } 
+    B { LoutSetCMYKColor }
+    D { setcmykcolor }
+@Rowa
+    A { p } 
+    B { LoutSetTexture }
+    D { setpattern }
+    rb { yes }
+    mb { 0i }
+}
+These have similar signatures to the corresponding PostScript
+operators shown, and the idea is to use the Lout-defined
+versions where you would normally use the PostScript ones.
+The first four set the color without disturbing any current
+texture; the last sets the texture without disturbing
+any current color.  Here @Code { p } may be the PostScript
+{@Code null} object, meaning no texture i.e. normal filling,
+or else it must be an instantiated pattern dictionary, as
+returned by @Code { makepattern }.
+@PP
+There are three key data types used by this code:
+@BulletList
+
+@LI { A colorspace, denoted @Code { cs }, is a PostScript
+colorspace array and may have one of the following values:
+@DP @RID @Tbl
+    mv { 0.6vx }
+    aformat { @Cell @Code A | @Cell B }
+{
+@Rowa
+    ma { 0i }
+    A { "[ /DeviceGray ]" }
+    B { The greyscale colorspace }
+@Rowa
+    A { "[ /DeviceRGB ]" }
+    B { The RGB colorspace }
+@Rowa
+    A { "[ /DeviceCMYK ]" }
+    B { The CMYK colorspace }
+@Rowa
+    A { "[ /Pattern ]" }
+    B { A colored pattern }
+@Rowa
+    mb { 0i }
+    A { "[ /Pattern /name ]" }
+    B { An uncolored pattern; @Code "/name" may be
+{@Code "/DeviceGray"}, {@Code "/DeviceRGB"}, or
+{@Code "/DeviceCMYK"} }
+}
+}
+
+@LI { A color, denoted c, is an array containing a PostScript
+non-pattern color and thus may have one of the following values:
+@ID @Tbl
+    mv { 0.6vx }
+    aformat { @Cell @Code A | @Cell B }
+{
+@Rowa
+    ma { 0i }
+    A { "[ grey ]" }
+    B { A @Code "/DeviceGray" color }
+@Rowa
+    A { "[ red green blue ]" }
+    B { A @Code "/DeviceRGB" color }
+@Rowa
+    A { "[ c m y k ]" }
+    B { A @Code "/DeviceCMYK" color }
+    mb { 0i }
+}
+We enclose colors in an array to make it easy for us to
+deal with their varying length.  The array has to be unpacked
+with @Code "aload" before calling {@Code setcolor}.
+}
+
+@LI { A pattern, denoted {@Code "p"}.  For us, a pattern is
+either the PostScript null object, meaning to fill with solid
+color, or else it is a dictionary as returned by
+{@Code makepattern}.  When such a dictionary is installed in
+the current graphics state, this code guarantees that it will
+contain two extra entries:
+@ID @Tbl
+    mv { 0.6vx }
+    aformat { @Cell @Code A | @Cell B }
+{
+@Rowa
+    ma { 0i }
+    A { "/UnderlyingColorSpace" }
+    B { A @Code cs as defined above }
+@Rowa
+    A { "/UnderlyingColor" }
+    B { A @Code c as defined above }
+    mb { 0i }
+}
+We need these extra entries to make color independent of
+texture:  without them we would lose the current color when
+we set a texture.  Because of these variables we can't share
+pattern dictionaries among graphics states.  We must copy them.
+}
+
+@EndList
+This representation obeys the following invariant:
+@BulletList
+
+@LI {
+All components of the PostScript graphics state related to
+pattern and color have defined values (e.g. there is never a
+situation where we set color space but not color).
+}
+
+@LI { 
+If the PostScript graphics state contains a @Code "/Pattern"
+colorspace, the pattern dictionary stored in the state has
+@Code "/UnderlyingColorSpace" and @Code "/UnderlyingColor"
+entries of types @Code cs and {@Code c}.
+}
+
+@LI {
+If the graphics state contains an uncolored @Code "/Pattern"
+colorspace, then the @Code "/UnderlyingColorSpace" and
+@Code "/UnderlyingColor" entries of the pattern dictionary
+stored in the state agree with the underlying color space
+and color stored in the graphics state.
+}
+
+@EndList
+And it has the following abstraction function:
+@BulletList
+
+@LI {
+If the graphics state colorspace is {@Code "/Pattern"}, then
+the abstract current texture is the pattern dictionary stored
+in the graphics state color.  If the graphics state colorspace
+is not {@Code "/Pattern"}, then the abstract current texture
+is {@Code null}.
+}
+
+@LI {
+If the graphics state colorspace is {@Code "/Pattern"}, then the
+abstract colorspace and color are the values of
+@Code "/UnderlyingColorSpace" and @Code "/UnderlyingColor"
+in the pattern dictionary stored in the graphics state color.
+If the graphics state colorspace is not {@Code "/Pattern"},
+then the abstract current colorspace and color are as returned
+by @Code "currentcolorspace" and {@Code "[ currentcolor ]"}.
+}
+
+@EndList
+The following functions are private helpers for the public functions:
+@IndentedList
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% Current pattern (may be null): - LoutCurrentP p
+/LoutCurrentP
+{                              %% -
+  currentcolorspace            %% [ /name etc ]
+  0 get /Pattern eq            %% bool
+  {                            %% -   (have pattern)
+    [ currentcolor ]           %% [ comp0 ... compn p ]
+    dup length 1 sub get       %% p
+  }
+  {                            %% -   (no pattern)
+    null                       %% null
+  } ifelse                     %% p
+} def
+@End @Verbatim
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% Current color and color space: - LoutCurrentCCS c cs
+/LoutCurrentCCS
+{
+  LoutCurrentP dup null eq     %% p bool
+  {                            %% null
+    pop [ currentcolor ]       %% c
+    currentcolorspace          %% c cs
+  }
+  {                            %% p
+    dup                        %% p p
+    /UnderlyingColor get exch  %% c p
+    /UnderlyingColorSpace get  %% c cs
+  } ifelse                     %% c cs
+} def
+@End @Verbatim
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% Make c, cs, and p current: c cs p LoutSetCCSP -
+/LoutSetCCSP
+{                              %% c cs p
+  dup null eq                  %% c cs p bool
+  {                            %% c cs p    (null pattern)
+    pop setcolorspace          %% c
+    aload pop setcolor         %% -
+  }
+  {                            %% c cs p    (non-null pattern)
+    % copy pattern dictionary
+    12 dict copy               %% c cs p
+
+    % record cs and c in p
+    dup /UnderlyingColorSpace  %% c cs p p /UCS
+    3 index put                %% c cs p
+    dup /UnderlyingColor       %% c cs p p /UC
+    4 index put                %% c cs p
+
+    % do setcolorspace and setcolor
+    dup /PaintType get 1 eq    %% c cs p bool
+    {                          %% c cs p   (colored pattern)
+      [/Pattern] setcolorspace %% c cs p
+      setcolor                 %% c cs
+      pop pop                  %% -
+    }
+    {                          %% c cs p   (uncolored pattern)
+      [ /Pattern               %% c cs p [ /Pattern
+      4 -1 roll                %% c p [ /Pattern cs
+      ] setcolorspace          %% c p
+      exch aload length 1 add  %% p comp1 ... compm m+1
+      -1 roll                  %% comp1 ... compm p
+      setcolor                 %% -
+    } ifelse                   %% -
+  } ifelse                     %% -
+} def
+@End @Verbatim
+
+@EndList
+With the helper functions it's now easy to derive the colour and
+texture setting commands that we are offering to our end users.
+When setting the color we pass it, plus the current pattern, to
+{@Code "LoutSetCCSP"}; when setting the pattern we pass it, plus
+the current color, to {@Code "LoutSetCCSP"}.  Note that there is
+no {@Code "/DeviceHSB"}: @Code "hsb" is a variant of {@Code "rgb"}.
+@IndentedList
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% num LoutSetGray -
+/LoutSetGray
+{
+  [ 2 1 roll ]                 %% c
+  [ /DeviceGray ]              %% c cs
+  LoutCurrentP                 %% c cs p
+  LoutSetCCSP                  %% -
+} def
+@End @Verbatim
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% r g b LoutSetRGBColor -
+/LoutSetRGBColor
+{                              %% r g b
+  [ 4 1 roll ]                 %% c
+  [ /DeviceRGB ]               %% c cs
+  LoutCurrentP                 %% c cs p
+  LoutSetCCSP                  %% -
+} def
+@End @Verbatim
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% h s b LoutSetHSBColor -
+/LoutSetHSBColor
+{                              %% h s b
+  gsave sethsbcolor            %% -
+  currentrgbcolor grestore     %% r g b
+  LoutSetRGBColor              %% -
+} def
+@End @Verbatim
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% c m y k LoutSetRGBColor -
+/LoutSetCMYKColor
+{
+  [ 5 1 roll ]                 %% c
+  [ /DeviceCMYK ]              %% c cs
+  LoutCurrentP                 %% c cs p
+  LoutSetCCSP                  %% -
+} def
+@End @Verbatim
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% p LoutSetTexture -
+/LoutSetTexture
+{
+  LoutCurrentCCS               %% p c cs
+  3 -1 roll                    %% c cs p
+  LoutSetCCSP                  %% -
+} def
+@End @Verbatim
+
+@EndList
+All we need now is some sample textures.  Textures are just pattern
+dictionaries as returned by {@Code "makepattern"}.  Here is
+a PostScript function that appears in the Lout prologue.  Its
+function is to simplify the production of textures.  It first
+takes six parameters to specify a transformation of the texture
+used to build the matrix taken by {@Code makepattern}, then
+five parameters that go into the pattern dictionary.
+@IndentedList
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+% <scale> <scalex> <scaley> <rotate> <hshift> <vshift>
+% <pt> <bb> <xs> <ys> <pc> LoutMakeTexture p
+/LoutMakeTexture
+{                              %% s sx sy r h v pt bb xs ys pp
+  12 dict begin                %% s sx sy r h v pt bb xs ys pp
+  /PaintProc exch def          %% s sx sy r h v pt bb xs ys
+  /YStep exch def              %% s sx sy r h v pt bb xs
+  /XStep exch def              %% s sx sy r h v pt bb
+  /BBox exch def               %% s sx sy r h v pt
+  /PaintType exch def          %% s sx sy r h v
+  /PatternType 1 def           %% s sx sy r h v
+  /TilingType 1 def            %% s sx sy r h v
+  currentdict end              %% s sx sy r h v p
+  7 1 roll                     %% p s sx sy r h v
+  matrix translate             %% p s sx sy r mat1
+  5 1 roll                     %% p mat1 s sx sy r
+  matrix rotate                %% p mat1 s sx sy mat2
+  4 1 roll                     %% p mat1 mat2 s sx sy
+  matrix scale                 %% p mat1 mat2 s mat3
+  exch dup matrix scale        %% p mat1 mat2 mat3 mat4
+  matrix concatmatrix          %% p mat1 mat2 mat34
+  matrix concatmatrix          %% p mat1 mat234
+  matrix concatmatrix          %% p mat1234
+  /makepattern where
+  {                            %% p mat123 dict
+    pop makepattern            %% p
+  }
+  {                            %% p mat123
+    pop pop null               %% null
+  } ifelse                     %% p (may be null)
+} def
+@End @Verbatim
+
+@EndList
+For examples of textures using {@Code LoutMakeTexture}, consult
+the standard include file {@Code coltex}.  There is only one
+built-in texture, {@Code LoutTextureSolid}:
+@IndentedList
+
+@LI @OneRow -2px @Break @F @Verbatim @Begin
+/LoutTextureSolid
+{
+  null
+  LoutSetTexture
+} def
+@End @Verbatim
+
+@RawEndList
+@End @Appendix

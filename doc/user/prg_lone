@@ -4,6 +4,9 @@
 @Begin
 @PP
 Printing of program files independently of any document is accomplished by
+programs. @RawIndex { programs }
+programs.standalone @SubIndex { stand-alone }
+standalone.programs @Index { stand-alone programs }
 the following Unix pipeline:
 @ID @Code "prg2lout  -l language  options  files  |  lout  -s  >  out.ps"
 where @Code language stands for any one of the programming language

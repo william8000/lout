@@ -1,0 +1,485 @@
+%%BeginResource: procset LoutPiePrependGraphic
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                    %
+%  PostScript @SysPrependGraphic file for @Pie  Jeffrey H. Kingston  %
+%  Version 1.0                                                       %
+%                                                                    %
+%  Jeffrey H. Kingston                                               %
+%  October 2002                                                      %
+%                                                                    %
+%  To assist in avoiding name clashes, the names of all symbols      %
+%  defined here begin with "lpie".                                   %
+%                                                                    %
+%  <point>      is two numbers, a point.                             %
+%  <length>     is one number, a length                              %
+%  <angle>      is one number, an angle in degrees                   %
+%  <dashlength> is one number, the preferred length of a dash        %
+%                                                                    %
+%  The following invariant is maintained from the end of the         %
+%  call to lpiebegin to the beginning of the call to lpieend:        %
+%                                                                    %
+%  lpiecentre        is an executable function which leaves the two  %
+%                    coordinates of the centre of the pie on the     %
+%                    operand stack (signature - lpiectr <x> <y>)     %
+%                                                                    %
+%  lpieradius        is the radius of the pie                        %
+%                                                                    %
+%  lpieinitangle     is the initial angle                            %
+%                                                                    %
+%  lpietotalweight   is the total weight of all slices               %
+%                                                                    %
+%  lpiecurrentweight is the total weight of all slices so far        %
+%                                                                    %
+%  The first four are constants set by lpiebegin; the last is        %
+%  updated as each slice is printed.                                 %
+%                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% install error handler into error dictionary
+errordict begin
+   /handleerror
+   {
+      {  /Times-Roman findfont 8 pt scalefont setfont
+	 0 setgray 4 pt 4 pt moveto
+	 $error /errorname get
+	 dup lpiedict exch known
+	 { lpiedict exch get }
+	 { 100 string cvs } ifelse
+	 show
+	 (  Command: ) show
+	 $error /command get 100 string cvs show
+      } stopped {} if
+      showpage stop
+   } def
+end
+
+% initial coordinates of debug output
+/lpiedebugposy 432 def
+/lpiedebugposx 72 def
+
+% <string> <int> lpiedebugprint -
+% must be defined outside lpiedict since used in arbitrary places
+% print <string> plus count or <int> stack entries, whichever is the smaller
+/lpiedebugprint
+{
+  exch
+  gsave
+  initgraphics
+  lpiedebugposy 72 lt
+  { /lpiedebugposx lpiedebugposx 144 add store
+    /lpiedebugposy 432 store
+  }
+  {
+    /lpiedebugposy lpiedebugposy 12 sub store
+  } ifelse
+  lpiedebugposx lpiedebugposy moveto
+  /Times-Roman findfont 10 scalefont setfont
+  0 setgray show
+  count 1 sub 2 copy lt { pop } { exch pop } ifelse 1 sub
+  0 exch 1 exch
+  {
+    /lpiedebugposy lpiedebugposy 12 sub store
+    lpiedebugposx 12 add lpiedebugposy moveto
+    index
+    dup type (dicttype) eq
+    {
+      (begin dict) show
+      {
+        /lpiedebugposy lpiedebugposy 12 sub store
+        lpiedebugposx 24 add lpiedebugposy moveto
+	pop 100 string cvs show
+      } forall
+      /lpiedebugposy lpiedebugposy 12 sub store
+      lpiedebugposx 12 add lpiedebugposy moveto
+      (end dict) show
+    }
+    {
+      dup type (arraytype) eq
+      {
+	dup xcheck { (executable array) } { (literal array) } ifelse show
+	{
+          /lpiedebugposy lpiedebugposy 12 sub store
+          lpiedebugposx 24 add lpiedebugposy moveto
+	  100 string cvs show
+        } forall
+        /lpiedebugposy lpiedebugposy 12 sub store
+        lpiedebugposx 12 add lpiedebugposy moveto
+        (end array) show
+      }
+      {
+        dup xcheck { (ex: ) } { (lit: ) } ifelse show
+        100 string cvs show
+      } ifelse
+    } ifelse
+  } for
+  grestore
+} def
+
+% name lpiedebugpoint -
+/lpieshowpoint
+{
+  dup cvx exec moveto 20 string cvs show newpath
+} def
+
+% begin pie: <totalweight> <initialangle> lpiebegin -
+% must be defined outside lpiedict since it loads it
+/lpiebegin
+{ lpiedict begin
+  20 dict begin
+  xmark ymark /lpiecentre lpiepointdef
+  /lpieradius xmark def
+  /lpieinitialangle exch def
+  /lpietotalweight exch def
+  /lpiecurrentweight 0 def
+} def
+
+% end pie: - lpieend -
+/lpieend
+{
+  end
+  end
+} def
+
+% pie dictionary
+/lpiedict 200 dict def
+
+% subsequent definitions are held within the pie dictionary
+lpiedict begin
+
+% error messages
+/syntaxerror (syntaxerror error:  syntax error in text of pie chart?) def
+/typecheck (typecheck error:  syntax error in text of pie chart?) def
+/undefined (undefined error:  unknown or misspelt label?) def
+/VMError (VMError error:  run out of memory?) def
+
+% maximum of two numbers:  <num> <num> lpiemax <num>
+/lpiemax { 2 copy gt { pop } { exch pop } ifelse } def
+
+% minimum of two numbers:  <num> <num> lpiemin <num>
+/lpiemin { 2 copy lt { pop } { exch pop } ifelse } def
+
+% add two points:  <point> <point> lpiepadd <point>
+/lpiepadd
+{
+  % (Entering padd) 4 lpiedebugprint
+  exch 3 1 roll add 3 1 roll add exch
+  % (Leaving padd) 2 lpiedebugprint
+} def
+
+% subtract first point from second:  <point> <point> lpiepsub <point>
+/lpiepsub { 3 2 roll sub 3 1 roll exch sub exch } def
+
+% max two points:  <point> <point> lpiepmax <point>
+/lpiepmax { exch 3 1 roll lpiemax 3 1 roll lpiemax exch } def
+
+% min two points:  <point> <point> lpiepmin <point>
+/lpiepmin { exch 3 1 roll lpiemin 3 1 roll lpiemin exch } def
+
+% scalar multiplication: <point> <num> lpiepmul <point>
+/lpiepmul { dup 3 1 roll mul 3 1 roll mul exch } def
+
+% distance between two points:  <point> <point> lpiedistance <length>
+/lpiedistance { lpiepsub dup mul exch dup mul add sqrt } def
+
+% point at angle and distance
+% <point> <length> <angle> lpieatangle <point>
+/lpieatangle { 2 copy cos mul 3 1 roll sin mul lpiepadd } def
+
+% stroke a solid line:  <length> <dashlength> lpiesolid -
+/lpiesolid
+{ % (Entering lpiesolid) 2 lpiedebugprint
+  gsave pop pop [] 0 setdash 1 setlinecap stroke grestore newpath
+  % (Leaving lpiesolid) 0 lpiedebugprint
+} def
+
+% stroke a dashed line:   <length> <dashlength> lpiedashed -
+/lpiedashed
+{  gsave
+   2 copy div 2 le 1 index 0 le or
+   {  exch pop 1 pt lpiemax [ exch dup ] 0 setdash }
+   {  dup [ exch 4 2 roll 2 copy div
+      1 sub 2 div ceiling dup 4 1 roll
+      1 add mul sub exch div ] 0 setdash
+   } ifelse 0 setlinecap stroke
+   grestore newpath
+} def
+
+% stroke a cdashed line:  <length> <dashlength> lpiecdashed -
+/lpiecdashed
+{  % (Entering lpiecdashed) 2 lpiedebugprint
+   gsave
+   2 copy le 1 index 0 le or
+   { exch pop 1 pt lpiemax [ exch dup ] dup 0 get 2 div setdash }
+   { dup [ 4 2 roll exch 2 copy exch div
+     2 div ceiling div 1 index sub
+     ] exch 2 div setdash
+   } ifelse 0 setlinecap stroke
+   grestore newpath
+   % (Leaving lpiecdashed) 0 lpiedebugprint
+} def
+
+% stroke a dotted line:  <length> <dashlength> lpiedotted -
+/lpiedotted
+{  gsave
+   2 copy le 1 index 0 le or
+   { exch pop 1 pt lpiemax [ exch 0 exch ] 0 setdash }
+   { 1 index exch div ceiling div
+     [ 0 3 2 roll ] 0 setdash
+   } ifelse 1 setlinecap stroke
+   grestore newpath
+} def
+
+% stroke a noline line:  <length> <dashlength> lpienoline -
+/lpienoline
+{ pop pop
+} def
+
+% label a point in current dictionary:  <point> /name lpiepointdef -
+/lpiepointdef
+{
+  % (Entering lpiepointdef) 3 lpiedebugprint
+  [ 4 2 roll transform /itransform cvx ] cvx def
+  % (Leaving lpiepointdef) 0 lpiedebugprint
+} def
+
+% find the angle that the current slice starts at
+% - lpiesliceangle1 <angle>
+/lpiesliceangle1
+{ lpiecurrentweight lpietotalweight div 360 mul lpieinitialangle add
+} def
+
+% find the angle that the current slice stops at
+% - lpiesliceangle2 <angle>
+/lpiesliceangle2
+{ weight lpiecurrentweight add lpietotalweight div 360 mul lpieinitialangle add
+} def
+
+% find the angle that bisects the current slice
+% - lpieslicemidangle <angle>
+/lpieslicemidangle
+{ weight 2 div lpiecurrentweight add lpietotalweight div 360 mul lpieinitialangle add
+} def
+
+% update the total weight
+% - lpieupdateweight -
+/lpieupdateweight
+{ weight lpiecurrentweight add /lpiecurrentweight exch def
+} def
+
+% find the apex of the slice
+% - lpiesliceapex <x> <y>
+/lpiesliceapex
+{ lpiecentre lpieradius detach mul lpieslicemidangle lpieatangle
+} def
+
+% find the end of the first arm of the slice
+% - lpieslicearm1 <x> <y>
+/lpieslicearm1
+{ lpiesliceapex lpieradius lpiesliceangle1 lpieatangle
+} def
+
+% find the end of the second arm of the slice
+% - lpieslicearm2 <x> <y>
+/lpieslicearm2
+{ lpiesliceapex lpieradius lpiesliceangle2 lpieatangle
+} def
+
+% set the whole closed path for the current slice
+% - lpiesetslicepath -
+/lpiesetslicepath
+{ newpath lpiesliceapex moveto
+  currentpoint lpieradius lpiesliceangle1 lpiesliceangle2 arc
+  closepath
+} def
+
+% set the first segment of the current slice and return its length
+% - lpiesetsegment1 <length>
+/lpiesetsegment1
+{ newpath lpiesliceapex moveto lpieslicearm1 lineto
+  lpieradius
+} def
+
+% set the second segment of the current slice and return its length
+% - lpiesetsegment2 <length>
+/lpiesetsegment2
+{ newpath lpiesliceapex moveto lpieslicearm2 lineto
+  lpieradius
+} def
+
+% set the arc segment of the current slice and return its length
+% - lpiesetarcsegment <length>
+/lpiesetarcsegment
+{ newpath
+  lpiesliceapex lpieradius lpiesliceangle1 lpiesliceangle2 arc
+  lpiesliceangle2 lpiesliceangle1 sub 180 div 3.14159 mul lpieradius mul
+} def
+
+% draw one slice
+% <dashlength> [ <outlinecommand> ] <outlinewidth> { <paintcommand> }
+% <weight> <detach> lpiedrawslice -
+/lpiebeginslice
+{
+  % (Entering lpiebeginslice) 6 lpiedebugprint
+  /detach exch def
+  /weight exch def
+
+  % paint the slice
+  gsave lpiesetslicepath exec grestore
+
+  % set the line width
+  setlinewidth
+
+  % stroke each segment separately to get dashes right
+  2 copy lpiesetsegment1 3 1 roll
+  dup length 0 exch mod get cvx
+  % (Stroking segment1) count 1 sub lpiedebugprint
+  exec
+
+  2 copy lpiesetarcsegment 3 1 roll
+  dup length 1 exch mod get cvx
+  % (Stroking arc segment) count 1 sub lpiedebugprint
+  exec
+
+  lpiesetsegment2 3 1 roll
+  dup length 2 exch mod get cvx
+  % (Stroking segment2) count 1 sub lpiedebugprint
+  exec
+
+  % (Leaving lpiebeginslice) 0 lpiedebugprint
+} def
+
+% finish off one slice
+/lpieendslice
+{
+  % (Entering lpieendslice) 0 lpiedebugprint
+
+  % update current weight ready for next slice
+  lpieupdateweight
+
+  % (Leaving lpieendslice) 0 lpiedebugprint
+} def
+
+% translate label
+% <xadjust> <yadjust> <labelradius> lpietranslatelabel -
+/lpietranslatelabel
+{
+  % (Entering lpietranslatelabel) 3 lpiedebugprint 
+  /labelradius exch def
+  % lpiecentre (lpiecentre:) 2 lpiedebugprint pop pop
+  % lpieradius (lpieradius:) 1 lpiedebugprint pop
+  % labelradius (labelradius:) 1 lpiedebugprint pop
+  % lpieslicemidangle (lpieslicemidangle:) 1 lpiedebugprint pop
+  xsize 2 div ysize 2 div /labelcentre lpiepointdef
+  labelcentre
+  lpiesliceapex lpieradius labelradius mul lpieslicemidangle lpieatangle lpiepsub
+  lpiepadd
+  translate
+  % (Leaving lpietranslatelabel) 0 lpiedebugprint 
+} def
+
+% fix an angle to 0 <= res < 360:  <angle> lpiefixangle <angle>
+/lpiefixangle
+{
+  % (Entering lpiefixangle) 1 lpiedebugprint
+  { dup 0 ge { exit } if
+    360 add
+  } loop
+  { dup 360 lt { exit } if
+    360 sub
+  } loop
+  % (Leaving lpiefixangle) 1 lpiedebugprint
+} def
+
+% angle from one point to another
+% <point> <point> lpieangleto <angle>
+/lpieangleto {
+  lpiepsub 2 copy 0 eq exch 0 eq and {pop} {exch atan} ifelse
+} def
+
+% find point on circumference of box:  alpha a b lpieboxcircum x y
+/lpieboxcircum
+{
+  % (Entering lpieboxcircum) 3 lpiedebugprint
+  4 dict begin
+    /b exch def
+    /a exch def
+    lpiefixangle /alpha exch def
+    0 0 a b lpieangleto /theta exch def
+    % a (a:) 1 lpiedebugprint pop
+    % b (b:) 1 lpiedebugprint pop
+    % theta (theta:) 1 lpiedebugprint pop
+    % alpha (alpha:) 1 lpiedebugprint pop
+
+    % if alpha <= theta, return (a, a*tan(alpha))
+    alpha theta le
+    { a  a alpha sin mul alpha cos div }
+    {
+      % else if alpha <= 180 - theta, return (b*cot(alpha), b)
+      alpha 180 theta sub le
+      { b alpha cos mul alpha sin div  b }
+      {
+        % else if alpha <= 180 + theta, return (-a, -a*tan(alpha))
+        alpha 180 theta add le
+        { a neg  a neg alpha sin mul alpha cos div }
+        {
+	  % else if alpha <= 360 - theta, return (-b*cot(alpha), -b)
+	  alpha 360 theta sub le
+          { b neg alpha cos mul alpha sin div  b neg }
+	  {
+	    % else 360 - theta <= alpha, return (a, a*tan(alpha))
+	    a  a alpha sin mul alpha cos div
+	  } ifelse
+        } ifelse
+      } ifelse
+    } ifelse
+  end
+  % (Leaving lpieboxcircum) 2 lpiedebugprint
+} def
+
+
+% draw finger (will immediately follow lpietranslatelabel)
+% <fingerdashlength> "[" <fingerstyle> "]" fingerwidth
+% <fingeradjustx> <fingeradjusty> <fingerradius> lpiedrawfinger -
+/lpiedrawfinger
+{
+  % (Entering lpidrawfinger) 6 lpiedebugprint
+  % find inner endpoint of finger
+  /fingerradius exch def
+  lpiesliceapex lpieradius fingerradius mul
+  lpieslicemidangle lpieatangle lpiepadd
+  /fingerinner lpiepointdef
+  xsize 2 div ysize 2 div /labelcentre lpiepointdef
+  0 0 /labelorigin lpiepointdef
+
+  % find outer endpoint of finger, on circumference of label
+  labelcentre fingerinner lpieangleto
+  xsize 2 div ysize 2 div
+  lpieboxcircum labelcentre lpiepadd
+  /fingerouter lpiepointdef
+
+  % set the line width
+  setlinewidth
+
+  % draw line
+  newpath fingerinner moveto fingerouter lineto
+  fingerinner fingerouter lpiedistance 3 1 roll 0 get cvx exec
+  % (Leaving lpiedrawfinger) 0 lpiedebugprint
+} def
+
+% draw arrowhead (will immediately follow lpiedrawfinger if reqd)
+% <headlength> <headwidth> lpiedrawarrowhead
+/lpiedrawarrowhead
+{
+  gsave
+  /headwidth exch def
+  /headlength exch def
+  fingerinner translate
+  fingerouter fingerinner lpieangleto rotate
+  0 0 moveto
+  headlength neg headwidth 2 div lineto
+  0 headwidth neg rlineto
+  closepath fill
+  grestore
+} def
+end
+%%EndResource

@@ -4,6 +4,8 @@
 @Begin
 @PP
 Lout is quite good a choosing suitable widths for cells.  It leaves
+column.width @RawIndex { column width }
+column.width.in.tables @SubIndex { in tables }
 narrow cells at their natural width, then uses paragraph breaking to
 reduce the wider cells to a common width which is as large as
 the available space allows:
@@ -23,6 +25,10 @@ parts; many varieties.
 }
 This usually looks good, but if you need something else, there is
 the @Code width option:
+tables. @RawIndex { tables }
+tables.width @SubIndex { @Code "width" option }
+width. @RawIndex { @Code "width" option }
+width.in.tables @SubIndex { in tables }
 @ID @OneRow @Code "@Cell width { 3c }"
 Here we have asked for a cell width of three centimetres; this includes
 the cell margins.  When using @Code width to fine-tune the appearance of
@@ -34,6 +40,8 @@ given a common width equal to the width of the widest.  One simple way to
 approximate this is to give these cells the same @Code width value.  The
 @Code width option also has a special value, {@Code "expand"}.  All
 cells with @Code "width { expand }" are assigned a common width
+tables. @RawIndex { tables }
+tables.expand @SubIndex { @Code expand cell width }
 expand.cell.width @Index { @Code expand cell width in tables }
 equal to the maximum amount permitted by the available space.  For example,
 @ID @OneRow @Code @Verbatim {
@@ -78,6 +86,10 @@ the result will be
 with the total table width reduced to four inches.
 @PP
 There is an analogous @Code height option which makes a cell take on
+tables. @RawIndex { tables }
+tables.height @SubIndex { @Code height option }
+height. @RawIndex { @Code "height" option }
+height.in.tables @SubIndex { in tables }
 a particular fixed height, again including margins.  Make sure there
 is enough height in the cell to hold its entry when you use this
 option.  The @Code "expand" value is not available for height.

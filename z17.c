@@ -1,9 +1,9 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -176,7 +176,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 /*****************************************************************************/
 
 FULL_LENGTH MinGap(FULL_LENGTH a, FULL_LENGTH b, FULL_LENGTH c, GAP *xgap)
-{ FULL_LENGTH res;  int w;
+{ FULL_LENGTH res;  int w = 0;
   switch( units(*xgap) )
   {
     case FIXED_UNIT:	w = width(*xgap);
@@ -297,7 +297,7 @@ FULL_LENGTH ExtraGap(FULL_LENGTH a, FULL_LENGTH b, GAP *xgap, int dir)
 
 FULL_LENGTH ActualGap(FULL_LENGTH prevf, FULL_LENGTH b, FULL_LENGTH f,
   GAP *xgap, FULL_LENGTH frame_size, FULL_LENGTH mk)
-{ FULL_LENGTH res;  int w, w2;
+{ FULL_LENGTH res;  int w = 0, w2;
   switch( units(*xgap) )
   {
     case FIXED_UNIT:	w = width(*xgap);

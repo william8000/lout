@@ -4,6 +4,10 @@
 %  PostScript @SysPrependGraphic file for @Fig  Jeffrey H. Kingston  %
 %  Version 2.0 (includes CIRCUM label)                 January 1992  %
 %                                                                    %
+%  Although Fig is now obsolete I have updated it 20 October 2002    %
+%  to work with textures, i.e. replacing setrgbcolor with            %
+%  LoutSetRGBColor.                                                  %
+%                                                                    %
 %  To assist in avoiding name clashes, the names of all symbols      %
 %  defined here begin with "lfig".  However, this is not feasible    %
 %  with user-defined labels and some labels used by users.           %
@@ -150,34 +154,34 @@ lfigdict begin
 } def
 
 % painting (i.e. filling): - lfigwhite - (etc.)
-/lfignopaint		{			       } def
-/lfignochange		{ 			  fill } def
-/lfigdarkblue		{ 0.0 0.0 0.5 setrgbcolor fill } def
-/lfigblue		{ 0.0 0.0 1.0 setrgbcolor fill } def
-/lfiglightblue		{ 0.5 0.5 1.0 setrgbcolor fill } def
-/lfigdarkgreen		{ 0.0 0.5 0.0 setrgbcolor fill } def
-/lfiggreen		{ 0.0 1.0 0.0 setrgbcolor fill } def
-/lfiglightgreen		{ 0.5 1.0 0.5 setrgbcolor fill } def
-/lfigdarkred		{ 0.5 0.0 0.0 setrgbcolor fill } def
-/lfigred		{ 1.0 0.0 0.0 setrgbcolor fill } def
-/lfiglightred		{ 1.0 0.5 0.5 setrgbcolor fill } def
-/lfigdarkcyan		{ 0.0 0.5 0.5 setrgbcolor fill } def
-/lfigcyan		{ 0.0 1.0 1.0 setrgbcolor fill } def
-/lfiglightcyan		{ 0.5 1.0 1.0 setrgbcolor fill } def
-/lfigdarkmagenta	{ 0.5 0.0 0.5 setrgbcolor fill } def
-/lfigmagenta		{ 1.0 0.0 1.0 setrgbcolor fill } def
-/lfiglightmagenta	{ 1.0 0.5 1.0 setrgbcolor fill } def
-/lfigdarkyellow		{ 0.5 0.5 0.0 setrgbcolor fill } def
-/lfigyellow		{ 1.0 1.0 0.0 setrgbcolor fill } def
-/lfiglightyellow	{ 1.0 1.0 0.5 setrgbcolor fill } def
-/lfigdarkgray		{ 0.2 0.2 0.2 setrgbcolor fill } def
-/lfiggray		{ 0.5 0.5 0.5 setrgbcolor fill } def
-/lfiglightgray		{ 0.8 0.8 0.8 setrgbcolor fill } def
-/lfigdarkgrey		{ 0.2 0.2 0.2 setrgbcolor fill } def
-/lfiggrey		{ 0.5 0.5 0.5 setrgbcolor fill } def
-/lfiglightgrey		{ 0.8 0.8 0.8 setrgbcolor fill } def
-/lfigblack		{ 0.0 0.0 0.0 setrgbcolor fill } def
-/lfigwhite		{ 1.0 1.0 1.0 setrgbcolor fill } def
+/lfignopaint		{			           } def
+/lfignochange		{ 			      fill } def
+/lfigdarkblue		{ 0.0 0.0 0.5 LoutSetRGBColor fill } def
+/lfigblue		{ 0.0 0.0 1.0 LoutSetRGBColor fill } def
+/lfiglightblue		{ 0.5 0.5 1.0 LoutSetRGBColor fill } def
+/lfigdarkgreen		{ 0.0 0.5 0.0 LoutSetRGBColor fill } def
+/lfiggreen		{ 0.0 1.0 0.0 LoutSetRGBColor fill } def
+/lfiglightgreen		{ 0.5 1.0 0.5 LoutSetRGBColor fill } def
+/lfigdarkred		{ 0.5 0.0 0.0 LoutSetRGBColor fill } def
+/lfigred		{ 1.0 0.0 0.0 LoutSetRGBColor fill } def
+/lfiglightred		{ 1.0 0.5 0.5 LoutSetRGBColor fill } def
+/lfigdarkcyan		{ 0.0 0.5 0.5 LoutSetRGBColor fill } def
+/lfigcyan		{ 0.0 1.0 1.0 LoutSetRGBColor fill } def
+/lfiglightcyan		{ 0.5 1.0 1.0 LoutSetRGBColor fill } def
+/lfigdarkmagenta	{ 0.5 0.0 0.5 LoutSetRGBColor fill } def
+/lfigmagenta		{ 1.0 0.0 1.0 LoutSetRGBColor fill } def
+/lfiglightmagenta	{ 1.0 0.5 1.0 LoutSetRGBColor fill } def
+/lfigdarkyellow		{ 0.5 0.5 0.0 LoutSetRGBColor fill } def
+/lfigyellow		{ 1.0 1.0 0.0 LoutSetRGBColor fill } def
+/lfiglightyellow	{ 1.0 1.0 0.5 LoutSetRGBColor fill } def
+/lfigdarkgray		{ 0.2 0.2 0.2 LoutSetRGBColor fill } def
+/lfiggray		{ 0.5 0.5 0.5 LoutSetRGBColor fill } def
+/lfiglightgray		{ 0.8 0.8 0.8 LoutSetRGBColor fill } def
+/lfigdarkgrey		{ 0.2 0.2 0.2 LoutSetRGBColor fill } def
+/lfiggrey		{ 0.5 0.5 0.5 LoutSetRGBColor fill } def
+/lfiglightgrey		{ 0.8 0.8 0.8 LoutSetRGBColor fill } def
+/lfigblack		{ 0.0 0.0 0.0 LoutSetRGBColor fill } def
+/lfigwhite		{ 1.0 1.0 1.0 LoutSetRGBColor fill } def
 
 % line caps (and joins, not currently used)
 /lfigbutt       0 def

@@ -1,0 +1,92 @@
+@Section
+   @Title { "@SetTexture" }
+   @Tag { texture }
+@Begin
+@PP
+The @@SetTexture symbol
+settexture.sym @Index { @@SetTexture symbol }
+returns its right parameter in the texture specified by its left
+parameter.  A texture is a pattern used when filling areas to
+get a texture rather than solid color.
+@PP
+In the PostScript world, textures are called patterns, and the
+relevant PostScript commands use this terminology.  The author
+has preferred the term `texture' because it is more precise:
+a pattern could be a pattern for anything.
+@PP
+The @@SetTexture command accepts the special value {@Code "nochange"}
+for the left parameter.  This value causes the right parameter to have
+the texture it would have had without the @@SetTexture command.  An
+empty left parameter also has this effect.
+@PP
+Another special value is {@Code "LoutTextureSolid"}, which means no
+texture at all, just solid colour.  It would be useful to change
+back to solid colour within an enclosing textured region.  It is also
+the initial texture; thus there is no need to ensure that the root
+galley or each of its components is enclosed in a @@SetTexture symbol.
+@PP
+The form of the left parameter is implementation-dependent; in Basser
+Lout it must be an object whose value is a sequence of words comprising
+PostScript for setting a texture, up to and including the PostScript
+@Code "setpattern" command (or equivalent) which installs the texture
+into the graphics state.  Lout makes no attempt to understand textures,
+it simply prints the PostScript commands when appropriate.  Consult
+@Cite { $adobe1990ps } for information about PostScript patterns.
+You'll need to do that in order to make sense of the rest of this section.
+@PP
+Since building even a simple texture takes a lot of PostScript
+and is quite error-prone, Lout defines two symbols in the PostScript
+prologue called @Code "LoutMakeTexture" and @Code "LoutSetTexture"
+that you can use to make and set a texture, like this:
+@ID @Code @Verbatim {
+{   "1 1 1 0 dg 0 pt 0 pt"
+    "2 [0 0 2 pt 3 pt] 2 pt 3 pt { ... }"
+    "LoutMakeTexture LoutSetTexture"
+} @SetTexture ...
+}
+We'll explain both symbols in detail in a moment, but just briefly,
+@Code "LoutMakeTexture" makes a texture, leaving a pattern dictionary
+as returned by @Code "makepattern" on the execution stack, and
+@Code "LoutSetTexture" installs this texture into the current graphics
+state, like @Code "setpattern" but without any mention of colour.
+@PP
+@Code "LoutMakeTexture" is just a convenience definition that
+constructs a pattern matrix and dictionary, populating them with the
+stack elements to its left, then calls {@Code makepattern}.  You don't
+have to use it if you don't want to.  The above example of
+@Code "LoutMakeTexture" sets the pattern matrix and dictionary as follows.
+@PP
+The first number is a scale factor, and the second and third are horizontal
+and vertical scale factors.  The fourth ({@Code "0 dg"}) is an angle of
+rotation.  The fifth and sixth are horizontal and vertical shifts.  These
+six numbers determine the pattern transformation matrix passed to
+{@Code makepattern}.
+@PP
+The remaining elements go into the pattern dictionary.  @Code "PaintType"
+is set to the first of them, or the seventh item overall (2 in our example,
+denoting an uncoloured pattern, which will usually be the best choice;
+the pattern will be painted in the current colour), @Code "BBox" is set
+to the eighth item, here {@Code "[0 0 2 pt 3 pt]"}, @Code "XStep" is set
+to the ninth item, here {@Code "2 pt"}, @Code "YStep" is set to the tenth
+item, here {@Code "3 pt"}, and @Code "PaintProc" is set to the eleventh
+and last item, which should be an executable array as shown.  All non-zero
+lengths must be in absolute units, that is, followed by {@Code in}, {@Code cm},
+{@Code pt}, or {@Code em}, otherwise the results will be unpredictable.
+@PP
+@Code "LoutSetTexture" installs the given texture into the
+graphics state, preserving the current colour.  You must use
+@Code "LoutSetTexture" and you must not use {@Code setcolorspace},
+@Code {setcolor}, and {@Code setpattern}, because Lout considers
+colour and texture to be independent of each other, and these PostScript
+commands don't.
+@PP
+Another advantage of @Code "LoutMakeTexture" and @Code "LoutSetTexture"
+is that they behave sensibly on Level 1 PostScript interpreters,
+which do not have patterns.  Rather than failing altogether, these
+commands will make sure everything appears in solid colour.  Be
+aware, though, that interpreters exist (e.g @Code gv ca. 1997) which
+appear to be Level 2 but actually leave textured areas blank.
+@PP
+For information on how these symbols are implemented, consult
+Appendix {@NumberOf tex}.
+@End @Section

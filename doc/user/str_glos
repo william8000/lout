@@ -1,0 +1,209 @@
+@Section
+   @Title { Glossaries }
+   @Tag { glossaries }
+@Begin
+@PP
+A glossary
+@FootNote {
+The features described in this section are closely based on a
+design by Thorsten Seitz. }
+is a section at the end of a document containing terms
+and their definitions, with a reference back to the page of the
+document where each term is first used.  It's similar to an index,
+except that there are fewer entries and they are longer and more
+spaced out -- for reading rather than just reference.
+@PP
+In order to get a glossary, you have to be using either the @Code book
+or @Code report setup file, and you have to make your own copy of
+the setup file (as described in Section {@NumberOf setup}) and change
+the @Code "@MakeGlossary" option within it to {@Code "Yes"}.  Lout
+does not insert a glossary automatically.  The glossary will appear
+at the end of the document, immediately before any index.
+@PP
+To make an entry in the glossary, place something like this in
+your main text at the point you are defining the term:
+@ID @Code @Verbatim {
+Object @Glossary {
+Part of a document occupying a rectangular area;
+may be a simple word, or a collection of smaller
+objects composed in arbitrary ways.
+}
+}
+The object to the left of @Code "@Glossary" is the term being defined,
+and the object to the right is its definition.  Nothing will appear
+in the main text where you put this, but the term will appear in the
+glossary, accompanied by its definition and the page number of this spot.
+@PP
+The term should be just a word or a short sequence of words.  The
+definition may be as long and complex as you wish, containing
+paragraphs, displays, and so on.
+@PP
+The glossary items will appear sorted alphabetically.  You can use
+the @Code "sortkey" option of @Code "@Glossary" to provide a separate
+sorting key:
+@ID @Code @Verbatim {
+{@Char florin} @Glossary sortkey { florin } {
+The florin character.
+}
+}
+This entry will appear in the list where things beginning with
+@Code f do, not where the @Code florin character code would
+place it.  If you do this, since the term being defined is no
+longer used as a sort key it is free to be an arbitrary object, not
+restricted to be a word or a short sequence of words.
+@PP
+Creating a glossary entry does not automatically create an index
+entry (Section {@NumberOf indexes}).  If you want an index entry
+for your glossary term as well (as you probably will) you need to
+make that separately, and you will need to use a different tag
+from the tag used by the glossary entry (which is either the term
+being defined, or @Code sortkey if given).  To make an index entry
+that points into the actual glossary, which you also probably need,
+just place your index entry somewhere inside the definition.
+@PP
+In your main text you may want to indicate to the reader that
+some word or phrase appears in the glossary.  For that there
+is the @Code "@InGlossary" symbol:
+@ID @Code "... where you can put one @InGlossary { object } ..."
+The thing between braces does not actually have to be in the
+glossary; @Code "@InGlossary" usually just changes the font,
+by default to small capitals, and it does not change anything
+unless @Code "@MakeGlossary" is {@Code Yes}.
+@PP
+The remainder of this section explains how to change the appearance
+of the printed glossary, by setting options in the setup file.  For
+a general introduction to setup files and their options, see
+Section {@NumberOf setup}; here we just explain how the particular
+options relating to glossaries work.
+@PP
+Most of the glossary options appear within the @Code "@DocumentSetup"
+@Code "@Use" clause.  Here they are (except {@Code "@GlossaryFormat"}
+which we'll discuss in a moment) with their default values:
+@ID @Code @OneRow @Verbatim {
+@MakeGlossary { No }
+@GlossaryText { @Null }
+@GlossaryFont {}
+@GlossaryBreak {}
+@GlossaryGap { @DisplayGap }
+@GlossaryColumnNumber{ 2 }
+@GlossaryColumnGap { 1.00c @OrIfPlain 6s }
+@InGlossaryFont { smallcaps }
+@InGlossaryFormat { @Body }
+}
+First comes {@Code "@MakeGlossary"}, which determines whether to
+make a glossary, as we know.
+@PP
+{@Code "@GlossaryText"} is some arbitrary text that will be
+placed before the first entry of the glossary.  You can also
+give this option to the @Code "@Book" and @Code "@Report" symbols,
+and that would probably be the best place since such text is
+usually part of the document content, not the setup.
+@PP
+@Code "@GlossaryFont" and @Code "@GlossaryBreak" are font and
+break style options which are applied to each glossary entry.  The
+default values don't change the font or break style at all.
+@PP
+@Code "@GlossaryGap" determines the vertical separation between
+one glossary entry and the next.  You can give any length
+(Section {@NumberOf objects}) here; the default is the gap used
+around displays.
+@PP
+@Code "@GlossaryColumnNumber" and @Code "@GlossaryColumnGap"
+determine the number of columns on glossary pages, and the
+width of the gap between them.  By default you get two columns
+per page and a one centimetre gap (or six spaces in plain text
+output), as for indexes (Section {@NumberOf indexes}).
+@PP
+@Code "@InGlossaryFont" and @Code "@InGlossaryFormat" determine
+the appearance of the result of the @Code "@InGlossary" symbol.  The
+first changes the font; the second allows for more radical
+formatting.  Within it, {@Code "@Body"} stands for the object
+following the {@Code "@InGlossary"} object, and you can do
+anything you like with it here.  For example,
+@ID @Code "@InGlossaryFormat { @CurveBox @Body }"
+would cause @Code "@InGlossary" to enclose the following
+object in a curvebox (which would look horrible, of course).
+The default values change to small capitals but nothing more.
+@PP
+{@Code "@GlossaryFormat"}, which we omitted earlier because
+it is more complex, determines the format of each glossary
+entry.  Here it is with its default value:
+@ID @OneRow @Code @Verbatim {
+@GlossaryFormat {
+    +3p @Font @S @Name @Right @I { @Word&&page @PageNum }
+    @DP
+    @RawIndentedDisplay @Body
+}
+}
+We'll go through this bit by bit.
+@PP
+First, the value of the option is longer than usual so we have
+spread it over three lines.  There is nothing significant in
+this; end of line is the same as a space to Lout, and we've
+used three lines just to show the value clearly.
+@PP
+Within @Code "@GlossaryFormat" three symbols are made
+available specially:
+@QD @OneRow @Tbl
+    aformat { @Cell @Code A | @Cell B }
+{
+@Rowa
+    A { "@Name" }
+    B { Will be replaced by the term being defined }
+@Rowa
+    A { "@PageNum" }
+    B { Will be replaced by the number of the page of the
+spot where the @Code "@Glossary" symbol is placed }
+@Rowa
+    A { "@Body" }
+    B { Will be replaced by the definition }
+}
+Now let's look at what the default format does.  The first bit,
+@ID @Code "+3p @Font @S @Name"
+produces the term being defined, three points larger than would
+have been the case otherwise, and in small capitals.  The
+@Code "@Right" symbol causes what follows it to appear at the
+far right, so
+@ID @Code "@I { @Word&&page @PageNum }"
+will appear at the right of the column on the same line as
+the term.  The value of {@Code "@Word&&page"} is just
+{@Code page} in the current language, and @Code "@PageNum" is a
+page number as we know, so this produces something like
+@ID @I { page 143 }
+at the right.  After that we have {@Code "@DP"} which leaves
+a display-sized vertical gap, then the body appears in an
+indented display, made Raw so that there is no trailing
+vertical space.
+@PP
+You can change this option to anything you like.  For example,
+suppose you prefer bold to small capitals, you want the page number
+in parentheses after the term, and you want each entry to be
+kept together in one column:
+@ID @OneRow @Code @Verbatim {
+@GlossaryFormat {
+    @OneRow {
+        @B @Name (@I { @Word&&page @PageNum })
+        @DP
+        @RawIndentedDisplay @Body
+    }
+}
+}
+And so on.
+@PP
+There are a few more setup file options for glossaries, to be found
+in the {@Code "@BookSetup"} or {@Code "@ReportSetup"} @Code "@Use"
+clause of the setup file.  Here they are with their default values:
+@ID @OneRow @Code @Verbatim {
+@GlossaryWord { glossary }
+@GlossaryInContents { Yes  }
+@GlossaryPrefix {}
+}
+The first determines the word that will be used as the title of
+the glossary.  The default value shown produces {@Code Glossary}
+in English and its equivalent in other languages.  You could change
+it, for example, to
+@ID @Code "@GlossaryWord { List of Definitions }"
+@Code "@GlossaryInContents" determines whether the glossary will
+be listed in the table of contents if there is one; and
+@Code "@GlossaryPrefix" is used by structure page numbers.
+@End @Section

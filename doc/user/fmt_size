@@ -6,11 +6,11 @@
 This section explains how to use the setup file options that determine
 page size and page orientation.  Here they are with their default values:
 page.type @Index @Code "@PageType"
-@ID @OneRow @Code {
-"@PageType { A4 }"
-"@PageWidth {}"
-"@PageHeight {}"
-"@PageOrientation { Portrait }"
+@ID @OneRow @Code @Verbatim {
+@PageType { A4 }
+@PageWidth {}
+@PageHeight {}
+@PageOrientation { Portrait }
 }
 The usual way to determine the page size is to set the @Code "@PageType"
 option to the name of the paper you use:

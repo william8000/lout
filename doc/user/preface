@@ -3,7 +3,7 @@
 This User's Guide brings together in one document everything needed
 for the day-to-day use of Version 3 of the Lout document formatting
 system.
-@IndexBlanks
+@IndexLetters
 @PP
 There are three other documents describing Lout:  the Expert's Guide
 @Cite { $kingston1995lout.expert }, which you need if you want to add
@@ -17,8 +17,8 @@ Lout is distributed free of charge under the GNU Public License.  The
 gnu. @Index { GNU Public License }
 primary source is directory
 @ID @Code "ftp://ftp.it.usyd.edu.au/jeff/lout"
-in which may be found a gzipped tar file containing the main distribution
-(currently {@Code "lout-3.26.tar.gz"}), and various other things including
+containing a gzipped tar file of the current version
+(currently {@Code "lout-3.27.tar.gz"}), and various other things including
 a PostScript version of this guide.  The distribution contains source code,
 libraries, documentation, license, and installation instructions.
 @PP
@@ -40,6 +40,7 @@ cherry.l @Index { Cherry, Lorinda L.}
 eqn. @Index { @Code eqn equation formatter }
 equation formatter @Cite { $kernighan1975eqn }, and also by Brian K. Reid's
 Scribe system @Cite { $reid1980scribe }.  That
+scribe. @RawIndex { Scribe }
 scribe.influence @SubIndex { influence on Lout }
 reid.b @Index { Reid, Brian K. }
 research phase ended in October 1991 with the first public release of Lout.

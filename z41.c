@@ -1,9 +1,9 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -47,7 +47,7 @@ static FILE	*last_write_fp  = null;
 OBJECT ReadFromFile(FILE_NUM fnum, long pos, int lnum)
 { OBJECT t, res;
 #if DEBUG_ON
-  int ipos;
+  int ipos = 0;
 #endif
   ifdebug(DPP, D, ProfileOn("ReadFromFile"));
   ifdebug(DIO, D, ipos = (int) pos);
@@ -530,6 +530,7 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case BREAK:		name = KW_BREAK;	goto SETC;
     case UNDERLINE:	name = KW_UNDERLINE;	goto SETC;
     case COLOUR:	name = KW_COLOUR;	goto SETC;
+    case TEXTURE:	name = KW_TEXTURE;	goto SETC;
     case OUTLINE:	name = KW_OUTLINE;	goto SETC;
     case LANGUAGE:	name = KW_LANGUAGE;	goto SETC;
     case CURR_LANG:	name = KW_CURR_LANG;	goto SETC;
@@ -553,6 +554,7 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case GRAPHIC:	name = KW_GRAPHIC;	goto SETC;
     case LINK_SOURCE:	name = KW_LINK_SOURCE;	goto SETC;
     case LINK_DEST:	name = KW_LINK_DEST;	goto SETC;
+    case LINK_DEST_NULL:name = KW_LINK_DEST;	goto SETC;
     case LINK_URL:	name = KW_LINK_URL;	goto SETC;
 
       /* print left parameter, if present */
@@ -651,7 +653,7 @@ void AppendToFile(OBJECT x, FILE_NUM fnum, int *pos, int *lnum)
 	FATAL, PosOfFile(fnum), str, NEW_DATA_SUFFIX);
     StringCopy(buff, str);  StringCat(buff, NEW_DATA_SUFFIX);
     last_write_fp = StringFOpen(buff,
-      FileTestUpdated(fnum) ? APPEND_TEXT : WRITE_TEXT);
+      FileTestUpdated(fnum) ? APPEND_FILE : WRITE_FILE);
     if( last_write_fp == null )
       Error(41, 4, "cannot append to database file %s", FATAL, no_fpos, buff);
     last_write_fnum = fnum;
@@ -717,7 +719,7 @@ void CloseFiles(void)
       /* be a problem); then rename "newname" to be "oldname" (avoids	*/
       /* overwriting an existing file "oldname", another problem)	*/
 
-      if( (fp = StringFOpen(oldname, READ_TEXT)) != NULL )
+      if( (fp = StringFOpen(oldname, READ_FILE)) != NULL )
       { fclose(fp);
 	StringRemove(oldname);
       }

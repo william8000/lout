@@ -1,0 +1,258 @@
+@Section
+   @Title { Textures }
+   @Tag { textures }
+@Begin
+@PP
+The @Code "@Texture" symbol works in the same kind of way as @Code "@Font"
+texture.sym @Index { @Code "@Texture" symbol }
+and @Code "@Colour" do.  It causes the object to its right to be printed
+in a texture specified by the object to its
+left:
+@ID @Code "striped @Texture 50p @Font ABC"
+produces
+@FootNote {
+If you can't see the result here, or if you can see it but without
+texture, then the fault is probably in your PostScript viewer.
+The PostScript viewer used by the author (a 1997 version of @I { gv })
+shows a blank space here and throughout this section wherever a
+texture is supposed to appear, but when printed on his printer
+the textures appear correctly.
+}
+@CD striped @Texture 50p @Font ABC
+The object to the right of @Code "@Texture" may be arbitrary as usual.
+@PP
+# Textures are harder to specify than colours, and only a few
+# texture names are widely used.
+Only a handful of textures
+are offered by the @Code "@Texture" symbol; but, as some
+compensation, there are options which allow any texture to
+be scaled, printed at any angle,
+texture.sym @RawIndex { @Code "@Texture" symbol }
+texture.sym.scale @SubIndex { @Code "scale" option }
+texture.sym.angle @SubIndex { @Code "angle" option }
+texture.sym.hshift @SubIndex { @Code "hshift" option }
+texture.sym.vshift @SubIndex { @Code "vshift" option }
+and shifted:
+@ID @OneRow @Code @Verbatim {
+striped @Texture
+    scale { 2 }
+    angle { 45d }
+    hshift { 1p }
+    vshift { 3p }
+50p @Font ABC
+}
+produces
+@CD striped @Texture
+    scale { 2 }
+    angle { 45d }
+    hshift { 1p }
+    vshift { 3p }
+50p @Font ABC
+with the texture scaled by a factor of 2, printed at an angle of 45
+degrees, and shifted one point horizontally and three points
+vertically.  The @Code scale option causes equal scaling in the
+horizontal and vertical directions; there is also {@Code hscale}
+which scales horizontally only, and @Code vscale which scales
+vertically only.  As you would expect, the default values of these
+options are @Code 1 for the scaling options, {@Code 0d} for {@Code angle},
+and {@Code 0p} for {@Code hshift} and {@Code vshift}.
+# @PP
+# Stripes would rarely need to be shifted in practice, but some of the other
+# textures described below can benefit from shifting.
+@PP
+Here is the list of all textures offered by the @Code "@Texture"
+symbol, with the options specific to each kind of texture, their
+default values, and sample default output.  Remember, all textures
+take the {@Code angle}, {@Code scale}, {@Code hscale}, {@Code vscale},
+{@Code hshift}, and {@Code vshift} options as well.
+@ID @OneRow @Tbl
+    mv { 0.5v }
+    aformat { @Cell ml { 0i } A | @Cell @Code B | @Cell mr { 0i } @I lines @Break C }
+{
+
+@Rowa
+    ma { 0i }
+    A { @TextureSample solid }
+    B {
+"solid @Texture"
+solid."texture" @Index { @Code "solid" "texture" }
+}
+
+@Rowa
+    A { @TextureSample striped }
+    B {
+"striped @Texture"
+"    width { 1p }"
+"    gap { 1p }"
+}
+    C { ""
+The width of each stripe
+The width of each gap between stripes
+striped."texture" @Index { @Code "striped" "texture" }
+}
+
+@Rowa
+    A { @TextureSample grid }
+    B {
+"grid @Texture"
+"    width { 1p }"
+"    gap { 1p }"
+}
+    C { ""
+The width of each stripe
+grid."texture" @Index { @Code "grid" "texture" }
+The width of each gap between stripes
+}
+
+@Rowa
+    A { @TextureSample dotted }
+    B {
+"dotted @Texture"
+"    radius { 0.5p }"
+"    gap { 2p }"
+}
+    C { ""
+The radius of each dot (filled circle)
+dotted."texture" @Index { @Code "dotted" "texture" }
+The gap between the centres of adjacent dots
+}
+
+@Rowa
+    A { @TextureSample chessboard }
+    B {
+"chessboard @Texture"
+"    width { 2p }"
+}
+    C { ""
+The width of each square
+chessboard."texture" @Index { @Code "chessboard" "texture" }
+}
+
+@Rowa
+    A { @TextureSample brickwork }
+    B {
+"brickwork @Texture"
+"    width { 6p }"
+"    height { 2p }"
+"    linewidth { 0.5p }"
+}
+    C { ""
+The width of each brick
+The height of each brick
+brickwork."texture" @Index { @Code "brickwork" "texture" }
+The width of the brickwork lines
+}
+
+@Rowa
+    A { @TextureSample honeycomb }
+    B {
+"honeycomb @Texture"
+"    radius { 2p }"
+"    linewidth { 0.5p }"
+}
+    C { ""
+The radius of each hexagon
+honeycomb."texture" @Index { @Code "honeycomb" "texture" }
+The width of the lines
+}
+
+@Rowa
+    A { @TextureSample triangular }
+    B {
+"triangular @Texture"
+"    radius { 4p }"
+"    linewidth { 0.5p }"
+}
+    C { ""
+The side length of each triangle
+triangular."texture" @Index { @Code "triangular" "texture" }
+The width of the lines
+}
+
+@Rowa
+    mb { 0i }
+    A { @TextureSample string }
+    B {
+"string @Texture"
+"    width { 12p }"
+"    height { 12p }"
+"    font { Times-Roman }"
+"    size { 10p }"
+"    value { \"*\" }"
+}
+    C { ""
+The width at which the string repeats
+The height at which the string repeats
+The font used to display the string (see below)
+The font size used to display the string
+string."texture" @Index { @Code "string" "texture" }
+The characters to be displayed
+}
+
+}
+This last example seems like a good one for experimenting with
+the {@Code hshift} and {@Code vshift} options, so here goes:
+texture.sym.hshift @SubIndex { @Code "hshift" option }
+texture.sym.vshift @SubIndex { @Code "vshift" option }
+@ID @OneRow @Tbl
+    mv { 0.5v }
+    aformat { @Cell ml { 0i } A | @Cell @Code B | @Cell mr { 0i } @I lines @Break C }
+{
+@Rowa
+    mb { 0i }
+    A {
+@Box margin { 0i }
+string @Texture hshift { 4p } vshift { 4p }
+@Box margin { 2.0f } paint { black } {}
+}
+    B {
+"string @Texture"
+"    hshift { 4p }"
+"    vshift { 4p }"
+}
+}
+You have to find the right amount of shift by experiment, especially
+when combined with rotation and scaling.  We recommend sticking to the
+{@Code p} (points), {@Code m} (ems), {@Code c} (centimetres), and
+{@Code i} (inches) units of measurement when giving length options
+to {@Code "@Texture"} symbols.
+@PP
+Care is needed when using the @Code font and @Code value options
+of {@Code "string @Texture"}, since these options are passed straight
+through to the PostScript output without checking.  The @Code "font"
+option takes a PostScript name for a font, not a Lout name.  Typical
+PostScript font names, virtually certain to work, are {@Code Times-Roman}
+and {@Code Helvetica}.  Since Lout takes no special steps to make sure
+that the font you ask for is available, you should restrict your font
+choices to fonts known to be in use elsewhere on the same page, or
+known to be always loaded in your viewing device.  The @Code "value"
+option must be a sequence of characters from the nominated font.
+Although the value does not have to be quoted as shown, we recommend
+it as a reminder of how limited the choices are here.  Also, spaces in
+your value will work better between quotes, and to make parentheses --
+@Code "(" and @Code ")" -- come out correctly they must be enclosed in
+quotes and preceded by a backslash character, which you get as usual by
+writing @I two backslash characters.  For example, {@Code "\"\\\\(\""}
+will produce one left parenthesis.
+@PP
+Notice that {@Code "solid @Texture"} produces solid colour,
+or in other words no texture:
+@ID @Code @Verbatim {
+striped @Texture angle { 45d }
+@Box linewidth { 2p } solid @Texture 50p @Font WARNING!
+}
+produces
+@CD {
+striped @Texture angle { 45d }
+@Box linewidth { 2p } solid @Texture 50p @Font WARNING!
+}
+As shown, {@Code "solid @Texture"} is useful for switching back to
+normal printing within a textured region.  In this example, without
+it the letters would have been striped as well.
+@PP
+Expert users can also make the object to the left of @Code "@Texture"
+be anything that is acceptable to the left of the expert's symbol
+{@Code "@SetTexture"}, allowing people who want to do some serious
+work in PostScript to get arbitrary textures.  Consult the Expert's
+Guide for more about this.
+@End @Section

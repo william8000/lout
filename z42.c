@@ -1,9 +1,9 @@
 /*@z42.c:Colour Service:ColourChange, ColourCommand@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -131,15 +131,15 @@ static OBJECT ctab_retrieve(FULL_CHAR *str, COLOUR_TABLE S)
 #if DEBUG_ON
 static void ctab_debug(COLOUR_TABLE S, FILE *fp)
 { int i;  OBJECT x, link, y;
-  fprintf(fp, "  table size: %d;  current number of colours: %d\n",
-    ctab_size(S), ctab_count(S));
+  fprintf(fp, "  table size: %d;  current number of colours: %d%s",
+    ctab_size(S), ctab_count(S), STR_NEWLINE);
   for( i = 0;  i < ctab_size(S);  i++ )
   { x = ctab_num(S, i);
-    fprintf(fp, "  ctab_num(S, %d) = %s\n", i,
+    fprintf(fp, "  ctab_num(S, %d) = %s%s", i,
       x == nilobj ? AsciiToFull("<nilobj>") :
-      is_word(type(x)) ? string(x) : AsciiToFull("not WORD!"));
+      is_word(type(x)) ? string(x) : AsciiToFull("not WORD!"), STR_NEWLINE);
   }
-  fprintf(fp, "\n");
+  fprintf(fp, "%s", STR_NEWLINE);
   for( i = 0;  i < ctab_size(S);  i++ )
   { x = ctab_name(S, i);
     fprintf(fp, "ctab_name(S, %d) =", i);
@@ -152,7 +152,7 @@ static void ctab_debug(COLOUR_TABLE S, FILE *fp)
       fprintf(fp, " %s",
 	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
     }
-    fprintf(fp, "\n");
+    fprintf(fp, "%s", STR_NEWLINE);
   }
 } /* end ctab_debug */
 #endif
@@ -192,16 +192,6 @@ void ColourChange(STYLE *style, OBJECT x)
     debug0(DCO, D, "ColourChange returning (colour unchanged)");
     return;
   }
-
-  /* *** allowing empty left parameter now, means nochange
-  if( StringEqual(string(x), STR_EMPTY) )
-  { if( BackEnd->colour_avail )
-      Error(42, 4, "%s ignored (empty left parameter)", WARN, &fpos(x),
-        KW_COLOUR);
-    debug0(DCO, D, "ColourChange returning (colour unchanged)");
-    return;
-  }
-  *** */
 
   /* if argument is nochange, do nothing */
   if( StringEqual(string(x), STR_COLOUR_NOCHANGE) ||

@@ -7,7 +7,7 @@ To produce a book, start off with the @Code book setup file and the
 books. @Index { books }
 book. @Index @Code "@Book"
 @Code "@Book" symbol:
-@ID @OneRow @Code {
+@ID @OneRow -1px @Break @Code {
 "@SysInclude { book }"
 "@Book"
 "    @Title {}"
@@ -28,6 +28,10 @@ book. @Index @Code "@Book"
 "    @FirstPageNumber { 1 }"
 "    @IntroFirstPageNumber { 1 }"
 "    @OptimizePages { No }"
+"    @GlossaryText { @Null }"
+"    @IndexText { @Null }"
+"    @IndexAText { @Null }"
+"    @IndexBText { @Null }"
 "//"
 }
 This shows all the options of @Code "@Book" with their default values.  As
@@ -127,6 +131,11 @@ it, which might be wise after major changes.  It is possible for the
 optimizer to cycle, never settling on a single final best version; this
 is usually caused by footnotes or floating figures inserted at points
 which end up near page boundaries.
+@PP
+The {@Code "@GlossaryText"}, {@Code "@IndexText"}, {@Code "@IndexAText"},
+and {@Code "@IndexBText"} symbols allow you to insert some arbitrary
+text after the title of the glossary, index, etc., and before the
+entries.
 @PP
 After the compulsory @Code "//" comes an optional preface:
 preface. @Index @Code "@Preface"
@@ -352,7 +361,8 @@ vertical space between the chapter heading and body.
 separate.intro.numbering @Index @Code "@SeparateIntroNumbering"
 determines whether the introductory part of the book is to have a
 separate numbering sequence or not.  @Code "@ReferencesBeforeAppendices"
-references.before.appendices @Index @Code "@ReferencesBeforeAppendices"
+references. @RawIndex references
+references.references.before.appendices @SubIndex @Code "@ReferencesBeforeAppendices"
 determines whether any final list of references appears before or
 after any appendices.  @Code "@ChapterWord" determines
 the word used in chapter titles; its default value, {@Code "chapter"},

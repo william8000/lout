@@ -21,7 +21,7 @@ at the beginning of your document (Section {@NumberOf ordinary}).
 value 1 as shown, and @Code "@ColumnGap" may be any length (Section
 {@NumberOf objects}).  The column width is derived from these options
 column.width @RawIndex { column width }
-column.width.pages @SubIndex { on pages }
+column.width.in.pages @SubIndex { in pages }
 using the obvious formula
 @ID @Eq { columnwidth = { pagewidth - margins -
 ({@Code "@ColumnNumber"} - 1) times {@Code "@ColumnGap"} }

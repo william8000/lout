@@ -60,4 +60,34 @@ values for the left parameter are
 }
 Colouring an object white is useful for producing an empty space
 whose size is that of some object.
+@PP
+Since the introduction of textures to Lout in Version 3.27, direct
+use of PostScript colour setting operations such as {@Code setrgbcolor}
+is deprecated.  Instead, Lout offers its own versions of the
+standard PostScript colour setting operations:
+@ID @OneRow @Tbl
+    aformat { @Cell A | @Cell B }
+    bformat { @Cell @Code A | @Cell @Code B }
+{
+@Rowa
+    A { If you want this }
+    B { You should rather write this }
+    f { Italic }
+    rb { yes }
+@Rowb
+    A { num setgray }
+    B { num LoutSetGray }
+@Rowb
+    A { num num num setrgbcolor }
+    B { num num num LoutSetRGBColor }
+@Rowb
+    A { num num num sethsbcolor }
+    B { num num num LoutSetHSBColor }
+@Rowb
+    A { num num num setcmykcolor }
+    B { num num num LoutSetCMYKColor }
+    rb { yes }
+}
+The Lout versions are equivalent to the PostScript ones but without
+the unwanted effect of causing the current texture to be forgotten.
 @End @Section

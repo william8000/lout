@@ -5,6 +5,9 @@
 @PP
 In addition to drawing the outline, each of the standard node
 types also attaches names, called {@I tags}, to certain points.  For
+diagrams. @RawIndex { diagrams }
+diagrams.tags @SubIndex { tags ({@Code "::"}) }
+tags.diagrams @Index { tags ({@Code "::"}) in diagrams }
 example, the @Code "@Ellipse" symbol creates nine tags:
 @ID {
 @Code {
@@ -36,10 +39,10 @@ The names and positions of all standard tags may be found in the summary
 (Section {@NumberOf dia_summ}) at the end of this chapter.  Each tag
 stands for a point, and may be used wherever a point is required:
 @ID {
-@Code {
-"@Ellipse { Hello, world }"
-"//"
-"@Link from { SW } to { SE }"
+@Code @Verbatim {
+@Ellipse { Hello, world }
+//
+@Link from { SW } to { SE }
 }
 ||7ct
 @Diag {
@@ -73,10 +76,10 @@ afterwards the names are changed by prefixing the word preceding
 {@Code "::"}, plus a @Code "@" character, to each one.  These longer
 tags may be used exactly like the others:
 @ID {
-@Code {
-"A:: @Ellipse { Hello, world }"
-"//"
-"@Link from { A@SW } to { A@SE }"
+@Code @Verbatim {
+A:: @Ellipse { Hello, world }
+//
+@Link from { A@SW } to { A@SE }
 }
 ||7ct
 @Diag {
@@ -89,17 +92,17 @@ The retagging symbol may be applied to links, and indeed to arbitrary
 objects; it will retag every tag within the following object, even
 tags that have already been retagged:
 @ID {
-@Code {
-"A:: {"
-"    1:: @Ellipse"
-"        vsize { 1.0c }"
-"        hsize { 2.5c }"
-"    @DP"
-"    @DP"
-"    2:: @Ellipse"
-"        vsize { 1.0c }"
-"        hsize { 2.5c }"
-"}"
+@Code @Verbatim {
+A:: {
+    1:: @Ellipse
+        vsize { 1.0c }
+        hsize { 2.5c }
+    @DP
+    @DP
+    2:: @Ellipse
+        vsize { 1.0c }
+        hsize { 2.5c }
+}
 }
 ||7ct
 @Diag {
@@ -125,14 +128,14 @@ any mixup causes total disaster.
 @PP
 When a tag lies within the object following some node, it is
 automatically retagged in this way with tag {@Code IN}.  For example, in
-@ID @Code {
-"@Square"
-"@Circle Hello"
+@ID @Code @Verbatim {
+@Square
+@Circle Hello
 }
 the circle lies within the square, and what you get in effect is
-@ID @Code {
-"@Square"
-"IN:: @Circle Hello"
+@ID @Code @Verbatim {
+@Square
+IN:: @Circle Hello
 }
 This prevents confusion between the tags of the inner and outer nodes.  This
 retagging cannot be left to the user's discretion, owing to unexpected
@@ -144,13 +147,13 @@ Although @Code from and @Code to are just two of several options within
 given, they have a special virtue not shared by any other options.  It is
 possible to give the name of an entire node, not just a tag denoting one
 point, to them:
-@ID {
+@ID @Verbatim {
 @Code {
-"A:: @Circle"
-"@DP"
-"B:: @Ellipse { Hello, world }"
-"//"
-"@Link from { A } to { B }"
+A:: @Circle
+@DP
+B:: @Ellipse { Hello, world }
+//
+@Link from { A } to { B }
 }
 ||7ct
 @Diag {
@@ -167,6 +170,9 @@ potentially confusing:  @Code A and @Code B do not denote points and are
 not tags, strictly speaking, at all.
 @PP
 The @Code "::" symbol has a @Code restrict option which can be
+diagrams. @RawIndex { diagrams }
+diagrams.restrict @SubIndex { @Code "restrict" option }
+restrict.diagrams @Index { @Code "restrict" option (diagrams) }
 used to save printer memory in deeply nested structures (such as
 the syntax diagrams of Section {@NumberOf dia_synt}) by restricting
 the tags promoted by @Code "::" to a limited set:

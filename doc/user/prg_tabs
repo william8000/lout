@@ -4,12 +4,17 @@
 @Begin
 @PP
 Tab characters provide a convenient way to indent and align parts of
-tab.c @Index { tab characters in programs }
+programs. @RawIndex { programs }
+programs.tab.characters @SubIndex { tab characters }
+tab.characters.programs @Index { tab characters in programs }
 computer programs.  With care, this alignment can be preserved in the final
 print even with varying-width fonts.
 @PP
 The distance between two tab stops in the program text is by default taken
 to be 8 characters, which is standard for Unix.  This can be changed with
+programs. @RawIndex { programs }
+programs.tabin @SubIndex { @Code "tabin" option }
+tabin.programs @Index { @Code "tabin" option (programs) }
 the @Code "tabin" option.  For example,
 @ID @Code "@CP tabin { 4 }"
 informs Lout that tab stops occur every 4 characters in the program
@@ -19,6 +24,9 @@ we will stick with C for the rest of this section.
 @PP
 The distance between two tab stops on the printed page is quite a different
 thing, and it is determined by the value of the @Code "tabout" option, which
+programs. @RawIndex { programs }
+programs.tabout @SubIndex { @Code "tabout" option }
+tabout.programs @Index { @Code "tabout" option (programs) }
 must be a Lout length.  For example,
 @ID @Code "@CP tabout { 0.5i }"
 requests that tab stops be placed at half-inch intervals.  In other

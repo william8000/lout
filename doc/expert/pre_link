@@ -64,4 +64,22 @@ different left parameters are melded into one, one of the two will
 be the result, but which one is undefined.  Notice that melding
 cannot produce an undefined link, since the worst it can do is
 delete a @@LinkSource.
+@PP
+Practically speaking, the right parameters of @@LinkSource
+and @@URLLink need to be non-null, non-empty objects, since
+otherwise there is nothing visible for the user to click on.
+(This condition is not checked or enforced by Lout.)  However,
+the right parameter of @@LinkDest could reasonably be empty
+or null.  Usually, when @@Null lies inside a non-concatenation
+object, for example
+@ID "@OneCol @Null"
+the effect of the @@Null is lost -- the result in this example
+is equivalent to an empty object.  However, when the right
+parameter of @@LinkDest is @@Null:
+@ID "@LinkDest @Null"
+or when it is some object treated like @@Null by Lout (e.g.
+a @@Tagged symbol), then the @@LinkDest itself has the effect
+on surrounding concatentation operators that @@Null has,
+allowing it to be made effectively invisible in the printed
+document, though still really there.
 @End @Section

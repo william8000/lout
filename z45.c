@@ -1,9 +1,9 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.26)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
+/*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -38,17 +38,85 @@
 
 /*****************************************************************************/
 /*                                                                           */
+/*  int ReadOneLine(FILE *fp, char *buff, int buff_len)                      */
+/*                                                                           */
+/*  Read one line of fp, up to and including the following newline           */
+/*  sequence, which may be a CH_LF/CH_CR pair as well as singleton.          */
+/*  Place the contents of the line into *buff, including a concluding        */
+/*  \0 but never the concluding newline sequence.                            */
+/*                                                                           */
+/*  The buffer has space for buff_len characters including the concluding    */
+/*  \0.  If space runs out, terminate the read early; the unread portion     */
+/*  will be read by the next call to ReadOneLine().  This code assumes       */
+/*  that buff_len is at least 2.                                             */
+/*                                                                           */
+/*  Return values are as follows:                                            */
+/*                                                                           */
+/*     0   Did not read a line because EOF was encountered immediately       */
+/*     1   Successfully read a line, empty or otherwise, into *buff          */
+/*     2   Read a line but had to stop early owing to buffer overflow        */
+/*                                                                           */
+/*****************************************************************************/
+
+int ReadOneLine(FILE *fp, FULL_CHAR *buff, int buff_len)
+{ int ch;
+  int len1 = buff_len - 1;
+
+  /* read characters up to the end of line or file */
+  int count = 0;
+  while( (ch = getc(fp)) != EOF && ch != CH_LF && ch != CH_CR )
+  {
+    buff[count++] = ch;
+    if( count >= len1 )
+    {
+      /* out of space, have to stop early */
+      buff[count++] = '\0';
+      return 2;
+    }
+  }
+
+  /* terminate gracefully depending what character we stopped at */
+  if( ch == EOF )
+  {
+    if( count == 0 )
+      return 0;
+  }
+  else if( ch == CH_LF )
+  {
+    /* consume any immediately following CH_CR too */
+    ch = getc(fp);
+    if( ch != CH_CR )
+      ungetc(ch, fp);
+  }
+  else /* ch == CH_CR */
+  {
+    /* consume any immediately following CH_LF too */
+    ch = getc(fp);
+    if( ch != CH_LF )
+      ungetc(ch, fp);
+  }
+  buff[count++] = '\0';
+  return 1;
+} /* end ReadOneLine */
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  LINE *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, *len) */
 /*                                                                           */
 /*  Read all of the lines of fp into memory and return a null-terminated     */
 /*  array of pointers to these lines, and set *len to the number of lines.   */
 /*  Make sure the lines themselves are null-terminated, also.                */
 /*                                                                           */
+/*  As for ReadOneLine above, lines may be terminated by a one or two        */
+/*  character newline sequence, but these characters are never included      */
+/*  in the lines returned.                                                   */
+/*                                                                           */
 /*  fname is the name of the file being sorted, and is used for error        */
 /*  messages only.                                                           */
 /*                                                                           */
 /*  if first_line is non-null then it is a pointer to a string which is      */
-/*  to become as the first line of the result.  This string needs copying.   */
+/*  to become the first line of the result.  This string needs copying.      */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -119,10 +187,24 @@ LINE *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, int *len)
     }
 
     /* if newline char, end this line and start the next */
-    if( ch == '\n' )
+    if( ch == CH_LF || ch == CH_CR )
     {
       *bp++ = '\0';
       debug1(DEX, D, "  finished line: %s", *(lp-1));
+
+      /* get rid of following character if part of two-character line ending */
+      if( ch == CH_LF )
+      {
+	ch = getc(fp);
+	if( ch != CH_CR )
+	  ungetc(ch, fp);
+      }
+      else /* ch == CH_CR */
+      {
+	ch = getc(fp);
+	if( ch != CH_LF )
+	  ungetc(ch, fp);
+      }
 
       /* if no room in lines for next line, double its size */
       if( lp == lines_top )
@@ -164,7 +246,7 @@ void WriteLines(FILE *fp, LINE *lines, int len)
 { int i;
   for( i = 0;  i < len;  i++ )
   { fputs(lines[i], fp);
-    fputs("\n", fp);
+    fputs((char *) STR_NEWLINE, fp);
   }
 }
 
@@ -218,13 +300,13 @@ void SortFile(FULL_CHAR *infile, FULL_CHAR *outfile)
   debug2(DEX, D, "SortFile(%s, %s)", infile, outfile);
   
   /* open input file */
-  in_fp = fopen( (char *) infile, READ_BINARY);
+  in_fp = fopen( (char *) infile, READ_FILE);
   if( in_fp == (FILE *) NULL )
     Error(45, 5, "cannot open index file %s for reading",
 	    FATAL, no_fpos, outfile);
 
   /* open output file */
-  out_fp = fopen( (char *) outfile, WRITE_BINARY);
+  out_fp = fopen( (char *) outfile, WRITE_FILE);
   if( out_fp == (FILE *) NULL )
     Error(45, 6, "cannot open index file %s for writing",
 	    FATAL, no_fpos, outfile);

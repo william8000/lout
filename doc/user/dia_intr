@@ -48,6 +48,12 @@ Most uses of @@Diag contain a @I { nodes part } and a @I { links part }:
 @Code "}"
 }
 This reflects @@Diag's view of the world as consisting of {@I nodes}
+diagrams. @RawIndex { diagrams }
+diagrams.nodespart @SubIndex { nodes part }
+nodespart.diagrams @Index { nodes part in diagrams }
+diagrams. @RawIndex { diagrams }
+diagrams.linkspart @SubIndex { links part }
+linkspart.diagrams @Index { links part in diagrams }
 (circles, squares, and so on), which have to be put in their right
 places and then joined with @I links (lines, arrows).  The technical
 meaning of the {@Code "//"} symbol does not concern us here; it
@@ -75,6 +81,9 @@ Node symbols like @Code "@Ellipse" and @Code "@Square" follow a familiar
 pattern:  they consume the following object, which may be arbitrary, draw
 a shape around it, and give back the resulting object.  To insert links, the
 nodes must first be given names, called {@I tags}, using the @Code "::" symbol:
+diagrams. @RawIndex { diagrams }
+diagrams.tags @SubIndex { tags ({@Code "::"}) }
+tags.diagrams @Index { tags ({@Code "::"}) in diagrams }
 @ID @OneRow @Code {
 "A:: @Ellipse { Hello, world }"
 "@DP"
@@ -85,14 +94,14 @@ Then a link from @Code A to @Code B may be added to the links part:
   @Fmta { @Col 7c @Wide A ! @Col B }
 {
 @Rowa
-    A { @Code {
-"@Diag {"
-"    A:: @Ellipse { Hello, world }"
-"    @DP"
-"    B:: @Square @I x"
-"    //"
-"    @Link from { A } to { B }"
-"}"
+    A { @Code @Verbatim {
+@Diag {
+    A:: @Ellipse { Hello, world }
+    @DP
+    B:: @Square @I x
+    //
+    @Link from { A } to { B }
+}
 } }
     B { @Diag {
 A:: @Ellipse { Hello, world }

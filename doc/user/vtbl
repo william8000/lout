@@ -1,2 +1,15 @@
-vi tbl	tbl_intr tbl_cell tbl_rows tbl_rule tbl_marg tbl_widt tbl_inde	\
-	tbl_alig tbl_span tbl_mark tbl_mult tbl_plai tbl_setu tbl_summ 
+gvim tbl
+gvim tbl_intr
+gvim tbl_cell
+gvim tbl_rows
+gvim tbl_rule
+gvim tbl_marg
+gvim tbl_widt
+gvim tbl_inde
+gvim tbl_alig
+gvim tbl_span
+gvim tbl_mark
+gvim tbl_mult
+gvim tbl_plai
+gvim tbl_setu
+gvim tbl_summ 

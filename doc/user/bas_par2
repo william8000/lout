@@ -5,7 +5,7 @@
 @PP
 @I { Paragraph breaking } is the process of
 paragraph.breaking @Index { paragraph breaking }
-inserting line breaks into praragraphs at places appropriate to the column
+inserting line breaks into paragraphs at places appropriate to the column
 width.  Lout works out suitable column widths and performs paragraph
 breaking automatically, finding an `optimal' break with the method
 used by the @TeX
@@ -20,7 +20,7 @@ must be in want of a wife.
 }
 Changing the paragraph breaking style is similar to changing the font,
 colour, or language, and is done using the @Code "@Break" symbol:
-break. @Index @Code "@Break"
+breakzzz.sym @Index { @Code "@Break" symbol }
 @ID @Code "ragged @Break ..."
 This example causes every paragraph in the following object to be
 broken using the @Code ragged style, of which more below.
@@ -255,7 +255,7 @@ invoked in the @Code "@InitialBreak" option, like this:
 You can turn them off with @Code "breakablefirst @Break"
 and @Code "breakablelast @Break".  In both cases Lout makes it happen by
 breaking at the previous place, either between paragraphs or two lines from
-the end of a paragraph.  Alternatively, both features are compatible with
-Lout's @Code "@OptimizePages" option, which will optimize the overall page
-layout of the document subject to these requirements.
+the end of a paragraph.  Both features are compatible with Lout's
+@Code "@OptimizePages" option, which optimizes the overall page
+layout subject to these requirements.
 @End @Section

@@ -1,0 +1,111 @@
+@Section
+   @Title { Captions }
+   @Tag { pie_capt }
+@Begin
+@PP
+There are options for placing captions left, right, above, and below
+captions. @RawIndex { captions }
+captions.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.captions @SubIndex { captions }
+leftcaption. @RawIndex { @Code "leftcaption" option }
+leftcaption.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.leftcaption @SubIndex { @Code "leftcaption" option }
+rightcaption. @RawIndex { @Code "rightcaption" option }
+rightcaption.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.rightcaption @SubIndex { @Code "rightcaption" option }
+abovecaption. @RawIndex { @Code "abovecaption" option }
+abovecaption.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.abovecaption @SubIndex { @Code "abovecaption" option }
+belowcaption. @RawIndex { @Code "belowcaption" option }
+belowcaption.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.belowcaption @SubIndex { @Code "belowcaption" option }
+the pie graph, following the pattern of the captions in {@Code "@Graph"}:
+@ID @OneRow @Code @Verbatim {
+@Pie
+    leftcaption { At left }
+    rightcaption { At right }
+    abovecaption { This appears above }
+    belowcaption { This appears below }
+}
+produces
+@CD @Pie
+    leftcaption { At left }
+    rightcaption { At right }
+    abovecaption { This appears above }
+    belowcaption { This appears below }
+{
+    @Slice
+        weight { 20 }
+        label { Admin (20%) }
+    @Slice
+        weight { 40 }
+        paint { green }
+        label { Research (40%) }
+    @Slice
+        weight { 40 }
+        paint { lightred }
+        label { Teaching (40%) }
+}
+The captions may be arbitrary Lout objects, so may include
+equations, {@Code "@Rotate"}, and so on.  Each caption except
+@Code rightcaption is printed in the
+@Code "clines @Break" style, which means that multiple lines in one
+caption will be centred beneath each other.  The @Code rightcaption
+option uses the @Code "lines @Break" style, in which the lines are
+left justified beneath each other.
+@PP
+There are options for controlling the amount of space between each
+caption and the pie graph.  Here they are with their default values:
+leftgap. @RawIndex { @Code "leftgap" option }
+leftgap.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.leftgap @SubIndex { @Code "leftgap" option }
+rightgap. @RawIndex { @Code "rightgap" option }
+rightgap.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.rightgap @SubIndex { @Code "rightgap" option }
+abovegap. @RawIndex { @Code "abovegap" option }
+abovegap.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.abovegap @SubIndex { @Code "abovegap" option }
+belowgap. @RawIndex { @Code "belowgap" option }
+belowgap.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.belowgap @SubIndex { @Code "belowgap" option }
+@ID @OneRow @Code @Verbatim {
+@Pie
+    leftgap  { 0.5c }
+    rightgap { 0.5c }
+    abovegap { 0.5c }
+    belowgap { 0.5c }
+}
+These gaps are inserted only if the corresponding caption is
+non-empty.  Lout knows exactly where captions are, and leaves
+space for them and their gaps, so it would be wrong to attempt
+to use the {@Code leftextra}, {@Code rightextra}, {@Code aboveextra},
+and {@Code belowextra} options from Section {@NumberOf pie_over} to
+allow for the space occupied by captions.
+@PP
+When a pie graph is to be presented as a centred display, it is usually
+best if the centring is done with respect to the pie alone, not the
+captions and labels.  The @Code "hidecaptions" option does this by
+hidecaptions. @RawIndex { @Code "hidecaptions" option }
+hidecaptions.in.pie @SubIndex { in pie graphs }
+piegraphs. @RawIndex { pie graphs }
+piegraphs.hidecaptions @SubIndex { @Code "hidecaptions" option }
+making the left and right captions and gaps seem to Lout to have zero
+width:
+@ID @OneRow @Code @Verbatim {
+@Pie
+    hidecaptions { yes }
+}
+Actually @Code "yes" has been made the default value, since the vast
+majority of pie graphs are centred displays.  In the rare cases where
+this feature is not wanted (for example, if a pie graph appears as an entry
+in a table), use {@Code "hidecaptions { no }"}.
+@End @Section
