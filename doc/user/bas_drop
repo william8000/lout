@@ -10,14 +10,14 @@ and {@Code "@DropCapThree"}.  Place the capital to be dropped just
 before the symbol, and the rest of the paragraph after it:
 @ID @OneRow @Code {
 "I @DropCapTwo {"
-"it is a truth universally acknowledged, that a single man"
+"t is a truth universally acknowledged, that a single man"
 "in possession of a good fortune, must be in want of a wife."
 "}"
 }
 produces the object
 @ID 3i @Wide {
 I @DropCapTwo {
-it is a truth universally acknowledged, that a single man
+t is a truth universally acknowledged, that a single man
 in possession of a good fortune, must be in want of a wife.
 }
 }

@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.12                          #
+#  Make file for installing Basser Lout Version 3.13                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  6 April 1998                                                               #
+#  5 February 1999                                                            #
 #                                                                             #
 #     make lout         Compile the Lout source                               #
 #     make c2lout       Compile a small auxiliary program called c2lout       #
@@ -17,10 +17,6 @@
 #                       installdoc, installfr, and installde                  #
 #     make restart      Undo everything except changes to this makefile,      #
 #                       ready for a fresh start.                              #
-#                                                                             #
-#     make setupfiles   Creates setup files by editing include/master and     #
-#                       puts them in directory setup.  You should not need    #
-#                       to do this because it has already been done.          #
 #                                                                             #
 #  Most installations of Lout should require only the following steps.  If    #
 #  something goes wrong, you can start again with "make restart".  Please     #
@@ -50,7 +46,8 @@
 #         Systems requiring DBFIX = 0      Systems requiring DBFIX = 1        #
 #         -------------------------------------------------------------       #
 #         Unix                             NT/Visual C++                      #
-#         Cygnus gnuwin32 gcc                                                 #
+#         Cygnus gnuwin32 gcc              djgpp                              #
+#                                          Mingw32                            #
 #                                                                             #
 #  (3) Set the USESTAT macro defined below to 1 if the system you are         #
 #      compiling onto has the stat() file status system call.  If you are     #
@@ -225,13 +222,13 @@
 #                                                                             #
 # (18) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
-#      on line 1520 of file $(LIBDIR)/include/dl.  You can find the list of   #
-#      known page types in the User's Guide, and also at line 2679 in file    #
-#      $(LIBDIR)/include/dl.                                                  #
+#      on line 1607 of file $(LIBDIR)/include/dlf.  You can find the list of  #
+#      known page types in the User's Guide, and also at line 2707 in file    #
+#      $(LIBDIR)/include/dlf.                                                 #
 #                                                                             #
 # (19) If the usual language at your site is not English, you might like to   #
 #      now change the default value of the @InitialLanguage option on line    #
-#      1502 of file $(LIBDIR)/include/dl.  This will mean that by default     #
+#      1589 of file $(LIBDIR)/include/dlf.  This will mean that by default    #
 #      the date and words like Chapter and July will appear in a different    #
 #      language, and hyphenation will be carried out according to patterns    #
 #      designed for that language.  You can find the list of known languages  #
@@ -340,7 +337,6 @@ install: lout c2lout
 	mkdir $(LIBDIR)/$(LIBINCL)
 	chmod 755 $(LIBDIR)/$(LIBINCL)
 	cp include/* $(LIBDIR)/$(LIBINCL)
-	cp setup/* $(LIBDIR)/$(LIBINCL)
 	chmod 644 $(LIBDIR)/$(LIBINCL)/*
 	@echo ""
 	mkdir $(LIBDIR)/$(LIBDATA)
@@ -425,50 +421,3 @@ clean:
 	-rm -f lout c2lout *.o
 
 restart:	clean uninstall
-
-
-setupfiles:
-	@echo ""
-	@echo "Creating the basic five document types"
-	dosetup doc		doc
-	dosetup report		report
-	dosetup book		book
-	dosetup slides		slides
-	dosetup picture		picture
-
-	@echo ""
-	@echo "The basic five with C program printing"
-	dosetup cdoc		doc cprint
-	dosetup creport		report cprint
-	dosetup cbook		book cprint
-	dosetup cslides		slides cprint
-	dosetup cpicture	picture cprint
-
-	@echo ""
-	@echo "The basic five with Eiffel program printing"
-	dosetup edoc		doc eiffelprint
-	dosetup ereport		report eiffelprint
-	dosetup ebook		book eiffelprint
-	dosetup eslides		slides eiffelprint
-	dosetup epicture	picture eiffelprint
-
-	@echo ""
-	@echo "The basic five with diagram printing"
-	dosetup ddoc		doc diag
-	dosetup dreport		report diag
-	dosetup dbook		book diag
-	dosetup dslides		slides diag
-	dosetup dpicture	picture diag
-
-	@echo ""
-	@echo "Books with Eiffel and C program printing and diagrams"
-	dosetup dedoc		doc eiffelprint diag
-	dosetup debook		book eiffelprint diag
-	dosetup dcbook		book cprint diag
-
-	@echo ""
-	@echo "Ordinary documents and overheads with Blue printing"
-	dosetup	bdoc		doc blueprint
-	dosetup	bddoc		doc diag blueprint
-	dosetup bdslides	slides diag blueprint
-	dosetup ebdslides	slides diag blueprint eiffelprint

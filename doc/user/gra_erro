@@ -3,7 +3,7 @@
    @Tag { grerrors }
 @Begin
 @PP
-Lout normally produces an output file that will print without mishap on
+Lout normally produces output that will print without mishap on
 any PostScript device.  However, some of the options of @Code "@Graph"
 and all of the data and labels are passed through Lout without
 checking.  Any errors in this material will not be detected

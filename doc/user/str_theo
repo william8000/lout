@@ -7,13 +7,12 @@ examples, and claims }
 @PP
 theorem. @Index @Code "@Theorem"
 A theorem is created like this:
-@ID @Code {
+@ID @OneRow @Code {
 "@LD @Theorem"
 "    @Title { Fermat's Last Theorem }"
 "{"
-"@Eq { a sup n + b sup n != c sup n } for all positive"
-"integers @Eq { a }, @Eq { b }, @Eq { c } and @Eq { n }"
-"when @Eq { n > 2 }."
+"@Eq { a sup n + b sup n != c sup n } for all positive integers @Eq { a },"
+"@Eq { b }, @Eq { c } and @Eq { n } when @Eq { n > 2 }."
 "@LP"
 "@Proof I have a proof of this theorem, but the margin"
 "is too small to contain it. @EndProof"
@@ -26,9 +25,8 @@ for the equations.  The result is
 @ID @Theorem
     @Title { Fermat's Last Theorem }
 {
-@Eq { a sup n + b sup n != c sup n } for all positive
-integers @Eq { a }, @Eq { b }, @Eq { c } and @Eq { n }
-when @Eq { n > 2 }.
+@Eq { a sup n + b sup n != c sup n } for all positive integers @Eq { a },
+@Eq { b }, @Eq { c } and @Eq { n } when @Eq { n > 2 }.
 @LP
 @Proof I have a proof of this theorem, but the margin
 is too small to contain it. @EndProof
@@ -67,7 +65,7 @@ file option to
 @ID @Code "@ClaimWord { Conjecture }"
 and use the @Code "@Claim" symbol for your conjectures.  You can even put
 @ID @Code {
-"import @DocumentLayout"
+"import @DocumentSetup"
 "macro @Conjecture { @Claim }"
 }
 into your @Code mydefs file (Section {@NumberOf definitions}) if you wish,

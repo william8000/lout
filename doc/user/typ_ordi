@@ -37,7 +37,7 @@ document. @Index @Code "@Document"
 "..."
 "@End @Text"
 }
-This shows the eight options of {@Code "@Document"}, with their default
+This shows all the options of {@Code "@Document"}, with their default
 values.  As usual with options, the options of {@Code "@Document"}
 may be given in any order, and only the ones that need to be changed
 need be given at all.  Notice the @Code "//" after the last option.  Its
@@ -63,7 +63,9 @@ the bulk of the document.  It should have three parts:  a paragraph
 breaking style ({@Code adjust}, {@Code ragged}, etc.), an inter-line
 spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
 double spacing, and so on), and either @Code "hyphen" or @Code "nohyphen"
-for turning hyphenation on or off.
+for turning hyphenation on or off.  It may also have @Code "nobreakfirst"
+or @Code "nobreaklast" (or both), meaning to disallow a page break after
+the first line of a paragraph, or before the last, respectively.
 @PP
 @Code "@InitialSpace" determines how Lout treats white space between
 two objects, as described in Section
@@ -116,7 +118,7 @@ a paragraph symbol:
 "@PP"
 "Trespassers are hereby notified that, ..."
 }
-You can have @Code "@FullWidth" symbols repeatedly through the document,
+You can have several @Code "@FullWidth" symbols,
 producing full-width text wherever you want.  Just be aware that
 @Code "@FullWidth" always causes a fresh page to be begun, it will never
 appear on the same page as a figure or table, and it is not able to hold
@@ -131,10 +133,10 @@ tex.page @SubIndex { page optimization }
 optimal paragraph breaking algorithm.  It takes two runs to do this,
 with intermediate results stored in Lout's cross reference database
 (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.  It is possible for this
-page layout optimizer to cycle, never settling on a single final best
+it, which might be wise after major changes.  It is possible for the
+optimizer to cycle, never settling on a single final best
 version; this is usually caused by footnotes or floating figures inserted
-at points which end up near page boundaries.
+at points that end up near page boundaries.
 @PP
 The @Code "@Unpaginated" option, whose value is ignored unless plain text
 output is in effect, produces unpaginated output when changed to
@@ -157,7 +159,7 @@ endsections.ordinary @SubIndex { in ordinary documents }
 "@Section ... @End @Section"
 "@EndSections"
 }
-as described in detail in Section {@NumberOf largescale}.  Within any
+as described in Section {@NumberOf largescale}.  Within any
 section, a similar arrangement produces subsections:
 subsection. @RawIndex @Code "@SubSection"
 subsection.ordinary @SubIndex { in ordinary documents }
@@ -174,8 +176,8 @@ endsubsections.ordinary @SubIndex { in ordinary documents }
 "@SubSection ... @End @SubSection"
 "@EndSubSections"
 }
-Within any subsection, there may be sub-subsections, obtained in the same
-way only using {@Code "@BeginSubSubSections"}, {@Code "@SubSubSection"},
+Within any subsection, there may be sub-subsections, obtained
+using {@Code "@BeginSubSubSections"}, {@Code "@SubSubSection"},
 subsubsection. @RawIndex @Code "@SubSubSection"
 subsubsection.ordinary @SubIndex { in ordinary documents }
 beginsubsubsections. @RawIndex @Code "@BeginSubSubSections"
@@ -223,9 +225,9 @@ In addition to the {@Code "@Title"} option, each large-scale structure
 symbol ({@Code "@Section"}, {@Code "@SubSection"}, {@Code "@SubSubSection"},
 {@Code "@Appendix"}, {@Code "@SubAppendix"}, and {@Code "@SubSubAppendix"})
 has a @Code "@Tag" option for cross referencing (Section {@NumberOf cross}),
-an @Code "@InitialLanguage" option for changing the language of that
-part of the document, and a @Code "@RunningTitle" option which will be
-used in place of @Code "@Title" in running headers if given.  This last
+an @Code "@InitialLanguage" option for changing the language of that part
+of the document, and a @Code "@RunningTitle" option which will be used in
+place of @Code "@Title" in running headers if given.  @Code "@RunningTitle"
 is useful when the full title is rather long.
 @PP
 The features described in other chapters are all available within
@@ -258,14 +260,14 @@ to {@Code Yes}, and follow the instructions in Section
 {@NumberOf indexes}.  The index will appear automatically at the end
 of your document.
 @PP
-Within the @Code doc setup file there is an @Code "@OrdinaryLayout"
+Within the @Code doc setup file there is an @Code "@OrdinarySetup"
 symbol whose options control the appearance of features specific to
 ordinary documents (in other words, the features described in this
 section).  Here is a representative sample of these options, showing
 their default values:
-ordinary.layout @Index @Code "@OrdinaryLayout"
+ordinary.setup @Index @Code "@OrdinarySetup"
 @ID @OneRow @Code {
-"@Use { @OrdinaryLayout"
+"@Use { @OrdinarySetup"
 "  # @IndexWord { index }"
 "  # @AppendixWord { appendix }"
 "  # @SectionNumbers { Arabic }"

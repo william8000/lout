@@ -32,7 +32,7 @@ book. @Index @Code "@Book"
 This shows all the options of @Code "@Book" with their default values.  As
 usual, these options may be given in any order, and only those
 to be changed need be given at all.  The meaning of the
-@Code "//" symbol after the last is beyond our scope, but total
+@Code "//" symbol after the last option is beyond our scope, but total
 disaster will ensue if it is forgotten.
 @PP
 The {@Code "@Title"}, {@Code "@Author"}, and {@Code "@Edition"} options
@@ -70,7 +70,10 @@ the bulk of the book.  It should have three parts:  a paragraph
 breaking style ({@Code adjust}, {@Code ragged}, etc.), an inter-line
 spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
 double spacing, and so on), and either @Code "hyphen" or
-@Code "nohyphen" for turning hyphenation on or off.
+@Code "nohyphen" for turning hyphenation on or off.  It may also
+have @Code "nobreakfirst" or @Code "nobreaklast" (or both), meaning
+to disallow a page break after the first line of a paragraph, or
+before the last, respectively.
 @PP
 @Code "@InitialSpace" determines how Lout treats white space
 between two objects, as described in Section
@@ -99,10 +102,10 @@ printed full width.  There is a separate @Code "@IndexColumnNumber"
 option in the setup file which determines the number of columns in
 the index (Section {@NumberOf indexes}).
 @PP
-@Code "@FirstPageNumber" is the page number given to the first
+@Code "@FirstPageNumber" is the page number to be given to the first
 non-introductory page.  @Code "@IntroFirstPageNumber" is the
-page number of the first introductory page (it will ordinarily appear
-in Roman but must be given in Arabic).
+page number of the first introductory page; it will usually appear
+in Roman but must be given in Arabic.
 @PP
 Lout ordinarily places lines onto a page until space runs out, then moves
 to the next page and so on.  This often produces ugly empty spaces at
@@ -112,10 +115,10 @@ overall situation and try to minimize the ugliness, using the @TeX
 optimal paragraph breaking algorithm.  It takes two runs to do this,
 with intermediate results stored in Lout's cross reference database
 (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.  It is possible for this
-page layout optimizer to cycle, never settling on a single final best
-version; this is usually caused by footnotes or floating figures inserted
-at points which end up near page boundaries.
+it, which might be wise after major changes.  It is possible for the
+optimizer to cycle, never settling on a single final best version; this
+is usually caused by footnotes or floating figures inserted at points
+which end up near page boundaries.
 @PP
 After the compulsory @Code "//" comes an optional preface:
 preface. @Index @Code "@Preface"
@@ -194,14 +197,14 @@ endsubsections.books @SubIndex { in books }
 "@SubSection ... @End @SubSection"
 "@EndSubSections"
 }
-The subsections may contain sub-subsections following the same
+The subsections may contain sub-subsections in the same
 subsubsection.books @SubIndex { in books }
 beginsubsubsections.books @SubIndex { in books }
 endsubsubsections.books @SubIndex { in books }
-pattern.  There are no sub-sub-subsections.
+way.  There are no sub-sub-subsections.
 @PP
-After the chapters comes an optional sequence of appendices, each
-introduced by @Code "@Appendix" in the usual way:
+After the chapters comes an optional sequence of appendices.  Each
+is introduced by @Code "@Appendix" in the usual way:
 appendix.books @SubIndex { in books }
 @ID @OneRow @Code {
 "@Appendix"
@@ -286,13 +289,13 @@ as described in Chapter {@NumberOf biblio}.  As explained there, it is
 possible to have a list of references at the end of each chapter as well
 as at the end of the book.
 @PP
-Within the @Code "book" setup file there is a @Code "@BookLayout"
-booklayout. @Index @Code "@BookLayout"
+Within the @Code "book" setup file there is a @Code "@BookSetup"
+booksetup. @Index @Code "@BookSetup"
 symbol whose options control the appearance of features specific to books
 (in other words, the features described in this section).  Here is a
 representative sample of these options, showing their default values:
 @ID @OneRow @Code {
-"@Use { @BookLayout"
+"@Use { @BookSetup"
 "    # @TitlePageFont { Helvetica Base }"
 "    # @SeparateIntroNumbering { Yes }"
 "    # @PrefaceAfterContents { No }"
@@ -365,8 +368,8 @@ symbols standing for the @Code "@PartNumber" and @Code "@PartTitle"
 options of the relevant @Code "@Chapter" symbol.  The default value is
 @ID @Code "@PartHeadingFormat { @CD number @DP @CD title }"
 which centres the number and title.  The default paragraph breaking
-style is {@Code "clines"}, but you may include a @Code "@Break" symbol
-to change this.
+style is {@Code "clines"}, but you may place a @Code "@Break" symbol
+within @Code "@PartHeadingFormat" to change this.
 @PP
 The example of boxed titles for chapters given above suffers from two
 practical deficiencies.  First, the box won't extend right across the

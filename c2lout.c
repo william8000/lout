@@ -100,7 +100,7 @@ extern void ProcessStandAlone(char *fname, FILE *in_fp, FILE *out_fp);
 /*                                                                           */
 /*****************************************************************************/
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 { FILE *in_fp, *out_fp = stdout;
   BOOLEAN at_least_one_file, raw_seen;  int i;
   char *infilename, *outfilename, *errfilename, *str;

@@ -1,7 +1,7 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -1039,7 +1039,7 @@ void FontWordSize(OBJECT x)
   if( *p )
   { if ( word_font(x) < 1 || word_font(x) > font_count )
       Error(37, 48, "no current font at word %s", FATAL, &fpos(x), string(x));
-    if ( word_colour(x) == 0 )
+    if ( word_colour(x) == 0 && BackEnd != PLAINTEXT )
       Error(37, 49, "no current colour at word %s", FATAL, &fpos(x), string(x));
     if ( word_language(x) == 0 )
       Error(37, 50, "no current language at word %s", FATAL, &fpos(x),string(x));
@@ -1052,12 +1052,14 @@ void FontWordSize(OBJECT x)
     do
     { 
       /* check for missing glyph (lig[] == 1) or ligatures (lig[] > 1) */
+      debug2(DFT, D, "  examining `%c' lig = %d", *p, lig[*p]);
       if( lig[*q = *p++] )
       {
 	if( lig[*q] == 1 )
 	{ tmp = MakeWord(QWORD, STR_SPACE, &fpos(x));
 	  string(tmp)[0] = *q;
-	  if( unacc[*q] != '\0' )
+	  /* bug fix: unaccented version exists if unacc differs from self */
+	  if( unacc[*q] != *q )
 	  {
 	    /* *** this is acceptable now, let this char through
 	    Error(37, 51, "accent dropped from character %s (it has no glyph in font %s)",
@@ -1065,12 +1067,17 @@ void FontWordSize(OBJECT x)
 	      StringQuotedWord(tmp), FontFamilyAndFace(word_font(x)));
 	    *(p-1) = *q = unacc[*q];
 	    *** */
+	    debug2(DFT, D, "  unacc[%c] = `%c'", *q, unacc[*q]);
 	    fnt[*q].up = fnt[unacc[*q]].up;
 	    fnt[*q].down = fnt[unacc[*q]].down;
+	    fnt[*q].left = fnt[unacc[*q]].left;
 	    fnt[*q].right = fnt[unacc[*q]].right;
+	    fnt[*q].last_adjust = fnt[unacc[*q]].last_adjust;
+	    lig[*q] = 0;
 	  }
 	  else
 	  {
+	    debug1(DFT, D, "  unacc[%c] = 0, replacing by space", *q);
 	    Error(37, 52, "character %s replaced by space (it has no glyph in font %s)",
 	      WARN, &fpos(x),
 	      StringQuotedWord(tmp), FontFamilyAndFace(word_font(x)));
@@ -1079,7 +1086,9 @@ void FontWordSize(OBJECT x)
 	  Dispose(tmp);
 	}
 	else
-	{ a = &lig[ lig[*(p-1)] + MAX_CHARS ];
+	{
+	  debug1(DFT, D, "  processing ligature beginning at %c", *q);
+	  a = &lig[ lig[*(p-1)] + MAX_CHARS ];
 	  while( *a++ == *(p-1) )
 	  { b = p;
 	    while( *a == *b && *(a+1) != '\0' && *b != '\0' )  a++, b++;

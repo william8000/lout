@@ -17,7 +17,7 @@ symbols made available by the @@Open will be unavailable within the @@Open.
 @PP
 use.sym @Index { @@Use symbol }
 The @@Use symbol is an @@Open symbol in a
-different form.  It may only appear just after the definitions
+different form.  It may only appear among or after the definitions
 in Lout's input, and it is equivalent to enclosing the remainder of the
 input in an @@Open symbol.  For example,
 @ID @OneRow {

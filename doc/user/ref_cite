@@ -62,16 +62,15 @@ no.chap.cite @Index @Code "@NoChapCite"
 there is a @Code "@Ref" symbol:
 ref. @Index @Code "@Ref"
 @ID @Code "@Ref kingston1995lout.expert"
-is the same as @Code "@Cite { $kingston1995lout.expert }" except that it
-produces no brackets, just one bare label, at the point of citation.  There
-are analogous {@Code "@ChapRef"}, {@Code "@NoRef"}, and {@Code "@NoChapRef"}
+is the same as @Code "@Cite { $kingston1995lout.expert }" without the
+brackets.  There are analogous {@Code "@ChapRef"}, {@Code "@NoRef"},
+and {@Code "@NoChapRef"}
 chap.ref @Index @Code "@ChapRef"
 no.ref @Index @Code "@NoRef"
 no.chap.ref @Index @Code "@NoChapRef"
 symbols, which are not recommended.
 @PP
-Sometimes you need to print a reference outside the concluding
-reference list.  For this there is a @Code "@RefPrint" symbol:
+The @Code "@RefPrint" symbol will print a reference on the spot:
 ref.print @Index @Code "@RefPrint"
 resume. @Index { resumes }
 curriculum. @Index { curriculum vitae }

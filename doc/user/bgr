@@ -5,7 +5,7 @@
 @LP
 This chapter introduces some basic graphics symbols for colour, rotation,
 scaling, and included illustrations.  These are all from the standard
-DocumentLayout package, so no @Code "@SysInclude" line is needed to
+BasicLayout package, so no @Code "@SysInclude" line is needed to
 get them.
 @BeginSections
 @Include { bgr_colo }

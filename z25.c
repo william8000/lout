@@ -1,7 +1,7 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -108,17 +108,20 @@ static void newline(void)
 
 /*@::echo()@******************************************************************/
 /*                                                                           */
-/*  static echo(x, outer_prec)                                               */
+/*  static echo(x, outer_prec, count)                                        */
 /*                                                                           */
 /*  Echo x.  The result will be enclosed in braces only if its precedence    */
 /*  is less than or equal to outer_prec (words and parameterless closures    */
 /*  are taken to have infinite precedence, i.e. never enclosed in braces).   */
 /*                                                                           */
+/*  x is child number count of its parent.  Used by COL_THR and ROW_THR      */
+/*  only.                                                                    */
+/*                                                                           */
 /*****************************************************************************/
 
-static void echo(OBJECT x, unsigned outer_prec)
-{ OBJECT link, y, tmp, sym;
-  char *op, buff[20];  int prec, i, count;
+static void echo(OBJECT x, unsigned outer_prec, int count)
+{ OBJECT link, y, tmp, sym, z;
+  char *op;  int prec, i, childcount;
   BOOLEAN npar_seen, name_printed, lbr_printed, braces_needed;
 
   switch( type(x) )
@@ -134,8 +137,8 @@ static void echo(OBJECT x, unsigned outer_prec)
 	aprint( "#unattached " );
 	moveright();
 	if( Down(x) != x )
-	{ Child(y, Down(x));
-	  if( y != x ) echo(y, NO_PREC);
+	{ CountChild(y, Down(x), count);
+	  if( y != x ) echo(y, NO_PREC, count);
 	  else aprint("<child is self!>");
 	}
 	else aprint("<no child!>");
@@ -158,7 +161,7 @@ static void echo(OBJECT x, unsigned outer_prec)
     case PAGE_LABEL_IND:
     
 	/* aprint("#"); cprint(Image(type(x))); aprint(" "); */
-	echo(actual(x), NO_PREC);
+	echo(actual(x), NO_PREC, 1);
 	break;
 
 		
@@ -176,9 +179,9 @@ static void echo(OBJECT x, unsigned outer_prec)
 		SymName(actual(actual(x))) : Image(type(actual(x))) );
 	aprint(" ");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ CountChild(y, link, count);
 	  moveright();
-	  echo(y, NO_PREC);
+	  echo(y, NO_PREC, count);
 	  moveleft();
 	}
 	break;
@@ -194,7 +197,7 @@ static void echo(OBJECT x, unsigned outer_prec)
     
 	aprint("#follows");
 	if( blocked(x) )  aprint(" (blocked)");
-	Child(y, Down(x));
+	CountChild(y, Down(x), count);
 	if( Up(y) == LastUp(y) )  aprint(" (no precedes!)");
 	break;
 
@@ -204,9 +207,9 @@ static void echo(OBJECT x, unsigned outer_prec)
 	aprint("Galley ");  cprint(SymName(actual(x)));
 	aprint(" into ");   cprint(SymName(whereto(x)));
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ CountChild(y, link, count);
 	  newline();
-	  echo(y, type(y) == GAP_OBJ ? VCAT : VCAT_PREC);
+	  echo(y, type(y) == GAP_OBJ ? VCAT : VCAT_PREC, count);
 	}
 	break;
 
@@ -214,26 +217,44 @@ static void echo(OBJECT x, unsigned outer_prec)
     case ROW_THR:
 
 	aprint("{R ");
-	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
-	  echo(y, VCAT_PREC);
-	  newline();
-	  if( NextDown(link) != x )  aprint("/R ");
+	for( i=0, link = Down(x);  link != x && i < count ;  link = NextDown(link), i++ );
+	if( link != x )
+	{ CountChild(y, link, count);
+	  echo(y, VCAT_PREC, count);
+	  /* newline(); */
 	}
-	aprint("R}");
+	aprint(" R}");
 	break;
 
 
     case COL_THR:
 
 	aprint("{C ");
-	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
-	  echo(y, HCAT_PREC);
-	  newline();
-	  if( NextDown(link) != x )  aprint("|C ");
+	for( i=0, link = Down(x);  link != x && i < count ;  link = NextDown(link), i++ );
+	if( link != x )
+	{ CountChild(y, link, count);
+	  echo(y, HCAT_PREC, count);
+	  /* newline(); */
 	}
-	aprint("C}");
+	aprint(" C}");
+	break;
+
+
+    case HSPANNER:
+
+	aprint("{HS ");
+	CountChild(y, Down(x), count);
+	echo(y, NO_PREC, count);
+	aprint(" HS}");
+	break;
+
+
+    case VSPANNER:
+
+	aprint("{VS ");
+	CountChild(y, Down(x), count);
+	echo(y, NO_PREC, count);
+	aprint(" VS}");
 	break;
 
 
@@ -249,13 +270,13 @@ static void echo(OBJECT x, unsigned outer_prec)
 	if( prec <= outer_prec ) aprint("{ ");
 	/* *** if( Down(x) == LastDown(x) )  aprint(op);  must be manifested */
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ CountChild(y, link, count);
 	  if( is_index(type(y)) )
 	    newline();
 	  else if( (type(y) == GAP_OBJ && type(x) != ACAT) )
 	    newline();
-	  if( type(y) == GAP_OBJ )  echo(y, type(x));
-	  else echo(y, prec);
+	  if( type(y) == GAP_OBJ )  echo(y, type(x), count);
+	  else echo(y, prec, count);
 	}
 	if( prec <= outer_prec )  aprint(" }");
 	break;
@@ -263,17 +284,24 @@ static void echo(OBJECT x, unsigned outer_prec)
 
     case ACAT: op = "&", prec = ACAT_PREC; /*   goto ETC;  */
 
-	count = 0;
+	childcount = 0;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
-	  if( type(y) == GAP_OBJ ) continue;
-	  count++;
+	{ CountChild(y, link, count);
+	  if( type(y) == GAP_OBJ )
+	  {
+	    echo(y, ACAT, count);
+	    continue;
+	  }
+	  childcount++;
+	  echo(y, prec, count);
+	  /* ***
 	  if( link == Down(x) || link == LastDown(x) )
-	    echo(y, prec);
+	    echo(y, prec, count);
 	  else if( NextDown(NextDown(link)) == LastDown(x) )
-	  { sprintf(buff, " ++%d++ ", count+1);
+	  { sprintf(buff, " ++%d++ ", childcount+1);
 	    aprint(buff);
 	  }
+	  *** */
 	}
 	break;
 
@@ -284,8 +312,8 @@ static void echo(OBJECT x, unsigned outer_prec)
 	if( Down(x) != x )
 	{ if( outer_prec == ACAT )  aprint(" ");
 	  cprint( EchoCatOp(outer_prec, mark(gap(x)), join(gap(x))) );
-	  Child(y, Down(x));
-	  echo(y, FORCE_PREC);
+	  CountChild(y, Down(x), count);
+	  echo(y, FORCE_PREC, count);
 	  aprint(" ");
 	}
 	else if( outer_prec == ACAT )
@@ -323,12 +351,12 @@ static void echo(OBJECT x, unsigned outer_prec)
 	/* debug only */
 	aprint("<");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ CountChild(y, link, count);
 	  if( type(y) == CLOSURE )
 	  { cprint( SymName(actual(y)) );
-	    if( LastDown(y) != y )  echo(GetEnv(y), NO_PREC);
+	    if( LastDown(y) != y )  echo(GetEnv(y), NO_PREC, count);
 	  }
-	  else if( type(y) == ENV )  echo(y, NO_PREC);
+	  else if( type(y) == ENV )  echo(y, NO_PREC, count);
 	  else cprint(Image(type(y)));
 	  if( NextDown(link) != x )  aprint(" ");
 	}
@@ -340,11 +368,11 @@ static void echo(OBJECT x, unsigned outer_prec)
     case FORCE_CROSS:
 
 	assert( Down(x) != x, "echo: CROSS Down(x)!" );
-	Child(y, Down(x));
+	CountChild(y, Down(x), count);
 	if( type(y) == CLOSURE )  cprint(SymName(actual(y)));
 	else
 	{ cprint(KW_LBR);
-	  echo(y, NO_PREC);
+	  echo(y, NO_PREC, count);
 	  cprint(KW_RBR);
 	}
 	cprint(Image(type(x)));
@@ -356,8 +384,8 @@ static void echo(OBJECT x, unsigned outer_prec)
 	*** */
 	aprint(" ");
 	if( NextDown(Down(x)) != x )
-	{ Child(y, NextDown(Down(x)));
-	  echo(y, NO_PREC);
+	{ CountChild(y, NextDown(Down(x)), count);
+	  echo(y, NO_PREC, count);
 	}
 	else aprint("??");
 	break;
@@ -374,22 +402,20 @@ static void echo(OBJECT x, unsigned outer_prec)
 
 	npar_seen = FALSE;  name_printed = FALSE;
 	for( link = Down(x); link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ CountChild(y, link, count);
 	  if( type(y) == PAR )
 	  { assert( Down(y) != y, "EchoObject: Down(PAR)!" );
 	    switch( type(actual(y)) )
 	    {
 	     case LPAR:	Child(tmp, Down(y));
-			echo(tmp, (unsigned) precedence(sym));
+			echo(tmp, (unsigned) precedence(sym), 1);
 			aprint(" ");
 			break;
 
 	     case NPAR:	if( !name_printed )
 			{ cprint(SymName(sym));
-			  /* ***
 			  aprint("%");
 			  cprint(SymName(enclosing(sym)));
-			  *** */
 			  if( external_ver(x) || external_hor(x) || threaded(x) )
 			  { aprint(" #");
 			    if( external_ver(x) )  aprint(" external_ver");
@@ -403,17 +429,15 @@ static void echo(OBJECT x, unsigned outer_prec)
 			cprint( SymName(actual(y)) );
 			aprint(" { ");
 			Child(tmp, Down(y));
-			echo(tmp, NO_PREC);
+			echo(tmp, NO_PREC, 1);
 			aprint(" }");
 			npar_seen = TRUE;
 			break;
 
 	     case RPAR:	if( !name_printed )
 			{ cprint(SymName(sym));
-			  /* ***
 			  aprint("%");
 			  cprint(SymName(enclosing(sym)));
-			  *** */
 			  if( external_ver(x) || external_hor(x) || threaded(x) )
 			  { aprint(" #");
 			    if( external_ver(x) )  aprint(" external_ver");
@@ -428,10 +452,10 @@ static void echo(OBJECT x, unsigned outer_prec)
 			Child(tmp, Down(y));
 			if( has_body(sym) )
 			{ aprint("{ ");
-			  echo(tmp, NO_PREC);
+			  echo(tmp, NO_PREC, 1);
 			  aprint(" }");
 			}
-			else echo(tmp, (unsigned) precedence(sym));
+			else echo(tmp, (unsigned) precedence(sym), 1);
 			break;
 	
 	     default:	assert1(FALSE, "echo:", Image(type(actual(y))));
@@ -442,10 +466,8 @@ static void echo(OBJECT x, unsigned outer_prec)
 	}
 	if( !name_printed )
 	{ cprint( SymName(sym) );
-	  /* ***
 	  aprint("%");
 	  cprint(SymName(enclosing(sym)));
-	  *** */
 	  if( external_ver(x) || external_hor(x) || threaded(x) )
 	  { aprint(" #");
 	    if( external_ver(x) )  aprint(" external_ver");
@@ -464,9 +486,9 @@ static void echo(OBJECT x, unsigned outer_prec)
     
 	/* this should occur only in debug output case */
 	cprint(KW_SPLIT);  moveright();
-	Child(y, DownDim(x, COLM));
+	CountChild(y, DownDim(x, COLM), count);
 	aprint(" COLM:");
-	echo(y, FORCE_PREC);
+	echo(y, FORCE_PREC, count);
 	newline();
 	/* ***
 	Child(y, DownDim(x, ROWM));
@@ -488,8 +510,8 @@ static void echo(OBJECT x, unsigned outer_prec)
 
 	aprint("(");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
-	  echo(y, NO_PREC);
+	{ CountChild(y, link, count);
+	  echo(y, NO_PREC, count);
 	  if( NextDown(link) != x )  aprint(", ");
 	}
 	aprint(")");
@@ -575,7 +597,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 	/* print named parameters and local objects */
 	lbr_printed = FALSE;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ CountChild(y, link, count);
 	  assert( enclosing(y) == x, "echo: enclosing(y) != x!" );
 	  switch( type(y) )
 	  {
@@ -591,7 +613,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 			break;
 
 	    case NPAR:	moveright();  newline();
-			echo(y, NO_PREC);
+			echo(y, NO_PREC, count);
 			aprint("   # uses_count = ");
 			printnum(uses_count(y));
 			moveleft();
@@ -604,7 +626,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 			  lbr_printed = TRUE;
 			}
 			moveright();
-			echo(y, NO_PREC);
+			echo(y, NO_PREC, count);
 			moveleft();  newline();
 			break;
 
@@ -622,7 +644,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 
 	/* print body */
 	moveright();
-	if( sym_body(x) != nilobj )  echo(sym_body(x), NO_PREC);
+	if( sym_body(x) != nilobj )  echo(sym_body(x), NO_PREC, 1);
 	moveleft();  if( type(x) == LOCAL ) newline();
 	cprint(KW_RBR);
 	break;
@@ -632,8 +654,13 @@ static void echo(OBJECT x, unsigned outer_prec)
     case ONE_ROW:
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
     case PADJUST:
     case HADJUST:
     case VADJUST:
@@ -643,7 +670,9 @@ static void echo(OBJECT x, unsigned outer_prec)
     case VCOVER:
     case COMMON:
     case RUMP:
+    case MELD:
     case INSERT:
+    case ONE_OF:
     case NEXT:
     case PLUS:
     case MINUS:
@@ -653,8 +682,10 @@ static void echo(OBJECT x, unsigned outer_prec)
     case VSHIFT:
     case INCGRAPHIC:
     case SINCGRAPHIC:
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     case ROTATE:
+    case BACKGROUND:
     case SCALE:
     case KERN_SHRINK:
     case CASE:
@@ -679,8 +710,8 @@ static void echo(OBJECT x, unsigned outer_prec)
 
 	/* print left parameter */
 	if( Down(x) != LastDown(x) )
-	{ Child(y, Down(x));
-	  echo(y, find_max(outer_prec, DEFAULT_PREC));
+	{ CountChild(y, Down(x), count);
+	  echo(y, find_max(outer_prec, DEFAULT_PREC), count);
 	  aprint(" ");
 	}
 
@@ -689,9 +720,32 @@ static void echo(OBJECT x, unsigned outer_prec)
 	/* print right parameter */
 	assert( LastDown(x) != x, "echo: right parameter of predefined!" );
 	aprint(" ");
-	Child(y, LastDown(x));
-	echo(y, type(x)==OPEN ? FORCE_PREC : find_max(outer_prec,DEFAULT_PREC));
+	CountChild(y, LastDown(x), count);
+	echo(y, type(x)==OPEN ? FORCE_PREC : find_max(outer_prec,DEFAULT_PREC),
+	  count);
 	if( braces_needed )  aprint(" "), cprint(KW_RBR);
+	break;
+
+
+    case RAW_VERBATIM:
+    case VERBATIM:
+
+	cprint(type(x) == VERBATIM ? KW_VERBATIM : KW_RAWVERBATIM);
+	aprint(" ");
+	cprint(KW_LBR);
+	CountChild(y, Down(x), count);
+	if( type(y) == WORD )
+	{ cprint(string(y));
+	}
+	else
+	{ newline();
+	  for( link = Down(y);  link != y;  link = NextDown(link) )
+	  { Child(z, link)
+	    cprint(string(z));
+	    newline();
+	  }
+	}
+	cprint(KW_RBR);
 	break;
 
 
@@ -700,6 +754,8 @@ static void echo(OBJECT x, unsigned outer_prec)
     case CURR_FACE:
     case BACKEND:
     case PAGE_LABEL:
+    case HSPAN:
+    case VSPAN:
 
 	/* predefined symbols that have (or may have) no parameters */
 	cprint(Image(type(x)));
@@ -728,8 +784,8 @@ static void echo(OBJECT x, unsigned outer_prec)
     case CR_ROOT:
 
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
-	  echo(y, NO_PREC);  newline();
+	{ CountChild(y, link, count);
+	  echo(y, NO_PREC, count);  newline();
 	}
 	break;
 
@@ -746,7 +802,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 	  case 1:	aprint("SEEN_TARGET ");
 			printnum(target_seq(x));
 			aprint(": ");
-			echo(target_val(x), NO_PREC);
+			echo(target_val(x), NO_PREC, 1);
 			break;
 
 	  case 2:	aprint("WRITTEN_TARGET ");
@@ -798,7 +854,7 @@ FULL_CHAR *EchoObject(OBJECT x)
   if( fp == null )
   BeginString();
   if( x == nilobj )  AppendString(AsciiToFull("<nilobj>"));
-  else echo(x, type(x) == GAP_OBJ ? VCAT : 0);
+  else echo(x, type(x) == GAP_OBJ ? VCAT : 0, 1);
   debug0(DOE, D, "EchoObject returning");
   return EndString();
 } /* end EchoObject */
@@ -819,7 +875,7 @@ void DebugObject(OBJECT x)
   indent = 0;
   limit  = 60;
   if( x == nilobj )  fprintf(stderr, "<nilobj>");
-  else echo(x, type(x) == GAP_OBJ ? VCAT : 0);
+  else echo(x, type(x) == GAP_OBJ ? VCAT : 0, 1);
   fprintf(stderr, "\n");
   debug0(DOE, D, "DebugObject returning");
 } /* end DebugObject */

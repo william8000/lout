@@ -1,7 +1,7 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -50,6 +50,22 @@ void MinConstraint(CONSTRAINT *xc, CONSTRAINT *yc)
   bfc(*xc) = find_min(bfc(*xc), bfc(*yc));
   fc(*xc)  = find_min(fc(*xc),  fc(*yc));
 } /* end MinConstraint */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  SetSizeToMaxForwardConstraint(b, f, c)                                   */
+/*                                                                           */
+/*  Set *b, *f to their largest possible value within constraint *c, such    */
+/*  that *f is as large as possible.                                         */
+/*                                                                           */
+/*****************************************************************************/
+
+void SetSizeToMaxForwardConstraint(FULL_LENGTH *b, FULL_LENGTH *f, CONSTRAINT *c)
+{
+  *f = find_min(bfc(*c), fc(*c));
+  *b = find_min(bc(*c), bfc(*c) - *f);
+} /* end EnlargeToConstraint */
 
 
 /*****************************************************************************/
@@ -433,7 +449,10 @@ OBJECT y, int dim, OBJECT *why)
 void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 { OBJECT y, link, lp, rp, z, tlink, g;  CONSTRAINT yc, hc, vc;
   BOOLEAN ratm;  FULL_LENGTH xback, xfwd;  int tb, tf, tbf, tbc, tfc;
-  debug2(DSC, DD, "[ Constrained(%s, xc, %s, why)", EchoObject(x), dimen(dim));
+  SetLengthDim(dim);
+  debug2(DSC, DD, "[ Constrained(%s, xc, %s, why), x =",
+    Image(type(x)), dimen(dim));
+  ifdebug(DSC, DD, DebugObject(x));
   assert( Up(x) != x, "Constrained: x has no parent!" );
 
   /* a CLOSURE which is external_ver is unconstrained in the ROWM direction */
@@ -457,6 +476,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 
   switch( type(y) )
   {
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     case KERN_SHRINK:
     case ONE_COL:
@@ -465,8 +485,12 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
     case VCONTRACT:
     case HEXPAND:
     case VEXPAND:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
     case SPLIT:
-    
+    case BACKGROUND:
+
       Constrained(y, xc, dim, why);
       break;
 
@@ -521,6 +545,76 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
       break;
 
 
+    case HLIMITED:
+    case VLIMITED:
+
+      if( (type(y) == HLIMITED) == (dim == COLM) )
+      {
+	BOOLEAN still_searching = TRUE;
+	z = y;
+	SetConstraint(*xc, back(z, dim), size(z, dim), fwd(z, dim));
+	debug2(DSC, D, "  [ %s (%s)", Image(type(z)), EchoConstraint(xc));
+	while( still_searching && Up(z) != z )
+	{
+          Parent(z, UpDim(z, dim));
+	  switch( type(z) )
+	  {
+	    case VLIMITED:
+	    case HLIMITED:
+	    case COL_THR:
+	    case ROW_THR:
+	    case ONE_COL:
+	    case ONE_ROW:
+	    case HCONTRACT:
+	    case VCONTRACT:
+	    case SPLIT:
+	    case START_VSPAN:
+	    case START_HSPAN:
+
+	      SetConstraint(*xc, back(z, dim), size(z, dim), fwd(z, dim));
+	      debug2(DSC, DD, "    let s = %s (%s)", Image(type(z)),
+	        EchoConstraint(xc));
+	      break;
+
+
+	    case HSPANNER:
+	    case VSPANNER:
+
+	      /* SpannerAvailableSpace(z, dim, &b, &f); */
+	      CopyConstraint(*xc, constraint(z));
+	      debug2(DSC, D, "  ] let s = %s (%s) and stop",
+		Image(type(z)), EchoConstraint(&constraint(z)));
+	      still_searching = FALSE;
+	      break;
+
+
+	    default:
+
+	      debug1(DSC, D, "  ] stopping at %s", Image(type(z)));
+	      still_searching = FALSE;
+	      break;
+	  }
+	}
+	*why = y;
+      }
+      else
+      {
+        Constrained(y, xc, dim, why);
+      }
+      break;
+
+
+    case VSPANNER:
+    case HSPANNER:
+
+      /* we're saying that a spanner has a fixed constraint that is */
+      /* determined just once in its life                           */
+      CopyConstraint(*xc, constraint(y));
+      debug2(DSC, DD, "  Constrained(%s) = %s", Image(type(z)), EchoConstraint(xc));
+      /* SetConstraint(*xc, back(y, dim), size(y, dim), fwd(y, dim)); */
+      break;
+
+
     case HSHIFT:
     case VSHIFT:
 
@@ -536,7 +630,8 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 
     case HEAD:
     
-      if( dim == ROWM ) SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
+      if( dim == ROWM )
+	SetConstraint(*xc, MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
       else
       {	CopyConstraint(yc, constraint(y));
 	debug1(DSC, DD, "  head: %s; val is:", EchoConstraint(&yc));
@@ -619,7 +714,8 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
       break;
 
   }
-  debug1(DSC, DD, "] Constrained returning %s", EchoConstraint(xc));
+  debug2(DSC, DD, "] Constrained %s returning %s", Image(type(x)),
+    EchoConstraint(xc));
 } /* end Constrained */
 
 
@@ -636,34 +732,8 @@ FULL_CHAR *EchoConstraint(CONSTRAINT *c)
 { static char str[2][40];
   static int i = 0;
   i = (i+1) % 2;
-  sprintf(str[i], "<");
-  switch( BackEnd )
-  {
-    case POSTSCRIPT:
-    case PDF:
-
-      if( bc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF, ");
-      else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bc(*c)/CM);
-      if( bfc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF, ");
-      else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bfc(*c)/CM);
-      if( fc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF>");
-      else sprintf(&str[i][strlen(str[i])], "%.3fc>", (float) fc(*c)/CM);
-      break;
-
-    case PLAINTEXT:
-
-      if( bc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF, ");
-      else sprintf(&str[i][strlen(str[i])], "%.1fs, ",
-	(float) bc(*c)/PlainCharWidth);
-      if( bfc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF, ");
-      else sprintf(&str[i][strlen(str[i])], "%.1fs, ",
-	(float) bfc(*c)/PlainCharWidth);
-      if( fc(*c)==MAX_FULL_LENGTH )  sprintf(&str[i][strlen(str[i])], "INF>");
-      else sprintf(&str[i][strlen(str[i])], "%.1fs>",
-	(float) fc(*c)/PlainCharWidth);
-      break;
-
-  }
+  sprintf(str[i], "<%s, %s, %s>", EchoLength(bc(*c)), EchoLength(bfc(*c)),
+    EchoLength(fc(*c)));
   return AsciiToFull(str[i]);
 } /* end EchoConstraint */
 
@@ -687,12 +757,19 @@ void DebugConstrained(OBJECT x)
     case CROSS:
     case FORCE_CROSS:
     case ROTATE:
+    case BACKGROUND:
     case INCGRAPHIC:
     case SINCGRAPHIC:
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     case KERN_SHRINK:
     case WORD:
     case QWORD:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+    case HSPAN:
+    case VSPAN:
     
       break;
 
@@ -720,6 +797,8 @@ void DebugConstrained(OBJECT x)
     case ONE_ROW:
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
     case HSCALE:

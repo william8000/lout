@@ -1,7 +1,7 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -247,8 +247,10 @@ static OBJECT ManifestCat(OBJECT x, OBJECT env, STYLE *style, OBJECT bthr[2],
 OBJECT fthr[2], OBJECT *target, OBJECT *crs, BOOLEAN ok, BOOLEAN need_expand,
 OBJECT *enclose, BOOLEAN fcr)
 { OBJECT bt[2], ft[2], y, link, gaplink, g, first_bt, last_ft, z;
-  int par, perp;  unsigned res_inc;  BOOLEAN still_backing;
+  int par, perp;
+  unsigned res_inc;  BOOLEAN still_backing;
   STYLE new_style;
+  debug1(DOM, DD, "[ ManifestCat(%s)", EchoObject(x));
     
   StyleCopy(new_style, *style);
   if( type(x) == HCAT )
@@ -273,10 +275,8 @@ OBJECT *enclose, BOOLEAN fcr)
   if( bthr[par] )  { New(first_bt, THREAD); }
   else first_bt = nilobj;
   bt[par] = first_bt;
-  /* *** first_bt = bt[par] = bthr[par] ? New(THREAD) : nilobj; *** */
   if( join(gap(g)) )  { New(ft[par], THREAD); }
   else ft[par] = nilobj;
-  /* *** ft[par] = join(gap(g)) ? New(THREAD) : nilobj;         *** */
   still_backing = first_bt != nilobj;
 
   /* manifest y and insinuate any cross-references */
@@ -314,12 +314,6 @@ OBJECT *enclose, BOOLEAN fcr)
 
     /* set bt and ft threads for y */
     last_ft = ft[par];
-
-    /* ***
-    bt[par] = ft[par] ? New(THREAD) : nilobj;
-    ft[par] = g != nilobj ? join(gap(g)) ? New(THREAD) : nilobj
-			  : fthr[par]    ? New(THREAD) : nilobj;
-    *** */
     if( ft[par] ) { New(bt[par], THREAD); }  else bt[par] = nilobj;
     if( g != nilobj )
     { if( join(gap(g)) )  { New(ft[par], THREAD); }  else ft[par] = nilobj;
@@ -339,7 +333,8 @@ OBJECT *enclose, BOOLEAN fcr)
     }
 
     if( bt[par] )	/* then thread lists last_ft and bt[par] must merge */
-    { OBJECT llink, rlink, lthread, rthread;  BOOLEAN goes_through;
+    { OBJECT llink, rlink, lthread, rthread;
+      BOOLEAN goes_through;
       assert( Down(bt[par]) != bt[par], "Manifest: bt[par] no children!" );
       assert( last_ft!=nilobj && Down(last_ft)!=last_ft, "Manifest:last_ft!" );
 
@@ -387,6 +382,7 @@ OBJECT *enclose, BOOLEAN fcr)
   /* export par threads */
   if( fthr[par] )  MergeNode(fthr[par], ft[par]);
   if( bthr[par] )  MergeNode(bthr[par], first_bt);
+  debug0(DOM, DD, "] ManifestCat returning");
   return x;
 } /* end ManifestCat */
 
@@ -484,6 +480,7 @@ OBJECT *enclose, BOOLEAN fcr)
     { Error(8, 11, "replacing unknown %s option %s by %s",
 	WARN, &fpos(tag), KW_CASE, string(tag), string(firsttag));
       res = firstres;
+      debug1(DGP, D, "  res = %s", EchoObject(res));
     }
     else
     { Error(8, 12, "%s deleted (choice %s unknown)",
@@ -614,6 +611,8 @@ OBJECT *enclose, BOOLEAN fcr)
 
   sym = actual(x);
   StyleCopy(save_style(x), *style);
+  debugcond2(DOM, D, StringEqual(SymName(sym), "@Section"),
+     "manifesting %s at %s", SymName(sym), EchoFilePos(&fpos(x)));
   debug1(DOM, DD,  "  [ manifesting closure %s", SymName(sym));
 
   /* enclose, if required */
@@ -626,7 +625,7 @@ OBJECT *enclose, BOOLEAN fcr)
     Link(par, x);
     x = *enclose;
     *enclose = nilobj;
-    debug1(DHY, D, "  Manifest/enclose: %s", EchoObject(x));
+    debug1(DHY, DD, "  Manifest/enclose: %s", EchoObject(x));
     x = Manifest(x, env, style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);
     debug0(DOM, DD,  "  ] returning from manifesting closure (enclose)");
     return x;
@@ -728,6 +727,8 @@ OBJECT *enclose, BOOLEAN fcr)
   }
   else hold_env2 = nilobj;
 
+  debug3(DOM, DD, " expansion: has_target %s, indefinite %s, recursive %s",
+    bool(has_target(sym)), bool(indefinite(sym)), bool(recursive(sym)));
   if( has_target(sym) && !need_expand )
   {
     /* convert symbols with targets to unsized galleys */
@@ -872,11 +873,11 @@ OBJECT *enclose, BOOLEAN fcr)
   OBJECT link1, link2, x1, x2, y1, y2;
   int par, num1, num2;  GAP res_gap;  unsigned res_inc;  STYLE new_style;
   BOOLEAN done, multiline;  FULL_CHAR ch;  float scale_factor;
+  static int depth = 0;
 #if DEBUG_ON
   static unsigned int debug_type[MAX_DEPTH];
   static OBJECT	      debug_actual[MAX_DEPTH];
   static int	      debug_lnum[MAX_DEPTH];
-  static int depth = 0;
   BOOLEAN eee = (*enclose != nilobj);
   debug_type[depth] = type(x);
   debug_lnum[depth] = line_num(fpos(x));
@@ -894,6 +895,13 @@ OBJECT *enclose, BOOLEAN fcr)
     }
     Error(8, 23, "exiting now", FATAL, &fpos(x));
   }
+#else
+  depth++;
+  if( depth == MAX_DEPTH )
+  {
+    Error(8, 40, "maximum depth of symbol expansion (%d) reached",
+      FATAL, &fpos(x), MAX_DEPTH);
+  }
 #endif
 
   debug2(DOM, DD,   "[Manifest(%s %s )", Image(type(x)), EchoObject(x));
@@ -902,7 +910,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	EchoStyle(style), SymName(*target),
 	bthr[COLM] ? " up"    : "",  fthr[COLM] ? " down"  : "",
 	bthr[ROWM] ? " left"  : "",  fthr[ROWM] ? " right" : "");
-  debugcond2(DHY, D, eee, "[ Manifest(%s, *enclose = %s)",
+  debugcond2(DHY, DD, eee, "[ Manifest(%s, *enclose = %s)",
     EchoObject(x), EchoObject(*enclose));
 
   switch( type(x) )
@@ -1107,7 +1115,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
 	      /* Lout spacing plus one extra space for sentence end at eoln */
 	      width(gap(g)) = width(gap(g)) * (vspace(g) + hspace(g));
-	      debugcond2(DLS, D, vspace(g) > 0, "  prev = %s %s",
+	      debugcond2(DLS, DD, vspace(g) > 0, "  prev = %s %s",
 		Image(type(prev)), EchoObject(prev));
 	      if( vspace(g) > 0 )
 	      { 
@@ -1123,7 +1131,7 @@ OBJECT *enclose, BOOLEAN fcr)
 		if( is_word(type(z)) )
 		{
 		  for( p = string(z);  *p != '\0';  p++ );
-		  debug4(DLS, D, "  prev = %s, last = %c, LSE = %s, LWES = %s",
+		  debug4(DLS, DD, "  prev = %s, last = %c, LSE = %s, LWES = %s",
 		    EchoObject(z), *(p-1), bool(LanguageSentenceEnds[*(p-1)]),
 		    bool(LanguageWordEndsSentence(z, FALSE)));
 		  if( p != string(z) && LanguageSentenceEnds[*(p-1)]
@@ -1155,7 +1163,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	        if( is_word(type(z)) )
 	        {
 		  for( p = string(z);  *p != '\0';  p++ );
-		  debug4(DLS, D, "  prev = %s, last = %c, LSE = %s, LWES = %s",
+		  debug4(DLS, DD, "  prev = %s, last = %c, LSE = %s, LWES = %s",
 		      EchoObject(z), *(p-1), bool(LanguageSentenceEnds[*(p-1)]),
 		      bool(LanguageWordEndsSentence(z, TRUE)));
 		  if( p != string(z) && LanguageSentenceEnds[*(p-1)]
@@ -1348,6 +1356,8 @@ OBJECT *enclose, BOOLEAN fcr)
 
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
     case ONE_COL:
@@ -1355,7 +1365,7 @@ OBJECT *enclose, BOOLEAN fcr)
     
       ETC:
       par = (type(x)==ONE_COL || type(x)==HEXPAND || type(x) == HCONTRACT ||
-	     type(x)==WIDE || type(x)==HSHIFT) ? COLM : ROWM;
+	   type(x)==HLIMITED || type(x)==WIDE || type(x)==HSHIFT) ? COLM : ROWM;
       Child(y, Down(x));
 
       /* manifest the child, propagating perp threads and suppressing pars */
@@ -1367,6 +1377,13 @@ OBJECT *enclose, BOOLEAN fcr)
       bt[par] = bthr[par];  ft[par] = fthr[par];
       bt[1-par] = ft[1-par] = nilobj;
       ReplaceWithSplit(x, bt, ft);
+      break;
+
+
+    case HSPAN:
+    case VSPAN:
+
+      ReplaceWithSplit(x, bthr, fthr);
       break;
 
 
@@ -1386,18 +1403,31 @@ OBJECT *enclose, BOOLEAN fcr)
       sparec(constraint(x)) = width(res_gap);
       DisposeChild(Down(x));
       Child(y, Down(x));
-      y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE, enclose, fcr);
+      y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE,enclose,fcr);
       ReplaceWithSplit(x, bthr, fthr);
       break;
 
 
+    case BACKGROUND:
+
+      Child(y, Down(x));
+      y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE,enclose,fcr);
+      Child(y, LastDown(x));
+      y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE,enclose,fcr);
+      ReplaceWithSplit(x, bthr, fthr);
+      break;
+
+
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
     case HSCALE:
     case VSCALE:
     case HCOVER:
     case VCOVER:
 
       Child(y, Down(x));
-      y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE, enclose, fcr);
+      y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE,enclose,fcr);
       ReplaceWithSplit(x, bthr, fthr);
       break;
 
@@ -1450,6 +1480,16 @@ OBJECT *enclose, BOOLEAN fcr)
     case YIELD:
 
       Error(8, 29, "%s not expected here", FATAL, &fpos(x), KW_YIELD);
+      break;
+
+
+    case RAW_VERBATIM:
+    case VERBATIM:
+
+      Child(y, Down(x));
+      y = Manifest(y, env, style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);
+      DeleteLink(Down(x));
+      MergeNode(y, x);  x = y;
       break;
 
 
@@ -1609,6 +1649,7 @@ OBJECT *enclose, BOOLEAN fcr)
       break;
 
 
+    case MELD:
     case COMMON:
     case RUMP:
 
@@ -1661,57 +1702,66 @@ OBJECT *enclose, BOOLEAN fcr)
       }
       debug1(DHY, DDD, "  manifested x2 = %s", EchoObject(x2));
      
-      /* find the point where x1 and x2 begin to differ */
-      link1 = Down(x1);
-      link2 = Down(x2);
-      while( link1 != x1 && link2 != x2 )
+      if( type(x) == MELD )
       {
-	Child(y1, link1);
-	Child(y2, link2);
-	debug1(DHY, DDD, "    y1 = %s", EchoObject(y1));
-	debug1(DHY, DDD, "    y2 = %s", EchoObject(y2));
-	if( is_word(type(y1)) && is_word(type(y2)) )
-	{
-	  if( !StringEqual(string(y1), string(y2)) )  break;
-	}
-	else if( type(y1) != type(y2) )  break;
-	link1 = NextDown(link1);
-	link2 = NextDown(link2);
+        /* if Meld, result is Meld(x1, x2) */
+        res = Meld(x1, x2);
       }
+      else
+      {
 
-      /* if COMMON, result is x1 or x2 if either ran out,             */
-      /* or else x2 (say) up to but not including link2 and prec gap  */
-      if( type(x) == COMMON )
-      { if( link2 == x2 )
-	{ res = x2;
-	}
-	else if( link1 == x1 )
-	{ res = x1;
-	}
-	else
-	{ if( link2 == Down(x2) )
-	    res = MakeWord(WORD, STR_EMPTY, &fpos(x2));
+        /* find the point where x1 and x2 begin to differ */
+        link1 = Down(x1);
+        link2 = Down(x2);
+        while( link1 != x1 && link2 != x2 )
+        {
+	  Child(y1, link1);
+	  Child(y2, link2);
+	  debug1(DHY, DDD, "    y1 = %s", EchoObject(y1));
+	  debug1(DHY, DDD, "    y2 = %s", EchoObject(y2));
+	  if( is_word(type(y1)) && is_word(type(y2)) )
+	  {
+	    if( !StringEqual(string(y1), string(y2)) )  break;
+	  }
+	  else if( type(y1) != type(y2) )  break;
+	  link1 = NextDown(link1);
+	  link2 = NextDown(link2);
+        }
+
+        /* if COMMON, result is x1 or x2 if either ran out,             */
+        /* or else x2 (say) up to but not including link2 and prec gap  */
+        if( type(x) == COMMON )
+        { if( link2 == x2 )
+	  { res = x2;
+	  }
+	  else if( link1 == x1 )
+	  { res = x1;
+	  }
 	  else
-	  { TransferLinks(PrevDown(link2), x2, x1);
+	  { if( link2 == Down(x2) )
+	      res = MakeWord(WORD, STR_EMPTY, &fpos(x2));
+	    else
+	    { TransferLinks(PrevDown(link2), x2, x1);
+	      res = x2;
+	    }
+	  }
+        }
+
+        /* if RUMP, result is x2 starting from link2 or NextDown(link2) */
+        else if( type(x) == RUMP )
+        { if( link2 == x2 )
+	    res = MakeWord(WORD, STR_EMPTY, &fpos(x2));
+	  else if( link1 == x1 )
+	  { 
+	    TransferLinks(Down(x2), NextDown(link2), x1);
 	    res = x2;
 	  }
-	}
-      }
-
-      /* if RUMP, result is x2 starting from link2 or NextDown(link2) */
-      else
-      { if( link2 == x2 )
-	  res = MakeWord(WORD, STR_EMPTY, &fpos(x2));
-	else if( link1 == x1 )
-	{ 
-	  TransferLinks(Down(x2), NextDown(link2), x1);
-	  res = x2;
-	}
-	else /* link1 != x1 */
-	{
-	  TransferLinks(Down(x2), link2, x1);
-	  res = x2;
-	}
+	  else /* link1 != x1 */
+	  {
+	    TransferLinks(Down(x2), link2, x1);
+	    res = x2;
+	  }
+        }
       }
 
       /* now res replaces x */
@@ -1746,16 +1796,51 @@ OBJECT *enclose, BOOLEAN fcr)
       break;
 
 
+    case ONE_OF:
+
+      Child(y, Down(x));
+      if( type(y) != ACAT )
+      {
+	/* child is not a sequence of choices, so ignore ONE_OF */
+	Error(8, 39, "%s ignored: no choices in right parameter", WARN,
+	  &fpos(x), KW_ONE_OF);
+        y = Manifest(y, env, style, bthr, fthr, target, crs, ok, FALSE,
+	      enclose, fcr);
+        DeleteLink(Down(x));
+        MergeNode(y, x);  x = y;
+      }
+      else
+      {
+	/* try each child in turn; result is first to find *target */
+	OBJECT target_before;
+	for( link = Down(y);  link != y;  link = NextDown(link) )
+	{
+	  Child(z, link);
+	  if( type(z) == GAP_OBJ )  continue;
+	  target_before = *target;
+	  z = Manifest(z, env, style, bthr, fthr, target, crs, ok, FALSE,
+	    enclose, fcr);
+	  if( *target != target_before )
+	    break;
+	}
+	DeleteLink(Up(z));
+	ReplaceNode(z, x);
+	DisposeObject(x);
+	x = z;
+      }
+      break;
+
+
     case NEXT:
 
       assert( Down(x) != x, "Manifest/NEXT: Down(x) == x!" );
       Child(y, Down(x));
-      debug1(DCS, D, "  Manifesting Next( %s, 1 )", EchoObject(y));
+      debug1(DCS, DD, "  Manifesting Next( %s, 1 )", EchoObject(y));
       y = Manifest(y, env, style, bthr, fthr, target, crs, FALSE, FALSE, enclose, fcr);
-      debug1(DCS, D, "  calling Next( %s, 1 )", EchoObject(y));
+      debug1(DCS, DD, "  calling Next( %s, 1 )", EchoObject(y));
       done = FALSE;
       y = Next(y, 1, &done);
-      debug2(DCS, D, "  Next(done = %s) returning %s",
+      debug2(DCS, DD, "  Next(done = %s) returning %s",
 			bool(done), EchoObject(y));
       DeleteLink(Down(x));
       MergeNode(y, x);  x = y;
@@ -1781,7 +1866,7 @@ OBJECT *enclose, BOOLEAN fcr)
       else
       { res = MakeWord(WORD, STR_NOCROSS, &fpos(x));
       }
-      debug4(DOM, D, "{ %s } %s { %s } = %s", EchoObject(y), Image(type(x)),
+      debug4(DOM, DD, "{ %s } %s { %s } = %s", EchoObject(y), Image(type(x)),
 	EchoObject(z), EchoObject(res));
       res = Manifest(res, env, style, bthr, fthr, target, crs, FALSE, FALSE, enclose, fcr);
       ReplaceNode(res, x);
@@ -1843,6 +1928,7 @@ OBJECT *enclose, BOOLEAN fcr)
       break;
 
 
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
 
       debug1(DRS, DD, "  graphic style in Manifest = %s", EchoStyle(style));
@@ -1859,7 +1945,7 @@ OBJECT *enclose, BOOLEAN fcr)
     case SINCGRAPHIC:
 
       StyleCopy(save_style(x), *style);
-      debug2(DGP, D, "  manifest at %s (style %s)",
+      debug2(DGP, DD, "  manifest at %s (style %s)",
 	EchoObject(x), EchoStyle(&save_style(x)));
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
@@ -1889,9 +1975,7 @@ OBJECT *enclose, BOOLEAN fcr)
   debug1(DOM, DDD, "down:  ", EchoObject(fthr[COLM]));
   debug1(DOM, DDD, "left:  ", EchoObject(bthr[ROWM]));
   debug1(DOM, DDD, "right: ", EchoObject(fthr[ROWM]));
-  debugcond1(DHY, D, eee, "] Manifest returning %s", EchoObject(x));
-#if DEBUG_ON
+  debugcond1(DHY, DD, eee, "] Manifest returning %s", EchoObject(x));
   depth--;
-#endif
   return x;
 } /* end Manifest */

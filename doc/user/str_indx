@@ -78,6 +78,7 @@ between the letters of the alphabet, by inserting phantom entries:
 @ID @OneRow @Code {
 "b @RawIndex {}"
 "c @RawIndex {}"
+"d @RawIndex {}"
 "..."
 "z @RawIndex {}"
 }
@@ -303,7 +304,7 @@ In large projects it might help to rename the @Code "@IndexA" symbol
 to something else, such as {@Code "@AuthorIndex"}.  This can
 be done by placing
 @ID @Code {
-"import @DocumentLayout"
+"import @DocumentSetup"
 "macro @AuthorIndex { @IndexA }"
 }
 in the @Code mydefs file.  See Section {@NumberOf definitions} for

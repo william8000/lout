@@ -36,9 +36,8 @@ other than @Code Portrait do not work; }
 ignored.  This spoils the graphics and graphs of Chapters
 {@NumberOf graphics}, {@NumberOf diagrams}, and {@NumberOf graphs}. }
 @EndList
-Despite the problems, many things work surprisingly well.  Tables, for
-example, lose their ruled lines but otherwise look very good.  It does no
-harm to try things and see if they work out.
+Despite the problems, many things work surprisingly well.  Tables, for example,
+look very good.  It does no harm to try things and see if they work out.
 @PP
 The worst problem with plain text is that characters cannot be placed at
 arbitrary points on the page.  A superscript, for example, is impossible to

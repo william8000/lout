@@ -1,18 +1,19 @@
 
 ###########################################################################
 #                                                                         #
-#  @OrdinaryLayout extension to @DocumentLayout.                          #
+#  @OrdinarySetup extension to @DocumentSetup.                            #
 #                                                                         #
 #  Jeffrey H. Kingston                                                    #
 #  August 1994                                                            #
+#  5 February 1999                                                        #
 #                                                                         #
-#  This package extends DocumentLayout for ordinary documents.            #
+#  This package extends DocumentSetup for ordinary documents.             #
 #                                                                         #
 ###########################################################################
 
-extend @DocumentLayout
+extend @BasicSetup @DocumentSetup
 export @Doc @Document @Text
-def @OrdinaryLayout
+def @OrdinarySetup
 
     named @IndexWord			{ index			}
     named @IndexAWord			{ index			}
@@ -35,32 +36,32 @@ def @OrdinaryLayout
     named @SectionHeadingFont		{ Bold			}
     named @SectionHeadingBreak		{ ragged 1.2fx nohyphen }
     named @SectionHeadingFormat
-	    left number right title	{ number @DotSep title	}
+	    left number right title	{ number @Sep title	}
 
     named @SubSectionHeadingFont	{ Bold			}
     named @SubSectionHeadingBreak	{ ragged 1.2fx nohyphen	}
     named @SubSectionHeadingFormat
-	    left number right title	{ number @DotSep title	}
+	    left number right title	{ number @Sep title	}
 
     named @SubSubSectionHeadingFont	{ Slope			}
     named @SubSubSectionHeadingBreak	{ ragged 1.2fx nohyphen	}
     named @SubSubSectionHeadingFormat
-	    left number right title	{ number @DotSep title	}
+	    left number right title	{ number @Sep title	}
 
     named @AppendixHeadingFont		{ Bold			}
     named @AppendixHeadingBreak		{ ragged 1.2fx nohyphen	}
     named @AppendixHeadingFormat
-	    left number right title	{ number @DotSep title	}
+	    left number right title	{ number @Sep title	}
 
     named @SubAppendixHeadingFont	{ Bold			}
     named @SubAppendixHeadingBreak	{ ragged 1.2fx nohyphen	}
     named @SubAppendixHeadingFormat
-	    left number right title	{ number @DotSep title	}
+	    left number right title	{ number @Sep title	}
 
     named @SubSubAppendixHeadingFont	{ Slope			}
     named @SubSubAppendixHeadingBreak	{ ragged 1.2fx nohyphen	}
     named @SubSubAppendixHeadingFormat
-	    left number right title	{ number @DotSep title	}
+	    left number right title	{ number @Sep title	}
 
     named @ReferencesHeadingFont	{ Bold			}
     named @ReferencesHeadingBreak	{ ragged 1.2fx nohyphen	}
@@ -775,4 +776,4 @@ def @OrdinaryLayout
 
     }
 
-@End @OrdinaryLayout
+@End @OrdinarySetup

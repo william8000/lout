@@ -1,7 +1,7 @@
 /*@z47.c:Environment Table:EnvReadRetrieve()@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -202,7 +202,7 @@ BOOLEAN EnvReadRetrieve(FILE_NUM fnum, int offset, OBJECT *env)
 
 void EnvReadInsert(FILE_NUM fnum, int offset, OBJECT env)
 { int pos; OBJECT x, loser;
-  debug3(DET, DD, "EnvWriteInsert(%s, %d, env %d)",
+  debug3(DET, DD, "EnvReadInsert(%s, %d, env %d)",
     FileName(fnum), offset, (int) env);
 
   /* to limit the cache size, remove least recently used entry if full */

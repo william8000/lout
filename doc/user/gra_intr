@@ -14,12 +14,9 @@ you want graphs, like this:
 "..."
 "@End @Text"
 }
-Files of definitions, like {@Code "graph"}, must be included before the
-setup file.  Alternatively, if you are using your own setup file, you may
-place the include commands within it; the place to put them is clearly
-marked in all the standard setup files.  With this inclusion, the
-@Code "@Graph" symbol used below will then be available for use anywhere
-within your document.
+Setup files for specialized packages, such as {@Code "graph"}, should be
+included before the main setup file.  Once this is done, the @Code "@Graph"
+symbol used below will then be available for use anywhere within your document.
 @PP
 @Code "@Graph" distinguishes between the overall graph, produced by the
 @Code "@Graph" symbol itself, and the data sets to be placed within it,

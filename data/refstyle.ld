@@ -4,7 +4,7 @@
 #                                                                        #
 #  Standard reference styles database.                                   #
 #  Jeffrey H. Kingston                                                   #
-#  August 1994                                                           #
+#  August 1994 (@NumSep added in Version 3.13, February 1999).           #
 #                                                                        #
 ##########################################################################
 
@@ -22,8 +22,8 @@
 	{ @I @Title			} @If @Title
 	{ @Word&&notitle		} @If @Not @Title
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @HowPublished		} @If @HowPublished
 	{ .  @Publisher			} @If @Publisher
@@ -47,8 +47,8 @@
 	{ @I @Title			} @If @Title
 	{ @Word&&notitle		} @If @Not @Title
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @HowPublished		} @If @HowPublished
 	{ .  @Publisher			} @If @Publisher
@@ -72,8 +72,8 @@
 	{ @I @Title			} @If @Title
 	{ @Word&&notitle		} @If @Not @Title
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @Word&&phdthesis		} @If @True
 	{ , @HowPublished		} @If @HowPublished
@@ -106,8 +106,8 @@
 	{ @Title			} @If @Title
 	{ @Word&&notitle		} @If @Not @Title
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @TRType			} @If @TRType
 	{ .  @Word&&techrep		} @If @Not @TRType
@@ -134,8 +134,8 @@
 	{ @Title			} @If @Title
 	{ @Word&&notitle		} @If @Not @Title
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @Word&&mastersthesis	} @If @True
 	{ {} @Number			} @If @Number
@@ -161,8 +161,8 @@
 	{ @I @Title			} @If @Title
 	{ @Word&&notitle		} @If @Not @Title
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @HowPublished		} @If @HowPublished
 	{ .  @Publisher			} @If @Publisher
@@ -187,8 +187,8 @@
 	{ @Title			} @If @Title
 	{ @Word&&notitle		} @If @Not @Title
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @HowPublished		} @If @HowPublished
 	{ , @Publisher			} @If @Publisher
@@ -228,6 +228,7 @@
 	{ {} @Number			} @If @Number @And @Not @Volume
 	{ , @Pages			} @If @Pages
 	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ {} (@Day @Month @Year)	} @If @Year @And @Month @And @Day
 	{ {} (@Month @Year)		} @If @Year @And @Month @And @Not @Day
 	{ {} (@Year)			} @If @Year @And @Not @Month
@@ -257,8 +258,8 @@
 	{ @I @InTitle			} @If @InTitle
 	{ @Word&&notitle		} @If @Not @InTitle
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @HowPublished		} @If @HowPublished
 	{ .  @Publisher			} @If @Publisher
@@ -286,8 +287,8 @@
 	{ @I @InTitle			} @If @InTitle
 	{ @Word&&notitle		} @If @Not @InTitle
 	{ , @Pinpoint			} @If @Pinpoint
-	{ , @Word&&pages @Pages		} @If @Pages
-	{ , @Word&&page @Page		} @If @Page
+	{ , @Word&&pages @NumSep @Pages } @If @Pages
+	{ , @Word&&page @NumSep @Page	} @If @Page
 	{ .  @TitleNote			} @If @TitleNote
 	{ .  @HowPublished		} @If @HowPublished
 	{ .  @Publisher			} @If @Publisher

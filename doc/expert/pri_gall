@@ -275,5 +275,5 @@ the footnote moves on.  And the cross reference direction, @Code
 preceding or @Code following, is always obeyed (although lack of space
 sometimes prevents Lout from choosing the nearest target).  Only the
 root galley contains receptive symbols in our running example, but
-any galley may contain them, without restriction.
+any galley may contain them.
 @End @Section

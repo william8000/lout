@@ -1,7 +1,7 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -133,7 +133,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 	  EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)) );
   }
 
-  /* hyphenate hd of horizontal optimal galley says so */
+  /* hyphenate hd if horizontal optimal galley says so */
   else if( opt_components(hd) != nilobj && opt_hyph(hd) && type(y) == ACAT )
   { debug0(DOG, D, "  SizeGalley calling Hyphenate()");
     y = Hyphenate(y);

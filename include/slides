@@ -1,19 +1,9 @@
-
 ###############################################################################
 #                                                                             #
-#  Lout setup file                                                            #
+#   Lout setup file for overhead transparencies                               #
 #                                                                             #
-#  This Lout setup file contains everything needed to format documents        #
-#  using the following setup file configuration choice(s):                    #
-#                                                                             #
-#      slides         Overhead transparencies                                 #
-#                                                                             #
-#  It will work correctly on plain text documents as well as ordinary ones.   #
-#  It was probably generated automatically from file include/master by a sed  #
-#  script that selected this combination of the available choices.            #
-#                                                                             #
-#  Jeffrey H. Kingston                                                        #
-#  24 June 1996                                                               #
+#   Jeffrey H. Kingston                                                       #
+#   5 February 1999                                                           #
 #                                                                             #
 ###############################################################################
 
@@ -26,13 +16,9 @@
 
   @SysInclude { fontdefs	} # font definitions
   @SysInclude { langdefs	} # language definitions
-  @SysInclude { dl		} # DocumentLayout package
-  @SysInclude { slidesf		} # OverheadLayout extension
-# @SysInclude { tab		} # @Tab table formatter
-# @SysInclude { eq		} # @Eq equation formatter
-# @SysInclude { fig		} # @Fig advanced graphics (NOW OBSOLETE)
-# @SysInclude { graph		} # @Graph graph drawing
-# @SysInclude { pas 		} # @Pas Pascal programs
+  @SysInclude { bsf		} # BasicSetup package
+  @SysInclude { dsf		} # DocumentSetup package
+  @SysInclude { slidesf		} # OverheadSetup extension
 
 
 ###############################################################################
@@ -46,11 +32,14 @@
 
 ###############################################################################
 #                                                                             #
-#  The @DocumentLayout @Use clause - overall document format options.         #
+#  The @BasicSetup @Use clause - basics, lists, paragraphs, displays.         #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
 #                                                                             #
 ###############################################################################
-
-@Use { @DocumentLayout
+ 
+@Use { @BasicSetup
   # @InitialFont	{ Times Base 12p	} # initial font
     @InitialFont	{ Times Base 20p	} # initial font
   # @InitialBreak	{{adjust 1.2fx hyphen} @OrIfPlain {ragged 1fx nohyphen}}
@@ -73,6 +62,19 @@
   # @ListRightIndent	{ 0s			} # right indent of list items
   # @ListLabelWidth	{ 2.00f	@OrIfPlain 5s	} # width allowed for list tags
   # @NumberSeparator	{ .			} # separates nums like 2.3.7
+}
+
+
+###############################################################################
+#                                                                             #
+#  The @DocumentSetup @Use clause - page layout plus figures, tables, etc.    #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
+#                                                                             #
+###############################################################################
+ 
+@Use { @DocumentSetup
   # @PageType		{ A4	@OrIfPlain Other} # page type (width, height)
   # @PageWidth		{ 80s			} # page width if type Other
   # @PageHeight		{ 66f			} # page height if type Other
@@ -127,10 +129,10 @@
   # @ChapRefListTitle	{ references		} # title of chapter ref list
   # @RefListIndent	{ 0s			} # indent to left of labels
   # @RefListRightIndent	{ 0s			} # indent to right of items
-  # @RefListGap		{ 1.00v	@OrIfPlain 1f	} # gap between ref list items
+  # @RefListGap		{ @ListGap		} # gap between ref list items
   # @RefListFont	{        		} # font used in reference list
   # @RefListBreak	{        		} # break style of ref list
-  # @RefListLabelWidth 	{ 2.00f	@OrIfPlain 5s	} # Labels column width
+  # @RefListLabelWidth 	{ @ListLabelWidth	} # Labels column width
   # @RefListSortKey	{ @Tag			} # sorting key
   # @MakeIndex		{ No			} # make index? Yes or No
   # @IndexFont		{			} # index entries font
@@ -155,12 +157,12 @@
   # @FootNoteFont	{ 0.80f			} # font for footnotes
   # @FootNoteBreak	{ 1.2fx	@OrIfPlain 1fx	} # break for footnotes
   # @FootLen		{ 2.00c	@OrIfPlain 10s	} # length of footnote line
-  # @FootAboveGap	{ 1.00v			} # gap above footnote line
+  # @FootAboveGap	{ @DisplayGap		} # gap above footnote line
   # @FootGap		{ 0.20c	@OrIfPlain 1fx	} # gap between footnotes
   # @MarginNoteFont	{ 0.80f			} # font of margin notes
   # @MarginNoteBreak	{ ragged 1.10fx		} # break style of margin notes
   # @MarginNoteHGap	{ 0.5c   		} # horizontal gap to notes
-  # @MarginNoteVGap	{ 1.00v  		} # min vertical gap between
+  # @MarginNoteVGap	{ @DisplayGap		} # min vertical gap between
   # @MarginNoteWidth	{ 1.50c  		} # width of margin notes
   # @EndNoteNumbers	{ Arabic		} # endnote numbers
   # @EndNoteFont	{ 0.80f			} # font of endnotes
@@ -191,9 +193,9 @@
   # @StartEvenTop	{ @Null			}
   # @StartEvenFoot	{ @Null			}
   # @IntroOddTop	{ @Null			}
-  # @IntroOddFoot	{ @Null			}
+  # @IntroOddFoot	{ @Centre @PageNum	}
   # @IntroEvenTop	{ @Null			}
-  # @IntroEvenFoot	{ @Null			}
+  # @IntroEvenFoot	{ @Centre @PageNum	}
   # @IntroStartOddTop	{ @Null			}
   # @IntroStartOddFoot	{ @Null			}
   # @IntroStartEvenTop	{ @Null			}
@@ -229,11 +231,11 @@
 
 ###############################################################################
 #                                                                             #
-#  The @OverheadLayout @Use clause - options specific to overheads.           #
+#  The @OverheadSetup @Use clause - options specific to overheads.            #
 #                                                                             #
 ###############################################################################
 
-@Use { @OverheadLayout
+@Use { @OverheadSetup
   # @DateLine			{ No		} # No, Yes, or a date
   # @ContentsWord		{ contents	} # word for "Contents"
   # @LectureNumbers		{ Arabic	} # kind of lecture numbers
@@ -242,11 +244,11 @@
   # @FirstOverheadNumber	{ 1		} # first overhead num
   # @TitlePageFont		{ Helvetica Base 1.5f 	} # title page font
   # @LectureHeadingFont		{ Bold 1.20f		} # lecture head font
-  # @LectureHeadingBreak	{ clines 1.2fx nohyphen	} # lecture head font
-  # @LectureHeadingFormat	{ number @DotSep title	} # lecture head font
+  # @LectureHeadingBreak	{ clines 1.2fx nohyphen	} # lecture head break
+  # @LectureHeadingFormat	{ number @DotSep title	} # lecture head format
   # @OverheadHeadingFont	{ Bold			} # overhead head font
-  # @OverheadHeadingBreak	{ clines 1.2fx nohyphen	} # overhead head font
-  # @OverheadHeadingFormat	{ number @DotSep title	} # overhead head font
+  # @OverheadHeadingBreak	{ clines 1.2fx nohyphen	} # overhead head break
+  # @OverheadHeadingFormat	{ number @DotSep title	} # overhead head format
   # @LectureInContents		{ Yes		} # add lectures to contents
   # @OverheadInContents		{ No		} # add overheads to contents
   # @ReferencesInContents	{ Yes		} # add references to contents

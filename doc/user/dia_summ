@@ -1180,7 +1180,7 @@ The @Code "@HTree" option has a similar @Code "treevindent" option,
 which may be {@Code "top"}, {@Code ctr}, {@Code foot}, or any length
 from Section {@NumberOf objects}.
 @PP
-The @Code "@Diag" symbol and to the {@Code "@DiagramPrint"} setup
+The @Code "@Diag" symbol and to the {@Code "@DiagSetup"} setup
 file symbol have all of the options of {@Code "@Node"}, {@Code "@Link"},
 {@Code "@Tree"}, and {@Code "@HTree"}.  They also have the following
 options:

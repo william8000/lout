@@ -61,7 +61,8 @@ might be useful if the first page is really an unnumbered cover
 sheet.  @Code "@FirstPageNumber" must be an Arabic number even if
 @Code "@PageNumbers" is set to something other than {@Code "Arabic"}.
 @PP
-Some types of documents, such as books, have a separate introductory
+Some document types, such as books and technical reports with cover
+sheets, have a separate introductory
 sequence of pages preceding the main sequence.  For the page numbers on
 introductory pages there are two options, @Code "@IntroPageNumbers"
 intro.page.numbers @Index @Code "@IntroPageNumbers"
@@ -100,8 +101,8 @@ are non-start. }
 @LI { @I { Intro vs. non-intro }.  Intro pages form a separate sequence of
 intro.pages @Index { intro and non-intro pages }
 pages that precede the main (non-intro) sequence.  They typically contain
-prefatory material such as a title page, preface, and table of
-contents.  There will always be an even number of Intro pages, even if
+prefatory material such as a title page, preface, and table of contents.
+In a book there will always be an even number of Intro pages, even if
 it means that the last one is empty. }
 @EndList
 These classifications are quite independent of each other:  a page
@@ -134,29 +135,25 @@ non-intro pages.  Another eight options control footers in the same way:
 "@EvenFoot { @Null }"
 "@StartOddFoot { @Null }"
 "@StartEvenFoot { @Null }"
-"@IntroOddFoot { @Null }"
+"@IntroOddFoot { @Centre @PageNum }"
 "@IntroEvenFoot { @Null }"
-"@IntroStartOddFoot { @Null }"
+"@IntroStartOddFoot { @Centre @PageNum }"
 "@IntroStartEvenFoot { @Null }"
 }
 The value of the option is an object which becomes the header or
 footer.  It may be any object, but there are some peculiarities that
 will be explained now.
 @PP
-The full set of symbols of the DocumentLayout package unfortunately
-cannot be used within page header options, because we are still
-setting up this package at this point; the symbols become available
-only after the @Code "@Use" clause.  However, the following symbols
-@I can be used:
-@ID @OneRow @Code {
-"@Underline @Font @Break @Language @Wide @Plain @Sym @R @I @B @BI"
-"@S @Date @Time `` '' -- --- @Bullet @ParSym @SectSym @Dagger @DaggerDbl"
-"@CDot @Sterling @Yen @Florin @Star @Degree @Minute @Second @Multiply"
-"@Divide @Lozenge @Register @CopyRight @TradeMark @Colour @Color"
-"@Box @CurveBox @ShadowBox @FullWidthRule @LocalWidthRule"
-"@Rotate @Scale @IncludeGraphic"
-}
-And there are five symbols of special relevance to page headers and
+The full set of symbols of the BasicSetup package can be used
+when setting page header options (and indeed any of the options
+of the @Code "@BasicSetup" @Code "@Use" clause package), as well as
+symbols from special-purpose
+packages that have been included before this setup file.  This means
+you can use any symbol you might reasonably expect to.  But footnotes and
+floating figures and tables, for example, are not from BasicSetup so
+cannot be used.
+@PP
+There are five symbols of special relevance to page headers and
 footers: {@Code "@Null"}, {@Code "@Centre"}, {@Code "@Center"},
 {@Code "@Right"}, and {@Code "@PageNum"}.
 @PP
@@ -228,7 +225,8 @@ In addition to the symbols described earlier for simple page headers
 and footers, these running header options may contain the symbols
 {@Code "@MajorNum"}, {@Code "@MajorTitle"}, {@Code "@MinorNum"},
 {@Code "@MinorTitle"}, {@Code "@DotSep"}, {@Code "@NoDotSep"},
-{@Code "@DotJoin"}, {@Code "@NoDotJoin"}, and {@Code "@DashJoin"}.
+{@Code "@DotJoin"}, {@Code "@NoDotJoin"}, {@Code "@DashJoin"},
+and {@Code "@NumSep"} described below.
 major.num @Index @Code "@MajorNum"
 major.title @Index @Code "@MajorTitle"
 minor.num @Index @Code "@MinorNum"
@@ -282,6 +280,15 @@ get rid of all dots between numbers and titles it is necessary to
 change all occurrences of @Code "@DotSep" in the setup file to
 {@Code "@NoDotSep"}.  There are about ten occurrences, depending
 on the setup file.
+@PP
+@Code "@NumSep" {@PageMark numsep} is similar to @Code "@NoDotSep"
+except that one space
+num.sep @Index @Code "@NumSep"
+hungarian @Index { Hungarian and @Code "@NumSep" }
+is used, not two, and also the order of the two parts is reversed and
+a dot is added if the current language is Hungarian (apparently
+Hungarians write `3. Table' where other people write `Table 3').
+@Code "@NumSep" is used behind the scenes in a variety of places.
 @PP
 The present document was produced using @Code "@PageHeaders { Titles }"
 with the default values of the sixteen options unchanged, as you might

@@ -1,7 +1,7 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -46,10 +46,10 @@
 
 static FULL_LENGTH KernLength(FONT_NUM fnum, FULL_CHAR ch1, FULL_CHAR ch2)
 { FULL_LENGTH res;
-  MAPPING m      = font_mapping(finfo[fnum].font_table);
-  FULL_CHAR *mp  = MapTable[m]->map[MAP_UNACCENTED];
-  int ua_ch1     = mp[ch1];
-  int ua_ch2     = mp[ch2];
+  MAPPING m         = font_mapping(finfo[fnum].font_table);
+  FULL_CHAR *unacc  = MapTable[m]->map[MAP_UNACCENTED];
+  int ua_ch1        = unacc[ch1];
+  int ua_ch2        = unacc[ch2];
   int i = finfo[fnum].kern_table[ua_ch1], j;
   if( i == 0 )  res = 0;
   else
@@ -60,6 +60,255 @@ static FULL_LENGTH KernLength(FONT_NUM fnum, FULL_CHAR ch1, FULL_CHAR ch2)
   }
   return res;
 } /* end KernLength */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  BuildSpanner(x)                                                          */
+/*                                                                           */
+/*  Build a spanning structure starting at x.                                */
+/*                                                                           */
+/*****************************************************************************/
+
+static BOOLEAN BuildSpanner(OBJECT x)
+{ OBJECT link, prnt, y, hspanner, vspanner, end_link, t, hprnt, vprnt, spanobj;
+  BOOLEAN need_hspanner, need_vspanner;
+  debug1(DSF, DD, "BuildSpanner(%s)", EchoObject(x));
+  assert( type(x) == START_HVSPAN || type(x) == START_HSPAN ||
+	  type(x) == START_VSPAN , "BuildSpanner: type(x) != SPAN!" );
+  Child(spanobj, Down(x));
+  assert(Up(spanobj) == LastUp(spanobj), "BuildSpanner: spanobj!" );
+  DeleteLink(Up(spanobj));
+
+  need_hspanner = (type(x) == START_HVSPAN || type(x) == START_HSPAN);
+  if( need_hspanner )
+  {
+    /* check that column context is legal, if not exit with FALSE */
+    Parent(hprnt, UpDim(x, COLM));
+    if( type(hprnt) != COL_THR )
+    {
+      Error(12, 10, "%s deleted (not in column)", WARN,&fpos(x),Image(type(x)));
+      return FALSE;
+    }
+
+    /* build hspanner object and interpose it between x and spanobj */
+    New(hspanner, HSPANNER);
+    FposCopy(fpos(hspanner), fpos(x));
+    spanner_broken(hspanner) = FALSE;
+    Link(x, hspanner);
+    Link(hspanner, spanobj);
+
+    /* link later members of the spanner on the same row mark to hspanner    */
+    /* by definition this is every member across to the last @HSpan before a */
+    /* @StartHVSpan or @StartHSpan or @StartVSpan or @VSpan or end of row    */
+    Parent(prnt, UpDim(x, ROWM));
+    if( type(prnt) != ROW_THR )
+    {
+      Error(12, 11, "%s symbol out of place", FATAL, &fpos(x), Image(type(x)));
+    }
+    assert(type(prnt) == ROW_THR, "BuildSpanner: type(prnt)!");
+    spanner_sized(hspanner) = 0;
+    spanner_count(hspanner) = 1;
+    end_link = NextDown(UpDim(x, ROWM));
+    for( link = NextDown(UpDim(x, ROWM)); link != prnt; link = NextDown(link) )
+    { Child(y, link);
+      debug2(DSF, DD, "  examining ver %s %s", Image(type(y)), y);
+      if( type(y) == HSPAN )
+        end_link = NextDown(link);
+      else if( type(y) == START_HVSPAN || type(y) == START_HSPAN ||
+	       type(y) == START_VSPAN  || type(y) == VSPAN )
+        break;
+    }
+    for( link = NextDown(UpDim(x,ROWM)); link!=end_link; link = NextDown(link) )
+    {
+      /* each of these components becomes @HSpan and is added to vspanner */
+      Child(y, link);
+      New(t, HSPAN);
+      FposCopy(fpos(t), fpos(y));
+      ReplaceNode(t, y);
+      DisposeObject(y);
+      Link(t, hspanner);
+      spanner_count(hspanner)++;
+    }
+  }
+  else Link(x, spanobj);
+
+  need_vspanner = (type(x) == START_HVSPAN || type(x) == START_VSPAN);
+  if( need_vspanner )
+  {
+    /* check that row context is legal, if not exit with FALSE */
+    Parent(vprnt, UpDim(x, ROWM));
+    if( type(vprnt) != ROW_THR )
+    {
+      Error(12, 12, "%s deleted (not in row)", WARN, &fpos(x), Image(type(x)));
+      return FALSE;
+    }
+
+    /* build vspanner object and interpose it between x and spanobj */
+    New(vspanner, VSPANNER);
+    FposCopy(fpos(vspanner), fpos(x));
+    spanner_broken(vspanner) = FALSE;
+    Link(x, vspanner);
+    Link(vspanner, spanobj);
+
+    /* link later members of the spanner on the same column mark to vspanner */
+    /* by definition this is every member down to the last @VSpan before a   */
+    /* @StartHVSpan or @StartHSpan or @StartVSpan or @HSpan or end of column */
+    Parent(prnt, UpDim(x, COLM));
+    assert(type(prnt) == COL_THR, "BuildSpanner: type(prnt)!");
+    spanner_sized(vspanner) = 0;
+    spanner_count(vspanner) = 1;
+    end_link = NextDown(UpDim(x, COLM));
+    for( link = NextDown(UpDim(x, COLM)); link != prnt; link = NextDown(link) )
+    { Child(y, link);
+      debug2(DSF, DD, "  examining hor %s %s", Image(type(y)), y);
+      if( type(y) == VSPAN )
+        end_link = NextDown(link);
+      else if( type(y) == START_HVSPAN || type(y) == START_HSPAN ||
+	       type(y) == START_VSPAN  || type(y) == HSPAN )
+        break;
+    }
+    for( link = NextDown(UpDim(x,COLM)); link!=end_link; link = NextDown(link) )
+    {
+      /* each of these components becomes @VSpan and is added to vspanner */
+      Child(y, link);
+      New(t, VSPAN);
+      FposCopy(fpos(t), fpos(y));
+      ReplaceNode(t, y);
+      DisposeObject(y);
+      Link(t, vspanner);
+      spanner_count(vspanner)++;
+    }
+  }
+  else Link(x, spanobj);
+
+  debug2(DSF, DD, "BuildSpanner returning TRUE (rows = %d, cols = %d)",
+    need_vspanner ? spanner_count(vspanner) : 0,
+    need_hspanner ? spanner_count(hspanner) : 0);
+  ifdebug(DSF, DD, DebugObject(x));
+  return TRUE;
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  BOOLEAN FindSpannerGap(thr, cat_op, gp)                                  */
+/*                                                                           */
+/*  For the purposes of calculating spanning spacing, find the gap between   */
+/*  this object and the preceding one under the nearest cat_op.              */
+/*                                                                           */
+/*  If found, set &gp to the gap object and return TRUE; else return FALSE.  */
+/*                                                                           */
+/*****************************************************************************/
+
+static BOOLEAN FindSpannerGap(OBJECT thr, unsigned dim, unsigned cat_op,
+  OBJECT *res)
+{ OBJECT link, x;
+
+  /* find nearest enclosing cat_op that we aren't the first element of */
+  link = UpDim(thr, dim);
+  Parent(x, link);
+  while( (type(x) != cat_op || type(PrevDown(link)) != LINK) && Up(x) != x )
+  { link = UpDim(x, dim);
+    Parent(x, link);
+  }
+
+  /* if found and a gap precedes thr's component of it, return that gap */
+  if( type(x) == cat_op && type(PrevDown(link)) == LINK )
+  { Child(*res, PrevDown(link));
+    assert(type(*res) == GAP_OBJ, "FindSpannerGap: type(*res)!" );
+  }
+  else if( type(x) == HEAD && gall_dir(x)==dim && type(PrevDown(link))==LINK )
+  { Child(*res, PrevDown(link));
+    assert(type(*res) == GAP_OBJ, "FindSpannerGap (HEAD): type(*res)!" );
+    nobreak(gap(*res)) = TRUE;
+  }
+  else *res = nilobj;
+
+  debug1(DSF, DD, "  FindSpannerGap returning %s", EchoObject(*res));
+  return (*res != nilobj);
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void SpannerAvailableSpace(x, dim, rb, rf)                               */
+/*                                                                           */
+/*  Work out the total space available to hold this spanner, and set         */
+/*  (*rb, *rf) to record this value.  This space equals the total width      */
+/*  of all columns (and their intervening gaps) spanned, with the mark       */
+/*  of the last column being the one separating rb from rf.                  */
+/*                                                                           */
+/*****************************************************************************/
+
+void SpannerAvailableSpace(OBJECT y, int dim, FULL_LENGTH *resb,
+					      FULL_LENGTH *resf)
+{ OBJECT slink, s, thr, gp, prevthr;
+  FULL_LENGTH b, f;
+  unsigned thr_type, cat_type;
+
+  assert( type(y) == HSPANNER || type(y) == VSPANNER, "SpannerAvail!");
+  debug4(DSF, DD, "SpannerAvailableSpace(%d %s %s, %s)",
+    spanner_count(y), Image(type(y)), EchoObject(y), dimen(dim));
+  if( dim == COLM )
+  { thr_type = COL_THR;
+    cat_type = HCAT;
+  }
+  else
+  { thr_type = ROW_THR;
+    cat_type = VCAT;
+  }
+
+  /* first calculate the total space consumed in earlier spans */
+  /* Invariant: (b, f) is the size up to and including prev    */
+  /*                                                           */
+  prevthr = nilobj;
+  for( slink = Up(y);  slink != y;  slink = NextUp(slink) )
+  { Parent(s, slink);
+    Parent(thr, UpDim(s, dim));
+    if( type(thr) == thr_type )
+    {
+      assert( thr_state(thr) == SIZED, "SpannerAvailableSpace: thr_state!" );
+      if( prevthr == nilobj )
+      {
+        /* this is the first column spanned over */
+        b = back(thr, dim);
+        f = fwd(thr, dim);
+        debug4(DSF, DD, "  first component %s,%s: b = %s, f = %s",
+          EchoLength(back(thr, dim)), EchoLength(fwd(thr, dim)),
+	  EchoLength(b), EchoLength(f));
+      }
+      else if( FindSpannerGap(thr, dim, cat_type, &gp) )
+      {
+        /* this is a subquent column spanned over */
+        b += MinGap(fwd(prevthr, dim), back(thr, dim), fwd(thr, dim), &gap(gp));
+	f = fwd(thr, dim);
+        debug5(DSF, DD, "  later component %s,%s: gp = %s, b = %s, f = %s",
+          EchoLength(back(thr, dim)), EchoLength(fwd(thr, dim)), EchoObject(gp),
+	  EchoLength(b), EchoLength(f));
+      }
+      else
+      {
+        Error(12, 13, "search for gap preceding %s failed, using zero",
+  	  WARN, &fpos(s), Image(type(s)));
+        b += fwd(prevthr, dim) + back(thr, dim);
+	f = fwd(thr, dim);
+        debug4(DSF, DD, "  later component %s,%s: (no gap), b = %s, f = %s",
+          EchoLength(back(thr, dim)), EchoLength(fwd(thr, dim)),
+	  EchoLength(b), EchoLength(f));
+      }
+    }
+    else
+      Error(12, 14, "%s deleted (out of place)", WARN,&fpos(s),Image(type(s)));
+    prevthr = thr;
+  }
+
+  *resb = b;
+  *resf = f;
+  SetConstraint(constraint(y), MAX_FULL_LENGTH, b+f, MAX_FULL_LENGTH);
+  debug2(DSF, DD, "SpannerAvailableSpace returning %s,%s",
+    EchoLength(*resb), EchoLength(*resf));
+} /* end SpannerAvailableSpace */
 
 
 /*****************************************************************************/
@@ -200,7 +449,117 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case ONE_ROW:
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     
+      Child(y, Down(x));
+      y = MinSize(y, dim, extras);
+      back(x, dim) = back(y, dim);
+      fwd(x, dim)  = fwd(y, dim);
+      break;
+
+
+    case BACKGROUND:
+
+      Child(y, Down(x));
+      y = MinSize(y, dim, extras);
+      Child(y, LastDown(x));
+      y = MinSize(y, dim, extras);
+      back(x, dim) = back(y, dim);
+      fwd(x, dim)  = fwd(y, dim);
+      break;
+
+
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+    case HSPAN:
+    case VSPAN:
+
+      /* if first touch, build the spanner */
+      if( (type(x) == START_HVSPAN || type(x) == START_HSPAN ||
+	   type(x) == START_VSPAN) && dim == COLM )
+      {
+        if( !BuildSpanner(x) )
+	{
+	  t = MakeWord(WORD, STR_EMPTY, &fpos(x));
+	  ReplaceNode(t, x);
+	  x = t;
+	  back(x, COLM) = fwd(x, COLM) = 0;
+	  break;
+	}
+      }
+
+      /* if first vertical touch, break if necessary */
+      if( (type(x) == START_HVSPAN || type(x) == START_HSPAN) && dim == ROWM )
+      { CONSTRAINT c;
+ 
+        /* find the HSPANNER */
+	Child(t, DownDim(x, COLM));
+        assert( type(t) == HSPANNER, "MinSize/SPAN: type(t) != HSPANNER!" );
+ 
+        /* find the available space for this HSPANNER and break it */
+        SpannerAvailableSpace(t, COLM, &b, &f);
+        SetConstraint(c, MAX_FULL_LENGTH, b+f, MAX_FULL_LENGTH);
+        debug2(DSF,D, "  BreakObject(%s,%s)",EchoObject(t),EchoConstraint(&c));
+        t = BreakObject(t, &c);
+        spanner_broken(t) = TRUE;
+      }
+ 
+      /* make sure that HSPAN links to HSPANNER, VSPAN to VSPANNER      */
+      /* NB must follow breaking since that could affect the value of y */
+      Child(y, DownDim(x, dim));
+      if( (type(x) == HSPAN && type(y) != HSPANNER) ||
+	  (type(x) == VSPAN && type(y) != VSPANNER) )
+      {
+	if( dim == COLM )
+	  Error(12, 15, "%s replaced by empty object (out of place)",
+	    WARN, &fpos(x), Image(type(x)));
+        back(x, dim) = fwd(x, dim) = 0;
+	break;
+      }
+
+      /* now size the object */
+      if( (type(x)==HSPAN && dim==ROWM) || (type(x)==VSPAN && dim==COLM) )
+      {
+	/* perp dimension, covered by preceding @Span, so may be zero. */
+	back(x, dim) = fwd(x, dim) = 0;
+      }
+      else if( type(y) != HSPANNER && type(y) != VSPANNER )
+      {
+	/* no spanning in this dimension */
+	MinSize(y, dim, extras);
+	back(x, dim) = back(y, dim);
+	fwd(x, dim) = fwd(y, dim);
+      }
+      else if( ++spanner_sized(y) != spanner_count(y) )
+      {
+	/* not the last column or row, so say zero */
+	back(x, dim) = fwd(x, dim) = 0;
+      }
+      else
+      {
+	/* this is the last column or row of a spanner.  Its width is its */
+	/* natural width minus anything that will fit over the top of the */
+	/* things it spans.                                               */
+
+	MinSize(y, dim, extras);
+	SpannerAvailableSpace(y, dim, &b, &f);
+	back(x, dim) = 0;
+	fwd(x, dim) = find_max(size(y, dim) - b, 0);
+	debug3(DSF, DD, "  size(y, %s) = %s,%s", dimen(dim),
+	  EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
+      }
+      debug4(DSF, DD, "finishing MinSize(%s) of %s span, reporting %s,%s",
+	dimen(dim), spanner_count(y) != 1 ? "multi-column" : "one-column",
+	EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+      break;
+
+
+    case HSPANNER:
+    case VSPANNER:
+
+      assert( (type(x) == HSPANNER) == (dim == COLM), "MinSize: SPANNER!" );
       Child(y, Down(x));
       y = MinSize(y, dim, extras);
       back(x, dim) = back(y, dim);
@@ -227,6 +586,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       break;
 
 
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     
       Child(y, LastDown(x));
@@ -322,7 +682,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       y = MinSize(y, dim, extras);
       if( dim == COLM )
       { FULL_CHAR ch_left, ch_right;  FULL_LENGTH ksize;
-	debug3(DSF, D, "MinSize(%s,%s %s, COLM)",
+	debug3(DSF, DD, "MinSize(%s,%s %s, COLM)",
 	  EchoLength(back(y, COLM)), EchoLength(fwd(y, COLM)),
 	  EchoObject(x));
 
@@ -350,7 +710,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	if( ch_left != (FULL_CHAR) '\0' && ch_right != (FULL_CHAR) '\0' )
 	{
 	  ksize = KernLength(word_font(y), ch_left, ch_right);
-	  debug4(DSF, D, "  KernLength(%s, %c, %c) = %s",
+	  debug4(DSF, DD, "  KernLength(%s, %c, %c) = %s",
 	    FontName(word_font(y)), (char) ch_left, (char) ch_right,
 	    EchoLength(ksize));
 	  fwd(x, dim) += ksize;
@@ -389,7 +749,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       y = MinSize(y, dim, extras);
       if( dim == ROWM )
       { if( !FitsConstraint(back(y, dim), fwd(y, dim), constraint(x)) )
-        { Error(12, 1, "forced to enlarge %s", WARN, &fpos(x), KW_HIGH);
+        { Error(12, 1, "forced to enlarge %s from %s to %s", WARN, &fpos(x),
+	    KW_HIGH, EchoLength(bfc(constraint(x))), EchoLength(size(y, dim)));
 	  debug0(DSF, DD, "offending object was:");
 	  ifdebug(DSF, DD, DebugObject(y));
 	  SetConstraint(constraint(x), MAX_FULL_LENGTH, size(y, dim), MAX_FULL_LENGTH);
@@ -482,7 +843,9 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		    word_font(prev) == word_font(y) &&
 		    word_colour(prev) == word_colour(y) &&
 		    word_language(prev) == word_language(y) &&
-		    underline(prev) == underline(y) )
+		    underline(prev) == underline(y) &&
+		    NextDown(NextDown(Up(prev))) == link
+		    )
 		{
 		  unsigned typ;
 		  debug3(DSF, DD, "compressing %s and %s at %s",
@@ -551,7 +914,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		}
 		if( units(gap(g)) == FRAME_UNIT && width(gap(g)) > FR )
 		    will_expand = TRUE;
-		if( units(gap(g)) == AVAIL_UNIT && mark(gap(g)) )
+		if( units(gap(g)) == AVAIL_UNIT && mark(gap(g)) && width(gap(g)) > 0 )
 		  Error(12, 9, "mark alignment incompatible with centring or right justification",
 		    WARN, &fpos(g));
 		/* ***
@@ -654,25 +1017,95 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
 
     case COL_THR:
-    case ROW_THR:
 
-      assert( (type(x) == COL_THR) == (dim == COLM), "MinSize/COL_THR: dim!" );
+      assert( dim == COLM, "MinSize/COL_THR: dim!" );
       if( thr_state(x) == NOTSIZED )
       {	assert( Down(x) != x, "MinSize/COL_THR: Down(x)!" );
-	Child(y, Down(x));
-	y = MinSize(y, dim, extras);
-	b = back(y, dim);
-	f = fwd(y, dim);
-	for( link = NextDown(Down(x));  link != x;  link = NextDown(link) )
+
+	/* first size all the non-spanning members of the thread */
+	debug1(DSF, DD,  "[[ starting sizing %s", Image(type(x)));
+	b = f = 0;
+	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
-	  y = MinSize(y, dim, extras);
-	  b = find_max(b, back(y, dim));
-	  f = find_max(f, fwd(y, dim));
+	  if( type(y) != START_HVSPAN && type(y) != START_HSPAN &&
+	      type(y) != HSPAN && type(y) != VSPAN )
+	  { y = MinSize(y, dim, extras);
+	    b = find_max(b, back(y, dim));
+	    f = find_max(f, fwd(y, dim));
+	  }
 	}
 	back(x, dim) = b;
 	fwd(x, dim)  = f;
 	thr_state(x) = SIZED;
+	debug3(DSF, DD,  "][ middle sizing %s (%s,%s)", Image(type(x)),
+	  EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+
+	/* now size all the spanning members of the thread           */
+	/* these will use back(x, dim) and fwd(x, dim) during sizing */
+	for( link = Down(x);  link != x;  link = NextDown(link) )
+	{ Child(y, link);
+	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
+	  if( type(y) == START_HVSPAN || type(y) == START_HSPAN ||
+	      type(y) == HSPAN || type(y) == VSPAN )
+	  { y = MinSize(y, dim, extras);
+	    b = find_max(b, back(y, dim));
+	    f = find_max(f, fwd(y, dim));
+	  }
+	}
+	back(x, dim) = b;
+	fwd(x, dim)  = f;
+	debug3(DSF, DD,  "]] end sizing %s (%s,%s)", Image(type(x)),
+	  EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+      }
+      break;
+
+
+    case ROW_THR:
+
+      assert( dim == ROWM, "MinSize/ROW_THR: dim!" );
+      if( thr_state(x) == NOTSIZED )
+      {	assert( Down(x) != x, "MinSize/ROW_THR: Down(x)!" );
+
+	/* first size all the non-spanning members of the thread */
+	debug1(DSF, D,  "[[ starting sizing %s", Image(type(x)));
+	b = f = 0;
+	for( link = Down(x);  link != x;  link = NextDown(link) )
+	{ Child(y, link);
+	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
+	  if( type(y) != START_HVSPAN && type(y) != START_VSPAN &&
+	      type(y) != HSPAN        && type(y) != VSPAN )
+	  { y = MinSize(y, dim, extras);
+	    debug5(DSF, D, "   MinSize(%s) has size %s,%s -> %s,%s",
+	      Image(type(y)), EchoLength(back(y, dim)), EchoLength(fwd(y, dim)),
+	      EchoLength(b), EchoLength(f));
+	    b = find_max(b, back(y, dim));
+	    f = find_max(f, fwd(y, dim));
+	  }
+	}
+	back(x, dim) = b;
+	fwd(x, dim)  = f;
+	thr_state(x) = SIZED;
+	debug3(DSF, D,  "][ middle sizing %s (%s,%s)", Image(type(x)),
+	  EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+
+	/* now size all the spanning members of the thread           */
+	/* these will use back(x, dim) and fwd(x, dim) during sizing */
+	for( link = Down(x);  link != x;  link = NextDown(link) )
+	{ Child(y, link);
+	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
+	  if( type(y) == START_HVSPAN || type(y) == START_VSPAN ||
+	      type(y) == HSPAN ||        type(y) == VSPAN )
+	  { y = MinSize(y, dim, extras);
+	    back(x, dim) = find_max(back(x, dim), back(y, dim));
+	    fwd(x, dim) = find_max(fwd(x, dim), fwd(y, dim));
+	    debug5(DSF, D, "   MinSize(%s) has size %s,%s -> %s,%s",
+	      Image(type(y)), EchoLength(back(y, dim)), EchoLength(fwd(y, dim)),
+	      EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+	  }
+	}
+	debug3(DSF, D,  "]] end sizing %s (%s,%s)", Image(type(x)),
+	  EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
       }
       break;
 

@@ -1,7 +1,7 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -58,11 +58,11 @@ BOOLEAN SplitIsDefinite(OBJECT x)
 /*****************************************************************************/
 
 int DisposeObject(OBJECT x)
-{ debug2(DOS,DD,"[DisposeObject( %ld ), type = %s, x =", (long) x, Image(type(x)));
-  ifdebug(DOS, DD, DebugObject(x));
+{ debug2(DOS,DDD,"[DisposeObject( %ld ), type = %s, x =", (long) x, Image(type(x)));
+  ifdebug(DOS, DDD, DebugObject(x));
   assert( Up(x) == x, "DisposeObject: x has a parent!" );
   while( Down(x) != x )  DisposeChild(Down(x));   Dispose(x);
-  debug0(DOS, DD, "]DisposeObject returning.");
+  debug0(DOS, DDD, "]DisposeObject returning.");
   return 0;
 } /* end DisposeObject */
 
@@ -80,7 +80,7 @@ OBJECT MakeWord(unsigned typ, FULL_CHAR *str, FILE_POS *pos)
   NewWord(res, typ, StringLength(str), pos);
   StringCopy(string(res), str);
   FposCopy(fpos(res), *pos);
-  debug4(DOS, DD, "MakeWord(%s, %s, %s) returning %s",
+  debug4(DOS, DDD, "MakeWord(%s, %s, %s) returning %s",
     Image(typ), str, EchoFilePos(pos), EchoObject(res));
   return res;
 } /* end MakeWord */
@@ -98,13 +98,13 @@ OBJECT MakeWordTwo(unsigned typ, FULL_CHAR *str1, FULL_CHAR *str2, FILE_POS *pos
 { int len1 = StringLength(str1);
   int len2 = StringLength(str2);
   OBJECT res;
-  debug4(DOS, DD, "MakeWordTwo(%s, %s, %s, %s)",
+  debug4(DOS, DDD, "MakeWordTwo(%s, %s, %s, %s)",
     Image(typ), str1, str2, EchoFilePos(pos));
   NewWord(res, typ, len1 + len2, pos);
   StringCopy(string(res), str1);
   StringCopy(&string(res)[len1], str2);
   FposCopy(fpos(res), *pos);
-  debug5(DOS, DD, "MakeWordTwo(%s, %s, %s, %s) returning %s",
+  debug5(DOS, DDD, "MakeWordTwo(%s, %s, %s, %s) returning %s",
     Image(typ), str1, str2, EchoFilePos(pos), EchoObject(res));
   return res;
 } /* end MakeWordTwo */
@@ -123,12 +123,12 @@ OBJECT MakeWordThree(FULL_CHAR *s1, FULL_CHAR *s2, FULL_CHAR *s3)
   int len2 = StringLength(s2);
   int len3 = StringLength(s3);
   OBJECT res;
-  debug3(DOS, DD, "MakeWordThree(%s, %s, %s)", s1, s2, s3);
+  debug3(DOS, DDD, "MakeWordThree(%s, %s, %s)", s1, s2, s3);
   NewWord(res, WORD, len1 + len2 + len3, no_fpos);
   StringCopy(string(res), s1);
   StringCopy(&string(res)[len1], s2);
   StringCopy(&string(res)[len1 + len2], s3);
-  debug4(DOS, DD, "MakeWordThree(%s, %s, %s) returning %s",
+  debug4(DOS, DDD, "MakeWordThree(%s, %s, %s) returning %s",
     s1, s2, s3, EchoObject(res));
   return res;
 } /* end MakeWordThree */
@@ -145,7 +145,7 @@ OBJECT MakeWordThree(FULL_CHAR *s1, FULL_CHAR *s2, FULL_CHAR *s3)
 OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 { OBJECT y, link, res, tmp;
 
-  debug2(DOS, DD, "CopyObject(%s, %s)", EchoObject(x), EchoFilePos(pos));
+  debug2(DOS, DDD, "CopyObject(%s, %s)", EchoObject(x), EchoFilePos(pos));
   switch( type(x) )
   {
 
@@ -191,12 +191,22 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case KERN_SHRINK:
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+    case HSPAN:
+    case VSPAN:
     case PADJUST:
     case HADJUST:
     case VADJUST:
     case ROTATE:
+    case BACKGROUND:
+    case RAW_VERBATIM:
+    case VERBATIM:
     case CASE:
     case YIELD:
     case BACKEND:
@@ -214,7 +224,9 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case CURR_FACE:
     case COMMON:
     case RUMP:
+    case MELD:
     case INSERT:
+    case ONE_OF:
     case NEXT:
     case PLUS:
     case MINUS:
@@ -222,6 +234,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case TAGGED:
     case INCGRAPHIC:
     case SINCGRAPHIC:
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     case VCAT:
     case HCAT:
@@ -286,7 +299,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
   } /* end switch */
   if( pos == no_fpos )  FposCopy(fpos(res), fpos(x));
   else FposCopy(fpos(res), *pos);
-  debug1(DOS, DD, "CopyObject returning %s", EchoObject(res));
+  debug1(DOS, DDD, "CopyObject returning %s", EchoObject(res));
   return res;
 } /* end CopyObject */
 
@@ -302,7 +315,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 
 OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
 { OBJECT link, y, g, res;
-  debug2(DOS, D, "InsertObject(%s, %s)", EchoObject(x), EchoObject(*ins));
+  debug2(DOS, DDD, "InsertObject(%s, %s)", EchoObject(x), EchoObject(*ins));
   switch( type(x) )
   {
     case WORD:
@@ -326,6 +339,8 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
     case CLOSURE:
     case INCGRAPHIC:
     case SINCGRAPHIC:
+    case HSPAN:
+    case VSPAN:
 
       res = x;
       break;
@@ -352,20 +367,27 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
     case VADJUST:
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
     case HSCALE:
     case VSCALE:
     case HCOVER:
     case VCOVER:
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     case ROTATE:
+    case BACKGROUND:
     case SCALE:
     case KERN_SHRINK:
     case WIDE:
     case HIGH:
     case HSHIFT:
     case VSHIFT:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
 
       Child(y, LastDown(x));
       y = InsertObject(y, ins, style);
@@ -392,7 +414,178 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
       break;
 
   }
-  debug2(DOS, D, "InsertObject returning (%s) %s",
+  debug2(DOS, DDD, "InsertObject returning (%s) %s",
     *ins == nilobj ? "success" : "failure", EchoObject(res));
   return res;
 } /* end InsertObject */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Meld(x, y)                                                               */
+/*                                                                           */
+/*  Return the meld of x with y.                                             */
+/*                                                                           */
+/*****************************************************************************/
+#define NO_DIR	0
+#define X_DIR	1
+#define Y_DIR	2
+#define XY_DIR	3
+#define MAX_MELD 32
+
+OBJECT Meld(OBJECT x, OBJECT y)
+{ OBJECT res;
+  char table[MAX_MELD][MAX_MELD], dir[MAX_MELD][MAX_MELD];
+  OBJECT xcomp[MAX_MELD], ycomp[MAX_MELD];
+  OBJECT xgaps[MAX_MELD], ygaps[MAX_MELD];
+  BOOLEAN is_equal;
+  OBJECT link, z, g;  BOOLEAN jn;
+  int xlen, ylen, xi, yi;
+  debug2(DOS, D, "Meld(%s, %s)", EchoObject(x), EchoObject(y));
+  assert(type(x) == ACAT, "Meld: type(x) != ACAT");
+  assert(type(y) == ACAT, "Meld: type(y) != ACAT");
+
+  /* initialize xcomp, xgaps, xlen */
+  debug0(DOS, DD, "  initializing xcomp[]");
+  xlen = 0;
+  xcomp[xlen] = nilobj;
+  xlen++;
+  g = nilobj;
+  FirstDefinite(x, link, z, jn);
+  while( link != x )
+  { if( xlen >= MAX_MELD )
+      Error(7, 1, "%s: maximum paragraph length (%d) exceeded", FATAL, &fpos(x),
+	KW_MELD, MAX_MELD-1);
+    xcomp[xlen] = z;
+    xgaps[xlen] = g;
+    debug3(DOS, DD, "  initializing xcomp[%d] to %s %s",
+      xlen, Image(type(z)), EchoObject(z));
+    xlen++;
+    NextDefiniteWithGap(x, link, z, g, jn)
+  }
+
+  /* initialize ycomp, ygaps, ylen */
+  debug0(DOS, DD, "  initializing ycomp[]");
+  ylen = 0;
+  ycomp[ylen] = nilobj;
+  ylen++;
+  g = nilobj;
+  FirstDefinite(y, link, z, jn);
+  while( link != y )
+  { if( ylen >= MAX_MELD )
+      Error(7, 1, "%s: maximum paragraph length (%d) exceeded", FATAL, &fpos(y),
+	KW_MELD, MAX_MELD-1);
+    ycomp[ylen] = z;
+    ygaps[ylen] = g;
+    debug3(DOS, DD, "  initializing ycomp[%d] to %s %s",
+      ylen, Image(type(z)), EchoObject(z));
+    ylen++;
+    NextDefiniteWithGap(y, link, z, g, jn)
+  }
+
+  /* initialize table and dir */
+  debug0(DOS, DD, "  initializing table[]");
+  table[0][0] = 0;
+  dir[0][0] = NO_DIR;
+  for( xi = 1;  xi < xlen;  xi++ )
+  { table[xi][0] = 0;
+    dir[xi][0] = X_DIR;
+  }
+  for( yi = 1;  yi < ylen;  yi++ )
+  { table[0][yi] = 0;
+    dir[0][yi] = Y_DIR;
+  }
+  for( xi = 1;  xi < xlen;  xi++ )
+  {
+    for( yi = 1;  yi < ylen;  yi++ )
+    {
+      if( is_word(type(xcomp[xi])) )
+      { is_equal = is_word(type(ycomp[yi])) &&
+	  StringEqual(string(xcomp[xi]), string(ycomp[yi]));
+      }
+      else
+      {
+	is_equal = (type(xcomp[xi]) == type(ycomp[yi]));
+      }
+      if( is_equal )
+      {
+	table[xi][yi] = 1 + table[xi - 1][yi - 1];
+	dir[xi][yi] = XY_DIR;
+        debug3(DOS, DD, "  assigning (XY) table[%d][%d] = %d", xi, yi,
+	  table[xi][yi]);
+      }
+      else if( table[xi - 1][yi] > table[xi][yi - 1] )
+      {
+	table[xi][yi] = table[xi - 1][yi];
+	dir[xi][yi] = X_DIR;
+        debug3(DOS, DD, "  assigning (X) table[%d][%d] = %d", xi, yi,
+	  table[xi][yi]);
+      }
+      else
+      {
+	table[xi][yi] = table[xi][yi - 1];
+	dir[xi][yi] = Y_DIR;
+        debug3(DOS, DD, "  assigning (Y) table[%d][%d] = %d", xi, yi,
+	  table[xi][yi]);
+      }
+    }
+  }
+
+  /* traverse table from [xlen-l][ylen-1] back to [0][0], finding who's in */
+  debug0(DOS, DD, "  traversing table[]");
+  New(res, ACAT);
+  StyleCopy(save_style(res), save_style(x));
+  for( xi = xlen - 1, yi = ylen - 1;  dir[xi][yi] != NO_DIR; )
+  {
+    switch( dir[xi][yi] )
+    {
+      case XY_DIR:
+
+        debug3(DOS, DD, "  at table[%d][%d] (XY) linking %s",
+	  xi, yi, EchoObject(xcomp[xi]));
+        Link(Down(res), xcomp[xi]);
+        g = xgaps[xi];
+        xi--;
+        yi--;
+	break;
+
+    
+      case Y_DIR:
+
+        debug3(DOS, DD, "  at table[%d][%d] (ydec) linking %s",
+	  xi, yi, EchoObject(ycomp[yi]));
+        Link(Down(res), ycomp[yi]);
+        g = ygaps[yi];
+        yi--;
+	break;
+
+      case X_DIR:
+
+        debug3(DOS, DD, "  at table[%d][%d] (xdec) linking %s",
+	  xi, yi, EchoObject(xcomp[xi]));
+        Link(Down(res), xcomp[xi]);
+        g = xgaps[xi];
+        xi--;
+    }
+
+    /* add gap if not last time; either g or one we make up */
+    if( dir[xi][yi] != NO_DIR )
+    {
+      if( g == nilobj )
+      {
+	OBJECT tmp;
+	New(g, GAP_OBJ);
+	hspace(g) = 1;  vspace(g) = 0;
+	FposCopy(fpos(g), *no_fpos);
+	SetGap(gap(g), FALSE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE,
+	  width(space_gap(save_style(res))));
+	tmp = MakeWord(WORD, AsciiToFull("1s"), &fpos(g));
+	Link(g, tmp);
+      }
+      Link(Down(res), g);
+    }
+  }
+
+  debug1(DOS, D, "Meld returning %s", EchoObject(res));
+  return res;
+}

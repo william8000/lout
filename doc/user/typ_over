@@ -94,8 +94,8 @@ overall situation and try to minimize the ugliness, using the @TeX
 optimal paragraph breaking algorithm.  It takes two runs to do this,
 with intermediate results stored in Lout's cross reference database
 (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.  It is possible for this
-page layout optimizer to cycle, never settling on a single final best
+it, which might be wise after major changes.  It is possible for the
+optimizer to cycle, never settling on a single final best
 version; this is usually caused by footnotes or floating figures inserted
 at points which end up near page boundaries.
 @PP
@@ -198,13 +198,13 @@ the @Code "@MakeContents" option of the setup file to {@Code Yes}.  It
 will appear automatically after any title overhead.  However, it is not
 possible to have an index, and it is not possible to have multiple columns.
 @PP
-Within the @Code slides setup file there is an @Code "@OverheadLayout"
+Within the @Code slides setup file there is an @Code "@OverheadSetup"
 symbol whose options control the appearance of features specific to
-overhead.layout. @Index @Code "@OverheadLayout"
+overhead.setup. @Index @Code "@OverheadSetup"
 overheads (in other words, the features described in this section).  Here
 are all these options and their default values:
 @ID @OneRow @Code {
-"@Use { @OverheadLayout"
+"@Use { @OverheadSetup"
 "  # @DateLine { No }"
 "  # @FirstOverheadNumber { 1 }"
 "  # @FirstLectureNumber { 1 }"

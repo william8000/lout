@@ -16,19 +16,19 @@ have symbols to produce it anyway.
 Previous examples have used @Code "@DP" for getting nodes one under
 another, and white space between nodes for getting them side by side, but
 this is very primitive.  This section suggests three better ways:  using
-{@Code "@Tab"}, using {@Code "@Graph"}, and using coordinates; and the
+{@Code "@Tbl"}, using {@Code "@Graph"}, and using coordinates; and the
 following section adds a fourth, using @@Diag's tree-drawing symbols.  It's
 a bit of a jumble.
 @PP
-The {@Code "@Tab"} symbol (Chapter {@NumberOf tables}) is a good choice when
+The {@Code "@Tbl"} symbol (Chapter {@NumberOf tables}) is a good choice when
 the nodes have any kind of grid-like arrangement:
 @ID @OneRow {
 @Code {
 "@Diag {"
-"@Tab"
-"    @Fmta { @Col A ! @Col B ! @Col C }"
-"    hmargin { 0.5c }"
-"    vmargin { 0.25c }"
+"@Tbl"
+"    aformat { @Cell A | @Cell B | @Cell C }"
+"    marginhorizontal { 0.5c }"
+"    marginvertical { 0.25c }"
 "{"
 "@Rowa"
 "    B { A:: @Square }"
@@ -48,10 +48,10 @@ the nodes have any kind of grid-like arrangement:
 }
 ||9ct
 @Diag {
-@Tab
-    @Fmta { @Col A ! @Col B ! @Col C }
-    hmargin { 0.5c }
-    vmargin { 0.25c }
+@Tbl
+    aformat { @Cell A | @Cell B | @Cell C }
+    marginhorizontal { 0.5c }
+    marginvertical { 0.25c }
 {
 @Rowa
     B { A:: @Square }

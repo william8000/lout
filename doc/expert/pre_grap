@@ -67,8 +67,8 @@ meaning is not defined by Lout, and different implementations could
 require different values for it.  The following description applies to
 Basser Lout, which uses the PostScript page description language
 @Cite { $adobe1990ps }.  Similar but more restricted possibilities exist
-with the PDF back end added to Lout in Version 3.12 (see a separate document
-distributed with Lout); to include both, use the @@BackEnd symbol like this:
+with the PDF back end (see a separate document distributed with Lout);
+to include both, use the @@BackEnd symbol like this:
 @ID @OneRow @Code {
 "{ @BackEnd @Case {"
 "      PostScript @Yield"
@@ -252,9 +252,9 @@ which both fills and strokes the path.  Since Basser Lout does not check
 that the left parameter is valid PostScript, it is possible to cause
 mysterious errors in the printing device, resulting in no output, if an
 incorrect value is given.  It is a good idea to encapsulate graphics
-objects in carefully tested definitions, like those of the Fig figure
+objects in carefully tested definitions, like those of the Diag figure
 drawing package @Cite { $kingston1995lout.user, Chapter 9 },
-fig @Index { Fig figure-drawing package }
+diag @Index { Diag diagram-drawing package }
 to be sure of avoiding these errors.
 @PP
 PostScript experts may find the following information helpful when
@@ -280,5 +280,5 @@ PostScript output has the form
 where @Eq {x, y} is the position of the lower left corner of the
 base.  Having two parts permits bracketing operations, like @Code save
 and @Code restore or @Code begin and {@Code end}, to enclose an
-object.  See the source file of the Fig package for examples.
+object.  See the source file of the Diag package for examples.
 @End @Section

@@ -30,7 +30,7 @@ In each chase @@HShift includes a @@OneCol effect.
 @PP
 The units of measurement of @I length may be {@Code "c"}, {@Code "i"},
 {@Code "p"}, {@Code "m"}, {@Code "f"}, {@Code "s"}, {@Code "v"}, or
-{@Code "w"}.  in the latter case, @Code "1w" is taken to be the width
+{@Code "w"}.  In the latter case, @Code "1w" is taken to be the width
 of the right parameter, so that, for example, @Code "0.5w @HShift" will
 centre the principal column mark within the right parameter.
 @PP

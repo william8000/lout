@@ -14,12 +14,9 @@ Australia }
     @DateLine { 27 January, 1993 }
     @InitialLanguage { English }
     @OptimizePages { Yes }
-//
-
-@Abstract
-   @Title { SUMMARY }
+    @AbstractTitle { SUMMARY }
+    @Abstract
 {
-@LP
 Lout is a high-level language for document formatting, whose ease of use
 has permitted an unprecedented number of advanced features to be added
 quickly and reliably.  This paper charts the evolution of the design and
@@ -29,6 +26,8 @@ and possible solutions.
 @DP
 {@B Keywords}  document formatting typesetting
 }
+
+//
 
 @Include { s1_0 }
 @Include { s2_0 }

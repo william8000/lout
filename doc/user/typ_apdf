@@ -3,8 +3,7 @@
    @Tag { pdf }
 @Begin
 @PP
-Starting with Version 3.12, Lout has been enhanced with the option of
-providing PDF (Adobe Portable Document Format) output as an alternative
+Lout offers PDF (Adobe Portable Document Format) output as an alternative
 pdf. @Index { PDF documents }
 to PostScript.  Any document that can be produced by Lout in
 PostScript can be produced in PDF as well, by adding a @Code "-Z"

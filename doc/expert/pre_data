@@ -26,7 +26,9 @@ index.file @Index { Index file (for databases) }
 which in this example is called {@Code "standard.li"}, the first time it
 ever encounters the database, as an aid to searching it.  If the database
 file is changed, its index file must be deleted by the user so that
-Basser Lout knows to reconstruct it.
+Basser Lout knows to reconstruct it.  There is also an installation
+option which allows this deletion to be done automatically on suitable
+systems (including Unix).
 @PP
 Basser Lout searches for databases in the current directory first, then
 in a sequence of standard places.  To search the standard places only, use

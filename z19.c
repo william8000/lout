@@ -1,7 +1,7 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -342,6 +342,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	EchoObject(target), EchoConstraint(&c));
       if( !FitsConstraint(0, 0, c) )
       { debug0(DGA, D, "  reject: target_galley horizontal constraint is -1");
+	y = nilobj;
         goto REJECT;
       }
     }
@@ -375,6 +376,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       assert( constrained(c), "AttachGalley: dest unconstrained!" );
       if( !FitsConstraint(0, 0, c) )
       { debug0(DGA, D, "  reject: hd horizontal constraint is -1");
+	y = nilobj;
         goto REJECT;
       }
     }
@@ -529,13 +531,22 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	case VCOVER:
 	case HCONTRACT:
 	case VCONTRACT:
+	case HLIMITED:
+	case VLIMITED:
 	case HEXPAND:
 	case VEXPAND:
+	case START_HVSPAN:
+	case START_HSPAN:
+	case START_VSPAN:
+	case HSPAN:
+	case VSPAN:
 	case ROTATE:
+	case BACKGROUND:
 	case SCALE:
 	case KERN_SHRINK:
 	case INCGRAPHIC:
 	case SINCGRAPHIC:
+	case PLAIN_GRAPHIC:
 	case GRAPHIC:
 	case ACAT:
 	case HCAT:
@@ -872,7 +883,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     REJECT:
 	
       /* reject first component */
-      debug1(DGA, D, "  reject %s", EchoObject(y));
+      /* debug1(DGA, D, "  reject %s", EchoObject(y)); */
+      debug0(DGA, D, "  reject first component");
       LeaveErrorBlock(TRUE);
       debug0(DYY, D, "] LeaveErrorBlock(TRUE) (REJECT)");
       if( tg_inners != nilobj )  DisposeObject(tg_inners), tg_inners = nilobj;
@@ -938,7 +950,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	StyleCopy(save_style(junk), save_style(dest));
 	adjust_cat(junk) = padjust(save_style(junk));
       }
-      Promote(hd, link == hd ? hd : NextDown(link), dest_index);
+      Promote(hd, link == hd ? hd : NextDown(link), dest_index, TRUE);
 
       /* move target_galley into target */
       /* nb Interpose must be done after all AdjustSize calls */
@@ -946,7 +958,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       {	Child(z, LastDown(target_galley));
 	Interpose(target, VCAT, z, z);
       }
-      Promote(target_galley, target_galley, target_index);
+      Promote(target_galley, target_galley, target_index, TRUE);
       DeleteNode(target_galley);
       assert(Down(target_index)==target_index, "AttachGalley: target_ind");
       if( blocked(target_index) )  blocked(dest_index) = TRUE;

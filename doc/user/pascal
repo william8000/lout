@@ -49,9 +49,9 @@ end;
 }
 Blank lines, line breaks, indents and spaces in the input are respected,
 with a tab being considered equal to eight spaces.  @Code "@Pas" can also
-be used within a paragraph to produce a fragment like @Pas { A[i..j] }.  Use
-@Code "@OneCol @Pas { ... }" to prevent the result from breaking over two
-lines.
+be used within a paragraph to produce a fragment like
+@OneCol @Pas { A[i..j] }.  Use @Code "@OneCol @Pas { ... }" to prevent the
+result from breaking over two lines.
 @PP
 @Code "@Pas" does not attempt to rearrange the program in any way.  Each
 item is simply printed according to the following plan:

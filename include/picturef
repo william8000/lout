@@ -1,18 +1,18 @@
 
 ###########################################################################
 #                                                                         #
-#  @IllustrationLayout extension to @DocumentLayout.                      #
+#  @IllustrationSetup extension to @DocumentSetup.                        #
 #                                                                         #
 #  Jeffrey H. Kingston                                                    #
 #  August 1994                                                            #
 #                                                                         #
-#  This package extends DocumentLayout for illustrations.                 #
+#  This package extends DocumentSetup for illustrations.                  #
 #                                                                         #
 ###########################################################################
 
-extend @DocumentLayout
+extend @BasicSetup @DocumentSetup
 export @Illustration
-def @IllustrationLayout
+def @IllustrationSetup
 @Begin
 
     #######################################################################
@@ -34,4 +34,4 @@ def @IllustrationLayout
 	@OneCol @OneRow x
     }
 
-@End @IllustrationLayout
+@End @IllustrationSetup

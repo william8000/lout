@@ -1,7 +1,7 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -1069,7 +1069,12 @@ OBJECT Hyphenate(OBJECT x)
 
     /* if a - ended the run, hyphenate there only */
     if( key[stop] == CH_HYPHEN )
-    { next_link = NextDown(link);
+    {
+      /* actually, don't hyphenate if the hyphen is last in the word [thanks Uwe] */
+      if( key[stop+1] == '\0' )
+	continue;
+
+      next_link = NextDown(link);
       z = MakeWord(WORD, &key[stop+1], &fpos(y));
       word_font(z) = word_font(y);
       word_colour(z) = word_colour(y);

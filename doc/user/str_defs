@@ -22,10 +22,10 @@ The method is to create a file called @Code "mydefs" in your current
 mydefs.file @Index { @Code mydefs file }
 directory, containing definitions like this:
 @ID @OneRow @Code {
-"import @DocumentLayout"
+"import @BasicSetup"
 "def @Batlow { Batlow Food Distributors Pty. Ltd. }"
 }
-The meaning of the first line, {@Code "import @DocumentLayout"}, will
+The meaning of the first line, {@Code "import @BasicSetup"}, will
 be explained shortly.  After that comes @Code "def" for `define,'
 then the name of the symbol being defined, then its value between
 braces.  So this example defines a symbol called @Code "@Batlow" to
@@ -41,13 +41,13 @@ symbol.  @Code "@Batlow" is a good choice, for example.
 The object between braces is quite arbitrary; in particular, it may
 contain symbols.  For example, suppose you frequently need a small grey box:
 @ID @OneRow @Code {
-"import @DocumentLayout"
+"import @BasicSetup"
 "def @GreyBox { @Box paint { lightgrey } {} }"
 }
 This defines a @Code "@GreyBox" symbol that produces {@GreyBox}.  Most
-of the symbols in this guide are from the @I {DocumentLayout package},
+of the symbols in this guide are from the @I {BasicSetup package},
 import. @Index @Code import
-which is why @Code "import @DocumentLayout" is required:  it makes
+which is why @Code "import @BasicSetup" is required:  it makes
 these symbols available to the definition, and can actually be omitted
 before definitions like the one for @Code "@Batlow" which do not use
 any symbols.  However it does no harm, so we place it in front of every
@@ -56,7 +56,7 @@ definition as a matter of course.
 Later chapters of this guide introduce specialized symbols for producing
 tables, equations, diagrams, graphs, and computer programs.  You need a
 different @Code "import" clause when using those symbols within a
-definition, because they are not from the DocumentLayout package.  Examples
+definition, because they are not from the BasicSetup package.  Examples
 may be found in the chapters concerned.
 }
 @PP
@@ -71,7 +71,7 @@ However, there is a way to define a @Code "@GreyBox" symbol so that
 @Code "@GreyBox ENTRY" produces {@GreyBox ENTRY}, @Code "@GreyBox EXIT"
 produces {@GreyBox EXIT}, and so on:
 @ID @OneRow @Code {
-"import @DocumentLayout"
+"import @BasicSetup"
 "def @GreyBox right x { @Box paint { lightgrey } x }"
 }
 The addition of @Code "right x" immediately after the symbol's name
@@ -88,7 +88,7 @@ which produces @GreyBox { Hello world }.
 It is a good principle to choose symbol names that refer to what the symbol
 is for, rather than how it does what it does.  Here is a good example:
 @ID @OneRow @Code {
-"import @DocumentLayout"
+"import @BasicSetup"
 "def @Poetry right x { lines @Break @I x }"
 }
 This kind of name is very pleasant to use, since it allows you to
@@ -108,7 +108,7 @@ You can define symbols that consume the object to their left as well
 as the object to their right, as the {@Code "@Font"}, {@Code "@Break"},
 and {@Code "@Colour"} symbols do:
 @ID @OneRow @Code {
-"import @DocumentLayout"
+"import @BasicSetup"
 "def @HeadingBox left x right y"
 "{  @Box { @CentredDisplay @Heading x y }"
 "}"

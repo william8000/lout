@@ -58,7 +58,7 @@ vast range of possibilities opened up by this:
 @ID @Code "@CurveBox { @I Hello world }"
 produces
 @ID @CurveBox { @I Hello world }
-@Code It doesn't bother @Code "@CurveBox" if one of the words inside
+It doesn't bother @Code "@CurveBox" if one of the words inside
 it is in italics.  Next:
 @ID @Code "@I @CurveBox { Hello world }"
 produces

@@ -1,47 +1,74 @@
 @Section
-   @Title { Margins }
+    @Title { Margins }
+    @Tag { tbl_marg }
 @Begin
 @PP
-@Code "@Tab" places a @I { vertical margin } above and below each row, and a
-margins.tables @SubIndex { in tables }
-@I { horizontal margin } to the left and right of each column.  (If there are
-no side rules, the leftmost and rightmost margins are omitted.)  The size of
-these margins is determined by two options to the @Code "@Tab" symbol:
-@ID @OneRow @Code {
-"@Tab"
-"    hmargin { 0.3c }"
-"    vmargin { 0.2v }"
-"    @Fmta { ... }"
-"..."
+The @Code "@Cell" symbol offers a @Code margin option for changing the
+margins @RawIndex { margins }
+margins.in.tables @SubIndex { margins in tables }
+amount of margin left between the entry and the boundary of the cell:
+@ID @Code "@Cell margin { 0.3f }"
+The default values are different for horizontal and vertical margins,
+which brings us to the @Code marginhorizontal and @Code marginvertical
+options:
+@ID @OneRow @Code @Verbatim {
+@Cell
+    marginhorizontal { 0.6f }
+    marginvertical { 0.3f }
 }
-Shown here are the default values, 0.3 centimetres for the horizontal
-margins, and 0.2 times the current inter-line spacing (denoted by the
-letter {@Code v}) for the vertical margins.
-@PP
-The horizontal margin is fixed, but each row may have its own vertical margin:
-@ID @OneRow @Code {
-"@Rowa"
-"    vmargin { 0.5vx }"
-"    A { ... }"
-}
-If omitted, the @Code vmargin value is taken from the @Code "@Tab" option.
-@PP
-The value shown here, {@Code "0.5vx"}, requests a vertical margin of
-half the current inter-line spacing, measured from the baseline of the
-entry rather than from its edge (this is what the @Code x means).  This
-value is a good choice when the entries contain simple words or lines
-of text (i.e. no paragraphs, large equations, figures, etc.):
-@CD {
-@Tab
-    vmargin { 0.5vx }
-    @Fmta { @Col @Heading A  !  @Col @Heading B }
-    @Fmtb { @Col A  !  @Col @CC B }
+These are the default values, 0.6 and 0.3 times the current font size
+respectively.  Another useful value is {@Code "marginvertical { 0.5vx }"},
+which asks for a vertical margin of half the current line separation, but
+measured from baseline to baseline (this is what the @Code "x" means).
+This produces a separation equal to the separation of the surrounding lines:
+@CD @Tbl
+    marginvertical { 0.5vx }
+    aformat { @Cell A  |  @Cell B  |  @Cell C }
 {
-    @Rowa A { Course } B { Enrolment }
-    @Rowb A { Software Engineering } B { 174 }
-    @Rowb A { Complexity Theory } B { 37 }
+@Rowa
+    A { Austen }
+    B { Chaucer }
+    C { Donne }
+@Rowa
+    A { Balzac }
+    B { Darwin }
+    C { Goethe }
+@Rowa
+    A { Byron }
+    B { Dickens }
+    C { Homer }
+}
+This margin does not work so well when the cells contain paragraphs,
+diagrams or other things that could not be described as single lines.
+@PP
+There are {@Code "marginabove"}, {@Code "marginbelow"}, {@Code "marginleft"},
+and {@Code "marginright"} options for setting margins individually.  For
+example, sometimes you don't want the extreme left and right margins in
+a table, and they can be got rid of like this:
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    paint { lightgrey }
+    aformat { @Cell ml { 0i } A  |  @Cell B  |  @Cell mr { 0i } C }
+{
+@Rowa
+    A { Column A }
+    B { Column B }
+    C { Column C }
 }
 }
-since the lines of the table will then be separated evenly like
-the lines in paragraphs.
+We've used abbreviated versions of the options' names:  @Code "ml" for
+{@Code marginleft}, and @Code "mr" for {@Code marginright}.  Every option
+has such an abbreviated name, made from the first letters of the parts of
+its full name (Section {@NumberOf tbl_summ} lists all these names).  The
+result is
+@CD @Tbl
+    paint { lightgrey }
+    aformat { @Cell ml { 0i } A  |  @Cell B  |  @Cell mr { 0i } C }
+{
+@Rowa
+    A { Column A }
+    B { Column B }
+    C { Column C }
+}
+with the painting showing the reduced margins.
 @End @Section

@@ -1,7 +1,7 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -66,7 +66,7 @@ void FilterInit(void)
 /*****************************************************************************/
 
 OBJECT FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos)
-{ FULL_CHAR buff[MAX_LINE];  FILE *fp;  OBJECT x, res;
+{ FULL_CHAR buff[MAX_LINE];  FILE *fp;  OBJECT x, res, junk;
   debug3(DFH, D, "FilterCreate(%s, %s, %s)", bool(use_begin),
     SymName(act), EchoFilePos(xfpos));
   New(res, FILTERED);
@@ -81,7 +81,7 @@ OBJECT FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos)
   filter_actual(x) = act;
   Link(res, x);
   Link(filter_active, x);
-  LexScanFilter(fp, use_begin, xfpos);
+  junk = LexScanVerbatim(fp, use_begin, xfpos, FALSE);
   fclose(fp);
   sprintf( (char *) buff, "%s%d", FILTER_OUT, filter_count);
   x = MakeWord(WORD, buff, xfpos);

@@ -36,8 +36,9 @@ recursive and receptive ones, discard all @@Font, @@Break, @@Space,
 breaking as required, and discard all redundant braces.  Then view the
 galley as a sequence of one or more objects separated by vertical
 concatenation symbols; these are the components and split points,
-except that concatenation symbols whose gaps are unbreakable are not
-eligible to be split points.  For example, given the definition
+except that concatenation symbols whose gaps are unbreakable
+(Section {@NumberOf concatenation}) are not eligible to be split
+points.  For example, given the definition
 @ID @OneRow @Code {
 "def @Section into { @SectionPlace&&preceding }"
 "    named @Title {}"
@@ -234,7 +235,7 @@ footnotes.
 @PP
 Basser Lout is keen to write out pages as soon as possible, to save memory,
 and it cannot afford to wait forever for non-existent footnotes.  A variant
-of the galley concept, called a {@I {forcing galley}},
+of the galley concept, called a @I {forcing galley},
 forcing.galley @Index { Forcing galley } {@PageMark forcing}
 is introduced to solve this problem.  A forcing galley is defined like this:
 @ID @OneRow @Code {
@@ -305,6 +306,19 @@ it will have the effect of a forcing galley, while if it happens to
 attach to
 @ID @Code "@SomePlace noforce"
 it will not.
+@PP
+Although it doesn't matter whether a galley is declared as a forcing
+galley or merely arrives at a {@Code "@ForceGalley"} symbol from the
+point of view of the effect on nearby targets, there is one way in
+which Lout treats the two cases differently.  If a forcing galley's
+first component does not fit into the available space, that component
+will be scaled vertically until it does.  The rationale for this is
+that forcing galleys are meant to carry the bulk of the document and
+cannot afford to be held up because the user has inadvertently included
+an over-high component, which for all Lout knows to the contrary may
+not fit on any page.  If this scaling is not wanted but forcing is,
+the galley may be declared not forcing but all its targets may be set
+to contain {@Code "@ForceGalley"}.
 @PP
 Within a galley, a symbol whose name is @@Enclose has a special
 enclose.sym @Index @@Enclose

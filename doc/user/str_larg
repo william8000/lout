@@ -52,7 +52,7 @@ in Chapter {@NumberOf types}.
 @PP
 The @Code "@Begin ... @End @Section" that brackets the body of each
 section may be abbreviated to {@Code "{ ... }"}.  However, the long
-form is recommmended because it helps Lout to detect missing or extra
+form is recommended because it helps Lout to detect missing or extra
 braces within the body of the section.
 @PP
 All large-scale structure symbols have a @Code "@Tag" option, whose
@@ -89,7 +89,7 @@ a whole, unless you change their language explicitly using the
 The remainder of this section describes the setup file options for
 controlling the appearance of large-scale structure symbols.  (For an
 introduction to setup files, consult Section {@NumberOf setup}.)  These
-options mainly appear in the second @Code "@Use" clause, since exactly which
+options mainly appear in the third @Code "@Use" clause, since exactly which
 large-scale structure symbols exist depends on the type of document.  For
 example, here are the setup file options from the @Code "doc" setup file
 relating to appendices:
@@ -119,8 +119,8 @@ language.  Any other value produces itself.
 @Code "@AppendixNumbers" determines the style of numbering of appendices,
 and may be {@Code Arabic}, {@Code Roman}, {@Code UCRoman}, {@Code Alpha},
 {@Code UCAlpha}, or {@Code None} meaning unnumbered.  Most common is
-{@Code Arabic}, but appendices are traditionally numbered using upper-case
-letters, hence the value {@Code UCAlpha} used above.
+{@Code Arabic}, but appendices traditionally use upper-case
+letters, hence the value {@Code UCAlpha} given above.
 @PP
 @Code "@FirstAppendixNumber { 1 }" is the number (always in Arabic) to
 assign to the first appendix.  It is almost always 1, but a few people

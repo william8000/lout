@@ -1,7 +1,7 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -193,17 +193,23 @@ void LexInit(void)
 /*****************************************************************************/
 
 void LexPush(FILE_NUM x, int offs, int ftyp, int lnum, BOOLEAN same)
-{
-  debug5(DLA, D, "LexPush(%s, %d, %s, %d, %s)", FileName(x), offs,
+{ int i;
+  debug5(DLA, DD, "LexPush(%s, %d, %s, %d, %s)", FileName(x), offs,
     ftyp==SOURCE_FILE ? "source" : ftyp==INCLUDE_FILE ? "include":"database",
     lnum, bool(same));
   if( stack_free >= MAX_LEX_STACK - 1 )
   { if( ftyp == INCLUDE_FILE )
-      Error(2, 1, "include file %s too deeply nested",
-        FATAL, PosOfFile(x), FullFileName(x));
+      Error(2, 1, "too many open files when opening include file %s; open files are:",
+        WARN, PosOfFile(x), FullFileName(x));
     else
-      Error(2, 2, "database file %s too deeply nested",
-        FATAL, PosOfFile(x), FileName(x));
+      Error(2, 2, "too many open files when opening database file %s; open files are:",
+        WARN, PosOfFile(x), FileName(x));
+    for( i = stack_free - 1;  i >= 0;  i-- )
+    {
+      Error(2, 23, "  %s", WARN, no_fpos,
+	EchoFileSource(lex_stack[i].this_file));
+    }
+    Error(2, 24, "exiting now", FATAL, no_fpos);
   }
   if( stack_free >= 0 )  /* save current state */
   { lex_stack[stack_free].chpt		 = chpt;
@@ -252,7 +258,7 @@ void LexPush(FILE_NUM x, int offs, int ftyp, int lnum, BOOLEAN same)
 /*****************************************************************************/
 
 void LexPop(void)
-{ debug0(DLA, D, "LexPop()");
+{ debug0(DLA, DD, "LexPop()");
   assert( stack_free > 0, "LexPop: stack_free <= 0!" );
   stack_free--;
   if( same_file )
@@ -339,7 +345,7 @@ long LexNextTokenPos(void)
   }
 #endif /* DB_FIX */
 
-  debug1(DLA, D, "LexNextTokenPos() returning %ld", res);
+  debug1(DLA, DD, "LexNextTokenPos() returning %ld", res);
   return res;
 }
 
@@ -721,18 +727,37 @@ OBJECT LexGetToken(void)
 } /* end LexGetToken */
 
 
-/*@::LexScanFilter@***********************************************************/
+/*@::LexScanVerbatim@*********************************************************/
 /*                                                                           */
-/*  LexScanFilter(fp, end_stop, err_pos)                                     */
+/*  OBJECT LexScanVerbatim(fp, end_stop, err_pos, lessskip)                  */
 /*                                                                           */
-/*  Scan input file and transfer to filter file fp.  If end_stop,            */
-/*  terminate at @End, else terminate at matching right brace.               */
+/*  Scan input file and transfer to filter file fp, or if that is NULL, make */
+/*  a VCAT of objects, one per line (or just a WORD if one line only), and   */
+/*  return that object as the result.  If end_stop, terminate at @End, else  */
+/*  terminate at matching right brace.                                       */
+/*                                                                           */
+/*  If lessskip is true it means that we should skip only up to and          */
+/*  including the first newline character, as opposed to the usual           */
+/*  skipping of all initial white space characters.                          */
 /*                                                                           */
 /*****************************************************************************/
 
+#define print(ch)							\
+{ debug2(DLA, D, "print(%c), bufftop = %d", ch, bufftop);		\
+  if( fp == NULL )							\
+  { if( bufftop < MAX_BUFF )						\
+    { if( chtbl[ch] == NEWLINE )					\
+      { res = BuildLines(res, buff, &bufftop);				\
+      }									\
+      else buff[bufftop++] = ch;					\
+    }									\
+  }									\
+  else putc(ch, fp);							\
+}
+
 #define clear()								\
 { int i;								\
-  for( i = 0;  i < hs_top;  i++ )  putc(hs_buff[i], fp);		\
+  for( i = 0;  i < hs_top;  i++ )  print(hs_buff[i]);			\
   hs_top = 0;								\
 }
 
@@ -741,8 +766,45 @@ OBJECT LexGetToken(void)
   hs_buff[hs_top++] = ch;						\
 }
 
-void LexScanFilter(fp, end_stop, err_pos)
-FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
+static OBJECT BuildLines(OBJECT current, FULL_CHAR *buff, int *bufftop)
+{ OBJECT wd, res, gp, gpword;  int c;
+
+  /* build a new word and reset the buffer */
+  setword(WORD, wd, file_pos, buff, *bufftop);
+  debug1(DLA, D, "BuildLines(current, %s)", EchoObject(wd));
+  *bufftop = 0;
+
+  if( current == nilobj )
+  {
+    /* if this is the first word, make it the result */
+    res = wd;
+  }
+  else
+  {
+    /* if this is the second word, make the result a VCAT */
+    if( type(current) == WORD )
+    { New(res, VCAT);
+      FposCopy(fpos(res), fpos(current));
+      Link(res, current);
+    }
+    else res = current;
+
+    /* now attach the new word to res, preceded by a one-line gap */
+    New(gp, GAP_OBJ);
+    mark(gap(gp)) = FALSE;
+    join(gap(gp)) = FALSE;
+    FposCopy(fpos(gp), file_pos);
+    gpword = MakeWord(WORD, AsciiToFull("1vx"), &file_pos);
+    Link(gp, gpword);
+    Link(res, gp);
+    Link(res, wd);
+  }
+  debug1(DLA, D, "BuildLines returning %s", EchoObject(res));
+  return res;
+}
+
+OBJECT LexScanVerbatim(fp, end_stop, err_pos, lessskip)
+FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
 {
   register FULL_CHAR *p;		/* pointer to current input char     */
   int depth;				/* depth of nesting of { ... }       */
@@ -750,9 +812,12 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
   BOOLEAN skipping;			/* TRUE when skipping initial spaces */
   FULL_CHAR hs_buff[MAX_BUFF];		/* hold spaces here in case last     */
   int hs_top;				/* next free spot in hs_buff         */
+  FULL_CHAR buff[MAX_BUFF];		/* hold line here if not to file     */
+  int bufftop;				/* top of buff                       */
+  OBJECT res = nilobj;			/* result object if not to file      */
 
-  debug2(DFH, D, "LexScanFilter(fp, %s, %s)",
-    bool(end_stop), EchoFilePos(err_pos));
+  debug3(DLA, D, "LexScanVerbatim(fp, %s, %s, %s)",
+    bool(end_stop), EchoFilePos(err_pos), bool(lessskip));
   if( next_token != nilobj )
   { Error(2, 16, "filter parameter in macro", FATAL, err_pos);
   }
@@ -761,6 +826,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
   finished = FALSE;
   skipping = TRUE;
   hs_top = 0;
+  bufftop = 0;
   while( !finished ) switch( chtbl[*p++] )
   {
       case ESCAPE:
@@ -769,7 +835,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
       
 	skipping = FALSE;
 	clear();
-	putc(*(p-1), fp);
+	print(*(p-1));
 	break;
 
 
@@ -783,6 +849,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
       case NEWLINE:
       
 	if( !skipping )  hold(*(p-1));
+	if( lessskip ) skipping = FALSE;
 	chpt = p;  srcnext();
 	line_num(file_pos)++;
 	col_num(file_pos) = 0;
@@ -792,8 +859,12 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 
       case ENDFILE:
       
-	Error(2, 17, "end of file reached while reading filter parameter",
-	  FATAL, err_pos);
+	if( fp == NULL )
+	  Error(2, 22, "end of file reached while reading %s",
+	    FATAL, err_pos, lessskip ? KW_VERBATIM : KW_RAWVERBATIM);
+	else
+	  Error(2, 17, "end of file reached while reading filter parameter",
+	    FATAL, err_pos);
 	break;
 
 
@@ -802,7 +873,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 	skipping = FALSE;
 	if( *(p-1) == '{' /*}*/ )
 	{ clear();
-	  putc(*(p-1), fp);
+	  print(*(p-1));
 	  depth++;
 	}
 	else if( *(p-1) == /*{*/ '}' )
@@ -812,13 +883,13 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 	  }
 	  else
 	  { clear();
-	    putc(*(p-1), fp);
+	    print(*(p-1));
 	    depth--;
 	  }
 	}
 	else
 	{ clear();
-	  putc(*(p-1), fp);
+	  print(*(p-1));
 	}
 	break;
 
@@ -847,11 +918,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 	    incl_fname = ReplaceWithTidy(incl_fname, FALSE);
 	    if( !is_word(type(incl_fname)) )
 	      Error(2, 19, "expected file name here", FATAL,&fpos(incl_fname));
-	    /* ***
-	    incl_fp = StringFOpen(string(incl_fname), READ_TEXT);
-	    Dispose(incl_fname);
-	    *** */
-	    debug0(DFS, D, "  calling DefineFile from LexScanFilter");
+	    debug0(DFS, D, "  calling DefineFile from LexScanVerbatim");
 	    fnum = DefineFile(string(incl_fname), STR_EMPTY, &fpos(incl_fname),
 	      INCLUDE_FILE, sysinc ? SYSINCLUDE_PATH : INCLUDE_PATH);
 	    Dispose(incl_fname);
@@ -860,29 +927,29 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 	      Error(2, 20, "cannot open include file %s",
 		FATAL, PosOfFile(fnum), FullFileName(fnum));
 	    while( (ch = getc(incl_fp)) != EOF )
-	      putc(ch, fp);
+	      print(ch);
 	    fclose(incl_fp);
 	  }
 	  else
 	  { clear();
-	    putc(*p, fp);
+	    print(*p);
 	    p++;
 	  }
 	}
 	else
 	{ clear();
-	  putc(*(p-1), fp);
+	  print(*(p-1));
 	}
 	break;
 
 
       default:
       
-	assert(FALSE, "LexScanFilter: bad chtbl[]");
+	assert(FALSE, "LexScanVerbatim: bad chtbl[]");
 	break;
 
   };
-  putc('\n', fp);
+  print('\n');
 
   if( p - startline >= MAX_LINE )
   { col_num(file_pos) = 1;
@@ -890,5 +957,10 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
   }
 
   chpt = p;
-  debug1(DFH, D, "LexScanFilter returning at %s", EchoFilePos(&file_pos));
-} /* end LexScanFilter */
+  if( fp == NULL && res == nilobj )
+    res = MakeWord(WORD, STR_EMPTY, &file_pos);
+
+  debug2(DLA, D, "LexScanVerbatim returning %s at %s",
+    EchoObject(res), EchoFilePos(&file_pos));
+  return res;
+} /* end LexScanVerbatim */

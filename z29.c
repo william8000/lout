@@ -1,7 +1,7 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -35,8 +35,7 @@
 #include "externs.h"
 
 #define	MAX_STACK	300		/* size of scope stack               */
-#define	MAX_TAB		1024		/* size of hash table                */
-#define	TAB_MASK	0x3FF		/* i & TAB_MASK == i % MAX_TAB       */
+#define	MAX_TAB		1783		/* size of hash table                */
 
 #define	length(x)	word_font(x)
 
@@ -69,7 +68,7 @@ static	int		sym_count = 0;			/* symbol count      */
   x    = str;								\
   val  = *x++;								\
   while( --rlen )  val += *x++;						\
-  val  &= TAB_MASK;							\
+  val %= MAX_TAB;							\
 }
 
 
@@ -104,7 +103,7 @@ void InitSym(void)
 /*****************************************************************************/
 
 void PushScope(OBJECT x, BOOLEAN npars, BOOLEAN vis)
-{ debug2(DST, DD, "[ PushScope( %s, %s )", SymName(x), bool(npars));
+{ debug3(DST, DD, "[ PushScope(%s, %s, %s)", SymName(x), bool(npars), bool(vis));
   assert( suppress_scope == FALSE, "PushScope: suppress_scope!" );
   if( scope_top >= MAX_STACK )
   {
@@ -237,10 +236,10 @@ void DebugScope(void)
 { int i;
   if( suppress_scope )
   {
-    debug0(DST, D, "suppressed");
+    debug0(DST, DD, "suppressed");
   }
   else for( i = 0;  i < scope_top;  i++ )
-  { debug6(DST, D, "%s %s%s%s%s%s",
+  { debug6(DST, DD, "%s %s%s%s%s%s",
       i == scope_top - 1 ? "->" : "  ",
       SymName(scope[i]),
       npars_only[i] ? " npars_only" : "",
@@ -282,6 +281,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   filter(s)            = nilobj;
   use_invocation(s)    = nilobj;
   imports(s)           = nilobj;
+  imports_encl(s)      = FALSE;
   right_assoc(s)       = TRUE;
   precedence(s)        = xprecedence;
   indefinite(s)        = xindefinite;
@@ -388,7 +388,13 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   if( StringEqual(str, KW_FILTER) )
   { if( type(s) != LOCAL || enclosing(s) == StartSym )
       Error(29, 4, "%s must be a local definition", WARN, &fpos(s), str);
-    else filter(enclosing(s)) = s;
+    else if( !has_rpar(enclosing(s)) )
+      Error(29, 14, "%s must lie within a symbol with a right parameter",
+	WARN, &fpos(s), KW_FILTER);
+    else
+    { filter(enclosing(s)) = s;
+      precedence(enclosing(s)) = FILTER_PREC;
+    }
   }
 
   if( type(s) == RPAR && has_body(enclosing(s)) &&
@@ -413,6 +419,11 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
 	if( enclosing(s) == enclosing(q) )
 	{ Error(29, 7, "symbol %s previously defined at%s",
 	    WARN, &fpos(s), str, EchoFilePos(&fpos(q)) );
+	  if( AltErrorFormat )
+	  {
+	    Error(29, 13, "symbol %s previously defined here",
+	      WARN, &fpos(q), str);
+	  }
 	  break;
 	}
       }
@@ -433,6 +444,55 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
 		SymName(enclosing(s)), SymName(s));
   return s;
 } /* end InsertSym */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  InsertAlternativeName(str, s, xfpos)                                     */
+/*                                                                           */
+/*  Insert an alternative name for symbol s.                                 */
+/*                                                                           */
+/*****************************************************************************/
+
+void InsertAlternativeName(FULL_CHAR *str, OBJECT s, FILE_POS *xfpos)
+{ register int sum, rlen;
+  register unsigned char *x;
+  int len;
+  OBJECT entry, link, plink, p, q;
+  debug3(DST, DD, "InsertAlternativeName(%s, %s, %s)",
+    str, SymName(s), EchoFilePos(xfpos));
+
+  len = StringLength(str);
+  hash(str, len, sum);
+
+  ifdebug(DST, D, sym_spread[sum]++;  sym_count++);
+  entry = (OBJECT) &symtab[sum];
+  for( plink = Down(entry);  plink != entry;  plink = NextDown(plink) )
+  { Child(p, plink);
+    if( length(p) == len && StringEqual(str, string(p)) )
+    { for( link = Down(p);  link != p;  link = NextDown(link) )
+      {	Child(q, link);
+	if( enclosing(s) == enclosing(q) )
+	{ Error(29, 12, "symbol name %s previously defined at%s",
+	    WARN, &fpos(s), str, EchoFilePos(&fpos(q)) );
+	  break;
+	}
+      }
+      goto wrapup;
+    }
+  }
+
+  /* need a new OBJECT as well as s */
+  NewWord(p, WORD, len, xfpos);
+  length(p) = len;
+  StringCopy(string(p), str);
+  Link(entry, p);
+
+ wrapup:
+  Link(p, s);
+  /* not for copies if( enclosing(s) != nilobj ) Link(enclosing(s), s); */
+  debug0(DST, DD, "InsertAlternativeName returning.");
+} /* end InsertAlternativeName */
 
 
 /*@::SearchSym(), SymName()@**************************************************/
@@ -481,7 +541,8 @@ OBJECT SearchSym(FULL_CHAR *str, int len)
 	      && (!suppress_scope || StringEqual(string(p), KW_INCLUDE) ||
 				     StringEqual(string(p), KW_SYSINCLUDE))
 	    )
-	    {	debug1(DST, DDD, "SearchSym returning %s", Image(type(q)));
+	    {	debug3(DST, DD, "SearchSym returning %s %s%%%s",
+		  Image(type(q)), SymName(q), SymName(enclosing(q)));
 		return q;
 	    }
 	  }
@@ -667,7 +728,7 @@ static void DeleteSymBody(OBJECT s)
 
 void DeleteEverySym(void)
 { int i, j, load, cost;  OBJECT p, plink, link, x, entry;
-  debug0(DST, D, "DeleteEverySym()");
+  debug0(DST, DD, "DeleteEverySym()");
 
   /* dispose the bodies of all symbols */
   for( i = 0;  i < MAX_TAB;  i++ )
@@ -700,12 +761,12 @@ void DeleteEverySym(void)
     }
   }
   if( load > 0 )
-  { debug4(DST, D, "size = %d, items = %d (%d%%), probes = %.1f",
+  { debug4(DST, DD, "size = %d, items = %d (%d%%), probes = %.1f",
       MAX_TAB, load, (100*load)/MAX_TAB, (float) cost/load);
   }
   else
-  { debug1(DST, D, "table size = %d, no entries in table", MAX_TAB);
+  { debug1(DST, DD, "table size = %d, no entries in table", MAX_TAB);
   }
-  debug0(DST, D, "DeleteEverySym returning.");
+  debug0(DST, DD, "DeleteEverySym returning.");
 } /* end DeleteEverySym */
 #endif

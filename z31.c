@@ -1,7 +1,7 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -166,141 +166,156 @@ OBJECT 		xx_link, xx_tmp, xx_res, xx_hold;
 
 void MemInit(void)
 {
-  zz_lengths[ WORD        ] = 0;
-  zz_lengths[ QWORD       ] = 0;
-  zz_lengths[ LINK        ] = ceiling(sizeof(struct link_type), sizeof(ALIGN));
+  zz_lengths[ WORD         ] = 0;
+  zz_lengths[ QWORD        ] = 0;
+  zz_lengths[ LINK         ] = ceiling(sizeof(struct link_type), sizeof(ALIGN));
 
   /* object types, except closure NB have actual() field in token phase! */
-  zz_lengths[ CLOSURE     ] =
-  zz_lengths[ NULL_CLOS   ] =
-  zz_lengths[ PAGE_LABEL  ] =
-  zz_lengths[ UNDER_REC   ] =
-  zz_lengths[ CROSS       ] =
-  zz_lengths[ FORCE_CROSS ] =
-  zz_lengths[ SPLIT       ] =
-  zz_lengths[ PAR         ] =
-  zz_lengths[ ROW_THR     ] =
-  zz_lengths[ COL_THR     ] =
-  zz_lengths[ ACAT        ] =
-  zz_lengths[ HCAT        ] =
-  zz_lengths[ VCAT        ] =
-  zz_lengths[ ONE_COL     ] =
-  zz_lengths[ ONE_ROW     ] =
-  zz_lengths[ WIDE        ] =
-  zz_lengths[ HIGH        ] =
-  zz_lengths[ HSHIFT      ] =
-  zz_lengths[ VSHIFT      ] =
-  zz_lengths[ HSCALE      ] =
-  zz_lengths[ VSCALE      ] =
-  zz_lengths[ HCOVER      ] =
-  zz_lengths[ VCOVER      ] =
-  zz_lengths[ SCALE       ] =
-  zz_lengths[ KERN_SHRINK ] =
-  zz_lengths[ HCONTRACT   ] =
-  zz_lengths[ VCONTRACT   ] =
-  zz_lengths[ HEXPAND     ] =
-  zz_lengths[ VEXPAND     ] =
-  zz_lengths[ PADJUST     ] =
-  zz_lengths[ HADJUST     ] =
-  zz_lengths[ VADJUST     ] =
-  zz_lengths[ ROTATE      ] =
-  zz_lengths[ CASE        ] =
-  zz_lengths[ YIELD       ] =
-  zz_lengths[ BACKEND     ] =
-  zz_lengths[ FILTERED    ] =
-  zz_lengths[ XCHAR       ] =
-  zz_lengths[ FONT        ] =
-  zz_lengths[ SPACE       ] =
-  zz_lengths[ YUNIT       ] =
-  zz_lengths[ ZUNIT       ] =
-  zz_lengths[ BREAK       ] =
-  zz_lengths[ UNDERLINE   ] =
-  zz_lengths[ COLOUR      ] =
-  zz_lengths[ LANGUAGE    ] =
-  zz_lengths[ CURR_LANG   ] =
-  zz_lengths[ CURR_FAMILY ] =
-  zz_lengths[ CURR_FACE   ] =
-  zz_lengths[ COMMON      ] =
-  zz_lengths[ RUMP        ] =
-  zz_lengths[ INSERT      ] =
-  zz_lengths[ NEXT        ] =
-  zz_lengths[ PLUS        ] =
-  zz_lengths[ MINUS       ] =
-  zz_lengths[ ENV_OBJ     ] =
-  zz_lengths[ ENV         ] =
-  zz_lengths[ ENVA        ] =
-  zz_lengths[ ENVB        ] =
-  zz_lengths[ ENVC        ] =
-  zz_lengths[ ENVD        ] =
-  zz_lengths[ CENV        ] =
-  zz_lengths[ CLOS        ] =
-  zz_lengths[ LVIS        ] =
-  zz_lengths[ LUSE        ] =
-  zz_lengths[ LEO         ] =
-  zz_lengths[ OPEN        ] =
-  zz_lengths[ TAGGED      ] =
-  zz_lengths[ INCGRAPHIC  ] =
-  zz_lengths[ SINCGRAPHIC ] =
-  zz_lengths[ GRAPHIC     ] =
+  zz_lengths[ CLOSURE      ] =
+  zz_lengths[ NULL_CLOS    ] =
+  zz_lengths[ PAGE_LABEL   ] =
+  zz_lengths[ UNDER_REC    ] =
+  zz_lengths[ CROSS        ] =
+  zz_lengths[ FORCE_CROSS  ] =
+  zz_lengths[ SPLIT        ] =
+  zz_lengths[ PAR          ] =
+  zz_lengths[ ROW_THR      ] =
+  zz_lengths[ COL_THR      ] =
+  zz_lengths[ HSPANNER     ] =
+  zz_lengths[ VSPANNER     ] =
+  zz_lengths[ ACAT         ] =
+  zz_lengths[ HCAT         ] =
+  zz_lengths[ VCAT         ] =
+  zz_lengths[ ONE_COL      ] =
+  zz_lengths[ ONE_ROW      ] =
+  zz_lengths[ WIDE         ] =
+  zz_lengths[ HIGH         ] =
+  zz_lengths[ HSHIFT       ] =
+  zz_lengths[ VSHIFT       ] =
+  zz_lengths[ HSCALE       ] =
+  zz_lengths[ VSCALE       ] =
+  zz_lengths[ HCOVER       ] =
+  zz_lengths[ VCOVER       ] =
+  zz_lengths[ SCALE        ] =
+  zz_lengths[ KERN_SHRINK  ] =
+  zz_lengths[ HCONTRACT    ] =
+  zz_lengths[ VCONTRACT    ] =
+  zz_lengths[ HLIMITED     ] =
+  zz_lengths[ VLIMITED     ] =
+  zz_lengths[ HEXPAND      ] =
+  zz_lengths[ VEXPAND      ] =
+  zz_lengths[ START_HVSPAN ] =
+  zz_lengths[ START_HSPAN  ] =
+  zz_lengths[ START_VSPAN  ] =
+  zz_lengths[ HSPAN        ] =
+  zz_lengths[ VSPAN        ] =
+  zz_lengths[ PADJUST      ] =
+  zz_lengths[ HADJUST      ] =
+  zz_lengths[ VADJUST      ] =
+  zz_lengths[ ROTATE       ] =
+  zz_lengths[ BACKGROUND   ] =
+  zz_lengths[ VERBATIM     ] =
+  zz_lengths[ RAW_VERBATIM ] =
+  zz_lengths[ CASE         ] =
+  zz_lengths[ YIELD        ] =
+  zz_lengths[ BACKEND      ] =
+  zz_lengths[ FILTERED     ] =
+  zz_lengths[ XCHAR        ] =
+  zz_lengths[ FONT         ] =
+  zz_lengths[ SPACE        ] =
+  zz_lengths[ YUNIT        ] =
+  zz_lengths[ ZUNIT        ] =
+  zz_lengths[ BREAK        ] =
+  zz_lengths[ UNDERLINE    ] =
+  zz_lengths[ COLOUR       ] =
+  zz_lengths[ LANGUAGE     ] =
+  zz_lengths[ CURR_LANG    ] =
+  zz_lengths[ CURR_FAMILY  ] =
+  zz_lengths[ CURR_FACE    ] =
+  zz_lengths[ COMMON       ] =
+  zz_lengths[ RUMP         ] =
+  zz_lengths[ MELD         ] =
+  zz_lengths[ INSERT       ] =
+  zz_lengths[ ONE_OF       ] =
+  zz_lengths[ NEXT         ] =
+  zz_lengths[ PLUS         ] =
+  zz_lengths[ MINUS        ] =
+  zz_lengths[ ENV_OBJ      ] =
+  zz_lengths[ ENV          ] =
+  zz_lengths[ ENVA         ] =
+  zz_lengths[ ENVB         ] =
+  zz_lengths[ ENVC         ] =
+  zz_lengths[ ENVD         ] =
+  zz_lengths[ CENV         ] =
+  zz_lengths[ CLOS         ] =
+  zz_lengths[ LVIS         ] =
+  zz_lengths[ LUSE         ] =
+  zz_lengths[ LEO          ] =
+  zz_lengths[ OPEN         ] =
+  zz_lengths[ TAGGED       ] =
+  zz_lengths[ INCGRAPHIC   ] =
+  zz_lengths[ SINCGRAPHIC  ] =
+  zz_lengths[ PLAIN_GRAPHIC] =
+  zz_lengths[ GRAPHIC      ] =
 	ceiling(sizeof(struct closure_type), sizeof(ALIGN));
 
-  zz_lengths[ HEAD        ] =
+  zz_lengths[ HEAD         ] =
 	ceiling(sizeof(struct head_type), sizeof(ALIGN));
 
-  zz_lengths[ LBR         ] =
-  zz_lengths[ RBR         ] =
-  zz_lengths[ BEGIN       ] =
-  zz_lengths[ END         ] =
-  zz_lengths[ USE         ] =
-  zz_lengths[ NOT_REVEALED] =
-  zz_lengths[ GSTUB_NONE  ] =
-  zz_lengths[ GSTUB_INT   ] =
-  zz_lengths[ GSTUB_EXT   ] =
+  zz_lengths[ LBR          ] =
+  zz_lengths[ RBR          ] =
+  zz_lengths[ BEGIN        ] =
+  zz_lengths[ END          ] =
+  zz_lengths[ USE          ] =
+  zz_lengths[ NOT_REVEALED ] =
+  zz_lengths[ GSTUB_NONE   ] =
+  zz_lengths[ GSTUB_INT    ] =
+  zz_lengths[ GSTUB_EXT    ] =
   zz_lengths[ UNEXPECTED_EOF] =
-  zz_lengths[ PREPEND     ] =
-  zz_lengths[ SYS_PREPEND ] =
-  zz_lengths[ DATABASE    ] =
-  zz_lengths[ SYS_DATABASE] =
-  zz_lengths[ DEAD        ] =
-  zz_lengths[ UNATTACHED  ] =
-  zz_lengths[ RECEPTIVE   ] =
-  zz_lengths[ RECEIVING   ] =
-  zz_lengths[ RECURSIVE   ] =
-  zz_lengths[ PRECEDES    ] =
-  zz_lengths[ FOLLOWS     ] =
-  zz_lengths[ CROSS_FOLL  ] =
+  zz_lengths[ PREPEND      ] =
+  zz_lengths[ SYS_PREPEND  ] =
+  zz_lengths[ DATABASE     ] =
+  zz_lengths[ SYS_DATABASE ] =
+  zz_lengths[ DEAD         ] =
+  zz_lengths[ UNATTACHED   ] =
+  zz_lengths[ RECEPTIVE    ] =
+  zz_lengths[ RECEIVING    ] =
+  zz_lengths[ RECURSIVE    ] =
+  zz_lengths[ PRECEDES     ] =
+  zz_lengths[ FOLLOWS      ] =
+  zz_lengths[ CROSS_FOLL   ] =
   zz_lengths[ CROSS_FOLL_OR_PREC] =
-  zz_lengths[ GALL_FOLL   ] =
+  zz_lengths[ GALL_FOLL    ] =
   zz_lengths[ GALL_FOLL_OR_PREC ] =
-  zz_lengths[ CROSS_TARG  ] =
-  zz_lengths[ GALL_TARG   ] =
-  zz_lengths[ GALL_PREC   ] =
-  zz_lengths[ CROSS_PREC  ] =
+  zz_lengths[ CROSS_TARG   ] =
+  zz_lengths[ GALL_TARG    ] =
+  zz_lengths[ GALL_PREC    ] =
+  zz_lengths[ CROSS_PREC   ] =
   zz_lengths[ PAGE_LABEL_IND] =
-  zz_lengths[ SCALE_IND   ] =
-  zz_lengths[ COVER_IND   ] =
-  zz_lengths[ EXPAND_IND  ] =
-  zz_lengths[ THREAD      ] =
-  zz_lengths[ CR_LIST     ] =
+  zz_lengths[ SCALE_IND    ] =
+  zz_lengths[ COVER_IND    ] =
+  zz_lengths[ EXPAND_IND   ] =
+  zz_lengths[ THREAD       ] =
+  zz_lengths[ CR_LIST      ] =
 	ceiling(sizeof(struct closure_type), sizeof(ALIGN));
 
   /* symbol types */
-  zz_lengths[ MACRO       ] =
-  zz_lengths[ LOCAL       ] =
-  zz_lengths[ LPAR        ] =
-  zz_lengths[ RPAR        ] =
-  zz_lengths[ NPAR        ] =
+  zz_lengths[ MACRO        ] =
+  zz_lengths[ LOCAL        ] =
+  zz_lengths[ LPAR         ] =
+  zz_lengths[ RPAR         ] =
+  zz_lengths[ NPAR         ] =
 	ceiling(sizeof(struct symbol_type), sizeof(ALIGN));
 
   /* gap objects */
-  zz_lengths[ TSPACE      ] =
-  zz_lengths[ TJUXTA      ] =
-  zz_lengths[ GAP_OBJ     ] =
+  zz_lengths[ TSPACE       ] =
+  zz_lengths[ TJUXTA       ] =
+  zz_lengths[ GAP_OBJ      ] =
 	ceiling(sizeof(struct gapobj_type), sizeof(ALIGN));
 
   /* cross-reference and data base types */
-  zz_lengths[ CROSS_SYM   ] =
-  zz_lengths[ CR_ROOT     ] = ceiling(sizeof(struct cr_type) , sizeof(ALIGN));
+  zz_lengths[ CROSS_SYM    ] =
+  zz_lengths[ CR_ROOT      ] = ceiling(sizeof(struct cr_type) , sizeof(ALIGN));
 
   /* external galley record */
   zz_lengths[ EXT_GALL  ] = ceiling(sizeof(struct ext_gall_type),sizeof(ALIGN));

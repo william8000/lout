@@ -3,15 +3,15 @@
    @Tag { paras }
 @Begin
 @PP
-@I { Paragraph breaking } is the process of taking a paragraph and
+@I { Paragraph breaking } is the process of
 paragraph.breaking @Index { paragraph breaking }
-inserting line breaks at the places appropriate to the column
+inserting line breaks into praragraphs at places appropriate to the column
 width.  Lout works out suitable column widths and performs paragraph
 breaking automatically, finding an `optimal' break with the method
 used by the @TeX
 tex.paragraph @SubIndex { paragraph breaking }
-system.  It offers eight styles of paragraph breaking,
-which we will explore with the aid of this example paragraph:
+system.  It offers nine styles of paragraph breaking,
+which we will explore with the aid of this example:
 @ID @OneRow @Code {
 It is a truth universally
 acknowledged, that a single man
@@ -235,4 +235,27 @@ Serves to'advance an honest minde.
 as desired.  To set the entire document in a paragraph breaking style other
 than {@Code "adjust"}, you need to change the @Code "@InitialBreak" option,
 as explained at the end of Section {@NumberOf linespace}.
+@PP
+Some people don't like to see the first line of a paragraph alone at the
+widows @Index { widow lines }
+orphans @Index { orphan lines }
+unbreakablefirst. @Index { @Code unbreakablefirst }
+unbreakablelast. @Index { @Code unbreakablelast }
+foot of a page or column (the rest appearing on the next page).  You can
+instruct Lout not to allow this with
+@ID @Code "unbreakablefirst @Break ..."
+meaning that the first line cannot be broken off from the rest of the
+paragraph.  Similarly,
+@ID @Code "unbreakablelast @Break ..."
+instructs Lout to prevent the last line of a paragraph from appearing
+alone at the top of a page or column.  These features would probably be
+invoked in the @Code "@InitialBreak" option, like this:
+@ID
+@Code "@InitialBreak { unbreakablefirst unbreakablelast hyphen adjust 1.2fx }"
+You can turn them off with @Code "breakablefirst @Break"
+and @Code "breakablelast @Break".  In both cases Lout makes it happen by
+breaking at the previous place, either between paragraphs or two lines from
+the end of a paragraph.  Alternatively, both features are compatible with
+Lout's @Code "@OptimizePages" option, which will optimize the overall page
+layout of the document subject to these requirements.
 @End @Section

@@ -132,16 +132,18 @@ superscripts and subscripts:
 In effect, the definition of such symbols changes depending on the
 context; but Lout does not permit such a change.  Luckily, the so-called
 `style' information set by the @@Font, @@Break, and @@Space symbols can
-change in this way.  Accordingly, Eq commandeers the @Code v unit,
-normally used for line gaps, and uses it for these spaces instead:
+change in this way.  Accordingly, Eq uses the @Code y unit, which is
+part of style, for these spaces:
 @ID @Code {
-"def @MedGap { 0.20v }"
+"def @MedGap { 0.20y }"
 ""
 "def \"+\" { &@MedGap plus &@MedGap }"
 ""
-"def @Smaller right x { 0.7f @Font 0c @Space 0.2f @Break x }"
+"def @HSqueeze right x { 0.2f @YUnit x }"
 }
-The @Code "@Smaller" symbol is applied to all superscripts and subscripts,
-reducing the font size and also reducing the @Code "v" unit,
-thereby reducing the space around @Code "+" and similar symbols.
+In the equation as a whole, the y unit is initially set to
+{@Code 1f}, and so @Code "@MedGap" ordinarily supplies 20% of this
+amount.  But superscripts and subscripts are enclosed in the
+@Code "@HSqueeze" symbol, which, by changing the y unit, ensures that
+any @Code "@MedGap" within them is much smaller than usual.
 @End @Section

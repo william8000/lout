@@ -1,7 +1,7 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -35,7 +35,7 @@
 /*  This module implements the PostScript back end.                          */
 /*                                                                           */
 /*****************************************************************************/
-#include	<math.h>	/*	for fabs()	*/
+#include <math.h>			/* for fabs()                        */
 
 #include "externs.h"
 #define	StartUpResource	"LoutStartUp"
@@ -507,11 +507,13 @@ void PrintBetween(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
 
     case PDF:
 
-    	PDFPage_Cleanup(out_fp);			/*	write out page objects	*/
-
+      /* write out page objects	*/
+      PDFPage_Cleanup(out_fp);
       PDFPage_Init(out_fp, 1.0 / PT, PT/2);
-    	FontPrintPageResources(out_fp);	/*	write out font objects	*/
-	FontPrintPageSetup(out_fp);
+
+      /* write out font objects	*/
+      FontPrintPageResources(out_fp);
+      FontPrintPageSetup(out_fp);
       FontAdvanceCurrentPage();
       break;
 
@@ -528,8 +530,6 @@ void PrintBetween(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
 /*                                                                           */
 /*****************************************************************************/
 
-#if 0
-
 #define KernLength(fnum, mp, ch1, ch2, res)				\
 { int ua_ch1 = mp[ch1];							\
   int ua_ch2 = mp[ch2];							\
@@ -542,28 +542,6 @@ void PrintBetween(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
       finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;		\
   }									\
 } /* end KernLength */
-
-#else
-
-/*	debugging version		*/
-
-static	FULL_LENGTH		_KernLength(FONT_NUM fnum, FULL_CHAR *mp, FULL_CHAR ch1, FULL_CHAR ch2)
-{ int ua_ch1 = mp[ch1];
-  int ua_ch2 = mp[ch2];
-  int i = finfo[fnum].kern_table[ua_ch1], j;
-  if( i == 0 )  return 0;
-  else
-  { FULL_CHAR *kc = finfo[fnum].kern_chars;
-    for( j = i;  kc[j] > ua_ch2;  j++ );
-    return (kc[j] == ua_ch2) ?
-      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;
-  }
-} /* end KernLength */
-
-#define KernLength(fnum, mp, ch1, ch2, res)				\
-		res	=	_KernLength(fnum, mp, ch1, ch2);
-
-#endif
 
 
 /*@::PrintWord()@*************************************************************/
@@ -587,14 +565,23 @@ void PrintWord(OBJECT x, int hpos, int vpos)
     case PLAINTEXT:
 
       h = ((float) hpos / PlainCharWidth) + 0.5;
-      /*** buggy; mark is already halfway up the word ***
-      v = ((float) vpos / PlainCharHeight) + 0.5;
-      *** */
       v = ((float) vpos / PlainCharHeight);
-      debug3(DGP, D, "PrintWord(%s at h = %d, v = %d)", string(x), h, v);
-      p = &page[v*hsize + h];
-      for( i = 0;  string(x)[i] != '\0';  i++ )
-	*p++ = string(x)[i];
+      debug3(DGP, DD, "PrintWord(%s at h = %d, v = %d)", string(x), h, v);
+      if( h >= 0 && h + StringLength(string(x)) < hsize && v >= 0 && v < vsize )
+      {
+        assert( h >= 0,     "PrintWord:  h < 0!" );
+        assert( h <  hsize, "PrintWord:  h >= hsize!" );
+        assert( v >= 0,     "PrintWord:  v < 0!" );
+        assert( v <  vsize, "PrintWord:  v >= vsize!" );
+        p = &page[v*hsize + h];
+        for( i = 0;  string(x)[i] != '\0';  i++ )
+	  *p++ = string(x)[i];
+      }
+      else
+      {
+        Error(24, 11, "word %s deleted (internal error, off page at %d,%d)",
+          WARN, &fpos(x), string(x), h, v);
+      }
       break;
 
 
@@ -698,8 +685,9 @@ void PrintWord(OBJECT x, int hpos, int vpos)
 
     case PDF:
     {
-      static    int    last_hpos;	/* does not need to be initialised */
-      static    int    next_hpos	=	-1;
+
+      static int last_hpos;	/* does not need to be initialised */
+      static int next_hpos = -1;
 #if 0
       struct metrics *fnt;
 #endif
@@ -779,40 +767,41 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       *q = '\0';
 
       /* show string(x) */
+      /* FontWordSize(x); - this should not be necessary	*/
 
-/*	FontWordSize(x); - this should not be necessary	*/
+      switch (command)
+      {
+	case 'm':
 
-	switch (command)
-	{
-		case 'm':
-			PDFText_OpenXY(out_fp, hpos, vpos);
-		      last_hpos	=	hpos;
-			next_hpos	=	hpos + fwd(x, COLM);	/* fwd(x, COLM) = width of word */
-			break;
+	  PDFText_OpenXY(out_fp, hpos, vpos);
+	  last_hpos = hpos;
+	  next_hpos =	hpos + fwd(x, COLM);	/* fwd(x, COLM) = width of wd */
+	  break;
 
-		case 's':
+	case 's':
 #if 0
-			PDFText_Open(out_fp);
-			PDFText_Kern(out_fp, hpos - next_hpos);
+	  PDFText_Open(out_fp);
+	  PDFText_Kern(out_fp, hpos - next_hpos);
 #else
-			PDFText_OpenX(out_fp, hpos - last_hpos);
+	  PDFText_OpenX(out_fp, hpos - last_hpos);
 #endif
-		      last_hpos	=	hpos;
-			next_hpos	=	hpos + fwd(x, COLM);	/* fwd(x, COLM) = width of word */
-			break;
+	  last_hpos = hpos;
+	  next_hpos =	hpos + fwd(x, COLM);	/* fwd(x, COLM) = width of wd */
+	  break;
 #if 0
-		case ' ':
-			PDFText_Open(out_fp);
-#if 1	/* try kerning to get correct position */
-			PDFText_Kern(out_fp, fnt[' '].right);
+	case ' ':
+
+	  PDFText_Open(out_fp);
+#if 1
+	  /* try kerning to get correct position */
+	  PDFText_Kern(out_fp, fnt[' '].right);
 #else
-		      PDFPage_Write(out_fp, EightBitToPrintForm[' ']);
+	  PDFPage_Write(out_fp, EightBitToPrintForm[' ']);
 #endif
-			next_hpos	+=	fwd(x, COLM) +	/* fwd(x, COLM) = width of word */
-						fnt[' '].right;	/* width of space char */
-			break;
+	  next_hpos += fwd(x, COLM) +	fnt[' '].right;	/* width of space ch */
+	  break;
 #endif
-	}
+      }
 
       p = string(x);
       PDFPage_Write(out_fp, EightBitToPrintForm[*p]);
@@ -822,21 +811,79 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       /* acc   = MapTable[m]->map[MAP_ACCENT]; */
       for( p++;  *p;  p++ )
       {
-		KernLength(word_font(x), unacc, *(p-1), *p, ksize);
-		if ( ksize != 0 )
-{
-			PDFText_Kern(out_fp, ksize);
-}
-
-		PDFPage_Write(out_fp, EightBitToPrintForm[*p]);
+	KernLength(word_font(x), unacc, *(p-1), *p, ksize);
+	if ( ksize != 0 )
+	{
+	  PDFText_Kern(out_fp, ksize);
 	}
-
-	PDFText_Close(out_fp);
+	PDFPage_Write(out_fp, EightBitToPrintForm[*p]);
+      }
+      PDFText_Close(out_fp);
       break;
     }
+
+
   } /* end switch */
   debug0(DGP, DDD, "PrintWord returning");
 } /* end PrintWord */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PrintPlainGraphicObject(x, xmk, ymk, z)                                  */
+/*                                                                           */
+/*  Print plain graphic object x at xmk, ymk with the size of z.             */
+/*                                                                           */
+/*****************************************************************************/
+
+void PrintPlainGraphicObject(OBJECT x, FULL_LENGTH xmk,FULL_LENGTH ymk,OBJECT z)
+{ int i, len, starth, startv, stoph, stopv, h, v;
+  debug2(DGP, D, "PrintPlainGraphicObject(x, xmk %s, ymk %s)",
+    EchoLength(xmk), EchoLength(ymk));
+
+  assert( BackEnd == PLAINTEXT, "PrintPlainGraphicObject: back end!" );
+  if( type(x) != WORD && type(x) != QWORD )
+  {
+    Error(24, 12, "left parameter of %s must be a simple word",
+      WARN, &fpos(x), KW_PLAINGRAPHIC);
+    return;
+  }
+  len = StringLength(string(x));
+  if( StringLength(string(x)) == 0 )
+  {
+    Error(24, 13, "left parameter of %s must be a non-empty word",
+      WARN, &fpos(x), KW_PLAINGRAPHIC);
+    return;
+  }
+  starth = (((float) xmk ) / PlainCharWidth) + 0.5;
+  startv = (((float) ymk ) / PlainCharHeight);
+  stoph = (((float) xmk + size(z, COLM)) / PlainCharWidth) + 0.5;
+  stopv = (((float) ymk - size(z, ROWM)) / PlainCharHeight); /* NB - not + */
+  SetLengthDim(COLM);
+  debug5(DGP, D, "  xmk %s bk %s fwd %s -> %d,%d",
+    EchoLength(xmk), EchoLength(back(z, COLM)), EchoLength(fwd(z, COLM)),
+    starth, stoph);
+  SetLengthDim(ROWM);
+  debug5(DGP, D, "  ymk %s bk %s fwd %s -> %d,%d",
+    EchoLength(ymk), EchoLength(back(z, ROWM)), EchoLength(fwd(z, ROWM)),
+    startv, stopv);
+  if( starth >= 0 && stoph < hsize && startv >= 0 && stopv < vsize )
+  { i = 0;
+    for( v = startv-1;  v >= stopv;  v-- )
+    {
+      for( h = starth;  h < stoph;  h++ )
+      {
+        if( i == len )  i = 0;
+        page[v*hsize + h] = string(x)[i++];
+      }
+    }
+  }
+  else
+  {
+    Error(24, 14, "fill %s deleted (internal error, off page at %d,%d)",
+      WARN, &fpos(x), string(x), h, v);
+  }
+} /* end PrintPlainGraphicObject */
 
 
 /*****************************************************************************/
@@ -950,12 +997,12 @@ void PrintAfterLast(void)
 	break;
 
      case PDF:
-    	PDFPage_Cleanup(out_fp);			/*	write out page objects	*/
 
-/*        MapPrintResources(out_fp);	is not needed	*/
-
+    	PDFPage_Cleanup(out_fp);		/* write out page objects */
+        /* MapPrintResources(out_fp); not needed */
     	PDFFile_Cleanup(out_fp);
-      break;
+        break;
+
     } /* end switch */
   } /* end if prologue_done */
 } /* end PrintAfterLast */
@@ -972,21 +1019,22 @@ void PrintAfterLast(void)
 void CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
 { debug2(DRS,D,"CoordTranslate(%s, %s)",
     EchoLength(xdist), EchoLength(ydist));
-/*  assert( BackEnd == POSTSCRIPT, "CoordTranslate: BackEnd!" );	*/
   assert( BackEnd != PLAINTEXT, "CoordTranslate: BackEnd!" );
   if (BackEnd == POSTSCRIPT)
     fprintf(out_fp, "%d %d translate\n", xdist, ydist);
   else if (BackEnd == PDF)
+  {
     if ((xdist != 0) || (ydist != 0))
     {
 #if 1
-	PDFPage_Translate(out_fp, xdist, ydist);
+      PDFPage_Translate(out_fp, xdist, ydist);
 #else
-    	char	temp_str[64];
+      char	temp_str[64];
       sprintf(temp_str, "1 0 0 1 %d %d cm\n", xdist, ydist);
       PDFPage_Write(out_fp, temp_str);
 #endif
     }
+  }
   cpexists = FALSE;
   /***
   currentfont = NO_FONT;
@@ -994,6 +1042,7 @@ void CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
   ***/
   debug0(DRS, D, "CoordTranslate returning.");
 } /* end CoordTranslate */
+
 
 /*@::CoordRotate(), CoordScale(), SaveGraphicsState(), etc.@******************/
 /*                                                                           */
@@ -1005,7 +1054,6 @@ void CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
 
 void CoordRotate(FULL_LENGTH amount)
 { debug1(DRS, D, "CoordRotate(%.1f degrees)", (float) amount / DG);
-/*  assert( BackEnd == POSTSCRIPT, "CoordRotate: BackEnd!" );	*/
   assert( BackEnd != PLAINTEXT, "CoordRotate: BackEnd!" );
   if (BackEnd == POSTSCRIPT)
     fprintf(out_fp, "%.4f rotate\n", (float) amount / DG);
@@ -1041,23 +1089,24 @@ void CoordScale(float hfactor, float vfactor)
 #if DEBUG_ON
   char buff[20];
 #endif
-/*  assert( BackEnd == POSTSCRIPT, "CoordScale: BackEnd!" );  */
   assert( BackEnd != PLAINTEXT, "CoordScale: BackEnd!" );
   ifdebug(DRS, D, sprintf(buff, "%.3f, %.3f", hfactor, vfactor));
   debug1(DRS, D, "CoordScale(%s)", buff);
   if (BackEnd == POSTSCRIPT)
     fprintf(out_fp, "%.4f %.4f scale\n", hfactor, vfactor);
   else if (BackEnd == PDF)
+  {
     if ( (fabs(hfactor - 1.0) > 0.01) || (fabs(vfactor - 1.0) > 0.01) )
     {
 #if 1
-	PDFPage_Scale(out_fp, hfactor, vfactor);
+      PDFPage_Scale(out_fp, hfactor, vfactor);
 #else
-    	char		temp_str[64];
+      char temp_str[64];
       sprintf(temp_str, "%.2f 0 0 %.2f 0 0 cm\n", hfactor, vfactor);
       PDFPage_Write(out_fp, temp_str);
 #endif
     }
+  }
   cpexists = FALSE;
   /***
   currentfont = NO_FONT;
@@ -1078,7 +1127,6 @@ void CoordScale(float hfactor, float vfactor)
 
 void SaveGraphicState(OBJECT x)
 { debug0(DRS, D, "SaveGraphicState()");
-/*  assert( BackEnd == POSTSCRIPT, "SaveGraphicState: BackEnd!" );  */
   assert( BackEnd != PLAINTEXT, "SaveGraphicState: BackEnd!" );
   if (BackEnd == POSTSCRIPT)
     fprintf(out_fp, "gsave\n");
@@ -1110,11 +1158,10 @@ void SaveGraphicState(OBJECT x)
 
 void RestoreGraphicState(void)
 { debug0(DRS, D, "RestoreGraphicState()");
-/*  assert( BackEnd == POSTSCRIPT, "RestoreGraphicState: BackEnd!" );  */
   assert( BackEnd != PLAINTEXT, "RestoreGraphicState: BackEnd!" );
-  if (BackEnd == POSTSCRIPT)
+  if( BackEnd == POSTSCRIPT )
     fprintf(out_fp, "\ngrestore\n");
-  else if (BackEnd == PDF)
+  else if( BackEnd == PDF )
     PDFPage_Pop(out_fp);
   currentfont	  = gs_stack[gs_stack_top].gs_font;
   currentcolour	  = gs_stack[gs_stack_top].gs_colour;
@@ -1147,17 +1194,13 @@ void PrintGraphicObject(OBJECT x)
     case WORD:
     case QWORD:
 #if 1
-        if (BackEnd == POSTSCRIPT)
-            StringFPuts(string(x), out_fp);
-	  else if (BackEnd == PDF)
-	  {
-/*
-	      PDFPage_Write(out_fp, "% PostScript: ");
- */
-	      PDFPage_WriteGraphic(out_fp, string(x));
-	  }
+      if (BackEnd == POSTSCRIPT)
+	StringFPuts(string(x), out_fp);
+      else if (BackEnd == PDF)
+      {
+	PDFPage_WriteGraphic(out_fp, string(x));
+      }
 #else
-    
       StringFPuts(string(x), out_fp);
 #endif
       break;
@@ -1169,18 +1212,19 @@ void PrintGraphicObject(OBJECT x)
       {	Child(y, link);
 	if( type(y) == GAP_OBJ )
 	{
-        if (BackEnd == POSTSCRIPT)
+          if( BackEnd == POSTSCRIPT )
 	  {
 	    if( vspace(y) > 0 )  fputs("\n", out_fp);
 	    else if( hspace(y) > 0 ) fputs(" ", out_fp);
 	  }
-	  else if (BackEnd == PDF)
+	  else if( BackEnd == PDF )
 	  {
 	    if( vspace(y) > 0 )  PDFPage_Write(out_fp, "\n");
 	    else if( hspace(y) > 0 ) PDFPage_Write(out_fp, " ");
 	  }
 	}
-	else if( is_word(type(y)) || type(y) == ACAT )  PrintGraphicObject(y);
+	else if( is_word(type(y)) || type(y) == ACAT )
+	  PrintGraphicObject(y);
 	else if( type(y) != WIDE && !is_index(type(y)) )
 		/* @Wide, indexes are sometimes inserted by Manifest */
 	{ Error(24, 6, "error in left parameter of %s",
@@ -1198,6 +1242,7 @@ void PrintGraphicObject(OBJECT x)
       debug1(DGP, D, "  type(x) = %s, x =", Image(type(x)));
       ifdebug(DGP, D, DebugObject(x));
       break;
+
   }
 } /* end PrintGraphicObject */
 
@@ -1212,8 +1257,6 @@ void PrintGraphicObject(OBJECT x)
 
 void DefineGraphicNames(OBJECT x)
 { assert( type(x) == GRAPHIC, "PrintGraphic: type(x) != GRAPHIC!" );
-
-/*  assert( BackEnd == POSTSCRIPT, "DefineGraphicNames: BackEnd!" );	*/
   assert( BackEnd != PLAINTEXT, "DefineGraphicNames: BackEnd!" );
   debug1(DRS, D, "DefineGraphicNames( %s )", EchoObject(x));
   debug1(DRS, DD, "  style = %s", EchoStyle(&save_style(x)));
@@ -1227,7 +1270,7 @@ void DefineGraphicNames(OBJECT x)
       if (BackEnd == POSTSCRIPT)
         fprintf(out_fp, "%hd %s ", FontSize(currentfont, x), FontName(currentfont));
       else if (BackEnd == PDF)
-	  PDFFont_Set(out_fp, FontSize(currentfont, x), FontName(currentfont));
+	PDFFont_Set(out_fp, FontSize(currentfont, x), FontName(currentfont));
 #else
       fprintf(out_fp, "%hd %s ", FontSize(currentfont, x),
         FontName(currentfont));
@@ -1241,14 +1284,13 @@ void DefineGraphicNames(OBJECT x)
     if( currentcolour > 0 )
     {
 #if 1
-      if (BackEnd == POSTSCRIPT)
+      if( BackEnd == POSTSCRIPT )
         fprintf(out_fp, "%s ", ColourCommand(currentcolour));
       else if (BackEnd == PDF)
       {
-          char	str[256];
-
-	    sprintf(str, "%s ", ColourCommand(currentcolour));
-	    PDFPage_Write(out_fp, str);
+	char str[256];
+	sprintf(str, "%s ", ColourCommand(currentcolour));
+	PDFPage_Write(out_fp, str);
       }
 #else
       fprintf(out_fp, "%s ", ColourCommand(currentcolour));
@@ -1261,11 +1303,11 @@ void DefineGraphicNames(OBJECT x)
       size(x, COLM), size(x, ROWM), back(x, COLM), fwd(x, ROWM),
       currentfont <= 0 ? 12*PT : FontSize(currentfont, x),
       width(line_gap(save_style(x))), width(space_gap(save_style(x))));
-  else if (BackEnd == PDF)
+  else if( BackEnd == PDF )
   {
-	PDFPage_SetVars(size(x, COLM), size(x, ROWM), back(x, COLM), fwd(x, ROWM),
-          currentfont <= 0 ? 12*PT : FontSize(currentfont, x),
-          width(line_gap(save_style(x))), width(space_gap(save_style(x))));
+    PDFPage_SetVars(size(x, COLM), size(x, ROWM), back(x, COLM), fwd(x, ROWM),
+      currentfont <= 0 ? 12*PT : FontSize(currentfont, x),
+      width(line_gap(save_style(x))), width(space_gap(save_style(x))));
   }
 
   debug0(DRS, D, "DefineGraphicNames returning.");
@@ -1289,7 +1331,7 @@ void DefineGraphicNames(OBJECT x)
 
 void SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
 {
-  if (BackEnd == PDF)
+  if( BackEnd == PDF )
   {
     /* do it bit by bit */
     SaveGraphicState(x);
@@ -1300,7 +1342,6 @@ void SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
   }
 
   assert( BackEnd == POSTSCRIPT, "SaveTranslateDefineSave: BackEnd!" );
-
   if( gs_stack_top >= MAX_GS - 1 || font(save_style(x)) != currentfont ||
       colour(save_style(x))!=currentcolour )
   {
@@ -1343,6 +1384,7 @@ void SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
   }
 } /* end SaveTranslateDefineSave */
 
+
 /*@::PrintGraphicInclude()@***************************************************/
 /*                                                                           */
 /*  PrintGraphicInclude(x, colmark, rowmark)                                 */
@@ -1379,9 +1421,9 @@ void PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
 
   if (BackEnd == PDF)
   {
-  	Error(24, 8, "PrintGraphicInclude: cannot include EPSF in a PDF file. File ignored.",
-  		WARN, &fpos(x));
-  	return;
+    Error(24, 8, "PrintGraphicInclude: cannot include EPSF in a PDF file. File ignored.",
+      WARN, &fpos(x));
+    return;
   }
 
   assert( BackEnd == POSTSCRIPT, "PrintGraphicInclude: BackEnd!" );
@@ -1397,7 +1439,7 @@ void PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
   if( font(save_style(x)) != currentfont )
   { currentfont = font(save_style(x));
     currentxheight2 = FontHalfXHeight(currentfont);
-    fprintf(out_fp, "%hd %s\n", FontSize(currentfont, x), FontName(currentfont));
+    fprintf(out_fp, "%hd %s\n", FontSize(currentfont,x), FontName(currentfont));
   }
 
   /* if colour is different to previous word then print change */

@@ -18,10 +18,10 @@ ignore all white space in its input, even between two objects.  (The
 simplest way to restore the effect of white space to part of an equation
 is to enclose that part in a @Code "@Font" symbol.)
 @PP
-Every symbol provided by {@Code "@Eq"} has a {@I {full name}}, which
+Every symbol provided by {@Code "@Eq"} has a @I {full name}, which
 full.name @Index { full name of equation symbol }
 denotes the symbol without any space attached.  Many symbols also
-have a {@I {short name}}, which denotes the same symbol with what
+have a @I {short name}, which denotes the same symbol with what
 short.name @Index { short name of equation symbol }
 {@Code "@Eq"} considers to be an appropriate amount of space for that
 symbol attached to it.  For example, @Eq { lessequal } has full name

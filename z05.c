@@ -1,7 +1,7 @@
 /*@z05.c:Read Definitions:ReadFontDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -256,12 +256,22 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case KERN_SHRINK:
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+    case HSPAN:
+    case VSPAN:
     case PADJUST:
     case HADJUST:
     case VADJUST:
     case ROTATE:
+    case BACKGROUND:
+    case RAW_VERBATIM:
+    case VERBATIM:
     case CASE:
     case YIELD:
     case BACKEND:
@@ -279,13 +289,16 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case CURR_FACE:
     case COMMON:
     case RUMP:
+    case MELD:
     case INSERT:
+    case ONE_OF:
     case NEXT:
     case PLUS:
     case MINUS:
     case TAGGED:
     case INCGRAPHIC:
     case SINCGRAPHIC:
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     case NOT_REVEALED:
 
@@ -463,12 +476,19 @@ static OBJECT ReadMacro(OBJECT *token, OBJECT curr_encl, OBJECT encl)
     *token = t;
     return nilobj;
   }
-  res = InsertSym(string(t), MACRO, &fpos(t), 0, FALSE, TRUE,0,curr_encl,nilobj);
+  res = InsertSym(string(t), MACRO, &fpos(t), 0, FALSE,TRUE,0,curr_encl,nilobj);
   if( curr_encl != encl )  visible(res) = TRUE;
   UnSuppressScope();
 
+  /* find alternative names for this symbol */
+  Dispose(t);  t = LexGetToken();
+  while( is_word(type(t)) )
+  {
+    InsertAlternativeName(string(t), res, &fpos(t));
+    Dispose(t);  t = LexGetToken();
+  }
+
   /* find opening left brace */
-  t = LexGetToken();
   if( type(t) != LBR )
   { Error(5, 25, "%s ignored (opening %s is missing)",
       WARN, &fpos(t), KW_MACRO, KW_LBR);
@@ -504,7 +524,7 @@ static OBJECT ReadMacro(OBJECT *token, OBJECT curr_encl, OBJECT encl)
 
 void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
 { OBJECT t, res, res_target, export_list, import_list, link, y, z;
-  OBJECT curr_encl;  BOOLEAN compulsory_par;
+  OBJECT curr_encl;  BOOLEAN compulsory_par, has_import_encl;
   t = *token;
 
   while( res_type==LOCAL || is_string(t, KW_NAMED) || is_string(t, KW_IMPORT) )
@@ -541,6 +561,7 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
     /* get import or extend list and change scope appropriately */
     BodyParNotAllowed();
     New(import_list, ACAT);
+    has_import_encl = FALSE;
     if( is_string(t, KW_IMPORT) )
     { Dispose(t);
       t = LexGetToken();
@@ -560,6 +581,7 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
 	    {
 	    *** */
 	      PushScope(actual(t), FALSE, TRUE);
+	      if( actual(t) == encl )  has_import_encl = TRUE;
 	      Link(import_list, t);
 	    /* ***
 	    }
@@ -584,7 +606,11 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
 	       (type(t)==WORD && !is_string(t,KW_EXPORT) && !is_string(t,KW_DEF)
 	       && !is_string(t, KW_MACRO)) )
       {	if( type(t) == CLOSURE )
-	{ if( type(actual(t)) == LOCAL )
+	{ if( imports(actual(t)) != nilobj )
+	  { Error(5, 48, "%s has %s clause, so cannot be extended",
+	      WARN, &fpos(t), SymName(actual(t)), KW_IMPORT);
+	  }
+	  else if( type(actual(t)) == LOCAL )
 	  { PushScope(actual(t), FALSE, FALSE);
 	    curr_encl = actual(t);
             debug1(DRD, D, "  curr_encl = %s", SymName(curr_encl));
@@ -610,7 +636,8 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
     { Dispose(t);
       SuppressScope();
       t = LexGetToken();
-      while( is_word(type(t)) && !is_string(t, KW_DEF) )
+      while( is_word(type(t)) && !is_string(t, KW_DEF) && !is_string(t, KW_IMPORT)
+	&& !is_string(t, KW_MACRO) && !is_string(t, KW_EXTEND) )
       { Link(export_list, t);
 	t = LexGetToken();
       }
@@ -655,11 +682,29 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
       res = InsertSym(string(t), res_type, &fpos(t), DEFAULT_PREC,
 		FALSE, FALSE, 0, curr_encl, nilobj);
       if( curr_encl != encl )  visible(res) = TRUE;
+      if( has_import_encl )
+      {
+	imports_encl(res) = TRUE;
+	debug1(DCE, D, "  setting import_encl(%s) to TRUE", SymName(res));
+      }
       if( compulsory_par )
       { has_compulsory(encl)++;
 	is_compulsory(res) = TRUE;
       }
-      t = LexGetToken();
+      Dispose(t);  t = LexGetToken();
+
+      /* find alternative names for this symbol */
+      while( is_word(type(t)) && !is_string(t, KW_NAMED) &&
+	!is_string(t, KW_IMPORT) &&
+	!is_string(t, KW_FORCE) && !is_string(t, KW_INTO) &&
+	!is_string(t, KW_HORIZ) && !is_string(t, KW_PRECEDENCE) &&
+	!is_string(t, KW_ASSOC) && !is_string(t, KW_LEFT) &&
+	!is_string(t, KW_RIGHT) && !is_string(t, KW_BODY) &&
+	!is_string(t, KW_LBR) && !is_string(t, KW_BEGIN) )
+      {
+	InsertAlternativeName(string(t), res, &fpos(t));
+	Dispose(t);  t = LexGetToken();
+      }
 
       /* find force, if any */
       if( is_string(t, KW_FORCE) )

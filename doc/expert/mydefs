@@ -15,6 +15,7 @@
    ###################################################
 
    def @@BackEnd           { @Code "@BackEnd"           }
+   def @@Background        { @Code "@Background"        }
    def @@Begin             { @Code "@Begin"             }
    def @@Break             { @Code "@Break"             }
    def @@Case              { @Code "@Case"              }
@@ -34,9 +35,11 @@
    def @@HCover            { @Code "@HCover"            }
    def @@HContract         { @Code "@HContract"         }
    def @@HExpand           { @Code "@HExpand"           }
+   def @@HLimited          { @Code "@HLimited"          }
    def @@High              { @Code "@High"              }
    def @@HScale            { @Code "@HScale"            }
    def @@HShift            { @Code "@HShift"            }
+   def @@HSpan             { @Code "@HSpan"             }
    def @@Include           { @Code "@Include"           }
    def @@IncludeGraphic    { @Code "@IncludeGraphic"    }
    def @@KernShrink        { @Code "@KernShrink"        }
@@ -47,17 +50,21 @@
    def @@LInput            { @Code "@LInput"            }
    def @@LUse              { @Code "@LUse"              }
    def @@LVis              { @Code "@LVis"              }
+   def @@Meld              { @Code "@Meld"              }
    def @@Merge             { @Code "@Merge"             }
    def @@Moment            { @Code "@Moment"            }
    def @@Next              { @Code "@Next"              }
    def @@NotRevealed       { @Code "@NotRevealed"       }
    def @@Null              { @Code "@Null"              }
    def @@OneCol            { @Code "@OneCol"            }
+   def @@OneOf             { @Code "@OneOf"             }
    def @@OneRow            { @Code "@OneRow"            }
    def @@Open              { @Code "@Open"              }
    def @@PAdjust           { @Code "@PAdjust"           }
    def @@PageLabel         { @Code "@PageLabel"         }
+   def @@PlainGraphic      { @Code "@PlainGraphic"    }
    def @@PrependGraphic    { @Code "@PrependGraphic"    }
+   def @@RawVerbatim       { @Code "@RawVerbatim"       }
    def @@Rotate            { @Code "@Rotate"            }
    def @@Rump              { @Code "@Rump"              }
    def @@Insert            { @Code "@Insert"            }
@@ -65,6 +72,9 @@
    def @@SetColor          { @Code "@SetColor"          }
    def @@SetColour         { @Code "@SetColour"         }
    def @@Space             { @Code "@Space"             }
+   def @@StartHSpan        { @Code "@StartHSpan"        }
+   def @@StartVSpan        { @Code "@StartVSpan"        }
+   def @@StartHVSpan       { @Code "@StartHVSpan"       }
    def @@SysDatabase       { @Code "@SysDatabase"       }
    def @@SysInclude        { @Code "@SysInclude"        }
    def @@SysIncludeGraphic { @Code "@SysIncludeGraphic" }
@@ -77,8 +87,11 @@
    def @@VContract         { @Code "@VContract"         }
    def @@VCover            { @Code "@VCover"            }
    def @@VExpand           { @Code "@VExpand"           }
+   def @@Verbatim          { @Code "@Verbatim"          }
+   def @@VLimited          { @Code "@VLimited"          }
    def @@VScale            { @Code "@VScale"            }
    def @@VShift            { @Code "@VShift"            }
+   def @@VSpan             { @Code "@VSpan"             }
    def @@Wide              { @Code "@Wide"              }
    def @@Yield             { @Code "@Yield"             }
    def @@YUnit             { @Code "@YUnit"             }

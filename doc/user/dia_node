@@ -73,7 +73,7 @@ the diagram:
     @Node @I b
 }
 }
-These options also appear in the setup file ({@Code ddoc} or whatever);
+These options also appear in the setup file ({@Code diag});
 if set there, they apply to every node in every diagram of the
 document.  As the number of nodes increases, it becomes very tedious and
 error-prone to duplicate options at all the nodes.  Giving each option
@@ -500,8 +500,8 @@ into each node:  an invisible object with zero width and height equal to
 }
 }
 The @Code vstrut option may be {@Code yes}, {@Code no} (the default value), or
-a length, meaning to insert a strut of this height.  So @Code "strut { yes }"
-is equivalent to {@Code "strut { 1.0f }"}.
+a length, meaning to insert a strut of this height.  So @Code "vstrut { yes }"
+is equivalent to {@Code "vstrut { 1.0f }"}.
 @PP
 There are {@Code halign}, {@Code hsize}, {@Code hindent}, and {@Code hstrut}
 options which work horizontally exactly as {@Code valign}, {@Code vsize},

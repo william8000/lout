@@ -1,7 +1,7 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -78,6 +78,8 @@ FULL_CHAR *EchoStyle(STYLE *style)
   { StringCat(res, AsciiToFull(":z="));
     StringCat(res, EchoLength(zunit(*style)));
   }
+  if( nobreakfirst(*style) ) StringCat(res, AsciiToFull(":NBF"));
+  if( nobreaklast(*style) ) StringCat(res, AsciiToFull(":NBL"));
   StringCat(res, AsciiToFull("]"));
   return res;
 } /* end EchoStyle */
@@ -198,6 +200,14 @@ static void changebreak(STYLE *style, OBJECT x)
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_CENTRE;
     else if( StringEqual(string(x), STR_BREAK_RLINES) )
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_RIGHT;
+    else if( StringEqual(string(x), STR_BREAK_NOFIRST) )
+	nobreakfirst(*style) = TRUE;
+    else if( StringEqual(string(x), STR_BREAK_FIRST) )
+	nobreakfirst(*style) = FALSE;
+    else if( StringEqual(string(x), STR_BREAK_NOLAST) )
+	nobreaklast(*style) = TRUE;
+    else if( StringEqual(string(x), STR_BREAK_LAST) )
+	nobreaklast(*style) = FALSE;
     else Error(11, 5, "unknown option to %s symbol (%s)",
 	   WARN, &fpos(x), KW_BREAK, string(x));
   }

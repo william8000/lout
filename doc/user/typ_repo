@@ -3,7 +3,8 @@
    @Tag { reports }
 @Begin
 @PP
-To make a technical report, start off with the @Code "report" setup
+To make a technical report,
+start off with the @Code "report" setup
 reports. @Index { reports }
 technical.reports. @Index { technical reports }
 report. @Index @Code "@Report"
@@ -26,13 +27,28 @@ file and the @Code "@Report" symbol:
 "    @ColumnNumber { 1 }"
 "    @FirstPageNumber { 1 }"
 "    @OptimizePages { No }"
+"    @AbstractDisplay { Yes }"
+"    @AbstractTitle { Abstract }"
+"    @Abstract {}"
 "//"
 }
-This shows all the options of {@Code "@Report"} with their default
-values.  As usual with options, they may be given in any order, and
-only the ones whose values need to be changed need be given at all.  The
-meaning of the @Code "//" symbol after the last option is beyond our
-scope, but disaster will ensue if it is forgotten.
+This shows all the options of {@Code "@Report"}
+@FootNote {
+Version 3.13 of Lout is not completely upwardly compatible with
+previous versions in its handling of technical reports.  The change
+concerns the abstract, and if you see the error message
+@ID @Code "symbol @Abstract unknown or misspelt"
+you probably need to convert your document.  To convert an older
+document to Version 3.13, move any @Code "@Abstract" from after the
+@Code "//" to before it, delete any options to the @Code "@Abstract"
+symbol, and delete any initial paragraph symbol within the abstract.
+You can use the @Code "@AbstractTitle" option described in this section
+to change the title of the abstract.
+}
+with their default values.  As usual with options, they may be given in
+any order, and only the ones whose values need to be changed need be
+given at all.  The meaning of the @Code "//" symbol is beyond our scope,
+but disaster will ensue if it is forgotten.
 @PP
 The @Code "@Title" option holds the title of the report.  It will be
 printed using the @Code clines paragraph breaking style (Section
@@ -68,10 +84,10 @@ taken to be a date and printed:
 A good plan is to use @Code "@DateLine { Yes }" until
 the report is finalized.
 @PP
-The remaining options are a selection of setup file options (Section
-{@NumberOf setup}) that frequently need to be changed.  If your changes
-to the overall formatting are confined to these options, you can change
-them here and avoid having your own setup file.  If you already have
+The remaining options (except {@Code "@Abstract"}) are setup file options
+(Section {@NumberOf setup}) that frequently need to be changed.  If your
+changes to the overall formatting are confined to these options, you can
+change them here and avoid having your own setup file.  If you already have
 your own setup file, change them in either place and omit them in
 the other.
 @PP
@@ -79,7 +95,9 @@ If @Code "@CoverSheet" is {@Code Yes}, an unnumbered cover
 cover.sheet. @Index @Code "@CoverSheet"
 sheet will be produced containing the title, author, institution,
 abstract, and dateline.  Otherwise they will appear on the
-first page.
+first page.  The `cover sheet' is in reality a sequence of Intro pages
+(Section {@NumberOf headers}), numbered by default with Roman numerals
+on pages after the first.
 @PP
 In order to get a table of contents, it is necessary to use your
 own setup file (Section {@NumberOf setup} explains how to do this)
@@ -93,7 +111,7 @@ effective if @Code "@CoverSheet" is {@Code No}, since a separate cover
 sheet and separate pages for the table of contents would leave nothing on
 the first page.
 @PP
-@Code "@InitialFont" is the font of bulk of the report,
+@Code "@InitialFont" is the font of the bulk of the report,
 and should contain a family, a face, and a size.  The default
 value selects the Times family, the Base face, and the 12 point size.
 @PP
@@ -102,7 +120,10 @@ the bulk of the report.  It should have three parts:  a paragraph
 breaking style ({@Code adjust}, {@Code ragged}, etc.), an inter-line
 spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
 double spacing, and so on), and either @Code "hyphen" or
-@Code "nohyphen" for turning hyphenation on or off.
+@Code "nohyphen" for turning hyphenation on or off.  It may also
+have @Code "nobreakfirst" or @Code "nobreaklast" (or both), meaning
+to disallow a page break after the first line of a paragraph, or
+before the last, respectively.
 @PP
 @Code "@InitialSpace" determines how Lout treats white space between
 two objects, as described in Section
@@ -115,7 +136,7 @@ value may be {@Code Portrait} (the default), {@Code Landscape},
 Section {@NumberOf pagesize} for further details.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
-footers throughout the report.  Its value may be {@Code None},
+footers.  Its value may be {@Code None},
 {@Code Simple}, {@Code Titles}, or {@Code NoTitles}.  Section
 {@NumberOf headers} has the details, but just briefly, {@Code None}
 produces no page headers, {@Code Simple} produces a centred page number
@@ -143,28 +164,29 @@ overall situation and try to minimize the ugliness, using the @TeX
 optimal paragraph breaking algorithm.  It takes two runs to do this,
 with intermediate results stored in Lout's cross reference database
 (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.  It is possible for this
-page layout optimizer to cycle, never settling on a single final best
-version; this is usually caused by footnotes or floating figures inserted
-at points which end up near page boundaries.
+it, which might be wise after major changes.  It is possible for the
+optimizer to cycle, never settling on a single final best version; this
+is usually caused by footnotes or floating figures inserted at points
+which end up near page boundaries.
 @PP
-After the compulsory {@Code "//"} comes an optional abstract:
+Finally we have three options that control the abstract.
+@Code "@AbstractDisplay" may be @Code { Yes } or {@Code No};
+it determines whether the abstract is displayed (occupying
+the full page width except for an indent at each side like a quoted
+display) or inline (occupying the column width).
+@Code "@AbstractTitle" is the title of the abstract; its default
+value is @Code Abstract or its equivalent in the current language.
 abstract. @Index @Code "@Abstract"
-@ID @OneRow @Code {
-"@Abstract"
-"    @Title { Abstract }"
-"@Begin"
-"@LP"
-"..."
-"@End @Abstract"
-}
-This will be printed either on the cover sheet or on the first page,
-depending on the @Code "@CoverSheet" option of @Code "@Report" (see
-above).  The default value of @Code "@Title" is `Abstract' in the
-current language, so you can usually omit {@Code "@Title"}.
+Finally, @Code "@Abstract" contains the abstract itself; it may be
+empty or absent, in which case there will be no abstract.
 @PP
-Next comes the body of the report in the form of a sequence of
-sections:
+The abstract may contain footnotes in the usual way.  Regrettably, each
+footnote in the abstract will generate one spurious `unresolved cross
+reference' error message that does not go away.  This slight problem
+might be fixed in the future.
+@PP
+After the compulsory {@Code "//"} comes the report body in the
+form of a sequence of sections:
 section.reports @SubIndex { in reports }
 @ID @OneRow @Code {
 "@Section"
@@ -258,14 +280,14 @@ is much better to divide the report into multiple files, following the
 method given in Section {@NumberOf organizing}.
 @PP
 In addition to the {@Code "@Title"} option, each large-scale structure
-symbol ({@Code "@Abstract"}, {@Code "@Section"}, {@Code "@SubSection"},
-{@Code "@SubSubSection"}, {@Code "@Appendix"}, {@Code "@SubAppendix"},
+symbol ({@Code "@Section"}, {@Code "@SubSection"}, {@Code "@SubSubSection"},
+{@Code "@Appendix"}, {@Code "@SubAppendix"},
 and {@Code "@SubSubAppendix"}) has a @Code "@Tag" option for cross
 referencing (Section {@NumberOf cross}), an @Code "@InitialLanguage"
 option for changing the language of that part of the document, and a
 @Code "@RunningTitle" option which will be used in place of @Code "@Title"
-in running headers if given.  This last is useful when the full title is
-rather long.
+in running headers if given.  @Code "@RunningTitle" is useful when the
+full title is rather long.
 @PP
 The features described in other chapters are all available within
 technical reports.  To get a table of contents, change the @Code
@@ -276,14 +298,14 @@ ordinary documents.  To get an index, again you need only change the
 references appear at the end of the report.  Figures and tables are
 numbered 1, 2, 3, etc.
 @PP
-Within the @Code "report" setup file there is a @Code "@ReportLayout"
+Within the @Code "report" setup file there is a @Code "@ReportSetup"
 symbol whose options control the appearance of features specific to
-report.layout @Index @Code "@ReportLayout"
+report.setup @Index @Code "@ReportSetup"
 reports (in other words, the features described in this section).  Section
 {@NumberOf setup} explains setup files and their options in general; here
 is a representative sample of these options, showing their default values:
 @ID @OneRow @Code {
-"@Use { @ReportLayout"
+"@Use { @ReportSetup"
 "    # @CoverSheet { Yes }"
 "    # @DateLine { No }"
 "    # @ReferencesBeforeAppendices { No }"

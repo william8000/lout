@@ -38,10 +38,9 @@ option to the name of the paper you use:
 }
 This will automatically assign the widths and heights shown above to
 the @Code "@PageWidth" and @Code "@PageHeight" options, so you don't
-have to worry about those options.
-@PP
-If your paper size is not on this list, set @Code "@PageType" to
-@Code Other and supply your own width and height:
+have to worry about those options.  If your paper size is not on this
+list, set @Code "@PageType" to @Code Other and supply your own width
+and height:
 page.width @Index @Code "@PageWidth"
 page.height @Index @Code "@PageHeight"
 @ID @Tab
@@ -55,8 +54,7 @@ page.height @Index @Code "@PageHeight"
 The width and height may each be any length (Section {@NumberOf objects}),
 and do not have to be in points.
 @PP
-The basic page orientations are @I portrait (shorter side at the top)
-and @I landscape (longer side at the top):
+The basic page orientations are @I portrait and @I landscape:
 page.orientation @Index @Code "@PageOrientation"
 @ID @Tab
     @Fmta { @Col 8c @Wide @Code A ! @Col B }
@@ -87,7 +85,7 @@ the basic ones:
     B { @Box 1.4c @Wide 1.0c @High { //1rt &1rt 180d @Rotate Hello } }
 }
 @Code ReverseLandscape might be useful when post-processing the PostScript output
-to print two landscape pages per sheet of paper.  In addition to being available
-in the setup file, the @Code "@PageOrientation" symbol is also available at the
-start of a document, like {@Code "@InitialFont"} and {@Code "@PageHeaders"}.
+to print two landscape pages per sheet.  The @Code "@PageOrientation" symbol is
+available at the start of a document, as well as in the setup file, like
+{@Code "@InitialFont"} and {@Code "@PageHeaders"}.
 @End @Section

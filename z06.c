@@ -1,7 +1,7 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -410,12 +410,20 @@ static BOOLEAN Reduce(void)
     case KERN_SHRINK:
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+    case HSPAN:
+    case VSPAN:
     case PADJUST:
     case HADJUST:
     case VADJUST:
     case ROTATE:
+    case BACKGROUND:
     case YIELD:
     case BACKEND:
     case XCHAR:
@@ -432,15 +440,20 @@ static BOOLEAN Reduce(void)
     case CURR_FACE:
     case COMMON:
     case RUMP:
+    case MELD:
     case INSERT:
+    case ONE_OF:
     case NEXT:
     case PLUS:
     case MINUS:
     case TAGGED:
     case INCGRAPHIC:
     case SINCGRAPHIC:
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     case OPEN:
+    case RAW_VERBATIM:
+    case VERBATIM:
 
 	if( has_rpar(actual(op)) )
 	{ s2 = PopObj();
@@ -552,6 +565,7 @@ static BOOLEAN Reduce(void)
 	}
 	else
 	{ if( actual(op) != actual(TokenTop) )
+	  {
 	    if( actual(op) == StartSym )
 	      Error(6, 7, "%s %s appended at end of file to match %s at%s",
 		WARN, &fpos(op), KW_END, SymName(actual(TokenTop)),
@@ -567,6 +581,7 @@ static BOOLEAN Reduce(void)
 	        WARN, &fpos(op), KW_END, SymName(actual(op)),
 		KW_END, SymName(actual(TokenTop)),
 		KW_BEGIN, EchoFilePos(&fpos(TokenTop)) );
+	  }
 	  Dispose( PopToken() );
 	}
 	Dispose(op);
@@ -774,35 +789,34 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
   t = LexGetToken();
   if( defs_allowed )
   { ReadDefinitions(&t, encl, LOCAL);
-    if( encl == StartSym ) /* transition point from defs to content */
+
+    /* if error in definitions, stop now */
+    if( ErrorSeen() )
+      Error(6, 14, "exiting now", FATAL, &fpos(t));
+
+    if( encl == StartSym )
     {
-      /* turn on debugging now */
-#if DEBUG_ON
-      debug_now = TRUE;
-#endif
-      debugcond4(DOP, DD, debug_now, "[ Parse (first) (%s, %s, %s, %s)",
-	EchoToken(*token), SymName(encl), bool(defs_allowed),
-	bool(transfer_allowed));
-
-      /* if error in definitions, stop now */
-      if( ErrorSeen() )
-	Error(6, 14, "exiting now", FATAL, &fpos(t));
-
-      /* load cross-references from previous run, open new cross refs */
-      if( AllowCrossDb )
-      {	NewCrossDb = DbCreate(MakeWord(WORD, string(cross_name), no_fpos));
-	OldCrossDb = DbLoad(cross_name, SOURCE_PATH, FALSE, nilobj);
-      }
-      else OldCrossDb = NewCrossDb = nilobj;
-
-      /* tidy up and possibly print symbol table */
-      FlattenUses();
-      ifdebug(DST, D, DebugObject(StartSym));
-
-      /* read @Use, @Database, and @Prepend commands and construct env */
+      /* read @Use, @Database, and @Prepend commands and defs and construct env */
       New(env, ENV);
       for(;;)
-      {	if( type(t) == USE )
+      {
+	if( type(t) == WORD && (
+	    StringEqual(string(t), KW_DEF)     ||
+	    StringEqual(string(t), KW_FONTDEF) ||
+	    StringEqual(string(t), KW_LANGDEF) ||
+	    StringEqual(string(t), KW_MACRO)   ||
+	    StringEqual(string(t), KW_IMPORT)  ||
+	    StringEqual(string(t), KW_EXTEND)  ||
+	    StringEqual(string(t), KW_EXPORT)  ) )
+	{
+	  ReadDefinitions(&t, encl, LOCAL);
+
+          /* if error in definitions, stop now */
+          if( ErrorSeen() )
+	    Error(6, 39, "exiting now", FATAL, &fpos(t));
+
+	}
+	else if( type(t) == USE )
 	{
 	  OBJECT crs, res_env;  STYLE style;
 	  Dispose(t);  t = LexGetToken();
@@ -812,7 +826,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 	  y = Parse(&t, encl, FALSE, FALSE);
 	  if( is_cross(type(y)) )
 	  { OBJECT z;
-	    Child(z, Down(y))
+	    Child(z, Down(y));
 	    if( type(z) == CLOSURE )
 	    { crs = nilobj;
 	      y = CrossExpand(y, env, &style, &crs, &res_env);
@@ -853,6 +867,26 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 	}
 	else break;
       }
+
+      /* transition point from defs to content; turn on debugging now */
+#if DEBUG_ON
+      debug_now = TRUE;
+#endif
+      debugcond4(DOP, DD, debug_now, "[ Parse (first) (%s, %s, %s, %s)",
+	EchoToken(*token), SymName(encl), bool(defs_allowed),
+	bool(transfer_allowed));
+
+      /* load cross-references from previous run, open new cross refs */
+      if( AllowCrossDb )
+      {	NewCrossDb = DbCreate(MakeWord(WORD, string(cross_name), no_fpos));
+	OldCrossDb = DbLoad(cross_name, SOURCE_PATH, FALSE, nilobj);
+      }
+      else OldCrossDb = NewCrossDb = nilobj;
+
+      /* tidy up and possibly print symbol table */
+      FlattenUses();
+      ifdebug(DST, DD, DebugObject(StartSym));
+
       TransferInit(env);
       debug0(DMA, D, "at end of definitions:");
       ifdebug(DMA, D, DebugMemory());
@@ -950,12 +984,20 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case KERN_SHRINK:
       case HCONTRACT:
       case VCONTRACT:
+      case HLIMITED:
+      case VLIMITED:
       case HEXPAND:
       case VEXPAND:
+      case START_HVSPAN:
+      case START_HSPAN:
+      case START_VSPAN:
+      case HSPAN:
+      case VSPAN:
       case PADJUST:
       case HADJUST:
       case VADJUST:
       case ROTATE:
+      case BACKGROUND:
       case CASE:
       case YIELD:
       case BACKEND:
@@ -973,16 +1015,45 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case CURR_FACE:
       case COMMON:
       case RUMP:
+      case MELD:
       case INSERT:
+      case ONE_OF:
       case NEXT:
       case TAGGED:
       case INCGRAPHIC:
       case SINCGRAPHIC:
+      case PLAIN_GRAPHIC:
       case GRAPHIC:
 
 	/* clean up left context of t (these ops are all right associative) */
 	Shift(t, precedence(t), RIGHT_ASSOC,
-		has_lpar(actual(t)), has_rpar(actual(t)));
+	  has_lpar(actual(t)), has_rpar(actual(t)));
+	t = LexGetToken();
+	break;
+
+
+      case VERBATIM:
+      case RAW_VERBATIM:
+
+	/* clean up left context of t */
+	x = t;
+	Shift(t, precedence(t), RIGHT_ASSOC,
+	  has_lpar(actual(t)), has_rpar(actual(t)));
+	
+	/* check for opening brace or begin following, and shift it onto the stacks */
+	t = LexGetToken();
+	if( type(t) != BEGIN && type(t) != LBR )
+	  Error(6, 40, "right parameter of %s or %s must be enclosed in braces",
+	    FATAL, &fpos(x), KW_VERBATIM, KW_RAWVERBATIM);
+        actual(t) = type(x) == VERBATIM ? VerbatimSym : RawVerbatimSym;
+	Shift(t, LBR_PREC, 0, FALSE, TRUE);
+
+	/* read right parameter and add it to the stacks, and reduce */
+	y = LexScanVerbatim( (FILE *) NULL, type(t) == BEGIN, &fpos(t),
+	  type(x) == RAW_VERBATIM);
+	ShiftObj(y, PREV_OBJ);
+
+	/* carry on, hopefully to the corresponding right brace or @End @Verbatim */
 	t = LexGetToken();
 	break;
 
@@ -992,7 +1063,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 
 	/* clean up left context of t (these ops are all left associative) */
 	Shift(t, precedence(t), LEFT_ASSOC,
-		has_lpar(actual(t)), has_rpar(actual(t)));
+	  has_lpar(actual(t)), has_rpar(actual(t)));
 	t = LexGetToken();
 	break;
 
@@ -1025,6 +1096,16 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 	{ x = LexGetToken();
 	  if( type(x) == CLOSURE )
 	  { actual(t) = actual(x);
+	    Dispose(x);
+	    x = nilobj;
+	  }
+	  else if( type(x) == VERBATIM )
+	  { actual(t) = VerbatimSym;
+	    Dispose(x);
+	    x = nilobj;
+	  }
+	  else if( type(x) == RAW_VERBATIM )
+	  { actual(t) = RawVerbatimSym;
 	    Dispose(x);
 	    x = nilobj;
 	  }

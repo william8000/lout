@@ -33,7 +33,7 @@ in-paragraph concatenation symbol @Code "&" produces horizontal concatenation
 within a paragraph; its special properties are treated in detail at the
 end of this section.
 @PP
-The concatenation symbols in any one family are {@I{mutually associative}},
+The concatenation symbols in any one family are @I { mutually associative },
 which means that
 @ID {
 @Code "{"  @I x  {@Code "|"}{@I p}  @I y  @Code "}"  {@Code "|"}{@I q}  @I z
@@ -49,7 +49,7 @@ redundant and can be misleading.  The result of the complete sequence of
 concatenations will be called the {@I{whole concatenation object}}, and
 the objects which make it up will be called the {@I components}.
 @PP
-One mark is designated as the {@I {principal mark}}, usually the mark of
+One mark is designated as the @I { principal mark }, usually the mark of
 principal.mark @Index { Principal mark }
 the first component.  A later mark can be chosen for this honour by
 attaching {@Code "^"} to the preceding concatenation symbol.  See Section
@@ -131,7 +131,7 @@ or its height if the symbol is vertical concatenation.
 }
       @Rowa A { r } B {
 One @Code r equals one @Code b minus one {@Code w}.  This unit is used
-for centring and right justification.
+for centring, and for left and right justification.
 }
       @Rowa A { d } B {
 Degrees.  This unit may only be used with the @Code "@Rotate" symbol.
@@ -266,13 +266,21 @@ concatenation object.  It is the main user of the @Code b and @Code r
 units of measurement; for example, @Code "|1rt" will right-justify the
 following component, and @Code "|0.5rt" will centre it.
 @PP
+The value @Code "|0rt" separating the first and second items in a
+sequence of horizontally concatenated objects is somewhat special in
+that it denotes left justification of the object to its left in the
+available space.  This is identical with @Code "|0ie" when the object to
+the left also has the principal mark; but when it does not, @Code "|0rt"
+will cause the object to the left to appear further to the left than it
+would otherwise have done, if space to do so is available.
+@PP
 A gap is optionally concluded with an indication of unbreakability,
 which is a letter @Code "u" appended to the gap.  A paragraph will
-never be broken at an unbreakable gap.  In principle, a galley
-should not break at such a gap either, but, at present, a @Code "u"
-appended to a galley gap is ignored by the regular galley breaking
-algorithm.  However it is taken into account when calculating optimal
-galley breaks.
+never be broken at an unbreakable gap, nor will a galley be broken
+across two targets at such a gap.  Basser Lout's implementation is
+slightly defective in that it ignores any unbreakable indication
+in the gap separating the first component promoted into any target
+from the second.
 @PP
 When two objects are separated only by zero or more white space
 white.space.when @SubIndex { when significant }

@@ -1,7 +1,7 @@
 /*@z09.c:Closure Expansion:SearchEnv()@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -41,19 +41,19 @@
 
 OBJECT SearchEnv(OBJECT env, OBJECT sym)
 { OBJECT link, y;
-  debug2(DCE, DD, "SearchEnv(%s, %s)", EchoObject(env), SymName(sym));
+  debug2(DCE, DD, "[ SearchEnv(%s, %s)", EchoObject(env), SymName(sym));
   for(;;)
   {
     debug1(DCE, DDD, "  searching env %s", EchoObject(env));
     assert( env != nilobj && type(env) == ENV, "SearchEnv: env!" );
     if( Down(env) == env )
-    { debug0(DCE, DD, "SearchEnv returning <nilobj>");
+    { debug0(DCE, DD, "] SearchEnv returning <nilobj>");
       return nilobj;
     }
     Child(y, Down(env));
     assert( type(y) == CLOSURE, "SearchEnv: type(y) != CLOSURE!" );
     if( actual(y) == sym )
-    { debug1(DCE, DD, "SearchEnv returning %s", EchoObject(y));
+    { debug1(DCE, DD, "] SearchEnv returning %s", EchoObject(y));
       return y;
     }
     assert( LastDown(y) != y, "SearchEnv: LastDown(y) == y!" );
@@ -73,13 +73,13 @@ OBJECT SearchEnv(OBJECT env, OBJECT sym)
 
 OBJECT SetEnv(OBJECT x, OBJECT y)
 { OBJECT res;
-  debug1(DCE, D, "SetEnv( x, %s ), x =", EchoObject(y));
-  ifdebug(DCE, D, DebugObject(x));
+  debug1(DCE, DD, "SetEnv( x, %s ), x =", EchoObject(y));
+  ifdebug(DCE, DD, DebugObject(x));
   assert( x!=nilobj && type(x)==CLOSURE, "SetEnv: x==nilobj or not CLOSURE!" );
   assert( y==nilobj || type(y)==ENV, "SetEnv: y!=nilobj && type(y) != ENV!" );
   New(res, ENV);  Link(res, x);
   if( y != nilobj )  Link(res, y);
-  debug1(DCE, D, "SetEnv returning %s", EchoObject(res));
+  debug1(DCE, DD, "SetEnv returning %s", EchoObject(res));
   return res;
 } /* end SetEnv */
 
@@ -154,7 +154,7 @@ OBJECT DetachEnv(OBJECT x)
 OBJECT ClosureExpand(OBJECT x, OBJECT env, BOOLEAN crs_wanted,
 OBJECT *crs, OBJECT *res_env)
 { OBJECT link, y, res, prnt_env, par, prnt;
-  debug3(DCE, DD, "ClosureExpand( %s, %s, %s, crs, res_env )",
+  debug3(DCE, D, "[ ClosureExpand( %s, %s, %s, crs, res_env )",
     EchoObject(x), EchoObject(env), bool(crs_wanted));
   assert( type(x) == CLOSURE, "ClosureExpand given non-CLOSURE!");
   assert( predefined(actual(x)) == FALSE, "ClosureExpand given predefined!" );
@@ -196,14 +196,11 @@ OBJECT *crs, OBJECT *res_env)
 	  { debug0(DCR, DDD, "  calling SetEnv from ClosureExpand (a)");
 	    *res_env = SetEnv(prnt, nilobj);  DisposeObject(x);
 	  }
-
-	  /* *** new code for optimizing left and right parameters */
-	  else if( type(actual(x)) == RPAR || type(actual(x)) == LPAR )
-	  { *res_env = prnt_env;
-	    DisposeObject(x);
+	  else if( type(actual(x)) == NPAR && imports_encl(actual(x)) )
+	  { debug0(DCR, DDD, "  calling SetEnv from ClosureExpand (x)");
+	    AttachEnv(env, x);
+	    *res_env = SetEnv(x, nilobj);
 	  }
-	  /* *** end new code */
-
 	  else
 	  { AttachEnv(env, x);
 	    debug0(DCR, DDD, "  calling SetEnv from ClosureExpand (b)");
@@ -238,9 +235,9 @@ OBJECT *crs, OBJECT *res_env)
   }
 
   assert( *res_env!=nilobj && type(*res_env)==ENV, "ClosureExpand: *res_env!");
-  debug0(DCE, DD, "ClosureExpand returning, res =");
-  ifdebug(DCE, DD, DebugObject(res));
-  debug1(DCE, DD, "  environment = %s", EchoObject(*res_env));
+  debug0(DCE, D, "] ClosureExpand returning, res =");
+  ifdebug(DCE, D, DebugObject(res));
+  debug1(DCE, D, "  environment = %s", EchoObject(*res_env));
   return res;
 } /* end ClosureExpand */
 

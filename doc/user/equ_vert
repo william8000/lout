@@ -9,7 +9,7 @@ axis @Index { axis of equation }
 with respect to nearby objects.  In the Expert's Guide to Lout
 @Cite { $kingston1995lout.expert } this is called a @I { row mark },
 but we'll stick with axis.  Here are some examples with the axis
-shown as a dotted line:
+shown as a dashed line:
 @ID {
 @ShowHMark @Eq { x sup 2 }
 ||2c
@@ -18,7 +18,7 @@ shown as a dotted line:
 @ShowHMark @Eq { @ExA }
 }
 When these objects are placed adjacent to one another, their
-marks are merged, giving the correct vertical positioning:
+axes are merged, giving the correct vertical positioning:
 @ID @ShowHMark @Eq { x sup 2 + @ExA }
 Most of the time you do not need to think about vertical
 positioning, because for most objects there is just one

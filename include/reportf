@@ -1,21 +1,23 @@
 
 ###########################################################################
 #                                                                         #
-#  @ReportLayout extension to @DocumentLayout.                            #
+#  @ReportSetup extension to @DocumentSetup.                              #
 #                                                                         #
 #  Jeffrey H. Kingston                                                    #
 #  August 1994                                                            #
 #                                                                         #
-#  This package extends DocumentLayout with definitions for reports.      #
+#  This package extends DocumentSetup with definitions for reports.       #
 #                                                                         #
 ###########################################################################
 
-extend @DocumentLayout
-export @Report @Abstract @Section @Appendix
-def @ReportLayout
+extend @BasicSetup @DocumentSetup
+export @Report @Section @Appendix
+def @ReportSetup
     named @CoverSheet			{ Yes			}
     named @ContentsSeparate		{ No			}
     named @DateLine			{ No			}
+    named @AbstractDisplay		{ Yes			}
+    named @AbstractTitle		{ dft			}
     named @ReferencesBeforeAppendices	{ No			}
 
     named @AbstractWord			{ abstract		}
@@ -130,17 +132,17 @@ def @ReportLayout
     named @SubAppendixNumInDisplays	{ No			}
     named @SubSubAppendixNumInDisplays	{ No			}
 
-    named @SectionNumInFigures		{ Yes			}
+    named @SectionNumInFigures		{ No			}
     named @SubSectionNumInFigures	{ No			}
     named @SubSubSectionNumInFigures	{ No			}
-    named @AppendixNumInFigures		{ Yes			}
+    named @AppendixNumInFigures		{ No			}
     named @SubAppendixNumInFigures	{ No			}
     named @SubSubAppendixNumInFigures	{ No			}
 
-    named @SectionNumInTables		{ Yes			}
+    named @SectionNumInTables		{ No			}
     named @SubSectionNumInTables	{ No			}
     named @SubSubSectionNumInTables	{ No			}
-    named @AppendixNumInTables		{ Yes			}
+    named @AppendixNumInTables		{ No			}
     named @SubAppendixNumInTables	{ No			}
     named @SubSubAppendixNumInTables	{ No			}
 
@@ -209,8 +211,6 @@ def @ReportLayout
         //@SubSubAppendixGap   @SubSubAppendixList @Next num
     }
 
-    def @AbstractPlace { @Galley }
-
 
     #######################################################################
     #                                                                     #
@@ -219,6 +219,11 @@ def @ReportLayout
     #######################################################################
 
     def @Full force into { @FullPlace&&following } right x
+    {
+        x
+    }
+
+    def @NoForceFull into { @FullPlace&&following } right x
     {
         x
     }
@@ -246,6 +251,9 @@ def @ReportLayout
         named @ColumnNumber { @ColumnNumber }
         named @FirstPageNumber { @FirstPageNumber }
 	named @OptimizePages { @OptimizePages }
+	named @AbstractDisplay { @AbstractDisplay }
+	named @AbstractTitle { @AbstractTitle }
+	named @Abstract {}
     {
 
 	def @Cntr right x
@@ -273,11 +281,37 @@ def @ReportLayout
 	    //1.00v clines @Break @Cntr @DateValue
 	}
 
+	def @AbstractPart
+	{
+	    def @Title
+	    {
+		@AbstractHeadingFont @Font @AbstractHeadingBreak @Break
+		@AbstractHeadingFormat {
+		    @AbstractTitle @Dft { abstract @WordVal @AbstractWord }
+		}
+	    }
+
+	    @Abstract @Case {
+
+		"" @Yield @Null
+
+		else @Yield @AbstractDisplay @Case {
+		    
+		    No @Yield { @Title @DP @Abstract }
+
+		    Yes @Yield { |0.5rt @Title |
+				 @DP
+				 |@DisplayIndent @Abstract |@DisplayIndent
+				}
+		}
+	    }
+	}
+
 	def @ContentsPart
 	{
 	    //	|0.5rt @ContentsHeadingFont @Font @ContentsHeadingBreak @Break
 		       @ContentsHeadingFormat { contents @WordVal @ContentsWord } |
-	    //  @ContentsSection
+	    //@DisplayGap  @ContentsSection
 	    //  NonStart @Runner @MajorTitle {contents @WordVal @ContentsWord}
 	}
 
@@ -290,6 +324,7 @@ def @ReportLayout
                 type { Major }
                 initiallanguage { @InitialLanguage }
                 title { @RefHeading @RefListTitle }
+		sendheader { @Body }
                 headingfont { @ReferencesHeadingFont }
                 headingbreak { @ReferencesHeadingBreak }
                 headingformat { @ReferencesHeadingFormat @Body }
@@ -412,27 +447,6 @@ def @ReportLayout
 
         }
 
-        def @ReportBodyWithCoverSheet force into { @ColPlace&&preceding }
-	    named @Optimize { @OptimizePages }
-        {
-
-	    //			Start @Runner
-	    //@SectionGap	@ContentsPart
-	    //@SectionGap	@SectionList @FirstSectionNumber
-	    //@SectionGap	@ReferencesBeforeAppendices @Do {
-				    @MakeReferences @Do @ReferencesPart
-				}
-            //@AppendixGap	@AppendixList @FirstAppendixNumber
-	    //@SectionGap	@ReferencesBeforeAppendices @NoDo {
-				    @MakeReferences @Do @ReferencesPart
-				}
-	    //@SectionGap	@EndFigureList
-	    //@SectionGap	@EndNoteList 1
-	    //			@MakeIndexA @Do @IndexAPart
-	    //			@MakeIndexB @Do @IndexBPart
-	    //			@MakeIndex  @Do @IndexPart
-        }
-
 	def @ContentsGap
 	{
 	    @ContentsSeparate @Case {
@@ -441,12 +455,12 @@ def @ReportLayout
 	    }
 	}
 
-        def @ReportBodyWithoutCoverSheet force into { @ColPlace&&preceding }
+        def @ReportBodyWithoutCoverSheet force into { @ColPlace&&following }
 	    named @Optimize { @OptimizePages }
         {
 
-	    //			Start @Runner
-	    //			@AbstractPlace
+	      			Start @Runner
+	    //			@AbstractDisplay @NoDo @AbstractPart
 	    //@ContentsGap	@ContentsPart
 	    //@ContentsGap	@SectionList @FirstSectionNumber
 	    //@SectionGap	@ReferencesBeforeAppendices @Do {
@@ -463,6 +477,35 @@ def @ReportLayout
 	    //			@MakeIndex  @Do @IndexPart
         }
 
+        def @ReportCoverSheet into { @IntroColPlace&&preceding }
+	    named @Optimize { @OptimizePages }
+        {
+	    //                  Start @Runner
+	    //			@TitleMaterial
+	    //@DisplayGap	@DP @AbstractPart
+	}
+
+        def @ReportBodyWithCoverSheet force into { @ColPlace&&preceding }
+	    named @Optimize { @OptimizePages }
+        {
+
+	      	 		Start @Runner
+	    //@SectionGap	@ContentsPart
+	    //@SectionGap	@SectionList @FirstSectionNumber
+	    //@SectionGap	@ReferencesBeforeAppendices @Do {
+				    @MakeReferences @Do @ReferencesPart
+				}
+            //@AppendixGap	@AppendixList @FirstAppendixNumber
+	    //@SectionGap	@ReferencesBeforeAppendices @NoDo {
+				    @MakeReferences @Do @ReferencesPart
+				}
+	    //@SectionGap	@EndFigureList
+	    //@SectionGap	@EndNoteList 1
+	    //			@MakeIndexA @Do @IndexAPart
+	    //			@MakeIndexB @Do @IndexBPart
+	    //			@MakeIndex  @Do @IndexPart
+        }
+
         @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
 	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
         {
@@ -474,6 +517,8 @@ def @ReportLayout
 		    //	Yes @BeginDisplayCounter {}
 		    //	Yes @BeginFigureCounter {}
 		    //	Yes @BeginTableCounter {}
+		    //  @AbstractDisplay @Do { @NoForceFull @AbstractPart }
+		    //  @ReportBodyWithoutCoverSheet
 		    //  @PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }
@@ -481,7 +526,6 @@ def @ReportLayout
 			    # extra { Yes }
 			    @AtTop { @TitleMaterial }
 			    @FirstPageNumber
-		    //	@ReportBodyWithoutCoverSheet
 		    //	NonStart @Runner
 		}
 
@@ -491,17 +535,12 @@ def @ReportLayout
 		    //	Yes @BeginDisplayCounter {}
 		    //	Yes @BeginFigureCounter {}
 		    //	Yes @BeginTableCounter {}
-		    //  @PageLabel "i"
-		    //	@OddPage @Orient { @PageOrientation }
-			{
-			    @FootNoteThrough @NoDo @BeginFootNoteCounter
-			    // @TitleMaterial
-			    //0.5i |0.5rt @OneCol {|0.5i @AbstractPlace |0.5i}
-			    // //1rt @OneRow {
-				//@MidGap @PageFootNoteSection
-			        //@MidGap @ColFootNoteSection
-				}
-			}
+		    //  @SimpleOddOrEvenIntroPageList
+			    @ColumnNumber { 1 }
+			    @PageHeaders { Simple }
+			    @Orient { @PageOrientation }
+			    1
+		    //	@ReportCoverSheet
 		    //	@PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }
@@ -514,27 +553,6 @@ def @ReportLayout
 		}
 	    }
         }
-    }
-
-
-    #######################################################################
-    #                                                                     #
-    #  Abstract.                                                          #
-    #                                                                     #
-    #######################################################################
-
-    def @Abstract force into { @AbstractPlace&&preceding }
-        named @Tag {}
-        named @Title { abstract @WordVal @AbstractWord }
-        named @RunningTitle { dft }
-	named @InitialLanguage {}
-        body @Body
-    {
-	@InitialLanguage @Language {
-		|0.5rt @AbstractHeadingFont @Font @AbstractHeadingBreak @Break
-		       @AbstractHeadingFormat @Title |
-	    //  @Body
-	}
     }
 
 
@@ -863,4 +881,4 @@ def @ReportLayout
 	    @Body
     }
 
-@End @ReportLayout
+@End @ReportSetup

@@ -4,7 +4,7 @@
 @Begin
 @PP
 next.sym @Index { @@Next symbol }
-The symbol @@Next returns its parameter
+The @@Next symbol returns its parameter
 plus one.  It is rather clever at working this out:  it hunts through
 the parameter from right to left, looking for a number to increment:
 @ID @Code {

@@ -77,6 +77,7 @@ a few Lout commands are not implemented; they are listed below.
 	report [ no change ]
 	slides [ no change ]
 	tab    [ complete ]
+	tbl    [ complete - done by JeffK (not a guarantee of quality!) ]
 
 Currently, there is no work-around for this lack of functionality.
 [ ? add a mechanism to include external graphical files (such as
@@ -174,9 +175,9 @@ The possible PostScript to PDF changes are now listed:
 	<val>ft				__mul(<val>, __loutf)
 	<val>sp				__mul(<val>, __louts)
 
-	setlinewidth		w
+	setlinewidth			w
 	stroke				S
-	closepath stroke	s
+	closepath stroke		s
 	closepath			h
 	moveto				m
 	lineto				l
@@ -186,7 +187,7 @@ The possible PostScript to PDF changes are now listed:
 	grestore			Q
 	setgray				g [fill]   G [stroke]
 	setrgbcolor			rg [fill]  RG [stroke]
-	setcmykcolor		k [fill]   K [stroke]
+	setcmykcolor			k [fill]   K [stroke]
 	setdash				d
 	concat				cm
 	curveto				c
@@ -205,11 +206,11 @@ notation expression evaluator. The syntax is:
 
 	<expr>		=	<operator> | <value>
 	<operator>	=	__add(<subexpr>, <subexpr>) | __sub(<subexpr>, <subexpr>) |
-					__mul(<subexpr>, <subexpr>) | __div(<subexpr>, <subexpr>) |
-					__sin(<subexpr>) | __cos(<subexpr) |
-					__pick(<cardinal number>, <list of expr>)
+				__mul(<subexpr>, <subexpr>) | __div(<subexpr>, <subexpr>) |
+				__sin(<subexpr>) | __cos(<subexpr) |
+				__pick(<cardinal number>, <list of expr>)
 	<value>		=	__in | __cm | __pt | __em | __loutv | __loutf | __louts |
-					__xsize | __ysize | __xmark | __ymark
+				__xsize | __ysize | __xmark | __ymark
 	<subexpr>	=	<expr> | +<subexpr> | -<subexpr> | <constant>
 	<constant>	=	0-9.[0-9]*
 
@@ -305,13 +306,13 @@ to the PDF document:
 The possible destination link options are:
 
 __FitNoChange	no change to the zoom state of the window
-__Fit			change zoom to fit the page to the window
-__FitH			change zoom to fit the width of the page to the window
-__FitV			change zoom to fit the height of the page to the window
-__FitR			change zoom to fit the rectangle of the target to the window
-__FitB			change zoom to fit the page's bounding box to the window
-__FitBH			change zoom to fit the width of the page's bounding box to the window
-__FitBV			change zoom to fit the height of the page's bounding box to the window
+__Fit		change zoom to fit the page to the window
+__FitH		change zoom to fit the width of the page to the window
+__FitV		change zoom to fit the height of the page to the window
+__FitR		change zoom to fit the rectangle of the target to the window
+__FitB		change zoom to fit the page's bounding box to the window
+__FitBH		change zoom to fit the width of the page's bounding box to the window
+__FitBV		change zoom to fit the height of the page's bounding box to the window
 
 The default option is __FitNoChange.
 

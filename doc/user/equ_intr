@@ -2,12 +2,13 @@
    @Title { Introduction }
 @Begin
 @PP
-The Lout definitions for the @Code "@Eq" symbol are kept in a file called
-{@Code "eq"}, which you must include at the start of your document if
+The Lout definitions for the @Code "@Eq" symbol are accessed via a setup
+file called {@Code "eq"}, which you must include at the start of your
+document if
 eq.file @Index { @Code "eq" file }
 you want equations, like this:
 @ID @OneRow @Code {
-"@SysInclude { tab }"
+"@SysInclude { tbl }"
 "@SysInclude { eq }"
 "@SysInclude { doc }"
 "@Doc @Text @Begin"
@@ -15,12 +16,10 @@ you want equations, like this:
 "@End @Text"
 }
 This shows what to do if you want both tables and equations, but you
-may leave out the line for tables if you don't want them.  Files of
-definitions, like {@Code "tab"} and {@Code "eq"}, must be included
-before the setup file, but may be included in any order.  Alternatively,
-if you are using your own setup file, you may place the include commands
-within it; the place to put them is clearly marked in all the standard
-setup files.
+may leave out the line for tables if you don't want them.  Setup files
+for specialized packages, such as like {@Code "tab"} and {@Code "eq"},
+are best included before the main setup file, but may be included in
+any order.
 @PP
 With the @Code "eq" file included, you may write
 eq. @Index { @Code "@Eq" }

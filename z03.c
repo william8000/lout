@@ -1,7 +1,7 @@
 /*@z03.c:File Service:Declarations, no_fpos@******************************** */
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -521,7 +521,7 @@ FULL_CHAR *EchoAltFilePos(FILE_POS *pos)
 } /* end EchoFilePos */
 
 
-/*@::EchoFileSource(), EchoFileLIne(), PosOfFile()@***************************/
+/*@::EchoFileSource(), EchoFileLine(), PosOfFile()@***************************/
 /*                                                                           */
 /*  FULL_CHAR *EchoFileSource(fnum)                                          */
 /*                                                                           */
@@ -538,11 +538,11 @@ FULL_CHAR *EchoFileSource(FILE_NUM fnum)
     x = ftab_num(file_tab, fnum);
     assert( x != nilobj, "EchoFileSource: x == nilobj!" );
     if( type_of_file(x) == FILTER_FILE )
-    { StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 15, "filter")));
+    { StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 11, "filter")));
       /* for estrip's benefit: Error(3, 11, "filter"); */
       StringCat(buff[bp], STR_SPACE);
     }
-    StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 9, "file")));
+    StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 12, "file")));
     /* for estrip's benefit: Error(3, 12, "file"); */
     StringCat(buff[bp], STR_SPACE);
     /* *** x = ftab_num(file_tab, fnum); *** */
@@ -553,14 +553,14 @@ FULL_CHAR *EchoFileSource(FILE_NUM fnum)
     { StringCat(buff[bp], AsciiToFull(" ("));
       for(;;)
       { nextx = ftab_num(file_tab, file_num(fpos(x)));
-	StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 10, "from")));
+	StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 13, "from")));
 	/* for estrip's benefit: Error(3, 13, "from"); */
 	StringCat(buff[bp], STR_SPACE);
         StringCat(buff[bp], STR_QUOTE);
         StringCat(buff[bp], string(nextx));
         StringCat(buff[bp], STR_QUOTE);
 	StringCat(buff[bp], STR_SPACE);
-        StringCat(buff[bp],  AsciiToFull(condcatgets(MsgCat, 3, 11, "line")));
+        StringCat(buff[bp],  AsciiToFull(condcatgets(MsgCat, 3, 14, "line")));
 	/* for estrip's benefit: Error(3, 14, "line"); */
 	StringCat(buff[bp], STR_SPACE);
         StringCat(buff[bp], StringInt( (int) line_num(fpos(x))));
@@ -819,29 +819,38 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
 	READ_TEXT, &used_source_suffix);
   if( *full_name == nilobj )  *full_name = MakeWord(WORD, str, xfpos);
 
-  /* if file is compressed, uncompress it into file LOUT_EPS */
-  for( i = 0;  i < MAX_COMPRESSED; i++ )
-  { if( StringEndsWith(string(*full_name), AsciiToFull(compress_suffixes[i])) )
-      break;
+  if( fp == null )
+  {
+    /* if file didn't open, nothing more to do */
+    *compressed = FALSE;
+    fp = null;
   }
-  if( i < MAX_COMPRESSED )
-  { char buff[MAX_BUFF];
-    fclose(fp);
-    sprintf(buff, UNCOMPRESS_COM, (char *) string(*full_name), LOUT_EPS);
-    if( SafeExecution )
-    {
-      Error(3, 17, "safe execution prohibiting command: %s", WARN, xfpos,buff);
-      *compressed = FALSE;
-      fp = null;
+  else
+  {
+    /* if file is compressed, uncompress it into file LOUT_EPS */
+    for( i = 0;  i < MAX_COMPRESSED; i++ )
+    { if( StringEndsWith(string(*full_name), AsciiToFull(compress_suffixes[i])) )
+        break;
     }
-    else
-    {
-      system(buff);
-      fp = fopen(LOUT_EPS, READ_TEXT);
-      *compressed = TRUE;
+    if( i < MAX_COMPRESSED )
+    { char buff[MAX_BUFF];
+      fclose(fp);
+      sprintf(buff, UNCOMPRESS_COM, (char *) string(*full_name), LOUT_EPS);
+      if( SafeExecution )
+      {
+        Error(3, 17, "safe execution prohibiting command: %s", WARN, xfpos,buff);
+        *compressed = FALSE;
+        fp = null;
+      }
+      else
+      {
+        system(buff);
+        fp = fopen(LOUT_EPS, READ_TEXT);
+        *compressed = TRUE;
+      }
     }
+    else *compressed = FALSE;
   }
-  else *compressed = FALSE;
 
   debug2(DFS, DD, "OpenIncGraphicFile returning (fp %s null, *full_name = %s)",
     fp==null ? "==" : "!=", string(*full_name));

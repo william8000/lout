@@ -1,137 +1,192 @@
 @Section
-   @Title { Rules, boxes, multi-page tables, etc. }
+    @Title { Rules }
+    @Tag { tbl_rule }
 @Begin
 @PP
-@Code "@Tab" draws four kinds of rules.  @I {Above rules} go across the
-rules. @Index { rules in tables }
-table above a specified row; @I {below rules} go across the table below a
-row.  @I {Between rules} go down the table between any two columns, but
-not before the first or after the last; and @I { side rules } go down
-the two sides:
-@ID @OneRow @Code {
-"@Tab"
-"    above { no }"
-"    below { yes }"
-"    between { single }"
-"    side { double }"
-"    @Fmta { ... }"
-"..."
-}
-Each option may have the value @Code no (no rules), @Code yes or
-@Code single (draw single rules), or @Code double (draw double
-rules).  Omitting an option is equivalent to giving it the value
-{@Code no}.  A rule below one row exactly overstrikes a rule above the
-next, unless a page break intervenes.
+There is a @Code "rule" option for drawing a rule around a cell:
+@ID @OneRow @Code "@Cell rule { yes }"
+The other possible values are {@Code no} (the default),
+{@Code single} (the same as {@Code yes}), and {@Code double}, which
+draws a double rule.
 @PP
-These options to @Code "@Tab" will draw all possible rules of the given
-type.  If only some are wanted, there are {@Code above} and
-{@Code below} options (but no {@Code side} option) for each row symbol:
-@ID @OneRow @Code {
-"@Rowf"
-"    above { yes }"
-"    below { double }"
-"    ..."
-}
-and there is a @Code between option for the @Code "!" symbol that
-separates columns in the format options:
-@ID @Code "@Col A  ! between { double }  @Col B"
-The symbols @Code "!!" and @Code "!!!" are abbreviations for
-@Code "! between { single }" and {@Code "! between { double }"}.  All
-these options override the corresponding @Code "@Tab" options when they
-are present; when they are absent, the @Code "@Tab" options hold sway.
-@PP
-It is not hard to assemble a single box around a table, using side
-boxes.tables @Index { boxes around tables }
-rules, a rule above the first row, and a rule below the last:
-@ID @OneRow @Code {
-"@Tab"
-"    side { single }"
-"{"
-"    @Rowa above { single } ..."
-"    ..."
-"    @Rowj below { single } ..."
-"}"
-}
-Double boxes around a table should be assembled using the following recipe:
-@ID @OneRow @Code {
-"@Tab"
-"    side { double }"
-"{"
-"    @Rowa above { doubleboxabove } ..."
-"    ..."
-"    @Rowj below { doubleboxbelow } ..."
-"}"
-}
-This is a little tedious, but the result is good.
-@PP
-The symbols @Code "@Line" and @Code "@DoubleLine" produce horizontal
-lines.tables @Index { lines in tables }
-single and double lines of the width of the column.  Two other symbols,
-@Code "@Rule" and {@Code "@DoubleRule"}, produce lines which extend into
-the adjacent margins as well.  For example,
-@CD {
-@Tab
-    @Fmta { @Col A }
+There are @Code "rulehorizontal" and @Code "rulevertical" options which
+draw only horizontal or vertical rules, and also {@Code "ruleabove"},
+{@Code "rulebelow"}, {@Code "ruleleft"}, and {@Code "ruleright"} options:
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    aformat { @Cell A | @Cell B }
 {
-    @Rowa A { 5^.46 }
-    @Rowa A { 3^.4159 }
-    @Rowa A { 5772^ }
-    @Rowa A { @Line } vmargin { 0i }
-    @Rowa A { 5909^.0759 }
+@Rowa
+    ruleabove { yes }
+    A { Commercial property }
+    B { 10% }
+@Rowa
+    A { Stock market }
+    B { 15% }
+    rulebelow { yes }
 }
 }
-is produced by
-@ID @OneRow @Code {
-"@Tab"
-"    @Fmta { @Col A }"
-"{"
-"    @Rowa A { 5^.46 }"
-"    @Rowa A { 3^.4159 }"
-"    @Rowa A { 5772^ }"
-"    @Rowa A { @Line } vmargin { 0i }"
-"    @Rowa A { 5909^.0759 }"
-"}"
+produces
+@CD @OneRow @Tbl
+    aformat { @Cell A | @Cell B }
+{
+@Rowa
+    ruleabove { yes }
+    A { Commercial property  }
+    B { 10% }
+@Rowa
+    A { Stock market }
+    B { 15% }
+    rulebelow { yes }
 }
-Owing to problems behind the scenes, @Code "@Rule" and @Code "@DoubleRule"
-fail in aligned columns.
+These options take the same values as {@Code "rule"}, but draw
+along only one or two of the four edges.
 @PP
-The @Code "@Tab" symbol has a @Code "linewidth" option which determines
-the thickness of all the lines:
-@ID @OneRow @Code {
-"@Tab"
-"    linewidth { 0.5p }"
+Other options control the appearance of rules.  Here they are with their
+default values:
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    rulewidth { 0.05f }
+    rulegap { 0.15f }
+    rulecolour { black }
 }
-shows the default value, 0.5 points.  This cannot be overridden within
-the table.  Double rules are drawn with their centres three line widths
-apart.  Tab thinks that rules and double rules occupy no space, so thick
-rules may require larger margins.
-@PP
-The tables produced by @Code "@Tab" permit page breaks between any two
-rows.  The choice of page breaks can either be left to Lout, or it can be
-forced by placing the new page symbol @Code "@NP" between two rows.  To
-ensure that each part of a multi-page table is boxed, the rows preceding
-multi.page.tables @Index { multi-page tables }
-the page breaks must have @Code below rules, and the rows following them
-must have @Code above rules.  It works best to display a multi-page
-table at the left margin by preceding and following it with
-{@Code "@DP"}.  To prevent page breaks within a small table, use
-@Code "@OneRow @Tab ...".
-@PP
-The @Code "@HAdjust" symbol from raw Lout can be used to widen a
-table's columns until it occupies the full column width.  The
-recommended arrangement is
-@ID @OneRow @Code {
-"@DP"
-"@HAdjust @Tab"
-"   ..."
-"@DP"
+These say that rules are to be @Code "0.05f" wide (thick), double rules
+are to appear @Code "0.15f" apart, and the colour of rules is to be black.
+Once again, more specific versions of these symbols exist for controlling
+above, below, left, and right rules:
+@ID @OneRow @Code @Tbl
+    aformat { @Cell ml { 0i } A | @Cell B | @Cell C }
+    marginvertical { 0.5vx }
+{
+@Rowa
+    A { rulehorizontalwidth }
+    B { rulehorizontalgap }
+    C { rulehorizontalcolour }
+@Rowa
+    A { ruleabovewidth }
+    B { ruleabovegap }
+    C { ruleabovecolour }
+@Rowa
+    A { rulebelowwidth }
+    B { rulebelowgap }
+    C { rulebelowcolour }
+@Rowa
+    A { ruleverticalwidth }
+    B { ruleverticalgap }
+    C { ruleverticalcolour }
+@Rowa
+    A { ruleleftwidth }
+    B { ruleleftgap }
+    C { ruleleftcolour }
+@Rowa
+    A { rulerightwidth }
+    B { rulerightgap }
+    C { rulerightcolour }
 }
-since @Code "@HAdjust" is not effective within displays.
+As usual, all these options have abbreviated names; and @Code { colour }
+may be spelt @Code { color } wherever it appears.  Section
+{@NumberOf tbl_summ} has a complete summary of all spellings of all
+options.
 @PP
-Expert users might occasionally find a use for the @Code "@MarkRow"
-mark.row @Index { @Code "@MarkRow" symbols }
-symbols.  There is one of them for each @Code "@Row" symbol
-({@Code "@MarkRowa"} for {@Code "@Rowa"}, etc.).  A @Code "@MarkRow"
-symbol causes the principal mark of the table to pass through its row,
-permitting alignment with that row.
+To clarify exactly where the rules are drawn, let's start with
+a cell with no rules at all:
+@CD @Tbl
+    aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+{
+@Rowa
+}
+Above rules and left rules are drawn within the cell boundary, just
+touching it, with any above rule overstriking any left rule:
+@CD { @Tbl
+    aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+{
+@Rowa
+}
+@Background @Tbl
+    aformat { @Cell width { 3c } height { 1.5c } A }
+    ruleleft { yes }
+    ruleabove { yes }
+    rulehorizontalwidth { 0.8v }
+    ruleverticalwidth { 0.5v }
+    ruleverticalcolour { grey }
+    rulehorizontalcolour { black }
+{
+@Rowa
+}
+}
+Below and right rules are drawn just outside the boundary of the
+cell, also touching it:
+@CD @Tbl aformat { @Cell A | @Cell | @Cell B }
+{
+@Rowa
+    A {
+        @Tbl
+            aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+        {
+        @Rowa
+        }
+        @Background
+        @Tbl
+            aformat { @Cell width { 3c } height { 1.5c } A }
+            rulebelow { yes }
+	    rulehorizontalwidth { 0.8v }
+	    ruleverticalwidth { 0.5v }
+	    ruleverticalcolour { grey }
+	    rulehorizontalcolour { black }
+        {
+        @Rowa
+        }
+      }
+    B {
+        @Tbl
+            aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+        {
+        @Rowa
+        }
+        @Background
+        @Tbl
+            aformat { @Cell width { 3c } height { 1.5c } A }
+            ruleright { yes }
+	    rulehorizontalwidth { 0.8v }
+	    ruleverticalwidth { 0.5v }
+	    ruleverticalcolour { grey }
+	    rulehorizontalcolour { black }
+        {
+        @Rowa
+        }
+      }
+}
+@DP
+When a right rule is present, any above and below rules are extended
+by the width of the right rule, and they overstrike it:
+@CD {
+@Tbl
+    aformat { @Cell width { 3c } height { 1.5c } paint { lightgrey } A }
+{
+@Rowa
+}
+@Background
+@Tbl
+    aformat { @Cell width { 3c } height { 1.5c } A }
+    ruleabove { yes }
+    ruleright { yes }
+    rulebelow { yes }
+    rulehorizontalwidth { 0.8v }
+    ruleverticalwidth { 0.5v }
+    ruleverticalcolour { grey }
+    rulehorizontalcolour { black }
+{
+@Rowa
+}
+}
+@DP
+(These diagrams were produced by @Code "@Tbl" itself, using horizontal
+rules of width @Code 0.8v drawn in black, and vertical rules of width
+@Code 0.5v drawn in grey.)  These arrangements ensure that even thick
+rules produce clean corners, and also that a right rule and a neighbouring
+left rule exactly overstrike each other, as do a below rule and its
+neighbouring above rule.
+@PP
+For information about rules in plain text tables, consult Section
+{@NumberOf tbl_plai}.
 @End @Section

@@ -1,7 +1,7 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -98,6 +98,20 @@ FULL_CHAR *EndString(void)
 } /* end Endstring */
 #endif
 
+/*****************************************************************************/
+/*                                                                           */
+/*  SetLengthDim(int dim)                                                    */
+/*                                                                           */
+/*  Set dimension for echoing lengths.                                       */
+/*                                                                           */
+/*****************************************************************************/
+
+static int length_dim = COLM;
+
+void SetLengthDim(int dim)
+{
+  length_dim = dim;
+}
 
 /*****************************************************************************/
 /*                                                                           */
@@ -108,10 +122,12 @@ FULL_CHAR *EndString(void)
 /*****************************************************************************/
 
 FULL_CHAR *EchoLength(int len)
-{ static FULL_CHAR buff[6][20];
+{ static FULL_CHAR buff[8][20];
   static int i = 0;
-  i = (i + 1) % 6;
-  switch( BackEnd )
+  i = (i + 1) % 8;
+  if( len == MAX_FULL_LENGTH )
+    sprintf( (char *) buff[i], "%s", "INF");
+  else switch( BackEnd )
   {
     case POSTSCRIPT:
     case PDF:
@@ -121,7 +137,14 @@ FULL_CHAR *EchoLength(int len)
 
     case PLAINTEXT:
 
-      sprintf( (char *) buff[i], "%.1fs", (float) len/PlainCharWidth);
+      if( length_dim == COLM )
+      {
+        sprintf( (char *) buff[i], "%.2fs", (float) len/PlainCharWidth);
+      }
+      else
+      {
+        sprintf( (char *) buff[i], "%.2ff", (float) len/PlainCharHeight);
+      }
       break;
 
   }
@@ -169,14 +192,26 @@ FULL_CHAR *Image(unsigned int c)
     case VCOVER:		return  KW_VCOVER;
     case HCONTRACT:		return  KW_HCONTRACT;
     case VCONTRACT:		return  KW_VCONTRACT;
+    case HLIMITED:		return  KW_HLIMITED;
+    case VLIMITED:		return  KW_VLIMITED;
     case HEXPAND:		return  KW_HEXPAND;
     case VEXPAND:		return  KW_VEXPAND;
+    case START_HVSPAN:		return  KW_STARTHVSPAN;
+    case START_HSPAN:		return  KW_STARTHSPAN;
+    case START_VSPAN:		return  KW_STARTVSPAN;
+    case HSPAN:			return  KW_HSPAN;
+    case VSPAN:			return  KW_VSPAN;
+    case HSPANNER:		return  AsciiToFull("hspannner");
+    case VSPANNER:		return  AsciiToFull("vspannner");
     case PADJUST:		return  KW_PADJUST;
     case HADJUST:		return  KW_HADJUST;
     case VADJUST:		return  KW_VADJUST;
     case ROTATE:		return  KW_ROTATE;
+    case BACKGROUND:		return	KW_BACKGROUND;
     case SCALE:			return  KW_SCALE;
     case KERN_SHRINK:		return  KW_KERN_SHRINK;
+    case RAW_VERBATIM:		return  KW_RAWVERBATIM;
+    case VERBATIM:		return  KW_VERBATIM;
     case CASE:			return  KW_CASE;
     case YIELD:			return  KW_YIELD;
     case BACKEND:		return  KW_BACKEND;
@@ -195,7 +230,9 @@ FULL_CHAR *Image(unsigned int c)
     case CURR_FACE:		return  KW_CURR_FACE;
     case COMMON:		return  KW_COMMON;
     case RUMP:			return  KW_RUMP;
+    case MELD:			return  KW_MELD;
     case INSERT:		return  KW_INSERT;
+    case ONE_OF:		return  KW_ONE_OF;
     case NEXT:			return  KW_NEXT;
     case PLUS:			return  KW_PLUS;
     case MINUS:			return  KW_MINUS;
@@ -214,6 +251,7 @@ FULL_CHAR *Image(unsigned int c)
     case TAGGED:		return  KW_TAGGED;
     case INCGRAPHIC:		return  KW_INCGRAPHIC;
     case SINCGRAPHIC:		return  KW_SINCGRAPHIC;
+    case PLAIN_GRAPHIC:		return  KW_PLAINGRAPHIC;
     case GRAPHIC:		return  KW_GRAPHIC;
     case ACAT:			return  AsciiToFull("acat");
     case HCAT:			return  AsciiToFull("hcat");

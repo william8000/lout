@@ -104,7 +104,7 @@ of any node, link, or other label.  Although a label may be an arbitrary
 object, it is treated as having zero size and will overstrike anything
 that happens to be where it wants to go.
 @PP
-There are options for controlling the the appearance and position of
+There are options for controlling the appearance and position of
 labels.  These are described below mainly for {@Code alabel}, but there
 are corresponding options for all nine labels.
 @PP

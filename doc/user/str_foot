@@ -38,6 +38,30 @@ of the document or at the end of some major part of it, depending on
 the type of document (Chapter {@NumberOf types}).  Endnotes are
 always column width and so have no @Code "@Location" option.
 @PP
+Footnotes are usually labelled with consecutive Arabic numberals, but
+you can tell Lout to label a footnote (not an endnote) with something
+else, like this:
+@ID @OneRow @Code @Verbatim {
+@FootNote
+    @Label { @Dagger }
+{ This footnote will be labelled with a dagger, not a number. }
+}
+whose result should appear at the bottom of this page.
+@FootNote
+    @Label { @Dagger }
+{ This footnote will be labelled with a dagger, not a number. }
+Symbols commonly used for footnote labels include @Code "@Dagger" (@Dagger),
+@Code "@DaggerDbl" (@DaggerDbl), @Code "@Star" (@Star),
+@Code "@SectSym" (@SectSym), and @Code "@ParSym" (@ParSym),
+but you can use any object.  If you want no label at all,
+use an empty object like this:
+@ID @OneRow @Code @Verbatim {
+@FootNote
+    @Label {}
+}
+Footnotes with a @Code "@Label" option are excluded from the automatic
+numbering that applies to other footnotes.
+@PP
 The language of a footnote or endnote will be the language of the
 document as a whole.  This is not necessarily the same as the
 current language at the point where the footnote or endnote occurs,
@@ -55,13 +79,13 @@ is to place an @Code "@LP" after the last line (including the footnote).
 @PP
 In the rare case where more than one footnote is attached to one word,
 use @Code "@AnotherFootNote" for the second and subsequent footnotes:
-anotherfootnote. @Index @Code "@AnotherFootdNote"
+anotherfootnote. @Index @Code "@AnotherFootNote"
 @ID @Code {
 "something or other."
 "@FootNote { The first footnote. }"
 "@AnotherFootNote { The second footnote. }"
 }
-This ensures that the superscripted numbers will be separated by
+This ensures that the superscripts will be separated by
 commas, as convention demands.
 @PP
 The setup file contains a number of options for controlling the
@@ -90,7 +114,7 @@ through the document (or through each chapter in the case of books);
 page.  @Code "@FootNoteLocation" determines the default value of
 footnotelocatin. @Index @Code "@FootNoteLocation"
 the @Code "@Location" option mentioned above; it may be either
-@Code "ColFoot" or {@Code "ColPage"}.  @Code "@FootNoteNumbers"
+@Code "ColFoot" or {@Code "PageFoot"}.  @Code "@FootNoteNumbers"
 determines how the footnotes are numbered;
 footnotenumbers. @Index @Code "@FootNoteNumbers"
 it may be {@Code Arabic}, {@Code Roman}, {@Code UCRoman}, {@Code Alpha},

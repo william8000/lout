@@ -34,7 +34,7 @@ makereferences.sym @Index { @Code "@MakeReferences" }
 Setting @Code "@MakeReferences" to @Code "No" will cause Lout to ignore
 all citation symbols and omit all reference lists.
 @PP
-@Code "@RefCiteStyle" and @Code "@RefCiteLabels" work together to
+@Code "@RefCiteStyle" and @Code "@RefCiteLabels" combine to
 refcitestyle.sym @Index { @Code "@RefCiteStyle" }
 determine the appearance of citations.  The result of each @Code "@Cite"
 symbol is the value of @Code "@RefCiteStyle" with the @Code "cite"
@@ -48,7 +48,7 @@ refcitelabels.sym @Index { @Code "@RefCiteLabels" }
 the citation.  Within it, the @Code "@RefNum" symbol will produce the
 number of the reference, and you may also use any of the options of the
 @Code "@Reference" symbol listed at the beginning of Section
-{@NumberOf entries}.  Here are some examples:
+{@NumberOf entries}:
 @ID @OneRow @Tab
     @Fmta { @Col @Code A ! @Col B }
 {
@@ -180,7 +180,7 @@ As usual @Code "@Label" will use the value of a @Code "label" option
 to the citation if there is one.  There is no way to sort by order of
 first appearance in the document.
 @PP
-The value of @Code "@RefListSortKey" may be any sequence of words
+@Code "@RefListSortKey" may be any sequence of words
 and options from the @Code "@Reference" symbol, but not @Code "@RefNum"
 for obvious reasons.  A possible more elaborate sorting key is
 @ID @Code "@RefListSortKey { @Author:@Year:@Tag }"

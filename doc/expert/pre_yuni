@@ -10,7 +10,7 @@ changes the value of the @Code y unit of measurement (Section
 {@NumberOf concatenation}) within its right parameter to the value
 given by the left parameter:
 @ID {
-@Code "1c @YUnit { ..."
+@Code "1c @YUnit { ... }"
 }
 ensures that the value of @Code "1y" within the right parameter will
 be {@Code "1c"}.  The @@ZUnit symbol is similar, setting the value

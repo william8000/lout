@@ -13,15 +13,15 @@ and changing it.
 @PP
 For general information about how to make your own setup file, consult
 Section {@NumberOf setup}.  The options that determine the default
-values are in the @Code "@CPrint" @Code "@Use" clause near the end of
-cprint. @Index @Code "@CPrint"
-the setup file:
+values are in the @Code "@CPSetup" @Code "@Use" clause near the end of
+cprint. @Index @Code "@CPSetup"
+the @Code "cpsetup." setup file:
 @ID @Code @Tab
    vmargin { 0.5vx }
    @Fmta { @Col A ! @Col B ! @Col C}
    @Fmtb { @Col { "    #" A } ! @Col { "{" B } ! @Col "}" }
 {
-@Rowa A { "@Use {  @CPrint" }
+@Rowa A { "@Use {  @CPSetup" }
 @Rowb A { "style" } B { fixed         }
 
 @Rowa 

@@ -4,7 +4,7 @@
 @Begin
 @PP
 The @@Break symbol influences the appearance of paragraphs (Section
-{@NumberOf concatenation}), offering a fixed set of eight styles:
+{@NumberOf concatenation}), offering a fixed set of nine styles:
 @IL
 
 @LI {
@@ -106,7 +106,7 @@ smaller by the length of @I gap than it would otherwise have been.
 @EL
 In each case, the mode of @I gap is adopted within {@I object}.
 @PP
-Finally, the @@Break symbol influences hyphenation:
+The @@Break symbol also controls hyphenation:
 @IL
 
 @LI {
@@ -123,6 +123,29 @@ hyphenation gaps without exception revert to edge-to-edge mode.
 }
 
 @EL
+The @@Break also has options which control widow and orphan lines:
+@IL
+
+@LI {
+2i @Wide { |1rt @Code "unbreakablefirst @Break" @I object }
+hyphen.break @Index { @Code hyphen @@Break }
+|2m Prevent column and page breaks (i.e. prevent a galley from splitting)
+between the first and second lines of the paragraphs of {@I object};
+}
+
+@LI {
+2i @Wide { |1rt @Code "unbreakablelast @Break" @I object }
+nohyphen.break @Index { @Code nohyphen @@Break }
+|2m Prevent column and page breaks between the last and second
+last lines of the paragraphs of {@I object}.
+}
+
+@EL
+These options work by adding the @Code "u" (unbreakable) suffix to the
+appropriate gaps during paragraph breaking, so their precise effect is
+as described for this suffix.  These options may be countermanded by
+@Code "breakablefirst @Break" and @Code "breakablelast @Break".
+@PP
 Several options may be given to the @@Break symbol simultaneously, in
 any order.  For example,
 @ID @Code "{ adjust 1.2fx hyphen }  @Break  ..."

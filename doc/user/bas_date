@@ -77,7 +77,8 @@ The default format for @Code "@Date" in English is
 @ID @Code "@Date @Format { @DayNum @Month, @Year }"
 and the default format for @Code "@Time" in English is
 @ID @Code "@Time @Format { @TwelveHour.@Minute @MeriDiem }"
-Both default formats depend on the current language, and of
-course so do {@Code "@Month"}, {@Code "@ShortMonth"},
-{@Code "@Day"}, and {@Code "@ShortDay"}.
+Both default formats depend on the current language, and
+so do {@Code "@Month"}, {@Code "@ShortMonth"},
+{@Code "@Day"}, and {@Code "@ShortDay"},{@Code "@MeriDiem" }
+and {@Code "@ShortMeriDiem" }.
 @End @Section

@@ -1,0 +1,57 @@
+@Section
+    @Title { Multi-page tables }
+    @Tag { tbl_mult }
+@Begin
+@PP
+The tables produced by @Code "@Tbl" permit page breaks (including breaking
+multi.page.tables @Index { multi-page tables }
+to a new column) between every two rows, except rows that have a
+vertically spanning cell in common.  Page breaks cannot occur
+within rows.  The choice of page breaks can either be left to Lout,
+or it can be forced by placing the new page symbol @Code "@NP" between two
+np.tables @Index { @Code "@NP" (new page) in tables }
+rows.
+@PP
+Some care is needed over where to put multi-page tables.  They can't go
+within any of the display symbols, because display symbols are not clever
+enough to break tables between rows, even though they are sometimes able
+to break simpler displays.  (A display symbol will scale a very high table
+to fit on one page, and it will go wrong on a table containing
+{@Code "@NP"}.)  Multi-page tables can go inside @Code "@Figure" or
+@Code "@Table" symbols, because these symbols have been set up to accept
+multi-page objects.  Or they can go into the body text of the document
+at full width with a paragraph symbol before and after, like this:
+@ID @Code @Verbatim {
+@DP
+@Tbl ...
+@DP
+}
+An example of this kind of multi-page table appears in
+Section {@NumberOf tbl_summ}.  You can simulate an indent by means of an
+empty cell at the left of each row format, although in the author's opinion
+a multi-page table looks better at full width anyway.  Lout will expand the
+rightmost column to the full page width; one way to prevent this is to add
+a @Code "|" after the last cell within each {@Code format} option, creating
+an empty extra column.
+@PP
+The simplest way to get rules right in multi-page tables is to set
+@Code "rulehorizontal" to {@Code yes}.  This places a rule above every
+row including the first on each page, and a rule below every row including
+the last on each page.
+@PP
+To prevent page breaks within a table, precede the @Code "@Tbl"
+symbol by {@Code "@OneRow"}:
+@ID @Code "@CD @OneRow @Tbl ..."
+@Code "@OneRow" is a general Lout symbol which binds the following
+object into a single, unbreakable row.  Make sure your table is
+small enough to fit on one page when you do this, otherwise an error
+message will be printed and it will be scaled to fit.  Of course, we
+have just said that display symbols like @Code "@CD" do this anyway,
+but that might change some day.
+@PP
+To prevent a page break between two particular rows, but not in
+general, replace the @Code "@Row" symbol of the second row with
+the corresponding @Code "@NoBreakRow" symbol (@Code "@NoBreakRowa"
+instead of {@Code "@Rowa"}, @Code "@NoBreakRowb" instead of
+{@Code "@Rowb"}, and so on).
+@End @Section

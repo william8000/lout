@@ -12,6 +12,6 @@ reasonable minimum (after paragraph breaking).  For example,
 has result
 @ID { 5i @Wide @HContract { A |1rt B } }
 in which the B is much closer to the A than it would otherwise have
-been.  @@VContract is similar, but in a vertical direction.  See Section
-{@NumberOf size} for a more extensive discussion.
+been.  @@VContract is similar, but in a vertical direction.  See
+Section {@NumberOf size} for a more extensive discussion.
 @End @Section

@@ -1,7 +1,7 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -43,12 +43,38 @@
 
 static void BreakJoinedGroup(OBJECT start, OBJECT stop, OBJECT m,
 CONSTRAINT *c, FULL_LENGTH *res_back, FULL_LENGTH *res_fwd)
-{ OBJECT y, link;  FULL_LENGTH b, f;  CONSTRAINT yc;
-  debug1(DOB, DD, "BreakJoinedGroup(start, stop, m, %s, -, -)",
+{ OBJECT y, link;  FULL_LENGTH b, f, sb, sf;  CONSTRAINT yc;
+  debug1(DOB, DD, "[ BreakJoinedGroup(start, stop, m, %s, -, -)",
     EchoConstraint(c));
-  CopyConstraint(yc, *c);
+
+  /* work out a suitable constraint to apply to each component */
+  sb = sf = 0;
+  for( link = start;  link != NextDown(stop);  link = NextDown(link) )
+  { Child(y, link);
+    if( !is_definite(type(y)) )  continue;
+    sb = find_max(sb, back(y, COLM));
+    sf = find_max(sf, fwd(y, COLM));
+  }
+  if( sb <= bc(*c) )
+  {
+    /* make sure the constraint will accept objects with size (sb, 0) */
+    b = sb;
+    f = 0;
+  }
+  else
+  {
+    /* sb is too wide anyway, so don't worry about it */
+    b = 0;
+    f = 0;
+  }
+  SetConstraint(yc, find_min(bc(*c), bfc(*c)-f), bfc(*c), find_min(fc(*c), bfc(*c)-b));
+
+  /* apply this constraint to each component in turn, m first */
   if( m != nilobj )
-  { m = BreakObject(m, &yc);
+  {
+    debug1(DOB, DD, "  +++BreakJoinedGroup calling first child, yc = %s",
+      EchoConstraint(&yc));
+    m = BreakObject(m, &yc);
     b = back(m, COLM);
     f = fwd(m, COLM);
     SetConstraint(yc, find_min(bc(yc), bfc(yc)-f), bfc(yc), find_min(fc(yc), bfc(yc)-b));
@@ -57,19 +83,21 @@ CONSTRAINT *c, FULL_LENGTH *res_back, FULL_LENGTH *res_fwd)
   for( link = start;  link != NextDown(stop);  link = NextDown(link) )
   { Child(y, link);
     if( !is_definite(type(y)) || y == m )  continue;
+    debug1(DOB, DD, "  +++BreakJoinedGroup calling child, yc = %s",
+      EchoConstraint(&yc));
     y = BreakObject(y, &yc);
     b = find_max(b, back(y, COLM));
     f = find_max(f, fwd(y, COLM));
     SetConstraint(yc, find_min(bc(yc), bfc(yc)-f), bfc(yc), find_min(fc(yc), bfc(yc)-b));
   }
   if( !FitsConstraint(b, f, *c) )
-  { debug3(DOB, D, "  in BreakJoinedGroup: !FitsConstraint(%s, %s, %s)",
+  { debug3(DOB, DD, "  in BreakJoinedGroup: !FitsConstraint(%s, %s, %s)",
       EchoLength(b), EchoLength(f), EchoConstraint(c));
     Error(13, 1, "failed to break column to fit into its available space",
       WARN, m != nilobj ? &fpos(m) : (y != nilobj ? &fpos(y) : no_fpos));
   }
   *res_back = b;  *res_fwd = f;
-  debug2(DOB, DD,"BreakJoinedGroup returning (%s, %s)",
+  debug2(DOB, DD,"] BreakJoinedGroup returning (%s, %s)",
 	EchoLength(b), EchoLength(f));
 } /* end BreakJoinedGroup */
 
@@ -245,7 +273,7 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
   /* if column gaps alone are too wide, kill them all */
   if( !FitsConstraint(bwidth, fwidth, *c) )
   {
-    debug2(DOB, DD, "column gaps alone too wide: bwidth: %s; fwidth: %s",
+    debug2(DOB, D, "column gaps alone too wide: bwidth: %s; fwidth: %s",
        EchoLength(bwidth), EchoLength(fwidth));
     Error(13, 2, "reducing column gaps to 0i (object is too wide)",
       WARN, &fpos(x));
@@ -262,8 +290,8 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
   /* break each column, from smallest to largest */
   while( bcount + fcount > 0 && FitsConstraint(bwidth, fwidth, *c) )
   {
-    debug2(DOB, DD, "bcount: %d;  bwidth: %s", bcount, EchoLength(bwidth));
-    debug2(DOB, DD, "fcount: %d;  fwidth: %s", fcount, EchoLength(fwidth));
+    debug2(DOB, D, "bcount: %d;  bwidth: %s", bcount, EchoLength(bwidth));
+    debug2(DOB, D, "fcount: %d;  fwidth: %s", fcount, EchoLength(fwidth));
 
     /* find a minimal-width unbroken component my */
     my = nilobj;  msize = size(x, COLM);       /* an upper bound for size(y) */
@@ -286,18 +314,18 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 
     /* find neighbouring definite objects and resulting pd_extra and sd_extra */
     SetNeighbours(mlink, ratm, &pg, &prec_def, &sg, &succ_def, &mside);
-    debug2(DOB, DD, "my (%s): %s", Image(mside), EchoObject(my));
+    debug2(DOB, D, "my (%s): %s", Image(mside), EchoObject(my));
     pd_extra = pg == nilobj ? 0 :
       ExtraGap(broken(prec_def) ? fwd(prec_def,COLM) : 0, 0, &gap(pg), BACK);
     sd_extra = sg == nilobj ? 0 :
       ExtraGap(0, broken(succ_def) ? back(succ_def,COLM) : 0, &gap(sg), FWD);
-    debug2(DOB, DD, "pd_extra:   %s;  sd_extra:      %s",
+    debug2(DOB, D, "pd_extra:   %s;  sd_extra:      %s",
 		EchoLength(pd_extra), EchoLength(sd_extra) );
 
     /* calculate desirable constraints for my */
     av_colsize = (bfc(*c) - bwidth - fwidth) / (bcount + fcount);
-    debug1(DOB, DD, "av_colsize = %s", EchoLength(av_colsize));
-    debug1(DOB, DD, "prev_col_size = %s", EchoLength(prev_col_size));
+    debug1(DOB, D, "av_colsize = %s", EchoLength(av_colsize));
+    debug1(DOB, D, "prev_col_size = %s", EchoLength(prev_col_size));
     switch( mside )
     {
 
@@ -345,10 +373,12 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 	assert(FALSE, "BreakTable: mside");
 	break;
     }
-    debug1(DOB, DD, "col_size = %s", EchoLength(col_size));
+    debug1(DOB, D, "col_size = %s", EchoLength(col_size));
     prev_col_size = col_size;
 
     /* now break my according to these constraints, and accept it */
+    debug2(DOB, DD, "  calling BreakObject(%s, %s)", EchoObject(my),
+      EchoConstraint(&mc));
     my = BreakObject(my, &mc);  broken(my) = TRUE;
 
     /* calculate the effect of accepting my on bwidth and fwidth */
@@ -392,7 +422,7 @@ static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 
   debug2(DOB, D,  "] BreakTable returning %s,%s; x =",
     EchoLength(bwidth), EchoLength(fwidth));
-  ifdebug(DOB, D, DebugObject(x));
+  ifdebug(DOB, DD, DebugObject(x));
   return x;
 } /* end BreakTable */
 
@@ -499,14 +529,14 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	font(save_style(y)) = word_font(x);
 	colour(save_style(y)) = word_colour(x);
 	language(save_style(y)) = word_language(x);
-	debug3(DOF, D, "  in BreakObject y %s %s %s",
+	debug3(DOF, DD, "  in BreakObject y %s %s %s",
 	  EchoStyle(&save_style(y)), Image(type(y)), EchoObject(y));
 
 	/* enclose x in the ACAT and try breaking (i.e. filling) it */
 	ReplaceNode(y, x);
 	Link(y, x);
 	x = y;
-	debug3(DOF, D, "  in BreakObject x %s %s %s",
+	debug3(DOF, DD, "  in BreakObject x %s %s %s",
 	  EchoStyle(&save_style(x)), Image(type(x)), EchoObject(x));
 	x = BreakObject(x, c);
       }
@@ -568,16 +598,58 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
     case VSHIFT:
     case HCONTRACT: 
     case VCONTRACT:
+    case HLIMITED: 
+    case VLIMITED:
     case HEXPAND: 
     case VEXPAND:
     case ONE_ROW:
     case ONE_COL:
+    case HSPANNER:
     
       assert( Down(x) == LastDown(x), "BreakObject: downs!" );
       Child(y, Down(x));
       y = BreakObject(y, c);
       back(x, COLM) = back(y, COLM);
       fwd(x, COLM) = fwd(y, COLM);
+      break;
+
+
+    case BACKGROUND:
+
+      Child(y, Down(x));
+      y = BreakObject(y, c);
+      Child(y, LastDown(x));
+      y = BreakObject(y, c);
+      back(x, COLM) = back(y, COLM);
+      fwd(x, COLM) = fwd(y, COLM);
+      break;
+
+
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+    case HSPAN:
+    case VSPAN:
+
+      /* these all have size zero except the last one, so if we get to  */
+      /* this point we must be at the last column and need to break it. */
+      /* this is done just by setting its size to zero, unless it is    */
+      /* the last column in which case it claims everything that is     */
+      /* going; the real break is deferred to the first ROWM touch,     */
+      /* when we know that all contributing columns have been broken    */
+      /* unless the child is not a spanner, in which case it's @OneCol  */
+      Child(y, Down(x));
+      if( type(y) != HSPANNER )
+      {
+        y = BreakObject(y, c);
+        back(x, COLM) = back(y, COLM);
+        fwd(x, COLM) = fwd(y, COLM);
+      }
+      else
+      {
+        back(x, COLM) = 0;
+        fwd(x, COLM) = find_min(bfc(*c), fc(*c));
+      }
       break;
 
 
@@ -594,6 +666,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
       break;
 
 
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     
       Child(y, LastDown(x));
@@ -635,7 +708,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	}
 	Error(13, 10, "column mark of paragraph moved left before breaking",
 	  WARN, &fpos(rpos));
-	ifdebug(DOB, D, DebugObject(x));
+	ifdebug(DOB, DD, DebugObject(x));
       }
       x = FillObject(x, c, nilobj, TRUE, TRUE, FALSE, &junk);
       break;
@@ -668,9 +741,8 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
   }
   assert( back(x, COLM) >= 0, "BreakObject: back(x, COLM) < 0!" );
   assert( fwd(x, COLM) >= 0, "BreakObject: fwd(x, COLM) < 0!" );
-  debug0(DOB, DD,  "] BreakObject returning, x =");
+  debug2(DOB, DD,  "] BreakObject returning %s,%s, x =",
+    EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)));
   ifdebug(DOB, DD,  DebugObject(x));
-  debug2(DOB, DD, "  (size is %s, %s)",
-	EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)));
   return x;
 } /* end BreakObject */

@@ -1,7 +1,7 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -44,7 +44,7 @@
 /*      <width>      ::=  <unsigned number> <units>                          */
 /*      <units>      ::=  c  |  i  |  p  |  m  |  f  |  s                    */
 /*                   ::=  v  |  w  |  b  |  r  |  d  |  y  |  z              */
-/*      <mode>       ::=  e  |  h  |  x  |  o  |  k  |  t                    */
+/*      <mode>       ::=  e  |  h  |  x  |  o  |  k  |  t  |  n              */
 /*                                                                           */
 /*  Set *res_gap to the gap in the strings of x; *res_inc is the increment.  */
 /*  The gap is calculated using the given style.                             */
@@ -148,7 +148,11 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 
   /* read the optional nobreak */
   if( *str == CH_NOBREAK )
-  { nobreak(*res_gap) = TRUE;
+  {
+    if( mode(*res_gap) == HYPH_MODE )
+      Error(17, 9, "replacing self-contradictory gap %s by breakable version",
+	WARN, &fpos(x), string(x));
+    else nobreak(*res_gap) = TRUE;
     str++;
   }
 
@@ -198,7 +202,7 @@ FULL_LENGTH MinGap(FULL_LENGTH a, FULL_LENGTH b, FULL_LENGTH c, GAP *xgap)
 
     case ADD_HYPH:
     case HYPH_MODE:
-    case EDGE_MODE:	res = find_min(MAX_SHORT_LENGTH, a + w + b);
+    case EDGE_MODE:	res = find_min(MAX_FULL_LENGTH, a + w + b);
 			break;
 
     case MARK_MODE:	if( BackEnd != PLAINTEXT )
@@ -259,7 +263,7 @@ FULL_LENGTH ExtraGap(FULL_LENGTH a, FULL_LENGTH b, GAP *xgap, int dir)
 			  res = find_max(0, w - a - b);
 			break;
 
-    case OVER_MODE:	res = MAX_SHORT_LENGTH;
+    case OVER_MODE:	res = MAX_FULL_LENGTH;
 			break;
 
     case KERN_MODE:	tmp = find_max(a, find_max(b, w));
@@ -282,16 +286,17 @@ FULL_LENGTH ExtraGap(FULL_LENGTH a, FULL_LENGTH b, GAP *xgap, int dir)
 
 /*@::ActualGap()@*************************************************************/
 /*                                                                           */
-/*  FULL_LENGTH ActualGap(a, b, c, xgap, f, mk)                              */
+/*  FULL_LENGTH ActualGap(prevf, b, f, xgap, frame_size, mk)                 */
 /*                                                                           */
 /*  Returns the actual separation between the marks of an object of size     */
-/*  (?, a) and an object of size (b, c) separated by gap *xgap in a frame    */
-/*  of size f; the first object lies at mk in the frame (0 <= mk <= f).      */
+/*  (?, prevf) and an object of size (b, f) separated by gap *xgap in a      */
+/*  frame of size frame_size; the first object lies at mk in the frame,      */
+/*  where 0 <= mk <= frame_size.                                             */
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_LENGTH ActualGap(FULL_LENGTH a, FULL_LENGTH b, FULL_LENGTH c, GAP *xgap,
-  FULL_LENGTH f, FULL_LENGTH mk)
+FULL_LENGTH ActualGap(FULL_LENGTH prevf, FULL_LENGTH b, FULL_LENGTH f,
+  GAP *xgap, FULL_LENGTH frame_size, FULL_LENGTH mk)
 { FULL_LENGTH res;  int w, w2;
   switch( units(*xgap) )
   {
@@ -299,16 +304,16 @@ FULL_LENGTH ActualGap(FULL_LENGTH a, FULL_LENGTH b, FULL_LENGTH c, GAP *xgap,
 			break;
 
     case FRAME_UNIT:	if( width(*xgap) > FR )
-			  w = MAX_SHORT_LENGTH;
+			  w = MAX_FULL_LENGTH;
 			else
-			  w = (width(*xgap) * f) / FR;
+			  w = (width(*xgap) * frame_size) / FR;
 			break;
 
-    case AVAIL_UNIT:	w = (width(*xgap) * (f - b - c)) / FR;
+    case AVAIL_UNIT:	w = (width(*xgap) * (frame_size - b - f)) / FR;
 			w = find_max(w, 0);
 			break;
 
-    case NEXT_UNIT:	w = width(*xgap) * (b + c) / FR;
+    case NEXT_UNIT:	w = width(*xgap) * (b + f) / FR;
 			break;
 
     default:		assert(FALSE, "ActualGap: units");
@@ -316,39 +321,40 @@ FULL_LENGTH ActualGap(FULL_LENGTH a, FULL_LENGTH b, FULL_LENGTH c, GAP *xgap,
   }
   switch( mode(*xgap) )
   {
-    case NO_MODE:	assert(FALSE, "ActualGap: NO_MODE");
+    case NO_MODE:	Error(17, 10, "cannot continue after previous error(s)", FATAL, no_fpos);
+			assert(FALSE, "ActualGap: NO_MODE");
 			w2 = 0;
 			break;
 
     case ADD_HYPH:
     case HYPH_MODE:
-    case EDGE_MODE:	w2 = a + w + b;
+    case EDGE_MODE:	w2 = prevf + w + b;
 			break;
 
     case MARK_MODE:	if( BackEnd != PLAINTEXT )
-			  w2 = find_max(w, a + b + (FULL_LENGTH) (0.1 * w) );
+			  w2 = find_max(w, prevf + b + (FULL_LENGTH) (0.1 * w) );
 			else
-			  w2 = find_max(w, a + b);
+			  w2 = find_max(w, prevf + b);
 			break;
 
     case OVER_MODE:	w2 = w;
 			break;
 
-    case KERN_MODE:	w2 = find_max( find_max(a, b), w);
+    case KERN_MODE:	w2 = find_max( find_max(prevf, b), w);
 			break;
 
     case TAB_MODE:	w2 = w + b - mk;
-			w2 = find_max( w2, a + b );
+			w2 = find_max(w2, prevf + b );
 			break;
 
     default:		assert(FALSE, "ActualGap: mode");
 			w2 = 0;
 			break;
   }
-  res = find_min(MAX_SHORT_LENGTH, w2);
-  debug6(DGW, D, "ActualGap( _,%s %s %s,%s; %s ) = %s",
-	EchoLength(a), EchoGap(xgap), EchoLength(b),
-	EchoLength(c), EchoLength(f), EchoLength(res) );
+  res = find_min(MAX_FULL_LENGTH, w2);
+  debug7(DGW, D, "ActualGap( _,%s %s %s,%s; frame_size %s, mk %s ) = %s",
+	EchoLength(prevf), EchoGap(xgap), EchoLength(b), EchoLength(f),
+	EchoLength(frame_size), EchoLength(mk), EchoLength(res));
   return res;
 } /* end ActualGap */
 

@@ -1,5 +1,5 @@
-THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)
-BASSER LOUT VERSION 3 COPYRIGHT (C) 1994, 1996 Jeffrey H. Kingston
+THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)
+BASSER LOUT VERSION 3 COPYRIGHT (C) 1994, 1999 Jeffrey H. Kingston
 
 Jeffrey H. Kingston
 Basser Department of Computer Science
@@ -41,11 +41,10 @@ formatting system.  It contains the following directories:
 
 and the following files:
 
-    READMEPDF       A description of the PDF back end, new in Version 3.12
+    READMEPDF       A description of the PDF back end
     blurb           A news blurb describing Lout
     blurb.short     A short news blurb describing Lout
     c2lout.c        c2lout source code (all in one file)
-    dosetup         A shell script used by "make setupfiles" in makefile
     externs.h z*.c  Lout source code
     gnu.gpl         A copy of the GNU General Public License
     makefile        A makefile for installing Lout

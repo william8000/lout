@@ -1,7 +1,7 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -122,7 +122,12 @@ void FlushGalley(OBJECT hd)
   OBJECT succ_gap;		/* the gap following dest if any else nilobj */
   OBJECT succ_def;		/* the component following dest, if any      */
   OBJECT stop_link;		/* most recently seen gap link of hd         */
+  FULL_LENGTH stop_back;        /* back(dest_encl) incl all before stop_link */
+  FULL_LENGTH stop_fwd;         /* fwd(dest_encl) incl. all before stop_link */
+  FULL_LENGTH stop_perp_back;   /* back(dest_encl) in other direction        */
+  FULL_LENGTH stop_perp_fwd;    /* fwd(dest_encl) in other direction         */
   BOOLEAN prnt_flush;		/* TRUE when the parent of hd needs a flush  */
+  BOOLEAN target_is_internal;   /* TRUE if flushing into an internal target  */
   OBJECT zlink, z, tmp, prnt;  int attach_status;  BOOLEAN remove_target;
   OBJECT why;
   FULL_LENGTH perp_back, perp_fwd;  /* current perp size of dest_encl        */
@@ -203,7 +208,9 @@ void FlushGalley(OBJECT hd)
 	  /* AttachGalley only returns inners here if they really need to */
 	  /* be flushed; in particular the galley must be unsized before  */
 	  if( inners != nilobj )
-	  { FlushInners(inners, nilobj);
+	  {
+	    debug0(DGF, D, "  calling FlushInners() from FlushGalley (a)");
+	    FlushInners(inners, nilobj);
 	    goto RESUME;
 	  }
 	  stop_link = nilobj;
@@ -240,7 +247,11 @@ void FlushGalley(OBJECT hd)
 	  }
 	  DetachGalley(hd);
 	  KillGalley(hd, TRUE);
-          if( inners != nilobj ) FlushInners(inners, nilobj);
+          if( inners != nilobj )
+	  {
+	    debug0(DGF, D, "  calling FlushInners() from FlushGalley (b)");
+	    FlushInners(inners, nilobj);
+	  }
 	  else ParentFlush(prnt_flush, dest_index, remove_target);
 	  debug0(DGF, D, "] FlushGalley returning ATTACH_NULL");
 	  return;
@@ -266,7 +277,11 @@ void FlushGalley(OBJECT hd)
           }
           else prnt_flush = prnt_flush || blocked(dest_index);
           debug1(DGF, D, "    force: prnt_flush = %s", bool(prnt_flush));
-          if( inners != nilobj ) FlushInners(inners, nilobj);
+          if( inners != nilobj )
+	  {
+	    debug0(DGF, D, "  calling FlushInners() from FlushGalley (c)");
+	    FlushInners(inners, nilobj);
+	  }
           goto RESUME;
 
 
@@ -295,6 +310,8 @@ void FlushGalley(OBJECT hd)
       break;
   }
   dest = actual(dest_index);
+  target_is_internal =
+    (dim==ROWM && !external_ver(dest)) || (dim==COLM && !external_hor(dest));
   debug1(DGF, DD, "  dest_index: %s", EchoObject(dest_index));
 
 
@@ -323,14 +340,26 @@ void FlushGalley(OBJECT hd)
   /*  Loop invariant                                                         */
   /*                                                                         */
   /*  The children of hd up to but not including Child(link) have been       */
-  /*  examined and pronounced to be promotable.                              */
+  /*  examined and pronounced to be promotable, if unbreakable gaps are      */
+  /*  ignored.  When unbreakable gaps are taken into account, the most       */
+  /*  recent gap where a break is possible is at Child(stop_link), or        */
+  /*  nowhere if stop_link == nilobj.                                        */
   /*                                                                         */
-  /*  stop_link is the link of the most recently encountered gap object of   */
-  /*  hd, or nilobj if no gap object has been encountered yet.               */
+  /*  Case 1:  target_is_internal == FALSE                                   */
   /*                                                                         */
-  /*  if dest_encl is non-nilobj, then the destination is not external,      */
-  /*  dest_encl is its parent, and the following variables are defined:      */
+  /*  If this flag is FALSE, it means that the target of this galley is      */
+  /*  external.  Consequently, there is no need to calculate sizes because   */
+  /*  there is no constraint on them.  Also, a REJECT action is impossible   */
+  /*  so unbreakable gaps are no impediment.  Variable dest_encl is nilobj.  */
   /*                                                                         */
+  /*  Case 2:  target_is_internal == TRUE                                    */
+  /*                                                                         */
+  /*  If this flag is TRUE, it means that the target of this galley is       */
+  /*  internal.  Consequently, sizes need to be calculated, and unbreakable  */
+  /*  gaps need to be taken into account.  Variable dest_encl may be not     */
+  /*  nilobj, in which case the following variables are defined:             */
+  /*                                                                         */
+  /*    dest_encl        the object enclosing dest (which must exist)        */
   /*    prec_gap         gap object preceding dest (which must exist)        */
   /*    prec_def         first definite object preceding dest (must exist)   */
   /*    dest_back        back(dest_encl) including effect of accepted compts */
@@ -343,6 +372,14 @@ void FlushGalley(OBJECT hd)
   /*    perp_fwd         fwd(dest_encl) in other direction,  incl accepteds  */
   /*                                                                         */
   /*  if dest_encl is nilobj, these variables are not defined.               */
+  /*                                                                         */
+  /*  If stop_link is non-nilobj, then in the internal case dest_encl must   */
+  /*  be non-nilobj, and the following variables are defined:                */
+  /*                                                                         */
+  /*    stop_back        back(dest_encl) including all before stop_link      */
+  /*    stop_fwd         fwd(dest_encl)  including all before stop_link      */
+  /*    stop_perp_back   back(dest_encl) in other direction                  */
+  /*    stop_perp_fwd    fwd(dest_encl) in other direction                   */
   /*                                                                         */
   /*  need_adjust is true if at least one definite component has been        */
   /*  accepted for promotion and the destination is internal; hence,         */
@@ -363,7 +400,18 @@ void FlushGalley(OBJECT hd)
       case GAP_OBJ:
 
 	prec_gap = y;
-	stop_link = link;
+	if( target_is_internal )
+	{ assert( dest_encl != nilobj, "FlushGalley/GAP_OBJ: dest_encl!" );
+	  if( !nobreak(gap(prec_gap)) )
+	  {
+	    stop_link = link;
+	    stop_back = dest_back;
+	    stop_fwd  = dest_fwd;
+	    stop_perp_back = perp_back;
+	    stop_perp_fwd = perp_fwd;
+	  }
+	}
+	else stop_link = link;
 	if( !join(gap(y)) )  seen_nojoin(hd) = TRUE;
 	break;
 
@@ -447,13 +495,22 @@ void FlushGalley(OBJECT hd)
       case VCOVER:
       case HCONTRACT:
       case VCONTRACT:
+      case HLIMITED:
+      case VLIMITED:
       case HEXPAND:
       case VEXPAND:
+      case START_HVSPAN:
+      case START_HSPAN:
+      case START_VSPAN:
+      case HSPAN:
+      case VSPAN:
       case ROTATE:
+      case BACKGROUND:
       case SCALE:
       case KERN_SHRINK:
       case INCGRAPHIC:
       case SINCGRAPHIC:
+      case PLAIN_GRAPHIC:
       case GRAPHIC:
       case ACAT:
       case HCAT:
@@ -487,8 +544,7 @@ void FlushGalley(OBJECT hd)
 	}
 
 	/* check size constraint */
-	if( (dim == ROWM && !external_ver(dest)) ||
-	    (dim == COLM && !external_hor(dest)) )
+	if( target_is_internal )
 	{
 	  /* initialise dest_encl etc if not done yet */
 	  if( dest_encl == nilobj )
@@ -516,6 +572,8 @@ void FlushGalley(OBJECT hd)
 	    perp_fwd  = fwd(dest_encl, 1-dim);
 	    Constrained(dest_encl, &dest_par_constr, dim, &why);
 	    Constrained(dest_encl, &dest_perp_constr, 1-dim, &why);
+	    debug1(DGF, D, "  setting dest_perp_constr = %s",
+	      EchoConstraint(&dest_perp_constr));
 	    frame_size = constrained(dest_par_constr) ? bfc(dest_par_constr) :0;
 	  }
 
@@ -529,6 +587,13 @@ void FlushGalley(OBJECT hd)
 		  ActualGap(fwd(prec_def, dim), back(y, dim),
 			fwd(y, dim), &gap(prec_gap), frame_size,
 			dest_back + dest_fwd - fwd(prec_def, dim));
+	    debug5(DGF, D, "  f = %s + %s - %s + %s (prec_gap %s)",
+	      EchoLength(dest_fwd), EchoLength(fwd(y, dim)),
+	      EchoLength(fwd(prec_def, dim)), EchoLength(
+		  ActualGap(fwd(prec_def, dim), back(y, dim),
+			fwd(y, dim), &gap(prec_gap), frame_size,
+			dest_back + dest_fwd - fwd(prec_def, dim))
+	      ), EchoGap(&gap(prec_gap)));
 	    debug3(DGF, D, "  b,f: %s,%s;   dest_encl: %s",
 			EchoLength(dest_back), EchoLength(f),
 			EchoConstraint(&dest_par_constr));
@@ -536,12 +601,8 @@ void FlushGalley(OBJECT hd)
 	    /* check new size against parallel constraint */
 	    if( (units(gap(prec_gap))==FRAME_UNIT && width(gap(prec_gap)) > FR)
 	        || !FitsConstraint(dest_back, f, dest_par_constr)
-
-		/* *** new code for rejecting if optimizer says so *** */
 		|| (opt_components(hd) != nilobj && opt_comps_permitted(hd)<=0)
-		/* *****************************************************/
-
-	    )
+	      )
 	    {
 	      if( opt_components(hd) != nilobj )
 	      { OBJECT z;
@@ -586,8 +647,16 @@ void FlushGalley(OBJECT hd)
 	    }
 
 	    /* calculate perpendicular effect of adding y to dest */
-	    pb = find_max(perp_back, back(y, 1-dim));
-	    pf = find_max(perp_fwd,  fwd(y,  1-dim));
+	    if( seen_nojoin(hd) )
+	    {
+	      pb = 0;
+	      pf = find_max(perp_fwd,  size(y, 1-dim));
+	    }
+	    else
+	    {
+	      pb = find_max(perp_back, back(y, 1-dim));
+	      pf = find_max(perp_fwd,  fwd(y,  1-dim));
+	    }
 
 	    /* check new size against perpendicular constraint */
 	    if( !FitsConstraint(pb, pf, dest_perp_constr) )
@@ -597,6 +666,15 @@ void FlushGalley(OBJECT hd)
 		opt_components(hd) = nilobj;
 		debug1(DOG, D, "FlushGalley(%s) de-optimizing (perp problem)",
 		  SymName(actual(hd)));
+	      }
+	      if( dim == ROWM )
+	      {
+		Error(20, 3, "component too wide for available space",
+		  WARN, &fpos(y));
+		debug6(DGF, D, "  %s,%s [%s,%s] too wide for %s, y = %s",
+		  EchoLength(pb), EchoLength(pf),
+		  EchoLength(back(y, 1-dim)), EchoLength(fwd(y, 1-dim)),
+		  EchoConstraint(&dest_perp_constr), EchoObject(y));
 	      }
 	      debug1(DGF, D, "  reject (c) %s", EchoObject(y));
 	      goto REJECT;
@@ -612,24 +690,40 @@ void FlushGalley(OBJECT hd)
 	    }
 	  }
 	  /* accept indefinite component */
+	} /* end if( target_is_internal ) */
 
-	} /* end if( !external_ver(dest) ) */
-
-	/* accept this component into dest */
-	debug3(DGF, D, "  accept %s %s %s", Image(type(y)), EchoObject(y),
+	/* accept this component into dest, subject to following nobreaks */
+	debug3(DGF, D, "  t-accept %s %s %s", Image(type(y)), EchoObject(y),
 	  EchoFilePos(&fpos(y)));
 	prnt_flush = prnt_flush || blocked(dest_index);
 	debug1(DGF, DDD, "    prnt_flush = %s", bool(prnt_flush));
 	debug1(DGF, DDD, "    inners = %s", DebugInnersNames(inners));
 	if( inners != nilobj )
-	{ Promote(hd, NextDown(link), dest_index);
-	  if( need_adjust )
-	  { debug0(DSA, D, "  calling AdjustSize from FlushGalley (ACCEPT)");
-	    AdjustSize(dest_encl, dest_back, dest_fwd, dim);
-	    AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
+	{ BOOLEAN promotable;  OBJECT tgp;
+
+	  /* We would prefer to promote right now, then give these inners */
+	  /* a chance.  However this is not possible unless the following */
+	  /* gap (if any) is breakable                                    */
+
+	  if( type(NextDown(link)) == LINK )
+	  { Child(tgp, NextDown(link));
+	    assert( type(tgp) == GAP_OBJ, "FlushGalley:  tgp!" );
+	    promotable = !nobreak(gap(tgp));
 	  }
-	  FlushInners(inners, hd);
-	  goto RESUME;
+	  else promotable = TRUE;
+
+	  if( promotable )
+	  {
+	    Promote(hd, NextDown(link), dest_index, TRUE);
+	    if( need_adjust )
+	    { debug0(DSA, D, "  calling AdjustSize from FlushGalley (ACCEPT)");
+	      AdjustSize(dest_encl, dest_back, dest_fwd, dim);
+	      AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
+	    }
+	    debug0(DGF, D, "  calling FlushInners() from FlushGalley (d)");
+	    FlushInners(inners, hd);
+	    goto RESUME;
+	  }
 	}
 	break;
 
@@ -640,7 +734,6 @@ void FlushGalley(OBJECT hd)
 	break;
 
     } /* end switch */
-
   } /* end for */
 
 
@@ -650,7 +743,7 @@ void FlushGalley(OBJECT hd)
     debug0(DGF, D, "  galley empty now");
     if( inners != nilobj )  DisposeObject(inners);
     if( Down(hd) != hd )
-    { Promote(hd, hd, dest_index);
+    { Promote(hd, hd, dest_index, TRUE);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (EMPTY)");
 	AdjustSize(dest_encl, dest_back, dest_fwd, dim);
@@ -683,11 +776,11 @@ void FlushGalley(OBJECT hd)
     assert(actual(dest) != PrintSym, "FlushGalley: reject print!");
     if( inners != nilobj )  DisposeObject(inners);
     if( stop_link != nilobj )
-    { Promote(hd, stop_link, dest_index);
+    { Promote(hd, stop_link, dest_index, TRUE);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (REJECT)");
-	AdjustSize(dest_encl, dest_back, dest_fwd, dim);
-	AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
+	AdjustSize(dest_encl, stop_back, stop_fwd, dim);
+	AdjustSize(dest_encl, stop_perp_back, stop_perp_fwd, 1-dim);
       }
     }
     DetachGalley(hd);
@@ -703,11 +796,11 @@ void FlushGalley(OBJECT hd)
     debug1(DGF, D, "  suspend %s", EchoIndex(y));
     if( inners != nilobj )  DisposeObject(inners);
     if( stop_link != nilobj )
-    { Promote(hd, stop_link, dest_index);
+    { Promote(hd, stop_link, dest_index, TRUE);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (SUSPEND)");
-	AdjustSize(dest_encl, dest_back, dest_fwd, dim);
-	AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
+	AdjustSize(dest_encl, stop_back, stop_fwd, dim);
+	AdjustSize(dest_encl, stop_perp_back, stop_perp_fwd, 1-dim);
       }
     }
 
@@ -759,7 +852,7 @@ void FlushGalley(OBJECT hd)
 	if( found )  found = gall && newsym == eg_symbol(eg) &&
 			StringEqual(newtag, string(tag));
 
-	/* *** new code for merging galleys whose seq strings are equal *** */
+	/* merge galleys whose seq strings are equal */
 	if( found && StringEqual(newseq, string(seq)) )
 	{ SwitchScope(nilobj);
 	  val = ReadFromFile(eg_fnum(eg), eg_fpos(eg), eg_lnum(eg));
@@ -779,7 +872,6 @@ void FlushGalley(OBJECT hd)
 	    Link(hd2, val);
 	  }
 	}
-	/* *** */
 
       } while( found && StringEqual(newseq, string(seq)) );
       if( found )

@@ -6,6 +6,7 @@ langdef EnglishUK				{ engluk	. : ! ? .) ?) !) .' !' ?' }
 langdef Finnish Suomi				{ finnish	. : ! ? .) ?) !) .' !' ?' }
 langdef French Francais "Fran\347ais"		{ french				  }
 langdef German Deutsch				{ german	. : ! ? .) ?) !) .' !' ?' }
+langdef Hungarian Magyar			{ -		. : ! ? .) ?) !) .' !' ?' }
 langdef	Italian Italiano			{ italian	. : ! ? .) ?) !) .' !' ?' }
 langdef Norwegian Norsk				{ norweg	. : ! ? .) ?) !) .' !' ?' }
 langdef Polish Polski				{ polish	. : ! ? .) ?) !) .' !' ?' }

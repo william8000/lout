@@ -1,7 +1,7 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -269,7 +269,7 @@ static void WriteClosure(OBJECT x, int *linecount, FILE_NUM fnum, OBJECT env)
 /*****************************************************************************/
 
 static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
-{ OBJECT link, y, gap_obj, sym, env;  FULL_CHAR *name; int offset, lnum;
+{ OBJECT link, y, z, gap_obj, sym, env;  FULL_CHAR *name; int offset, lnum;
   int prec, i, last_prec;  BOOLEAN braces_needed;
   switch( type(x) )
   {
@@ -495,12 +495,20 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case KERN_SHRINK:	name = KW_KERN_SHRINK;	goto SETC;
     case HCONTRACT:	name = KW_HCONTRACT;	goto SETC;
     case VCONTRACT:	name = KW_VCONTRACT;	goto SETC;
+    case HLIMITED:	name = KW_HLIMITED;	goto SETC;
+    case VLIMITED:	name = KW_VLIMITED;	goto SETC;
     case HEXPAND:	name = KW_HEXPAND;	goto SETC;
     case VEXPAND:	name = KW_VEXPAND;	goto SETC;
+    case START_HVSPAN:	name = KW_STARTHVSPAN;	goto SETC;
+    case START_HSPAN:	name = KW_STARTHSPAN;	goto SETC;
+    case START_VSPAN:	name = KW_STARTVSPAN;	goto SETC;
+    case HSPAN:		name = KW_HSPAN;	goto SETC;
+    case VSPAN:		name = KW_VSPAN;	goto SETC;
     case PADJUST:	name = KW_PADJUST;	goto SETC;
     case HADJUST:	name = KW_HADJUST;	goto SETC;
     case VADJUST:	name = KW_VADJUST;	goto SETC;
     case ROTATE:	name = KW_ROTATE;	goto SETC;
+    case BACKGROUND:	name = KW_BACKGROUND;	goto SETC;
     case CASE:		name = KW_CASE;		goto SETC;
     case YIELD:		name = KW_YIELD;	goto SETC;
     case BACKEND:	name = KW_BACKEND;	goto SETC;
@@ -518,7 +526,9 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case CURR_FACE:	name = KW_CURR_FACE;	goto SETC;
     case COMMON:	name = KW_COMMON;	goto SETC;
     case RUMP:		name = KW_RUMP;		goto SETC;
+    case MELD:		name = KW_MELD;		goto SETC;
     case INSERT:	name = KW_INSERT;	goto SETC;
+    case ONE_OF:	name = KW_ONE_OF;	goto SETC;
     case NEXT:		name = KW_NEXT;		goto SETC;
     case PLUS:		name = KW_PLUS;		goto SETC;
     case MINUS:		name = KW_MINUS;	goto SETC;
@@ -526,6 +536,7 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case TAGGED:	name = KW_TAGGED;	goto SETC;
     case INCGRAPHIC:	name = KW_INCGRAPHIC;	goto SETC;
     case SINCGRAPHIC:	name = KW_SINCGRAPHIC;	goto SETC;
+    case PLAIN_GRAPHIC:	name = KW_PLAINGRAPHIC;	goto SETC;
     case GRAPHIC:	name = KW_GRAPHIC;	goto SETC;
 
       /* print left parameter, if present */
@@ -552,6 +563,37 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
 	else WriteObject(y, DEFAULT_PREC, linecount, fnum);
       }
       if( DEFAULT_PREC <= outer_prec )  StringFPuts(KW_RBR, last_write_fp);
+      break;
+
+
+    case RAW_VERBATIM:
+    case VERBATIM:
+
+      StringFPuts(type(x) == VERBATIM ? KW_VERBATIM : KW_RAWVERBATIM, last_write_fp);
+      StringFPuts(STR_SPACE, last_write_fp);
+      StringFPuts(KW_BEGIN, last_write_fp);
+      StringFPuts(STR_NEWLINE, last_write_fp);
+      Child(y, Down(x));
+      if( type(y) == WORD )
+      {
+	StringFPuts(string(y), last_write_fp);
+        StringFPuts(STR_SPACE, last_write_fp);
+      }
+      else
+      {
+	assert( type(y) == VCAT, "WriteObject/VERBATIM!" );
+	for( link = Down(y);  link != y;  link = NextDown(link) )
+	{ Child(z, link);
+	  if( type(z) == GAP_OBJ )  continue;
+	  assert( type(z) == WORD, "WriteObject/VERBATIM/WORD!");
+	  StringFPuts(string(z), last_write_fp);
+	  StringFPuts(STR_NEWLINE, last_write_fp);
+	  *linecount += 1;
+	}
+      }
+      StringFPuts(KW_END, last_write_fp);
+      StringFPuts(STR_SPACE, last_write_fp);
+      StringFPuts(type(x) == VERBATIM ? KW_VERBATIM : KW_RAWVERBATIM, last_write_fp);
       break;
 
 

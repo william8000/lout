@@ -22,7 +22,7 @@ Optimal galley breaking is applied to each galley, horizontal or
 vertical, that possesses a parameter or nested symbol called
 @Code "@Optimize" whose value is {@Code Yes}.  Like cross referencing,
 it takes two runs to have effect.  On the first run, Lout records the
-sizes of the galleys components and gaps, and also the space available
+sizes of the galley's components and gaps, and also the space available
 at each of its targets.  At end of run this information is used to find
 an optimal break, which is written to the cross-reference database.  On
 the second run, the optimal break is retrieved and used.

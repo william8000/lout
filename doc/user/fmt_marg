@@ -5,7 +5,7 @@
 @PP
 There are six options for setting the top and bottom margins on each
 margins. @RawIndex { margins }
-margins.pages @SubIndex { in pages }
+margins.in.pages @SubIndex { in pages }
 top.margin @Index @Code "@TopMargin"
 foot.margin @Index @Code "@FootMargin"
 odd.left.margin @Index @Code "@OddLeftMargin"

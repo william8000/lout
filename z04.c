@@ -1,7 +1,7 @@
 /*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -164,12 +164,22 @@ FULL_CHAR *EchoToken(OBJECT x)
     case KERN_SHRINK:
     case HCONTRACT:
     case VCONTRACT:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+    case HSPAN:
+    case VSPAN:
     case PADJUST:
     case HADJUST:
     case VADJUST:
     case ROTATE:
+    case BACKGROUND:
+    case VERBATIM:
+    case RAW_VERBATIM:
     case CASE:
     case YIELD:
     case BACKEND:
@@ -187,7 +197,9 @@ FULL_CHAR *EchoToken(OBJECT x)
     case CURR_FACE:
     case COMMON:
     case RUMP:
+    case MELD:
     case INSERT:
+    case ONE_OF:
     case NEXT:
     case PLUS:
     case MINUS:
@@ -195,6 +207,7 @@ FULL_CHAR *EchoToken(OBJECT x)
     case TAGGED:
     case INCGRAPHIC:
     case SINCGRAPHIC:
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
     case ACAT:
     case HCAT:

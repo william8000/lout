@@ -4,8 +4,8 @@
 @Begin
 @BeginSections
 @Include { det_lexi }
-@Include { det_visi }
 @Include { det_name }
+@Include { det_visi }
 @Include { det_filt }
 @Include { det_prec }
 @Include { det_size }

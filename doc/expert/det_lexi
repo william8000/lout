@@ -37,103 +37,11 @@ fact the `other' class contains all 8-bit characters (except octal 0)
 not assigned to previous classes.
 @PP
 A @I {white space} is a sequence of one or more white space characters.
- Lout treats the formfeed character exactly like the space character;
-it is useful for getting page breaks when printing Lout source code.
 white.space @Index { White space }
 formfeed @Index { Formfeed }
 space.f @Index { Space }
-@PP
-An @I identifier is a sequence of one or more letters which is the name of a
-identifier @Index { Identifier }
-symbol.  It is conventional but not essential to begin identifiers with
-{@Code "@"};  Basser Lout will print a warning message if it finds an
-unquoted literal word (see below) beginning with {@Code "@"}, since such
-words are usually misspelt identifiers.  The ten digits are not letters
-and may not appear in identifiers; and although the underscore character
-is a letter and may be used in identifiers, it is not conventional to
-do so.  The complete list of predefined identifiers is
-@ID @OneRow @Code {
-{     "@BackEnd"
-  @JL "@Begin"
-  @JL "@Break"
-  @JL "@Case"
-  @JL "@Common"
-  @JL "@Char"
-  @JL "@Database"
-  @JL "@End"
-  @JL "@Enclose"
-  @JL "@Filter"
-  @JL "@FilterErr"
-  @JL "@FilterIn"
-  @JL "@FilterOut"
-  @JL "@Font"
-  @JL "@ForceGalley"
-  @JL "@Galley"
-  @JL "@Graphic"
-  @JL "@HAdjust"
-  @JL "@HContract"
-  @JL "@HCover"
-  @JL "@HExpand"
-  @JL "@High"
-  @JL "@HScale"
-} |4.4cx {
-      "@HShift"
-  @JL "@Include"
-  @JL "@IncludeGraphic"
-  @JL "@Insert"
-  @JL "@KernShrink"
-  @JL "@Key"
-  @JL "@LClos"
-  @JL "@LEnv"
-  @JL "@LInput"
-  @JL "@LVis"
-  @JL "@LUse"
-  @JL "@Merge"
-  @JL "@Moment"
-  @JL "@Next"
-  @JL "@NotRevealed"
-  @JL "@Null"
-  @JL "@OneCol"
-  @JL "@OneRow"
-  @JL "@Open"
-  @JL "@PAdjust"
-  @JL "@PageLabel"
-  @JL "@PrependGraphic"
-  @JL "@Rotate"
-} |4.4cx {
-      "@Rump"
-  @JL "@Scale"
-  @JL "@SetColor"
-  @JL "@SetColour"
-  @JL "@Space"
-  @JL "@SysDatabase"
-  @JL "@SysInclude"
-  @JL "@SysIncludeGraphic"
-  @JL "@SysPrependGraphic"
-  @JL "@Tag"
-  @JL "@Tagged"
-  @JL "@Underline"
-  @JL "@Use"
-  @JL "@VAdjust"
-  @JL "@VContract"
-  @JL "@VContract"
-  @JL "@VExpand"
-  @JL "@VScale"
-  @JL "@VShift"
-  @JL "@Wide"
-  @JL "@Yield"
-  @JL "@YUnit"
-  @JL "@ZUnit"
-}
-}
-plus the names of the parameters of @@Moment.  The symbols @@LClos, @@LEnv,
-lclos @Index { @@LClos symbol }
-lenv @Index { @@LEnv symbol }
-linput @Index { @@LInput symbol }
-lvis @Index { @@LVis symbol }
-luse @Index { @@LUse symbol }
-@@LInput, @@LVis and @@LUse appear in cross reference databases generated
-by Lout and are not for use elsewhere.
+ Lout treats the formfeed character exactly like the space character;
+it is useful for getting page breaks when printing Lout source code.
 @PP
 A @I delimiter is a sequence of one or more `other' characters which
 delimiter @Index { Delimiter }
@@ -169,6 +77,119 @@ of predefined delimiters is
 }
 A longer delimiter like @Code "<=" will be recognised in
 preference to a shorter one like {@Code "<"}.
+@PP
+An @I identifier is a sequence of one or more letters which is the name of a
+identifier @Index { Identifier }
+symbol.  It is conventional but not essential to begin identifiers with
+{@Code "@"};  Basser Lout will print a warning message if it finds an
+unquoted literal word (see below) beginning with {@Code "@"}, since such
+words are usually misspelt identifiers.  The ten digits are not letters
+and may not appear in identifiers; and although the underscore character
+is a letter and may be used in identifiers, it is not conventional to
+do so.  The complete list of predefined identifiers is
+@ID @OneRow @Code {
+{     "@BackEnd"
+  @JL "@Background"
+  @JL "@Begin"
+  @JL "@Break"
+  @JL "@Case"
+  @JL "@Common"
+  @JL "@Char"
+  @JL "@CurrFace"
+  @JL "@CurrFamily"
+  @JL "@CurrLang"
+  @JL "@Database"
+  @JL "@End"
+  @JL "@Enclose"
+  @JL "@Filter"
+  @JL "@FilterErr"
+  @JL "@FilterIn"
+  @JL "@FilterOut"
+  @JL "@Font"
+  @JL "@ForceGalley"
+  @JL "@Galley"
+  @JL "@Graphic"
+  @JL "@HAdjust"
+  @JL "@HContract"
+  @JL "@HCover"
+  @JL "@HExpand"
+  @JL "@High"
+  @JL "@HLimited"
+  @JL "@HScale"
+  @JL "@HShift"
+  @JL "@HSpan"
+} |4.4cx {
+      "@Include"
+  @JL "@IncludeGraphic"
+  @JL "@Insert"
+  @JL "@KernShrink"
+  @JL "@Key"
+  @JL "@Language"
+  @JL "@LClos"
+  @JL "@LEnv"
+  @JL "@LInput"
+  @JL "@LVis"
+  @JL "@LUse"
+  @JL "@Meld"
+  @JL "@Merge"
+  @JL "@Minus"
+  @JL "@Moment"
+  @JL "@Next"
+  @JL "@NotRevealed"
+  @JL "@Null"
+  @JL "@OneCol"
+  @JL "@OneOf"
+  @JL "@OneRow"
+  @JL "@Open"
+  @JL "@Optimize"
+  @JL "@PAdjust"
+  @JL "@PageLabel"
+  @JL "@PlainGraphic"
+  @JL "@Plus"
+  @JL "@PrependGraphic"
+  @JL "@RawVerbatim"
+  @JL "@Rotate"
+} |4.4cx {
+      "@Rump"
+  @JL "@Scale"
+  @JL "@SetColor"
+  @JL "@SetColour"
+  @JL "@Space"
+  @JL "@StartHSpan"
+  @JL "@StartHVSpan"
+  @JL "@StartVSpan"
+  @JL "@SysDatabase"
+  @JL "@SysInclude"
+  @JL "@SysIncludeGraphic"
+  @JL "@SysPrependGraphic"
+  @JL "@Tag"
+  @JL "@Tagged"
+  @JL "@Target"
+  @JL "@Underline"
+  @JL "@Use"
+  @JL "@VAdjust"
+  @JL "@VContract"
+  @JL "@VCover"
+  @JL "@Verbatim"
+  @JL "@VExpand"
+  @JL "@VLimited"
+  @JL "@VScale"
+  @JL "@VShift"
+  @JL "@VSpan"
+  @JL "@Wide"
+  @JL "@Yield"
+  @JL "@YUnit"
+  @JL "@ZUnit"
+}
+}
+plus the names of the parameters of @@Moment.  The symbols @@LClos, @@LEnv,
+lclos @Index { @@LClos symbol }
+lenv @Index { @@LEnv symbol }
+linput @Index { @@LInput symbol }
+lvis @Index { @@LVis symbol }
+luse @Index { @@LUse symbol }
+@@LInput, @@LVis and @@LUse appear in cross reference databases generated
+by Lout and are not for use elsewhere.
 @PP
 A sequence of characters which is neither a white space, an identifier, nor a
 delimiter, is by default a @I {literal word}, which means that it will

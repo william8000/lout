@@ -13,13 +13,13 @@ Some good general principles and many examples have been given by van Leunen
 van.leunen. @Index { van Leunen, Mary-Claire }
 @Cite { $vanleunen1992handbook }.  Broadly speaking Lout follows her
 recommendations, with some unification and scaling back as is inevitable
-with software.  The reference formatting of Scribe @Cite { $reid1980scribe }
+with software.  Scribe @Cite { $reid1980scribe }
 latex. @Index @LaTeX
 scribe. @RawIndex Scribe
 scribe.reference @SubIndex { reference formatting }
-and @LaTeX @Cite { $lamport1986latex } were derived from the first edition
-of the same source, so there is a family resemblance which is close enough
-to make translation from Scribe and @LaTeX references fairly straightforward.
+and @LaTeX @Cite { $lamport1986latex } followed the first edition of the
+same source, so translation from Scribe and @LaTeX references is
+fairly straightforward.
 @BeginSections
 @Include { ref_sett }
 @Include { ref_cite }

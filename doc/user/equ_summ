@@ -281,8 +281,7 @@ ragged @Break {
 ":="		@Dbl @Eq {  :=			}
 }
 @DP
-These can be negated by enclosing them in braces and preceding them with
-{@Code "not"}, as in
+These can be negated by preceding them with {@Code "not"}, as in
 negation. @Index { negation of equation symbols }
 {@Code "not =="}, for example, which yields {@Eq { not == }}.  The
 following short names define binary operators (medium space on each side):

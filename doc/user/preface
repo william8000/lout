@@ -18,7 +18,7 @@ gnu. @Index { GNU Public License }
 primary source is directory
 @ID @Code "ftp://ftp.cs.su.oz.au/jeff/lout"
 in which may be found a gzipped tar file containing the main distribution
-(currently {@Code "lout.3.12.tar.gz"}), and various other things including
+(currently {@Code "lout-3.13.tar.gz"}), and various other things including
 a PostScript version of this guide.  The distribution contains source code,
 libraries, documentation, license, and installation instructions.
 @PP
@@ -32,8 +32,8 @@ in the Subject line.
 @PP
 Lout began in 1984 as a research project into the design of a high-level
 language for document formatting.  At that time my name for the subject
-was `document layout,' and this terminology survives in the names of
-some of the standard packages, and in `Lout' itself.  The initial design
+was `document layout,' and this terminology survives in the name
+`Lout'.  The initial design
 was strongly influenced by Brian W. Kernighan and Lorinda L. Cherry's eqn
 kernighan @Index { Kernighan, Brian W. }
 cherry.l @Index { Cherry, Lorinda L.}

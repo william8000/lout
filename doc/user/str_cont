@@ -68,7 +68,7 @@ clear.
 In addition to these options, each document type has options that
 determine which large-scale structure symbols will be listed in the
 table of contents.  For example, among the options to the
-@Code "@BookLayout" symbol in the @Code book setup file are these:
+@Code "@BookSetup" symbol in the @Code book setup file are these:
 @ID @OneRow @Code {
 "@ChapterInContents { Yes }"
 "@SectionInContents { Yes }"

@@ -3,9 +3,9 @@
    @Tag { chapters }
 @Begin
 @PP
-The definitions of chapters and sections from the DocumentLayout package
+The definitions of chapters and sections from the DocumentSetup package
 chapters. @Index { Chapters and sections }
-of Version 2 (in Version 3, the BookLayout extension of DocumentLayout)
+of Version 2 (in Version 3, the BookSetup extension of DocumentSetup)
 form the subject of this section.  They allow a chapter to be entered
 like this:
 document.layout.chapters @SubIndex { chapters and sections }
@@ -28,7 +28,7 @@ Within the chapter a sequence of sections may be included by writing
 These are numbered automatically, and an entry is made for each in a
 table of contents.
 @PP
-The user of the DocumentLayout package can find the number of the chapter or
+The user of the DocumentSetup package can find the number of the chapter or
 section with a given tag by writing @Code "@NumberOf tag" at any point
 in the document.  This feature is based on the following definitions:
 numberof.example @Index { @Code "@NumberOf" example }
@@ -259,7 +259,7 @@ a juxtaposition of simple words:  although
 is formally equivalent, @Code "&" was not permitted within a
 @Code "@Tag" parameter until recently.
 @PP
-The DocumentLayout package also contains definitions for subsections in the
+The DocumentSetup package also contains definitions for subsections in the
 same style.  They raise the question of whether Lout is capable of
 producing subsections should the user place {@Code "@BeginSections"},
 {@Code "@Section"}, and {@Code "@EndSections"} within a {@I section},
@@ -268,6 +268,6 @@ nesting of sections within sections is available now, although the
 numbering would of course be wrong.  The author has worked out
 definitions which provide correct numbering to arbitrary depth, with an
 arbitrary format for each level.  These were not incorporated into
-DocumentLayout because the author considers sub-subsections to be poor
+DocumentSetup because the author considers sub-subsections to be poor
 style, and he prefers separate names for the symbols at each level.
 @End @Section

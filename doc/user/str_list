@@ -229,6 +229,36 @@ broken in two between any two lines.  To force a list item to keep
 together on one page or column, use the @Code "@OneRow" symbol like
 this:  @Code "@ListItem @OneRow { ... }".
 @PP
+Occasionally it is desirable to start a new page or column between
+two list items.  This cannot be done by inserting @Code "@NP"
+between them, because the space between two list items is a kind
+of no-man's land where nothing is allowed to be.  Instead, the
+@Code "@ListNewPage" symbol is used:  it is permitted only between
+two list items, and its effect is to make the following list item
+appear at the top of the next page or column.  It may be used within
+any kind of list.
+@PP
+Another special list item is {@Code "@ListInterruptItem"}.  This
+prints its content without any numbering or formatting:
+@ID @OneRow @Code {
+"@NumberedList"
+"@ListItem { This is the first list item. }"
+"@ListInterruptItem { This is an interruption to the list. }"
+"@ListItem { This is the second list item. }"
+"@EndList"
+}
+produces
+@ID @OneRow {
+@RawNumberedList
+@ListItem { This is the first list item. }
+@ListInterruptItem { This is an interruption to the list. }
+@ListItem { This is the second list item. }
+@RawEndList
+}
+Although @Code "@ListInterruptItem" is written like a list item, the
+result appears to be an interruption to the list.  It may be used
+in any kind of list.
+@PP
 Every symbol introduced in this section has an abbreviated form
 consisting of @Code "@" followed by its capital letters only.  For
 example, @Code "@RawNumberedList" abbreviates to {@Code "@RNL"},

@@ -79,13 +79,13 @@
    { @OneCol { L &0.3fo { +0.1f @VShift 0.8f @Font A } &0.4fo @TeX }
    }
 
-   import @DocumentLayout
+   import @BasicSetup
    def @Batlow { Batlow Food Distributors Pty. Ltd. }
 
-   import @DocumentLayout
+   import @BasicSetup
    def @GreyBox right x { @Box paint { lightgrey } x }
 
-   import @DocumentLayout
+   import @BasicSetup
    def @HeadingBox left x right y
    {
        @Box { @CentredDisplay @Heading x y }
@@ -117,75 +117,12 @@
      { 1.2i @Wide { |1rt @Code x } |0.2i @Eq {non y} }
    }
  
-   import @Fig
-   def @JoinFigures
-      left A
-      named linestyle { solid }
-      named dashlength { 0.15 cm }
-      named arrow { noarrow }
-      named linewidth { 0.5 pt }
-      right B
-   {  @Arrow
-	 from { A"@CTR" ++ {{A"@CTR" @Angle B"@CTR"} A"@CIRCUM"} }
-	 to   { B"@CTR" ++ {{B"@CTR" @Angle A"@CTR"} B"@CIRCUM"} }
-         linestyle { linestyle }
-         dashlength { dashlength }
-         arrow { arrow }
-         linewidth { linewidth }
-      {}
-   }
-
-   def @ShowMarks
-      named linewidth  { 0.015 cm  }
-      named linestyle  { dashed    }
-      named dashlength { 0.15 cm   }
-      named paint      { lightgrey }
-      right x
-   {
-      @Fig
-      {   @Box margin { 0c } linewidth { linewidth } paint { paint }
-	  {   @Figure
-		 shape { -0.3 cm ymark
-			 {xsize ymark} ++ {0.3 cm 0}  []
-			 xmark -0.3 cm
-			 {xmark ysize} ++ {0 0.3 cm}
-		       }
-		 linewidth { linewidth }
-		 linestyle { linestyle }
-		 dashlength { dashlength }
-	      x
-	  }
-
-      }
-   }
-
-   def @ShowHMark
-      named linewidth  { 0.03 cm }
-      named linestyle  { dotted   }
-      named dashlength { 0.06 cm  }
-      named paint      { light    }
-      right x
-   {
-      @Fig
-      {   
-	 @Figure
-		 shape {
-			 -0.3 cm ymark
-			 {xsize ymark} ++ {0.3 cm 0}
-		       }
-		 linewidth { linewidth }
-		 linestyle { linestyle }
-		 dashlength { dashlength }
-	 x
-      }
-   }
-
    import @Eq
    def @ExA { 1 over sqrt { 1 - 4 x sup 2 } }
 
    def @@Diag { @Code "@Diag" }
 
-   extend @DiagramPrint @Diag
+   extend @DiagSetup @Diag
    macro @MyNode {
     @Node
 	outline {
@@ -197,7 +134,7 @@
 	}
    }
 
-   extend @DiagramPrint @Diag
+   extend @DiagSetup @Diag
    macro @MyLink {
     @Link
 	path {
@@ -205,4 +142,62 @@
 	    TO:: to
 	    FROM TO
 	}
+   }
+
+   def @ShowHMark
+      named linewidth  { 0.015 cm }
+      named linestyle  { dashed   }
+      named dashlength { 0.15 cm  }
+      named paint      { light    }
+      right x
+   {
+      @Fig
+      {
+         @Figure
+                 shape {
+                   @BackEnd @Case {
+                     PostScript @Yield {
+                         -0.3 cm ymark
+                         {xsize ymark} ++ {0.3 cm 0}
+                     }
+                     PDF @Yield { ""    #       VT: PDF currently has no output
+                     }
+                   }
+                 }
+                 linewidth { linewidth }
+                 linestyle { linestyle }
+                 dashlength { dashlength }
+         x
+      }
+   }
+ 
+   def @ZeroWidth right x { @OneCol { |0io x |0io } }
+ 
+   def @SomeText
+   {
+Johnson suddenly uttered, in a strong determined tone, an apophegm, at
+which many will start:  `Patriotism is the last refuge of a scoundrel.'
+   }
+ 
+   import @DiagSetup
+   def @OpenCircle { @Diag { @Circle margin { 0.2f } } }
+ 
+   import @DiagSetup
+   def @ClosedCircle { @Diag { @Circle paint { black } margin { 0.2f } } }
+ 
+   import @TblSetup @BasicSetup
+   def @AmberLight
+   {
+       @OneRow @Tbl
+           aformat { @Cell A }
+           marginhorizontal { 0i }
+           marginvertical { 0i }
+           strut { no }
+           rule { no }
+           paint { no }
+        {
+            @Rowa A { @OpenCircle }
+            @MarkRowa A { @ClosedCircle }
+            @Rowa A { @OpenCircle }
+        }
    }

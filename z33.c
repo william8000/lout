@@ -1,7 +1,7 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -232,10 +232,10 @@ OBJECT OldCrossDb, NewCrossDb;
 
 OBJECT DbCreate(OBJECT x)
 { OBJECT db = x;
-  debug1(DBS, D, "DbCreate(%s)", string(db));
+  debug1(DBS, DD, "DbCreate(%s)", string(db));
   assert( is_word(type(x)), "DbCreate: !is_word(type(x))" );
   reading(db) = FALSE;  filep(db) = null;
-  debug1(DBS, D, "DbCreate returning %s", EchoObject(db));
+  debug1(DBS, DD, "DbCreate returning %s", EchoObject(db));
   return db;
 } /* end DbCreate */
 
@@ -276,7 +276,11 @@ BOOLEAN check)
   assert( tag[0] != '\0', "DbInsert: null tag!" );
   assert( seq[0] != '\0', "DbInsert: null seq!" );
   ifdebug(DPP, D, ProfileOn("DbInsert"));
-  debug6(DBS, D, "DbInsert(%s, %s, %s, %s, %s, %s, dlnum, dfpos)",
+  debugcond6(DBS, D, StringEqual(tag, AsciiToFull("background")),
+	"DbInsert(%s, %s, %s, %s, %s, %s, dlnum, dfpos)",
+	string(db), bool(gall), SymName(sym), tag, seq,
+	dfnum == NO_FILE ? AsciiToFull(".") : FileName(dfnum));
+  debug6(DBS, DD, "DbInsert(%s, %s, %s, %s, %s, %s, dlnum, dfpos)",
 	string(db), bool(gall), SymName(sym), tag, seq,
 	dfnum == NO_FILE ? AsciiToFull(".") : FileName(dfnum));
   assert(!reading(db), "DbInsert: insert into reading database");
@@ -324,13 +328,13 @@ BOOLEAN check)
   }
   else StringCopy(buff, AsciiToFull("."));
   SymToNum(db, sym, symnum, gall);
-  ifdebug(DBS, D,
+  ifdebug(DBS, DD,
   fprintf(stderr, "  -> %s%d&%s\t%s\t%ld\t%d\t%s\n", gall ? "0" : "", symnum,
     tag, seq, dfpos, dlnum, buff);
   );
   fprintf(filep(db), "%s%d&%s\t%s\t%s\t%ld\t%d\t%s\n", gall ? "0" : "", symnum,
     tag, seq, StringFiveInt(++extra_seq), dfpos, dlnum, buff);
-  debug0(DBS, D, "DbInsert returning.");
+  debug0(DBS, DD, "DbInsert returning.");
   ifdebug(DPP, D, ProfileOff("DbInsert"));
 } /* end DbInsert */
 
@@ -348,7 +352,7 @@ void DbConvert(OBJECT db, BOOLEAN full_name)
 { FULL_CHAR oldname[MAX_BUFF+10], newname[MAX_BUFF];
   OBJECT link, y;
   ifdebug(DPP, D, ProfileOn("DbConvert"));
-  debug2(DBS, D, "DbConvert( %ld %s )", (long) db, string(db));
+  debug2(DBS, DD, "DbConvert( %ld %s )", (long) db, string(db));
   assert( !reading(db), "DbConvert: reading database");
   StringCopy(newname, string(db));
   StringCat(newname, INDEX_SUFFIX);
@@ -366,13 +370,13 @@ void DbConvert(OBJECT db, BOOLEAN full_name)
     }
     fprintf(filep(db), "00 %s %s\n", LOUT_VERSION, "database index file");
     fclose(filep(db));
-    debug2(DBS, D, "  calling SortFile(%s, %s)", oldname, newname);
+    debug2(DBS, DD, "  calling SortFile(%s, %s)", oldname, newname);
     SortFile( (char *) oldname, (char *) newname);
   }
   else StringRemove(newname);
   StringRemove(oldname);
   DeleteNode(db);
-  debug0(DBS, D, "DbConvert returning.");
+  debug0(DBS, DD, "DbConvert returning.");
   ifdebug(DPP, D, ProfileOff("DbConvert"));
 } /* end DbConvert */
 
@@ -411,7 +415,7 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
   int i, lnum, dlnum, num, count;  FILE_NUM index_fnum, dfnum;  long dfpos;
   BOOLEAN gall;  FULL_CHAR line[MAX_BUFF], sym_name[MAX_BUFF];
   ifdebug(DPP, D, ProfileOn("DbLoad"));
-  debug3(DBS, D, "[ DbLoad(%s, %d, %s, -)", string(stem), fpath, bool(create));
+  debug3(DBS, DD, "[ DbLoad(%s, %d, %s, -)", string(stem), fpath, bool(create));
 
   /* open or else create index file fp */
   debug0(DFS, D, "  calling DefineFile from DbLoad (1)");
@@ -511,7 +515,7 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
     Link(db, symbs);
   }
   if( fp == null )
-  { debug1(DBS, D, "] DbLoad returning (empty) %s", string(db));
+  { debug1(DBS, DD, "] DbLoad returning (empty) %s", string(db));
     ifdebug(DPP, D, ProfileOff("DbLoad"));
     return db;
   }
@@ -562,13 +566,13 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
     else
     { Error(33, 13, "undefined symbol in database file %s (line %d)",
 	WARN, &fpos(db), FileName(index_fnum), lnum);
-      debug1(DBS, D, "] DbLoad returning %s (error)", string(db));
+      debug1(DBS, DD, "] DbLoad returning %s (error)", string(db));
       fclose(filep(db));  filep(db) = null;  /* effectively an empty database */
       ifdebug(DPP, D, ProfileOff("DbLoad"));
       return db;
     }
   }
-  debug1(DBS, D, "] DbLoad returning %s", string(db));
+  debug1(DBS, DD, "] DbLoad returning %s", string(db));
   ifdebug(DPP, D, ProfileOff("DbLoad"));
   return db;
 } /* end DbLoad */
@@ -646,10 +650,10 @@ BOOLEAN DbRetrieve(OBJECT db, BOOLEAN gall, OBJECT sym, FULL_CHAR *tag,
 FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, int *dlnum, long *cont)
 { int symnum;  FULL_CHAR line[MAX_BUFF], buff[MAX_BUFF];  OBJECT y;
   ifdebug(DPP, D, ProfileOn("DbRetrieve"));
-  debug4(DBS, D, "DbRetrieve(%s, %s%s&%s)", string(db), gall ? "0" : "",
+  debug4(DBS, DD, "DbRetrieve(%s, %s%s&%s)", string(db), gall ? "0" : "",
 	SymName(sym), tag);
   if( !reading(db) || filep(db) == null )
-  { debug0(DBS, D, "DbRetrieve returning FALSE (empty or not reading)");
+  { debug0(DBS, DD, "DbRetrieve returning FALSE (empty or not reading)");
     ifdebug(DPP, D, ProfileOff("DbRetrieve"));
     return FALSE;
   }
@@ -658,7 +662,7 @@ FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, int *dlnum, long *cont)
   fseek(filep(db), 0L, SEEK_END);
   if( !SearchFile(filep(db), (int) left_pos(db), (int) ftell(filep(db)) - 1,
 	buff, line) )
-  { debug0(DBS, D, "DbRetrieve returning FALSE (key not present)");
+  { debug0(DBS, DD, "DbRetrieve returning FALSE (key not present)");
     ifdebug(DPP, D, ProfileOff("DbRetrieve"));
     return FALSE;
   }
@@ -675,7 +679,7 @@ FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, int *dlnum, long *cont)
   }
   *cont = ftell(filep(db));
   Child(y, Down(db));
-  debug3(DBS, D, "DbRetrieve returning TRUE (in %s at %ld, line %d)",
+  debug3(DBS, DD, "DbRetrieve returning TRUE (in %s at %ld, line %d)",
     FileName(*dfnum), *dfpos, *dlnum);
   ifdebug(DPP, D, ProfileOff("DbRetrieve"));
   return TRUE;
@@ -696,16 +700,16 @@ BOOLEAN DbRetrieveNext(OBJECT db, BOOLEAN *gall, OBJECT *sym, FULL_CHAR *tag,
 FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, int *dlnum, long *cont)
 { FULL_CHAR line[MAX_BUFF], fname[MAX_BUFF]; int symnum;
   ifdebug(DPP, D, ProfileOn("DbRetrieveNext"));
-  debug2(DBS, D, "DbRetrieveNext( %s, %ld )", string(db), *cont);
+  debug2(DBS, DD, "DbRetrieveNext( %s, %ld )", string(db), *cont);
   assert(reading(db), "DbRetrieveNext: not reading");
   if( filep(db) == null )
-  { debug0(DBS, D, "DbRetrieveNext returning FALSE (empty database)");
+  { debug0(DBS, DD, "DbRetrieveNext returning FALSE (empty database)");
     ifdebug(DPP, D, ProfileOff("DbRetrieveNext"));
     return FALSE;
   }
   fseek(filep(db), *cont == 0L ? (long) left_pos(db) : *cont, SEEK_SET);
   if( StringFGets(line, MAX_BUFF, filep(db)) == NULL )
-  { debug0(DBS, D, "DbRetrieveNext returning FALSE (no successor)");
+  { debug0(DBS, DD, "DbRetrieveNext returning FALSE (no successor)");
     ifdebug(DPP, D, ProfileOff("DbRetrieveNext"));
     return FALSE;
   }
@@ -722,7 +726,7 @@ FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, int *dlnum, long *cont)
       DATABASE_FILE, SOURCE_PATH);
   }
   NumToSym(db, symnum, *sym);  *cont = ftell(filep(db));
-  debug3(DBS, D, "DbRetrieveNext returning TRUE (in %s at %ld, line %d)",
+  debug3(DBS, DD, "DbRetrieveNext returning TRUE (in %s at %ld, line %d)",
     FileName(*dfnum), *dfpos, *dlnum);
   ifdebug(DPP, D, ProfileOff("DbRetrieveNext"));
   return TRUE;

@@ -5,7 +5,7 @@
 @PP
 rotate.sym @Index { @@Rotate symbol }
 rotation @Index { Rotation of object }
-The symbol @@Rotate will rotate its
+The @@Rotate symbol will rotate its
 right parameter counterclockwise an amount given in degrees (positive or
 negative) by its left parameter.  For example,
 @ID @Code {

@@ -103,24 +103,15 @@ rules. @Index rules
 produces a rule which occupies the full page (or column) width:
 @DP @FullWidthRule @DP
 More precisely, the rule occupies as much horizontal space as it
-legally can.
-@PP
-@Code "@FullWidthRule" produces an object in the usual way, so
-you will need paragraph or display symbols to separate it from
-preceding and following things.  This is a problem when using rules
-in page headers, since paragraph and display symbols cannot be used
-in page header options.  So you need to do something like this:
-@ID @Code {
-"@OddPageTop { My lovely document @Right @PageNum //0.3v @FullWidthRule }"
-}
-where @Code "//0.3v" is a piece of raw Lout whose effect is similar to
-{@Code "@LP"}.
+legally can.  @Code "@FullWidthRule" produces an object in the usual
+way, so you will need paragraph or display symbols to separate it from
+preceding and following things.
 @PP
 A variant called @Code "@LocalWidthRule" is more timid about zooming
 localwidthrule. @Index @Code "@LocalWidthRule"
 across the whole page:
 @ID @Code {
-"@OddPageTop { { My lovely document //0.3v @LocalWidthRule } @Right @PageNum }"
+"@OddPageTop { { My lovely document @LP @LocalWidthRule } @Right @PageNum }"
 }
 will draw a rule under just the three words.  Of course, underlining using
 the @Code "@Underline" symbol might be a better way to do this.  Both

@@ -11,8 +11,8 @@
 }
 Here @Eq { x } is in Italic, @Eq { 2 } is in Roman, and @Eq { minus } is
 from the Symbol font.  The character @Code "-" is a @I symbol which
-stands for {@Eq {minus}}, and @Code "2" is also a symbol, standing for
-{@Eq { 2 }}.  @Code "@Eq" includes a vast number of symbols:
+stands for @Eq {minus}, and @Code "2" is also a symbol, standing for
+@Eq { 2 }.  @Code "@Eq" includes a vast number of symbols:
 @ID {
 @Code "Omega delta int partial club"
 |7ct

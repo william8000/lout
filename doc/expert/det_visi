@@ -146,4 +146,36 @@ symbols after the @Code "import" keyword.  All these symbols
 share an important restriction:  they may not have parameters.
 This is necessary because Lout would be unable to determine
 suitable values for any such parameters, if they did exist.
+@PP
+As an exception to the rule just given, a named parameter may
+import the symbol it is a parameter of:
+@ID @OneRow @Code {
+"export @Cell"
+"def @Tbl"
+"    import @Tbl named @Format { ... }"
+}
+In this example the exported definitions of @Code "@Tbl" (i.e.
+{@Code "@Cell"}) will be visible within {@Code "@Format"}.  However,
+they may only be used in actual parameters, not in the default
+value of the named parameter.  This is owing to implementation
+problems:  at the time the default value of {@Code "@Format"} is
+read, the exported symbols have not been read and are consequently
+not known.
+@PP
+Since @Code "@Cell" is nested within {@Code "@Tbl"}, the
+value of an invocation of @Code "@Cell" may depend on the value
+of parameters of {@Code "@Tbl"}.  If @Code "@Cell" is used within
+an actual {@Code "@Format"} parameter, its value depends on the
+value of parameters of the invocation of {@Code "@Tbl"} of which
+the {@Code "@Format"} parameter is a part.
+@PP
+A definition, macro, or named parameter may have several alternative
+names, like this:
+@ID @Code "macro @CD @CentredDisplay @CenteredDisplay { ... }"
+This is useful for abbreviated and alternative spellings, as shown.  The
+names appear together, and they may subsequently be used interchangeably.
+@PP
+If one name of a symbol appears in an export or import list, its other
+names are automaticaly included as well, and should not also appear
+in the list.
 @End @Section

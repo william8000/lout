@@ -29,7 +29,6 @@ where the mark protrudes from the numerator:
 @ShowMarks
 @OneRow { |0.5rt Slope @Font x + 2 //1p @HLine //1p |0.5rt 5 }
 }
-@PP
 onecol.sym @Index { @@OneCol symbol }
 @@OneCol has the same effect on columns as @@OneRow does on rows, with
 the symbols @Code "^|" and @Code "^||" (or {@Code "^&"}) determining

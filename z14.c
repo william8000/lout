@@ -1,7 +1,7 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -28,7 +28,7 @@
 /*                                                                           */
 /*****************************************************************************/
 #include "externs.h"
-#define TOO_TIGHT_BAD	1048576	/* 2^20; badness of a too tight line         */
+#define TOO_TIGHT_BAD	1048576	/* 2^21; badness of a too tight line         */
 #define TOO_LOOSE_BAD	65536	/* 2^16; the max badness of a too loose line */
 #define	TIGHT_BAD	4096	/* 2^12; the max badness of a tight line     */
 #define	LOOSE_BAD	4096	/* 2^12; the max badness of a loose line     */
@@ -38,9 +38,9 @@
 #define SQRT_TOO_LOOSE	512	/* 2^ 9; sqrt(TOO_LOOSE_BAD) (used to be)    */
 #define	SQRT_TIGHT_BAD	128	/* 2^ 7; sqrt(TIGHT_BAD) (used to be)        */
 #define	SQRT_LOOSE_BAD	128	/* 2^ 7; sqrt(LOOSE_BAD) (used to be)        */
-#define	SQRT_TOO_TIGHT	4096	/* 2^12; sqrt(TOO_TIGHT_BAD) (used to be)    */
+#define	SQRT_TOO_TIGHT	8192	/* 2^13; sqrt(TOO_TIGHT_BAD) (used to be)    */
 #define MAX_EXPAND	1
-#define MAX_SHRINK	3
+#define MAX_SHRINK	4
 
 
 typedef struct {
@@ -146,215 +146,6 @@ typedef struct {
 } /* end macro SetIntervalBadness */
 
 
-/*@::CorrectOversize()@*******************************************************/
-/*                                                                           */
-/*  CorrectOversize(x, problem_link, etc_width)                              */
-/*                                                                           */
-/*  The child of x whose link is problem_link has caused an oversize error,  */
-/*  either because it is wider than etc_width, or because it is joined by    */
-/*  unbreakable gaps to other objects with oversize total size.              */
-/*                                                                           */
-/*  CorrectOversize first finds the subsequence of all objects connected     */
-/*  to the problem one by unbreakable gaps.  It then places all of these     */
-/*  objects into a single sub-object, and either scales it to fit or else    */
-/*  replaces it by an empty object.                                          */
-/*                                                                           */
-/*****************************************************************************/
-#define BEFORE_STATE	0
-#define EQUAL_STATE	1
-#define AFTER_STATE	2
-
-static void CorrectOversize(OBJECT x, OBJECT problem_link, int etc_width)
-{ OBJECT y, link, g, prev_link, problem, tmp, first_link, last_link;
-  CONSTRAINT c;  BOOLEAN jn;  int state;
-  SetConstraint(c, etc_width, etc_width, etc_width);
-  debug2(DOF, DD, "CorrectOversize(%s, problem_link, %s)",
-    EchoObject(x), EchoLength(etc_width));
-
-  /* determine the range of objects involved:  first_link ... last_link */
-  first_link = last_link = nilobj;
-
-  /* move to the first definite component of the paragraph */
-  FirstDefinite(x, link, y, jn);
-  assert( link != x, "CorrectOversize: link == x!" );
-  state = (link == problem_link ? EQUAL_STATE : BEFORE_STATE);
-  prev_link = nilobj;
-
-  while( link != x )
-  {
-    ifdebug(DOF, DD,
-	Child(tmp, link);
-	debug4(DOF, DD, "  examining %s %s (%s,%s)", Image(type(tmp)),
-	  EchoObject(tmp), EchoLength(back(tmp, COLM)),
-	  EchoLength(fwd(tmp, COLM)));
-    )
-
-    /* update first_link and last_link depending on where we are */
-    switch( state )
-    {
-
-      case BEFORE_STATE:
-
-	if( prev_link == nilobj || !nobreak(gap(g)) )
-	{
-	  debug0(DOF, DD, "  (before) setting or resetting first_link");
-	  first_link = link;
-	}
-	break;
-
-
-      case EQUAL_STATE:
-
-	if( first_link == nilobj )
-	{
-	  debug0(DOF, DD, "  (equal) setting or resetting first_link");
-	  first_link = link;
-	}
-	break;
-
-
-      case AFTER_STATE:
-
-	assert( g != nilobj && type(g) == GAP_OBJ, "CorrectOversize: g!" );
-	debug2(DOF, DD, "  (after) g = %s (nobreak = %s)",
-	  EchoGap(&gap(g)), bool(nobreak(gap(g))));
-	if( last_link == nilobj && !nobreak(gap(g)) )
-	{
-	  debug0(DOF, DD, "  (after) setting last_link to prev_link");
-	  last_link = prev_link;
-	}
-	break;
-
-    }
-    
-    /* move to next definite component of the paragraph */
-    prev_link = link;
-    NextDefiniteWithGap(x, link, y, g, jn);
-    if( state == EQUAL_STATE )
-      state = AFTER_STATE;
-    else if( link == problem_link )
-      state = EQUAL_STATE;
-  }
-  if( last_link == nilobj )
-  {
-    debug0(DOF, DD, "  (wrapup) setting last_link");
-    last_link = prev_link;
-  }
-  assert( first_link != nilobj, "CorrectOversize: first_link!" );
-
-
-  /* replace first_link to last_link by a single object, if not already */
-  if( first_link != last_link )
-  { FULL_LENGTH b, f;  OBJECT after, new_acat, new_y, prev;
-
-    /* re-calculate the size of sub-paragraph first_link to last_link */
-    link = first_link;
-    Child(y, link);
-    debug3(DOF, DD, "  first culprit %s,%s: %s", EchoLength(back(y, COLM)),
-      EchoLength(fwd(y, COLM)), EchoObject(y));
-    b = back(y, COLM);
-    f = 0;
-    do
-    {
-      prev = y;
-      NextDefiniteWithGap(x, link, y, g, jn);
-
-      assert( link != x, "CorrectOversize: link!" );
-      Child(y, link);
-      debug4(DOF, DD, "  culprit (%s) %s,%s: %s", EchoGap(&gap(g)),
-	EchoLength(back(y, COLM)), EchoLength(fwd(y, COLM)), EchoObject(y));
-      f += MinGap(fwd(prev, COLM), back(y, COLM), fwd(y, COLM), &gap(g));
-      if( mark(gap(g)) )  b += f, f = 0;
-
-    } while( link != last_link );
-    f += fwd(y, COLM);
-    b = find_min(MAX_FULL_LENGTH, b);
-    f = find_min(MAX_FULL_LENGTH, f);
-    debug2(DOF, DD, "culprits' width is %s,%s", EchoLength(b), EchoLength(f));
-
-    /* create a new ACAT and put the culprits under it */
-    New(new_acat, ACAT);
-    Child(tmp, Down(first_link));
-    FposCopy(fpos(new_acat), fpos(tmp));
-    StyleCopy(save_style(new_acat), save_style(x));
-    back(new_acat, COLM) = b;
-    fwd(new_acat, COLM) = f;
-    back(new_acat, ROWM) = 0;
-    fwd(new_acat, ROWM) = 0;
-    after = NextDown(last_link);
-    TransferLinks(first_link, after, new_acat);
-
-    /* create a new ONE_COL and link the new ACAT to it */
-    New(new_y, ONE_COL);
-    FposCopy(fpos(new_y), fpos(new_acat));
-    back(new_y, COLM) = back(new_acat, COLM);
-    fwd(new_y, COLM) = fwd(new_acat, COLM);
-    back(new_y, ROWM) = back(new_acat, ROWM);
-    fwd(new_y, ROWM) = fwd(new_acat, ROWM);
-    Link(new_y, new_acat);
-
-    /* insert the new ONE_COL in place and call it problem */
-    Link(after, new_y);
-    problem = new_y;
-    debug1(DOF, DD, "problem = %s", EchoObject(problem));
-  }
-
-  /* else the culprit is the common child of first_link and last_link */
-  else
-  { Child(problem, first_link);
-    debug3(DOF, DD, "sole problem %s,%s is %s", EchoLength(back(problem, COLM)),
-      EchoLength(fwd(problem, COLM)), EchoObject(problem));
-  }
-
-  /* now problem should not fit the size constraint we have, but sometimes does */
-  if( FitsConstraint(back(problem, COLM), fwd(problem, COLM), c) )
-  {
-    /* problem went away, so print warning message */
-    Error(14, 8, "phantom oversized object", WARN, &fpos(problem));
-  }
-
-  else if( BackEnd != PLAINTEXT && InsertScale(problem, &c) )
-  { OBJECT prnt;
-    Parent(prnt, Up(problem));
-
-    /* the problem has just been fixed, by inserting a @Scale above problem */
-    if( is_word(type(problem)) )
-    { Error(14, 1, "word %s horizontally scaled by factor %.2f (too wide for %s paragraph)",
-        WARN, &fpos(problem), string(problem), (float) bc(constraint(prnt)) / SF,
-	EchoLength(etc_width));
-    }
-    else
-    {
-      Error(14, 2, "%s object horizontally scaled by factor %.2f (too wide for %s paragraph)",
-        WARN, &fpos(problem), EchoLength(size(problem, COLM)),
-	(float) bc(constraint(prnt)) / SF, EchoLength(etc_width));
-    }
-  }
-
-  else
-  {
-    /* fix the problem by replacing problem by an empty object */
-    if( size(problem, COLM) <= 0 )
-      Error(14, 3, "oversize object has size 0 or less", INTERN, &fpos(problem));
-    if( is_word(type(problem)) )
-    { Error(14, 4, "word %s deleted (too wide for %s paragraph)",
-	WARN, &fpos(problem), string(problem), EchoLength(etc_width));
-    }
-    else
-    { Error(14, 5, "%s object deleted (too wide for %s paragraph)",
-	WARN, &fpos(problem), EchoLength(size(problem, COLM)),
-	EchoLength(etc_width));
-    }
-    tmp = MakeWord(WORD, STR_EMPTY, &fpos(x));
-    back(tmp, COLM) = fwd(tmp, COLM) = back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
-    word_font(tmp) = word_colour(tmp) = 0;
-    word_language(tmp) = word_hyph(tmp) = 0;
-    Link(Up(problem), tmp);  DisposeChild(Up(problem));
-  }
-  debug0(DOF, DD, "CorrectOversize returning");
-} /* end CorrectOversize */
-
-
 /*@::MoveRightToGap()@********************************************************/
 /*                                                                           */
 /*  MoveRightToGap(I, x, rlink, right, max_width, etc_width, hyph_word)      */
@@ -398,36 +189,44 @@ static void CorrectOversize(OBJECT x, OBJECT problem_link, int etc_width)
 	Image(type(newg)), Image(type(tmp)), EchoObject(tmp),		\
 	EchoGap(&gap(newg)), EchoLength(save_space(newg)));		\
       }									\
-      else debug3(DOF, DD, "newg %s: gap = %s, save_space = %s",		\
+      else debug3(DOF, DD, "newg %s: gap = %s, save_space = %s",	\
 	Image(type(newg)), EchoGap(&gap(newg)),				\
 	EchoLength(save_space(newg)));					\
     )									\
 									\
-    /* if interval ends with hyphen, add hyph_word to nat_width */	\
-    /* NB ADD_HYPH is possible after a restart                  */	\
-    if( hyph_allowed &&							\
-	(mode(gap(newg)) == HYPH_MODE || mode(gap(newg)) == ADD_HYPH) )	\
-    { if( is_word(type(right)) && 					\
-	 !(string(right)[StringLength(string(right))-1] == CH_HYPHEN) )	\
+    /* sort out ending with hyphenation and/or being unbreakable */	\
+    /* NB ADD_HYPH is possible after a restart                   */	\
+    if( mode(gap(newg)) == HYPH_MODE || mode(gap(newg)) == ADD_HYPH )	\
+    { if( hyph_allowed )						\
       {									\
-	/* make sure hyph_word exists and is of the right font */	\
-	debug0(DOF, DD, "  MoveRightToGap checking hyph_word");		\
-	if( hyph_word == nilobj )					\
-	{ hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
-	  word_font(hyph_word) = 0;					\
-	  word_colour(hyph_word) = colour(save_style(x));		\
-	  word_language(hyph_word) = language(save_style(x));		\
-	  word_hyph(hyph_word) = hyph_style(save_style(x)) == HYPH_ON;	\
-	}								\
-	if( word_font(hyph_word) != font(save_style(x)) )		\
-	{ word_font(hyph_word) = font(save_style(x));			\
-	  FposCopy(fpos(hyph_word), fpos(x));				\
-	  FontWordSize(hyph_word);					\
-	}								\
+	/* hyphenation is allowed, so add hyph_word to nat_width */	\
+	if( is_word(type(right)) && 					\
+	 !(string(right)[StringLength(string(right))-1] == CH_HYPHEN) )	\
+        {								\
+	  /* make sure hyph_word exists and is of the right font */	\
+	  debug0(DOF, DD, "  MoveRightToGap checking hyph_word");	\
+	  if( hyph_word == nilobj )					\
+	  { hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
+	    word_font(hyph_word) = 0;					\
+	    word_colour(hyph_word) = colour(save_style(x));		\
+	    word_language(hyph_word) = language(save_style(x));		\
+	    word_hyph(hyph_word) = hyph_style(save_style(x))==HYPH_ON;	\
+	  }								\
+	  if( word_font(hyph_word) != font(save_style(x)) )		\
+	  { word_font(hyph_word) = font(save_style(x));			\
+	    FposCopy(fpos(hyph_word), fpos(x));				\
+	    FontWordSize(hyph_word);					\
+	  }								\
 									\
-	mode(gap(newg)) = ADD_HYPH;					\
-	I.nat_width += size(hyph_word, COLM);				\
-	debug0(DOF, DD, "   adding hyph_word from nat_width");		\
+	  mode(gap(newg)) = ADD_HYPH;					\
+	  I.nat_width += size(hyph_word, COLM);				\
+	  debug0(DOF, DD, "   adding hyph_word from nat_width");	\
+        }								\
+      }									\
+      else								\
+      {									\
+	/* hyphenation is not allowed, so this gap is unbreakable */	\
+	unbreakable_at_right = TRUE;					\
       }									\
     }									\
     else if( nobreak(gap(newg)) )					\
@@ -582,7 +381,8 @@ static void CorrectOversize(OBJECT x, OBJECT problem_link, int etc_width)
       else Child(I.cwid, tlink);					\
     }									\
     SetIntervalBadness(I, max_width, etc_width);			\
-    if( nobreak(gap(lgap)) )						\
+    if( nobreak(gap(lgap)) || ( !hyph_allowed &&			\
+	(mode(gap(lgap))==HYPH_MODE || mode(gap(lgap))==ADD_HYPH) ) )	\
       I.class = UNBREAKABLE_LEFT;					\
   }									\
   debug1(DOF, DDD, "IShiftLeftEnd returning %s", IntervalPrint(I, x));	\
@@ -1005,6 +805,19 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       assert( type(z) == GAP_OBJ, "FillObject: last gap_obj!" );
       DisposeChild(LastDown(y));
     }
+
+    /* set unbreakable bit of first and last inter-line gaps, if required */
+    if( nobreakfirst(save_style(x)) && Down(res) != LastDown(res) )
+    { Child(gp, NextDown(Down(res)));
+      assert( type(gp) == GAP_OBJ, "FillObject: type(gp) != GAP_OBJ (a)!" );
+      nobreak(gap(gp)) = TRUE;
+    }
+    if( nobreaklast(save_style(x)) && Down(res) != LastDown(res) )
+    { Child(gp, PrevDown(LastDown(res)));
+      assert( type(gp) == GAP_OBJ, "FillObject: type(gp) != GAP_OBJ (b)!" );
+      nobreak(gap(gp)) = TRUE;
+    }
+
 
     /* recalculate the width of the last line, since it may now be smaller */
     assert( LastDown(res) != res, "FillObject: empty paragraph!" );

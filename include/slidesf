@@ -1,18 +1,18 @@
 
 ###########################################################################
 #                                                                         #
-#  @OverheadLayout extension to @DocumentLayout.                          #
+#  @OverheadSetup extension to @DocumentSetup.                            #
 #                                                                         #
 #  Jeffrey H. Kingston                                                    #
 #  August 1994                                                            #
 #                                                                         #
-#  This package extends DocumentLayout with definitions for overheads.    #
+#  This package extends DocumentSetup with definitions for overheads.     #
 #                                                                         #
 ###########################################################################
 
-extend @DocumentLayout
+extend @BasicSetup @DocumentSetup
 export @OverheadTransparencies @Lecture @Overhead
-def @OverheadLayout
+def @OverheadSetup
     named @DateLine			{ No			}
     named @ContentsWord			{ contents		}
     named @LectureNumbers		{ Arabic		}
@@ -370,4 +370,4 @@ def @OverheadLayout
         //  @ER
     }
 
-@End @OverheadLayout
+@End @OverheadSetup

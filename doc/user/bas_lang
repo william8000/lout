@@ -31,8 +31,7 @@ and the alphabetic list symbols of Section {@NumberOf lists} also
 vary with the current language.  So it's worth doing for the sake of
 knowing that non-English parts will appear as they should.
 @PP
-At the time of writing, the following languages were available as
-part of the standard distribution of Lout:
+At the time of writing, the following languages were available:
 @ID @OneRow @Code {
 Czech Cesky Cestina
 Danish Dansk
@@ -42,6 +41,7 @@ EnglishUK
 Finnish Suomi
 French Francais Fran{@Char ccedilla}ais
 German Deutsch
+Hungarian Magyar
 Italian Italiano
 Norwegian Norsk
 Polish Polski
@@ -53,7 +53,8 @@ Swedish Svenska
 As shown, most languages have alternative names, all equally acceptable
 to the @Code "@Language" symbol.  @Code "EnglishUK" differs from
 @Code "English" only by applying hyphenation rules said to be more
-appropriate for British English.
+appropriate for British English.  Hungarian does not yet allow
+hyphenation.
 @PP
 If your entire document is in a language other than English, you need
 to change the @Code "@InitialLanguage" option:
@@ -76,9 +77,9 @@ directory for a complete list of these fonts.
 Russian uses Cyrillic characters.  In principle, users of Russian
 have to place
 @ID @Code "@SysInclude { russian }"
-at the very start of their documents in order to get access to the
-Cyrillic versions of the fonts.  However no such fonts are distributed
+at the very start of their documents in order to get access to
+Cyrillic fonts.  However no such fonts are distributed
 with the current version of Lout, so this line does nothing at
-present.  Other left-to-right languages are easily added, so please
+present.  Other left-to-right languages are easily added, so
 consult the author if your language is not listed.
 @End @Section

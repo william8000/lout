@@ -39,15 +39,13 @@ To make each section begin on a new page you must set the @Code "@SectionGap"
 sectiongap. @Index @Code "@SectionGap"
 setup file option (Section {@NumberOf largescale}).  To make one particular
 section start on a new page or column, place @Code "@NP" within the previous
-section, at the end.  It is tempting to try placing @Code "@NP" between
-sections, but you will find that it does not work.
+section, at the end.  Placing @Code "@NP" between sections will not work.
 @PP
 Occasionally Lout will start a new page or column directly after a heading,
 which looks very poor.  The obvious answer is to place an @Code "@NP"
 just before the heading, but when the document is later revised and the
 heading no longer falls near the page or column ending, this @Code "@NP"
 will have to be taken away again.
-@PP
 A better answer is to precede the heading with a @Code "@CNP" `conditional
 cnp. @Index @Code "@CNP"
 new page' symbol, which checks whether enough space remains in the page or
@@ -71,6 +69,11 @@ that the heading is the beginning of a new section of the document, and
 to use a large-scale structure symbol like @Code "@Section" (Section
 {@NumberOf largescale}).  Conditional new page is just one of many
 services provided automatically by these symbols.
+@PP
+Some people do not like to see the first line of a paragraph alone at
+the bottom of a page, or the last line of a paragraph alone at the
+top (these blemishes are sometimes called widows and orphans).  You
+can instruct Lout not to allow these; see the next section for details.
 @PP
 You can modify the effect of the paragraph symbols by changing options
 in the setup file.  For general information about setup files and their

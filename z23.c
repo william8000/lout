@@ -1,7 +1,7 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -31,9 +31,6 @@
 #define	NO_SUPPRESS	FALSE
 #define	SUPPRESS	TRUE
 #define word_equal(x, str)  (is_word(type(x)) && StringEqual(string(x), str))
-
-#define CountChild(y, link, i)						\
-for( y=pred(link, PARENT), i=1; type(y)==LINK;  y = pred(y, PARENT), i++ )
 
 
 /*****************************************************************************/
@@ -128,11 +125,13 @@ static FULL_LENGTH FindAdjustIncrement(OBJECT x, FULL_LENGTH frame_size,int dim)
 
 void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
   FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg, int count)
-{ OBJECT y, link, prev, g, uplink, z, face;
+{ OBJECT y, link, prev, g, uplink, z, face, thr;
   FULL_LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
   int i; float scale_factor;  BOOLEAN jn;
-  debug6(DGP, DD, "[ FixAndPrintObject(%s, %s, %s,%s, %s, %s, pg )",
-    Image(type(x)), EchoLength(xmk), EchoLength(xb), EchoLength(xf),dimen(dim),
+  debug7(DGP, DD, "[ FixAndPrintObject(%s %s, %s, %s,%s, %s, %s, pg )",
+    Image(type(x)),
+    ((type(x) == WORD || type(x) == QWORD) ? string(x) : STR_EMPTY),
+    EchoLength(xmk), EchoLength(xb), EchoLength(xf),dimen(dim),
     (suppress == SUPPRESS ? "suppress" : "no_suppress"));
   debug2(DGP, DD, "  size(x) = %s,%s;  x =",
     EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
@@ -158,6 +157,52 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case FORCE_CROSS:
     
       back(x, dim) = xb;  fwd(x, dim) = xf;
+      break;
+
+
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+
+      CountChild(y, DownDim(x, dim), count);
+      if( type(y) == HSPANNER || type(y) == VSPANNER )
+      {
+        Child(z, Down(y));
+	Parent(thr, UpDim(x, dim));
+        debug7(DGP, D, "  calling SPAN %s(xmk %s, x %s,%s, cons %s, z %s,%s)",
+	    dimen(dim), EchoLength(xmk),
+	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
+	    EchoConstraint(&constraint(y)),
+	    EchoLength(back(z, dim)), EchoLength(fwd(z, dim)));
+	/* ***
+	f = find_max(xf, fwd(z,dim));
+        FixAndPrintObject(z, xmk - back(thr, dim) + back(z, dim), back(z, dim),
+	  find_max(f, bfc(constraint(y)) - back(z, dim)),
+	  dim, FALSE, pg, 1);
+	*** */
+	debug5(DGP, D, "  calling FAPO from %s (y = %s, bfc = %s, z = %s,%s",
+	  Image(type(x)), Image(type(y)), EchoLength(bfc(constraint(y))),
+	  EchoLength(back(z, dim)), EchoLength(fwd(z, dim)));
+	/* ***
+        FixAndPrintObject(z, xmk - back(thr, dim) + back(z, dim), back(z, dim),
+	  bfc(constraint(y)) - back(z, dim), dim, FALSE, pg, 1);
+	*** */
+        FixAndPrintObject(z, xmk - back(thr, dim) + back(z, dim), back(z, dim),
+	  find_max(fwd(z, dim), bfc(constraint(y)) - back(z, dim)),
+	  dim, FALSE, pg, 1);
+      }
+      else
+      {
+        FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+	back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      }
+      break;
+
+
+    case HSPAN:
+    case VSPAN:
+
+      /* nothing to print, spanner beneath is already done */
       break;
 
 
@@ -256,6 +301,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
     case ONE_COL:
     case ONE_ROW:
+    case HLIMITED:
+    case VLIMITED:
     case HEXPAND:
     case VEXPAND:
     
@@ -401,6 +448,17 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       break;
 
 
+    case BACKGROUND:
+ 
+      /* this object has the size of its second child; but its first */
+      /* child gets printed too, in the same space                   */
+      CountChild(y, Down(x), count);
+      FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+      CountChild(y, LastDown(x), count);
+      FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+      break;
+
+
     case ROTATE:
     
       CountChild(y, Down(x), count);
@@ -440,6 +498,54 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
           }
 	  break;
       }
+      back(x, dim) = xb;  fwd(x, dim) = xf;
+      break;
+
+
+    case PLAIN_GRAPHIC:
+
+      CountChild(y, LastDown(x), count);
+      switch( BackEnd )
+      {
+
+	case POSTSCRIPT:
+	case PDF:
+
+          FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+	  break;
+
+
+	case PLAINTEXT:
+
+          if( dim == COLM )
+          {
+	    back(x, dim) = xb;
+	    fwd(x, dim)  = xf;
+	    save_mark(x) = xmk - back(x, dim);
+	    debug2(DGP, DD, "PLAIN_GRAPHIC COLM storing size %s, %s",
+	      EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+            FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+          }
+          else
+          { OBJECT tmp, pre, post;
+            Child(tmp, Down(x));
+            if( type(tmp) == VCAT )
+            { Child(pre, Down(tmp));
+              Child(post, LastDown(tmp));
+            }
+            else pre = tmp, post = nilobj;
+	    back(x, dim) = xb;
+	    fwd(x, dim)  = xf;
+            PrintPlainGraphicObject(pre, save_mark(x),
+	      pg - (xmk - back(x, dim)), x);
+            FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+            if( post != nilobj )
+	      PrintPlainGraphicObject(post, save_mark(x),
+		pg - (xmk - back(x, dim)), x);
+          }
+	  break;
+
+      } /* end switch */
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
 
@@ -525,7 +631,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
           if( dim == COLM )
 	  { save_mark(x) = xmk;
 	    if( incgraphic_ok(x) )
-	    { debug2(DGP, D, "  %s (style %s)",
+	    { debug2(DGP, DD, "  %s (style %s)",
 		EchoObject(x), EchoStyle(&save_style(x)));
 	      face = finfo[font(save_style(x))].original_font;
 	      if( font_page(face) < font_curr_page )
@@ -557,21 +663,69 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
       if( (type(x) == VCAT) == (dim == ROWM) )
       { 
-	/* find adjustment increment if required */
-	frame_size = xb + xf;
-	if( adjust_cat(x) && !suppress )
-	  inc = FindAdjustIncrement(x, frame_size, dim);
-	else inc = 0;
-
 	FirstDefinite(x, link, prev, jn);
 	if( link != x )
-	{ back_edge = xmk - back(x, dim);
-	  mk = back_edge + back(prev, dim);
+	{
+
+	  /* handle the special case of a 0rt gap at the beginning (left  */
+	  /* justify) by converting it to 0ie but increasing fwd(prev)    */
+	  /* to the max. possible                                         */
 	  NextDefiniteWithGap(x, link, y, g, jn);
+	  if( link != x && mode(gap(g)) == TAB_MODE &&
+	      units(gap(g)) == AVAIL_UNIT && width(gap(g)) == 0 )
+	  {
+	    debug2(DGP, D, "  FAPO-CAT converting 0rt (back(x, dim) %s, xb %s)",
+	      EchoLength(back(x, dim)), EchoLength(xb));
+	    fwd(prev, dim) += xb - back(x, dim);
+	    back(x, dim) = xb;
+	    mode(gap(g)) = EDGE_MODE;
+	    units(gap(g)) = FIXED_UNIT;
+	  }
+	  FirstDefinite(x, link, prev, jn);
+
+	  /* the frame size is the total width actually available */
+	  frame_size = back(x, dim) + xf;
+
+	  /* back_edge is where the first element begins */
+	  back_edge = xmk - back(x, dim);
+
+	  /* inc is the adjust increment, used when adjusting gaps */
+	  if( adjust_cat(x) && !suppress )
+	    inc = FindAdjustIncrement(x, frame_size, dim);
+	  else inc = 0;
+
+	  debug6(DGP, D, "[ FAPO-CAT %s (%s,%s): xmk %s, xb %s, xf %s",
+	    Image(type(x)), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
+	    EchoLength(xmk), EchoLength(xb), EchoLength(xf));
+
+	  mk = back_edge + back(prev, dim);
+	  debug4(DGP, D, "  FAPO-CAT back_edge %s, mk %s, framesize %s, inc %s",
+	    EchoLength(back_edge), EchoLength(mk), EchoLength(frame_size),
+	    EchoLength(inc));
+
+	  NextDefiniteWithGap(x, link, y, g, jn);
+
 	  while( link != x )
 	  {
-	    FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
-	      dim, NO_SUPPRESS, pg, count);
+	    if( mode(gap(g)) == TAB_MODE && units(gap(g)) == AVAIL_UNIT &&
+		width(gap(g))==FR )
+	    {
+	      /* object is followed by 1rt gap, give it full space to print */
+	      debug5(DGP,D,"  FAPO (a) calling FAPO(%s, %s, %s, max(%s, %s))",
+	        Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
+		EchoLength(fwd(prev, dim)), EchoLength(xmk+xf-mk-size(y,dim)));
+	      FixAndPrintObject(prev, mk, back(prev, dim),
+		find_max(fwd(prev, dim), xmk+xf-mk - size(y, dim)),
+		dim, NO_SUPPRESS, pg, count);
+	    }
+	    else
+	    {
+	      debug5(DGP, D, "  FAPO-CAT (b) calling FAPO(%s, %s, %s, %s+%s)",
+	        Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
+		EchoLength(fwd(prev, dim)), EchoLength(inc));
+	      FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
+	        dim, NO_SUPPRESS, pg, count);
+	    }
 	    /* NB fwd(prev, dim) may be changed by the call to FAPO */
 	    mk += ActualGap(fwd(prev, dim), back(y, dim), fwd(y, dim), &gap(g),
 		    frame_size, mk - back_edge);
@@ -579,16 +733,27 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    NextDefiniteWithGap(x, link, y, g, jn);
 	  }
 	  if( suppress )
+	  {
+	    debug4(DGP, D, "  FAPO-CAT (c) calling FAPO(%s, %s, %s, %s)",
+	      Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
+	      EchoLength(fwd(prev, dim)));
 	    FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
 	      dim, NO_SUPPRESS, pg, count);
+	  }
 	  else
+	  {
+	    debug5(DGP,D,"  FAPO-CAT (d) calling FAPO(%s, %s, %s, max(%s, %s))",
+	      Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
+	      EchoLength(fwd(prev, dim)), EchoLength(xmk + xf - mk));
 	    FixAndPrintObject(prev, mk, back(prev,dim),
-	      find_max(fwd(prev, dim), back_edge+frame_size-mk),
+	      find_max(fwd(prev, dim), xmk + xf - mk),
 	      dim, NO_SUPPRESS, pg, count);
+	  }
 	  back(x, dim) = find_max(back(x, dim), xb);
 	  fwd(x, dim) = mk + fwd(prev, dim) - back_edge - back(x, dim);
 	}
 	else back(x, dim) = xb, fwd(x, dim) = xf;
+	debug0(DGP, D, "] FAPO-CAT returning.");
       }
       else
       { OBJECT start_group, zlink, m;  BOOLEAN dble_found;
@@ -604,7 +769,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  m = y;
 	  start_group = link;
 	  dble_found = !jn;
-	  debug2(DGP, DD, "  starting first group: b = %s, f = %s",
+	  debug4(DGP, DD, "  starting first group %s (%sdbl_found): b = %s, f = %s",
+	    Image(type(y)), dble_found ? "" : "not ",
 	    EchoLength(b), EchoLength(f));
 	
 	  NextDefiniteWithGap(x, link, y, g, jn);
@@ -791,7 +957,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  }
 	  else
 	  {
-	    /* fix the problem by refraining from printing it */
+	    /* fix the problem by refraining from printing the line */
 	    if( size(x, COLM) <= 0 )
 	      Error(23, 5, "oversize object has size 0 or less", INTERN, &fpos(x));
 	    Child(y, Down(x));
@@ -803,6 +969,14 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    { Error(23, 7, "%s object deleted (too wide for %s paragraph)",
 		WARN, &fpos(x), EchoLength(size(x, COLM)), EchoLength(frame_size));
 	    }
+
+	    /* delete and dispose every child of x */
+	    while( Down(x) != x )
+	      DisposeChild(Down(x));
+	    y = MakeWord(WORD, STR_EMPTY, &fpos(x));
+	    Link(x, y);
+	    back(y, COLM) = fwd(y, COLM) = 0;
+	    back(y, ROWM) = fwd(y, ROWM) = 0;
 	  }
         }
         else
@@ -1013,10 +1187,19 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	link = NextDown(link), uplink = NextUp(uplink), i++ );
       assert( link != x && uplink != x, "FixAndPrintObject: link or uplink!" );
       CountChild(y, link, count);
+      debug7(DGP, DD, "  fapo of %s (%s,%s) child %d %s (%s,%s)",
+	Image(type(x)),
+	EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
+	i, Image(type(y)), EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
       MoveLink(uplink, link, CHILD);  DeleteLink(link);  /* IMPORTANT!!! */
       assert( type(y) != GAP_OBJ, "FAPO: THR!");
 
       /* assign size if not done previously */
+      /* ***
+      if( thr_state(x) != FINALSIZE && type(y) != START_HVSPAN &&
+	  type(y) != START_HSPAN && type(y) != START_VSPAN &&
+	  type(y) != HSPAN && type(y) != VSPAN )
+      *** */
       if( thr_state(x) != FINALSIZE )
       {	back(x, dim) = xb;  fwd(x, dim) = xf;
 	thr_state(x) = FINALSIZE;

@@ -94,8 +94,8 @@ to great lengths to do the right thing when options are omitted:
 @Rowa A { "        {  @I @Title" }		B { "}  @If  @Title" }
 @Rowa A { "        {  @Word&&notitle" }		B { "}  @If  @Not @Title" }
 @Rowa A { "        {  , @Pinpoint" }		B { "}  @If  @Pinpoint" }
-@Rowa A { "        {  , @Word&&pages @Pages" }	B { "}  @If  @Pages" }
-@Rowa A { "        {  , @Word&&page @Page" }	B { "}  @If  @Page" }
+@Rowa A { "        {  , @Word&&pages @NumSep @Pages" }	B { "}  @If  @Pages" }
+@Rowa A { "        {  , @Word&&page @NumSep @Page" }	B { "}  @If  @Page" }
 @Rowa A { "        {  .  @TitleNote" }		B { "}  @If  @TitleNote" }
 @Rowa A { "        {  .  @HowPublished" }	B { "}  @If  @HowPublished" }
 @Rowa A { "        {  .  @Publisher" }		B { "}  @If  @Publisher" }
@@ -134,5 +134,6 @@ The object @Code "@Word&&notitle" produces @Code "No title" in the
 current language; @Code "@Word&&pages" produces {@Code pages} in the
 current language, and so on.  Consult database @Code "standard.ld" for
 standard.ld.file @Index { @Code "standard.ld" file }
-other standard words and phrases.
+other standard words and phrases, and page {@PageOf numsep} for
+{@Code "@NumSep"}.
 @End @Section

@@ -47,11 +47,11 @@ the options and their default values:
 "@MarginNoteVGap { 1.00v }"
 "@MarginNoteWidth { 1.50c }"
 }
-@Code "@MarginNoteFont" determines the font used; the default value
-produces the current font scaled to 0.8 times the current size; you
-could write @Code "Slope 0.80f" to get italic notes, and so
-on.  @Code "@MarginNoteBreak" is the paragraph breaking style to
-use, similar to the @Code "@InitialBreak" setup file option.
+@Code "@MarginNoteFont" determines the font; the default value
+produces the current font scaled to 0.8 times the current size.
+@Code "Slope 0.80f" would yield italic notes, and so
+on.  @Code "@MarginNoteBreak" is the paragraph breaking style,
+similar to the @Code "@InitialBreak" setup file option.
 @PP
 @Code "@MarginNoteHGap" determines how far away from the
 adjacent text column the margin note will appear; the default
@@ -82,7 +82,7 @@ sparingly.  Margin notes do not appear in plain text output
 A more radical way to place objects at arbitrary points on the current
 place. @Index @Code "@Place"
 page is provided by the @Code "@Place" symbol:
-@ID @Code {
+@ID @OneRow @Code {
 "@Place"
 "    x { right - 1 cm - xsize }"
 "    y { { foot + top } / 2 }"

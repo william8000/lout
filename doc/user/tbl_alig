@@ -1,58 +1,96 @@
 @Section
-   @Title { Aligned columns }
-   @Tag { aligned }
+    @Title { Aligned columns }
+    @Tag { tbl_alig }
 @Begin
 @PP
 Columns of numbers are often presented with decimal points aligned:
-aligned. @Index { aligned columns in tables }
-@CD @Tab
-    @Fmta { @Col A }
+aligned.columns @Index { aligned columns in tables }
+@CD @OneRow @Tbl
+    marginvertical { 0.5vx }
+    aformat { @Cell A }
 {
-    @Rowa A { 5^.46 }
-    @Rowa A { 3^.4159 }
-    @Rowa A { 5772^ }
+@Rowa A { 5^.46 } marginabove { 0i }
+@Rowa A { 3^.4159 }
+@Rowa A { 5772^ } marginbelow { 0i }
 }
-You can produce this by placing a @Code "^" symbol just before the
-alignment point in each entry:
-@ID @OneRow @Code {
-"@Tab"
-"    @Fmta { @Col A }"
-"{"
-"    @Rowa A { 5^.46 }"
-"    @Rowa A { 3^.4159 }"
-"    @Rowa A { 5772^ }"
-"}"
+You can produce this by placing a @Code "^" symbol, which is used
+generally throughout Lout for alignment, just before the alignment point in
+each entry:
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    marginvertical { 0.5vx }
+    aformat { @Cell A }
+{
+@Rowa A { 5^.46 }
+@Rowa A { 3^.4159 }
+@Rowa A { 5772^ }
 }
-The equals signs of equations can be aligned in the same way.  The
-format of such columns should not contain @Code "@CC" or {@Code "@RR"}.
+}
+The equals signs of equations can be aligned in the same way (see the
+example at the start of this chapter).  Aligned cells should have no
+@Code indent option.
 @PP
-The simplest way to get a heading over an aligned column is to use the
-@Code "^" symbol in the heading as well.  If it is not possible to do
-this, for example because the heading entry is a paragraph of text
-broken over more than one line, the most viable alternative is to use
-@Code "@Over" in the heading line's format to make the heading column
-span over the aligned column:
-@ID @OneRow @Code {
-"@Tab"
-"    @Fmta { @Col @CC H @Over A }"
-"    @Fmtb { @Col A }"
-"{"
-"    @Rowa H { Heading }"
-"    @Rowb A { 5^.46 }"
-"    @Rowb A { 3^.4159 }"
-"    @Rowb A { 5772^ }"
-"}"
-}
-for example produces
-@CD @Tab
-    @Fmta { @Col @CC H @Over A }
-    @Fmtb { @Col A }
+Owing to problems behind the scenes, getting a heading over the top
+of an aligned column is a problem with no ideal solution.  What most
+people want is for the heading to be centred in the column, and the
+aligned entries to be centred in the column as a block, but Lout cannot
+do this.  One approximation is to make the heading cell a spanning
+cell with centring, like this:
+@FootNote { Lout does not currently accept single-column tables
+with {@Code "@StartHSpan"}, so we've had to add
+an empty second column. }
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    marginvertical { 0.5vx }
+    aformat { @StartHSpan @Cell indent { ctr } @B A | }
+    bformat { @Cell A | }
 {
-    @Rowa H { Heading }
-    @Rowb A { 5^.46 }
-    @Rowb A { 3^.4159 }
-    @Rowb A { 5772^ }
+@Rowa A { Heading }
+@Rowb A { 5^.46 }
+@Rowb A { 3^.4159 }
+@Rowb A { 5772^ }
 }
-Unfortunately, the aligned entries are left-justified in the column,
-not centred.
+}
+The spanning frees the heading from alignment, permitting
+@Code "indent { ctr }" to work:
+@CD @OneRow @Tbl
+    marginvertical { 0.5vx }
+    aformat { @StartHSpan @Cell indent { ctr } @B A | }
+    bformat { @Cell A | }
+{
+@Rowa A { Heading } marginabove { 0i }
+@Rowb A { 5^.46 }
+@Rowb A { 3^.4159 }
+@Rowb A { 5772^ } marginbelow { 0i }
+}
+But if the heading cell is wider than the aligned cells, you get this:
+@CD @OneRow @Tbl
+    marginvertical { 0.5vx }
+    aformat { @StartHSpan @Cell indent { ctr } @B A | }
+    bformat { @Cell A | }
+{
+@Rowa A { A Wider Heading } marginabove { 0i }
+@Rowb A { 5^.46 }
+@Rowb A { 3^.4159 }
+@Rowb A { 5772^ } marginbelow { 0i }
+}
+In other words, this will centre a heading with respect
+to aligned entries, but it will not centre aligned entries with
+respect to a heading.  In these cases you could forget about
+@Code "@StartHSpan" and treat the heading as an aligned entry,
+either by placing a @Code "^" within it or by using
+@ID @Code "@Cell 0.5w @HShift A"
+which places the alignment point in the centre of the entry.
+#@CD @OneRow @Tbl
+#    marginvertical { 0.5vx }
+#    aformat { @Cell 0.5w @HShift @B A }
+#    bformat { @Cell A }
+#{
+#@Rowa A { A Wider Heading } marginabove { 0i }
+#@Rowb A { 5^.46 }
+#@Rowb A { 3^.4159 }
+#@Rowb A { 5772^ } marginbelow { 0i }
+#}
+You can move the alignment point about by changing the 0.5.  Of course,
+all this is a poor substitute for the real thing.
 @End @Section

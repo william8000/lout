@@ -7,10 +7,8 @@ The basic idea is to store your references in a separate
 database.file @Index { database file }
 @I { database file }, in a form which does not include formatting
 details such as font changes.  This makes it easy to use the same
-references in many documents, and it leaves the formatting to
-Lout.
-@PP
-Here is an example of a reference as it would appear in a database file:
+references in many documents, and it leaves the formatting to Lout.  Here
+is an example of a reference as it would appear in a database file:
 @ID @OneRow @Code {
 "{ @Reference"
 "    @Tag { vanleunen1992 }"
@@ -88,8 +86,7 @@ where they are typed in, but Lout will notice them and treat them as if
 they had come from a database file.  In this case no @Code "@Database"
 symbol is needed unless you are referring to a database as well.
 @PP
-You may have multiple databases.  For example, you might use a public
-database augmented with some entries of your own:
+You may have multiple databases, like this:
 @ID @OneRow @Code {
 "@Database @Reference { myrefs }"
 "@Database @Reference { \"/usr/pub/refs/theoryrefs\" }"

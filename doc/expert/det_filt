@@ -55,9 +55,7 @@ lines, and @Code -r for reversing the sorting order.  So the result of
 "Dickens, Charles"
 "Eliot, George"
 "Hardy, Thomas"
-"Dickens, Charles"
 "Bront{@Char edieresis}, Charlotte"
-"Hardy, Thomas"
 "}"
 }
 is

@@ -75,7 +75,8 @@ The output is the PostScript
 file {@Code "intro.ps"}, which is suitable for printing on many laser
 printers and other devices.  There are programs that show you the
 result on your screen as well, although you won't be able to edit it
-there.  You can also get plain text output (Section {@NumberOf plain}).
+there.  You can also get plain text output (Section {@NumberOf plain})
+and PDF output.
 @PP
 There are a few points that often confuse people as they begin, so we'll
 treat them briefly now with pointers to later sections where they are

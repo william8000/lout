@@ -1,18 +1,18 @@
 
 ###########################################################################
 #                                                                         #
-#  @BookLayout extension to @DocumentLayout.                              #
+#  @BookSetup extension to @DocumentSetup.                                #
 #                                                                         #
 #  Jeffrey H. Kingston                                                    #
-#  August 1994                                                            #
+#  5 February 1999                                                        #
 #                                                                         #
-#  This package extends DocumentLayout with definitions for books.        #
+#  This package extends DocumentSetup with definitions for books.         #
 #                                                                         #
 ###########################################################################
 
-extend @DocumentLayout
+extend @BasicSetup @DocumentSetup
 export @Book @Preface @Introduction @Chapter @Appendix
-def @BookLayout
+def @BookSetup
     named @TitlePageFont		{  Helvetica Base		}
     named @SeparateIntroNumbering	{  Yes				}
     named @PrefaceAfterContents		{  No				}
@@ -1193,4 +1193,4 @@ def @BookLayout
 
     }
 
-@End @BookLayout
+@End @BookSetup

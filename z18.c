@@ -1,7 +1,7 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -83,6 +83,8 @@ void TransferInit(OBJECT InitEnv)
   language(InitialStyle)        = 0;			/* i.e. undefined    */
   yunit(InitialStyle)           = 0;			/* i.e. zero         */
   zunit(InitialStyle)           = 0;			/* i.e. zero         */
+  nobreakfirst(InitialStyle)	= FALSE;
+  nobreaklast(InitialStyle)	= FALSE;
 
   /* construct destination for root galley */
   New(up_hd, HEAD);
@@ -307,12 +309,27 @@ void TransferComponent(OBJECT x)
   SizeGalley(hd, env, TRUE, threaded(dest), FALSE, TRUE, &save_style(dest),
 	&constraints[itop], nilobj, &nothing, &recs, &inners, nilobj);
   if( recs != nilobj )  ExpandRecursives(recs);
+  debug3(DSA, D, "after SizeGalley, hd width is (%s,%s), constraint was %s",
+    EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)),
+    EchoConstraint(&constraints[itop]));
 
   /* promote the components, remembering where old spot was */
   start_search = PrevDown(Up(dest_index));
-  debug0(DSA, D, "  calling AdjustSize from TransferComponent");
+  debug1(DSA, D, "  calling AdjustSize from TransferComponent %s",
+    EchoFilePos(&fpos(hd)));
+  ifdebug(DSA, D,
+    Child(y, Down(hd));
+    while( type(y) == VCAT )  Child(y, Down(y));
+    debug2(DSA, D, "  first component is %s at %s",
+      Image(type(y)), EchoFilePos(&fpos(y)));
+    if( NextDown(Down(hd)) != hd && NextDown(NextDown(Down(hd))) != hd )
+    { Child(y, NextDown(NextDown(Down(hd))));
+      debug2(DSA, D, "  second component is %s at %s",
+        Image(type(y)), EchoFilePos(&fpos(y)));
+    }
+  );
   AdjustSize(dest, back(hd, COLM), fwd(hd, COLM), COLM);
-  Promote(hd, hd, dest_index);
+  Promote(hd, hd, dest_index, FALSE);
   DeleteNode(hd);
 
   /* flush any widowed galleys attached to \Input */
@@ -333,11 +350,16 @@ void TransferComponent(OBJECT x)
       MoveLink(Up(index), NextDown(start_search), PARENT);
       Link(tinners, index);
     }
+    debug0(DGF, D, "  calling FlushInners() from TransferComponent (a)");
     FlushInners(tinners, nilobj);
   }
 
   /* flush any galleys inside hd */
-  if( inners != nilobj )  FlushInners(inners, nilobj);
+  if( inners != nilobj )
+  {
+    debug0(DGF, D, "  calling FlushInners() from TransferComponent (b)");
+    FlushInners(inners, nilobj);
+  }
 
   /* flush parent galley, if needed */
   if( blocked(dest_index) )
@@ -388,6 +410,9 @@ void TransferEnd(OBJECT x)
     &save_style(dest), &constraints[itop], nilobj, &nothing, &recs, &inners,
     nilobj);
   if( recs != nilobj )  ExpandRecursives(recs);
+  debug3(DSA, D, "after SizeGalley, hd width is (%s,%s), constraint was %s",
+    EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)),
+    EchoConstraint(&constraints[itop]));
 
   /* promote the components, remembering where old spot was */
   start_search = PrevDown(Up(dest_index));
@@ -399,7 +424,7 @@ void TransferEnd(OBJECT x)
     AdjustSize(dest, back(z, ROWM), fwd(z, ROWM), ROWM);
     Interpose(dest, VCAT, hd, z);
   }
-  Promote(hd, hd, dest_index);  DeleteNode(hd);
+  Promote(hd, hd, dest_index, TRUE);  DeleteNode(hd);
 
   /* flush any widowed galleys attached to \Input */
   if( Down(dest_index) != dest_index )
@@ -419,11 +444,16 @@ void TransferEnd(OBJECT x)
       MoveLink(Up(index), NextDown(start_search), PARENT);
       Link(tinners, index);
     }
+    debug0(DGF, D, "  calling FlushInners() from TransferEnd (a)");
     FlushInners(tinners, nilobj);
   }
 
   /* flush any galleys inside hd */
-  if( inners != nilobj )  FlushInners(inners, nilobj);
+  if( inners != nilobj )
+  {
+    debug0(DGF, D, "  calling FlushInners() from TransferEnd (b)");
+    FlushInners(inners, nilobj);
+  }
 
   /* close dest_index, and flush parent galley if needed */
   if( blocked(dest_index) )
@@ -456,7 +486,11 @@ void TransferClose(void)
   if( LastDown(root_galley) != root_galley )
   { inners = nilobj;
     FreeGalley(root_galley, root_galley, &inners, nilobj, nilobj);
-    if( inners != nilobj )  FlushInners(inners, nilobj);
+    if( inners != nilobj )
+    {
+      debug0(DGF, D, "  calling FlushInners() from TransferClose");
+      FlushInners(inners, nilobj);
+    }
     debug0(DGF, D, "  calling FlushGalley from TransferClose");
     FlushGalley(root_galley);
   }

@@ -12,8 +12,8 @@ file and symbol names are different, of course:
     @Fmta { @Col A ! @Col B }
 {
 @Rowa
-    A { {@Code cdoc}, {@Code creport}, etc. }
-    B { {@Code edoc}, {@Code ereport}, etc. }
+    A { @Code cprint }
+    B { @Code eiffel }
 @Rowa
     A { @Code c2lout }
     B { @Code eif2lout }
@@ -21,18 +21,20 @@ file and symbol names are different, of course:
     A { @Code "@CP" }
     B { @Code "@Eiffel" }
 @Rowa
-    A { @Code "@CPrint" }
-    B { @Code "@EiffelPrint" }
+    A { @Code "@CPSetup" }
+    B { @Code "@EiffelSetup" }
 }
 but everything works in an exactly analogous way:  you place
-@ID @Code "@SysInclude { edoc }"
+@ID @Code "@SysInclude { eiffel }"
 at the top of your document, enclose Eiffel program texts in
-@Code "@Eiffel { ... }", and so on.  The default style has been
+@Code "@Eiffel { ... }", embed Lout into Eiffel using comments
+beginning with {@Code "--@"}, and so on.  The default style has been
 changed to {@Code varying}, so as to conform to the style guidelines
 in the standard Eiffel reference @Cite { $meyer1992eiffel }.  Some care
 has gone into making this conformance strict; in particular, if you
 enclose identifiers within comments in ` and ', as the style guidelines
-say you should, they will come out in italics.
+say you should, they will come out in italics; in fact, arbitrary text
+between ` and ' within comments will be set as Eiffel code.
 @PP
 The files needed for Eiffel printing are distributed separately from
 Basser Lout.  You can get them from the author's @Code ftp directory

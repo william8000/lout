@@ -104,13 +104,13 @@ Changes and new features introduced in Version 3.10
     Dot between section (etc.) numbers and title made optional
     Updated version of lout.teq (TeX-style equation formatter)
     EvenPageTop and EvenFullPage figure and table locations
-    @Graph options for plotting values in decreasing rather than increasing order
+    @Graph options for plotting values in decreasing order
     References may cite other references now (bug fix)
     Installation option for making "lout -S" the default behaviour
     @E symbol added alongside @Eq as synonym for @OneCol @Eq
     New language EnglishUK which is like English but with UK hyphenation rules
     @AnotherFootNote symbol for consecutive footnotes on one word
-    LOUTLIB environment variable determines library directory at run time if set
+    LOUTLIB env variable determines library directory at run time if set
     Lots of arrow symbols added to eq and teq
     Paragraph gaps may have "u" suffix, meaning unbreakable (for expert users)
 
@@ -133,5 +133,66 @@ Changes and new features introduced in Version 3.12
     Latin2 and Russian are now part of the main Lout distribution
     Changed license from GNU General Public License Version 1 to Version 2
 
+Changes and new features introduced in Version 3.13 [released February 1999]
+
+    Bug fixes
+    Gaps between galley components may have "u" (unbreakable) suffix, meaning
+      that the galley may not be broken at this gap (for expert users)
+    @StartHSpan, @StartVSpan, @StartHVSpan, @HSpan, @VSpan (spanning cols, rows)
+    unbreakablefirst @Break and unbreakablelast @Break (stops widows, orphans)
+    named parameters may import their parent, like body parameters (expert)
+    definitions and named parameters may have multiple names (expert)
+    @OneOf symbol chooses result that contains desired galley target (expert)
+    @HLimited, @VLimited symbols for further control over use of space (expert)
+    @ListInterruptItem and @ListNewPage: interrupts, page breaks between items
+    @Verbatim symbol now built-in, so no longer limited to Unix
+    @RawVerbatim like @Verbatim but preserves initial spaces on first line
+    0rt gap for left justification of the preceding object (expert)
+    @Background symbol for printing one object in the background of another
+    Maximum depth of @Includes increased from 7 to 10
+    New table formatting package, see User's Guide (old one is still there)
+    New @Meld symbol for better melding of index entries (expert)
+    Option to @FootNote for choosing your own footnote label
+    Optional full-width abstracts in technical reports
+    Hungarian language including Hungarian-specific heading formats
+
+    *** IMPORTANT: TWO CHANGES THAT ARE NOT UPWARDLY COMPATIBLE ***
+
+    (1)  The @Abstract symbol in technical reports now comes before the
+	 // symbol, not after it.  See User's Guide for details.
+
+    (2)  Setup file arrangements have changed.  You now need to have one
+	 @SysInclude line for each package you use.  For example,
+
+	    Previous versions           Version 3.13
+	    ---------------------------------------------
+
+	    @SysInclude { eq }          @SysInclude { eq }
+	    @SysInclude { ddoc }        @SysInclude { diag }
+				        @SysInclude { doc }
+
+         Import clauses in mydefs files also have to change:
+
+	    Previous versions           Version 3.13
+	    ---------------------------------------------
+
+            import @DocumentLayout      import @BasicSetup
+	    import @CPrint              import @CPSetup
+	    import @DiagramPrint        import @DiagSetup
+
+         Sorry for the inconvenience, but the old system was inconsistent
+	 and was tending towards an unsustainable combinatorial explosion
+	 of setup files.  No changes *within* documents are needed, and
+	 these new arrangements do not affect the content of the packages.
+	 The user's guide documents it all.
+
+Things that ought to be done but haven't been done yet
+
+    Review and possible inclusion of new @Eq symbol by Mark Shields
+    pdfmark in PostScript output
+    Review Uwe's proposal for moving word row marks to the baseline
+    Implement Mark Burton's suggestion for "freshpage" as well as "newpage"
+    Several suggestions for enhancing the overhead transparencies package
+
 Jeff Kingston
-5 April 1998
+5 February 1999

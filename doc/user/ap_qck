@@ -1,7 +1,7 @@
 @Appendix
     @Title { Lout Quick Reference Guide }
 @Begin
-10p @Font 1.17fx @Break @OneCol
+10p @Font 1.15fx @Break @OneCol
 @Tab @Fmta { @Col 20c @Wide A ! @Col 20c @Wide B }
 {
 @Rowa A {
@@ -30,6 +30,7 @@
 "    @PageHeaders { Simple }"
 "    @FirstPageNumber { 1 }"
 "    @ColumnNumber { 1 }"
+"    @PageOrientation { Portrait }"
 "//"
 "@Text @Begin"
 "..."
@@ -111,6 +112,8 @@ B {
 @Rowa
     A { "@S { small-caps font}" }
     B { "@F { fixed-width font }" }
+@Rowa
+    B { "@II { italic bold or Roman }" }
 }
 @LI @Code {
 "{ family face size } @Font { ... }"
@@ -152,7 +155,7 @@ B {
 
 } # end first table
 @LP
-10p @Font 1.17fx @Break @OneCol
+10p @Font 1.15fx @Break @OneCol
 @Tab @Fmta { @Col 20c @Wide A ! @Col 20c @Wide B }
 {
 @Rowa A {
@@ -313,12 +316,12 @@ B {
 @LP
 @Heading { 14.  Tables }
 @LD @Code {
-"@SysInclude { tab }"
+"@SysInclude { tbl }"
 "@SysInclude { doc }"
 "..."
-"@Tab"
-"    @Fmta { @Col A ! @Col B }"
-"    vmargin { 0.5vx }"
+"@Tbl"
+"    aformat { @Cell A | @Cell B }"
+"    marginvertical { 0.5vx }"
 "{"
 "@Rowa"
 "    A { ... }"

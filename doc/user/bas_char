@@ -16,8 +16,7 @@ Systems Symbol font, plus the characters {@Char quotesinglbase},
 {@Char fl}, {@Char endash}, {@Char emdash}, {@Char bullet}, {@Char dagger},
 {@Char daggerdbl}, {@Char florin}, and {@Char fraction}.  If it exists
 at all, you will find it here.  ISO-LATIN-2 and Russian characters are
-available separately (consult directory @Code { software } in the Lout
-distribution).  In principle, there is no limit to the characters available,
+available separately.  In principle, there is no limit to the characters available,
 but to go beyond those given in this section requires expertise in defining
 encoding vectors and fonts @Cite { $kingston1995lout.expert}.
 @PP

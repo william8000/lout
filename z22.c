@@ -1,7 +1,7 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -66,12 +66,57 @@ void Interpose(OBJECT z, int typ, OBJECT x, OBJECT y)
 void FlushInners(OBJECT inners, OBJECT hd)
 { OBJECT y, z, tmp, dest_index;
 
+  ifdebug(DGF, D,
+    OBJECT link;
+    fprintf(stderr, "dgf: [ FlushInners(");
+    for( link = Down(inners);  link != inners;  link = NextDown(link) )
+    {
+      Child(y, link);
+      fprintf(stderr, " %s", Image(type(y)));
+      switch( type(y) )
+      {
+
+        case DEAD:
+      
+	  break;
+
+
+        case RECEIVING:
+        case UNATTACHED:
+      
+	  if( Down(y) != y )	/* bug fix (was assert before) */
+	  { assert( Down(y) != y, "FlushInners: UNATTACHED!");
+	    Child(z, Down(y));
+	    fprintf(stderr, " %s", SymName(actual(z)));
+	  }
+	  break;
+
+
+        case PRECEDES:
+      
+	  break;
+
+
+        case GALL_PREC:
+
+	  break;
+
+
+        default:
+      
+	  break;
+      }
+    }
+    fprintf(stderr, ")\n");
+  )
+
   /* check for root galley case */
   if( hd != nilobj )
   { assert( Up(hd) != hd, "FlushInners: Up(hd)!" );
     Parent(dest_index, Up(hd));
     if( actual(actual(dest_index)) == PrintSym )
     { DisposeObject(inners);
+      debug0(DGF, D, "] FlushInners returning (PrintSym)");
       return;
     }
   }
@@ -93,7 +138,8 @@ void FlushInners(OBJECT inners, OBJECT hd)
 	if( Down(y) != y )	/* bug fix (was assert before) */
 	{ assert( Down(y) != y, "FlushInners: UNATTACHED!");
 	  Child(z, Down(y));
-	  debug0(DGF, D, "  calling FlushGalley from FlushInners (a)");
+	  debug1(DGF,D,"  possibly calling FlushGalley %s from FlushInners (a)",
+	    SymName(actual(z)));
 	  if( whereto(z)==nilobj || !uses_extern_target(whereto(z)) ) /* &&& */
 	    FlushGalley(z);
 	}
@@ -130,6 +176,7 @@ void FlushInners(OBJECT inners, OBJECT hd)
     }
   }
   Dispose(inners);
+  debug0(DGF, D, "] FlushInners returning");
 } /* end FlushInners */
 
 
@@ -171,8 +218,10 @@ void ExpandRecursives(OBJECT recs)
       &save_style(target), &non_c, nilobj, &n1, &newrecs, &inners, nilobj);
     debug0(DCR, DDD, "    as galley:");
     ifdebug(DCR, DDD, DebugObject(hd));
+    debug1(DGS, D, "[ ExpandRecursives calling Constrained(%s, COLM)",
+      EchoObject(target));
     Constrained(target, &hc, COLM, &why);
-    debug2(DSC, DD, "Constrained( %s, COLM ) = %s",
+    debug2(DGS, D, "] ExpandRecursives Constrained(%s, COLM) = %s",
       EchoObject(target), EchoConstraint(&hc));
     debug3(DCR, DD, "    horizontal size: (%s, %s); constraint: %s",
       EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)), EchoConstraint(&hc));
@@ -209,9 +258,13 @@ void ExpandRecursives(OBJECT recs)
       AdjustSize(target, back(z, ROWM), fwd(z, ROWM), ROWM);
       Interpose(target, VCAT, z, z);
     }
-    Promote(hd, hd, target_index);  DeleteNode(hd);
+    Promote(hd, hd, target_index, TRUE);  DeleteNode(hd);
     DeleteNode(target_index);
-    if( inners != nilobj )  FlushInners(inners, nilobj);
+    if( inners != nilobj )
+    {
+      debug0(DGF, D, "  calling FlushInners from ExpandRecursives");
+      FlushInners(inners, nilobj);
+    }
     if( newrecs != nilobj )  MergeNode(recs, newrecs);
   } /* end while */
   Dispose(recs);
@@ -247,6 +300,7 @@ static OBJECT FindSplitInGalley(OBJECT hd)
     case HSHIFT:
     case VSHIFT:
     case VCONTRACT:
+    case VLIMITED:
     case VEXPAND:
 
       Child(y, Down(y));
@@ -270,10 +324,18 @@ static OBJECT FindSplitInGalley(OBJECT hd)
     case HCOVER:
     case VCOVER:
     case HCONTRACT:
+    case HLIMITED:
     case HEXPAND:
+    case START_HVSPAN:
+    case START_HSPAN:
+    case START_VSPAN:
+    case HSPAN:
+    case VSPAN:
     case ROTATE:
+    case BACKGROUND:
     case INCGRAPHIC:
     case SINCGRAPHIC:
+    case PLAIN_GRAPHIC:
     case GRAPHIC:
 
       debug0(DGF, D, "FindSplitInGalley(hd) failing, hd =");
@@ -294,16 +356,20 @@ static OBJECT FindSplitInGalley(OBJECT hd)
 
 /*@::Promote()@***************************************************************/
 /*                                                                           */
-/*  Promote(hd, stop_link, dest_index)                                       */
+/*  Promote(hd, stop_link, dest_index, join_after)                           */
 /*                                                                           */
 /*  Promote components of galley hd into its destination (dest), up to but   */
 /*  not including the one linked to hd by link stop_link, which always       */
 /*  follows a component.  No size adjustments are made, except that when     */
 /*  two col_thr nodes are merged, a COLM adjustment is made to the result.   */
 /*                                                                           */
+/*  If the galley is ending here, Promote inserts a gap at the end of it.    */
+/*  Whether to make this a joining gap or not is a tricky question which     */
+/*  Promote answers by referring to join_after.                              */
+/*                                                                           */
 /*****************************************************************************/
 
-void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
+void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 {
   /* these two variables refer to the root galley only */
   static BOOLEAN first = TRUE;	/* TRUE when the first component not written */
@@ -330,9 +396,10 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
     FposCopy(fpos(y), fpos(hd));
     hspace(y) = 0;  vspace(y) = 1;
     /* SetGap(gap(y), FALSE, FALSE, seen_nojoin(hd), FIXED_UNIT, NO_MODE, 0); */
-    SetGap(gap(y), FALSE, FALSE, TRUE, FIXED_UNIT, NO_MODE, 0);
     /* SetGap(gap(y), FALSE, FALSE, threaded(dest), FIXED_UNIT, NO_MODE, 0); */
+    /* SetGap(gap(y), FALSE, FALSE, TRUE, FIXED_UNIT, NO_MODE, 0); */
     /* ClearGap(gap(y)); */
+    SetGap(gap(y), FALSE, FALSE, join_after, FIXED_UNIT, NO_MODE, 0);
     Link(stop_link, y);
   }
 
@@ -500,6 +567,9 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
 	    debug1(DGF, D, "never-attached galley %s:", EchoFilePos(&fpos(z)));
 	    ifdebug(DGF, D, DebugObject(z));
 	    KillGalley(z, FALSE);
+	    /* ***
+	    link = NextDown(link);
+	    *** */
 	  }
 	  break;
 
@@ -568,13 +638,22 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
 	case VCOVER:
 	case HCONTRACT:
 	case VCONTRACT:
+	case HLIMITED:
+	case VLIMITED:
 	case HEXPAND:
 	case VEXPAND:
+	case START_HVSPAN:
+	case START_HSPAN:
+	case START_VSPAN:
+	case HSPAN:
+	case VSPAN:
 	case ROTATE:
+	case BACKGROUND:
 	case SCALE:
 	case KERN_SHRINK:
 	case INCGRAPHIC:
 	case SINCGRAPHIC:
+	case PLAIN_GRAPHIC:
 	case GRAPHIC:
 	case ACAT:
 	case HCAT:
@@ -591,6 +670,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
 	  if( !is_indefinite(type(y)) && size(y, ROWM) != 0 )
 	  {
 	    /* fix horizontally; work out which fonts needed */
+	    SetLengthDim(COLM);
 	    FixAndPrintObject(y, back(y, COLM), back(y, COLM), fwd(y, COLM),
 	      COLM, FALSE, 0, 0);
 
@@ -612,6 +692,9 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index)
 
 	    /* fix and print vertically */
 	    debug1(DGF,D, "  Promote calling FixAndPrint %s", Image(type(y)));
+	    debug3(DGP,D, "  Promote calling FixAndPrint %s %s,%s", dimen(ROWM),
+	      EchoLength(back(y,ROWM)), EchoLength(fwd(y, ROWM)));
+	    SetLengthDim(ROWM);
 	    FixAndPrintObject(y, back(y,ROWM), back(y, ROWM), fwd(y, ROWM),
 	      ROWM, FALSE, size(y, ROWM), 0);
 
@@ -855,7 +938,7 @@ OBJECT relocate_link, OBJECT sym)
 void SetTarget(OBJECT hd)
 { OBJECT x, y, link, cr, lpar, rpar, env;
   BOOLEAN copied;
-  debug1(DGS, D, "SetTarget(%s)", SymName(actual(hd)));
+  debug1(DGS, DD, "SetTarget(%s)", SymName(actual(hd)));
   assert( type(hd) == HEAD, "SetTarget: type(hd) != HEAD!" );
   Child(x, Down(hd));
   assert( type(x) == CLOSURE, "SetTarget: type(x) != CLOSURE!" );

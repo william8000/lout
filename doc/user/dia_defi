@@ -310,7 +310,7 @@ production the best thing to do with it is to add it to your
 extend. @Index { @Code extend keyword }
 @Code "mydefs" file in the following form:
 @ID @OneRow @Code {
-"extend @DiagramPrint @Diag"
+"extend @DiagSetup @Diag"
 "macro @MyNode {"
 "    @Node"
 "        outline {"
@@ -327,7 +327,7 @@ symbol, {@Code "@MyNode"}, which stands for what follows it between
 braces.  @Code "@MyNode" will then behave exactly like @Code "@Circle"
 and the other standard node symbols.  The same pattern works for links:
 @ID @OneRow @Code {
-"extend @DiagramPrint @Diag"
+"extend @DiagSetup @Diag"
 "macro @MyLink {"
 "    @Link"
 "        path {"
@@ -344,7 +344,7 @@ for then it will be available, easily, forever.
 This same approach is also useful to define common combinations of
 options, even when there is no new outline or path:
 @ID @OneRow @Code {
-"extend @DiagramPrint @Diag"
+"extend @DiagSetup @Diag"
 "macro @BigOctagon {"
 "    @Polygon"
 "        sides { 8 }"

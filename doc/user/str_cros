@@ -46,7 +46,7 @@ usual, to control grouping:  we don't want the following punctuation
 characters in the tag.
 @PP
 One tag called @Code "last.page" is created automatically
-"last.page.tag" @Index { last.page tag }
+"last.page.tag" @Index { @Code "last.page" tag }
 for you.  @Code "@PageOf last.page" gives the number of the last page
 of the document.  For example, the result for this document is
 {@PageOf last.page}.

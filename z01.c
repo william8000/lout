@@ -1,7 +1,7 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -55,7 +55,7 @@ POINTER MemCheck = 0;
 /*****************************************************************************/
 
 OBJECT StartSym, GalleySym, ForceGalleySym, InputSym, PrintSym, OptGallSym,
-       FilterInSym, FilterOutSym, FilterErrSym;
+       FilterInSym, FilterOutSym, FilterErrSym, VerbatimSym, RawVerbatimSym;
 
 
 /*****************************************************************************/
@@ -614,9 +614,21 @@ int main(int argc, char *argv[])
   ifdebug(DPP, D, ProfileOn("main"));
 
   /* open output file, or stdout if none specified, and initialize printer */
-  if( StringEqual(outfile, STR_STDOUT) )  out_fp = stdout;
-  else if( (out_fp = StringFOpen(outfile, WRITE_TEXT)) == null )
-    Error(1, 27, "cannot open output file %s", FATAL, no_fpos, outfile);
+  if( StringEqual(outfile, STR_STDOUT) )
+  {
+#if OS_DOS
+    /* For DOS/Win32 we need to set binary mode on stdout to prevent
+       PDF compressed streams and xrefs from being corrupted - Uwe 12/98 */
+    if (_setmode(_fileno(stdout), _O_BINARY) == -1)
+      Error(1,27, "cannot set binary mode on stdout", FATAL, no_fpos);
+#endif
+    out_fp = stdout;
+  }
+  else
+  { out_fp = StringFOpen(outfile, BackEnd==PLAINTEXT ? WRITE_TEXT:WRITE_BINARY);
+    if( out_fp == null )
+      Error(1, 27, "cannot open output file %s", FATAL, no_fpos, outfile);
+  }
   FontInit();
   ColourInit();
   LanguageInit();
@@ -648,81 +660,94 @@ int main(int argc, char *argv[])
   FilterOutSym   = load(KW_FILTEROUT,    0, FALSE,  FALSE,  FALSE, NO_PREC     );
   FilterErrSym   = load(KW_FILTERERR,    0, FALSE,  FALSE,  FALSE, NO_PREC     );
   OptGallSym     = load(KW_OPTGALL,      0, FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  VerbatimSym    = load(KW_VERBATIM,VERBATIM,FALSE, TRUE,   FALSE, DEFAULT_PREC);
+  RawVerbatimSym = load(KW_RAWVERBATIM,RAW_VERBATIM,FALSE, TRUE,   FALSE, DEFAULT_PREC);
 
 
-  load(KW_BEGIN,       BEGIN,          FALSE,  FALSE,  FALSE, BEGIN_PREC  );
-  load(KW_END,         END,            FALSE,  FALSE,  FALSE, END_PREC    );
-  load(KW_ENV,         ENV,            FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_ENVA,        ENVA,           FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_ENVB,        ENVB,           FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_ENVC,        ENVC,           FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_ENVD,        ENVD,           FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_CENV,        CENV,           FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_CLOS,        CLOS,           FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_LVIS,        LVIS,           FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_LUSE,        LUSE,           FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_LEO,         LEO,            FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_LBR,         LBR,            FALSE,  FALSE,  FALSE, LBR_PREC    );
-  load(KW_RBR,         RBR,            FALSE,  FALSE,  FALSE, RBR_PREC    );
-  load(KW_INCLUDE,     INCLUDE,        FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_SYSINCLUDE,  SYS_INCLUDE,    FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_PREPEND,     PREPEND,        FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_SYSPREPEND,  SYS_PREPEND,    FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_DATABASE,    DATABASE,       FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_SYSDATABASE, SYS_DATABASE,   FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_USE,         USE,            FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_NOT_REVEALED,NOT_REVEALED,   FALSE,  FALSE,  FALSE, NO_PREC     );
-  load(KW_CASE,        CASE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_YIELD,       YIELD,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_BACKEND,     BACKEND,        FALSE,  FALSE,  FALSE, DEFAULT_PREC);
-  load(KW_XCHAR,       XCHAR,          FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_FONT,        FONT,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_SPACE,       SPACE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_YUNIT,       YUNIT,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_ZUNIT,       ZUNIT,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_BREAK,       BREAK,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_UNDERLINE,   UNDERLINE,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_COLOUR,      COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_COLOR,       COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_LANGUAGE,    LANGUAGE,       TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_CURR_LANG,   CURR_LANG,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
-  load(KW_CURR_FAMILY, CURR_FAMILY,    FALSE,  FALSE,  FALSE, DEFAULT_PREC);
-  load(KW_CURR_FACE,   CURR_FACE,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
-  load(KW_COMMON,      COMMON,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_RUMP,        RUMP,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_INSERT,      INSERT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_NEXT,        NEXT,           FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_PLUS,        PLUS,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_MINUS,       MINUS,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_OPEN,        OPEN,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_TAGGED,      TAGGED,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_WIDE,        WIDE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_HIGH,        HIGH,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_HSHIFT,      HSHIFT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_VSHIFT,      VSHIFT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_ONE_COL,     ONE_COL,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_ONE_ROW,     ONE_ROW,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_HSCALE,      HSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_VSCALE,      VSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_HCOVER,      HCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_VCOVER,      VCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_KERN_SHRINK, KERN_SHRINK,    TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_SCALE,       SCALE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_HCONTRACT,   HCONTRACT,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_VCONTRACT,   VCONTRACT,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_HEXPAND,     HEXPAND,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_VEXPAND,     VEXPAND,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_PADJUST,     PADJUST,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_HADJUST,     HADJUST,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_VADJUST,     VADJUST,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_ROTATE,      ROTATE,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_INCGRAPHIC,  INCGRAPHIC,     FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_SINCGRAPHIC, SINCGRAPHIC,    FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_GRAPHIC,     GRAPHIC,        TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_CROSS,       CROSS,          TRUE,   TRUE,   FALSE, CROSSOP_PREC);
-  load(KW_FORCE_CROSS, FORCE_CROSS,    TRUE,   TRUE,   FALSE, CROSSOP_PREC);
-  load(KW_NULL,        NULL_CLOS,      FALSE,  FALSE,  TRUE,  NO_PREC     );
-  load(KW_PAGE_LABEL,  PAGE_LABEL,     FALSE,  TRUE,   TRUE,  DEFAULT_PREC);
+  load(KW_BEGIN,        BEGIN,          FALSE,  FALSE,  FALSE, BEGIN_PREC  );
+  load(KW_END,          END,            FALSE,  FALSE,  FALSE, END_PREC    );
+  load(KW_ENV,          ENV,            FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_ENVA,         ENVA,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_ENVB,         ENVB,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_ENVC,         ENVC,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_ENVD,         ENVD,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_CENV,         CENV,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_CLOS,         CLOS,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_LVIS,         LVIS,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_LUSE,         LUSE,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_LEO,          LEO,            FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_LBR,          LBR,            FALSE,  FALSE,  FALSE, LBR_PREC    );
+  load(KW_RBR,          RBR,            FALSE,  FALSE,  FALSE, RBR_PREC    );
+  load(KW_INCLUDE,      INCLUDE,        FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_SYSINCLUDE,   SYS_INCLUDE,    FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_PREPEND,      PREPEND,        FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_SYSPREPEND,   SYS_PREPEND,    FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_DATABASE,     DATABASE,       FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_SYSDATABASE,  SYS_DATABASE,   FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_USE,          USE,            FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_NOT_REVEALED, NOT_REVEALED,   FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_CASE,         CASE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_YIELD,        YIELD,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_BACKEND,      BACKEND,        FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_XCHAR,        XCHAR,          FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_FONT,         FONT,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_SPACE,        SPACE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_YUNIT,        YUNIT,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_ZUNIT,        ZUNIT,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_BREAK,        BREAK,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_UNDERLINE,    UNDERLINE,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_COLOUR,       COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_COLOR,        COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_LANGUAGE,     LANGUAGE,       TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_CURR_LANG,    CURR_LANG,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_CURR_FAMILY,  CURR_FAMILY,    FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_CURR_FACE,    CURR_FACE,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_COMMON,       COMMON,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_RUMP,         RUMP,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_MELD,         MELD,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_INSERT,       INSERT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_ONE_OF,       ONE_OF,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_NEXT,         NEXT,           FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_PLUS,         PLUS,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_MINUS,        MINUS,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_OPEN,         OPEN,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_TAGGED,       TAGGED,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_WIDE,         WIDE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HIGH,         HIGH,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HSHIFT,       HSHIFT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VSHIFT,       VSHIFT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_ONE_COL,      ONE_COL,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_ONE_ROW,      ONE_ROW,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HSCALE,       HSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VSCALE,       VSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HCOVER,       HCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VCOVER,       VCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_KERN_SHRINK,  KERN_SHRINK,    TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_SCALE,        SCALE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HCONTRACT,    HCONTRACT,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VCONTRACT,    VCONTRACT,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HLIMITED,     HLIMITED,       FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VLIMITED,     VLIMITED,       FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HEXPAND,      HEXPAND,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VEXPAND,      VEXPAND,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_STARTHVSPAN,  START_HVSPAN,   FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_STARTHSPAN,   START_HSPAN,    FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_STARTVSPAN,   START_VSPAN,    FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HSPAN,        HSPAN,          FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_VSPAN,        VSPAN,          FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_PADJUST,      PADJUST,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HADJUST,      HADJUST,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VADJUST,      VADJUST,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_ROTATE,       ROTATE,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_BACKGROUND,   BACKGROUND,     TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_INCGRAPHIC,   INCGRAPHIC,     FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_SINCGRAPHIC,  SINCGRAPHIC,    FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_PLAINGRAPHIC, PLAIN_GRAPHIC,  TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_GRAPHIC,      GRAPHIC,        TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_CROSS,        CROSS,          TRUE,   TRUE,   FALSE, CROSSOP_PREC);
+  load(KW_FORCE_CROSS,  FORCE_CROSS,    TRUE,   TRUE,   FALSE, CROSSOP_PREC);
+  load(KW_NULL,         NULL_CLOS,      FALSE,  FALSE,  TRUE,  NO_PREC     );
+  load(KW_PAGE_LABEL,   PAGE_LABEL,     FALSE,  TRUE,   TRUE,  DEFAULT_PREC);
 
 #define setcat(s, mk, jn)  has_mark(s)=mk, has_join(s)=jn
 

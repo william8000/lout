@@ -528,8 +528,7 @@ Light LightOblique Narrow NarrowBold NarrowBoldObl
 NarrowObl Oblique UltraCompressed }
 @Rowa
     A { Schoolbook }
-    B { Base Slope Bold BoldSlope BoldItalic
-Italic Roman }
+    B { Base Slope Bold BoldSlope BoldItalic Italic Roman }
 @Rowa
     A { Palatino }
     B { Base Slope Bold BoldSlope BoldItalic

@@ -35,7 +35,7 @@ omitted, the language of the document as a whole will be used, not the
 language where the figure or table occurs.
 @PP
 The two symbols also have a @Code "@CaptionPos" option, which determines
-whether the captions to figures and tables appear above or below them.  The
+whether the caption appears above or below the figure or table.  The
 default is {@Code "Below"}, the alternative is {@Code "Above"}.
 @PP
 The question of what is a suitable running header to print on pages
@@ -63,7 +63,8 @@ sufficient space. }
 @Rowa
     A { EvenPageTop }
     B { Like @Code PageTop except that the first page of the figure
-or table will be an even-numbered (left-hand or verso) page.  }
+or table will be an even-numbered (left-hand or verso) page -- useful
+for double-pace spreads.  }
 @Rowa
     A { FullPage }
     B { Like {@Code PageTop} except that nothing else will appear on the
@@ -93,8 +94,8 @@ is different from @Code PageTop only in multi-column documents. }
     A { ColFoot }
     B { The figure will appear at the foot of the current column,
 occupying the column width; or, if there is insufficient space there, at
-the top of the following column and so on as for {@Code ColTop}.  This
-is different from @Code PageFoot only in multi-column documents. }
+the top of the following column as for {@Code ColTop}.  This differs
+from @Code PageFoot only in multi-column documents. }
 @Rowa
     A { ColEnd }
     B { The figure will appear in a column at the end of the document
@@ -131,7 +132,11 @@ The numbers assigned to figures and tables, and their ordering in any list
 of figures or tables, is based on where they appear in the final printed
 document, not on where they appear in the source files.  This is better for
 the reader in the unusual case of a fixed figure being overtaken by a
-floating one.
+floating one.  If a section number is printed as part of a figure number,
+and the figure floats forward from one section into another, the figure
+number will reflect the later section, not the earlier one as it should.
+You can fix this problem by moving the figure to an earlier point in
+the section, or by not having section numbers in figures (see below).
 @PP
 @Code "@Figure" and @Code "@Table" each have a @Code "@OnePage" option,
 whose value may be @Code "Yes" or {@Code No}.  Setting @Code "@OnePage"
@@ -181,7 +186,7 @@ its caption.  It applies to each page or column of a multi-page or
 multi-column figure; for example, the above format will draw a box around
 each page of a multi-page figure, and each page will be separately centred.
 @Code "ColEnd" and @Code "Raw" figures are exceptions to this rule:  they
-always apply the format to the figure as a whole.  This  means that you cannot
+always apply the format to the figure as a whole.  This means that you cannot
 box multi-page figures of these two types, since the result would be an
 unbreakable object too large to fit on one page.
 @PP
@@ -202,8 +207,8 @@ names.  Here they all are:
 "@FigureListWord { figurelist }"
 }
 @Code "@FigureLocation" is the default value of the @Code "@Location"
-option of figures described above.  By changing it, for example to
-{@Code "FullPage"}, you can change the location of all figures at
+option of figures.  Changing it, for example to
+{@Code "FullPage"}, changes the location of all figures at
 once.  You may still override this location for any individual figure,
 however, by giving that figure a @Code "@Location" option.  In a similar way,
 figureformat. @Index @Code "@FigureFormat"
@@ -226,7 +231,12 @@ numbered automatically or not; the choices are
 {@Code "None"}, {@Code "Arabic"}, {@Code "Roman"}, {@Code "UCRoman"},
 {@Code "Alpha"}, and {@Code "UCAlpha"}.  Depending on the document
 type and where the figure or table occurs, the number might include
-a chapter number as well.
+a chapter number as well.  This is determined by options in the
+setup file for your document type; for example, 
+@ID @Code "@SectionNumInFigures { No }"
+appears in the @Code "report" setup file, and means that a section
+number will not appear in the figure number (unless you change the
+option to {@Code Yes}).
 @PP
 @Code "@CaptionFont" and @Code "@CaptionBreak" determine the font and
 paragraph breaking style used in the captions of figures and tables.  Their

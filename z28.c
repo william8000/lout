@@ -1,7 +1,7 @@
 /*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.12)                       */
-/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.13)                       */
+/*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -180,15 +180,15 @@ POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...
       {
         fprintf(fp, condcatgets(MsgCat, 28, 7, "%s internal error: %s\n"),
 	  EchoAltFilePos(pos), val);
+        /* for estrip's benefit: Error(28, 7, "%s internal error: %s\n") */
       }
       else
       {
         PrintFileBanner(file_num(*pos));
         fprintf(fp, condcatgets(MsgCat, 28, 4, "  %6s internal error: %s\n"),
 	  EchoFileLine(pos), val);
+        /* for estrip's benefit: Error(28, 4, "  %6s internal error: %s\n") */
       }
-      /* for estrip's benefit: Error(28, 4, "  %6s internal error: %s\n") */
-      /* for estrip's benefit: Error(28, 7, "%s internal error: %s\n") */
 #if DEBUG_ON
       abort();
 #else
