@@ -1,0 +1,26 @@
+@Section
+   @Title { Errors }
+   @Tag { figerrors }
+@Begin
+@PP
+Lout normally produces an output file that will print without mishap on
+any PostScript device.  However, some of the options of {@Code "@Fig"}'s
+symbols are passed through Lout to the output file without checking,
+including anything containing @Code "@Fig" lengths, angles, points, and
+labels.  Any errors in these options will not be detected until the file
+is printed.
+@PP
+The most likely errors are {@I syntax @I errors}, as in
+@Code "shape { 0 0 [ 0 xsize }" for example, in which a @Code "]" is
+missing; @I { type errors }, as in @Code "0 0 @Distance 45" where the
+right parameter is not a point; and @I { undefined errors }, arising
+from labels misspelt or used before being defined.  Less commonly, the
+options may all be correct but the figure is too large in some way:  too
+many labels, too deeply nested, etc.
+@PP
+When an error is detected, @Code "@Fig" arranges for the offending page to
+be printed up to the point where the error occurred, with a message nearby
+describing the error.  Printing of the document is then aborted.  It is
+often quite easy to find the problem, because it lies in whatever should
+have been printed next.
+@End @Section

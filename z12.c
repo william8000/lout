@@ -1,7 +1,7 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -50,7 +50,7 @@ OBJECT x;  int dim;  OBJECT *extras;
   int b, f, dble_fwd, llx, lly, urx, ury, status;
   float fllx, flly, furx, fury;
   BOOLEAN dble_found, found, will_expand, first_line;
-  FILE *fp;  FULL_CHAR buff[MAX_LINE];
+  FILE *fp;  FULL_CHAR buff[MAX_BUFF];
 
   debug2(DSF, DD, "[ MinSize( %s, %s, extras )", EchoObject(x), dimen(dim));
   ifdebug(DSF, DDD, DebugObject(x));
@@ -71,8 +71,9 @@ OBJECT x;  int dim;  OBJECT *extras;
       if( dim == ROW )
       {	z = New(cross_type(x));
 	actual(z) = x;
+	Link(z, x);		/* new code to avoid disposal */
 	Link(*extras, z);
-	debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
+	debug2(DCR, D, "  MinSize index: %d %s", (int) z, EchoObject(z));
       }
       back(x, dim) = fwd(x, dim) = 0;
       break;
@@ -111,6 +112,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
 	x = y;	/* now sizing y, not x */
+	back(x, COL) = fwd(x, COL) = 0;  /* fix non-zero size @Null bug!! */
       }
       else external(x) = FALSE;
       back(x, dim) = fwd(x, dim) = 0;
@@ -133,7 +135,8 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  Link(*extras, z);
 	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
-	else Error(INTERN,&fpos(x), "MinSize: definite non-recursive CLOSURE!");
+	else Error(12, 1, "MinSize: %s", INTERN, &fpos(x),
+	      "definite non-recursive closure");
       }
       else external(x) = FALSE;		/*  nb must be done just here! */
       back(x, dim) = fwd(x, dim) = 0;
@@ -168,7 +171,8 @@ OBJECT x;  int dim;  OBJECT *extras;
       {	z = New(EXPAND_IND);
 	actual(z) = x;
 	Link(*extras, z);
-	debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
+	/* Can't do Link(z, x) because Constrained goes up and finds z */
+	debug2(DCR, D, "  MinSize index: %d %s", (int) z, EchoObject(z));
       }	
       break;
 
@@ -221,10 +225,18 @@ OBJECT x;  int dim;  OBJECT *extras;
       if( dim == COL )
       { back(x, dim) = (back(y, dim) * bc(constraint(x))) / SF;
         fwd(x, dim)  = (fwd(y, dim)  * bc(constraint(x))) / SF;
+	if( bc(constraint(x)) == 0 )  /* Lout-supplied factor required */
+        { z = New(SCALE_IND);
+	  actual(z) = x;
+	  Link(*extras, z);
+	  debug1(DSF, DDD, "  MinSize: %s", EchoObject(z));
+	  vert_sized(x) = FALSE;
+        }	
       }
       else
       { back(x, dim) = (back(y, dim) * fc(constraint(x))) / SF;
         fwd(x, dim)  = (fwd(y, dim)  * fc(constraint(x))) / SF;
+	vert_sized(x) = TRUE;
       }
       break;
 
@@ -254,7 +266,7 @@ OBJECT x;  int dim;  OBJECT *extras;
       y = MinSize(y, dim, extras);
       if( dim == ROW )
       { if( !FitsConstraint(back(y, dim), fwd(y, dim), constraint(x)) )
-        { Error(WARN, &fpos(x), "forced to enlarge %s", KW_HIGH);
+        { Error(12, 2, "forced to enlarge %s", WARN, &fpos(x), KW_HIGH);
 	  debug0(DSF, D, "offending object was:");
 	  ifdebug(DSF, D, DebugObject(y));
 	  SetConstraint(constraint(x), MAX_LEN, size(y, dim), MAX_LEN);
@@ -266,6 +278,23 @@ OBJECT x;  int dim;  OBJECT *extras;
       else
       {	back(x, dim) = back(y, dim);
 	fwd(x, dim)  = fwd(y, dim);
+      }
+      break;
+
+
+    case HSHIFT:
+    case VSHIFT:
+
+      Child(y, Down(x));
+      y = MinSize(y, dim, extras);
+      if( (dim == COL) == (type(x) == HSHIFT) )
+      { f = FindShift(x, y, dim);
+	back(x, dim) = min(MAX_LEN, max(0, back(y, dim) + f));
+	fwd(x, dim)  = min(MAX_LEN, max(0, fwd(y, dim)  - f));
+      }
+      else
+      { back(x, dim) = back(y, dim);
+	fwd(x, dim) = fwd(y, dim);
       }
       break;
 
@@ -332,15 +361,15 @@ OBJECT x;  int dim;  OBJECT *extras;
 	    {
 	      /* error if preceding gap has mark */
 	      if( g != nil && mark(gap(g)) )
-	      {	Error(WARN, &fpos(y), "catenation modifier ^ deleted (%s)",
-			"it may not precede this object");
+	      {	Error(12, 3, "^ deleted (it may not precede this object)",
+		  WARN, &fpos(y));
 		mark(gap(g)) = FALSE;
 	      }
 
 	      /* error if next unit is used in preceding gap */
 	      if( g != nil && units(gap(g)) == NEXT_UNIT )
-	      {	Error(WARN, &fpos(y), "gap replaced by 0i (%s)",
-			"unit n may not precede this object");
+	      {	Error(12, 4, "gap replaced by 0i (%c unit not allowed here)",
+		  WARN, &fpos(y), CH_UNIT_WD);
 		units(gap(g)) = FIXED_UNIT;
 		width(gap(g)) = 0;
 	      }
@@ -486,7 +515,7 @@ OBJECT x;  int dim;  OBJECT *extras;
       /* *** fp = OpenFile(fnum = sparec(constraint(x)), FALSE); */
       if( fp == NULL )  status = IG_NOFILE;
       first_line = TRUE;
-      while( status == IG_LOOKING && StringFGets(buff, MAX_LINE, fp) != NULL )
+      while( status == IG_LOOKING && StringFGets(buff, MAX_BUFF, fp) != NULL )
       {
 	if( first_line && !StringBeginsWith(buff, AsciiToFull("%!")) )
 	  status = IG_BADFILE;
@@ -512,31 +541,32 @@ OBJECT x;  int dim;  OBJECT *extras;
       /* report error or calculate true size, depending on status */
       switch( status )
       {
-	case IG_LOOKING:
-
-	  Error(WARN, &fpos(x), "%s given zero size: format error in file %s%s",
-	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
-	    string(full_name), " (missing %%BoundingBox: line)");
-	  back(y, COL) = fwd(y, COL) = back(y, ROW) = fwd(y, ROW) = 0;
-	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
-	  sparec(constraint(x)) = TRUE;
-	  fclose(fp);
-	  break;
-
 	case IG_NOFILE:
 
-	  Error(WARN, &fpos(x), "%s deleted: cannot open file %s",
+	  Error(12, 5, "%s deleted (cannot open file %s)", WARN, &fpos(x),
 	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
 	    string(full_name));
 	  sparec(constraint(x)) = FALSE;
 	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
 	  break;
 
+	case IG_LOOKING:
+
+	  Error(12, 6, "%s given zero size (no BoundingBox line in file %s)",
+	    WARN, &fpos(x),
+	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
+	    string(full_name));
+	  back(y, COL) = fwd(y, COL) = back(y, ROW) = fwd(y, ROW) = 0;
+	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
+	  sparec(constraint(x)) = TRUE;
+	  fclose(fp);
+	  break;
+
 	case IG_BADFILE:
 
-	  Error(WARN, &fpos(x), "%s deleted: format error in file %s %s",
-	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
-	    string(full_name), "(bad first line)");
+	  Error(12, 7, "%s deleted (bad first line in file %s)", WARN,
+	    &fpos(x), type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
+	    string(full_name));
 	  sparec(constraint(x)) = FALSE;
 	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
 	  fclose(fp);
@@ -544,9 +574,10 @@ OBJECT x;  int dim;  OBJECT *extras;
 	
 	case IG_BADSIZE:
 
-	  Error(WARN, &fpos(x), "%s given zero size: format error in file %s%s",
+	  Error(12, 8, "%s given zero size (bad BoundingBox line in file %s)",
+	    WARN, &fpos(x),
 	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
-	    string(full_name), " (bad %%BoundingBox: line)");
+	    string(full_name));
 	  back(y, COL) = fwd(y, COL) = back(y, ROW) = fwd(y, ROW) = 0;
 	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
 	  sparec(constraint(x)) = TRUE;
@@ -575,7 +606,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 
     default:
     
-      Error(INTERN, &fpos(x), "MinSize: type(x): %s", Image(type(x)));
+      Error(12, 9, "MinSize: %s", INTERN, &fpos(x), Image(type(x)));
       break;
 
 
@@ -585,8 +616,10 @@ OBJECT x;  int dim;  OBJECT *extras;
 		EchoLength(back(x, dim)), EchoLength(fwd(x, dim)) );
   ifdebug(DSF, DDD, DebugObject(x));
 
-  assert( back(x, dim) >= 0, "MinSize: back(x, dim) < 0!" );
-  assert( fwd(x, dim)  >= 0, "MinSize: fwd(x, dim)  < 0!" );
+  if( back(x, dim) < 0 )
+    Error(12, 10, "MinSize: back(x, dim) < 0!", INTERN, &fpos(x));
+  if( fwd(x, dim) < 0 )
+    Error(12, 11, "MinSize: fwd(x, dim) < 0!", INTERN, &fpos(x));
 
   return x;
 } /* end MinSize */

@@ -1,0 +1,69 @@
+@Section
+   @Title { Plain text documents }
+   @Tag { plain }
+@Begin
+@PP
+Occasionally you may need to produce an output file containing plain text
+plain.text. @Index { plain text documents }
+rather than PostScript, for example for an online manual entry or to send
+as electronic mail.  Any document that can be produced by Lout in
+PostScript can be produced in plain text as well, by adding a @Code "-p"
+flag to the Unix command line:
+@ID @Code "lout -p simple"
+No other changes are required, although one is recommended (use of the
+@Code pdoc setup file, see below).  Here we are sending the output
+directly to the screen, but it can be redirected to a file, or piped through
+the @Code more command for viewing one page at a time, etc.
+@PP
+Of course, plain text is an extremely limited medium of communication
+compared with PostScript, and this forces Lout to make some rather
+drastic compromises:
+@BulletList
+@LI { Symbols like {@Code "@Bullet"}, which stand for unusual characters,
+produce printable characters which approximate the PostScript ones.  For
+example, {@Code "@Bullet"} produces {@Code "o"}.  However, the @Code "@Char"
+and @Code "@Sym" symbols often produce unprintable characters, and are best
+avoided; }
+@LI { All font and size changes are ignored, since plain text has only
+one font and size.  Every character is taken to be @Eq { 1 frac 10 } inch
+wide and @Eq { 1 frac 6 } inch high; }
+@LI { Scaled objects are not printed unless the scale factor happens to be 1; }
+@LI { Rotated objects are not printed unless the angle happens to be zero
+degrees.  This means that page orientations (Section {@NumberOf pagesize})
+other than @Code Portrait do not work; }
+@LI { Ruled lines are not printed, and paint and colour options are
+ignored.  This spoils the graphics and graphs of Chapters
+{@NumberOf graphics}, {@NumberOf fig}, and {@NumberOf graphs}. }
+@EndList
+Despite the problems, many things work surprisingly well.  Tables, for
+example, lose their ruled lines but otherwise look very good.  It does no
+harm to try things and see if they work out.
+@PP
+The worst problem with plain text is that characters cannot be placed at
+arbitrary points on the page.  A superscript, for example, is impossible to
+place correctly, so Lout uses a different layout for footnote labels (and
+makes a mess of equations, which are best avoided).  Because of this problem
+it's best to make all horizontal lengths multiples of @Eq {1 frac 10} inch
+(conveniently expressed as {@Code 1s}), and all vertical lengths multiples
+of @Eq { 1 frac 6 } inch (conveniently expressed as {@Code 1f}).  To help
+you do this, there is a setup file called @Code pdoc which is exactly like
+@Code doc except that the values of the setup file options are chosen to
+suit plain text output.  Use it like this:
+pdoc.file @Index { @Code "pdoc" setup file }
+@ID @Code {
+"@SysInclude { pdoc }"
+"@Doc @Text @Begin"
+"..."
+"@End @Text"
+}
+No plain text versions of the setup files for other document types are
+supplied, but they could easily be made following the example of
+{@Code pdoc}.
+@PP
+If you use @Code "lout -P" instead of {@Code "lout -p"}, the plain text
+output will contain a form-feed character (control-L) after each page
+form.feed @Index { form-feed in plain text }
+except the last.  This character causes most printing devices to start
+a new page, which is very useful when your page height is not exactly
+right.
+@End @Section

@@ -5,8 +5,11 @@
 #                                                                             #
 #  Version 1.0 by Jeffrey H. Kingston, September 1991.                        #
 #  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
+#  Version 3.0 by Jeffrey H. Kingston, 13 September 1993.                     #
 #                                                                             #
-#  See "Tab - A Lout package for formatting tables" for user information.     #
+#  The only change between Versions 2 and 3 is to make the linewidth          #
+#  option accept a Lout length rather than a Fig length.  See the User's      #
+#  Guide for user information.                                                #
 #                                                                             #
 ###############################################################################
 
@@ -25,7 +28,15 @@ def @Tab
     named side      { no      }
     named hmargin   { 0.3c    }
     named vmargin   { 0.2v    }
-    named linewidth { 0.5 pt  }
+    named linewidth
+	named c { " cm" }
+	named i { " in" }
+	named e { " em" }
+	named p { " pt" }
+	named f { " ft" }
+	named s { " sp" }
+	named v { " vs" }
+		    { 0.5p    }
 
     named @Fmta
 	named A {} named B {} named C {} named D {} named E {}

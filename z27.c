@@ -1,7 +1,7 @@
 /*@z27.c:Debug Service:Debug flags@*******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -72,6 +72,10 @@ struct dbs  dbg[] = {
     "ft",    0, 0, 0,		/* Font Tables               */
     "ev",    0, 0, 0,		/* Encoding Vextors          */
     "sh",    0, 0, 0,		/* String Handler            */
+    "fh",    0, 0, 0,		/* Filter Handler            */
+    "io",    0, 0, 0,		/* Object Input-Output       */
+    "co",    0, 0, 0,		/* Colour Service            */
+    "ls",    0, 0, 0,		/* Language Service          */
     "pp",    0, 0, 0,		/* Profiling                 */
     "",      0, 0, 0,		/* any                       */
 };
@@ -91,7 +95,7 @@ FULL_CHAR *str;
   for( j = 1;  ;  j++ )
   { if( StringEqual(AsciiToFull(dbg[j].flag), &str[urg+2]) )  break;
     if( StringEqual(AsciiToFull(dbg[j].flag), STR_EMPTY) )
-      Error(FATAL, no_fpos, "unknown debug flag %s", str);
+      Error(27, 1, "unknown debug flag %s", FATAL, no_fpos, str);
   }
   for( ;  urg >= 0;  urg-- )  dbg[j].on[urg] = dbg[ANY].on[urg] = TRUE;
 } /* end DebugInit */
@@ -148,10 +152,10 @@ char *str;
   { if( strcmp(profstack[i].label, str) == 0 )
     { for( i = 0;  i < proftop;  i++ )
 	fprintf(stderr, "profstack[%d] = %s\n", i, profstack[i].label);
-      Error(INTERN, no_fpos, "ProfileOn: %s restarted", str);
+      Error(27, 2, "ProfileOn: %s restarted", INTERN, no_fpos, str);
     }
   }
-  if( proftop == MAXPROF )  Error(INTERN, no_fpos, "ProfileOn: overflow");
+  if( proftop==MAXPROF )  Error(27, 3, "ProfileOn: overflow", INTERN, no_fpos);
   time(&raw_time);  profstack[proftop].label = str;
   profstack[proftop++].time  = raw_time;
 } /* end ProfileOn */
@@ -169,10 +173,11 @@ ProfileOff(str)
 char *str;
 { int i;  long raw_time;
   if( proftop == 0 || strcmp(profstack[proftop-1].label, str) != 0 )
-    Error(INTERN, no_fpos, "ProfileOff: %s is not the current label", str);
+    Error(27, 4, "ProfileOff: %s is not current", INTERN, no_fpos, str);
   for( i = 0;  i < profsize && strcmp(profstore[i].label, str) != 0; i++ );
   if( i >= profsize )
-  { if( profsize++ == MAXPROF )  Error(INTERN, no_fpos, "ProfileOff: overflow");
+  { if( profsize++ == MAXPROF )
+      Error(27, 5, "ProfileOff: overflow", INTERN, no_fpos);
     profstore[i].label = str;
     profstore[i].calls = 0;
     profstore[i].time  = 0;

@@ -1,7 +1,7 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -40,9 +40,10 @@
 #define	ESCAPE		3		/* escape character inside strings   */
 #define	COMMENT		4		/* comment delimiter type            */
 #define	CSPACE		5		/* space character type              */
-#define	TAB		6		/* tab character type                */
-#define	NEWLINE		7		/* newline character type            */
-#define	ENDFILE		8		/* end of file character type        */
+#define	FORMFEED	6		/* formfeed character type           */
+#define	TAB		7		/* tab character type                */
+#define	NEWLINE		8		/* newline character type            */
+#define	ENDFILE		9		/* end of file character type        */
 
 static	unsigned char	chtbl[256];	/* type table indexed by a FULL_CHAR */
 static	FULL_CHAR	*chpt;		/* pointer to current text character */
@@ -59,7 +60,7 @@ static	OBJECT		next_token;	/* next token if already read	     */
 static	int		offset;		/* where to start reading in file    */
 static	FULL_CHAR	*mem_block;	/* file buffer                       */
 
-static int top_stack;		/* top of lexical analyser stack     */
+static int stack_free;		/* first free slot in lexical stack  */
 static struct {
   FULL_CHAR	*chpt;		/* pointer to current text character */
   FULL_CHAR	*frst;		/* address of first buffer character */
@@ -155,9 +156,11 @@ LexInit()
   initchtbl(ESCAPE,  STR_ESCAPE);
   initchtbl(COMMENT, STR_COMMENT);
   initchtbl(CSPACE,  STR_SPACE);
+  initchtbl(FORMFEED,STR_FORMFEED);
   initchtbl(TAB,     STR_TAB);
   initchtbl(NEWLINE, STR_NEWLINE);
   chtbl['\0'] = ENDFILE;
+  stack_free = -1;
 } /* end LexInit */
 
 /*@::LexPush(), LexPop()@*****************************************************/
@@ -173,6 +176,7 @@ LexInit()
 /*      SOURCE_FILE    last input file ends, return @End \Input              */
 /*      DATABASE_FILE  database file, return @End \Input                     */
 /*      INCLUDE_FILE   include file, must pop lexical analyser and continue  */
+/*      FILTER_FILE    filter file, return @End @FilterOut                   */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -180,29 +184,35 @@ LexPush(x, offs, ftyp)
 FILE_NUM x;  int offs;  int ftyp;
 { char *malloc();
   debug3(DLA, D, "LexPush(%s, %d, %s)", FileName(x), offs,
-    ftyp==SOURCE_FILE ? "source" : ftyp==INCLUDE_FILE ? "include" : "database");
-  if( top_stack >= MAX_LEX_STACK - 1 )
-    Error(FATAL, PosOfFile(x), "%s or %s file %s too deeply nested",
-      KW_INCLUDE, KW_DATABASE, FileName(x));
-  if( top_stack >= 0 )  /* save current state */
-  { lex_stack[top_stack].chpt		= chpt;
-    lex_stack[top_stack].frst		= frst;
-    lex_stack[top_stack].limit		= limit;
-    lex_stack[top_stack].buf		= buf;
-    lex_stack[top_stack].blksize	= blksize;
-    lex_stack[top_stack].startline	= startline;
-    lex_stack[top_stack].this_file	= this_file;
-    lex_stack[top_stack].fp		= fp;
-    lex_stack[top_stack].ftype		= ftype;
-    lex_stack[top_stack].next_token	= next_token;
-    lex_stack[top_stack].offset		= offset;
-    lex_stack[top_stack].mem_block	= mem_block;
-    FposCopy( lex_stack[top_stack].file_pos, file_pos );
+    ftyp==SOURCE_FILE ? "source" : ftyp==INCLUDE_FILE ? "include":"database");
+  if( stack_free >= MAX_LEX_STACK - 1 )
+  { if( ftyp == INCLUDE_FILE )
+      Error(2, 1, "include file %s too deeply nested",
+        FATAL, PosOfFile(x), FileName(x));
+    else
+      Error(2, 2, "database file %s too deeply nested",
+        FATAL, PosOfFile(x), FileName(x));
   }
-  top_stack += 1;
+  if( stack_free >= 0 )  /* save current state */
+  { lex_stack[stack_free].chpt		= chpt;
+    lex_stack[stack_free].frst		= frst;
+    lex_stack[stack_free].limit		= limit;
+    lex_stack[stack_free].buf		= buf;
+    lex_stack[stack_free].blksize	= blksize;
+    lex_stack[stack_free].startline	= startline;
+    lex_stack[stack_free].this_file	= this_file;
+    lex_stack[stack_free].fp		= fp;
+    lex_stack[stack_free].ftype		= ftype;
+    lex_stack[stack_free].next_token	= next_token;
+    lex_stack[stack_free].offset	= offset;
+    lex_stack[stack_free].mem_block	= mem_block;
+    FposCopy( lex_stack[stack_free].file_pos, file_pos );
+  }
+  stack_free += 1;
   mem_block = (FULL_CHAR *) malloc((MAX_LINE+BUFFER_SIZE+2)*sizeof(FULL_CHAR));
-  if( mem_block == NULL )  Error(FATAL, PosOfFile(x),
-      "run out of memory when opening file %s", FileName(x));
+  if( mem_block == NULL )
+    Error(2, 3, "run out of memory when opening file %s",
+      FATAL, PosOfFile(x), FileName(x));
   buf = chpt = &mem_block[MAX_LINE];
   this_file = x;  offset = offs;
   ftype = ftyp;  next_token = nil;
@@ -218,23 +228,23 @@ FILE_NUM x;  int offs;  int ftyp;
 
 LexPop()
 { debug0(DLA, D, "LexPop()");
-  assert( top_stack > 0, "LexPop: top_stack <= 0!" );
+  assert( stack_free > 0, "LexPop: stack_free <= 0!" );
   if( fp != null )  fclose(fp);
-  top_stack--;
+  stack_free--;
   free( (char *) mem_block);
-  mem_block    = lex_stack[top_stack].mem_block;
-  chpt         = lex_stack[top_stack].chpt;
-  frst         = lex_stack[top_stack].frst;
-  limit        = lex_stack[top_stack].limit;
-  buf          = lex_stack[top_stack].buf;
-  blksize      = lex_stack[top_stack].blksize;
-  startline    = lex_stack[top_stack].startline;
-  this_file    = lex_stack[top_stack].this_file;
-  fp           = lex_stack[top_stack].fp;
-  ftype        = lex_stack[top_stack].ftype;
-  next_token   = lex_stack[top_stack].next_token;
-  offset       = lex_stack[top_stack].offset;
-  FposCopy( file_pos, lex_stack[top_stack].file_pos );
+  mem_block    = lex_stack[stack_free].mem_block;
+  chpt         = lex_stack[stack_free].chpt;
+  frst         = lex_stack[stack_free].frst;
+  limit        = lex_stack[stack_free].limit;
+  buf          = lex_stack[stack_free].buf;
+  blksize      = lex_stack[stack_free].blksize;
+  startline    = lex_stack[stack_free].startline;
+  this_file    = lex_stack[stack_free].this_file;
+  fp           = lex_stack[stack_free].fp;
+  ftype        = lex_stack[stack_free].ftype;
+  next_token   = lex_stack[stack_free].next_token;
+  offset       = lex_stack[stack_free].offset;
+  FposCopy( file_pos, lex_stack[stack_free].file_pos );
 } /* end LexPop */
 
 
@@ -265,7 +275,8 @@ LexPop()
 long LexNextTokenPos()
 { long res;
   if( next_token != nil )
-    Error(FATAL, &fpos(next_token), "illegal macro invokation in database");
+    Error(2, 4, "illegal macro invocation in database",
+      FATAL, &fpos(next_token));
   res = ftell(fp) - (limit - chpt) - (buf - frst);
   debug1(DLA, D, "LexNextTokenPos() returning %ld", res);
   return res;
@@ -282,12 +293,13 @@ long LexNextTokenPos()
 
 static srcnext()
 { register FULL_CHAR *col;
-  debug4(DLA, DDD, "srcnext();  buf: %d, chpt: %d, frst: %d, limit: %d",
+  debugcond4(DLA, DD, stack_free <= 1,
+    "srcnext();  buf: %d, chpt: %d, frst: %d, limit: %d",
     buf - mem_block, chpt - mem_block, frst - mem_block, limit - mem_block);
 
   /* if time to transfer last line to area preceding buffer, do so */
   if( blksize != 0 && chpt < limit )
-  { debug0(DLA, DDD, "srcnext: transferring.");
+  { debugcond0(DLA, DD, stack_free <= 1, "srcnext: transferring.");
     col = buf;
     while( (*--col = *--limit) != CH_NEWLINE );
     frst = col + 1;  limit++;  blksize = 0;
@@ -298,21 +310,24 @@ static srcnext()
   if( chpt >= limit )
   { if( chpt > limit )
     { col_num(file_pos) = 1;
-      Error(FATAL, &file_pos, "line is too long (or final newline missing)");
+      Error(2, 5, "line is too long (or final newline missing)",
+	FATAL, &file_pos);
     }
     chpt = frst;
     blksize = fread( (char *) buf, sizeof(char), BUFFER_SIZE, fp);
-    debug4(DLA, D, "srcnext: %d = fread(0x%x, %d, %d, fp)",
+    debugcond4(DLA, DD, stack_free <= 1,
+      "srcnext: %d = fread(0x%x, %d, %d, fp)",
       blksize, buf, sizeof(char), BUFFER_SIZE);
     frst = buf;  limit = buf + blksize;  *limit = CH_NEWLINE;
   }
 
   /* if nothing more to read, make this clear */
   if( chpt >= limit )
-  { debug0(DLA, DDD, "srcnext: nothing more to read");
+  { debugcond0(DLA, DD, stack_free <= 1, "srcnext: nothing more to read");
     chpt = limit = buf;  *limit = '\0';
   }
-  debug4(DLA, DDD, "srcnext returning;  buf: %d, chpt: %d, frst: %d, limit: %d",
+  debugcond4(DLA, DD, stack_free <= 1,
+    "srcnext returning;  buf: %d, chpt: %d, frst: %d, limit: %d",
     buf - mem_block, chpt - mem_block, frst - mem_block, limit - mem_block);
 } /* end srcnext */
 
@@ -335,8 +350,9 @@ OBJECT LexGetToken()
 
   if( next_token != nil )
   { next_token = Delete(res = next_token, PARENT);
-    debug2(DLA, DD, "LexGetToken%s (in macro) returning %s",
-      EchoFilePos(&file_pos), EchoToken(res));
+    debugcond4(DLA, DD, stack_free <= 1,
+      "LexGetToken%s (in macro) returning %d.%d %s",
+      EchoFilePos(&file_pos), vspace(res), hspace(res), EchoToken(res));
     return res;
   }
 
@@ -347,7 +363,8 @@ OBJECT LexGetToken()
       case ESCAPE:
       
 	col_num(file_pos) = (startpos = p-1) - startline;
-	Error(WARN, &file_pos, "character %c outside quoted string", *startpos);
+	Error(2, 6, "character %c outside quoted string",
+	  WARN, &file_pos, *startpos);
 	break;
 
 
@@ -360,6 +377,7 @@ OBJECT LexGetToken()
 
 
       case CSPACE:
+      case FORMFEED:
 
 	hcount++;
 	break;
@@ -397,12 +415,14 @@ OBJECT LexGetToken()
 	  col_num(file_pos) = 0;
 	  fp = OpenFile(this_file, FALSE, TRUE);
 	  if( fp != null )  break;
-	  Error(WARN, &file_pos, "cannot open %s", FileName(this_file));
+	  Error(2, 7, "cannot open file %s",
+	    WARN, &file_pos, FileName(this_file));
 	  this_file = ftype == SOURCE_FILE ? NextFile(this_file) : NO_FILE;
 	}
 	if( fp != null )
 	{ if( offset != 0 )
-	  { fseek(fp, (long) offset, 0);
+	  { debugcond1(DLA, DD, stack_free <= 1, "fseek(fp, %d, 0)", offset);
+	    fseek(fp, (long) offset, 0);
 	    offset = 0L;
 	  }
 	  frst = limit = chpt = buf;
@@ -417,9 +437,19 @@ OBJECT LexGetToken()
 	  case SOURCE_FILE:
 	  case DATABASE_FILE:
 	  
-	    /* input ends with "@End \Input" */
-	    res = NewToken(END, &file_pos, 0, 0, END_PREC, nil);
-	    next_token = NewToken(CLOSURE, &file_pos, 0,0, NO_PREC, StartSym);
+	    /* input ends with "@End \Input" then UNEXPECTED_EOF */
+	    res = NewToken(END, &file_pos, 0, 0, END_PREC, StartSym);
+	    next_token = NewToken(UNEXPECTED_EOF, &file_pos, 0,0,NO_PREC,nil);
+	    --p;  startline = p;
+	    break;
+
+	  case FILTER_FILE:
+	  
+	    /* input ends with "@End @FilterOut" */
+	    res = NewToken(END, &file_pos, 0, 0, END_PREC, FilterOutSym);
+	    /* ***
+	    next_token = NewToken(CLOSURE,&file_pos,0,0,NO_PREC,FilterOutSym);
+	    *** */
 	    --p;  startline = p;
 	    break;
 
@@ -430,7 +460,7 @@ OBJECT LexGetToken()
 	    hcount = 0;
 	    break;
 
-	  default:  Error(INTERN, no_fpos, "ftype!");
+	  default:  Error(2, 8, "unknown file type", INTERN, no_fpos);
 
 	} /* end switch */
 	break;
@@ -460,7 +490,7 @@ OBJECT LexGetToken()
 	}
 	else if( type(res) == MACRO )
 	{ if( recursive(res) )
-	  { Error(WARN, &file_pos, "recursion in macro");
+	  { Error(2, 9, "recursion in macro", WARN, &file_pos);
 	    setword(WORD, res, file_pos, startpos, p-startpos);
 	  }
 	  else
@@ -477,16 +507,17 @@ OBJECT LexGetToken()
 	  chpt = p;
 	  t = LexGetToken();
 	  if( type(t) != LBR )
-	  { Error(WARN, &fpos(t), "%s expected after %s", KW_LBR, SymName(res));
+	  { Error(2, 10, "%s expected (after %s)",
+	      WARN, &fpos(t), KW_LBR, SymName(res));
 	    Dispose(t);
 	    res = nil;
 	    break;
 	  }
 	  fname = Parse(&t, nil, FALSE, FALSE);
-	  fname = ReplaceWithTidy(fname);
+	  fname = ReplaceWithTidy(fname, FALSE);
 	  if( !is_word(type(fname)) )
-	  { Error(WARN, &fpos(fname), "name of %s file expected here",
-	      SymName(res));
+	  { Error(2, 11, "name of include file expected here",
+	      WARN, &fpos(fname));
 	    Dispose(fname);
 	    res = nil;
 	    break;
@@ -500,9 +531,13 @@ OBJECT LexGetToken()
 	  Dispose(fname);
 	  LexPush(fnum, 0, INCLUDE_FILE);
 	  res = LexGetToken();
+	  vcount++; /** TEST ADDITION! **/
 	  p = chpt;
 	}
-	else res = NewToken(predefined(res), &file_pos,0,0,precedence(res),res);
+	else if( predefined(res) == END )
+	  res = NewToken(predefined(res), &file_pos,0,0,precedence(res),nil);
+	else
+	  res = NewToken(predefined(res), &file_pos,0,0,precedence(res),res);
 	break;
 
 
@@ -515,11 +550,12 @@ OBJECT LexGetToken()
 	  case LETTER:
 	  case COMMENT:
 	  case CSPACE:
+	  case FORMFEED:
 	  case TAB:	break;
 
 	  case NEWLINE:
 	  case ENDFILE:	--p;
-			Error(WARN, &file_pos, "unterminated string");
+			Error(2, 12, "unterminated string", WARN, &file_pos);
 			setword(QWORD, res, file_pos, startpos, q-1-startpos);
 			break;
 
@@ -528,7 +564,7 @@ OBJECT LexGetToken()
 
 	  case ESCAPE:	q--;
 			if( chtbl[*p] == NEWLINE || chtbl[*p] == ENDFILE )
-			{ Error(WARN, &file_pos, "unterminated string");
+			{ Error(2, 13, "unterminated string", WARN, &file_pos);
 			  setword(QWORD, res, file_pos, startpos, q-startpos);
 			}
 			else if( octaldigit(*p) )
@@ -538,14 +574,16 @@ OBJECT LexGetToken()
 			  { ch = ch * 8 + digitchartonum(*p++);
 			    count++;
 			  } while( octaldigit(*p) && count < 3 );
-			  if( ch == '\0' )  Error(WARN, &file_pos,
-				"skipping null character \0 in string");
+			  if( ch == '\0' )
+			    Error(2, 14, "skipping null character in string",
+			      WARN, &file_pos);
 			  else *q++ = ch;
 			}
 			else *q++ = *p++;
 			break;
 
-	  default:	Error(INTERN, &file_pos, "LexGetToken: quoted string");
+	  default:	Error(2, 15, "LexGetToken: error in quoted string",
+			  INTERN, &file_pos);
 			break;
 
 	} while( res == nil );
@@ -554,20 +592,190 @@ OBJECT LexGetToken()
 
       default:
       
-	Error(INTERN, &file_pos, "LexGetToken: bad chtbl[]");
+	Error(2, 16, "LexGetToken: bad chtbl[]", INTERN, &file_pos);
 	break;
 
   } while( res == nil );
 
   if( p - startline >= MAX_LINE )
   { col_num(file_pos) = 1;
-    Error(FATAL, &file_pos, "line is too long (or final newline missing)");
+    Error(2, 17, "line is too long (or final newline missing)",FATAL,&file_pos);
   }
 
   chpt = p;
   vspace(res) = vcount;
   hspace(res) = hcount;
-  debug4(DLA, DD, "LexGetToken%s returning %s %s (@%d)",
-	EchoFilePos(&file_pos), Image(type(res)), EchoToken(res), (int) res);
+  debugcond5(DLA, DD, stack_free <= 1, "LexGetToken%s returning %s %s %d.%d",
+    EchoFilePos(&file_pos), Image(type(res)), EchoToken(res),
+    vspace(res), hspace(res));
   return res;
 } /* end LexGetToken */
+
+
+/*@::LexScanFilter@***********************************************************/
+/*                                                                           */
+/*  LexScanFilter(fp, stop_at_end, err_pos)                                  */
+/*                                                                           */
+/*  Scan input file and transfer to filter file fp.  If stop_at_end,         */
+/*  terminate at @End, else terminate at matching right brace.               */
+/*                                                                           */
+/*****************************************************************************/
+
+#define clear()								\
+{ int i;								\
+  for( i = 0;  i < hs_top;  i++ )  putc(hs_buff[i], fp);		\
+  hs_top = 0;								\
+}
+
+#define hold(ch)							\
+{ if( hs_top == MAX_BUFF )  clear();					\
+  hs_buff[hs_top++] = ch;						\
+}
+
+LexScanFilter(fp, stop_at_end, err_pos)
+FILE *fp;  BOOLEAN stop_at_end;  FILE_POS *err_pos;
+{
+  register FULL_CHAR *p;		/* pointer to current input char     */
+  int vcount, hcount;			/* no. of newlines and spaces seen   */
+  int depth;				/* depth of nesting of { ... }       */
+  BOOLEAN finished;			/* TRUE when finished                */
+  BOOLEAN skipping;			/* TRUE when skipping initial spaces */
+  FULL_CHAR hs_buff[MAX_BUFF];		/* hold spaces here in case last     */
+  int hs_top;				/* next free spot in hs_buff         */
+
+  debug2(DFH, D, "LexScanFilter(fp, %s, %s)",
+    bool(stop_at_end), EchoFilePos(err_pos));
+  if( next_token != nil )
+  { Error(2, 18, "filter parameter in macro", FATAL, err_pos);
+  }
+
+  p = chpt;  depth = 0;
+  finished = FALSE;
+  skipping = TRUE;
+  hs_top = 0;
+  while( !finished ) switch( chtbl[*p++] )
+  {
+      case ESCAPE:
+      case COMMENT:
+      case QUOTE:
+      
+	skipping = FALSE;
+	clear();
+	putc(*(p-1), fp);
+	break;
+
+
+      case CSPACE:
+      case TAB:
+      
+	if( !skipping )  hold(*(p-1));
+	break;
+
+
+      case NEWLINE:
+      
+	if( !skipping )  hold(*(p-1));
+	chpt = p;  srcnext();
+	line_num(file_pos)++;
+	col_num(file_pos) = 0;
+	startline = (p = chpt) - 1;
+	break;
+
+
+      case ENDFILE:
+      
+	Error(2, 19, "end of file reached while reading filter parameter",
+	  FATAL, err_pos);
+	break;
+
+
+      case OTHER:
+      
+	skipping = FALSE;
+	if( *(p-1) == '{' )
+	{ clear();
+	  putc(*(p-1), fp);
+	  depth++;
+	}
+	else if( *(p-1) == '}' )
+	{ if( !stop_at_end && depth == 0 )
+	  { p--;
+	    finished = TRUE;
+	  }
+	  else
+	  { clear();
+	    putc(*(p-1), fp);
+	    depth--;
+	  }
+	}
+	else
+	{ clear();
+	  putc(*(p-1), fp);
+	}
+	break;
+
+
+      case LETTER:
+      
+	skipping = FALSE;
+	if( *(p-1) == '@' )
+	{
+	  p--;
+	  if( stop_at_end && StringBeginsWith(p, KW_END) )
+	  { finished = TRUE;
+	  }
+	  else if( StringBeginsWith(p, KW_INCLUDE) )
+	  { OBJECT incl_fname, t;  FILE *incl_fp;  int ch;
+	    clear();
+	    p += StringLength(KW_INCLUDE);
+	    chpt = p;
+	    t = LexGetToken();
+	    if( type(t) != LBR )  Error(2, 20, "expected %s here (after %s)",
+		FATAL, &fpos(t), KW_LBR, KW_INCLUDE);
+	    incl_fname = Parse(&t, nil, FALSE, FALSE);
+	    p = chpt;
+	    incl_fname = ReplaceWithTidy(incl_fname, FALSE);
+	    if( !is_word(type(incl_fname)) )
+	      Error(2, 21, "expected file name here", FATAL,&fpos(incl_fname));
+	    incl_fp = StringFOpen(string(incl_fname), "r");
+	    if( incl_fp == NULL )
+	      Error(2, 22, "cannot open include file %s",
+		FATAL, &fpos(incl_fname), string(incl_fname));
+	    Dispose(incl_fname);
+	    while( (ch = getc(incl_fp)) != EOF )
+	      putc(ch, fp);
+	    fclose(incl_fp);
+	  }
+	  else if( StringBeginsWith(p, KW_SYSINCLUDE) )
+	  { Error(2, 23, "%s in filter parameter not implemented",
+	      FATAL, &file_pos, KW_SYSINCLUDE);
+	  }
+	  else
+	  { clear();
+	    putc(*p, fp);
+	    p++;
+	  }
+	}
+	else
+	{ clear();
+	  putc(*(p-1), fp);
+	}
+	break;
+
+
+      default:
+      
+	Error(2, 24, "LexScanFilter: bad chtbl[]", INTERN, &file_pos);
+	break;
+
+  };
+  putc('\n', fp);
+
+  if( p - startline >= MAX_LINE )
+  { col_num(file_pos) = 1;
+    Error(2, 25, "line is too long (or final newline missing)",FATAL,&file_pos);
+  }
+
+  chpt = p;
+  debug1(DFH, D, "LexScanFilter returning at %s", EchoFilePos(&file_pos));
+} /* end LexScanFilter */

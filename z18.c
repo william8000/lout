@@ -1,7 +1,7 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -65,10 +65,12 @@ OBJECT InitEnv;
   debug1(DGT, D, "TransferInit( %s )", EchoObject(InitEnv));
   SetConstraint(initial_constraint, MAX_LEN-1, MAX_LEN-1, MAX_LEN-1);
 
-  /* save initial environment and style */
-  SetGap( line_gap(InitialStyle), FALSE, FALSE, FIXED_UNIT, MARK_MODE, 18*PT);
+  /* set initial environment and style */
+  SetGap(line_gap(InitialStyle),  FALSE, FALSE, FIXED_UNIT, MARK_MODE, 18*PT);
   SetGap(space_gap(InitialStyle), FALSE, TRUE,  FIXED_UNIT, EDGE_MODE,  1*EM);
-  font(InitialStyle)            = 0;
+  font(InitialStyle)            = 0;			/* i.e. undefined    */
+  colour(InitialStyle)          = 0;			/* i.e. undefined    */
+  language(InitialStyle)        = 0;			/* i.e. undefined    */
   hyph_style(InitialStyle)      = HYPH_UNDEF;
   fill_style(InitialStyle)      = FILL_UNDEF;
   display_style(InitialStyle)   = DISPLAY_UNDEF;
@@ -87,7 +89,7 @@ OBJECT InitEnv;
   root_galley = New(HEAD);
   FposCopy(fpos(root_galley), *no_fpos);
   actual(root_galley) = whereto(root_galley) = ready_galls(root_galley) = nil;
-  backward(root_galley) = must_expand(root_galley) = sized(root_galley) = FALSE;
+  backward(root_galley) = must_expand(root_galley) = sized(root_galley) =FALSE;
   x = New(CLOSURE);  actual(x) = InputSym;
   Link(root_galley, x);
   SizeGalley(root_galley, InitEnv, TRUE, FALSE, FALSE, FALSE, &InitialStyle,
@@ -117,7 +119,7 @@ OBJECT InitEnv;
 /*                                                                           */
 /*  OBJECT TransferBegin(x)                                                  */
 /*                                                                           */
-/*  Commence the transfer of a new galley whose header is invokation x.      */
+/*  Commence the transfer of a new galley whose header is invocation x.      */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -130,11 +132,11 @@ OBJECT x;
   assert( type(x) == CLOSURE, "TransferBegin: non-CLOSURE!" );
 
   /* add an automatically generated @Tag parameter to x if required */
-  CrossAddTag(x);
+  if( has_tag(actual(x)) )  CrossAddTag(x);
 
   /* construct new (inner) env chain */
   if( Down(targets[itop]) == targets[itop] )
-  	Error(FATAL, &fpos(x), "cannot attach galley %s", SymName(actual(x)));
+    Error(18, 1, "cannot attach galley %s", FATAL,&fpos(x),SymName(actual(x)));
   Child(target, Down(targets[itop]));
   xsym = actual(x);
   env = GetEnv(actual(target));
@@ -170,8 +172,12 @@ OBJECT x;
 
   /* search for destination for hd and release it */
   Link(Up(target), index);
-  debug0(DGF, D, "  calling FlushGalley from TransferBegin");
-  FlushGalley(hd);
+  debug0(DGF,D, "");
+  debug1(DGF,D, "  calling FlushGalley(%s) from TransferBegin, root_galley =",
+    SymName(actual(hd)));
+  ifdebug(DGF, D, DebugGalley(root_galley, 4));
+  if( whereto(hd) == nil || !uses_extern_target(whereto(hd)) ) /* &&& */
+    FlushGalley(hd);
 
   /* if failed to flush, undo everything and exit */
   Parent(index, Up(hd));
@@ -189,8 +195,9 @@ OBJECT x;
   if( has_rpar(actual(hd)) )
   {
     /* set up new target to be inner \InputSym, or nil if none */
-    if( ++itop >= MAX_DEPTH ) Error(FATAL, &fpos(x),
-	"galley nested too deeply (max is %d)", MAX_DEPTH);
+    if( ++itop >= MAX_DEPTH )
+      Error(18, 2, "galley nested too deeply (max is %d)",
+	FATAL, &fpos(x), MAX_DEPTH);
     targets[itop] = New(ACAT);  target = nil;
     for( link = Down(hd);  link != hd;  link = NextDown(link) )
     { Child(y, link);
@@ -205,8 +212,8 @@ OBJECT x;
 	  AttachEnv(new_env, actual(y));
 	}
 	else
-	{ Error(WARN, &fpos(hd), "galley %s deleted (target too narrow)",
-		SymName(actual(hd)));
+	{ Error(18, 3, "galley %s deleted (insufficient width at target)",
+	    WARN, &fpos(hd), SymName(actual(hd)));
 	}
 	break;
       }
@@ -217,8 +224,9 @@ OBJECT x;
       res = NewToken(GSTUB_EXT, no_fpos, 0, 0, precedence(xsym), nil);
     else
     { Constrained(actual(target), &c, ROW);
-      if( constrained(c) )  Error(FATAL, &fpos(target),
-	    "right parameter of %s is vertically constrained", SymName(xsym));
+      if( constrained(c) )
+	Error(18, 4, "right parameter of %s is vertically constrained",
+	  FATAL, &fpos(target), SymName(xsym));
       else res = NewToken(GSTUB_INT, no_fpos, 0, 0, precedence(xsym), nil);
     }
   }
@@ -229,7 +237,6 @@ OBJECT x;
   ifdebug(DGT, DD, debug_targets());
   return res;
 } /* end TransferBegin */
-
 
 /*@::TransferComponent()@*****************************************************/
 /*                                                                           */

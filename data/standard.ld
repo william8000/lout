@@ -1,4 +1,3 @@
-
 ######################################################
 #                                                    #
 #  standard.ld                  Jeffrey H. Kingston  #
@@ -6,17 +5,272 @@
 #                                                    #
 #  Database of commonly used symbols:                #
 #                                                    #
-#    @Roman         lower case Roman numerals        #
-#    @UCRoman       upper case Roman numerals        #
-#    @Alpha         lower case Roman alphabet        #
-#    @UCAlpha       upper case Roman alphabet        #
-#    @Months        months of the year               #
-#    @ShortMonths   months of the year, abbreviated  #
-#    @WeekDays      days of the week                 #
-#    @ShortWeekDays days of the week, abbreviated    #
+#    @Word           language-specific words         #
+#    @Roman          lower case Roman numerals       #
+#    @UCRoman        upper case Roman numerals       #
+#    @Alpha          lower case Roman alphabet       #
+#    @UCAlpha        upper case Roman alphabet       #
+#    @Months         months of the year              #
+#    @ShortMonths    months of the year, abbreviated #
+#    @WeekDays       days of the week                #
+#    @ShortWeekDays  days of the week, abbreviated   #
+#    @TwelveHours    hours on twelve-hour clock      #
+#    @ShortHours     short hours on 24-hour clock    #
+#    @MeriDiem       a.m. or p.m.                    #
+#    @ShortMeriDiem  am or pm                        #
+#    @DateTimeFormat format of date and time.        #
 #                                                    #
 ######################################################
 
+{ contents @Word @CurrLang @Case {
+    Danish	@Yield { Indhold }
+    Dutch       @Yield { Inhoudsopgave }
+    English	@Yield { Contents }
+    Finnish	@Yield { Sis{@Char adieresis}lt{@Char odieresis} }
+    French	@Yield { Table des Mati{@Char egrave}res }
+    German	@Yield { Inhalt }
+    Norwegian   @Yield { Innhold }
+    Spanish	@Yield { Contenidos }
+    Swedish	@Yield { Inneh{@Char aring}ll }
+  }
+}
+
+{ references @Word @CurrLang @Case {
+    Danish	@Yield { Referencer }
+    Dutch       @Yield { Referenties }
+    English	@Yield { References }
+    Finnish	@Yield { Viitteet }
+    French	@Yield { R{@Char eacute}f{@Char eacute}rences }
+    German	@Yield { Literaturverzeichnis }
+    Norwegian   @Yield { Referanser }
+    Spanish	@Yield { Referencias }
+    Swedish	@Yield { Referenser }
+  }
+}
+
+{ bibliography @Word @CurrLang @Case {
+    Danish	@Yield { Bibliografi }
+    Dutch       @Yield { Bibliografie } 
+    English	@Yield { Bibliography }
+    Finnish	@Yield { Kirjallisuusluettelo }
+    French	@Yield { Bibliographie }
+    German	@Yield { Literaturverzeichnis }
+    Norwegian   @Yield { Litteratur }
+    Spanish	@Yield { Bibliograf{@Char iacute}a }
+    Swedish	@Yield { Bibliografi }
+  }
+}
+
+{ figure @Word @CurrLang @Case {
+    Danish	@Yield { Figur }
+    Dutch       @Yield { Figuur }
+    English	@Yield { Figure }
+    Finnish	@Yield { Kuva }
+    French	@Yield { Figure }
+    German	@Yield { Abbildung }
+    Norwegian   @Yield { Figur  }
+    Spanish	@Yield { Figura }
+    Swedish	@Yield { Figur }
+  }
+}
+
+{ table @Word @CurrLang @Case {
+    Danish	@Yield { Tabel }
+    Dutch       @Yield { Tabel }
+    English	@Yield { Table }
+    Finnish	@Yield { Taulukko }
+    French	@Yield { Table }
+    German	@Yield { Tabelle }
+    Norwegian   @Yield { Tabell }
+    Spanish	@Yield { Tabla }
+    Swedish	@Yield { Tabell }
+  }
+}
+
+{ abstract @Word @CurrLang @Case {
+    Danish	@Yield { Synopsis }
+    Dutch       @Yield { Samenvatting }
+    English	@Yield { Abstract }
+    Finnish	@Yield { Yleiskatsaus }
+    French	@Yield { R{@Char eacute}sum{@Char eacute} }
+    German	@Yield { Zusammenfassung }
+    Norwegian   @Yield { Sammendrag }
+    Spanish	@Yield { Sinopsis }
+    Swedish	@Yield { {@Char Odieresis}versikt }
+  }
+}
+
+{ preface @Word @CurrLang @Case {
+    Danish	@Yield { Forord }
+    Dutch       @Yield { Voorwoord } # or { Woord vooraf }
+    English	@Yield { Preface }
+    Finnish	@Yield { Esipuhe }
+    French	@Yield { Pr{@Char eacute}face }
+    German	@Yield { Vorwort }
+    Norwegian   @Yield { Forord }
+    Spanish	@Yield { Prefacio }
+    Swedish	@Yield { F{@Char odieresis}rord }
+  }
+}
+
+{ introduction @Word @CurrLang @Case {
+    Danish	@Yield { Indledning }
+    Dutch       @Yield { Inleiding }
+    English	@Yield { Introduction }
+    Finnish	@Yield { Johdanto }
+    French	@Yield { Introduction }
+    German	@Yield { Einleitung }
+    Norwegian   @Yield { Innledning }
+    Spanish	@Yield { Introducci{@Char oacute}n }
+    Swedish	@Yield { Inledning }
+  }
+}
+
+{ chapter @Word @CurrLang @Case {
+    Danish	@Yield { Kapitel }
+    Dutch       @Yield { Hoofdstuk }
+    English	@Yield { Chapter }
+    Finnish	@Yield { Luku }
+    French	@Yield { Chapitre }
+    German	@Yield { Kapitel }
+    Norwegian   @Yield { Kapittel }
+    Spanish	@Yield { Cap{@Char iacute}tulo }
+    Swedish	@Yield { Kapitel }
+  }
+}
+
+{ appendix @Word @CurrLang @Case {
+    Danish	@Yield { Appendiks }
+    Dutch       @Yield { Appendix }
+    English	@Yield { Appendix }
+    Finnish	@Yield { Liite }
+    French	@Yield { Annexe }
+    German	@Yield { Anhang }
+    Norwegian   @Yield { Tillegg }
+    Spanish	@Yield { Ap{@Char eacute}ndice }
+    Swedish	@Yield { Appendix }
+  }
+}
+
+{ index @Word @CurrLang @Case {
+    Danish	@Yield { Indeks }
+    Dutch       @Yield { Index }
+    English	@Yield { Index }
+    Finnish	@Yield { Hakemisto }
+    French	@Yield { Index }
+    German	@Yield { Index }
+    Norwegian   @Yield { Register }
+    Spanish	@Yield { Indice }
+    Swedish	@Yield { Index }
+  }
+}
+
+{ notitle @Word @CurrLang @Case {
+    Danish	@Yield { Ingen titel }
+    Dutch       @Yield { Zonder titel }
+    English	@Yield { No title }
+    Finnish	@Yield { Ei nime{@Char adieresis} }
+    French	@Yield { Sans titre }
+    German	@Yield { Ohne Titel }
+    Norwegian   @Yield { Utel tittel }
+    Spanish	@Yield { Sin t{@Char iacute}tulo }
+    Swedish	@Yield { Ingen titel }
+  }
+}
+
+{ pages @Word @CurrLang @Case {
+    Danish	@Yield { sider }
+    Dutch       @Yield { pagina's } # or {bladzijden}, {pag.}, {blz.}
+    English	@Yield { pages }
+    Finnish	@Yield { sivut }
+    French	@Yield { pages }
+    German	@Yield { Seiten }
+    Norwegian   @Yield { sider }
+    Spanish	@Yield { p{@Char aacute}ginas }
+    Swedish	@Yield { sidor }
+  }
+}
+
+{ page @Word @CurrLang @Case {
+    Danish	@Yield { side }
+    Dutch       @Yield { pagina } # or {bladzijde}, {pag.}, {blz.}
+    English	@Yield { page }
+    Finnish	@Yield { sivu }
+    French	@Yield { page }
+    German	@Yield { Seite }
+    Norwegian   @Yield { side }
+    Spanish	@Yield { p{@Char aacute}gina }
+    Swedish	@Yield { sida }
+  }
+}
+
+{ nopublisher @Word @CurrLang @Case {
+    Danish	@Yield { Intet forlag }
+    Dutch       @Yield { Ongepubliceerd } # or {Zonder uitgever}
+    English	@Yield { No publisher }
+    Finnish	@Yield { Ei kustantamo }
+    French	@Yield { Sans {@Char eacute}diteur }
+    German	@Yield { Ohne Verleger }
+    Norwegian   @Yield { Upublisert }
+    Spanish	@Yield { Sin editor }
+    Swedish	@Yield { Inget f{@Char odieresis}rlag }
+  }
+}
+
+{ techrep @Word @CurrLang @Case {
+    Danish	@Yield { Teknisk rap. }
+    Dutch       @Yield { Technisch rapport }
+    English	@Yield { Tech. Rep. }
+    Finnish	@Yield { Tekn. rap. }
+    French	@Yield { Rapport technique }
+    German	@Yield { Techn. Ber. }
+    Norwegian   @Yield { Tekn. Rapp. }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { Tekn. rap. }
+  }
+}
+
+{ phdthesis @Word @CurrLang @Case {
+    Danish	@Yield { Ph.D. afhandling }
+    Dutch       @Yield { Proefschrift } # or {Dissertatie}
+    English	@Yield { Ph.D. thesis }
+    Finnish	@Yield { tohtorinv{@Char adieresis}it{@Char odieresis}skirja }
+    French	@Yield { Th{@Char egrave}se de Doctorat }
+    German	@Yield { Doktorarbeit }
+    Norwegian   @Yield { Doktorgradsavhandling }
+    Spanish	@Yield { Tesis Doctoral }
+    Swedish	@Yield { doktorsavhandling }
+  }
+}
+
+{ mastersthesis @Word @CurrLang @Case {
+    Danish	@Yield { Speciale }
+    Dutch       @Yield { Doctoraalscriptie } 
+    English	@Yield { Master's thesis }
+    Finnish	@Yield { diplomity{@Char odieresis} }
+    French	@Yield { M{@Char eacute}moire de Ma{@Char icircumflex}trise }
+    German	@Yield { Magisterarbeit }
+    Norwegian   @Yield { Diplomoppgave }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { diplomarbete }
+  }
+}
+
+{ in @Word @CurrLang @Case {
+    Danish	@Yield { I }
+    Dutch       @Yield { In }
+    English	@Yield { In }
+    Finnish	@Yield { teoksessa }
+    French	@Yield { dans }
+    German	@Yield { In }
+    Norwegian   @Yield { I }
+    Spanish	@Yield { En }
+    Swedish	@Yield { I }
+  }
+}
+
+
+{  ?? @Roman ??		}
 {   1 @Roman i		}
 {   2 @Roman ii		}
 {   3 @Roman iii	}
@@ -116,8 +370,109 @@
 {  97 @Roman xcvii	}
 {  98 @Roman xcviii	}
 {  99 @Roman xcix	}
-{ 100 @Roman c		}
+{ 100 @Roman cc		}
+{ 101 @Roman ci		}
+{ 102 @Roman cii	}
+{ 103 @Roman ciii	}
+{ 104 @Roman civ	}
+{ 105 @Roman cv		}
+{ 106 @Roman cvi	}
+{ 107 @Roman cvii	}
+{ 108 @Roman cviii	}
+{ 109 @Roman cix	}
+{ 110 @Roman cx		}
+{ 111 @Roman cxi	}
+{ 112 @Roman cxii	}
+{ 113 @Roman cxiii	}
+{ 114 @Roman cxiv	}
+{ 115 @Roman cxv	}
+{ 116 @Roman cxvi	}
+{ 117 @Roman cxvii	}
+{ 118 @Roman cxviii	}
+{ 119 @Roman cxix	}
+{ 120 @Roman cxx	}
+{ 121 @Roman cxxi	}
+{ 122 @Roman cxxii	}
+{ 123 @Roman cxxiii	}
+{ 124 @Roman cxxiv	}
+{ 125 @Roman cxxv	}
+{ 126 @Roman cxxvi	}
+{ 127 @Roman cxxvii	}
+{ 128 @Roman cxxviii	}
+{ 129 @Roman cxxix	}
+{ 130 @Roman cxxx	}
+{ 131 @Roman cxxxi	}
+{ 132 @Roman cxxxii	}
+{ 133 @Roman cxxxiii	}
+{ 134 @Roman cxxxiv	}
+{ 135 @Roman cxxxv	}
+{ 136 @Roman cxxxvi	}
+{ 137 @Roman cxxxvii	}
+{ 138 @Roman cxxxviii	}
+{ 139 @Roman cxxxix	}
+{ 140 @Roman cxl	}
+{ 141 @Roman cxli	}
+{ 142 @Roman cxlii	}
+{ 143 @Roman cxliii	}
+{ 144 @Roman cxliv	}
+{ 145 @Roman cxlv	}
+{ 146 @Roman cxlvi	}
+{ 147 @Roman cxlvii	}
+{ 148 @Roman cxlviii	}
+{ 149 @Roman cxlix	}
+{ 150 @Roman cl		}
+{ 151 @Roman cli	}
+{ 152 @Roman clii	}
+{ 153 @Roman cliii	}
+{ 154 @Roman cliv	}
+{ 155 @Roman clv	}
+{ 156 @Roman clvi	}
+{ 157 @Roman clvii	}
+{ 158 @Roman clviii	}
+{ 159 @Roman clix	}
+{ 160 @Roman clx	}
+{ 161 @Roman clxi	}
+{ 162 @Roman clxii	}
+{ 163 @Roman clxiii	}
+{ 164 @Roman clxiv	}
+{ 165 @Roman clxv	}
+{ 166 @Roman clxvi	}
+{ 167 @Roman clxvii	}
+{ 168 @Roman clxviii	}
+{ 169 @Roman clxix	}
+{ 170 @Roman clxx	}
+{ 171 @Roman clxxi	}
+{ 172 @Roman clxxii	}
+{ 173 @Roman clxxiii	}
+{ 174 @Roman clxxiv	}
+{ 175 @Roman clxxv	}
+{ 176 @Roman clxxvi	}
+{ 177 @Roman clxxvii	}
+{ 178 @Roman clxxviii	}
+{ 179 @Roman clxxix	}
+{ 180 @Roman clxxx	}
+{ 181 @Roman clxxxi	}
+{ 182 @Roman clxxxii	}
+{ 183 @Roman clxxxiii	}
+{ 184 @Roman clxxxiv	}
+{ 185 @Roman clxxxv	}
+{ 186 @Roman clxxxvi	}
+{ 187 @Roman clxxxvii	}
+{ 188 @Roman clxxxviii	}
+{ 189 @Roman clxxxix	}
+{ 190 @Roman cxc	}
+{ 191 @Roman cxci	}
+{ 192 @Roman cxcii	}
+{ 193 @Roman cxciii	}
+{ 194 @Roman cxciv	}
+{ 195 @Roman cxcv	}
+{ 196 @Roman cxcvi	}
+{ 197 @Roman cxcvii	}
+{ 198 @Roman cxcviii	}
+{ 199 @Roman cxcix	}
+{ 200 @Roman cc		}
 
+{  ?? @UCRoman ??	}
 {   1 @UCRoman I	}
 {   2 @UCRoman II	}
 {   3 @UCRoman III	}
@@ -217,8 +572,110 @@
 {  97 @UCRoman XCVII	}
 {  98 @UCRoman XCVIII	}
 {  99 @UCRoman XCIX	}
-{ 100 @UCRoman C	}
+{ 100 @UCRoman CC	}
+{ 101 @UCRoman CI	}
+{ 102 @UCRoman CII	}
+{ 103 @UCRoman CIII	}
+{ 104 @UCRoman CIV	}
+{ 105 @UCRoman CV	}
+{ 106 @UCRoman CVI	}
+{ 107 @UCRoman CVII	}
+{ 108 @UCRoman CVIII	}
+{ 109 @UCRoman CIX	}
+{ 110 @UCRoman CX	}
+{ 111 @UCRoman CXI	}
+{ 112 @UCRoman CXII	}
+{ 113 @UCRoman CXIII	}
+{ 114 @UCRoman CXIV	}
+{ 115 @UCRoman CXV	}
+{ 116 @UCRoman CXVI	}
+{ 117 @UCRoman CXVII	}
+{ 118 @UCRoman CXVIII	}
+{ 119 @UCRoman CXIX	}
+{ 120 @UCRoman CXX	}
+{ 121 @UCRoman CXXI	}
+{ 122 @UCRoman CXXII	}
+{ 123 @UCRoman CXXIII	}
+{ 124 @UCRoman CXXIV	}
+{ 125 @UCRoman CXXV	}
+{ 126 @UCRoman CXXVI	}
+{ 127 @UCRoman CXXVII	}
+{ 128 @UCRoman CXXVIII	}
+{ 129 @UCRoman CXXIX	}
+{ 130 @UCRoman CXXX	}
+{ 131 @UCRoman CXXXI	}
+{ 132 @UCRoman CXXXII	}
+{ 133 @UCRoman CXXXIII	}
+{ 134 @UCRoman CXXXIV	}
+{ 135 @UCRoman CXXXV	}
+{ 136 @UCRoman CXXXVI	}
+{ 137 @UCRoman CXXXVII	}
+{ 138 @UCRoman CXXXVIII	}
+{ 139 @UCRoman CXXXIX	}
+{ 140 @UCRoman CXL	}
+{ 141 @UCRoman CXLI	}
+{ 142 @UCRoman CXLII	}
+{ 143 @UCRoman CXLIII	}
+{ 144 @UCRoman CXLIV	}
+{ 145 @UCRoman CXLV	}
+{ 146 @UCRoman CXLVI	}
+{ 147 @UCRoman CXLVII	}
+{ 148 @UCRoman CXLVIII	}
+{ 149 @UCRoman CXLIX	}
+{ 150 @UCRoman CL	}
+{ 151 @UCRoman CLI	}
+{ 152 @UCRoman CLII	}
+{ 153 @UCRoman CLIII	}
+{ 154 @UCRoman CLIV	}
+{ 155 @UCRoman CLV	}
+{ 156 @UCRoman CLVI	}
+{ 157 @UCRoman CLVII	}
+{ 158 @UCRoman CLVIII	}
+{ 159 @UCRoman CLIX	}
+{ 160 @UCRoman CLX	}
+{ 161 @UCRoman CLXI	}
+{ 162 @UCRoman CLXII	}
+{ 163 @UCRoman CLXIII	}
+{ 164 @UCRoman CLXIV	}
+{ 165 @UCRoman CLXV	}
+{ 166 @UCRoman CLXVI	}
+{ 167 @UCRoman CLXVII	}
+{ 168 @UCRoman CLXVIII	}
+{ 169 @UCRoman CLXIX	}
+{ 170 @UCRoman CLXX	}
+{ 171 @UCRoman CLXXI	}
+{ 172 @UCRoman CLXXII	}
+{ 173 @UCRoman CLXXIII	}
+{ 174 @UCRoman CLXXIV	}
+{ 175 @UCRoman CLXXV	}
+{ 176 @UCRoman CLXXVI	}
+{ 177 @UCRoman CLXXVII	}
+{ 178 @UCRoman CLXXVIII	}
+{ 179 @UCRoman CLXXIX	}
+{ 180 @UCRoman CLXXX	}
+{ 181 @UCRoman CLXXXI	}
+{ 182 @UCRoman CLXXXII	}
+{ 183 @UCRoman CLXXXIII	}
+{ 184 @UCRoman CLXXXIV	}
+{ 185 @UCRoman CLXXXV	}
+{ 186 @UCRoman CLXXXVI	}
+{ 187 @UCRoman CLXXXVII	}
+{ 188 @UCRoman CLXXXVIII}
+{ 189 @UCRoman CLXXXIX	}
+{ 190 @UCRoman CXC	}
+{ 191 @UCRoman CXCI	}
+{ 192 @UCRoman CXCII	}
+{ 193 @UCRoman CXCIII	}
+{ 194 @UCRoman CXCIV	}
+{ 195 @UCRoman CXCV	}
+{ 196 @UCRoman CXCVI	}
+{ 197 @UCRoman CXCVII	}
+{ 198 @UCRoman CXCVIII	}
+{ 199 @UCRoman CXCIX	}
+{ 200 @UCRoman CC	}
 
+
+{  ?? @Alpha ??		}
 {   1 @Alpha a		}
 {   2 @Alpha b		}
 {   3 @Alpha c		}
@@ -246,6 +703,43 @@
 {  25 @Alpha y		}
 {  26 @Alpha z		}
 
+{ 27 @Alpha @CurrLang @Case {
+    Danish	@Yield { @Char ae }
+    English	@Yield { ?? }
+    Dutch	@Yield { ?? }
+    Finnish	@Yield { @Char aring }
+    French	@Yield { @Char ae }
+    German	@Yield { ?? }
+    Norwegian	@Yield { @Char ae }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { @Char aring }
+} }
+
+{ 28 @Alpha @CurrLang @Case {
+    Danish	@Yield { @Char oslash }
+    Dutch	@Yield { ?? }
+    English	@Yield { ?? }
+    Finnish	@Yield { @Char adieresis }
+    French	@Yield { ?? }
+    German	@Yield { ?? }
+    Norwegian	@Yield { @Char oslash }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { @Char adieresis }
+} }
+
+{ 29 @Alpha @CurrLang @Case {
+    Danish	@Yield { @Char aring }
+    Dutch	@Yield { ?? }
+    English	@Yield { ?? }
+    Finnish	@Yield { @Char odieresis }
+    French	@Yield { ?? }
+    German	@Yield { ?? }
+    Norwegian	@Yield { @Char aring }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { @Char odieresis }
+} }
+
+{  ?? @UCAlpha ??	}
 {   1 @UCAlpha A	}
 {   2 @UCAlpha B	}
 {   3 @UCAlpha C	}
@@ -273,44 +767,628 @@
 {  25 @UCAlpha Y	}
 {  26 @UCAlpha Z	}
 
-{   1 @Months January   }
-{   2 @Months February  }
-{   3 @Months March     }
-{   4 @Months April     }
-{   5 @Months May       }
-{   6 @Months June      }
-{   7 @Months July      }
-{   8 @Months August    }
-{   9 @Months September }
-{  10 @Months October   }
-{  11 @Months November  }
-{  12 @Months December  }
+{ 27 @UCAlpha @CurrLang @Case {
+    Danish	@Yield { @Char AE }
+    Dutch	@Yield { ?? }
+    English	@Yield { ?? }
+    Finnish	@Yield { @Char Aring }
+    French	@Yield { @Char AE }
+    German	@Yield { ?? }
+    Norwegian	@Yield { @Char AE }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { @Char Aring }
+} }
 
-{   1 @ShortMonths Jan	}
-{   2 @ShortMonths Feb	}
-{   3 @ShortMonths Mar	}
-{   4 @ShortMonths Apr	}
-{   5 @ShortMonths May	}
-{   6 @ShortMonths Jun	}
-{   7 @ShortMonths Jul	}
-{   8 @ShortMonths Aug	}
-{   9 @ShortMonths Sep	}
-{  10 @ShortMonths Oct	}
-{  11 @ShortMonths Nov	}
-{  12 @ShortMonths Dec	}
+{ 28 @UCAlpha @CurrLang @Case {
+    Danish	@Yield { @Char Oslash }
+    Dutch	@Yield { ?? }
+    English	@Yield { ?? }
+    Finnish	@Yield { @Char Adieresis }
+    French	@Yield { ?? }
+    German	@Yield { ?? }
+    Norwegian	@Yield { @Char Oslash }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { @Char Adieresis }
+} }
 
-{   1 @WeekDays Sunday		}
-{   2 @WeekDays Monday		}
-{   3 @WeekDays Tuesday		}
-{   4 @WeekDays Wednesday	}
-{   5 @WeekDays Thursday	}
-{   6 @WeekDays Friday		}
-{   7 @WeekDays Saturday	}
+{ 29 @UCAlpha @CurrLang @Case {
+    Danish	@Yield { @Char Aring }
+    Dutch	@Yield { ?? }
+    English	@Yield { ?? }
+    Finnish	@Yield { @Char Odieresis }
+    French	@Yield { ?? }
+    German	@Yield { ?? }
+    Norwegian	@Yield { @Char Aring }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { @Char Odieresis }
+} }
 
-{   1 @ShortWeekDays Sun	}
-{   2 @ShortWeekDays Mon	}
-{   3 @ShortWeekDays Tue	}
-{   4 @ShortWeekDays Wed	}
-{   5 @ShortWeekDays Thu	}
-{   6 @ShortWeekDays Fri	}
-{   7 @ShortWeekDays Sat	}
+
+{ 1 @Months @CurrLang @Case {
+    Danish	@Yield { januar }
+    Dutch       @Yield { januari }
+    English	@Yield { January }
+    Finnish	@Yield { tammikuu }
+    French	@Yield { janvier }
+    German	@Yield { Januar }
+    Norwegian	@Yield { januar }
+    Spanish	@Yield { Enero }
+    Swedish	@Yield { januari }
+} }
+
+{ 2 @Months @CurrLang @Case {
+    Danish	@Yield { februar }
+    Dutch       @Yield { februari }
+    English	@Yield { February }
+    Finnish	@Yield { helmikuu }
+    French	@Yield { f{@Char eacute}vrier }
+    German	@Yield { Februar }
+    Norwegian	@Yield { februar }
+    Spanish	@Yield { Febrero }
+    Swedish	@Yield { februari }
+} }
+
+{ 3 @Months @CurrLang @Case {
+    Danish	@Yield { marts }
+    Dutch       @Yield { maart }
+    English	@Yield { March }
+    Finnish	@Yield { maaliskuu }
+    French	@Yield { mars }
+    German	@Yield { M{@Char adieresis}rz }
+    Norwegian	@Yield { mars }
+    Spanish	@Yield { Marzo }
+    Swedish	@Yield { mars }
+} }
+
+{ 4 @Months @CurrLang @Case {
+    Danish	@Yield { april }
+    Dutch       @Yield { april }
+    English	@Yield { April }
+    Finnish	@Yield { huhtikuu }
+    French	@Yield { avril }
+    German	@Yield { April }
+    Norwegian	@Yield { april }
+    Spanish	@Yield { Abril }
+    Swedish	@Yield { april }
+} }
+
+{ 5 @Months @CurrLang @Case {
+    Danish	@Yield { maj }
+    Dutch       @Yield { mei }
+    English	@Yield { May }
+    Finnish	@Yield { toukokuu }
+    French	@Yield { mai }
+    German	@Yield { Mai }
+    Norwegian	@Yield { mai }
+    Spanish	@Yield { Mayo }
+    Swedish	@Yield { maj }
+} }
+
+{ 6 @Months @CurrLang @Case {
+    Danish	@Yield { juni }
+    Dutch       @Yield { juni }
+    English	@Yield { June }
+    Finnish	@Yield { kes{@Char adieresis}kuu }
+    French	@Yield { juin }
+    German	@Yield { Juni }
+    Norwegian	@Yield { juni }
+    Spanish	@Yield { Junio }
+    Swedish	@Yield { juni }
+} }
+
+
+{ 7 @Months @CurrLang @Case {
+    Danish	@Yield { juli }
+    Dutch       @Yield { juli }
+    English	@Yield { July }
+    Finnish	@Yield { hein{@Char adieresis}kuu }
+    French	@Yield { juillet }
+    German	@Yield { Juli }
+    Norwegian	@Yield { juli }
+    Spanish	@Yield { Julio }
+    Swedish	@Yield { juli }
+} }
+
+{ 8 @Months @CurrLang @Case {
+    Danish	@Yield { august }
+    Dutch       @Yield { augustus }
+    English	@Yield { August }
+    Finnish	@Yield { elokuu }
+    French	@Yield { ao{@Char ucircumflex}t }
+    German	@Yield { August }
+    Norwegian	@Yield { august }
+    Spanish	@Yield { Agosto }
+    Swedish	@Yield { augusti }
+} }
+
+{ 9 @Months @CurrLang @Case {
+    Danish	@Yield { september }
+    Dutch       @Yield { september }
+    English	@Yield { September }
+    Finnish	@Yield { syyskuu }
+    French	@Yield { septembre }
+    German	@Yield { September }
+    Norwegian	@Yield { september }
+    Spanish	@Yield { Septiembre }
+    Swedish	@Yield { september }
+} }
+
+{ 10 @Months @CurrLang @Case {
+    Danish	@Yield { oktober }
+    Dutch       @Yield { oktober }
+    English	@Yield { October }
+    Finnish	@Yield { lokakuu }
+    French	@Yield { octobre }
+    German	@Yield { Oktober }
+    Norwegian	@Yield { oktober }
+    Spanish	@Yield { Octubre }
+    Swedish	@Yield { oktober }
+} }
+
+{ 11 @Months @CurrLang @Case {
+    Danish	@Yield { november }
+    Dutch       @Yield { november }
+    English	@Yield { November }
+    Finnish	@Yield { marraskuu }
+    French	@Yield { novembre }
+    German	@Yield { November }
+    Norwegian	@Yield { november }
+    Spanish	@Yield { Noviembre }
+    Swedish	@Yield { november }
+} }
+
+{ 12 @Months @CurrLang @Case {
+    Danish	@Yield { december }
+    Dutch       @Yield { december }
+    English	@Yield { December }
+    Finnish	@Yield { joulukuu }
+    French	@Yield { d{@Char eacute}cembre }
+    German	@Yield { Dezember }
+    Norwegian	@Yield { desember }
+    Spanish	@Yield { Diciembre }
+    Swedish	@Yield { december }
+} }
+
+
+{ 1 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { jan }
+    Dutch       @Yield { jan }
+    English	@Yield { Jan }
+    Finnish	@Yield { tammikuu }
+    French	@Yield { jan }
+    German	@Yield { Jan }
+    Norwegian	@Yield { jan }
+    Spanish	@Yield { Ene }
+    Swedish	@Yield { jan }
+} }
+
+{ 2 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { feb }
+    Dutch       @Yield { feb }
+    English	@Yield { Feb }
+    Finnish	@Yield { helmikuu }
+    French	@Yield { f{@Char eacute}v }
+    German	@Yield { Feb }
+    Norwegian	@Yield { feb }
+    Spanish	@Yield { Feb }
+    Swedish	@Yield { feb }
+} }
+
+{ 3 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { mar }
+    Dutch       @Yield { mrt }
+    English	@Yield { Mar }
+    Finnish	@Yield { maaliskuu }
+    French	@Yield { mar }
+    German	@Yield { M{@Char adieresis}r }
+    Norwegian	@Yield { mar }
+    Spanish	@Yield { Mar }
+    Swedish	@Yield { mar }
+} }
+
+{ 4 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { apr }
+    Dutch       @Yield { apr }
+    English	@Yield { Apr }
+    Finnish	@Yield { huhtikuu }
+    French	@Yield { avr }
+    German	@Yield { Apr }
+    Norwegian	@Yield { apr }
+    Spanish	@Yield { Abr }
+    Swedish	@Yield { apr }
+} }
+
+{ 5 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { maj }
+    Dutch       @Yield { mei }
+    English	@Yield { May }
+    Finnish	@Yield { toukokuu }
+    French	@Yield { mai }
+    German	@Yield { Mai }
+    Norwegian	@Yield { mai }
+    Spanish	@Yield { May }
+    Swedish	@Yield { maj }
+} }
+
+{ 6 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { jun }
+    Dutch       @Yield { jun }
+    English	@Yield { Jun }
+    Finnish	@Yield { kes{@Char adieresis}kuu }
+    French	@Yield { juin }
+    German	@Yield { Jun }
+    Norwegian	@Yield { jun }
+    Spanish	@Yield { Jun }
+    Swedish	@Yield { jun }
+} }
+
+{ 7 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { jul }
+    Dutch       @Yield { jul }
+    English	@Yield { Jul }
+    Finnish	@Yield { hein{@Char adieresis}kuu }
+    French	@Yield { juil }
+    German	@Yield { Jul }
+    Norwegian	@Yield { jul }
+    Spanish	@Yield { Jul }
+    Swedish	@Yield { jul }
+} }
+
+{ 8 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { aug }
+    Dutch       @Yield { aug }
+    English	@Yield { Aug }
+    Finnish	@Yield { elokuu }
+    French	@Yield { ao{@Char ucircumflex} }
+    German	@Yield { Aug }
+    Norwegian	@Yield { aug }
+    Spanish	@Yield { Ago }
+    Swedish	@Yield { aug }
+} }
+
+{ 9 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { sep }
+    Dutch       @Yield { sep }
+    English	@Yield { Sep }
+    Finnish	@Yield { syyskuu }
+    French	@Yield { sep }
+    German	@Yield { Sep }
+    Norwegian	@Yield { sep }
+    Spanish	@Yield { Sep }
+    Swedish	@Yield { sep }
+} }
+
+{ 10 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { okt }
+    Dutch       @Yield { okt }
+    English	@Yield { Oct }
+    Finnish	@Yield { lokakuu }
+    French	@Yield { oct }
+    German	@Yield { Okt }
+    Norwegian	@Yield { okt }
+    Spanish	@Yield { Oct }
+    Swedish	@Yield { okt }
+} }
+
+{ 11 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { nov }
+    Dutch       @Yield { nov }
+    English	@Yield { Nov }
+    Finnish	@Yield { marraskuu }
+    French	@Yield { nov }
+    German	@Yield { Nov }
+    Norwegian	@Yield { nov }
+    Spanish	@Yield { Nov }
+    Swedish	@Yield { nov }
+} }
+
+{ 12 @ShortMonths @CurrLang @Case {
+    Danish	@Yield { dec }
+    Dutch       @Yield { dec }
+    English	@Yield { Dec }
+    Finnish	@Yield { joulukuu }
+    French	@Yield { d{@Char eacute}c }
+    German	@Yield { Dez }
+    Norwegian	@Yield { des }
+    Spanish	@Yield { Dic }
+    Swedish	@Yield { dec }
+} }
+
+
+{ 1 @WeekDays @CurrLang @Case {
+    Danish	@Yield { s{@Char oslash}ndag }
+    Dutch       @Yield { zondag }
+    English	@Yield { Sunday }
+    Finnish	@Yield { sunnuntai }
+    French	@Yield { dimanche }
+    German	@Yield { Sonntag }
+    Norwegian	@Yield { s{@Char oslash}ndag }
+    Spanish	@Yield { Domingo }
+    Swedish	@Yield { s{@Char odieresis}ndag }
+} }
+
+{ 2 @WeekDays @CurrLang @Case {
+    Danish	@Yield { mandag }
+    Dutch       @Yield { maandag }
+    English	@Yield { Monday }
+    Finnish	@Yield { maanantai }
+    French	@Yield { lundi }
+    German	@Yield { Montag }
+    Norwegian	@Yield { mandag }
+    Spanish	@Yield { Lunes }
+    Swedish	@Yield { m{@Char aring}ndag }
+} }
+
+{ 3 @WeekDays @CurrLang @Case {
+    Danish	@Yield { tirsdag }
+    Dutch       @Yield { dinsdag }
+    English	@Yield { Tuesday }
+    Finnish	@Yield { tiistai }
+    French	@Yield { mardi }
+    German	@Yield { Dienstag }
+    Norwegian	@Yield { tirsdag }
+    Spanish	@Yield { Martes }
+    Swedish	@Yield { tisdag }
+} }
+
+{ 4 @WeekDays @CurrLang @Case {
+    Danish	@Yield { onsdag }
+    Dutch       @Yield { woensdag }
+    English	@Yield { Wednesday }
+    Finnish	@Yield { keskiviikko }
+    French	@Yield { mercredi }
+    German	@Yield { Mittwoch }
+    Norwegian	@Yield { onsdag }
+    Spanish	@Yield { Mi{@Char eacute}rcoles }
+    Swedish	@Yield { onsdag }
+} }
+
+{ 5 @WeekDays @CurrLang @Case {
+    Danish	@Yield { torsdag }
+    Dutch       @Yield { donderdag }
+    English	@Yield { Thursday }
+    Finnish	@Yield { torstai }
+    French	@Yield { jeudi }
+    German	@Yield { Donnerstag }
+    Norwegian	@Yield { torsdag }
+    Spanish	@Yield { Jueves }
+    Swedish	@Yield { torsdag }
+} }
+
+{ 6 @WeekDays @CurrLang @Case {
+    Danish	@Yield { fredag }
+    Dutch       @Yield { vrijdag }
+    English	@Yield { Friday }
+    Finnish	@Yield { perjantai }
+    French	@Yield { vendredi }
+    German	@Yield { Freitag }
+    Norwegian	@Yield { fredag }
+    Spanish	@Yield { Viernes }
+    Swedish	@Yield { fredag }
+} }
+
+{ 7 @WeekDays @CurrLang @Case {
+    Danish	@Yield { l{@Char oslash}rdag }
+    Dutch       @Yield { zaterdag }
+    English	@Yield { Saturday }
+    Finnish	@Yield { lauantai }
+    French	@Yield { samedi }
+    German	@Yield { Samstag }
+    Norwegian	@Yield { l{@Char oslash}rdag }
+    Spanish	@Yield { S{@Char aacute}bado }
+    Swedish	@Yield { l{@Char odieresis}rdag }
+} }
+
+
+{ 1 @ShortWeekDays @CurrLang @Case {
+    Danish	@Yield { s{@Char oslash}n }
+    Dutch       @Yield { zo }
+    English	@Yield { Sun }
+    Finnish	@Yield { su }
+    French	@Yield { dim }
+    German	@Yield { So }
+    Norwegian	@Yield { s{@Char oslash}n }
+    Spanish	@Yield { Dom }
+    Swedish	@Yield { s{@Char odieresis} }
+} }
+
+{ 2 @ShortWeekDays @CurrLang @Case {
+    Danish	@Yield { man }
+    Dutch       @Yield { ma }
+    English	@Yield { Mon }
+    Finnish	@Yield { ma }
+    French	@Yield { lun }
+    German	@Yield { Mo }
+    Norwegian	@Yield { man }
+    Spanish	@Yield { Lun }
+    Swedish	@Yield { m{@Char aring} }
+} }
+
+{ 3 @ShortWeekDays @CurrLang @Case {
+    Danish	@Yield { tir }
+    Dutch       @Yield { di }
+    English	@Yield { Tue }
+    Finnish	@Yield { ti }
+    French	@Yield { mar }
+    German	@Yield { Di }
+    Norwegian	@Yield { tir }
+    Spanish	@Yield { Mar }
+    Swedish	@Yield { ti }
+} }
+
+{ 4 @ShortWeekDays @CurrLang @Case {
+    Danish	@Yield { ons }
+    Dutch       @Yield { wo }
+    English	@Yield { Wed }
+    Finnish	@Yield { ke }
+    French	@Yield { mer }
+    German	@Yield { Mi }
+    Norwegian	@Yield { ons }
+    Spanish	@Yield { Mie }
+    Swedish	@Yield { on }
+} }
+
+{ 5 @ShortWeekDays @CurrLang @Case {
+    Danish	@Yield { tor }
+    Dutch       @Yield { do }
+    English	@Yield { Thu }
+    Finnish	@Yield { to }
+    French	@Yield { jeu }
+    German	@Yield { Do }
+    Norwegian	@Yield { tor }
+    Spanish	@Yield { Jue }
+    Swedish	@Yield { to }
+} }
+
+{ 6 @ShortWeekDays @CurrLang @Case {
+    Danish	@Yield { fre }
+    Dutch       @Yield { vr }
+    English	@Yield { Fri }
+    Finnish	@Yield { pe }
+    French	@Yield { ven }
+    German	@Yield { Fr }
+    Norwegian	@Yield { fre }
+    Spanish	@Yield { Vie }
+    Swedish	@Yield { fr }
+} }
+
+{ 7 @ShortWeekDays @CurrLang @Case {
+    Danish	@Yield { l{@Char oslash}r }
+    Dutch       @Yield { za }
+    English	@Yield { Sat }
+    Finnish	@Yield { la }
+    French	@Yield { sam }
+    German	@Yield { Sa }
+    Norwegian	@Yield { l{@Char oslash}r }
+    Spanish	@Yield { Sab }
+    Swedish	@Yield { l{@Char odieresis} }
+} }
+
+
+{ 00 @TwelveHours 12 }
+{ 01 @TwelveHours  1 }
+{ 02 @TwelveHours  2 }
+{ 03 @TwelveHours  3 }
+{ 04 @TwelveHours  4 }
+{ 05 @TwelveHours  5 }
+{ 06 @TwelveHours  6 }
+{ 07 @TwelveHours  7 }
+{ 08 @TwelveHours  8 }
+{ 09 @TwelveHours  9 }
+{ 10 @TwelveHours 10 }
+{ 11 @TwelveHours 11 }
+{ 12 @TwelveHours 12 }
+{ 13 @TwelveHours  1 }
+{ 14 @TwelveHours  2 }
+{ 15 @TwelveHours  3 }
+{ 16 @TwelveHours  4 }
+{ 17 @TwelveHours  5 }
+{ 18 @TwelveHours  6 }
+{ 19 @TwelveHours  7 }
+{ 20 @TwelveHours  8 }
+{ 21 @TwelveHours  9 }
+{ 22 @TwelveHours 10 }
+{ 23 @TwelveHours 11 }
+
+
+{ 00 @ShortHours  0 }
+{ 01 @ShortHours  1 }
+{ 02 @ShortHours  2 }
+{ 03 @ShortHours  3 }
+{ 04 @ShortHours  4 }
+{ 05 @ShortHours  5 }
+{ 06 @ShortHours  6 }
+{ 07 @ShortHours  7 }
+{ 08 @ShortHours  8 }
+{ 09 @ShortHours  9 }
+{ 10 @ShortHours 10 }
+{ 11 @ShortHours 11 }
+{ 12 @ShortHours 12 }
+{ 13 @ShortHours 13 }
+{ 14 @ShortHours 14 }
+{ 15 @ShortHours 15 }
+{ 16 @ShortHours 16 }
+{ 17 @ShortHours 17 }
+{ 18 @ShortHours 18 }
+{ 19 @ShortHours 19 }
+{ 20 @ShortHours 20 }
+{ 21 @ShortHours 21 }
+{ 22 @ShortHours 22 }
+{ 23 @ShortHours 23 }
+
+
+{ 00 @MeriDiems a.m. }
+{ 01 @MeriDiems a.m. }
+{ 02 @MeriDiems a.m. }
+{ 03 @MeriDiems a.m. }
+{ 04 @MeriDiems a.m. }
+{ 05 @MeriDiems a.m. }
+{ 06 @MeriDiems a.m. }
+{ 07 @MeriDiems a.m. }
+{ 08 @MeriDiems a.m. }
+{ 09 @MeriDiems a.m. }
+{ 10 @MeriDiems a.m. }
+{ 11 @MeriDiems a.m. }
+{ 12 @MeriDiems p.m. }
+{ 13 @MeriDiems p.m. }
+{ 14 @MeriDiems p.m. }
+{ 15 @MeriDiems p.m. }
+{ 16 @MeriDiems p.m. }
+{ 17 @MeriDiems p.m. }
+{ 18 @MeriDiems p.m. }
+{ 19 @MeriDiems p.m. }
+{ 20 @MeriDiems p.m. }
+{ 21 @MeriDiems p.m. }
+{ 22 @MeriDiems p.m. }
+{ 23 @MeriDiems p.m. }
+
+
+{ 00 @ShortMeriDiems am }
+{ 01 @ShortMeriDiems am }
+{ 02 @ShortMeriDiems am }
+{ 03 @ShortMeriDiems am }
+{ 04 @ShortMeriDiems am }
+{ 05 @ShortMeriDiems am }
+{ 06 @ShortMeriDiems am }
+{ 07 @ShortMeriDiems am }
+{ 08 @ShortMeriDiems am }
+{ 09 @ShortMeriDiems am }
+{ 10 @ShortMeriDiems am }
+{ 11 @ShortMeriDiems am }
+{ 12 @ShortMeriDiems pm }
+{ 13 @ShortMeriDiems pm }
+{ 14 @ShortMeriDiems pm }
+{ 15 @ShortMeriDiems pm }
+{ 16 @ShortMeriDiems pm }
+{ 17 @ShortMeriDiems pm }
+{ 18 @ShortMeriDiems pm }
+{ 19 @ShortMeriDiems pm }
+{ 20 @ShortMeriDiems pm }
+{ 21 @ShortMeriDiems pm }
+{ 22 @ShortMeriDiems pm }
+{ 23 @ShortMeriDiems pm }
+
+
+{ date @DateTimeFormat @Value { @CurrLang @Case {
+    Danish	@Yield { @DayNum. @Month, @Year			}
+    English	@Yield { @DayNum @Month, @Year			}
+    Finnish	@Yield { @DayNum. @Month"ta" @Year		}
+    French	@Yield { @DayNum @Month @Year			}
+    German	@Yield { @DayNum. @Month @Year			}
+    Norwegian   @Yield { @DayNum @Month, @Year			}
+    Spanish	@Yield { @DayNum de @Month, @Year		}
+    Swedish	@Yield { @DayNum @Month @Year			}
+  } }
+}
+
+{ time @DateTimeFormat @Value { @CurrLang @Case {
+    Danish	@Yield { @ShortHour.@Minute			}
+    English	@Yield { @TwelveHour.@Minute @MeriDiem		}
+    Finnish	@Yield { @ShortHour.@Minute			}
+    French	@Yield { @ShortHour"h"@Minute			}
+    German	@Yield { @ShortHour.@Minute			}
+    Norwegian   @Yield { @ShortHour.@Minute 			}
+    Spanish	@Yield { @ShortHour:@Minute 			}
+    Swedish	@Yield { @ShortHour.@Minute			}
+  } }
+}

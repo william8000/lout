@@ -128,7 +128,7 @@ lfigdict begin
 % stroke a lfigcdashed line:  <length> <dashlength> lfigcdashed -
 /lfigcdashed
 {  2 copy le 1 index 0 le or
-   {  exch pop 1 pt lfigmax [ exch dup ] copy 0 get 2 div setdash }
+   { exch pop 1 pt lfigmax [ exch dup ] dup 0 get 2 div setdash }
    { dup [ 4 2 roll exch 2 copy exch div
      2 div ceiling div 1 index sub
      ] exch 2 div setdash
@@ -137,8 +137,8 @@ lfigdict begin
 
 % stroke a dotted line:  <length> <dashlength> lfigdotted -
 /lfigdotted
-{  dup 0 le
-   {  exch pop 1 pt lfigmax [ exch 0 exch ] 0 setdash }
+{  2 copy le 1 index 0 le or
+   { exch pop 1 pt lfigmax [ exch 0 exch ] 0 setdash }
    { 1 index exch div ceiling div
      [ 0 3 2 roll ] 0 setdash
    } ifelse stroke
@@ -150,13 +150,34 @@ lfigdict begin
 } def
 
 % painting (i.e. filling): - lfigwhite - (etc.)
-/lfigwhite   { 1.0  setgray fill } def
-/lfiglight   { 0.95 setgray fill } def
-/lfiggrey    { 0.9  setgray fill } def
-/lfiggray    { 0.9  setgray fill } def
-/lfigdark    { 0.7  setgray fill } def
-/lfigblack   { 0.0  setgray fill } def
-/lfignopaint {                   } def
+/lfignopaint		{			       } def
+/lfignochange		{ 			  fill } def
+/lfigdarkblue		{ 0.0 0.0 0.5 setrgbcolor fill } def
+/lfigblue		{ 0.0 0.0 1.0 setrgbcolor fill } def
+/lfiglightblue		{ 0.5 0.5 1.0 setrgbcolor fill } def
+/lfigdarkgreen		{ 0.0 0.5 0.0 setrgbcolor fill } def
+/lfiggreen		{ 0.0 1.0 0.0 setrgbcolor fill } def
+/lfiglightgreen		{ 0.5 1.0 0.5 setrgbcolor fill } def
+/lfigdarkred		{ 0.5 0.0 0.0 setrgbcolor fill } def
+/lfigred		{ 1.0 0.0 0.0 setrgbcolor fill } def
+/lfiglightred		{ 1.0 0.5 0.5 setrgbcolor fill } def
+/lfigdarkcyan		{ 0.0 0.5 0.5 setrgbcolor fill } def
+/lfigcyan		{ 0.0 1.0 1.0 setrgbcolor fill } def
+/lfiglightcyan		{ 0.5 1.0 1.0 setrgbcolor fill } def
+/lfigdarkmagenta	{ 0.5 0.0 0.5 setrgbcolor fill } def
+/lfigmagenta		{ 1.0 0.0 1.0 setrgbcolor fill } def
+/lfiglightmagenta	{ 1.0 0.5 1.0 setrgbcolor fill } def
+/lfigdarkyellow		{ 0.5 0.5 0.0 setrgbcolor fill } def
+/lfigyellow		{ 1.0 1.0 0.0 setrgbcolor fill } def
+/lfiglightyellow	{ 1.0 1.0 0.5 setrgbcolor fill } def
+/lfigdarkgray		{ 0.2 0.2 0.2 setrgbcolor fill } def
+/lfiggray		{ 0.5 0.5 0.5 setrgbcolor fill } def
+/lfiglightgray		{ 0.8 0.8 0.8 setrgbcolor fill } def
+/lfigdarkgrey		{ 0.2 0.2 0.2 setrgbcolor fill } def
+/lfiggrey		{ 0.5 0.5 0.5 setrgbcolor fill } def
+/lfiglightgrey		{ 0.8 0.8 0.8 setrgbcolor fill } def
+/lfigblack		{ 0.0 0.0 0.0 setrgbcolor fill } def
+/lfigwhite		{ 1.0 1.0 1.0 setrgbcolor fill } def
 
 % line caps (and joins, not currently used)
 /lfigbutt       0 def

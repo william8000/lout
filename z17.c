@@ -1,7 +1,7 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -65,7 +65,7 @@ OBJECT x;  STYLE *style;  GAP *res_gap;  unsigned *res_inc;
 
   /* make sure we have a WORD or QWORD argument */
   if( !is_word(type(x)) )
-  { Error(WARN, &fpos(x), "gap is not a simple word");
+  { Error(17, 1, "gap is not a simple word", WARN, &fpos(x));
     debug1(DGW, D, "GetGap failing (type(x) = %s)", Image(type(x)));
     return;
   }
@@ -83,9 +83,9 @@ OBJECT x;  STYLE *style;  GAP *res_gap;  unsigned *res_inc;
 
   /* read the gap width */
   if( sscanf((char *) str, "%f", &num) != 1 )
-  { Error(WARN, &fpos(x), "width missing from %s", string(x));
-    Error(WARN, &fpos(x), "reminder: /, | and & characters %s",
-		"must be enclosed in double quotes");
+  { Error(17, 2, "width missing from %s", WARN, &fpos(x), string(x));
+    Error(17, 3, "%s, %s and %s must be enclosed in double quotes",
+      WARN, &fpos(x), KW_VCAT_NJ, KW_HCAT_NJ, KW_ACAT_NJ);
     debug0(DGW, D, "GetGap failing (width missing)");
     return;
   }
@@ -107,24 +107,25 @@ OBJECT x;  STYLE *style;  GAP *res_gap;  unsigned *res_inc;
 
     case CH_UNIT_DG:	if( *res_inc == GAP_DEC ) num = - num;
 			*res_inc = GAP_ABS;
-			while( num >= 360.0 ) num -= 360.0;
-			while( num <= -360.0 ) num += 360.0;
-			assert( (num>= -360) && (num<=360), "GetGap: dg!" );
+			while( num >  180.0 ) num -= 360.0;
+			while( num < -180.0 ) num += 360.0;
+			assert((num>=-180.0) && (num<=180.0), "GetGap: dg!");
 			setwidths( num*DG,                        DEG_UNIT   );
 
-    default:	Error(WARN, &fpos(x), "units letter missing from %s",string(x));
+    default:	Error(17, 4, "units letter missing from %s",
+		  WARN, &fpos(x), string(x));
 		debug0(DGW, D, "GetGap failing (units letter missing)");
 		return;
   }
 
   if( units(*res_gap) == AVAIL_UNIT && w > FR )
-  { Error(WARN, &fpos(x), "%.1fr too large; replaced with 1.0r", num);
+  { Error(17, 5, "%.1fr too large (1.0r substituted)", WARN, &fpos(x), num);
     w = FR;
   }
   else if( w > MAX_LEN )
   { assert( units(*res_gap) != DEG_UNIT, "GetGap: oversize degrees!" );
-    Error(WARN, &fpos(x), "length %s is too large - max (%dc) substituted",
-		string(x), MAX_LEN/CM);
+    Error(17, 6, "length %s is too large (maximum %dc substituted)",
+      WARN, &fpos(x), string(x), MAX_LEN/CM);
     w = MAX_LEN;
   }
   width(*res_gap) = w;
@@ -140,13 +141,14 @@ OBJECT x;  STYLE *style;  GAP *res_gap;  unsigned *res_inc;
     case CH_MODE_KERN:	mode(*res_gap) = KERN_MODE;	break;
     case CH_MODE_TABL:	mode(*res_gap) = TAB_MODE;	break;
 
-    default:	Error(WARN, &fpos(x), "unknown gap mode in %s",string(x));
+    default:	Error(17, 7, "unknown gap mode in %s",
+		  WARN, &fpos(x), string(x));
 		debug0(DGW, D, "GetGap failing (spacing mode)");
 		return;
   }
 
   if( *str != '\0' && *++str != '\0' )
-    Error(WARN, &fpos(x), "invalid width or gap %s", string(x));
+    Error(17, 8, "invalid width or gap %s", WARN, &fpos(x), string(x));
 
   debug2(DGW, D, "GetGap returning (res_gap = %s, res_inc = %s)",
     EchoGap(res_gap), Image( (int) *res_inc) );
@@ -180,13 +182,13 @@ LENGTH a, b, c;  GAP *xgap;
     case NEXT_UNIT:	w = width(*xgap) * (b + c) / FR;
 			break;
 
-    default:		Error(INTERN, no_fpos, "MinGap: units = %d",
-				units(*xgap));
+    default:		Error(17, 9, "MinGap: units %d",
+			  INTERN, no_fpos, units(*xgap));
 			break;
   }
   switch( mode(*xgap) )
   {
-    case NO_MODE:	Error(INTERN, no_fpos, "MinGap: NO_MODE");
+    case NO_MODE:	Error(17, 10, "MinGap: NO_MODE", INTERN, no_fpos);
 			res = 0;
 			break;
 
@@ -207,7 +209,8 @@ LENGTH a, b, c;  GAP *xgap;
     case TAB_MODE:	res = a + b;
 			break;
 
-    default:		Error(INTERN, no_fpos, "MinGap: %d", mode(*xgap));
+    default:		Error(17, 11, "MinGap: mode %d", INTERN, no_fpos,
+			  mode(*xgap));
 			res = 0;
 			break;
 
@@ -236,7 +239,7 @@ LENGTH a, b; GAP *xgap;  int dir;
   LENGTH w = units(*xgap) == FIXED_UNIT ? width(*xgap) : 0;
   switch( mode(*xgap) )
   {
-    case NO_MODE:	Error(INTERN, no_fpos, "ExtraGap: NO_MODE");
+    case NO_MODE:	Error(17, 12, "ExtraGap: NO_MODE", INTERN, no_fpos);
 			res = 0;
 			break;
 
@@ -258,7 +261,8 @@ LENGTH a, b; GAP *xgap;  int dir;
     case TAB_MODE:	res = 0;
 			break;
 
-    default:		Error(INTERN, no_fpos, "ExtraGap: %d", mode(*xgap));
+    default:		Error(17, 13, "ExtraGap: %d", INTERN, no_fpos,
+			  mode(*xgap));
 			res = 0;
 			break;
 
@@ -297,13 +301,13 @@ LENGTH a, b, c;  GAP *xgap;  LENGTH f, mk;
     case NEXT_UNIT:	w = width(*xgap) * (b + c) / FR;
 			break;
 
-    default:		Error(INTERN, no_fpos, "ActualGap: units = %d",
-				units(*xgap));
+    default:		Error(17, 14, "ActualGap: units %d",
+			  INTERN, no_fpos, units(*xgap));
 			break;
   }
   switch( mode(*xgap) )
   {
-    case NO_MODE:	Error(INTERN, no_fpos, "ActualGap: NO_MODE");
+    case NO_MODE:	Error(17, 15, "ActualGap: NO_MODE", INTERN, no_fpos);
 			w2 = 0;
 			break;
 
@@ -325,7 +329,8 @@ LENGTH a, b, c;  GAP *xgap;  LENGTH f, mk;
 			w2 = max( w2, a + b );
 			break;
 
-    default:		Error(INTERN,no_fpos,"ActualGap: mode %d", mode(*xgap));
+    default:		Error(17, 16, "ActualGap: mode %d", INTERN, no_fpos,
+			  mode(*xgap));
 			w2 = 0;
 			break;
   }
@@ -372,7 +377,8 @@ GAP *xgap;
     case DEG_UNIT:	sprintf(buff, "%.1fd", (float) width(*xgap) / DG);
 			break;
 
-    default:		Error(INTERN, no_fpos, "EchoGap: %d", units(*xgap));
+    default:		Error(17, 17, "EchoGap: %d", INTERN, no_fpos,
+			  units(*xgap));
 			break;
 
   }

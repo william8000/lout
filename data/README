@@ -2,12 +2,12 @@ Directory lout/data
 
 This directory contains Lout database files:
 
-    loutrefs.ld		References used in the various reports
-    refstyles.ld	Reference printing styles
+    loutrefs.ld		References used in the Lout documentation
+    refstyles.ld	Standard reference printing styles
     standard.ld		Roman numerals, months, etc.
 
-Corresponding .li files will be created in this directory the
-first time each database is accessed.
+Corresponding .li files will be created during the initializing
+"lout -x" run, or else the first time each database is accessed.
 
 Jeffrey H. Kingston
-22 December 1992
+21 September 1994

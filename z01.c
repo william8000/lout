@@ -1,7 +1,7 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -33,24 +33,58 @@
 
 /*****************************************************************************/
 /*                                                                           */
+/*  MemCheck - check this memory location                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+int MemCheck = 0;
+
+/*****************************************************************************/
+/*                                                                           */
 /*  StartSym      the symbol table entry for \Start (overall scope)          */
 /*  GalleySym     the symbol table entry for @Galley                         */
 /*  InputSym      the symbol table entry for @LInput                         */
 /*  PrintSym      the symbol table entry for \Print (root target)            */
+/*  FilterInSym   the symbol table entry for @FilterIn                       */
+/*  FilterOutSym  the symbol table entry for @FilterOut                      */
+/*  FilterErrSym  the symbol table entry for @FilterErr                      */
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT StartSym, GalleySym, InputSym, PrintSym;
+OBJECT StartSym, GalleySym, InputSym, PrintSym,
+       FilterInSym, FilterOutSym, FilterErrSym;
 
 /*****************************************************************************/
 /*                                                                           */
 /*  AllowCrossDb        Allow references to OldCrossDb and NewCrossDb        */
 /*  Encapsulated        Produce a one-page encapsulated PostScript file      */
+/*  Kern                Do kerning                                           */
 /*                                                                           */
 /*****************************************************************************/
 
 BOOLEAN AllowCrossDb;
 BOOLEAN Encapsulated;
+BOOLEAN Kern;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  BackEnd		POSTSCRIPT or PLAINTEXT                              */
+/*  PlainCharWidth      if PLAINTEXT, the width of each character            */
+/*  PlainCharHeight     if PLAINTEXT, the height of each character           */
+/*  PlainFormFeed       if PLAINTEXT, TRUE if separate components with \f.   */
+/*  InitializeAll       TRUE if this is an initializing run.                 */
+/*  MsgCat              category for locale-specific messages                */
+/*                                                                           */
+/*****************************************************************************/
+
+int BackEnd;
+LENGTH PlainCharWidth, PlainCharHeight;
+BOOLEAN PlainFormFeed;
+BOOLEAN InitializeAll;
+#if LOCALE_ON
+nl_catd MsgCat;
+#endif
 
 
 /*****************************************************************************/
@@ -78,20 +112,21 @@ unsigned char xprec;
 
 /*@::GetArg(), main()@********************************************************/
 /*                                                                           */
-/*  GetArg(arg, message)                                                     */
+/*  GetArg(argv, argc, i)                                                    */
 /*                                                                           */
-/*  Get the next argument from the command line and store it in arg.         */
-/*  Print message as a fatal error if it isn't there.                        */
+/*  Get the next argument from the command line and return it.               */
+/*  Return NULL if it isn't there.                                           */
 /*                                                                           */
 /*****************************************************************************/
 
-#define GetArg(arg, message)						\
-{ if( !StringEqual(AsciiToFull(argv[i]+2), STR_EMPTY) )			\
-    arg = AsciiToFull(argv[i]+2);					\
-  else if( i < argc-1 && *argv[i+1] != CH_HYPHEN )			\
-    arg = AsciiToFull(argv[i++ +1]);					\
-  else									\
-    Error(FATAL, no_fpos, message);					\
+FULL_CHAR *GetArg(argv, argc, i)
+char *argv[]; int argc, *i;
+{ if( !StringEqual(AsciiToFull(argv[*i]+2), STR_EMPTY) )
+    return AsciiToFull(argv[*i]+2);
+  else if( *i < argc-1 && *argv[*i + 1] != CH_HYPHEN )
+    return AsciiToFull(argv[(*i)++ +1]);
+  else
+    return (FULL_CHAR *) NULL;
 } /* end GetArg */
 
 
@@ -109,13 +144,32 @@ int argc; char *argv[];
 { int i, len;  FULL_CHAR *arg;
   OBJECT t, res, s;			/* current token, parser output      */
   BOOLEAN stdin_seen;			/* TRUE when stdin file seen         */
+  int source_file_count;		/* number of source files in command */
   FULL_CHAR *cross_db;			/* name of cross reference database  */
   FULL_CHAR *outfile;			/* name of output file               */
   FILE *out_fp;
 
+  /* set locale if that's what we are doing */
+#if LOCALE_ON
+  char catname[MAX_BUFF], *loc;
+  loc = setlocale(LC_MESSAGES, "");
+  if( loc == (char *) NULL )
+  { Error(1, 6, "unable to initialize locale", WARN, no_fpos);
+    loc = "C";
+  }
+  sprintf(catname, "%s/%s/LC_MESSAGES/errors.%s", LOCALE_DIR, loc, loc);
+  MsgCat = catopen(catname, 0);
+#endif
+
   /* initialise various modules, add current directory to search paths */
+  BackEnd = POSTSCRIPT;
+  PlainCharWidth = PLAIN_WIDTH;
+  PlainCharHeight = PLAIN_HEIGHT;
+  PlainFormFeed = FALSE;
+  InitializeAll = FALSE;
   AllowCrossDb = TRUE;
   Encapsulated = FALSE;
+  Kern = TRUE;
   InitSym();
   LexInit();
   MemInit();
@@ -128,13 +182,15 @@ int argc; char *argv[];
   stdin_seen = FALSE;
   cross_db = CROSS_DB;
   outfile = STR_STDOUT;
+  source_file_count = 0;
   for( i = 1;  i < argc;  i++ )
   { if( *argv[i] == CH_HYPHEN ) switch( *(argv[i]+1) )
     {
       case CH_FLAG_OUTFILE:
      
 	/* read name of output file */
-	GetArg(outfile, "usage: -o<filename>");
+	if( (outfile = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 7, "usage: -o <filename>", FATAL, no_fpos);
 	break;
 
 
@@ -145,17 +201,26 @@ int argc; char *argv[];
 	break;
 
 
+      case CH_FLAG_NOKERN:
+     
+	/* suppress kerning */
+	Kern = FALSE;
+	break;
+
+
       case CH_FLAG_CROSS:
      
 	/* read name of cross reference database */
-	GetArg(cross_db, "usage: -c<filename>");
+	if( (cross_db = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 8, "usage: -c <filename>", FATAL, no_fpos);
 	break;
 
 
       case CH_FLAG_ERRFILE:
      
 	/* read log file name */
-	GetArg(arg, "usage: -e<filename>");
+	if( (arg = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 9, "usage: -e <filename>", FATAL, no_fpos);
 	ErrorInit(arg);
 	break;
 
@@ -164,7 +229,7 @@ int argc; char *argv[];
      
 	/* -EPS produces encapsulated PostScript output */
 	if( !StringEqual(AsciiToFull(argv[i]+1), STR_EPS) )
-	  Error(FATAL, no_fpos, "usage: -EPS");
+	  Error(1, 10, "usage: -EPS", FATAL, no_fpos);
 	Encapsulated = TRUE;
 	break;
 
@@ -172,7 +237,8 @@ int argc; char *argv[];
       case CH_FLAG_DIRPATH:
      
 	/* add directory to database and sysdatabase paths */
-	GetArg(arg, "usage: -D<dirname>");
+	if( (arg = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 11, "usage: -D <directoryname>", FATAL, no_fpos);
 	AddToPath(DATABASE_PATH, arg);
 	AddToPath(SYSDATABASE_PATH, arg);
 	break;
@@ -181,7 +247,8 @@ int argc; char *argv[];
       case CH_FLAG_ENCPATH:
      
 	/* add directory to encoding path */
-	GetArg(arg, "usage: -C<dirname>");
+	if( (arg = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 12, "usage: -C <directoryname>", FATAL, no_fpos);
 	AddToPath(ENCODING_PATH, arg);
 	break;
 
@@ -189,15 +256,26 @@ int argc; char *argv[];
       case CH_FLAG_FNTPATH:
      
 	/* add directory to font path */
-	GetArg(arg, "usage: -F<dirname>");
+	if( (arg = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 13, "usage: -F <directoryname>", FATAL, no_fpos);
 	AddToPath(FONT_PATH, arg);
+	break;
+
+
+      case CH_FLAG_HYPPATH:
+     
+	/* add directory to hyph path */
+	if( (arg = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 14, "usage: -H <directoryname>", FATAL, no_fpos);
+	AddToPath(HYPH_PATH, arg);
 	break;
 
 
       case CH_FLAG_INCPATH:
      
 	/* add directory to include and sysinclude paths */
-	GetArg(arg, "usage: -I<dirname>");
+	if( (arg = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 15, "usage: -I <directoryname>", FATAL, no_fpos);
 	AddToPath(INCLUDE_PATH, arg);
 	AddToPath(SYSINCLUDE_PATH, arg);
 	break;
@@ -206,12 +284,12 @@ int argc; char *argv[];
       case CH_FLAG_INCLUDE:
      
 	/* read sysinclude file and strip any .lt suffix */
-	GetArg(arg, "usage: -i<filename>");
+	if( (arg = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 16, "usage: -i <filename>", FATAL, no_fpos);
 	len = StringLength(arg) - StringLength(SOURCE_SUFFIX);
 	if( len >= 0 && StringEqual(&arg[len], SOURCE_SUFFIX) )
 	  StringCopy(&arg[len], STR_EMPTY);
-	DefineFile(arg, STR_EMPTY, no_fpos,
-	  SOURCE_FILE, SYSINCLUDE_PATH);
+	DefineFile(arg, STR_EMPTY, no_fpos, SOURCE_FILE, SYSINCLUDE_PATH);
 	break;
 
 
@@ -219,24 +297,93 @@ int argc; char *argv[];
      
 	/* declare hyphenation file */
 	if( FirstFile(HYPH_FILE) != NO_FILE )
-	  Error(FATAL, no_fpos, "two -h options illegal");
-	GetArg(arg, "usage: -h<filename>");
-	DefineFile(arg, STR_EMPTY, no_fpos,
-	  HYPH_FILE, INCLUDE_PATH);
-	DefineFile(arg, HYPH_SUFFIX, no_fpos,
-	  HYPH_PACKED_FILE, INCLUDE_PATH);
+	  Error(1, 17, "two -h options illegal", FATAL, no_fpos);
+	if( (arg = GetArg(argv, argc, &i)) == NULL )
+	  Error(1, 18, "usage: -h <filename>", FATAL, no_fpos);
+	DefineFile(arg, STR_EMPTY, no_fpos, HYPH_FILE, INCLUDE_PATH);
+	DefineFile(arg, HYPH_SUFFIX, no_fpos, HYPH_PACKED_FILE, INCLUDE_PATH);
 	break;
 
 
       case CH_FLAG_VERSION:
      
 	fprintf(stderr, "%s\n", LOUT_VERSION);
+	fprintf(stderr, "system include directory: %s\n", INCL_DIR);
+	fprintf(stderr, "system database directory: %s\n", DATA_DIR);
+	exit(0);
+	break;
+
+
+      case CH_FLAG_FFPLAIN:
+
+	PlainFormFeed = TRUE;
+	/* NB NO BREAK */
+
+
+      case CH_FLAG_PLAIN:
+     
+	BackEnd = PLAINTEXT;
+	if( *(argv[i]+2) != '\0' )
+	{ float len1, len2;  FULL_CHAR units1, units2;
+	  debug1(DGP, DD, "  command line %s", argv[i]+2);
+	  if( sscanf(argv[i]+2, "%f%c%f%c",&len1,&units1,&len2,&units2) != 4 )
+	  { Error(1, 21, "usage: lout -%c<length><length>",
+	      FATAL, no_fpos, *(argv[i]+1));
+	  }
+	  switch( units1 )
+	  {
+	    case CH_UNIT_CM:	PlainCharWidth = len1 * CM; break;
+	    case CH_UNIT_IN:	PlainCharWidth = len1 * IN; break;
+	    case CH_UNIT_PT:	PlainCharWidth = len1 * PT; break;
+	    case CH_UNIT_EM:	PlainCharWidth = len1 * EM; break;
+
+	    default:	Error(1, 22, "lout -%c: units must be c, i, p, or m",
+				  FATAL, no_fpos, *(argv[i]+1));
+				break;
+	  }
+	  switch( units2 )
+	  {
+	    case CH_UNIT_CM:	PlainCharHeight = len2 * CM; break;
+	    case CH_UNIT_IN:	PlainCharHeight = len2 * IN; break;
+	    case CH_UNIT_PT:	PlainCharHeight = len2 * PT; break;
+	    case CH_UNIT_EM:	PlainCharHeight = len2 * EM; break;
+
+	    default:	Error(1, 23, "lout -%c: units must be c, i, p, or m",
+				  FATAL, no_fpos, *(argv[i]+1));
+				break;
+	  }
+	}
+	break;
+
+
+      case CH_FLAG_INITALL:
+
+	InitializeAll = TRUE;
+	AllowCrossDb = FALSE;
+#if LOCALE_ON
+	{ char *p, buff[MAX_BUFF], dir[MAX_BUFF], com[MAX_BUFF];  int j;
+	  p = argv[i]+2;
+	  debug1(DHY, D, "starting -x%s", p);
+	  if( *p != '\0' )
+	  { do
+	    { j = 0;
+	      while( *p != '\0' && *p != ':' )
+	        buff[j++] = *p++;
+	      buff[j] = '\0';
+	      sprintf(dir, "%s/%s/LC_MESSAGES", LOCALE_DIR, buff);
+	      sprintf(com, "gencat %s/errors.%s %s/msgs.%s", dir, buff, dir, buff);
+	      debug1(DHY, D, "-x calling system(\"%s\")", com);
+	      system(com);
+	    } while( *p++ != '\0' );
+	  }
+	}
+#endif
 	break;
 
 
       case CH_FLAG_USAGE:
      
-	fprintf(stderr, "usage: lout [ -i<filename> ] files\n");
+	Error(1, 24, "usage: lout [ -i <filename> ] files", WARN, no_fpos);
 	exit(0);
 	break;
 
@@ -247,10 +394,17 @@ int argc; char *argv[];
 	break;
 
 
+      case 'M':
+
+	sscanf(argv[i], "-M%d", &MemCheck);
+	fprintf(stderr, "checking memory location %d\n", MemCheck);
+	break;
+
       case '\0':
      
 	/* read stdin as file name */
-	if( stdin_seen )  Error(FATAL, no_fpos, "stdin read twice!");
+	if( stdin_seen )
+	  Error(1, 25, "standard input specified twice", FATAL, no_fpos);
 	stdin_seen = TRUE;
 	DefineFile(STR_STDIN, STR_EMPTY, no_fpos, SOURCE_FILE, SOURCE_PATH);
 	break;
@@ -258,27 +412,21 @@ int argc; char *argv[];
 
       default:
      
-	Error(FATAL, no_fpos, "unknown command line flag %s", argv[i]);
+	Error(1, 26, "unknown command line flag %s", FATAL, no_fpos, argv[i]);
 	break;
 
     }
     else
     {   /* argument is source file, strip any .lout suffix and define it */
-	arg = argv[i];
+	arg = AsciiToFull(argv[i]);
 	len = StringLength(arg) - StringLength(SOURCE_SUFFIX);
 	if( len >= 0 && StringEqual(&arg[len], SOURCE_SUFFIX) )
 	  StringCopy(&arg[len], STR_EMPTY);
 	DefineFile(AsciiToFull(argv[i]), STR_EMPTY, no_fpos,
 	    SOURCE_FILE, SOURCE_PATH);
+	source_file_count++;
     }
   } /* for */
-
-  /* define hyphenation file if not done already by -h flag */
-  if( FirstFile(HYPH_FILE) == NO_FILE )
-  { DefineFile(HYPH_FILENAME, STR_EMPTY, no_fpos, HYPH_FILE, SYSINCLUDE_PATH);
-    DefineFile(HYPH_FILENAME, HYPH_SUFFIX, no_fpos,
-      HYPH_PACKED_FILE, SYSINCLUDE_PATH);
-  }
 
   /* start timing if required */
   ifdebug(DPP, D, ProfileOn("main"));
@@ -286,12 +434,15 @@ int argc; char *argv[];
   /* open output file, or stdout if none specified, and initialize printer */
   if( StringEqual(outfile, STR_STDOUT) )  out_fp = stdout;
   else if( (out_fp = StringFOpen(outfile, "w")) == null )
-    Error(FATAL, no_fpos, "cannot open output file %s", outfile);
+    Error(1, 27, "cannot open output file %s", outfile, FATAL, no_fpos);
   FontInit();
+  ColourInit();
+  LanguageInit();
   PrintInit(out_fp);
 
   /* append default directories to file search paths */
   AddToPath(FONT_PATH,         AsciiToFull(FONT_DIR));
+  AddToPath(HYPH_PATH,         AsciiToFull(HYPH_DIR));
   AddToPath(ENCODING_PATH,     AsciiToFull(EVEC_DIR));
   AddToPath(SYSDATABASE_PATH,  AsciiToFull(DATA_DIR));
   AddToPath(DATABASE_PATH,     AsciiToFull(DATA_DIR));
@@ -299,21 +450,26 @@ int argc; char *argv[];
   AddToPath(INCLUDE_PATH,      AsciiToFull(INCL_DIR));
 
   /* use stdin if no source files were mentioned */
-  if( FirstFile(SOURCE_FILE) == NO_FILE )
+  if( source_file_count == 0 )
     DefineFile(STR_STDIN, STR_EMPTY, no_fpos, SOURCE_FILE, SOURCE_PATH);
 
   /* load predefined symbols into symbol table */
-  StartSym = nil;  /* Not a mistake */
-  StartSym  = load(KW_START,    0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
-  GalleySym = load(KW_GALLEY,   0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
-  InputSym  = load(KW_INPUT,    0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
-  PrintSym  = load(KW_PRINT,    0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
+  StartSym     = nil;  /* Not a mistake */
+  StartSym     = load(KW_START,     0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  GalleySym    = load(KW_GALLEY,    0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  InputSym     = load(KW_INPUT,     0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  PrintSym     = load(KW_PRINT,     0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  FilterInSym  = load(KW_FILTERIN,  0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  FilterOutSym = load(KW_FILTEROUT, 0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  FilterErrSym = load(KW_FILTERERR, 0, FALSE,  FALSE,  FALSE, NO_PREC     );
+
 
   load(KW_BEGIN,       BEGIN,          FALSE,  FALSE,  FALSE, BEGIN_PREC  );
   load(KW_END,         END,            FALSE,  FALSE,  FALSE, END_PREC    );
   load(KW_ENV,         ENV,            FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_CLOS,        CLOS,           FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_LVIS,        LVIS,           FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_LUSE,        LUSE,           FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_LBR,         LBR,            FALSE,  FALSE,  FALSE, LBR_PREC    );
   load(KW_RBR,         RBR,            FALSE,  FALSE,  FALSE, RBR_PREC    );
   load(KW_INCLUDE,     INCLUDE,        FALSE,  FALSE,  FALSE, NO_PREC     );
@@ -325,15 +481,22 @@ int argc; char *argv[];
   load(KW_USE,         USE,            FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_CASE,        CASE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_YIELD,       YIELD,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_BACKEND,     BACKEND,        FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_XCHAR,       XCHAR,          FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_FONT,        FONT,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_SPACE,       SPACE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_BREAK,       BREAK,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_COLOUR,      COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_COLOR,       COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_LANGUAGE,    LANGUAGE,       TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_CURR_LANG,   CURR_LANG,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_NEXT,        NEXT,           FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_OPEN,        OPEN,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_TAGGED,      TAGGED,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
-  load(KW_HIGH,        HIGH,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_WIDE,        WIDE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HIGH,        HIGH,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HSHIFT,      HSHIFT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VSHIFT,      VSHIFT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_ONE_COL,     ONE_COL,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_ONE_ROW,     ONE_ROW,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HSCALE,      HSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
@@ -369,6 +532,9 @@ int argc; char *argv[];
   /* intialize current time and load @Moment symbol */
   InitTime();
 
+  /* initialize filter module */
+  FilterInit();
+
   /* initialise scope chain to <StartSym> */
   PushScope(StartSym, FALSE, FALSE);
 
@@ -379,13 +545,17 @@ int argc; char *argv[];
   InitParser(cross_db);
   t = NewToken(BEGIN, no_fpos, 0, 0, BEGIN_PREC, StartSym);
   res = Parse(&t, StartSym, TRUE, TRUE);
+  debug0(DGT, D, "calling TransferEnd(res) from main()");
   TransferEnd(res);
   TransferClose();
 
   /* close various  modules */
-  PrintClose();
+  PrintAfterLast();
   CrossClose();
   CloseFiles();
+
+  /* remove any leftover filter temporary files */
+  FilterScavenge(TRUE);
 
   /* wrapup */
   ifdebug(DST, D, CheckSymSpread() );
@@ -394,6 +564,11 @@ int argc; char *argv[];
   ifdebug(DMA, D, DebugMemory() );
   ifdebug(DPP, D, ProfileOff("main"));
   ifdebug(DPP, D, ProfilePrint());
+
+#if LOCALE_ON
+  catclose(MsgCat);
+#endif
+
   exit(0);
   return 0;
 } /* end main */

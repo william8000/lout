@@ -1,7 +1,7 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -170,6 +170,7 @@ OBJECT x;  unsigned outer_prec;
 	break;
 
 
+    case SCALE_IND:
     case EXPAND_IND:
     case GALL_PREC:
     case GALL_FOLL:
@@ -327,7 +328,7 @@ OBJECT x;  unsigned outer_prec;
 	{ Child(y, link);
 	  if( type(y) == CLOSURE )
 	  { cprint( SymName(actual(y)) );
-	    echo(GetEnv(y), NO_PREC);
+	    if( LastDown(y) != y )  echo(GetEnv(y), NO_PREC);
 	  }
 	  else if( type(y) == ENV )  echo(y, NO_PREC);
 	  else cprint(Image(type(y)));
@@ -379,12 +380,14 @@ OBJECT x;  unsigned outer_prec;
 
 	     case NPAR:	if( !name_printed )
 			{ cprint(SymName(sym));
+			  /* ***
 			  if( external(x) || threaded(x) )
 			  { aprint(" #");
 			    if( external(x) )  aprint(" external");
 			    if( threaded(x) )  aprint(" threaded");
 			    newline();
 			  }
+			  *** */
 			  name_printed = TRUE;
 			}
 			newline();  aprint("  ");
@@ -398,12 +401,14 @@ OBJECT x;  unsigned outer_prec;
 
 	     case RPAR:	if( !name_printed )
 			{ cprint(SymName(sym));
+			  /* ***
 			  if( external(x) || threaded(x) )
 			  { aprint(" #");
 			    if( external(x) )  aprint(" external");
 			    if( threaded(x) )  aprint(" threaded");
 			    newline();
 			  }
+			  *** */
 			  name_printed = TRUE;
 			}
 			if( npar_seen ) newline();
@@ -417,8 +422,8 @@ OBJECT x;  unsigned outer_prec;
 			else echo(tmp, (unsigned) precedence(sym));
 			break;
 	
-	     default:	Error(INTERN, &fpos(y), "echo: %s",
-					Image(type(actual(y))) );
+	     default:	Error(25, 1, "echo: %s", INTERN, &fpos(y),
+			  Image(type(actual(y))) );
 			break;
 
 	    }
@@ -426,12 +431,14 @@ OBJECT x;  unsigned outer_prec;
 	}
 	if( !name_printed )
 	{ cprint( SymName(sym) );
+	  /* ***
 	  if( external(x) || threaded(x) )
 	  { aprint(" #");
 	    if( external(x) )  aprint(" external");
 	    if( threaded(x) )  aprint(" threaded");
 	    newline();
 	  }
+	  *** */
 	}
 
 	/* print closing brace if needed */
@@ -581,8 +588,8 @@ OBJECT x;  unsigned outer_prec;
 			moveleft();  newline();
 			break;
 
-	    default:	Error(FATAL, &fpos(y), "echo: type(y) = %s",
-					Image(type(y)));
+	    default:	Error(25, 2, "echo: %s",
+			  FATAL, &fpos(y), Image(type(y)));
 			break;
 	  }
 	}
@@ -616,6 +623,8 @@ OBJECT x;  unsigned outer_prec;
     case NEXT:
     case WIDE:
     case HIGH:
+    case HSHIFT:
+    case VSHIFT:
     case INCGRAPHIC:
     case SINCGRAPHIC:
     case GRAPHIC:
@@ -627,8 +636,11 @@ OBJECT x;  unsigned outer_prec;
     case FONT:
     case SPACE:
     case BREAK:
+    case COLOUR:
+    case LANGUAGE:
     case OPEN:
     case TAGGED:
+
     
 	/* print enclosing left brace if needed */
 	braces_needed = (DEFAULT_PREC <= outer_prec);
@@ -649,6 +661,27 @@ OBJECT x;  unsigned outer_prec;
 	Child(y, LastDown(x));
 	echo(y, type(x)==OPEN ? FORCE_PREC : max(outer_prec,DEFAULT_PREC));
 	if( braces_needed )  aprint(" "), cprint(KW_RBR);
+	break;
+
+
+    case CURR_LANG:
+    case BACKEND:
+
+	/* predefined symbols that have no parameters */
+	cprint(Image(type(x)));
+	break;
+
+
+    case FILTERED:
+
+	aprint("[filtered ");
+	if( Down(x) != x )
+	{ Child(y, Down(x));
+	  if( type(y) != WORD ) cprint(Image(type(y)));
+	  else cprint(string(y));
+	}
+	else aprint("?");
+	aprint("]");
 	break;
 
 
@@ -706,7 +739,7 @@ OBJECT x;  unsigned outer_prec;
 
     default:
     
-	Error(INTERN, no_fpos, "echo found %s", Image(type(x)));
+	Error(25, 3, "echo: %s", INTERN, no_fpos, Image(type(x)));
 	break;
 
   } /* end switch */
@@ -724,7 +757,7 @@ OBJECT x;  unsigned outer_prec;
 FULL_CHAR *EchoObject(x)
 OBJECT x;
 { debug0(DOE, D, "EchoObject()");
-  fp = null;;
+  fp = null;
   col = 0;
   indent = 0;
   limit  = 60;
@@ -757,4 +790,185 @@ OBJECT x;
   fprintf(stderr, "\n");
   debug0(DOE, D, "DebugObject returning");
 } /* end DebugObject */
+
+
+/*@::EchoIndex()@*************************************************************/
+/*                                                                           */
+/*  FULL_CHAR *EchoIndex()                                                   */
+/*                                                                           */
+/*  Echo a component of a galley, briefly.                                   */
+/*                                                                           */
+/*****************************************************************************/
+
+FULL_CHAR *EchoIndex(index)
+OBJECT index;
+{ static FULL_CHAR buff[MAX_BUFF];  OBJECT z;
+  if( index == nil )
+  { sprintf(buff, "<nil>");
+  }
+  else switch( type(index) )
+  {
+    case RECEIVING:
+
+      sprintf(buff, "receiving %s", type(actual(index)) == CLOSURE ?
+	SymName(actual(actual(index))) : Image(type(actual(index))));
+      break;
+
+
+    case RECEPTIVE:
+
+      sprintf(buff, "receptive %s", type(actual(index)) == CLOSURE ?
+	SymName(actual(actual(index))) : Image(type(actual(index))));
+      break;
+
+
+    case UNATTACHED:
+
+      if( Down(index) != index )
+      { Child(z, Down(index));
+      }
+      else z = nil;
+      sprintf(buff, "unattached %s",
+	z == nil ? AsciiToFull("<nil>") : SymName(actual(z)));
+      break;
+
+
+    case WORD:
+    case QWORD:
+
+      sprintf(buff, "\"%s\"", string(index));
+      break;
+
+
+    default:
+
+      sprintf(buff, "%s", Image(type(index)));
+      break;
+  }
+  return buff;
+} /* end EchoIndex */
+
+
+/*@::DebugGalley()@***********************************************************/
+/*                                                                           */
+/*  DebugGalley(hd, indent)                                                  */
+/*                                                                           */
+/*  Print overview of galley hd on stderr.                                   */
+/*                                                                           */
+/*****************************************************************************/
+
+DebugGalley(hd, indent)
+OBJECT hd;  int indent;
+{ OBJECT link, y, z;  char istr[30];  int i;
+  for( i = 0;  i < indent;  i++ )  istr[i] = ' ';
+  istr[i] = '\0';
+  if( type(hd) != HEAD )
+  { fprintf(stderr, "%shd is %s\n", istr, Image(type(hd)));
+    return;
+  }
+  fprintf(stderr, "%sgalley %s into %s\n", istr,
+    SymName(actual(hd)), SymName(whereto(hd)));
+  for( link = Down(hd);  link != hd;  link = NextDown(link) )
+  { Child(y, link);
+    switch( type(y) )
+    {
+      case GAP_OBJ:
+
+	/* fprintf(stderr, "%s//\n", istr); */
+	break;
+
+
+      case CROSS_PREC:
+
+	fprintf(stderr, "%s%d cross_prec %d %s\n", istr, (int) y,
+	  (int) actual(y), EchoObject(actual(y)));
+	break;
+
+
+      case EXPAND_IND:
+
+	fprintf(stderr, "%s%d expand_ind %s\n", istr, (int) y, Image(type(actual(y))));
+	break;
+
+
+      case RECEIVING:
+
+	fprintf(stderr, "%sreceiving %s\n", istr, type(actual(y)) == CLOSURE ?
+	  SymName(actual(actual(y))) : Image(type(actual(y))));
+	if( Down(y) != y )
+	{ Child(z, Down(y));
+	  DebugGalley(z, indent+4);
+	}
+	break;
+
+
+      case RECEPTIVE:
+
+	fprintf(stderr, "%sreceptive %s\n", istr, type(actual(y)) == CLOSURE ?
+	  SymName(actual(actual(y))) : Image(type(actual(y))));
+	if( Down(y) != y )
+	{ Child(z, Down(y));
+	  DebugGalley(z, indent+4);
+	}
+	break;
+
+
+      case UNATTACHED:
+
+	fprintf(stderr, "%sunattached\n", istr);
+	if( Down(y) != y )
+	{ Child(z, Down(y));
+	  DebugGalley(z, indent+4);
+	}
+	break;
+
+
+      case ONE_COL:
+      case ONE_ROW:
+      case WIDE:
+      case HIGH:
+      case HSHIFT:
+      case VSHIFT:
+      case HSCALE:
+      case VSCALE:
+      case HCONTRACT:
+      case VCONTRACT:
+      case HEXPAND:
+      case VEXPAND:
+      case PADJUST:
+      case HADJUST:
+      case VADJUST:
+      case ROTATE:
+      case SCALE:
+      case INCGRAPHIC:
+      case SINCGRAPHIC:
+      case GRAPHIC:
+      case ACAT:
+      case HCAT:
+      case ROW_THR:
+      case CROSS:
+
+	fprintf(stderr, "%s%s\n", istr, Image(type(y)));
+	break;
+
+
+      case CLOSURE:
+
+	fprintf(stderr, "%s%s\n", istr, SymName(actual(y)));
+	break;
+
+
+      case WORD:
+      case QWORD:
+
+	fprintf(stderr, "%s\"%s\"\n", istr, string(y));
+	break;
+
+
+      default:
+
+	break;
+    }
+  }
+} /* end DebugGalley */
 #endif

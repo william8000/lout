@@ -1,7 +1,7 @@
 /*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -34,7 +34,8 @@
 
 static BOOLEAN	print_block[MAX_BLOCKS];	/* TRUE if print this block  */
 static int	start_block[MAX_BLOCKS];	/* first message of block    */
-static char	message[MAX_ERRORS][MAX_LINE];	/* the error messages    */
+static char	message[MAX_ERRORS][MAX_BUFF];	/* the error messages        */
+static int	message_fnum[MAX_ERRORS];	/* file number of error mess */
 static FILE	*fp = NULL;			/* file pointer of log file  */
 static BOOLEAN	error_seen = FALSE;		/* TRUE after first error    */
 static int	block_top = 0;			/* first free error block    */
@@ -52,10 +53,10 @@ static int	mess_top = 0;			/* first free error message  */
 ErrorInit(str)
 FULL_CHAR *str;
 { if( fp != NULL )
-    Error(FATAL, no_fpos, "-e argument appears twice in command line");
+    Error(28, 1, "-e argument appears twice in command line", FATAL, no_fpos);
   fp = StringFOpen(str, "w");
   if( fp == NULL )
-    Error(FATAL, no_fpos, "cannot open error file \"%s\"", str);
+    Error(28, 2, "cannot open error file %s", FATAL, no_fpos, str);
 } /* end ErrorInit */
 
 
@@ -70,6 +71,25 @@ FULL_CHAR *str;
 BOOLEAN ErrorSeen()
 { return error_seen;
 } /* end ErrorSeen */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PrintFileBanner(fnum)                                                    */
+/*                                                                           */
+/*  If fnum was not the subject of the previous call to PrintFileBanner,     */
+/*  print a file banner for fnum.                                            */
+/*                                                                           */
+/*****************************************************************************/
+
+PrintFileBanner(fnum)
+int fnum;
+{ static int CurrentFileNum = -1;
+  if( fnum != CurrentFileNum )
+  { fprintf(fp, "lout%s:\n", EchoFileSource(fnum));
+    CurrentFileNum = fnum;
+  }
+} /* end PrintFileBanner */
 
 
 /*@::EnterErrorBlock(), LeaveErrorBlock()@************************************/
@@ -88,7 +108,7 @@ BOOLEAN ok_to_print;
     start_block[block_top] = mess_top;
     block_top++;
   }
-  else Error(FATAL, no_fpos, "too many levels of error messages");
+  else Error(28, 3, "too many levels of error messages", FATAL, no_fpos);
 } /* end EnterErrorBlock */
 
 
@@ -109,7 +129,9 @@ BOOLEAN commit;
   if( fp == NULL )  fp = stderr;
   if( commit )
   { for( i = start_block[block_top - 1];  i < mess_top;  i++ )
+    { PrintFileBanner(message_fnum[i]);
       fputs(message[i], fp);
+    }
   }
   block_top--;
   mess_top = start_block[block_top];
@@ -118,7 +140,7 @@ BOOLEAN commit;
 
 /*@::Error()@*****************************************************************/
 /*                                                                           */
-/*  Error(etype, pos, str, p1, p2, p3, p4, p5, p6)                           */
+/*  Error**(etype, pos, str, p1, p2, p3, p4, p5, p6)                         */
 /*                                                                           */
 /*  Report error of type etype at position *pos in input.                    */
 /*  The error message is str with parameters p1 - p6.                        */
@@ -126,10 +148,13 @@ BOOLEAN commit;
 /*****************************************************************************/
 
 /*VARARGS3*/
-Error(etype, pos, str, p1, p2, p3, p4, p5, p6)
-int etype;  FILE_POS *pos;  char *str, *p1, *p2, *p3, *p4, *p5, *p6;
-{ char val[MAX_LINE];
-  sprintf(val, str, p1, p2, p3, p4, p5, p6);
+Error(set_num, msg_num, str, etype, pos, p1, p2, p3, p4, p5, p6)
+int set_num, msg_num; char *str; int etype;  FILE_POS *pos;
+char *p1, *p2, *p3, *p4, *p5, *p6;
+{
+  char val[MAX_BUFF];
+  sprintf(val, condcatgets(MsgCat, set_num, msg_num, str),
+    p1, p2, p3, p4, p5, p6);
   if( fp == NULL )  fp = stderr;
   switch( etype )
   {
@@ -137,7 +162,10 @@ int etype;  FILE_POS *pos;  char *str, *p1, *p2, *p3, *p4, *p5, *p6;
     case INTERN:
     
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
-      fprintf(fp, "lout%s internal error: %s\n", EchoFilePos(pos), val);
+      PrintFileBanner(file_num(*pos));
+      fprintf(fp, condcatgets(MsgCat, 28, 4, "  %6s internal error: %s\n"),
+	EchoFileLine(pos), val);
+      /* for estrip's benefit: Error(28, 4, "  %6s internal error: %s\n") */
 #if DEBUG_ON
       abort();
 #else
@@ -149,7 +177,10 @@ int etype;  FILE_POS *pos;  char *str, *p1, *p2, *p3, *p4, *p5, *p6;
     case FATAL:
     
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
-      fprintf(fp, "lout%s fatal error: %s\n", EchoFilePos(pos), val);
+      PrintFileBanner(file_num(*pos));
+      fprintf(fp, condcatgets(MsgCat, 28, 5, "  %6s fatal error: %s\n"),
+	EchoFileLine(pos), val);
+      /* for estrip's benefit: Error(28, 5, "  %6s fatal error: %s\n") */
       exit(1);
       break;
 
@@ -157,17 +188,22 @@ int etype;  FILE_POS *pos;  char *str, *p1, *p2, *p3, *p4, *p5, *p6;
     case WARN:
     
       if( block_top == 0 || print_block[block_top - 1] )
-	fprintf(fp, "lout%s: %s\n", EchoFilePos(pos), val);
+      { PrintFileBanner(file_num(*pos));
+	fprintf(fp, "  %6s: %s\n", EchoFileLine(pos), val);
+      }
       else if( mess_top < MAX_ERRORS )
-	sprintf(message[mess_top++], "lout%s: %s\n", EchoFilePos(pos), val);
-      else Error(FATAL, pos, "too many error messages");
+      { message_fnum[mess_top] = file_num(*pos);
+	sprintf(message[mess_top++], "  %6s: %s\n",
+	  EchoFileLine(pos), val);
+      }
+      else Error(28, 6, "too many error messages", FATAL, pos);
       error_seen = TRUE;
       break;
 
 
     default:
     
-      Error(INTERN, no_fpos, "invalid error type");
+      Error(28, 7, "invalid error type", INTERN, no_fpos);
       exit(1);
       break;
 

@@ -1,7 +1,7 @@
 /*@z09.c:Closure Expansion:SearchEnv()@***************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -75,8 +75,8 @@ OBJECT env, sym;
 OBJECT SetEnv(x, y)
 OBJECT x, y;
 { OBJECT res;
-  debug2(DCR, DD, "SetEnv( %s, %s )", EchoObject(x), EchoObject(y));
-  debug2(DCE, D, "SetEnv( %s, %s )", EchoObject(x), EchoObject(y));
+  debug1(DCE, D, "SetEnv( x, %s ), x =", EchoObject(y));
+  ifdebug(DCE, D, DebugObject(x));
   assert( x != nil && type(x) == CLOSURE, "SetEnv: x == nil or not CLOSURE!" );
   assert( y == nil || type(y) == ENV, "SetEnv: y != nil && type(y) != ENV!" );
   res = New(ENV);  Link(res, x);
@@ -96,11 +96,11 @@ OBJECT x, y;
 
 AttachEnv(env, x)
 OBJECT env, x;
-{ debug2(DCE, D, "AttachEnv( %s, %s )", EchoObject(env), EchoObject(x));
+{ debug2(DCE, DD, "AttachEnv( %s, %s )", EchoObject(env), EchoObject(x));
   assert( env != nil && type(env) == ENV, "AttachEnv: type(env) != ENV!" );
   assert( type(x) == CLOSURE, "AttachEnv: type(x) != CLOSURE!" );
   Link(x, env);
-  debug0(DCE, D, "AttachEnv returning.");
+  debug0(DCE, DD, "AttachEnv returning.");
 } /* end AttachEnv */
 
 
@@ -159,13 +159,13 @@ OBJECT x;
 OBJECT ClosureExpand(x, env, crs_wanted, crs, res_env)
 OBJECT x, env;  BOOLEAN crs_wanted;  OBJECT *crs, *res_env;
 { OBJECT link, y, res, prnt_env, par, prnt;
-  debug3(DCE, D, "ClosureExpand( %s, crs, %s, %s, res_env )",
+  debug3(DCE, DD, "ClosureExpand( %s, crs, %s, %s, res_env )",
     EchoObject(x), bool(crs_wanted), EchoObject(env));
   assert( type(x) == CLOSURE, "ClosureExpand given non-CLOSURE!");
   assert( predefined(actual(x)) == FALSE, "ClosureExpand given predefined!" );
 
   /* add tag to x if needed but not provided;  add cross-reference to crs  */
-  CrossAddTag(x);
+  if( has_tag(actual(x)) )  CrossAddTag(x);
   if( crs_wanted && has_tag(actual(x)) )
   { OBJECT tmp = CopyObject(x, no_fpos);  AttachEnv(env, tmp);
     y = CrossMake(actual(x), tmp, CROSS_TARG);
@@ -177,7 +177,11 @@ OBJECT x, env;  BOOLEAN crs_wanted;  OBJECT *crs, *res_env;
   res = *res_env = nil;
   if( is_par(type(actual(x))) )
   { prnt = SearchEnv(env, enclosing(actual(x)));
-    if( prnt==nil ) Error(FATAL, &fpos(x), "symbol with import list misused");
+    if( prnt==nil )
+    { debug3(DCE, D, "failing ClosureExpand( %s, crs, %s, %s, res_env )\n",
+	EchoObject(x), bool(crs_wanted), EchoObject(env));
+      Error(9, 1, "symbol with import list misused", FATAL, &fpos(x));
+    }
     assert( prnt != nil, "ClosureExpand: is_par but prnt == nil!" );
     prnt_env = GetEnv(prnt);
     for( link = Down(prnt);  link != prnt;  link = NextDown(link) )
@@ -220,8 +224,61 @@ OBJECT x, env;  BOOLEAN crs_wanted;  OBJECT *crs, *res_env;
   }
 
   assert( *res_env != nil && type(*res_env) == ENV, "ClosureExpand: *res_env!");
-  debug0(DCE, D, "ClosureExpand returning, res =");
-  ifdebug(DCE, D, DebugObject(res));
+  debug0(DCE, DD, "ClosureExpand returning, res =");
+  ifdebug(DCE, DD, DebugObject(res));
   debug1(DCE, DD, "  environment = %s", EchoObject(*res_env));
   return res;
 } /* end ClosureExpand */
+
+
+/*@::ParameterCheck()@********************************************************/
+/*                                                                           */
+/*  OBJECT ParameterCheck(x, env)                                            */
+/*                                                                           */
+/*  Check whether object x (which is an actual parameter that happens to be  */
+/*  a CLOSURE) has a value which is a simple word, and if so return a copy   */
+/*  of that word, else nil.                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT ParameterCheck(x, env)
+OBJECT x, env;
+{ OBJECT link, y, res, prnt_env, par, prnt;
+  debug2(DCE, DD, "ParameterCheck(%s, %s)", EchoObject(x), EchoObject(env));
+  assert( type(x) == CLOSURE, "ParameterCheck given non-CLOSURE!");
+
+  /* case x is a parameter */
+  prnt = SearchEnv(env, enclosing(actual(x)));
+  if( prnt==nil )
+  { debug0(DCE, DD, "ParameterCheck returning nil (prnt fail)");
+    return nil;
+  }
+  prnt_env = GetEnv(prnt);
+  for( link = Down(prnt);  link != prnt;  link = NextDown(link) )
+  { Child(par, link);
+    if( type(par) == PAR && actual(par) == actual(x) )
+    {	assert( Down(par) != par, "ParameterCheck: Down(par)!");
+	Child(y, Down(par));
+	res = is_word(type(y)) ? CopyObject(y, no_fpos) : nil;
+	debug1(DCE, DD, "  ParameterCheck returning %s", EchoObject(res));
+	return res;
+    }
+  }
+
+  /* case x is a default parameter */
+  y = sym_body(actual(x));
+  if( y == nil )
+  { res = nil;
+  }
+  else if( is_word(type(y)) )
+  { res = CopyObject(y, &fpos(y));
+  }
+  else if( type(y) == CLOSURE && is_par(type(actual(y))) )
+  { res = ParameterCheck(y, prnt_env);
+  }
+  else
+  { res = nil;
+  }
+  debug1(DCE, DD, "ParameterCheck returning %s", EchoObject(res));
+  return res;
+} /* end ParameterCheck */

@@ -1,0 +1,264 @@
+@Section
+   @Title { Galleys and targets }
+   @Tag { targets }
+@Begin
+@PP
+The behaviour of galleys and their targets, as described in Section
+galley.feature.in.detail @SubIndex { in detail }
+targets.in.detail @SubIndex { in detail }
+{@NumberOf galleys}, can be summarized in three laws:
+@DP
+{@I {First Law}}:  The first target is the closest invocation of the
+target symbol, either preceding or following the invocation point of the
+galley as required, which has sufficient space to receive the first
+component;
+@DP
+{@I {Second Law}}:  Each subsequent target is the closest invocation of
+the target symbol, following the previous target and lying within the same
+galley, which has sufficient space to receive the first remaining component;
+@DP
+{@I {Third Law}}:  A receptive symbol that does not receive at least one
+component of any galley is replaced by @@Null.
+@DP
+The terms `closest,' `preceding,' and `following' refer to position in
+the final printed document.  This section explains the operation of
+these laws in Basser Lout.
+@PP
+When a galley cannot be fitted into just one target, Lout must find
+points in the galley where it can be split in two.  The object lying
+between two neighbouring potential split points is called a @I component
+component @Index { Components of a galley }
+of the galley.  By definition, a component cannot be split.
+@PP
+To determine the components of a galley, expand all symbols other than
+recursive and receptive ones, discard all @@Font, @@Break, @@Space,
+@@SetColor, @@SetColour, and @@Language symbols, perform paragraph
+breaking as required, and discard all redundant braces.  Then view the
+galley as a sequence of one or more objects separated by vertical
+concatenation symbols; these are the components and split points.  For
+example, given the definition
+@ID @Code {
+"def @Section into { @SectionPlace&&preceding }"
+"    named @Title {}"
+"    right @Body"
+"{"
+"    15p @Font { @Title //0.7f }"
+"    //"
+"    @Body"
+"}"
+}
+the galley
+@ID @Code {
+"@Section"
+"    @Title { Introduction }"
+"{ This is a subject that really"
+"needs no introduction. }"
+}
+becomes
+@ID @Code {
+"Introduction"
+"//0.7f"
+"{}"
+"//"
+"This is a subject that really needs"
+"//1vx"
+"no introduction."
+}
+with four components.  If @Code "@Body" was preceded by @Code "|1.0c" in
+the definition, the result would be
+@ID @Code {
+"Introduction"
+"//0.7f"
+"{}"
+"//"
+"|1.0c { This is a subject that really needs //1vx no introduction. }"
+}
+and now @Code "//1vx" is buried within one component and is not a
+potential split point.  In fact, in this case the broken paragraph as
+a whole is enclosed in @@OneRow.  This highlights a deficiency of
+Basser Lout:  an indented paragraph cannot be split.
+@PP
+The lines of a paragraph become separate components if the paragraph
+occupies an entire component before breaking; otherwise they are
+enclosed in a @@OneRow symbol within one component.  The same is true of
+incoming components of other galleys.  If a @@Galley symbol occupies an
+entire component by the rules above, then the incoming components that
+replace it become components of their new home:
+@ID @Tab
+  @Fmta { @Col @Code A ! @Col lines @Break B ! @Col @Code C }
+{
+@Rowa
+   A {
+"An example"
+"//0.5c"
+"@Galley"
+"//0.5c"
+"@SomethingList"
+}
+  B {
+""
+@Eq { ==> }
+}
+   C {
+"An example"
+"//0.5c"
+"Incoming components"
+"//0.2c"
+"from some other galley"
+"//0.5c"
+"@SomethingList"
+}
+}
+Otherwise the incoming components are grouped within a @@OneRow symbol
+and lie within one component.
+@PP
+This distinction has a marked effect on the vertical concatenation
+b.unit.use @SubIndex { use in @Code "//1.1b" }
+symbol {@Code "//1.1b"}, which calls for more space than is available
+(Section {@NumberOf concatenation}).  There is no room for this symbol
+within any component, so it will force a split and be discarded in that
+case.  But it can be promoted to between two components.
+@PP
+Components may be separated by @Code "/" as well as by {@Code "//"},
+giving rise to column mark alignment between adjacent components:
+@ID @ShowVMark {
+@HContract @GreyBox { 1c @Wide ^| 1c @Wide 0.6c @High }
+/0.3c
+@HContract @GreyBox { 2c @Wide 0.6c @High }
+/0.3c
+@HContract @GreyBox { 0.5c @Wide ^| 0.8c @Wide 0.6c @High }
+}
+When aligned components are promoted into different targets, the meaning
+of alignment becomes very doubtful.  For example, what if the targets
+mark.alignment.in.detail @SubIndex { in detail }
+are in different columns of one page, or what if one lies within
+{@Code "90d @Rotate"}?
+@PP
+The truth is that @Code "/" causes all the objects that share a mark to
+have equal width:
+@ID @ShowVMark {
+@TightBox @HContract @GreyBox { 1c @Wide ^| 1c @Wide 0.6c @High }
+/0.3c
+@TightBox @HContract @GreyBox { 2c @Wide 0.6c @High }
+/0.3c
+@TightBox @HContract @GreyBox { 0.5c @Wide ^| 0.8c @Wide 0.6c @High }
+}
+This is a consequence of the `as wide as possible' rule (Section
+{@NumberOf size}).  Mark alignment occurs {@I incidentally}, whenever
+the fragments are placed into similar contexts.
+@PP
+In this connection we must also consider the special case of a @@Galley
+symbol which shares its column mark with some other object:
+@ID @Code {
+"@Galley"
+"/0.2c"
+"@SomethingList"
+}
+(The @@Galley may or may not occupy an entire component; that doesn't
+matter here.)  If incoming components are separated by @Code "//" rather
+than by {@Code "/"}, the meaning is so doubtful that this is forbidden.  In
+fact, a galley whose components replace such a @@Galley must have a
+single column mark running its full length; that is, its components must
+all share a single column mark.  This mark will be merged with the
+column mark passing through each @@Galley that these components replace;
+all the objects on the resulting merged mark will have equal width.
+@PP
+The root galley, where everything collects immediately prior to output,
+root.galley.in.detail @SubIndex { in detail }
+is created automatically, not by a definition.  Its target is the output
+file, and its object is the entire input, which typically looks like this:
+@ID @Code {
+"@PageList"
+"//"
+"@Text {"
+"  Body text of the document ..."
+"}"
+}
+where @Code "@PageList" expands to a sequence of pages containing
+@Code "@TextPlace" symbols (see Section {@NumberOf definitions}), and
+@Code "@Text" is a galley:
+@ID @Code {
+"def @TextPlace { @Galley }"
+""
+"def @Text into { @TextPlace&&preceding }"
+"    right x"
+"{"
+"    x"
+"}"
+}
+The spot vacated by a galley -- its invocation point -- becomes a @@Null
+object, so this root galley is effectively @Code "@PageList" alone, as
+required.  The @Code "@Text" galley will find its first target preceding
+its invocation point, within {@Code "@PageList"}.
+@PP
+Printing {@PageMark rootg} the root galley on the output file is somewhat problematical,
+root.galley.printing @SubIndex { printing of }
+because Lout has no way of knowing how large the paper is.  Basser Lout
+simply prints one root galley component per page (except it skips
+components of height zero), and the user is responsible for ensuring
+that each component is page-sized.
+@PP
+Basser Lout will promote a component only after any receptive symbols
+components.promotion @SubIndex { promotion of }
+promotion @Index { Promotion of components }
+within it have been replaced, either by galleys or by @@Null, since
+until then the component is not complete.  A component which shares a
+mark with following components is held up until they are all complete,
+since until then their width is uncertain.
+@PP
+Consider a page with @Code "@TextPlace" and @Code "@FootSect" receptive
+symbols.  The rule just given will prevent the page from being printed
+until @Code "@TextPlace" is replaced by body text, quite rightly; but
+@Code "@FootSect" will also prevent its printing, even when there are no
+footnotes.
+@PP
+Basser Lout is keen to write out pages as soon as possible, to save memory,
+and it cannot afford to wait forever for non-existent footnotes.  A variant
+of the galley concept, called a {@I {forcing galley}},
+forcing.galley @Index { Forcing galley } {@PageMark forcing}
+is introduced to solve this problem.  A forcing galley is defined like this:
+@ID @Code {
+"def @Text force into { @TextPlace&&preceding }"
+"   ..."
+}
+and so on.  When such a galley replaces a @@Galley symbol, Lout replaces
+every receptive symbol preceding the @@Galley by @@Null, thus ensuring that
+as soon as text enters a page, for example, everything up to and including
+the preceding page can be printed.  This does not take care of the very last
+page, but Basser Lout replaces all receptive symbols by @@Null when it realizes
+that its input has all been read, thus allowing the last page to print.
+@PP
+A forcing galley causes the Third Law to be applied earlier than
+expected, and this creates two problems.  First, the replacement by
+@@Null may be premature:  a galley may turn up later wanting one of the
+defunct targets.  Such galleys (entries in tables of contents are
+typical examples) are copied into the cross reference database and read
+in during the next run just before their targets are closed, and so they
+find their targets in the end.  Care must be taken to ensure that
+large galleys such as chapters and sections do not have defunct targets,
+since the cost of copying them to and from the database is unacceptably high.
+@PP
+A @Code "following" galley may fail to find a first target lying in a
+following component of the same galley as its invocation point.  This is
+a deficiency of Basser Lout, which occurs if the target has not been
+read from input at the time the galley tries to find it.  A workaround
+is to use a @Code "preceding" galley instead, defined like this:
+@ID @Code {
+"def @AGalley into { @AGalleyPlace&&preceding }"
+"    right @Body"
+"{"
+"    //1.1b"
+"    @Body"
+"}"
+}
+and invoked like this:
+@ID @Code {
+"@AGalleyPlace | @AGalley { content of galley }"
+"//"
+"..."
+"@AGalleyPlace"
+}
+The first @Code "@AGalleyPlace" receives only the initial empty object,
+since the @Code "//1.1b" forces a split; and the Second Law puts Basser
+Lout on the right track thereafter.
+@End @Section

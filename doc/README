@@ -1,29 +1,18 @@
 Directory lout/doc
 
-This directory contains directories holding the Lout source for
-the various technical reports that describe the Lout document
-formatting system:
+This directory contains directories holding the four documents
+that describe the Lout document formatting system:
 
-tr.lout	  `Document Formatting with Lout', the Lout user manual;
+design	`The design and implementation of the Lout document
+	formatting language,' Software--Practice and Experience,
+	vol. 23, pp1001-1041 (September 1993)
 
-tr.over	  `A New Approach to Document Formatting', a journal article;
+expert	An Expert's Guide to the Lout Document Formatting System
 
-tr.impl	  `The Design and Implementation of the Lout Document Formatting
-	  Language', another journal article;
+slides	A Practical Introduction to the Lout Document Formatting
+	System (overhead transparencies)
 
-tr.begin  `A Beginners' Guide to Lout', describing the @DocumentLayout
-	  package;
-
-tr.eq	  `Eq - A Lout package for typesetting mathematics',
-	  describing the Eq equation formatter, and also the
-	  Pas Pascal program formatter;
-
-tr.fig	  `Fig - A Lout package for drawing figures', describing
-	  the Fig figure drawing package.
-
-tr.tab	  `Tab - A Lout package for formatting tables', describing
-	  the Tab table formatting package.
+user	A User's Guide to the Lout Document Formatting System
 
 Jeffrey H. Kingston
-24 September 1991
-27 January 1993
+21 September 1994

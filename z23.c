@@ -1,7 +1,7 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -30,7 +30,6 @@
 #include "externs"
 #define	NO_SUPPRESS	FALSE
 #define	SUPPRESS	TRUE
-#define	ALL_ADJUST	2
 #define	LAST_ADJUST	1
 #define	ALL_ADJUST	2
 
@@ -136,7 +135,7 @@ OBJECT x;  LENGTH frame_size;  int dim;
 /*  dim == ROW, it is used to generate PostScript for printing x.            */
 /*                                                                           */
 /*  Parameter pg records the height of the current page.  This is used       */
-/*  to correct for the fact that Lout places its origin is at the top left,  */
+/*  to correct for the fact that Lout places its origin at the top left,     */
 /*  while PostScript places its origin at the bottom left.  This correction  */
 /*  cannot be made by transforming user space.                               */
 /*                                                                           */
@@ -147,14 +146,16 @@ OBJECT x;  LENGTH frame_size;  int dim;
 FixAndPrintObject(x, xmk, xb, xf, dim, adjust, suppress, padj, pg, count)
 OBJECT x;  LENGTH xmk, xb, xf; int dim, adjust;  BOOLEAN suppress;
 int padj;  LENGTH pg;  int count;
-{ OBJECT y, link, prev, g, uplink, z;
-  LENGTH mk, frame_size, back_edge, yb, yf, inc;
+{ OBJECT y, link, prev, g, uplink, z, face;
+  LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
   int i; float scale_factor;
-  debug8(DGP, D, "[ FixAndPrintObject(%s, %s, %s,%s, %s, %s, %s, %s, pg ), x =",
+  debug8(DGP, D, "[ FixAndPrintObject(%s, %s, %s,%s, %s, %s, %s, %s, pg )",
     Image(type(x)), EchoLength(xmk), EchoLength(xb), EchoLength(xf), dimen(dim),
     (adjust == LAST_ADJUST ? "last_adjust" : "all_adjust"),
     (suppress == SUPPRESS ? "suppress" : "no_suppress"),
     (padj   == LAST_ADJUST ? "last_adjust" : "all_adjust"));
+  debug2(DGP, D, "  size(x) = %s,%s;  x =",
+    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
   ifdebug(DGP, DD, DebugObject(x));
 
   switch( type(x) )
@@ -171,8 +172,24 @@ int padj;  LENGTH pg;  int count;
     case WORD:
     case QWORD:
     
-      if( dim == COL )  word_save_mark(x) = xmk;
-      else if( string(x)[0] != '\0' )  PrintWord(x, word_save_mark(x), pg-xmk);
+      if( dim == COL )
+      {
+	/* save horizontal position for PrintWord below */
+	word_save_mark(x) = xmk;
+
+	/* if first occurrence of this font on this page, notify font */
+	if( string(x)[0] != '\0' )
+	{ face = finfo[word_font(x)].original_font;
+	  if( font_page(face) < font_curr_page )
+	  { debug3(DFT, DD, "FAPO: x = %s, word_font = %d, face = %s",
+	      string(x), word_font(x), EchoObject(face));
+	    FontPageUsed(face);
+	  }
+	}
+      }
+      else
+      { if( string(x)[0] != '\0' )  PrintWord(x, word_save_mark(x), pg-xmk);
+      }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
 
@@ -195,6 +212,33 @@ int padj;  LENGTH pg;  int count;
       break;
 
 
+    case HSHIFT:
+    case VSHIFT:
+
+      CountChild(y, Down(x), count);
+      if( (dim == COL) == (type(x) == HSHIFT) )
+      {
+	/* work out the size of the shift depending on the units */
+	f = FindShift(x, y, dim);
+	ymk = xmk - f;
+	yb = max(0, xb - f);
+	yf = max(0, xf + f);
+	FixAndPrintObject(y, ymk, yb, yf, dim, adjust, suppress,
+	  padj, pg, count);
+
+	/* recalculate the size of x as in MinSize */
+	f = FindShift(x, y, dim);
+	back(x, dim) = min(MAX_LEN, max(0, back(y, dim) + f));
+	fwd(x, dim)  = min(MAX_LEN, max(0, fwd(y, dim)  - f));
+      }
+      else
+      {	FixAndPrintObject(y, xmk, xb, xf, dim, adjust, suppress,
+	  padj, pg, count);
+	back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      }
+      break;
+
+
     case HCONTRACT:
     case VCONTRACT:
     
@@ -205,7 +249,7 @@ int padj;  LENGTH pg;  int count;
         back(x, dim) = xb;  fwd(x, dim) = xf;
       }
       else
-      {	FixAndPrintObject(y, xmk, xb, xf, dim, adjust, suppress, padj,pg,count);
+      {	FixAndPrintObject(y, xmk, xb, xf, dim, adjust, suppress,padj,pg,count);
         back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
       }
       break;
@@ -223,7 +267,7 @@ int padj;  LENGTH pg;  int count;
         back(x, dim) = xb;  fwd(x, dim) = xf;
       }
       else
-      {	FixAndPrintObject(y, xmk, xb, xf, dim, adjust, suppress, padj,pg,count);
+      {	FixAndPrintObject(y, xmk, xb, xf, dim, adjust, suppress,padj,pg,count);
 	back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
       }
       break;
@@ -259,20 +303,30 @@ int padj;  LENGTH pg;  int count;
 
       debug0(DRS, D, "FixAndPrintObject at VSCALE");
       CountChild(y, Down(x), count);
-      if( dim == COL )
-      {	FixAndPrintObject(y, xmk, xb, xf, dim, LAST_ADJUST, NO_SUPPRESS,
-		padj,pg,count);
-      }
-      else if( (scale_factor = ScaleFactor(xb+xf, size(y, ROW))) > 0 )
-      {	SaveGraphicState();
-	CoordTranslate(0, pg - (xmk-xb + (LENGTH) (back(y, ROW)*scale_factor)));
-	CoordScale(1.0, scale_factor);
-        FixAndPrintObject(y, 0, back(y, ROW), fwd(y, ROW), dim, LAST_ADJUST,
-		NO_SUPPRESS, padj, 0, count);
-	RestoreGraphicState();
-      }
-      else if( !is_word(type(y)) || string(y)[0] != '\0' )
-      {	Error(WARN, &fpos(x), "object deleted: cannot %s", KW_VSCALE);
+      switch( BackEnd )
+      {
+	case PLAINTEXT:
+
+	  break;
+
+
+	case POSTSCRIPT:
+
+          if( dim == COL )
+            FixAndPrintObject(y, xmk, xb, xf, dim, LAST_ADJUST, NO_SUPPRESS,
+		    padj,pg,count);
+          else if( (scale_factor = ScaleFactor(xb+xf, size(y, ROW))) > 0 )
+          { SaveGraphicState();
+	    CoordTranslate(0, pg-(xmk-xb+(LENGTH) (back(y,ROW)*scale_factor)));
+	    CoordScale(1.0, scale_factor);
+            FixAndPrintObject(y, 0, back(y,ROW), fwd(y,ROW), dim, LAST_ADJUST,
+	      NO_SUPPRESS, padj, 0, count);
+	    RestoreGraphicState();
+          }
+          else if( !is_word(type(y)) || string(y)[0] != '\0' )
+            Error(23, 1, "object deleted (it cannot be scaled vertically)",
+	      WARN, &fpos(x));
+	  break;
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -282,25 +336,37 @@ int padj;  LENGTH pg;  int count;
     
       debug0(DRS, DD, "FixAndPrintObject at HSCALE");
       CountChild(y, Down(x), count);
-      if( dim == COL )
-      {	save_mark(x) = xmk;
-	bc(constraint(x)) = xb;
-	fc(constraint(x)) = xf;
-        if( (scale_factor = ScaleFactor(xb+xf, size(y, COL))) > 0 )
-	  FixAndPrintObject(y, 0, back(y, COL), fwd(y, COL), dim, LAST_ADJUST,
-		NO_SUPPRESS, LAST_ADJUST, pg, count);
-        else if( !is_word(type(y)) || string(y)[0] != '\0' )
-	  Error(WARN, &fpos(y), "object deleted: cannot %s", KW_HSCALE);
-      }
-      else if( (scale_factor =
-	ScaleFactor(bc(constraint(x))+fc(constraint(x)), size(y, COL))) > 0 )
-      {	SaveGraphicState();
-	CoordTranslate(save_mark(x) - bc(constraint(x))
-	   + (LENGTH) (back(y, COL)*scale_factor), 0);
-	CoordScale(scale_factor, 1.0);
-        FixAndPrintObject(y, xmk, xb, xf, dim, LAST_ADJUST,
-		NO_SUPPRESS, padj, pg, count);
-	RestoreGraphicState();
+      switch( BackEnd )
+      {
+	case PLAINTEXT:
+
+	  break;
+
+
+	case POSTSCRIPT:
+
+          if( dim == COL )
+          { save_mark(x) = xmk;
+	    bc(constraint(x)) = xb;
+	    fc(constraint(x)) = xf;
+            if( (scale_factor = ScaleFactor(xb+xf, size(y, COL))) > 0 )
+	      FixAndPrintObject(y, 0, back(y, COL), fwd(y, COL), dim,
+		LAST_ADJUST, NO_SUPPRESS, LAST_ADJUST, pg, count);
+            else if( !is_word(type(y)) || string(y)[0] != '\0' )
+	      Error(23, 2, "object deleted (it cannot be scaled horizontally)",
+		WARN, &fpos(y));
+          }
+          else if( (scale_factor =
+	    ScaleFactor(bc(constraint(x))+fc(constraint(x)),size(y,COL))) > 0 )
+          { SaveGraphicState();
+	    CoordTranslate(save_mark(x) - bc(constraint(x))
+	       + (LENGTH) (back(y, COL)*scale_factor), 0);
+	    CoordScale(scale_factor, 1.0);
+            FixAndPrintObject(y, xmk, xb, xf, dim, LAST_ADJUST,
+	      NO_SUPPRESS, padj, pg, count);
+	    RestoreGraphicState();
+          }
+	  break;
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -309,26 +375,42 @@ int padj;  LENGTH pg;  int count;
     case SCALE:
 
       CountChild(y, Down(x), count);
-      if( dim == COL )
+      switch( BackEnd )
       {
-	assert( bc(constraint(x)) > 0, "FAPO: horizontal scale factor!" );
-	save_mark(x) = xmk;
-	yb = xb * SF / bc(constraint(x));
-	yf = xf * SF / bc(constraint(x));
-        FixAndPrintObject(y, 0, yb, yf, dim, LAST_ADJUST, NO_SUPPRESS,
-		padj, pg, count);
-      }
-      else
-      {
-	assert( fc(constraint(x)) > 0, "FAPO: vertical scale factor!" );
-	yb = xb * SF / fc(constraint(x));
-	yf = xf * SF / fc(constraint(x));
-	SaveGraphicState();
-	CoordTranslate(save_mark(x), pg - xmk);
-	CoordScale( (float) bc(constraint(x))/SF, (float) fc(constraint(x))/SF);
-        FixAndPrintObject(y, 0, yb, yf, dim, LAST_ADJUST, NO_SUPPRESS,
-		padj,0,count);
-	RestoreGraphicState();
+	case PLAINTEXT:
+
+	  /* printable only if scale factor is one */
+	  if( bc(constraint(x)) == SF && fc(constraint(x)) == SF )
+	  {
+	    FixAndPrintObject(y, xmk, xb, xf, dim, adjust,
+	      suppress, padj, pg, count);
+	  }
+	  break;
+
+
+	case POSTSCRIPT:
+
+          if( dim == COL )
+          { assert( bc(constraint(x)) > 0, "FAPO: horizontal scale factor!" );
+	    save_mark(x) = xmk;
+	    yb = xb * SF / bc(constraint(x));
+	    yf = xf * SF / bc(constraint(x));
+            FixAndPrintObject(y, 0, yb, yf, dim, LAST_ADJUST, NO_SUPPRESS,
+		    padj, pg, count);
+          }
+          else
+          { assert( fc(constraint(x)) > 0, "FAPO: vertical scale factor!" );
+	    yb = xb * SF / fc(constraint(x));
+	    yf = xf * SF / fc(constraint(x));
+	    SaveGraphicState();
+	    CoordTranslate(save_mark(x), pg - xmk);
+	    CoordScale( (float) bc(constraint(x))/SF,
+	      (float) fc(constraint(x))/SF);
+            FixAndPrintObject(y, 0, yb, yf, dim, LAST_ADJUST, NO_SUPPRESS,
+	      padj,0,count);
+	    RestoreGraphicState();
+          }
+	  break;
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -337,28 +419,43 @@ int padj;  LENGTH pg;  int count;
     case ROTATE:
     
       CountChild(y, Down(x), count);
-      if( dim == COL )
-      {	save_mark(x) = xmk;
-	back(x, dim) = xb;
-	fwd(x, dim)  = xf;
-      }
-      else
+      switch( BackEnd )
       {
-	CONSTRAINT colc, rowc, yc;
-	back(x, dim) = xb;
-	fwd(x, dim)  = xf;
-	SetConstraint(colc, back(x,COL), MAX_LEN, fwd(x,COL));
-	SetConstraint(rowc, back(x,ROW), MAX_LEN, fwd(x,ROW));
-	RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc, COL);
-	FixAndPrintObject(y, 0, bc(yc), fc(yc), COL, LAST_ADJUST,
-		NO_SUPPRESS, padj, pg, count);
-	SaveGraphicState();
-	CoordTranslate(save_mark(x), pg - xmk);
-	CoordRotate(sparec(constraint(x)));
-	RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc, ROW);
-	FixAndPrintObject(y, 0, bc(yc), fc(yc), ROW, LAST_ADJUST,
-		NO_SUPPRESS, padj, 0, count);
-	RestoreGraphicState();
+	case PLAINTEXT:
+
+	  /* printable only if angle is zero */
+	  if( sparec(constraint(x)) == 0 )
+	  {
+	    FixAndPrintObject(y, xmk, xb, xf, dim, adjust,
+	      suppress, padj, pg, count);
+	  }
+	  break;
+
+
+	case POSTSCRIPT:
+
+          if( dim == COL )
+          { CONSTRAINT colc, rowc, yc;
+            save_mark(x) = xmk;
+	    SetConstraint(colc, back(x,COL), MAX_LEN, fwd(x,COL));
+	    SetConstraint(rowc, back(x,ROW), MAX_LEN, fwd(x,ROW));
+	    RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc, COL);
+	    FixAndPrintObject(y, 0, bc(yc), fc(yc), COL, LAST_ADJUST,
+		    NO_SUPPRESS, padj, pg, count);
+          }
+          else
+          { CONSTRAINT colc, rowc, yc;
+	    SaveGraphicState();
+	    CoordTranslate(save_mark(x), pg - xmk);
+	    CoordRotate(sparec(constraint(x)));
+	    SetConstraint(colc, back(x,COL), MAX_LEN, fwd(x,COL));
+	    SetConstraint(rowc, back(x,ROW), MAX_LEN, fwd(x,ROW));
+	    RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc, ROW);
+	    FixAndPrintObject(y, 0, bc(yc), fc(yc), ROW, LAST_ADJUST,
+		    NO_SUPPRESS, padj, 0, count);
+	    RestoreGraphicState();
+          }
+	  break;
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -367,40 +464,59 @@ int padj;  LENGTH pg;  int count;
     case GRAPHIC:
     
       CountChild(y, LastDown(x), count);
-      if( dim == COL )
+      switch( BackEnd )
       {
-	back(x, dim) = xb;
-	fwd(x, dim)  = xf;
-	debug2(DGP, DD, "GRAPHIC COL storing size %s, %s",
-	  EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
-	save_mark(x) = xmk - back(x, COL);
-        FixAndPrintObject(y, xb, xb, xf, dim, LAST_ADJUST,
-		NO_SUPPRESS, padj, pg, count);
-      }
-      else
-      { OBJECT tmp, pre, post;
-        Child(tmp, Down(x));
-        if( type(tmp) == VCAT )
-        { Child(pre, Down(tmp));
-          Child(post, LastDown(tmp));
-        }
-        else pre = tmp, post = nil;
-	back(x, dim) = xb;
-	fwd(x, dim)  = xf;
-        SaveGraphicState();
-        CoordTranslate(save_mark(x), pg - (xmk + fwd(x, ROW)));
-	debug4(DGP, DD, "GRAPHIC ROW calling %s,%s %s,%s",
-	  EchoLength(back(x, COL)), EchoLength(fwd(x, COL)),
-	  EchoLength(back(x, ROW)), EchoLength(fwd(x, ROW)));
-        DefineGraphicNames(x);
-        SaveGraphicState();
-        PrintGraphicObject(pre);
-        RestoreGraphicState();
-        FixAndPrintObject(y, xb, xb, xf, dim, LAST_ADJUST,
-		NO_SUPPRESS, padj, xb + xf, count);
-        if( post != nil )  PrintGraphicObject(post);
-        RestoreGraphicState();
-      }
+	case PLAINTEXT:
+
+          FixAndPrintObject(y, xmk, xb, xf,dim,adjust,suppress,padj,pg,count);
+	  break;
+
+
+	case POSTSCRIPT:
+
+          if( dim == COL )
+          {
+	    /* if first occurrence of this font on this page, notify font */
+	    if( font(save_style(x)) > 0 )
+	    { face = finfo[font(save_style(x))].original_font;
+	      if( font_page(face) < font_curr_page )  FontPageUsed(face);
+	    }
+
+	    back(x, dim) = xb;
+	    fwd(x, dim)  = xf;
+	    debug2(DGP, DD, "GRAPHIC COL storing size %s, %s",
+	      EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+	    save_mark(x) = xmk - back(x, COL);
+            FixAndPrintObject(y, xb, xb, xf, dim, LAST_ADJUST,
+		    NO_SUPPRESS, padj, pg, count);
+          }
+          else
+          { OBJECT tmp, pre, post;
+            Child(tmp, Down(x));
+            if( type(tmp) == VCAT )
+            { Child(pre, Down(tmp));
+              Child(post, LastDown(tmp));
+            }
+            else pre = tmp, post = nil;
+	    back(x, dim) = xb;
+	    fwd(x, dim)  = xf;
+            SaveGraphicState();
+            CoordTranslate(save_mark(x), pg - (xmk + fwd(x, ROW)));
+	    debug4(DGP, DD, "GRAPHIC ROW calling %s,%s %s,%s",
+	      EchoLength(back(x, COL)), EchoLength(fwd(x, COL)),
+	      EchoLength(back(x, ROW)), EchoLength(fwd(x, ROW)));
+            DefineGraphicNames(x);
+            SaveGraphicState();
+            PrintGraphicObject(pre);
+            RestoreGraphicState();
+            FixAndPrintObject(y, xb, xb, xf, dim, LAST_ADJUST,
+		    NO_SUPPRESS, padj, xb + xf, count);
+            if( post != nil )  PrintGraphicObject(post);
+            RestoreGraphicState();
+          }
+	  break;
+
+      } /* end switch */
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
 
@@ -409,12 +525,30 @@ int padj;  LENGTH pg;  int count;
     case SINCGRAPHIC:
 
       CountChild(y, Down(x), count);
-      if( dim == COL )
-      {	save_mark(x) = xmk;
-      }
-      else if( sparec(constraint(x)) )
+      switch( BackEnd )
       {
-	PrintGraphicInclude(x, save_mark(x), pg - xmk);
+	case PLAINTEXT:
+
+	  break;
+
+
+	case POSTSCRIPT:
+
+          if( dim == COL )
+	  { save_mark(x) = xmk;
+	    if( sparec(constraint(x)) )
+	    { face = finfo[font(save_style(x))].original_font;
+	      if( font_page(face) < font_curr_page )
+	      {	debug3(DFT, DD, "FAPO-IG: x = %s, font = %d, face = %s",
+		  string(x), font(save_style(x)), EchoObject(face));
+		FontPageUsed(face);
+	      }
+	    }
+	  }
+          else if( sparec(constraint(x)) )
+	    PrintGraphicInclude(x, save_mark(x), pg - xmk);
+	  break;
+
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -423,7 +557,7 @@ int padj;  LENGTH pg;  int count;
     case SPLIT:
     
       link = DownDim(x, dim);  CountChild(y, link, count);
-      FixAndPrintObject(y, xmk, xb, xf, dim, adjust, suppress, padj, pg, count);
+      FixAndPrintObject(y, xmk, xb, xf, dim, adjust, suppress,padj,pg,count);
       back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
       break;
 
@@ -721,16 +855,6 @@ int padj;  LENGTH pg;  int count;
 	thr_state(x) = FINALSIZE;
       }
 
-      /* *** else been here before, size is already decided; do nothing
-      {	if( back(x, dim) > xb || fwd(x, dim) > xf )
-	{ Error(WARN, &fpos(y), "wrong %s chosen (sorry!)",
-		dim == COL ? "column width" : "row height");
-	  if( back(x, dim) > xb )  back(x, dim) = xb;
-	  if( fwd(x, dim)  > xf )  fwd(x, dim)  = xf;
-	}
-      }
-      *** */
-
       /* fix y */
       FixAndPrintObject(y, xmk, back(x, dim), fwd(x, dim), dim, LAST_ADJUST,
 	NO_SUPPRESS, padj, pg, count);
@@ -740,7 +864,7 @@ int padj;  LENGTH pg;  int count;
 
     default:
     
-      Error(INTERN, no_fpos, "FixAndPrint: found %s", Image(type(x)));
+      Error(23, 3, "FixAndPrintObject: %s", INTERN, no_fpos, Image(type(x)));
       break;
 
   } /* end switch */

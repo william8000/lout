@@ -1,47 +1,48 @@
-Subject: Version 2.05 of Lout document formatting system
-Date: Tue, 27 Jul 1993 17:09:23 +1000
-Newsgroups: comp.text,comp.sources.d,aus.sources
-Keywords: document formatting typesetting lout
 
-Version 2.05 of the Lout document formatting system is now available
+         THE LOUT DOCUMENT FORMATTING SYSTEM, VERSION 3.02
+
+Version 3.02 of the Lout document formatting system is now available
 (free of charge).  The system reads a high-level description of a
 document similar in style to LaTeX and produces a PostScript file which
 can be printed on many laser printers and graphic display devices.
 
 Lout offers an unprecedented range of advanced features, including
 optimal paragraph breaking, automatic hyphenation, PostScript EPS file
-inclusion, equation formatting, tables, diagrams, rotation and scaling,
-sorted indexes, bibliographic databases, running headers and odd-even
-pages, automatic cross referencing, and much more, all ready to go.
-Furthermore, Lout is easily extended with definitions which are very
-much easier to write than troff of TeX macros because Lout is a
-high-level language, the outcome of an eight-year research project that
-went back to the beginning.
+inclusion and generation, equation formatting, tables, diagrams,
+rotation and scaling, sorted indexes, bibliographic databases, running
+headers and odd-even pages, automatic cross referencing, and much more,
+all ready to go.  Furthermore, Lout is easily extended with definitions
+which are very much easier to write than troff of TeX macros because
+Lout is a high-level language, the outcome of an eight-year research
+project that went back to the beginning.
 
-New features just introduced in Version 2.05 include full support for the
-ISO-LATIN-1 character set and arbitrary PostScript encoding vectors, small
-changes to the DocumentLayout package to simplify porting it to non-English
-languages, source code which compiles cleanly on type-fussy compilers and
-at least one 64-bit architecture (the DEC Alpha) but is not yet ANSI, and
-a few small enhancements and bug fixes.
+New features just introduced in Version 3.02 include plain text output,
+support for multilingual documents including hyphenation, packages for
+overhead transparencies, graphs, and C/C++ programs, many enhancements
+suggested by users, and an all-inclusive User's Guide.
 
-Lout is written in C, is highly portable to Unix systems, and produces
-PostScript output (used by many laser printers).  It is distributed under
-the GNU public licence as a compressed tar file called lout.2.05.tar.Z
-in the "jeff" subdirectory of the home directory you land in when running
-"ftp ftp.cs.su.oz.au" with login name "ftp" or "anonymous" (enter any
+Lout is written in C and is highly portable to Unix systems.  It is
+distributed under the GNU public license as a gzipped tar file called
+"lout.3.02.tar.gz" in the "jeff" subdirectory of the home directory
+of "ftp ftp.cs.su.oz.au" with login name "ftp" or "anonymous" (any
 non-empty password).  The comp.sources.misc newsgroup is an alternative
 source of Lout distributions.  The distribution contains
 
   *  Complete C source code
 
-  *  Standard packages of definitions for tech reports, books, equations,
-     tables, diagrams, and Pascal prettyprinting (all written in Lout)
+  *  Standard library packages of definitions for ordinary documents,
+     technical reports, books, overhead transparencies, stand-alone
+     illustrations, plain text documents, equations, tables, diagrams,
+     graphs, C and C++ prettyprinting, and Pascal
 
-  *  Complete user documentation in the form of seven technical reports
-     and a Unix manual page
+  *  Complete documentation for all these features consisting of a
+     User's Guide plus an Expert's Guide.
 
   *  A makefile and installation instructions
+
+For those who want to browse first, an extra copy of the PostScript
+version of the User's Guide may be found in file "lout.3.02.user.ps.gz"
+in the same ftp directory.
 
 Lout was designed and implemented by Jeffrey H. Kingston (jeff@cs.su.oz.au)
 of the Basser Department of Computer Science at the University of Sydney.

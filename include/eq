@@ -129,9 +129,13 @@ def @Eq
 
    def vctr
       right x
-   { @OneRow {   -180d @Rotate { /0.5wo 180d @Rotate { / @OneRow @OneCol x  } }
-	       ^/      @OneRow { /0.5wo      @OneRow { @OneRow @OneCol x ^/ } }
-	     }
+   {
+   
+     #@OneRow {  -180d @Rotate { /0.5wo 180d @Rotate { / @OneRow @OneCol x  } }
+     #         ^/      @OneRow { /0.5wo      @OneRow { @OneRow @OneCol x ^/ } }
+     #     }
+
+     0.5w @VShift x
    }
 
    ###################################################################

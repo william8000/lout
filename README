@@ -1,5 +1,5 @@
-LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING
-BASSER LOUT VERSION 2.05 COPYRIGHT (C) 1993 Jeffrey H. Kingston
+THE LOUT DOCUMENT FORMATTING SYSTEM
+BASSER LOUT VERSION 3 COPYRIGHT (C) 1994 Jeffrey H. Kingston
 
 Jeffrey H. Kingston
 Basser Department of Computer Science
@@ -25,29 +25,27 @@ You should have received a copy of the GNU General Public License
 (file gnu.gpl in this directory); if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-Version 2.05 is substantially different from Version 2.03 in its
-low-level character handling and attention to strong typing, as well
-as in the major innovation of support for ISO-LATIN-1 characters and
-arbitrary PostScript encoding vectors.  There is also a change in the
-database index (.li) file format, which means that all old database
-index files should be deleted before using Version 2.05.
-
 This directory contains everything needed to install the Lout document
 formatting system on Unix.  It contains the following directories:
 
-    include        Lout packages (in Lout) and hyphenation patterns file
     data           Lout databases (in Lout)
-    font           Adobe Systems font metrics (AFM) files
-    evec           Character encoding vectors (CEV) files
     doc            Lout documents (in Lout)
-    man            Lout manual entry
+    evec           Character encoding vectors (CEV) files
+    font           Adobe Systems font metrics files
+    hyph	   Lout hyphenation files (see hyph/README for info)
+    include        Lout packages (in Lout)
+    locale         Locale-specific error messages
+    man            Lout and c2lout manual entries
 
 and the following files:
 
+    c2lout.c       c2lout source code (all in one file)
+    dsc.notes	   Notes on the degree of Lout's conformance with the
+		   PostScript Document Structuring Conventions
     externs z*.c   Lout source code
     gnu.gpl        A copy of the GNU General Public License
-    hyph.install   Information about how to change the hyphenation patterns
+    mailinglist    Information about a public mailing list about Lout
     makefile       A makefile for installing Lout
     news.blurb	   A news blurb describing Lout
 
-Please see the makefile for installation instructions.
+See the makefile for installation instructions.

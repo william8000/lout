@@ -1,7 +1,7 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -34,7 +34,7 @@
 /*****************************************************************************/
 #include "externs"
 
-#define	MAX_STACK	 40		/* size of scope stack               */
+#define	MAX_STACK	300		/* size of scope stack               */
 #define	MAX_TAB		1024		/* size of hash table                */
 #define	TAB_MASK	0x3FF		/* i & TAB_MASK == i % MAX_TAB       */
 
@@ -109,9 +109,11 @@ OBJECT x;  BOOLEAN npars, vis;
   assert( suppress_scope == FALSE, "PushScope: suppress_scope!" );
   if( scope_top >= MAX_STACK )
   { int i;
+#if DEBUG_ON
     for( i = 0; i < scope_top; i++ )
-      debug2(DST, D, "  scope[%2d] = %s", i, SymName(scope[i]));
-    Error(INTERN, &fpos(x), "scope depth limit exceeded");
+      Error(29, 1, "  scope[%2d] = %s", WARN, &fpos(x), i, SymName(scope[i]));
+#endif
+    Error(29, 2, "scope depth limit exceeded", INTERN, &fpos(x));
   }
   scope[scope_top]      = x;
   npars_only[scope_top] = npars;
@@ -122,7 +124,7 @@ OBJECT x;  BOOLEAN npars, vis;
 
 PopScope()
 { debug0(DST, DD, "] PopScope()");
-  assert( scope_top > 0, "tried to pop empty scope stack");
+  assert( scope_top > 0, "PopScope: tried to pop empty scope stack");
   assert( suppress_scope == FALSE, "PopScope: suppress_scope!" );
   scope_top--;
 } /* end PopScope */
@@ -210,7 +212,7 @@ OBJECT sym;
 /*  BodyParAllowed()                                                         */
 /*  BodyParNotAllowed()                                                      */
 /*                                                                           */
-/*  Allow or disallow invokations of the body parameter of the current tos.  */
+/*  Allow or disallow invocations of the body parameter of the current tos.  */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -250,26 +252,29 @@ OBJECT xenclosing, xbody;
 
   debug3(DST, DD, "InsertSym( %s, %s, in %s )",
 	Image(xtype), str, SymName(xenclosing));
-  if( !LexLegalName(str) ) Error(WARN, xfpos, "invalid symbol name %s", str);
+  if( !LexLegalName(str) )
+    Error(29, 3, "invalid symbol name %s", WARN, xfpos, str);
 
   s = New(xtype);
   FposCopy(fpos(s), *xfpos);
-  has_body(s)    = FALSE;
-  right_assoc(s) = TRUE;
-  precedence(s)  = xprecedence;
-  indefinite(s)  = xindefinite;
-  recursive(s)   = xrecursive;
-  predefined(s)  = xpredefined;
-  enclosing(s)   = xenclosing;
-  sym_body(s)    = xbody;
-  base_uses(s)   = nil;
-  uses(s)        = nil;
-  marker(s)      = nil;
-  cross_sym(s)   = nil;
-  is_extern_target(s) = FALSE;
-  uses_extern_target(s) = FALSE;
-  visible(s)     = FALSE;
-  uses_galley(s) = FALSE;
+  has_body(s)          = FALSE;
+  filter(s)            = nil;
+  use_invocation(s)    = nil;
+  right_assoc(s)       = TRUE;
+  precedence(s)        = xprecedence;
+  indefinite(s)        = xindefinite;
+  recursive(s)         = xrecursive;
+  predefined(s)        = xpredefined;
+  enclosing(s)         = xenclosing;
+  sym_body(s)          = xbody;
+  base_uses(s)         = nil;
+  uses(s)              = nil;
+  marker(s)            = nil;
+  cross_sym(s)         = nil;
+  is_extern_target(s)  = FALSE;
+  uses_extern_target(s)= FALSE;
+  visible(s)           = FALSE;
+  uses_galley(s)       = FALSE;
 
   uses_count(s)  = 0;
   dirty(s)       = FALSE;
@@ -308,11 +313,18 @@ OBJECT xenclosing, xbody;
   if( !StringEqual(str, KW_KEY) ) is_key(s) = FALSE;
   else is_key(s) = has_key(enclosing(s)) = TRUE;
 
+  if( StringEqual(str, KW_FILTER) )
+  { if( type(s) != LOCAL || enclosing(s) == StartSym )
+      Error(29, 4, "%s must be a local definition", WARN, &fpos(s), str);
+    else filter(enclosing(s)) = s;
+  }
+
   if( type(s) == RPAR && has_body(enclosing(s)) && (is_tag(s) || is_key(s)) )
-    Error(WARN, &fpos(s), "a body parameter may not be named %s", str);
+    Error(29, 5, "a body parameter may not be named %s", WARN, &fpos(s), str);
 
   if( type(s) == RPAR && has_target(enclosing(s)) && (is_tag(s) || is_key(s)) )
-    Error(WARN,&fpos(s), "the right parameter of a galley may not be %s", str);
+    Error(29, 6, "the right parameter of a galley may not be called %s",
+      WARN, &fpos(s), str);
 
   len = StringLength(str);
   hash(str, len, sum);
@@ -325,8 +337,8 @@ OBJECT xenclosing, xbody;
     { for( link = Down(p);  link != p;  link = NextDown(link) )
       {	Child(q, link);
 	if( enclosing(s) == enclosing(q) )
-	{ Error(WARN, &fpos(s), "symbol %s previously defined at%s",
-	    str, EchoFilePos(&fpos(q)) );
+	{ Error(29, 7, "symbol %s previously defined at%s",
+	    WARN, &fpos(s), str, EchoFilePos(&fpos(q)) );
 	  break;
 	}
       }
@@ -429,7 +441,7 @@ OBJECT s;
 FULL_CHAR *FullSymName(x, str)
 OBJECT x;  FULL_CHAR *str;
 { OBJECT stack[20];  int i;
-  static FULL_CHAR buff[MAX_LINE], *sname;
+  static FULL_CHAR buff[MAX_BUFF], *sname;
   if( x == nil )  return AsciiToFull("<nil>");
   assert( enclosing(x) != nil, "FullSymName: enclosing(x) == nil!" );
   for( i = 0;  enclosing(x) != nil && i < 20;  i++ )
@@ -439,14 +451,14 @@ OBJECT x;  FULL_CHAR *str;
   StringCopy(buff, STR_EMPTY);
   for( i--;  i > 0;  i-- )
   { sname = SymName(stack[i]);
-    if( StringLength(sname)+StringLength(str)+StringLength(buff) >= MAX_LINE )
-      Error(FATAL, &fpos(x), "full name of symbol is too long");
+    if( StringLength(sname)+StringLength(str)+StringLength(buff) >= MAX_BUFF )
+      Error(29, 8, "full name of symbol is too long", FATAL, &fpos(x));
     StringCat(buff, sname);
     StringCat(buff, str);
   }
   sname = SymName(stack[0]);
-  if( StringLength(sname) + StringLength(buff) >= MAX_LINE )
-    Error(FATAL, &fpos(x), "full name of symbol is too long");
+  if( StringLength(sname) + StringLength(buff) >= MAX_BUFF )
+    Error(29, 9, "full name of symbol is too long", FATAL, &fpos(x));
   StringCat(buff, sname);
   return buff;
 } /* end FullSymName */
@@ -467,7 +479,8 @@ OBJECT s;  unsigned typ;
   { Child(y, link);
     if( type(y) == typ && enclosing(y) == s )  return y;
   }
-  Error(INTERN, &fpos(s), "Symbol %s has missing %s", SymName(s), Image(typ));
+  Error(29, 10, "symbol %s has missing %s", INTERN, &fpos(s),
+    SymName(s), Image(typ));
   return nil;
 } /* end ChildSym */
 
@@ -529,7 +542,7 @@ OBJECT s;
     case LOCAL:	if( sym_body(s) != nil ) DisposeObject(sym_body(s));
 		break;
 
-    default:	Error(INTERN,no_fpos, "unknown symbol type %s",Image(type(s)));
+    default:	Error(29, 11, "DeleteSymBody: %s", INTERN,no_fpos,Image(type(s)));
 		break;
   }
   debug0(DST, DDD, "DeleteSymBody returning.");

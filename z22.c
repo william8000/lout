@@ -1,7 +1,7 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -25,7 +25,7 @@
 /*  FILE:         z22.c                                                      */
 /*  MODULE:       Galley Service                                             */
 /*  EXTERNS:      Interpose(), FlushInners(), ExpandRecursives(),            */
-/*                Promote(),K illGalley(), FreeGalley(),                     */
+/*                Promote(), KillGalley(), FreeGalley(),                     */
 /*                TargetSymbol(), CheckConstraint()                          */
 /*                                                                           */
 /*****************************************************************************/
@@ -93,10 +93,13 @@ OBJECT inners, hd;
       case RECEIVING:
       case UNATTACHED:
       
-	assert( Down(y) != y, "FlushInners: UNATTACHED!");
-	Child(z, Down(y));
-	debug0(DGF, D, "  calling FlushGalley from FlushInners (a)");
-	FlushGalley(z);
+	if( Down(y) != y )	/* bug fix (was assert before) */
+	{ assert( Down(y) != y, "FlushInners: UNATTACHED!");
+	  Child(z, Down(y));
+	  debug0(DGF, D, "  calling FlushGalley from FlushInners (a)");
+	  if( whereto(z) == nil || !uses_extern_target(whereto(z)) ) /* &&& */
+	    FlushGalley(z);
+	}
 	break;
 
 
@@ -110,15 +113,22 @@ OBJECT inners, hd;
 	  { blocked(tmp) = FALSE;
 	    Parent(z, Up(tmp));
 	    debug0(DGF, D, "  calling FlushGalley from FlushInners (b)");
-	    FlushGalley(z);
+	    if( whereto(z)==nil || !uses_extern_target(whereto(z)) ) /* &&& */
+	      FlushGalley(z);
 	  }
 	}
 	break;
 
 
+      case GALL_PREC:
+
+	/* someone else is looking after this now */
+	break;
+
+
       default:
       
-	Error(INTERN,&fpos(y),"FlushInners %s", Image(type(y)));
+	Error(22, 1, "FlushInners: %s", INTERN, &fpos(y), Image(type(y)));
 	break;
     }
   }
@@ -223,7 +233,7 @@ OBJECT hd;
   if( link == hd )
   { debug0(DGF, D, "FindSplitInGalley failing, no definite component; hd =");
     ifdebug(DGF, D, DebugObject(hd));
-    Error(INTERN, &fpos(hd), "missing galley component");
+    Error(22, 2, "FindSplit: missing galley component", INTERN, &fpos(hd));
   }
   while( type(y) != SPLIT )  switch( type(y) )
   {
@@ -231,6 +241,8 @@ OBJECT hd;
     case ONE_ROW:
     case WIDE:
     case HIGH:
+    case HSHIFT:
+    case VSHIFT:
     case VCONTRACT:
     case VEXPAND:
     case PADJUST:
@@ -262,13 +274,13 @@ OBJECT hd;
 
       debug0(DGF, D, "FindSplitInGalley(hd) failing, hd =");
       ifdebug(DGF, D, DebugObject(hd));
-      Error(INTERN, &fpos(y), "FindSplitInGalley failed", Image(type(y)));
+      Error(22, 3, "FindSplitInGalley failed", INTERN, &fpos(y),Image(type(y)));
       break;
 
 
     default:
     
-      Error(INTERN, &fpos(y), "FindSplitInGalley found %s", Image(type(y)));
+      Error(22, 4, "FindSplitInGalley: %s", INTERN, &fpos(y), Image(type(y)));
       break;
 
   }
@@ -322,8 +334,8 @@ OBJECT x, stop_link, dest_index;
 
   /* error if promoting a seen_nojoin galley into a threaded destination */
   if( seen_nojoin(x) && threaded(dest) )
-    Error(FATAL, &fpos(x), "galley %s must have a single column mark",
-	SymName(actual(x)));
+    Error(22, 5, "galley %s must have a single column mark",
+      FATAL, &fpos(x), SymName(actual(x)));
   if( seen_nojoin(x) )  join(gap(y)) = FALSE; /* to make nojoin status clear */
 
   /* if promoting out of root galley, do special things */
@@ -337,6 +349,7 @@ OBJECT x, stop_link, dest_index;
       switch( type(y) )
       {
 
+	case SCALE_IND:
 	case PRECEDES:
       
 	  DisposeChild(NextDown(link));
@@ -367,8 +380,8 @@ OBJECT x, stop_link, dest_index;
 	  else
 	  {
 	    /* galley was never attached, print message and kill it */
-	    Error(WARN, &fpos(z), "Galley %s deleted - never attached",
-			SymName(actual(z)));
+	    Error(22, 6, "galley %s deleted (never attached)",
+	      WARN, &fpos(z), SymName(actual(z)));
 	    KillGalley(z);
 	  }
 	  break;
@@ -411,6 +424,8 @@ OBJECT x, stop_link, dest_index;
 	case ONE_ROW:
 	case WIDE:
 	case HIGH:
+	case HSHIFT:
+	case VSHIFT:
 	case HSCALE:
 	case VSCALE:
 	case HCONTRACT:
@@ -437,21 +452,32 @@ OBJECT x, stop_link, dest_index;
 	  debug0(DCR, D, "Promote --");
 	  if( !is_indefinite(type(y)) && size(y, ROW) != 0 )
 	  {
-	    /* move down as specified by the gap */
-	    if( first )
-	    { PrintPrologue(size(x, COL), size(y, ROW));
-	      first = FALSE;
-	    }
-	    else PrintOriginIncrement(prec_back - back(y, ROW)
-	          + MinGap(prec_fwd, back(y, ROW), fwd(y, ROW), &prec_gap));
-	    debug1(DGF,D, "  Promote calling FixAndPrint %s", Image(type(y)));
+	    /* fix horizontally; work out which fonts needed */
+	    /* *** nice in theory (preserves joins), but ... 
 	    FixAndPrintObject(y, back(x, COL), back(x, COL), fwd(x, COL),
 	      COL, LAST_ADJUST, FALSE, LAST_ADJUST, 0, 0);
+	    *** */
+	    FixAndPrintObject(y, back(y, COL), back(y, COL), fwd(y, COL),
+	      COL, LAST_ADJUST, FALSE, LAST_ADJUST, 0, 0);
+
+	    /* print prefatory or page separating material, including fonts */
+	    if( first )
+	    { PrintBeforeFirst(size(x, COL), size(y, ROW));
+	      first = FALSE;
+	    }
+	    else PrintBetween(size(x, COL), size(y, ROW));
+
+	    /* fix and print vertically */
+	    debug1(DGF,D, "  Promote calling FixAndPrint %s", Image(type(y)));
 	    FixAndPrintObject(y, back(y,ROW), back(y, ROW), fwd(y, ROW),
 	      ROW, LAST_ADJUST, FALSE, LAST_ADJUST, size(y,ROW), 0);
 	    prec_back = back(y, ROW);  prec_fwd = fwd(y, ROW);
+
 	  }
 	  DisposeChild(NextDown(link));
+
+	  /* scavenge any filter files now not needed */
+	  FilterScavenge(FALSE);
 	  break;
 
 
@@ -464,7 +490,7 @@ OBJECT x, stop_link, dest_index;
 
 	default:
       
-	  Error(INTERN, &fpos(y), "Promote (root): %s", Image(type(y)));
+	  Error(22, 7, "Promote: %s", INTERN, &fpos(y), Image(type(y)));
 	  break;
 	
       }
@@ -529,7 +555,7 @@ OBJECT y;
   if( dead_store == nil )  dead_store = New(ACAT);
   type(y) = DEAD;
   MoveLink(Up(y), dead_store, PARENT);
-  if( dead_count >= 100 )  DisposeChild(Down(dead_store));
+  if( dead_count >= 150 )  DisposeChild(Down(dead_store));
   else dead_count++;
   debug1(DGS, DDD, "MakeDead returning (dead_count = %d).", dead_count);
 } /* end MakeDead */
@@ -547,7 +573,7 @@ OBJECT y;
 KillGalley(hd)
 OBJECT hd;
 { OBJECT prnt, link, y, z;
-  debug2(DGA, D, "[ KillGalley(Galley %s into %s)",
+  debug2(DGF, D, "[ KillGalley(Galley %s into %s)",
 	SymName(actual(hd)), SymName(whereto(hd)));
   assert( type(hd) == HEAD && Up(hd) != hd, "KillGalley: precondition!" );
   Parent(prnt, Up(hd));
@@ -577,7 +603,7 @@ OBJECT hd;
 			Child(z, Down(y));  KillGalley(z);
 			break;
 
-      case HEAD:	Error(INTERN, &fpos(y), "KillGalley: HEAD!");
+      case HEAD:	Error(22, 8, "KillGalley: head", INTERN, &fpos(y));
 			break;
 
       default:		DisposeChild(NextDown(link));
@@ -587,7 +613,7 @@ OBJECT hd;
 
   /* move index into dead_store */
   MakeDead(prnt);
-  debug0(DGA, D, "] KillGalley returning.");
+  debug0(DGF, D, "] KillGalley returning.");
 } /* end KillGalley */
 
 
@@ -622,7 +648,7 @@ OBJECT hd, stop_link, *inners, relocate_link, sym;
   for( link = Down(hd);  link != stop_link;  link = NextDown(link) )
   { Child(y, link);
     if( type(y) == RECEIVING && actual(actual(y)) == InputSym )
-      Error(WARN, &fpos(actual(y)), "forcing galley past input point");
+      Error(22, 9, "forcing galley after input point", WARN, &fpos(actual(y)));
     else if( type(y) == RECEIVING )
     {
       /* either relocate or free each galley */
@@ -696,26 +722,27 @@ OBJECT x, *sym;
     debug1(DGS, DD, "TargetSymbol examining %s", EchoObject(cr));
     debug1(DGS, DD, "  type(cr) = %s", Image( (int) type(cr)) );
     if( type(cr) != CROSS )
-      Error(FATAL, &fpos(cr), "target of %s is not a cross-reference",
-	SymName(actual(x)));
+      Error(22, 10, "target of %s is not a cross reference",
+	FATAL, &fpos(cr), SymName(actual(x)));
 
     /* extract *sym from the left parameter */
     Child(lpar, Down(cr));
     if( type(lpar) != CLOSURE )
-      Error(FATAL,&fpos(lpar),"left parameter of %s is not a symbol",KW_CROSS);
+      Error(22, 11, "left parameter of %s is not a symbol",
+	FATAL, &fpos(lpar), KW_CROSS);
     *sym = actual(lpar);
 
     /* extract direction from the right parameter */
     Child(rpar, NextDown(Down(cr)));
     if( !is_word(type(rpar)) || !StringEqual(string(rpar), KW_PRECEDING) &&
 	!StringEqual(string(rpar), KW_FOLLOWING) )
-      Error(WARN, &fpos(rpar), "replacing %s%s? by %s%s%s",
-	SymName(actual(lpar)), KW_CROSS, SymName(actual(lpar)),
-	KW_CROSS, KW_FOLLOWING);
+      Error(22, 12, "replacing %s%s? by %s%s%s",
+	WARN, &fpos(rpar), SymName(actual(lpar)), KW_CROSS,
+	SymName(actual(lpar)), KW_CROSS, KW_FOLLOWING);
     return is_word(type(rpar)) && StringEqual(string(rpar), KW_PRECEDING);
   }
   else
-  { Error(INTERN, &fpos(x), "TargetSymbol: could not find @Target of x");
+  { Error(22, 13, "TargetSymbol: missing target of x", INTERN, &fpos(x));
     return FALSE;
   }
 } /* end TargetSymbol */

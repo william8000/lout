@@ -1,44 +1,270 @@
+##########################################################################
+#                                                                        #
+#  refstyles.ld                                                          #
+#                                                                        #
+#  Standard reference styles database.                                   #
+#  Jeffrey H. Kingston                                                   #
+#  August 1994                                                           #
+#                                                                        #
+##########################################################################
+
+
+##########################################################################
+#                                                                        #
+#  Large works: Book, Proceedings (identical to Book), PhDThesis.        #
+#                                                                        #
+##########################################################################
+
 { Book @RefStyle @Style
   {  @Reference&&reftag @Open
-     { @Author,  {Slope @Font @Title}.  @Publisher, @Year.  @Comment }
-  }
-}
-
-{ JournalArticle @RefStyle @Style
-  {  @Reference&&reftag @Open
-     { @Author,  @Title.  {Slope @Font @Journal} {Bold @Font @Volume},
-@Pages (@Year).  @Comment
+     {
+	{ @Author.  {}			} @If @Author
+	{ @I @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @HowPublished		} @If @HowPublished
+	{ .  @Publisher			} @If @Publisher
+	{ .  @Organization		} @If @Organization
+	{ .  @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition edition		} @If @Edition
+	{ , @Month @Year		} @If @Year @And @Month
+	{ , @Year 			} @If @Year @And @Not @Month
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
      }
   }
 }
 
-{ ConferencePaper @RefStyle @Style
+{ Proceedings @RefStyle @Style
   {  @Reference&&reftag @Open
-     { @Author,  @Title.  {Slope @Font @Proceedings},
-@Year, @Pages.  @Comment
+     {
+	{ @Author.  {}			} @If @Author
+	{ @I @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @HowPublished		} @If @HowPublished
+	{ .  @Publisher			} @If @Publisher
+	{ .  @Organization		} @If @Organization
+	{ .  @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition edition		} @If @Edition
+	{ , @Month @Year		} @If @Year @And @Month
+	{ , @Year 			} @If @Year @And @Not @Month
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
      }
   }
 }
+
+{ PhDThesis @RefStyle @Style
+  {  @Reference&&reftag @Open
+     {
+	{ @Author.  {}			} @If @Author
+	{ @I @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @Word&&phdthesis		} @If @True
+	{ , @HowPublished		} @If @HowPublished
+	{ , @Publisher			} @If @Publisher
+	{ , @Organization		} @If @Organization
+	{ , @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition edition		} @If @Edition
+	{ , @Month @Year		} @If @Year @And @Month
+	{ , @Year 			} @If @Year @And @Not @Month
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
+     }
+  }
+}
+
+
+##########################################################################
+#                                                                        #
+#  Small works not appearing within anything else: TechReport, Manual,   #
+#  MastersThesis, Misc                                                   #
+#                                                                        #
+##########################################################################
 
 { TechReport @RefStyle @Style
   {  @Reference&&reftag @Open
-     { @Author,  {Slope @Font @Title}.  Tech. Rep. @Number (@Year),
-@Institution.  @Comment
+     {
+	{ @Author.  {}			} @If @Author
+	{ @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @TRType			} @If @TRType
+	{ .  @Word&&techrep		} @If @Not @TRType
+	{ {} @Number			} @If @Number
+	{ {} (@Month @Year)		} @If @Year @And @Month
+	{ {} (@Year)			} @If @Year @And @Not @Month
+	{ , @HowPublished		} @If @HowPublished
+	{ , @Publisher			} @If @Publisher
+	{ , @Organization		} @If @Organization
+	{ , @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition edition		} @If @Edition
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
      }
   }
 }
 
-{ PhD @RefStyle @Style
+{ MastersThesis @RefStyle @Style
   {  @Reference&&reftag @Open
-     { @Author,  {Slope @Font @Title}.  Ph.D. thesis,
-@Institution (@Year).  @Comment
+     {
+	{ @Author.  {}			} @If @Author
+	{ @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @Word&&mastersthesis	} @If @True
+	{ {} @Number			} @If @Number
+	{ {} (@Month @Year)		} @If @Year @And @Month
+	{ {} (@Year)			} @If @Year @And @Not @Month
+	{ , @HowPublished		} @If @HowPublished
+	{ , @Publisher			} @If @Publisher
+	{ , @Organization		} @If @Organization
+	{ , @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition edition		} @If @Edition
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
      }
   }
 }
 
-{ Software @RefStyle @Style
+{ Misc @RefStyle @Style
   {  @Reference&&reftag @Open
-     { @Author,  {Slope @Font @Title}, @Year.  @Comment
+     {
+	{ @Author.  {}			} @If @Author
+	{ @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @HowPublished		} @If @HowPublished
+	{ , @Publisher			} @If @Publisher
+	{ , @Organization		} @If @Organization
+	{ , @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition edition		} @If @Edition
+	{ , @Month @Year		} @If @Year @And @Month
+	{ , @Year			} @If @Year @And @Not @Month
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
+     }
+  }
+}
+
+
+##########################################################################
+#                                                                        #
+#  Small works appearing within an ongoing forum: Article.               #
+#                                                                        #
+##########################################################################
+
+{ Article @RefStyle @Style
+  {  @Reference&&reftag @Open
+     {
+	{ @Author.  {}			} @If @Author
+	{ @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ , @Pinpoint			} @If @Pinpoint
+	{ .				} @If @True
+	{ {}  @TitleNote.		} @If @TitleNote
+	{ {}  @I @Journal		} @If @Journal
+	{ {}  @Word&&nopublisher	} @If @Not @Journal
+	{ {} @B @Volume			} @If @Volume
+	{ {} (@Number)			} @If @Number @And @Volume
+	{ {} @Number			} @If @Number @And @Not @Volume
+	{ , @Pages			} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ {} (@Day @Month @Year)	} @If @Year @And @Month @And @Day
+	{ {} (@Month @Year)		} @If @Year @And @Month @And @Not @Day
+	{ {} (@Year)			} @If @Year @And @Not @Month
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
+     }
+  }
+}
+
+
+##########################################################################
+#                                                                        #
+#  Small works appearing within large works:  InBook, InProceedings      #
+#  (identical to InBook).                                                #
+#                                                                        #
+##########################################################################
+
+{ InBook @RefStyle @Style
+  {  @Reference&&reftag @Open
+     {
+	{ @Author.  {}			} @If @Author
+	{ @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ .  @Word&&in {}		} @If @True
+	{ @InAuthor, {}			} @If @InAuthor
+	{ @I @InTitle			} @If @InTitle
+	{ @Word&&notitle		} @If @Not @InTitle
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @HowPublished		} @If @HowPublished
+	{ .  @Publisher			} @If @Publisher
+	{ .  @Organization		} @If @Organization
+	{ .  @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition edition		} @If @Edition
+	{ , @Month @Year		} @If @Year @And @Month
+	{ , @Year 			} @If @Year @And @Not @Month
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
+     }
+  }
+}
+
+{ InProceedings @RefStyle @Style
+  {  @Reference&&reftag @Open
+     {
+	{ @Author.  {}			} @If @Author
+	{ @Title			} @If @Title
+	{ @Word&&notitle		} @If @Not @Title
+	{ .  @Word&&in {}		} @If @True
+	{ @InAuthor, {}			} @If @InAuthor
+	{ @I @InTitle			} @If @InTitle
+	{ @Word&&notitle		} @If @Not @InTitle
+	{ , @Pinpoint			} @If @Pinpoint
+	{ , @Word&&pages @Pages		} @If @Pages
+	{ , @Word&&page @Page		} @If @Page
+	{ .  @TitleNote			} @If @TitleNote
+	{ .  @HowPublished		} @If @HowPublished
+	{ .  @Publisher			} @If @Publisher
+	{ .  @Organization		} @If @Organization
+	{ .  @Institution		} @If @Institution
+	{ , @Address			} @If @Address
+	{ .  @Edition edition		} @If @Edition
+	{ , @Month @Year		} @If @Year @And @Month
+	{ , @Year 			} @If @Year @And @Not @Month
+	{ .				} @If @True
+	{ {}  @Note.			} @If @Note
      }
   }
 }

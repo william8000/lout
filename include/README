@@ -1,22 +1,49 @@
 Directory lout/include
 
-This directory contains Lout source files for
-a variety of standard packages and setup files:
+This directory contains Lout source files for a variety of standard
+packages and setup files:
 
-   ft		A file of font definitions
-   dl		The DocumentLayout package
-   tl		The ToyLayout package (for beginners to play with)
-   doc		A setup file calling dl for simple documents
-   report	A setup file calling dl for technical reports
-   book		A setup file calling dl for books
-   eq		The Eq equation formatting package
-   pas		The Pas Pascal formatting package
-   fig		The Fig figure drawing package
-   fig_prepend	A PostScript file needed by fig
-   tab		The Tab table formatting package
-   tab_prepend	A PostScript file needed by Tab
-   lout.hyph	Text file of hyphenation patterns
+The DocumentLayout package and its extensions to various document types
+
+    dl			The DocumentLayout package
+    ordinarylayout	The OrdinaryLayout package
+    reportlayout	The ReportLayout package
+    booklayout		The BookLayout package
+    overheadslayout	The OverheadsLayout package
+    illustrationlayout	The IllustrationLayout package
+
+Setup files for all document types, with and without C and C++ printing
+
+    doc			Setup file for ordinary documents
+    cdoc		Setup file for ordinary documents with C and C++
+    report		Setup file for technical reports
+    creport		Setup file for technical reports with C and C++
+    book		Setup file for books
+    cbook		Setup file for books with C and C++
+    overheads		Setup file for overheads
+    coverheads		Setup file for overheads with C and C++
+    illustration	Setup file for illustrations
+    cillustration	Setup file for illustrations with C and C++
+    pdoc		Setup file for ordinary documents (plain text)
+
+Special-purpose packages and associated prepend files
+
+    tab			The Tab table formatting package
+    tab_prepend		A PostScript prepend file needed by Tab
+    eq			The Eq equation formatting package
+    fig			The Fig advanced graphics package
+    fig_prepend		A PostScript prepend file needed by Fig
+    graph		The Graph graph drawing package
+    graph_prepend	A PostScript prepend file needed by Graph
+    cprint		The cprint C and C++ program printing package
+    pas			The Pas Pascal progam printing package
+
+Miscellaneous
+
+    fontdefs		Standard font definitions file
+    langdefs		Standard language definitions file
+    mydefs		Empty file for if the user doesn't have one
+    tl			The ToyLayout package (a introductory example)
 
 Jeffrey H. Kingston
-22 December 1992
-27 July 1993
+12 September 1994

@@ -1,7 +1,7 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -96,20 +96,26 @@ MemInit()
   zz_lengths[ LINK        ] = ceiling( sizeof(struct link_type), sizeof(ALIGN));
 
   /* object types, except closure NB have actual() field in token phase! */
-  zz_lengths[ SPLIT       ] =
-  zz_lengths[ HEAD        ] =
-  zz_lengths[ PAR         ] =
-  zz_lengths[ ROW_THR     ] =
-  zz_lengths[ COL_THR     ] =
   zz_lengths[ CLOSURE     ] =
   zz_lengths[ NULL_CLOS   ] =
   zz_lengths[ CROSS       ] =
+  zz_lengths[ HEAD        ] =
+  zz_lengths[ SPLIT       ] =
+  zz_lengths[ PAR         ] =
+  zz_lengths[ ROW_THR     ] =
+  zz_lengths[ COL_THR     ] =
+  zz_lengths[ ACAT        ] =
+  zz_lengths[ HCAT        ] =
+  zz_lengths[ VCAT        ] =
   zz_lengths[ ONE_COL     ] =
   zz_lengths[ ONE_ROW     ] =
   zz_lengths[ WIDE        ] =
   zz_lengths[ HIGH        ] =
+  zz_lengths[ HSHIFT      ] =
+  zz_lengths[ VSHIFT      ] =
   zz_lengths[ HSCALE      ] =
   zz_lengths[ VSCALE      ] =
+  zz_lengths[ SCALE       ] =
   zz_lengths[ HCONTRACT   ] =
   zz_lengths[ VCONTRACT   ] =
   zz_lengths[ HEXPAND     ] =
@@ -118,37 +124,42 @@ MemInit()
   zz_lengths[ HADJUST     ] =
   zz_lengths[ VADJUST     ] =
   zz_lengths[ ROTATE      ] =
-  zz_lengths[ SCALE       ] =
   zz_lengths[ CASE        ] =
   zz_lengths[ YIELD       ] =
+  zz_lengths[ BACKEND     ] =
+  zz_lengths[ FILTERED    ] =
   zz_lengths[ XCHAR       ] =
   zz_lengths[ FONT        ] =
   zz_lengths[ SPACE       ] =
   zz_lengths[ BREAK       ] =
+  zz_lengths[ COLOUR      ] =
+  zz_lengths[ LANGUAGE    ] =
+  zz_lengths[ CURR_LANG   ] =
   zz_lengths[ NEXT        ] =
   zz_lengths[ ENV         ] =
   zz_lengths[ CLOS        ] =
   zz_lengths[ LVIS        ] =
+  zz_lengths[ LUSE        ] =
   zz_lengths[ OPEN        ] =
   zz_lengths[ TAGGED      ] =
   zz_lengths[ INCGRAPHIC  ] =
   zz_lengths[ SINCGRAPHIC ] =
   zz_lengths[ GRAPHIC     ] =
-  zz_lengths[ ACAT        ] =
-  zz_lengths[ HCAT        ] =
-  zz_lengths[ VCAT        ] =
+	ceiling(sizeof(struct closure_type), sizeof(ALIGN));
+
   zz_lengths[ LBR         ] =
   zz_lengths[ RBR         ] =
   zz_lengths[ BEGIN       ] =
   zz_lengths[ END         ] =
   zz_lengths[ USE         ] =
+  zz_lengths[ GSTUB_NONE  ] =
+  zz_lengths[ GSTUB_INT   ] =
+  zz_lengths[ GSTUB_EXT   ] =
+  zz_lengths[ UNEXPECTED_EOF] =
   zz_lengths[ PREPEND     ] =
   zz_lengths[ SYS_PREPEND ] =
   zz_lengths[ DATABASE    ] =
   zz_lengths[ SYS_DATABASE] =
-  zz_lengths[ GSTUB_NONE  ] =
-  zz_lengths[ GSTUB_INT   ] =
-  zz_lengths[ GSTUB_EXT   ] =
   zz_lengths[ DEAD        ] =
   zz_lengths[ UNATTACHED  ] =
   zz_lengths[ RECEPTIVE   ] =
@@ -162,6 +173,7 @@ MemInit()
   zz_lengths[ GALL_TARG   ] =
   zz_lengths[ GALL_PREC   ] =
   zz_lengths[ CROSS_PREC  ] =
+  zz_lengths[ SCALE_IND   ] =
   zz_lengths[ EXPAND_IND  ] =
   zz_lengths[ THREAD      ] =
   zz_lengths[ CR_LIST     ] =
@@ -212,7 +224,8 @@ int siz;  FILE_POS *pos;
   if( &next_free[siz] > top_free )
   { next_free = (ALIGN *) calloc(MEM_CHUNK, sizeof(ALIGN));
     ifdebug(DMA, D, no_of_calls++; )
-    if( next_free == NULL ) Error(FATAL,pos,"run out of memory - exiting now");
+    if( next_free == NULL )
+      Error(31, 1, "exiting now (run out of memory)", FATAL, pos);
     top_free = &next_free[MEM_CHUNK];
     debug2(DMA, D, "GetMemory: calloc returned %d - %d",
       (int) next_free, (int) top_free);

@@ -1,7 +1,7 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -33,7 +33,7 @@
 #if DEBUG_ON
 #define	MULTI	  7			/* max no of simultaneous calls      */
 
-static	FULL_CHAR buff[MULTI][MAX_LINE];/* buffers for strings       */
+static	FULL_CHAR buff[MULTI][2*MAX_BUFF];/* buffers for strings       */
 static	int	curr = 1;		/* current buffer in use             */
 static	int	bp;			/* next free space in buff[curr]     */
 static	BOOLEAN	instring = FALSE;	/* TRUE while making a string        */
@@ -48,7 +48,8 @@ static	BOOLEAN	instring = FALSE;	/* TRUE while making a string        */
 /*****************************************************************************/
 
 BeginString()
-{ if( instring ) Error(INTERN, no_fpos, "BeginString: currently in string!");
+{ if( instring )
+    Error(26, 1, "BeginString: currently in string", INTERN, no_fpos);
   instring = TRUE;  curr = (curr + 1) % MULTI;
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
   StringCopy(buff[curr], "");  bp = 0;
@@ -67,19 +68,20 @@ BeginString()
 AppendString(str, p1, p2, p3, p4, p5, p6)
 FULL_CHAR *str;  int p1, p2, p3, p4, p5, p6;
 { int len;
-  if( !instring ) Error(INTERN, no_fpos, "AppendString: no current string!");
+  if( !instring )
+    Error(26, 2, "AppendString: no current string", INTERN, no_fpos);
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
-  if( bp == MAX_LINE ) return;		/* no space, do nothing */
+  if( bp == MAX_BUFF ) return;		/* no space, do nothing */
 
   len = StringLength(str);
-  if( len + bp >= MAX_LINE )
-  { StringCopy( &buff[curr][MAX_LINE/2], AsciiToFull(" ... <too long>") );
-    bp = MAX_LINE;
+  if( len + bp >= MAX_BUFF )
+  { StringCopy( &buff[curr][MAX_BUFF/2], AsciiToFull(" ... <too long>") );
+    bp = MAX_BUFF;
   }
   else
   { sprintf( (char *) &buff[curr][bp], str, p1, p2, p3, p4, p5, p6 );
     while( buff[curr][bp] != '\0' )  bp++;
-    if( bp >= MAX_LINE )  Error(INTERN, no_fpos, "AppendString abort");
+    if( bp >= MAX_BUFF )  Error(26, 3, "AppendString abort", INTERN, no_fpos);
   }
 } /* end AppendString */
 
@@ -93,7 +95,7 @@ FULL_CHAR *str;  int p1, p2, p3, p4, p5, p6;
 /*****************************************************************************/
 
 FULL_CHAR *EndString()
-{ if( !instring ) Error(INTERN, no_fpos, "EndString: no current string!");
+{ if( !instring )  Error(26, 4, "EndString: no string", INTERN, no_fpos);
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
   instring = FALSE;
   return buff[curr];
@@ -150,6 +152,8 @@ unsigned int c;
     case ONE_ROW:	return  KW_ONE_ROW;
     case WIDE:		return  KW_WIDE;
     case HIGH:		return  KW_HIGH;
+    case HSHIFT:	return  KW_HSHIFT;
+    case VSHIFT:	return  KW_VSHIFT;
     case HSCALE:	return  KW_HSCALE;
     case VSCALE:	return  KW_VSCALE;
     case HCONTRACT:	return  KW_HCONTRACT;
@@ -163,14 +167,20 @@ unsigned int c;
     case SCALE:		return  KW_SCALE;
     case CASE:		return  KW_CASE;
     case YIELD:		return  KW_YIELD;
+    case BACKEND:	return  KW_BACKEND;
+    case FILTERED:	return  AsciiToFull("filtered");
     case XCHAR:		return  KW_XCHAR;
     case FONT:		return  KW_FONT;
     case SPACE:		return  KW_SPACE;
     case BREAK:		return  KW_BREAK;
+    case COLOUR:	return  KW_COLOUR;
+    case LANGUAGE:	return  KW_LANGUAGE;
+    case CURR_LANG:	return  KW_CURR_LANG;
     case NEXT:		return  KW_NEXT;
     case ENV:		return  KW_ENV;
     case CLOS:		return  KW_CLOS;
     case LVIS:		return  KW_LVIS;
+    case LUSE:		return  KW_LUSE;
     case OPEN:		return  KW_OPEN;
     case TAGGED:	return  KW_TAGGED;
     case INCGRAPHIC:	return  KW_INCGRAPHIC;
@@ -184,6 +194,7 @@ unsigned int c;
     case TJUXTA:	return  AsciiToFull("tjuxta");
     case LBR:		return  AsciiToFull("lbr");
     case RBR:		return  AsciiToFull("rbr");
+    case UNEXPECTED_EOF:return  AsciiToFull("unexpected_eof");
     case BEGIN:		return  KW_BEGIN;
     case END:		return  KW_END;
     case USE:		return  KW_USE;
@@ -211,6 +222,7 @@ unsigned int c;
     case GALL_TARG:	return  AsciiToFull("gall_targ");
     case GALL_PREC:	return  AsciiToFull("gall_prec");
     case CROSS_PREC:	return  AsciiToFull("cross_prec");
+    case SCALE_IND:	return  AsciiToFull("scale_ind");
     case EXPAND_IND:	return  AsciiToFull("expand_ind");
     case THREAD:	return  AsciiToFull("thread");
     case CROSS_SYM:	return  AsciiToFull("cross_sym");

@@ -1,7 +1,7 @@
 /*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -24,10 +24,62 @@
 /*                                                                           */
 /*  FILE:         z16.c                                                      */
 /*  MODULE:       Size Adjustment                                            */
-/*  EXTERNS:      SetNeighbours(), AdjustSize()                              */
+/*  EXTERNS:      FindShift(), SetNeighbours(), AdjustSize()                 */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  LENGTH FindShift(x, y, dim)                                              */
+/*                                                                           */
+/*  x = @HShift y or @VShift y depending on dim.  FindShift returns the      */
+/*  length of the shift measured from the mark of y to the mark of x.        */
+/*  This is negative if the mark of y is to the right of the mark of x.      */
+/*                                                                           */
+/*****************************************************************************/
+
+LENGTH FindShift(x, y, dim)
+OBJECT x, y;  int dim;
+{ LENGTH len, res;
+  debug3(DSF, D, "FindShift(%s, %s, %s)", Image(type(x)),
+    EchoObject(y), dimen(dim));
+
+  /* first determine the magnitude of the shift */
+  switch( units(shift_gap(x)) )
+  {
+    case FIXED_UNIT:	len = width(shift_gap(x));
+			break;
+
+    case NEXT_UNIT:	len = (size(y, dim) * width(shift_gap(x))) / FR;
+			break;
+
+    default:		Error(16, 1, "FindShift: %s",
+			  INTERN,&fpos(x),"units");
+			break;
+  }
+
+  /* then calculate the shift depending on the shift type */
+  switch( shift_type(x) )
+  {
+    case GAP_ABS:	res = len - back(y, dim);
+			break;
+
+    case GAP_INC:	res = len;
+			break;
+
+    case GAP_DEC:	res = - len;
+			break;
+
+    default:		Error(16, 2, "FindShift: %s",
+			  INTERN, &fpos(x),"type");
+			break;
+  }
+
+  debug1(DSF, D, "FindShift returning %s", EchoLength(res));
+  return res;
+} /* end FindShift */
 
 
 /*****************************************************************************/
@@ -184,7 +236,8 @@ OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
     ifdebug(DSA, D, DebugObject(y));
     debug0(DSA, D, "x was");
     ifdebug(DSA, D, DebugObject(x));
-    Error(FATAL,&fpos(y),"maximum size (%s) exceeded", EchoLength(MAX_LEN));
+    Error(16, 3, "maximum size %s exceeded",
+      FATAL, &fpos(y), EchoLength(MAX_LEN));
   }
   *b = bb;  *f = ff;
   debug2(DSA, D, "CatAdjustSize returning %s,%s", EchoLength(*b), EchoLength(*f));
@@ -278,6 +331,10 @@ OBJECT x;  LENGTH b, f;  int dim;
 	    for( link = NextDown(lp);  link != rp;  link = NextDown(link) )
 	    { Child(z, link);
 	      if( type(z) == GAP_OBJ || is_index(type(z)) )  continue;
+	      debugcond3(DSA, DD,  dim == COL && fwd(z, dim) > 20*CM,
+		  "  z %s (size %s,%s) = ", Image(type(z)),
+		  EchoLength(back(z, dim)), EchoLength(fwd(z, dim)));
+	      ifdebugcond(DSA, DD,  dim == COL && fwd(z, dim) > 20*CM, DebugObject(z));
 	      tb = max(tb, back(z, dim));
 	      tf = max(tf, fwd(z, dim));
 	    }
@@ -288,8 +345,9 @@ OBJECT x;  LENGTH b, f;  int dim;
 	    debug0(DSA, D, "] AdjustSize (COL) returning at HEAD (no wider)");
 	    return;
 	  }
-	  debug3(DGF, D, "AdjustSize widening %s to %s,%s",
+	  debug3(DSA, DD, "AdjustSize widening HEAD %s to b = %s, f = %s",
 		   SymName(actual(y)), EchoLength(b), EchoLength(f));
+	  ifdebugcond(DSA, DD,  dim == COL && f > 20*CM, DebugObject(y));
 	  back(y, dim) = b;  fwd(y, dim) = f;
 	  if( Up(y) == y )
 	  {
@@ -310,6 +368,8 @@ OBJECT x;  LENGTH b, f;  int dim;
 	    return;
 	  }
 	  y = actual(index);
+	  debug3(DSA, DD, "AdjustSize jumping to y = %s of size %s,%s", Image(type(y)),
+	     EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
 	}
 	break;
 
@@ -372,7 +432,8 @@ OBJECT x;  LENGTH b, f;  int dim;
       
 	if( (type(y) == WIDE) == (dim == COL) )
 	{ if( !FitsConstraint(b, f, constraint(y)) )
-	  { Error(WARN, &fpos(y), "size constraint %s,%s,%s broken by %s,%s",
+	  { Error(16, 4, "size constraint %s,%s,%s broken by %s,%s",
+	      WARN, &fpos(y),
 	      EchoLength(bc(constraint(y))), EchoLength(bfc(constraint(y))),
 	      EchoLength(fc(constraint(y))), EchoLength(b), EchoLength(f));
 	    SetConstraint(constraint(y), MAX_LEN, b+f, MAX_LEN);
@@ -383,6 +444,18 @@ OBJECT x;  LENGTH b, f;  int dim;
 	else
 	{ back(x, dim) = b;
 	  fwd(x, dim) = f;
+	}
+	break;
+
+
+      case HSHIFT:
+      case VSHIFT:
+
+	back(x, dim) = b;  fwd(x, dim) = f;
+	if( (type(y) == HSHIFT) == (dim == COL) )
+	{ tf = FindShift(y, x, dim);
+	  b = min(MAX_LEN, max(0, b + tf));
+	  f = min(MAX_LEN, max(0, f - tf));
 	}
 	break;
 
@@ -444,7 +517,7 @@ OBJECT x;  LENGTH b, f;  int dim;
       case CROSS:
       default:
       
-	Error(INTERN, &fpos(y), "AdjustSize: %s", Image(type(y)));
+	Error(16, 5, "AdjustSize: %s", INTERN, &fpos(y), Image(type(y)));
 	break;
 
     } /* end switch */

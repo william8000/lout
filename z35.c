@@ -1,7 +1,7 @@
 /*@z35.c:Time Keeper: MomentSym(), TimeString()@******************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -102,7 +102,7 @@ InitTime()
 
   /* get current time and convert to ASCII */
   if( time(&raw_time) == -1 )
-    Error(WARN, no_fpos, "unable to obtain the current time");
+    Error(35, 1, "unable to obtain the current time", WARN, no_fpos);
   now = localtime(&raw_time);
   StringCopy(time_string, AsciiToFull(asctime(now)));
 
@@ -112,9 +112,9 @@ InitTime()
 
   /* attach its many parameters */
   add_par("%s",   KW_NOW,                      tag);
-  add_par("%d",   now->tm_sec,                 second);
-  add_par("%d",   now->tm_min,                 minute);
-  add_par("%d",   now->tm_hour,                hour);
+  add_par("%.2d", now->tm_sec,                 second);
+  add_par("%.2d", now->tm_min,                 minute);
+  add_par("%.2d", now->tm_hour,                hour);
   add_par("%d",   now->tm_mday,                monthday);
   add_par("%d",   now->tm_mon + 1,             month);
   add_par("%.2d", now->tm_year % 100,          year);

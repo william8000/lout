@@ -1,7 +1,7 @@
 /*@z03.c:File Service:Declarations, no_fpos@******************************** */
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -26,28 +26,153 @@
 /*  MODULE:       File Service                                               */
 /*  EXTERNS:      InitFiles(), AddToPath(), DefineFile(), FirstFile(),       */
 /*                NextFile(), FileNum(), FileName(), EchoFilePos(),          */
-/*                PosOfFile(), OpenFile(), OpenIncGraphicFile(),             */
-/*                ReadFromFile(), AppendToFile(), CloseFiles()               */
+/*                PosOfFile(), OpenFile(), OpenIncGraphicFile()              */
+/*                EchoFileFrom()                                             */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
-#define MAX_TYPES	 10			/* number of file types      */
-#define MAX_PATHS	  7			/* number of search paths    */
-#define	TAB_MASK	0xFF			/* mask forces <= MAX_FILES  */
+#define MAX_TYPES	 11			/* number of file types      */
+#define MAX_PATHS	  8			/* number of search paths    */
+#define	INIT_TAB 	  3			/* initial file table size   */
 
 #define	file_number(x)	word_font(x)		/* file number of file x     */
-#define	updated(x)	broken(x)		/* TRUE when x is updated    */
+#define	updated(x)	fwd(x, COL)		/* TRUE when x is updated    */
 #define	path(x)		back(x, COL)		/* search path for file x    */
 
-static	int	file_count;			/* total number of files     */
-static	OBJECT	fvec[MAX_FILES] = { nil };	/* the file table            */
-static	OBJECT	file_list[MAX_TYPES];		/* files of each type        */
-static	OBJECT	file_path[MAX_PATHS];		/* the search paths          */
+
+/*****************************************************************************/
+/*                                                                           */
+/*  FILE_TABLE                                                               */
+/*                                                                           */
+/*  A symbol table permitting access to file records by number or name.      */
+/*  The table will automatically enlarge to accept any number of entries,    */
+/*  but there is an arbitrary limit of 65535 files imposed so that file      */
+/*  numbers can be stored in 16 bit fields.                                  */
+/*                                                                           */
+/*     ftab_new(newsize)                 New empty table, newsize capacity   */
+/*     ftab_insert(x, &S)                Insert new file object x into S     */
+/*     ftab_retrieve(str, S)             Retrieve file object of name str    */
+/*     ftab_num(S, num)                  Retrieve file object of number num  */
+/*     ftab_debug(S, fp)                 Debug print of table S to file fp   */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef struct
+{ int filetab_size;				/* size of table             */
+  int filetab_count;				/* number of files in table  */
+  struct filetab_rec
+  {	OBJECT	by_number;			/* file record by number     */
+	OBJECT	by_name_hash;			/* file record by name hash  */
+  } filetab[1];
+} *FILE_TABLE;
+
+#define	ftab_size(S)	(S)->filetab_size
+#define	ftab_count(S)	(S)->filetab_count
+#define	ftab_num(S, i)	(S)->filetab[i].by_number
+#define	ftab_name(S, i)	(S)->filetab[i].by_name_hash
+
+#define hash(pos, str, S)						\
+{ FULL_CHAR *p = str;							\
+  pos = *p++;								\
+  while( *p ) pos += *p++;						\
+  pos = pos % ftab_size(S);						\
+}
+
+static FILE_TABLE ftab_new(newsize)
+int newsize;
+{ FILE_TABLE S;  int i;
+  S = (FILE_TABLE) malloc(2*sizeof(int) + newsize * sizeof(struct filetab_rec));
+  if( S == (FILE_TABLE) NULL )
+    Error(3, 1, "run out of memory when enlarging file table", FATAL, no_fpos);
+  ftab_size(S) = newsize;
+  ftab_count(S) = 0;
+  for( i = 0;  i < newsize;  i++ )
+  { ftab_num(S, i) = ftab_name(S, i) = nil;
+  }
+  return S;
+} /* end ftab_new */
+
+static FILE_TABLE ftab_rehash(S, newsize)
+FILE_TABLE S;  int newsize;
+{ FILE_TABLE NewS;  int i;
+  NewS = ftab_new(newsize);
+  for( i = 1;  i <= ftab_count(S);  i++ )
+     ftab_insert(ftab_num(S, i), &NewS);
+  for( i = 0;  i < ftab_size(S);  i++ )
+  { if( ftab_name(S, i) != nil )  DisposeObject(ftab_name(S, i));
+  }
+  free(S);
+  return NewS;
+} /* end ftab_rehash */
+
+static ftab_insert(x, S)
+OBJECT x;  FILE_TABLE *S;
+{ int pos, num;					
+  if( ftab_count(*S) == ftab_size(*S) - 1 )	/* one less since 0 unused */
+    *S = ftab_rehash(*S, 2*ftab_size(*S));
+  num = ++ftab_count(*S);
+  if( num > MAX_FILES )
+    Error(3, 2, "too many files (maximum is %d)",
+      FATAL, &fpos(x), MAX_FILES);
+  hash(pos, string(x), *S);
+  if( ftab_name(*S, pos) == nil )  ftab_name(*S, pos) = New(ACAT);
+  Link(ftab_name(*S, pos), x);
+  file_number(x) = num;
+  ftab_num(*S, num) = x;
+} /* end ftab_insert */
+
+static OBJECT ftab_retrieve(str, S)
+FULL_CHAR *str;  FILE_TABLE S;
+{ OBJECT x, link, y;  int pos;
+  hash(pos, str, S);
+  x = ftab_name(S, pos);
+  if( x == nil )  return nil;
+  for( link = Down(x);  link != x;  link = NextDown(link) )
+  { Child(y, link);
+    if( StringEqual(str, string(y)) )  return y;
+  }
+  return nil;
+} /* end ftab_retrieve */
+
 #if DEBUG_ON
+static ftab_debug(S, fp)
+FILE_TABLE S;  FILE *fp;
+{ int i;  OBJECT x, link, y;
+  fprintf(fp, "  table size: %d;  current number of files: %d\n",
+    ftab_size(S), ftab_count(S));
+  for( i = 0;  i < ftab_size(S);  i++ )
+  { x = ftab_num(S, i);
+    fprintf(fp, "  ftab_num(S, %d) = %s\n", i,
+      x == nil ? AsciiToFull("<nil>") :
+      !is_word(type(x)) ? AsciiToFull("not WORD!") : string(x) );
+  }
+  fprintf(fp, "\n");
+  for( i = 0;  i < ftab_size(S);  i++ )
+  { x = ftab_name(S, i);
+    fprintf(fp, "  ftab_name(S, %d) =", i);
+    if( x == nil )
+      fprintf(fp, " <nil>");
+    else if( type(x) != ACAT )
+      fprintf(fp, " not ACAT!");
+    else for( link = Down(x);  link != x;  link = NextDown(link) )
+    { Child(y, link);
+      fprintf(fp, " %s",
+	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
+    }
+    fprintf(fp, "\n");
+  }
+} /* end ftab_debug */
+
 static	char	*file_types[]		/* the type names for debug  */
 		= { "source", "include", "incgraphic", "database", "index",
-		    "font", "prepend", "hyph", "hyphpacked", "encoding" };
+		    "font", "prepend", "hyph", "hyphpacked", "encoding",
+		    "filter" };
 #endif
+
+
+static	FILE_TABLE	file_tab;		/* the file table            */
+static	OBJECT		file_type[MAX_TYPES];	/* files of each type        */
+static	OBJECT		file_path[MAX_PATHS];	/* the search paths          */
 
 
 /*****************************************************************************/
@@ -58,23 +183,9 @@ static	char	*file_types[]		/* the type names for debug  */
 /*                                                                           */
 /*****************************************************************************/
 
-static FILE_POS no_file_pos = {0, 0, 0};
+static FILE_POS no_file_pos = {0, 0, 0, 0, 0};
 FILE_POS *no_fpos = &no_file_pos;
 
-/*****************************************************************************/
-/*                                                                           */
-/*  #define hash(str, val)                                                   */
-/*                                                                           */
-/*  Hash the string str and return its value in val.                         */
-/*                                                                           */
-/*****************************************************************************/
-
-#define hash(str, val)							\
-{ p = str;								\
-  val = *p++;								\
-  while( *p ) val += *p++;						\
-  val = (val * 8) & TAB_MASK;						\
-}
 
 /*@::InitFiles(), AddToPath(), DefineFile()@**********************************/
 /*                                                                           */
@@ -86,10 +197,9 @@ FILE_POS *no_fpos = &no_file_pos;
 
 InitFiles()
 { int i;
-  for( i = 0;  i < MAX_TYPES; i++ )  file_list[i]  = New(ACAT);
+  for( i = 0;  i < MAX_TYPES; i++ )  file_type[i]  = New(ACAT);
   for( i = 0;  i < MAX_PATHS; i++ )  file_path[i] = New(ACAT);
-  fvec[0] = file_list[0];	/* so that no files will be given slot 0 */
-  file_count = 1;
+  file_tab = ftab_new(INIT_TAB);
 } /* end InitFiles */
 
 
@@ -122,6 +232,7 @@ FILE_NUM DefineFile(str, suffix, xfpos, ftype, fpath)
 FULL_CHAR *str, *suffix; FILE_POS *xfpos;  int ftype, fpath;
 { register FULL_CHAR *p;
   register int i;
+  OBJECT fname;
   assert( ftype < MAX_TYPES, "DefineFile: ftype!" );
   debug5(DFS, D, "DefineFile(%s, %s,%s, %s, %d)",
     str, suffix, EchoFilePos(xfpos), file_types[ftype], fpath);
@@ -129,25 +240,22 @@ FULL_CHAR *str, *suffix; FILE_POS *xfpos;  int ftype, fpath;
   {
     /* check that file name does not end in ".li" or ".ld" */
     if( StringEqual(&str[i-StringLength(DATA_SUFFIX)], DATA_SUFFIX) )
-      Error(FATAL, xfpos,
-	"database file %s where source file expected", str);
+      Error(3, 3, "database file %s where source file expected",
+        FATAL, xfpos, str);
     if( StringEqual(&str[i-StringLength(INDEX_SUFFIX)], INDEX_SUFFIX) )
-      Error(FATAL, xfpos,
-	"database index file %s where source file expected", str);
+      Error(3, 4, "database index file %s where source file expected",
+        FATAL, xfpos, str);
   }
-  if( ++file_count >= MAX_FILES ) Error(FATAL, xfpos, "too many file names");
-  hash(str, i);
-  while( fvec[i] != nil )
-    if( ++i >= MAX_FILES ) i = 0;
-  if( StringLength(str) + StringLength(suffix) >= MAX_LINE )
-    Error(FATAL, no_fpos, "file name %s%s too long", str, suffix);
-  fvec[i] = MakeWordTwo(WORD, str, suffix, xfpos);
-  Link(file_list[ftype], fvec[i]);
-  file_number(fvec[i]) = i;
-  path(fvec[i]) = fpath;
-  debug1(DFS, D, "DefineFile returning %s",
-    i == NO_FILE ? STR_NONE : FileName( (FILE_NUM) i));
-  return (FILE_NUM) i;
+  if( StringLength(str) + StringLength(suffix) >= MAX_WORD )
+    Error(3, 5, "file name %s%s is too long", FATAL, no_fpos, str, suffix);
+  fname = MakeWordTwo(WORD, str, suffix, xfpos);
+  Link(file_type[ftype], fname);
+  path(fname) = fpath;
+  updated(fname) = FALSE;
+  ftab_insert(fname, &file_tab);
+  debug1(DFS, D, "DefineFile returning %s", string(fname));
+  ifdebug(DFS, DD, ftab_debug(file_tab, stderr));
+  return file_number(fname);
 } /* end DefineFile */
 
 
@@ -164,7 +272,7 @@ int ftype;
 { FILE_NUM i;
   OBJECT link, y;
   debug1(DFS, D, "FirstFile( %s )", file_types[ftype]);
-  link = Down(file_list[ftype]);
+  link = Down(file_type[ftype]);
   if( type(link) == ACAT )  i = NO_FILE;
   else
   { Child(y, link);
@@ -186,8 +294,8 @@ int ftype;
 FILE_NUM NextFile(i)
 FILE_NUM i;
 { OBJECT link, y;
-  debug1(DFS, D, "NextFile( %s )", EchoObject(fvec[i]));
-  link = NextDown(Up(fvec[i]));
+  debug1(DFS, D, "NextFile( %s )", FileName(i));
+  link = NextDown(Up(ftab_num(file_tab, i)));
   if( type(link) == ACAT )  i = NO_FILE;
   else
   { Child(y, link);
@@ -209,17 +317,15 @@ FILE_NUM i;
 FILE_NUM FileNum(str, suffix)
 FULL_CHAR *str, *suffix;
 { register FULL_CHAR *p;
-  register int i;
-  FULL_CHAR buff[MAX_LINE];
+  register int i;  OBJECT fname;
+  FULL_CHAR buff[MAX_BUFF];
   debug2(DFS, D, "FileNum(%s, %s)", str, suffix);
-  hash(str, i);
-  if( StringLength(str) + StringLength(suffix) >= MAX_LINE )
-    Error(FATAL, no_fpos, "file name %s%s too long", str, suffix);
+  if( StringLength(str) + StringLength(suffix) >= MAX_BUFF )
+    Error(3, 6, "file name %s%s is too long", FATAL, no_fpos, str, suffix);
   StringCopy(buff, str);
   StringCat(buff, suffix);
-  while( fvec[i] != nil && !StringEqual(string(fvec[i]), buff) )
-    if( ++i >= MAX_FILES ) i = 0;
-  if( fvec[i] == nil ) i = 0;
+  fname = ftab_retrieve(buff, file_tab);
+  i = fname == nil ? NO_FILE : file_number(fname);
   debug1(DFS, D, "FileNum returning %s",
     i == NO_FILE ? STR_NONE : FileName( (FILE_NUM) i));
   return (FILE_NUM) i;
@@ -238,8 +344,9 @@ FULL_CHAR *str, *suffix;
 FULL_CHAR *FileName(fnum)
 FILE_NUM fnum;
 { OBJECT x;
-  assert( fnum > 0 && fvec[fnum] != nil, "FileName: fvec[fnum] == nil!" );
-  x = fvec[fnum];  if( Down(x) != x )  Child(x, Down(x));
+  x = ftab_num(file_tab, fnum);
+  assert( x != nil, "FileName: x == nil!" );
+  if( Down(x) != x )  Child(x, Down(x));
   return string(x);
 } /* end FileName */
 
@@ -252,29 +359,31 @@ FILE_NUM fnum;
 /*                                                                           */
 /*****************************************************************************/
 
-static FULL_CHAR buff[2][MAX_LINE];  static bp = 1;
+static FULL_CHAR buff[2][MAX_BUFF];  static bp = 1;
 
 static append_fpos(pos)
 FILE_POS *pos;
 { OBJECT x;
-  x = fvec[file_num(*pos)];
-  assert( x != nil, "EchoFilePos: fvec[] entry is nil!" );
+  x = ftab_num(file_tab, file_num(*pos));
+  assert( x != nil, "EchoFilePos: file_tab entry is nil!" );
   if( file_num(fpos(x)) > 0 )
   { append_fpos( &fpos(x) );
-    if( StringLength(buff[bp]) + 2 >= MAX_LINE )
-      Error(FATAL,no_fpos,"file position %s... is too long to print", buff[bp]);
+    if( StringLength(buff[bp]) + 2 >= MAX_BUFF )
+      Error(3, 7, "file position %s... is too long to print",
+        FATAL, no_fpos, buff[bp]);
     StringCat(buff[bp], STR_SPACE);
     StringCat(buff[bp], AsciiToFull("/"));
   }
-  if( StringLength(buff[bp]) + StringLength(string(x)) + 13 >= MAX_LINE )
-    Error(FATAL, no_fpos, "file position %s... is too long to print", buff[bp]);
+  if( StringLength(buff[bp]) + StringLength(string(x)) + 13 >= MAX_BUFF )
+    Error(3, 8, "file position %s... is too long to print",
+      FATAL, no_fpos, buff[bp]);
   StringCat(buff[bp], STR_SPACE);
   StringCat(buff[bp], STR_QUOTE);
   StringCat(buff[bp], string(x));
   StringCat(buff[bp], STR_QUOTE);
   if( line_num(*pos) != 0 )
   { StringCat(buff[bp], STR_SPACE);
-    StringCat(buff[bp], StringInt(line_num(*pos)));
+    StringCat(buff[bp], StringInt( (int) line_num(*pos)));
     StringCat(buff[bp], AsciiToFull(","));
     StringCat(buff[bp], StringInt( (int) col_num(*pos)));
   }
@@ -289,6 +398,75 @@ FILE_POS *pos;
 } /* end EchoFilePos */
 
 
+/*@::EchoFileSource(), EchoFileLIne(), PosOfFile()@***************************/
+/*                                                                           */
+/*  FULL_CHAR *EchoFileSource(fnum)                                          */
+/*                                                                           */
+/*  Returns a string reporting the "file source" information for file fnum.  */
+/*                                                                           */
+/*****************************************************************************/
+
+FULL_CHAR *EchoFileSource(fnum)
+FILE_NUM fnum;
+{ OBJECT x, nextx;
+  bp = (bp + 1) % 2;
+  StringCopy(buff[bp], STR_EMPTY);
+  if( fnum > 0 )
+  { StringCat(buff[bp], STR_SPACE);
+    StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 9, "file")));
+    /* for estrip's benefit: Error(3, 9, "file"); */
+    StringCat(buff[bp], STR_SPACE);
+    x = ftab_num(file_tab, fnum);
+    StringCat(buff[bp], STR_QUOTE);
+    StringCat(buff[bp], string(x));
+    StringCat(buff[bp], STR_QUOTE);
+    if( file_num(fpos(x)) > 0 )
+    { StringCat(buff[bp], AsciiToFull(" ("));
+      for(;;)
+      { nextx = ftab_num(file_tab, file_num(fpos(x)));
+	StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 10, "from")));
+	/* for estrip's benefit: Error(3, 10, "from"); */
+	StringCat(buff[bp], STR_SPACE);
+        StringCat(buff[bp], STR_QUOTE);
+        StringCat(buff[bp], string(nextx));
+        StringCat(buff[bp], STR_QUOTE);
+	StringCat(buff[bp], STR_SPACE);
+        StringCat(buff[bp],  AsciiToFull(condcatgets(MsgCat, 3, 11, "line")));
+	/* for estrip's benefit: Error(3, 11, "line"); */
+	StringCat(buff[bp], STR_SPACE);
+        StringCat(buff[bp], StringInt( (int) line_num(fpos(x))));
+	if( file_num(fpos(nextx)) == 0 )  break;
+	StringCat(buff[bp], AsciiToFull(", "));
+	x = nextx;
+      }
+      StringCat(buff[bp], AsciiToFull(")"));
+    }
+  }
+  return buff[bp];
+} /* end EchoFileSource */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  FULL_CHAR *EchoFileLine(pos)                                             */
+/*                                                                           */
+/*  Returns a string reporting the "line source" information for pos.        */
+/*                                                                           */
+/*****************************************************************************/
+
+FULL_CHAR *EchoFileLine(pos)
+FILE_POS *pos;
+{ bp = (bp + 1) % 2;
+  StringCopy(buff[bp], STR_EMPTY);
+  if( file_num(*pos) > 0 && line_num(*pos) != 0 )
+  { StringCat(buff[bp], StringInt( (int) line_num(*pos)));
+    StringCat(buff[bp], AsciiToFull(","));
+    StringCat(buff[bp], StringInt( (int) col_num(*pos)));
+  }
+  return buff[bp];
+} /* end EchoFileLIne */
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  FILE_POS *PosOfFile(fnum)                                                */
@@ -299,8 +477,8 @@ FILE_POS *pos;
 
 FILE_POS *PosOfFile(fnum)
 FILE_NUM fnum;
-{ OBJECT  x = fvec[fnum];
-  assert( x != nil, "PosOfFile: fvec[] entry is nil!" );
+{ OBJECT  x = ftab_num(file_tab, fnum);
+  assert( x != nil, "PosOfFile: file_tab entry is nil!" );
   return &fpos(x);
 }
 
@@ -319,46 +497,70 @@ FILE_NUM fnum;
 /*  file and OpenFile() is required to check for a .lt suffix version if     */
 /*  the file does not open.                                                  */
 /*                                                                           */
-/*  Also return the full path name in object *full_name if reqd, else nil.   */
+/*  Also return the full path name in object *full_name if different from    */
+/*  the existing name, else nil.                                             */
 /*                                                                           */
 /*****************************************************************************/
 
 static FILE *SearchPath(str, fpath, check_ld, check_lt, full_name, xfpos)
 FULL_CHAR *str;  OBJECT fpath;  BOOLEAN check_ld, check_lt;
 OBJECT *full_name;  FILE_POS *xfpos;
-{ 
-  FULL_CHAR buff[MAX_LINE];  OBJECT link, y;  FILE *fp;
+{ FULL_CHAR buff[MAX_BUFF];  OBJECT link, y;  FILE *fp, *fp2;
   debug4(DFS, DD, "SearchPath(%s, %s, %s, %s, -)", str, EchoObject(fpath),
 	bool(check_ld), bool(check_lt));
   *full_name = nil;
+
+  /* if file name is "stdin" just return it */
   if( StringEqual(str, STR_STDIN) )
   { fp = stdin;
     debug0(DFS, DD, "  opened stdin");
   }
+
+  /* else if file name is a full path name, ignore fpath */
   else if( StringBeginsWith(str, AsciiToFull("/")) )
   { fp = StringFOpen(str, "r");
     debug1(DFS, DD, fp==null ? "  failed on %s" : "  succeeded on %s", str);
+
+    /* if check_lt, see if str.lout exists as well as or instead of str */
+    if( check_lt )
+    { StringCopy(buff, str);
+      StringCat(buff, SOURCE_SUFFIX);
+      fp2 = StringFOpen(buff, "r");
+      debug1(DFS, DD, fp2==null ? "  failed on %s" : "  succeeded on %s",buff);
+      if( fp2 != null )
+      {	if( fp != null )
+	  Error(3, 12, "files %s and %s both exist", FATAL, xfpos, str, buff);
+	fp = fp2;
+	*full_name = MakeWord(WORD, buff, xfpos);
+      }
+    }
   }
+
+  /* else prepend each element of fpath to str in turn and attempt to open */
   else
   { fp = null;
-    for( link = Down(fpath);  fp==null && link != fpath; link = NextDown(link) )
+    for( link = Down(fpath);  fp==null && link!=fpath; link = NextDown(link) )
     { Child(y, link);
+
+      /* set buff to hold the full path name and attempt to open it */
       if( StringLength(string(y)) == 0 )
       { StringCopy(buff, str);
 	fp = StringFOpen(str, "r");
-	debug1(DFS, DD, fp==null ? "  failed on %s" : "  succeeded on %s", str);
+	debug1(DFS,DD, fp==null ? "  failed on %s" : "  succeeded on %s", str);
       }
       else
-      {	if( StringLength(string(y)) + 1 + StringLength(str) >= MAX_LINE )
-	  Error(FATAL, &fpos(y), "file path name %s/%s is too long",
-		string(y), str);
+      {	if( StringLength(string(y)) + 1 + StringLength(str) >= MAX_BUFF )
+	  Error(3, 13, "file path name %s/%s is too long",
+	    FATAL, &fpos(y), string(y), str);
 	StringCopy(buff, string(y));
 	StringCat(buff, AsciiToFull("/"));
 	StringCat(buff, str);
 	fp = StringFOpen(buff, "r");
-	debug1(DFS, DD, fp==null ? "  failed on %s" : "  succeeded on %s",buff);
+	debug1(DFS,DD, fp==null ? "  failed on %s" : "  succeeded on %s",buff);
 	if( fp != null ) *full_name = MakeWord(WORD, buff, xfpos);
       }
+
+      /* if failed to find .li file, exit if corresponding .ld file is found */
       if( fp == null && check_ld )
       {	StringCopy(&buff[StringLength(buff) - StringLength(INDEX_SUFFIX)],
 	  DATA_SUFFIX);
@@ -370,12 +572,21 @@ OBJECT *full_name;  FILE_POS *xfpos;
 	  return null;
 	}
       }
-      if( fp == null && check_lt )
-      {	StringCopy(&buff[StringLength(buff)], SOURCE_SUFFIX);
-	fp = StringFOpen(buff, "r");
-	debug1(DFS,DD,fp==null ? "  failed on %s" : "  succeeded on %s", buff);
-	StringCopy(&buff[StringLength(buff) - StringLength(SOURCE_SUFFIX)], STR_EMPTY);
-	if( fp != null ) *full_name = MakeWord(WORD, buff, xfpos);
+
+      /* if check_lt, see if buff.lout exists as well as or instead of buff */
+      if( check_lt )
+      {	StringCat(buff, SOURCE_SUFFIX);
+	fp2 = StringFOpen(buff, "r");
+	debug1(DFS,DD,fp2==null ? "  failed on %s" : "  succeeded on %s",buff);
+	StringCopy(&buff[StringLength(buff) - StringLength(SOURCE_SUFFIX)],
+	  STR_EMPTY);
+	if( fp2 != null )
+	{ if( fp != null )
+	    Error(3, 14, "files %s and %s%s both exist",
+	      FATAL, xfpos, buff, buff, SOURCE_SUFFIX);
+	  fp = fp2;
+	  *full_name = MakeWord(WORD, buff, xfpos);
+	}
       }
     }
   }
@@ -403,18 +614,19 @@ OBJECT *full_name;  FILE_POS *xfpos;
 
 FILE *OpenFile(fnum, check_ld, check_lt)
 FILE_NUM fnum;  BOOLEAN check_ld, check_lt;
-{ FILE *fp;  OBJECT full_name, y;
+{ FILE *fp;  OBJECT fname, full_name, y;
   ifdebug(DPP, D, ProfileOn("OpenFile"));
   debug2(DFS, D, "OpenFile(%s, %s)", FileName(fnum), bool(check_ld));
-  if( Down(fvec[fnum]) != fvec[fnum] )
-  { Child(y, Down(fvec[fnum]));
+  fname = ftab_num(file_tab, fnum);
+  if( Down(fname) != fname )
+  { Child(y, Down(fname));
     fp = StringFOpen(string(y), "r");
     debug1(DFS,DD,fp==null ? "  failed on %s" : "  succeeded on %s", string(y));
   }
   else
-  { fp = SearchPath(string(fvec[fnum]), file_path[path(fvec[fnum])],
-	   check_ld, check_lt, &full_name, &fpos(fvec[fnum]));
-    if( full_name != nil )  Link(fvec[fnum], full_name);
+  { fp = SearchPath(string(fname), file_path[path(fname)],
+	   check_ld, check_lt, &full_name, &fpos(fname));
+    if( full_name != nil )  Link(fname, full_name);
   }
   ifdebug(DPP, D, ProfileOff("OpenFile"));
   debug1(DFS, D, "OpenFile returning (fp %s null)", fp==null ? "==" : "!=");
@@ -445,449 +657,29 @@ FULL_CHAR *str;  unsigned char typ;  OBJECT *full_name;  FILE_POS *xfpos;
 } /* end OpenIncGraphicFile */
 
 
-/*@::ReadFromFile()@**********************************************************/
+/*****************************************************************************/
 /*                                                                           */
-/*  OBJECT ReadFromFile(fnum, pos, sym)                                      */
+/*  FileSetUpdated(fnum)                                                     */
 /*                                                                           */
-/*  Read an object from file fnum starting at position pos.                  */
-/*  The object may include @Env operators defining its environment.          */
-/*  If sym != nil, sym is the symbol which is to be read in.                 */
+/*  Declare that file fnum has been updated.                                 */
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT ReadFromFile(fnum, pos, sym)
-FILE_NUM fnum; long pos;  OBJECT sym;
-{ OBJECT t, res; int ipos;
-  ifdebug(DPP, D, ProfileOn("ReadFromFile"));
-  ifdebug(DFS, D, ipos = (int) pos);
-  debug3(DFS, D, "ReadFromFile(%s, %d, %s)", FileName(fnum), ipos,SymName(sym));
-  LexPush(fnum, (int) pos, DATABASE_FILE);
-  SwitchScope(sym);
-  t = LexGetToken();
-  if( type(t) != LBR )
-  { debug1(DFS, D, "  following because type(t) = %s", Image(type(t)));
-    Error(FATAL, &fpos(t),"syntax error (missing %s) in database file", KW_LBR);
-  }
-  res = Parse(&t, StartSym, FALSE, FALSE);
-  if( t != nil || type(res) != CLOSURE )
-  { debug1(DFS, D, "  following because of %s", t != nil ? "t" : "type(res)");
-    Error(FATAL, &fpos(res), "syntax error in database file");
-  }
-  UnSwitchScope(sym);
-  LexPop();
-  debug1(DFS, D, "ReadFromFile returning %s", EchoObject(res));
-  ifdebug(DPP, D, ProfileOff("ReadFromFile"));
-  return res;
-} /* end ReadFromFile */
-
-
-static FILE_NUM	last_write_fnum = NO_FILE;
-static FILE	*last_write_fp  = null;
-
-
-/*@::WriteClosure()@**********************************************************/
-/*                                                                           */
-/*  static WriteClosure(x)                                                   */
-/*                                                                           */
-/*  Write closure x to file last_write_fp, without enclosing braces and      */
-/*  without any environment attached.                                        */
-/*                                                                           */
-/*****************************************************************************/
-
-static BOOLEAN need_lvis(sym)		/* true if @LVis needed before sym */
-OBJECT sym;
-{ return !visible(sym) &&
-	 enclosing(sym) != StartSym &&
-	 type(enclosing(sym)) == LOCAL;
-} /* end need_lvis */
-
-static WriteClosure(x)
-OBJECT x;
-{ OBJECT y, link, z, sym;
-  BOOLEAN npar_seen, name_printed;
-  static WriteObject();
-
-  sym = actual(x);  npar_seen = FALSE;  name_printed = FALSE;
-  for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
-    if( type(y) == PAR )  switch( type(actual(y)) )
-    {
-      case LPAR:
-      
-	assert( Down(y) != y, "WriteObject/CLOSURE: LPAR!" );
-	Child(z, Down(y));
-	WriteObject(z, (int) precedence(sym));
-	StringFPuts(STR_SPACE, last_write_fp);
-	break;
-
-
-      case NPAR:
-      
-	assert( Down(y) != y, "WriteObject/CLOSURE: NPAR!" );
-	Child(z, Down(y));
-	if( !name_printed )
-	{ if( need_lvis(sym) )
-	  { StringFPuts(KW_LVIS, last_write_fp);
-	    StringFPuts(STR_SPACE, last_write_fp);
-	  }
-	  StringFPuts(SymName(sym), last_write_fp);
-	  name_printed = TRUE;
-	}
-	StringFPuts(STR_NEWLINE, last_write_fp);
-	StringFPuts(STR_SPACE, last_write_fp);
-	StringFPuts(STR_SPACE, last_write_fp);
-	StringFPuts(STR_SPACE, last_write_fp);
-	StringFPuts(SymName(actual(y)), last_write_fp);
-	StringFPuts(STR_SPACE, last_write_fp);
-	StringFPuts(KW_LBR, last_write_fp);
-	StringFPuts(STR_SPACE, last_write_fp);
-	WriteObject(z, NO_PREC);
-	StringFPuts(STR_SPACE, last_write_fp);
-	StringFPuts(KW_RBR, last_write_fp);
-	npar_seen = TRUE;
-	break;
-
-
-      case RPAR:
-      
-	assert( Down(y) != y, "WriteObject/CLOSURE: RPAR!" );
-	Child(z, Down(y));
-	if( !name_printed )
-	{ if( need_lvis(sym) )
-	  { StringFPuts(KW_LVIS, last_write_fp);
-	    StringFPuts(STR_SPACE, last_write_fp);
-	  }
-	  StringFPuts(SymName(sym), last_write_fp);
-	  name_printed = TRUE;
-	}
-	StringFPuts(npar_seen ? STR_NEWLINE : STR_SPACE, last_write_fp);
-	if( has_body(sym) )
-	{
-	  StringFPuts(KW_LBR, last_write_fp);
-	  StringFPuts(STR_SPACE, last_write_fp);
-	  WriteObject(z, NO_PREC);
-	  StringFPuts(STR_SPACE, last_write_fp);
-	  StringFPuts(KW_RBR, last_write_fp);
-	}
-	else WriteObject(z, (int) precedence(sym));
-	break;
-
-
-      default:
-      
-	Error(INTERN, &fpos(y), "WriteClosure: %s", Image(type(actual(y))) );
-	break;
-
-    } /* end switch */
-  } /* end for each parameter */
-  if( !name_printed )
-  { if( need_lvis(sym) )
-    { StringFPuts(KW_LVIS, last_write_fp);
-      StringFPuts(STR_SPACE, last_write_fp);
-    }
-    StringFPuts(SymName(sym), last_write_fp);
-    name_printed = TRUE;
-  }
-} /* end WriteClosure */
-
-
-/*@::WriteObject()@***********************************************************/
-/*                                                                           */
-/*  static WriteObject(x, outer_prec)                                        */
-/*                                                                           */
-/*  Write object x to file last_write_fp, assuming it is a subobject of an   */
-/*  object and the precedence of operators enclosing it is outer_prec.       */
-/*                                                                           */
-/*****************************************************************************/
-
-static WriteObject(x, outer_prec)
-OBJECT x;  int outer_prec;
-{ OBJECT link, y, gap_obj, sym, env;  FULL_CHAR *name;
-  int prec, i, last_prec;  BOOLEAN braces_needed;
-  switch( type(x) )
-  {
-
-    case WORD:
-
-      if( StringLength(string(x)) == 0 && outer_prec > ACAT_PREC )
-      { StringFPuts(KW_LBR, last_write_fp);
-	StringFPuts(KW_RBR, last_write_fp);
-      }
-      else StringFPuts(string(x), last_write_fp);
-      break;
-
-    
-    case QWORD:
-
-      StringFPuts(StringQuotedWord(x), last_write_fp);
-      break;
-
-    
-    case VCAT:  prec = VCAT_PREC;  goto ETC;
-    case HCAT:  prec = HCAT_PREC;  goto ETC;
-    case ACAT:  prec = ACAT_PREC;  goto ETC;
-
-      ETC:
-      if( prec < outer_prec )  StringFPuts(KW_LBR, last_write_fp);
-      last_prec = prec;
-      for( link = Down(x);  link != x;  link = NextDown(link) )
-      {	Child(y, link);
-	if( type(y) == GAP_OBJ )
-	{ if( Down(y) == y )
-	  { assert( type(x) == ACAT, "WriteObject: Down(y) == y!" );
-	    for( i = 1;  i <= vspace(y);  i++ )
-	      StringFPuts(STR_NEWLINE, last_write_fp);
-	    for( i = 1;  i <= hspace(y);  i++ )
-	      StringFPuts(STR_SPACE,  last_write_fp);
-	    last_prec = (vspace(y) + hspace(y) == 0) ? JUXTA_PREC : ACAT_PREC;
-	  }
-	  else
-	  { Child(gap_obj, Down(y));
-	    StringFPuts(type(x)==ACAT ? STR_SPACE : STR_NEWLINE, last_write_fp);
-	    StringFPuts(EchoCatOp(type(x), mark(gap(y)), join(gap(y))),
-	      last_write_fp);
-	    if( !is_word(type(gap_obj)) || StringLength(string(gap_obj)) != 0 )
-		WriteObject(gap_obj, FORCE_PREC);
-	    StringFPuts(STR_SPACE, last_write_fp);
-	    last_prec = prec;
-	  }
-	}
-	else
-	{ if( type(x) == ACAT )
-	  { OBJECT next_gap;  int next_prec;
-	    if( NextDown(link) != x )
-	    { Child(next_gap, NextDown(link));
-	      assert( type(next_gap) == GAP_OBJ, "WriteObject: next_gap!" );
-	      next_prec = (vspace(next_gap) + hspace(next_gap) == 0)
-				? JUXTA_PREC : ACAT_PREC;
-	    }
-	    else next_prec = prec;
-	    WriteObject(y, max(last_prec, next_prec));
-	  }
-	  else WriteObject(y, prec);
-	}
-      }
-      if( prec < outer_prec )  StringFPuts(KW_RBR, last_write_fp);
-      break;
-
-
-    case ENV:
-
-      if( Down(x) == x )
-      { /* do nothing */
-      }
-      else if( Down(x) == LastDown(x) )
-      {	Child(y, Down(x));
-	assert( type(y) == CLOSURE, "WriteObject: ENV/CLOSURE!" );
-	assert( LastDown(y) != y, "WriteObject: ENV/LastDown(y)!" );
-	Child(env, LastDown(y));
-	assert( type(env) == ENV, "WriteObject: ENV/env!" );
-	WriteObject(env, NO_PREC);
-	StringFPuts(KW_LBR, last_write_fp);
-	WriteClosure(y);
-	StringFPuts(KW_RBR, last_write_fp);
-	StringFPuts(STR_NEWLINE, last_write_fp);
-      }
-      else
-      {	Child(env, LastDown(x));
-	assert( type(env) == ENV, "WriteObject: ENV/ENV!" );
-	WriteObject(env, NO_PREC);
-	Child(y, Down(x));
-	assert( type(y) == CLOSURE, "WriteObject: ENV/ENV+CLOSURE!" );
-	WriteObject(y, NO_PREC);
-      }
-      break;
-
-
-    case CLOSURE:
-
-      sym = actual(x);  env = nil;
-      if( LastDown(x) != x )
-      {	Child(y, LastDown(x));
-	if( type(y) == ENV )  env = y;
-      }
-
-      braces_needed = env != nil ||
-	(precedence(sym) <= outer_prec && (has_lpar(sym) || has_rpar(sym)));
-
-      /* print environment */
-      if( env != nil )
-      {	StringFPuts(KW_ENV, last_write_fp);
-      	StringFPuts(STR_NEWLINE, last_write_fp);
-	WriteObject(env, NO_PREC);
-      }
-
-      /* print left brace if needed */
-      if( braces_needed )  StringFPuts(KW_LBR, last_write_fp);
-	
-      /* print the closure proper */
-      WriteClosure(x);
-
-      /* print closing brace if needed */
-      if( braces_needed )  StringFPuts(KW_RBR, last_write_fp);
-
-      /* print closing environment if needed */
-      if( env != nil )
-      { StringFPuts(STR_NEWLINE, last_write_fp);
-	StringFPuts(KW_CLOS, last_write_fp);
-      	StringFPuts(STR_NEWLINE, last_write_fp);
-      }
-      break;
-
-
-    case CROSS:
-
-      Child(y, Down(x));
-      assert( type(y) == CLOSURE, "WriteObject/CROSS: type(y) != CLOSURE!" );
-      StringFPuts(SymName(actual(y)), last_write_fp);
-      StringFPuts(KW_CROSS, last_write_fp);
-      Child(y, LastDown(x));
-      WriteObject(y, FORCE_PREC);
-      break;
-
-
-    case NULL_CLOS:	name = KW_NULL;		goto SETC;
-    case ONE_COL:	name = KW_ONE_COL;	goto SETC;
-    case ONE_ROW:	name = KW_ONE_ROW;	goto SETC;
-    case WIDE:		name = KW_WIDE;		goto SETC;
-    case HIGH:		name = KW_HIGH;		goto SETC;
-    case HSCALE:	name = KW_HSCALE;	goto SETC;
-    case VSCALE:	name = KW_VSCALE;	goto SETC;
-    case SCALE:		name = KW_SCALE;	goto SETC;
-    case HCONTRACT:	name = KW_HCONTRACT;	goto SETC;
-    case VCONTRACT:	name = KW_VCONTRACT;	goto SETC;
-    case HEXPAND:	name = KW_HEXPAND;	goto SETC;
-    case VEXPAND:	name = KW_VEXPAND;	goto SETC;
-    case PADJUST:	name = KW_PADJUST;	goto SETC;
-    case HADJUST:	name = KW_HADJUST;	goto SETC;
-    case VADJUST:	name = KW_VADJUST;	goto SETC;
-    case ROTATE:	name = KW_ROTATE;	goto SETC;
-    case CASE:		name = KW_CASE;		goto SETC;
-    case YIELD:		name = KW_YIELD;	goto SETC;
-    case XCHAR:		name = KW_XCHAR;	goto SETC;
-    case FONT:		name = KW_FONT;		goto SETC;
-    case SPACE:		name = KW_SPACE;	goto SETC;
-    case BREAK:		name = KW_BREAK;	goto SETC;
-    case NEXT:		name = KW_NEXT;		goto SETC;
-    case OPEN:		name = KW_OPEN;		goto SETC;
-    case TAGGED:	name = KW_TAGGED;	goto SETC;
-    case INCGRAPHIC:	name = KW_INCGRAPHIC;	goto SETC;
-    case SINCGRAPHIC:	name = KW_SINCGRAPHIC;	goto SETC;
-    case GRAPHIC:	name = KW_GRAPHIC;	goto SETC;
-
-      /* print left parameter, if present */
-      SETC:
-      if( DEFAULT_PREC <= outer_prec )  StringFPuts(KW_LBR, last_write_fp);
-      if( Down(x) != LastDown(x) )
-      {	Child(y, Down(x));
-	WriteObject(y, DEFAULT_PREC);
-	StringFPuts(STR_SPACE, last_write_fp);
-      }
-
-      /* print the name of the symbol */
-      StringFPuts(name, last_write_fp);
-
-      /* print right parameter, if present */
-      if( LastDown(x) != x )
-      {	Child(y, LastDown(x));
-	StringFPuts(STR_SPACE, last_write_fp);
-	if( type(x) == OPEN )
-	{ StringFPuts(KW_LBR, last_write_fp);
-	  WriteObject(y, NO_PREC);
-	  StringFPuts(KW_RBR, last_write_fp);
-	}
-	else WriteObject(y, DEFAULT_PREC);
-      }
-      if( DEFAULT_PREC <= outer_prec )
-	StringFPuts(KW_RBR, last_write_fp);
-      break;
-
-
-    default:
-
-      Error(INTERN, &fpos(x), "WriteObject: type(x) = %s", Image(type(x)));
-      break;
-
-  } /* end switch */
-} /* end WriteObject */
-
-
-/*@::AppendToFile(), CloseFiles()@********************************************/
-/*                                                                           */
-/*  AppendToFile(x, fnum, pos)                                               */
-/*                                                                           */
-/*  Append object x to file fnum, returning its fseek position in *pos.      */
-/*  Record the fact that this file has been updated.                         */
-/*                                                                           */
-/*****************************************************************************/
-
-AppendToFile(x, fnum, pos)
-OBJECT x;  FILE_NUM fnum;  int *pos;
-{ FULL_CHAR buff[MAX_LINE], *str;
-  debug2(DFS, D, "AppendToFile( %s, %s )", EchoObject(x), FileName(fnum));
-
-  /* open file fnum for writing */
-  if( last_write_fnum != fnum )
-  { if( last_write_fnum != NO_FILE )  fclose(last_write_fp);
-    str = FileName(fnum);
-    if( StringLength(str) + StringLength(NEW_DATA_SUFFIX) >= MAX_LINE )
-      Error(FATAL, PosOfFile(fnum), "file name %s%s is too long",
-	str, NEW_DATA_SUFFIX);
-    StringCopy(buff, str);  StringCat(buff, NEW_DATA_SUFFIX);
-    last_write_fp = StringFOpen(buff, "a");
-    if( last_write_fp == null )  Error(FATAL, &fpos(fvec[fnum]),
-		"cannot append to database file %s", buff);
-    last_write_fnum = fnum;
-  }
-
-  /* write x out and record the fact that fnum has changed */
-  *pos = (int) ftell(last_write_fp);
-  StringFPuts(KW_LBR, last_write_fp);
-  WriteObject(x, NO_PREC);
-  StringFPuts(KW_RBR, last_write_fp);
-  StringFPuts(STR_NEWLINE, last_write_fp);
-  StringFPuts(STR_NEWLINE, last_write_fp);
-  updated(fvec[fnum]) = TRUE;
-  debug0(DFS, D, "AppendToFile returning.");
-} /* end AppendToFile */
+FileSetUpdated(fnum)
+FILE_NUM fnum;
+{ updated(ftab_num(file_tab, fnum)) = TRUE;
+} /* end FileSetUpdated */
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  CloseFiles()                                                             */
+/*  BOOLEAN FileTestUpdated(fnum)                                            */
 /*                                                                           */
-/*  Close all files and move new versions to the names of old versions.      */
+/*  Test whether file fnum has been declared to be updated.                  */
 /*                                                                           */
 /*****************************************************************************/
 
-CloseFiles()
-{ FILE_NUM fnum;  FULL_CHAR buff[MAX_LINE];
-  ifdebug(DPP, D, ProfileOn("CloseFiles"));
-  debug0(DFS, D, "CloseFiles()");
-
-  /* close off last file opened by AppendToFile above */
-  if( last_write_fnum != NO_FILE )  fclose(last_write_fp);
-
-  /* get rid of old database files */
-  for( fnum = FirstFile(SOURCE_FILE);  fnum != NO_FILE;  fnum = NextFile(fnum) )
-  { StringCopy(buff, FileName(fnum));
-    StringCat(buff, DATA_SUFFIX);  StringUnlink(buff);
-  }
-
-  /* move any new database files to the old names, if updated */
-  for( fnum = FirstFile(DATABASE_FILE); fnum != NO_FILE; fnum = NextFile(fnum) )
-  { if( updated(fvec[fnum]) )
-    { StringCopy(buff, string(fvec[fnum]));
-      StringCat(buff, NEW_DATA_SUFFIX);
-      debug1(DFS, D, "unlink(%s)", string(fvec[fnum]));
-      StringUnlink(string(fvec[fnum])); /* may fail if no old version */
-      debug2(DFS, D, "link(%s, %s)", buff, string(fvec[fnum]));
-      if( StringLink(buff, string(fvec[fnum])) != 0 )
-        Error(INTERN, no_fpos, "link(%s, %s) failed", buff, string(fvec[fnum]));
-      debug1(DFS, D, "unlink(%s)", buff);
-      if( StringUnlink(buff) != 0 )  Error(INTERN, no_fpos, "unlink(%s)", buff);
-    }
-  }
-  debug0(DFS, D, "CloseFiles returning.");
-  ifdebug(DPP, D, ProfileOff("CloseFiles"));
-} /* end CloseFiles */
+BOOLEAN FileTestUpdated(fnum)
+FILE_NUM fnum;
+{ return (BOOLEAN) updated(ftab_num(file_tab, fnum));
+} /* end FileTestUpdated */

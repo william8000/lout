@@ -1,7 +1,7 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -84,12 +84,13 @@ STYLE *style;  OBJECT x;
 { GAP res_gap;  unsigned gap_inc;
   debug2(DSS, D, "SpaceChange(%s, %s)", EchoStyle(style), EchoObject(x));
   if( !is_word(type(x)) )
-  { Error(WARN, &fpos(x), "invalid left parameter to %s", KW_SPACE);
+  { Error(11, 1, "invalid left parameter of %s", WARN, &fpos(x), KW_SPACE);
   }
   else
   { GetGap(x, style, &res_gap, &gap_inc);
     if( gap_inc != GAP_ABS && units(res_gap) != units(space_gap(*style)) )
-    { Error(WARN, &fpos(x), "space %s incompatible with enclosing", string(x));
+    { Error(11, 2, "spacing %s is not compatible with current spacing",
+	WARN, &fpos(x), string(x));
     }
     else
     { units(space_gap(*style)) = units(res_gap);
@@ -137,13 +138,14 @@ STYLE *style;  OBJECT x;
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_CENTRE;
     else if( StringEqual(string(x), STR_BREAK_RLINES) )
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_RIGHT;
-    else Error(WARN, &fpos(x), "invalid %s option %s", KW_BREAK, string(x));
+    else Error(11, 3, "unknown option to %s symbol (%s)",
+	   WARN, &fpos(x), KW_BREAK, string(x));
   }
   else /* should be a new inter-line gap */
   { GetGap(x, style, &res_gap, &gap_inc);
     if( gap_inc != GAP_ABS && units(res_gap) != units(line_gap(*style)) )
-      Error(WARN, &fpos(x),
-		    "line spacing %s incompatible with enclosing", string(x));
+      Error(11, 4, "line spacing %s is not compatible with current spacing",
+        WARN, &fpos(x), string(x));
     else
     { units(line_gap(*style)) = units(res_gap);
       mode(line_gap(*style))  = mode(res_gap);
@@ -160,22 +162,29 @@ STYLE *style;  OBJECT x;
   debug2(DSS, D, "BreakChange(%s, %s)", EchoStyle(style), EchoObject(x));
   switch( type(x) )
   {
+    case NULL_CLOS: break;
+
     case WORD:
-    case QWORD:	changebreak(style, x);
+    case QWORD:	if( !StringEqual(string(x), STR_EMPTY) )
+		  changebreak(style, x);
 		break;
 
 
     case ACAT:	for( link = Down(x);  link != x;  link = NextDown(link) )
 		{ Child(y, link);
-		  if( type(y) == GAP_OBJ )  continue;
-		  else if( is_word(type(y)) )  changebreak(style, y);
-		  else Error(WARN, &fpos(x), "invalid left parameter of %s",
-			 KW_BREAK);
+		  if( type(y) == GAP_OBJ || type(y) == NULL_CLOS )  continue;
+		  else if( is_word(type(y)) )
+		  { if( !StringEqual(string(y), STR_EMPTY) )
+		      changebreak(style, y);
+		  }
+		  else Error(11, 5, "invalid left parameter of %s",
+			 WARN, &fpos(x), KW_BREAK);
 		}
 		break;
 
 
-    default:	Error(WARN, &fpos(x), "invalid left parameter of %s", KW_BREAK);
+    default:	Error(11, 6, "invalid left parameter of %s",
+		  WARN, &fpos(x), KW_BREAK);
 		break;
   }
   debug1(DSS, D, "BreakChange returning %s", EchoStyle(style));

@@ -1,0 +1,83 @@
+@Section
+   @Title { Changing the default values }
+   @Tag { cpsetup }
+@Begin
+@PP
+We have just seen that the @Code "@CP" symbol has many options for
+changing the appearance of the C text.  However, most people would
+not want to have a different style for every C text in their document;
+they want to define the style once at the start, and have all their
+C texts come out in that style without laboriously setting options
+on every @Code "@CP" symbol.  This is done by copying the setup file
+and changing it.
+@PP
+For general information about how to make your own setup file, consult
+Section {@NumberOf setup}.  The options that determine the default
+values are in the @Code "@CPrint" @Code "@Use" clause near the end of
+cprint. @Index @Code "@CPrint"
+the setup file:
+@ID @Code @Tab
+   vmargin { 0.5vx }
+   @Fmta { @Col A ! @Col B ! @Col C}
+   @Fmtb { @Col { "    #" A } ! @Col { "{" B } ! @Col "}" }
+{
+@Rowa A { "@Use {  @CPrint" }
+@Rowb A { "style" } B { fixed         }
+
+@Rowa 
+@Rowb A { "fixedfont" }			B { Courier  }
+@Rowb A { "fixedstrings" }		B { Base  }
+@Rowb A { "fixedidentifiers" }		B { Base  }
+@Rowb A { "fixedcomments" }		B { Base  }
+@Rowb A { "fixedkeywords" }		B { Base  }
+@Rowb A { "fixednumbers" }		B { Base  }
+@Rowb A { "fixedoperators" }		B { Base  }
+@Rowb A { "fixedsize" }			B { -1.0p         }
+@Rowb A { "fixedline" }			B { 1.0vx         }
+@Rowb A { "fixedtabin" }		B { 8		  }
+@Rowb A { "fixedtabout" }		B { 8s		  }
+
+@Rowa 
+@Rowb A { "varyingfont" }		B {               }
+@Rowb A { "varyingstrings" }		B { Slope         }
+@Rowb A { "varyingidentifiers" }	B { Slope         }
+@Rowb A { "varyingcomments" }		B { Base          }
+@Rowb A { "varyingkeywords" }		B { Bold          }
+@Rowb A { "varyingnumbers" }		B { Base          }
+@Rowb A { "varyingoperators" }		B { Base          }
+@Rowb A { "varyingsize" }		B { 1.0f          }
+@Rowb A { "varyingline" }		B { 1.0vx         }
+@Rowb A { "varyingtabin" }		B { 8		  }
+@Rowb A { "varyingtabout" }		B { 3f		  }
+
+@Rowa 
+@Rowb A { "symbolfont" }		B {               }
+@Rowb A { "symbolstrings" }		B { Slope         }
+@Rowb A { "symbolidentifiers" }		B { Slope         }
+@Rowb A { "symbolcomments" }		B { Base          }
+@Rowb A { "symbolkeywords" }		B { Bold          }
+@Rowb A { "symbolnumbers" }		B { Base          }
+@Rowb A { "symboloperators" }		B { Base          }
+@Rowb A { "symbolsize" }		B { 1.0f          }
+@Rowb A { "symbolline" }		B { 1.0vx         }
+@Rowb A { "symboltabin" }		B { 8		  }
+@Rowb A { "symboltabout" }		B { 3f		  }
+
+@Rowa A { "}" }
+}
+These show the default font families, font faces, font sizes, line
+spacings, and tab settings in force for the three styles, and also that
+the default style is {@Code "fixed"}.  Notice that the font family name
+for @Code "fixed" style is {@Code "Courier"}, but for the other styles is
+empty.  This causes the @Code "fixed" style to always switch to Courier,
+and the other styles to use the same font family as in the surrounding
+document.
+@PP
+To change a default value, delete the preceding @Code "#" and change the
+part between braces.  For example, suppose you are happy with @Code "fixed"
+except that you want bold keywords.  Then one line needs to be changed, to
+@ID @Code "fixedkeywords { Bold }"
+Or suppose you like @Code "varying" as it stands, but would like it to be
+the default style rather than {@Code "fixed"}.  Again, only one line needs
+to be changed, to {@Code "style { varying }"}.
+@End @Section

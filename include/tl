@@ -1,7 +1,7 @@
 
 ###############################################################################
 #                                                                             #
-#  Lout @ToyLayout package (Jeff Kingston, July 1993)                         #
+#  Lout @ToyLayout package (Jeff Kingston, July 1993, updated October 1994)   #
 #                                                                             #
 #  In response to a user request I have put together this tiny package for    #
 #  people to play with who want to start learning how to do page layout and   #
@@ -20,7 +20,8 @@
 #                                                                             #
 ###############################################################################
 
-@SysInclude { ft }
+@SysInclude { fontdefs }
+@SysInclude { langdefs }
 
 export @I @B @Heading @PP @LP @DP @NP
        @LeftDisplay @IndentedDisplay @CenteredDisplay
@@ -84,6 +85,7 @@ def @ToyLayout
     {	@PageWidth @Wide @PageHeight @High
 	{ Times Base 12p } @Font
 	{ adjust nohyphen 14px } @Break
+	English @Language { 0 0 0 } @SetColour
 	{   //1i ||1i
 	    @HExpand @VExpand x
 	    ||1i //1i

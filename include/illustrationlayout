@@ -1,0 +1,35 @@
+
+###########################################################################
+#                                                                         #
+#  @IllustrationLayout extension to @DocumentLayout.                      #
+#                                                                         #
+#  Jeffrey H. Kingston                                                    #
+#  August 1994                                                            #
+#                                                                         #
+#  This package extends DocumentLayout for illustrations.                 #
+#                                                                         #
+###########################################################################
+
+extend @DocumentLayout
+export @Illustration
+def @IllustrationLayout
+@Begin
+
+    #######################################################################
+    #                                                                     #
+    #  @Illustration                                                      #
+    #                                                                     #
+    #######################################################################
+
+    def @Illustration
+	named @InitialFont { @InitialFont }
+	named @InitialBreak { @InitialBreak }
+	named @InitialLanguage { @InitialLanguage }
+	named @InitialColour { @InitialColour }
+	right x
+    {
+        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
+	{ @ColourCommand @InitialColour } @SetColour @OneCol @OneRow x
+    }
+
+@End @IllustrationLayout

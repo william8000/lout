@@ -1,0 +1,79 @@
+.TH C2LOUT 1
+.SH NAME
+c2lout - convert C and C++ source code into Lout
+.SH SYNOPSIS
+c2lout [ options ] C-files
+.SH DESCRIPTION
+Reformat C and C++ source code for input to the Lout document formatting
+system, taking care of comments, character strings, tab characters, etc.
+.P
+c2lout reads the named C and C++ files and produces output
+suitable for input to "lout -s".  Thus,
+
+     c2lout myprog.c | lout -s | lpr
+
+will print myprog.c on a PostScript printer.  Each file will start on a
+new page, preceded by its name in bold.
+.SH OPTIONS
+.TP
+-pfixed
+Use a fixed width font (the default).
+.TP
+-pvarying
+Use a varying-width italic font with non-italic bold keywords.
+.TP
+-psymbol
+Use a varying-width italic font with mathematical symbols and
+non-italic bold keywords.
+.TP
+-n
+Do not print the file name before each C or C++ file.
+.TP
+-f<font>
+Select a font family.  The default is -fCourier for -pfixed, and -fTimes
+for -pvarying and -psymbol.
+.TP
+-s<size>
+Select a Lout font size.  The default is -s9p (meaning 9 points) for
+-pfixed, and -s10p for -pvarying and -psymbol.  These work well with
+80-character-wide programs.
+.TP
+-v<vsize>
+Select a Lout vertical inter-line gap.  The default is -v1.1fx meaning
+1.1 times the font size measured from baseline to baseline.
+.TP
+-t<num>
+Set the tab interval to <num> characters (default is -t8).
+.TP
+-T<width>
+Without this option, c2lout simulates tabs with spaces.  With this
+option, c2lout simulates tabs with Lout tabulation operators; <width>
+is the width of one tab interval in the final print, measured in Lout
+units.  This guarantees alignment of characters following tabs even
+with varying-width fonts, provided <width> is sufficiently large.
+For example, -T0.5i produces half-inch tab intervals.
+.TP
+-u
+Print usage information on stderr.
+.TP
+-V
+Print version information on stderr.
+.SH RAW MODE
+There is a "raw mode" usage of c2lout invoked by a -r flag.  This
+converts one C file into Lout-readable source without any heading or
+trailing information.  Synopsis:
+
+    c2lout -r -i<infile> -o<outfile> -e<errfile> -t<num> -T<width>
+    
+Users should never need this mode; it is invoked automatically
+from within Lout by the @CP symbol from the cprint package
+(see reference).
+.SH SEE ALSO
+lout(1), lpr(1), ghostview(1)
+.SH REFERENCES
+.P
+Jeffrey H. Kingston, "A User's Guide to the Lout Document Formatting
+System", Chapter 11.
+.SH AUTHOR
+.P
+Jeffrey H. Kingston

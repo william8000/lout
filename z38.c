@@ -1,7 +1,7 @@
 /*@z38.c:Encoding Vectors:Declarations@***************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -24,7 +24,8 @@
 /*                                                                           */
 /*  FILE:         z38.c                                                      */
 /*  MODULE:       Encoding Vectors                                           */
-/*  EXTERNS:      EvLoad(), EvRetrieve(), EvName(), EvPrintAll()             */
+/*  EXTERNS:      EvLoad(), EvRetrieve(), EvName(), EvPrintEncodings(),      */
+/*                EvPrintResources()                                         */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -79,10 +80,11 @@ OBJECT file_name;  BOOLEAN must_print;
   { 
     /* initialize new slot in ev_table[] for a new encoding vector */
     if( evtop++ == MAX_EV )
-      Error(FATAL, &fpos(file_name), "too many encoding vectors");
+      Error(38, 1, "too many encoding vectors", FATAL, &fpos(file_name));
     ev_table[enc] = ev = (EVEC) malloc( sizeof(struct evec) );
-    if( ev == (EVEC) NULL )  Error(FATAL, &fpos(file_name),
-      "run out of memory when loading encoding vector");
+    if( ev == (EVEC) NULL )
+      Error(38, 2, "run out of memory when loading encoding vector",
+	FATAL, &fpos(file_name));
     ev->must_print = must_print;
     ev->file_name  = file_name;
     for( i = 0;  i < MAX_CHAR; i++ )  ev->vector[i] = nil;
@@ -92,19 +94,20 @@ OBJECT file_name;  BOOLEAN must_print;
     ev->fnum = DefineFile(string(file_name), STR_EMPTY, &fpos(file_name),
       ENCODING_FILE, ENCODING_PATH);
     fp = OpenFile(ev->fnum, FALSE, FALSE);
-    if( fp == NULL )  Error(FATAL, PosOfFile(ev->fnum),
-      "cannot open encoding vector file %s", FileName(ev->fnum));
+    if( fp == NULL )
+      Error(38, 3, "cannot open encoding vector file %s",
+	FATAL, PosOfFile(ev->fnum), FileName(ev->fnum));
 
     /* invent a PostScript name for the encoding vector */
     StringCopy(buff, AsciiToFull("vec"));
     StringCat(buff, StringInt(evtop));
     ev->name = MakeWord(WORD, buff, no_fpos);
 
-    /* read character names and insert (name, position) pairs into hash table */
+    /* read character names and insert (name, pos) pairs into hash table */
     for( code = 0;  fscanf(fp, "%s", buff) == 1;  code++ )
-    { if( code >= MAX_CHAR )  Error(FATAL, PosOfFile(ev->fnum),
-	"too many character names in encoding vector file %s",
-	FileName(ev->fnum));
+    { if( code >= MAX_CHAR )
+	Error(38, 4, "too many character names in encoding vector file %s",
+	  FATAL, PosOfFile(ev->fnum), FileName(ev->fnum));
       hash(buff, pos);
       while( (i = ev->hash_table[pos]) != 0 )
       {	if( StringEqual(string(ev->vector[i]), buff) )
@@ -118,16 +121,16 @@ OBJECT file_name;  BOOLEAN must_print;
 	ev->hash_table[pos] = (FULL_CHAR) code;
       }
     }
-    if( code != MAX_CHAR )  Error(FATAL, PosOfFile(ev->fnum),
-	"too few character names in encoding vector file %s",
-	FileName(ev->fnum));
+    if( code != MAX_CHAR )
+      Error(38, 5, "too few character names in encoding vector file %s",
+	FATAL, PosOfFile(ev->fnum), FileName(ev->fnum));
   }
   debug1(DEV, D, "EvLoad returning %d", enc);
   return enc;
 } /* end EvLoad */
 
 
-/*@::EvRetrieve(), EvName(), EvPrintAll()@************************************/
+/*@::EvRetrieve(), EvName(), EvPrintEncodings()@******************************/
 /*                                                                           */
 /*  FULL_CHAR EvRetrieve(str, enc)                                           */
 /*                                                                           */
@@ -166,20 +169,41 @@ ENCODING enc;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  EvPrintAll(fp)                                                           */
+/*  EvPrintEncodings(fp)                                                     */
 /*                                                                           */
 /*  Print all encoding vectors in PostScript form on file fp.                */
 /*                                                                           */
 /*****************************************************************************/
 
-EvPrintAll(fp)
+EvPrintEncodings(fp)
 FILE *fp;
 { ENCODING enc;  EVEC ev;  int i;
   for( enc = 0;  enc < evtop;  enc++ )  if( ev_table[enc]->must_print )
   { ev = ev_table[enc];
+    fprintf(fp, "%%%%BeginResource encoding %s\n", string(ev->name));
     fprintf(fp, "/%s [\n", string(ev->name));
     for( i = 0;  i < MAX_CHAR;  i++ )
       fprintf(fp, "/%s%c", string(ev->vector[i]), (i+1) % 8 != 0 ? ' ' : '\n');
-    fprintf(fp, "] def\n\n");
+    fprintf(fp, "] def\n");
+    fprintf(fp, "%%%%EndResource\n\n");
   }
-} /* end EvPrintAll */
+} /* end EvPrintEncodings */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  EvPrintResources(fp)                                                     */
+/*                                                                           */
+/*  Print all encoding vectors in PostScript form on file fp.                */
+/*                                                                           */
+/*****************************************************************************/
+
+EvPrintResources(fp)
+FILE *fp;
+{ ENCODING enc;  EVEC ev;  int i;
+  for( enc = 0;  enc < evtop;  enc++ )  if( ev_table[enc]->must_print )
+  { ev = ev_table[enc];
+    fprintf(fp, "%%%%+ encoding %s\n", string(ev->name));
+  }
+} /* end EvPrintResources */
+

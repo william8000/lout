@@ -1,14 +1,14 @@
 { @Reference
-     @Tag { knuth84 }
+     @Tag { knuth1984tex }
      @Type { Book }
-     @Author { Knuth, Donald E. }
-     @Title { The T{ /0.2fo E}XBook }
+     @Author { Donald E. Knuth }
+     @Title { The {@TeX}Book }
      @Publisher { Addison-Wesley }
      @Year { 1984 }
 }
 
 { @Reference
-     @Tag { adobe90 }
+     @Tag { adobe1990ps }
      @Type { Book }
      @Author { Adobe Systems, Inc. }
      @Title { PostScript Language Reference Manual, Second Edition }
@@ -17,39 +17,50 @@
 }
 
 { @Reference
-     @Tag { reid80 }
-     @Type { ConferencePaper }
-     @Author { Reid, Brian K. }
+     @Tag { jensen1975pascal }
+     @Type { Book }
+     @Author { K. Jensen and N. Wirth }
+     @Title { Pascal User Manual and Report }
+     @Publisher { Springer-Verlag }
+     @Year { 1975 }
+}
+
+{ @Reference
+     @Tag { reid1980scribe }
+     @Type { InProceedings }
+     @Author { Brian K. Reid }
      @Title { A High-Level Approach to Computer Document Production }
-     @Proceedings { Proceedings of the 7th Symposium on the Principles
+     @InTitle { Proceedings of the 7th Symposium on the Principles
 of Programming Languages (POPL), Las Vegas NV }
      @Pages { 24--31 }
      @Year { 1980 }
 }
 
 { @Reference
-     @Tag { strunk79 }
+     @Tag { strunk1979style }
      @Type { Book }
-     @Author { Strunk, William and White, E. B. }
+     @Author { William Strunk and E. B. White }
      @Title { The Elements of Style }
-     @Publisher { Macmillan, third edition }
+     @Publisher { Macmillan }
+     @Edition { Third }
      @Year { 1979 }
 }
 
 { @Reference
-     @Tag { ossanna76 }
+     @Tag { ossanna1976troff }
      @Type { TechReport }
      @Author { Joseph F. Ossanna }
      @Title { "Nroff/Troff" User's Manual }
      @Number { 54 }
-     @Institution { Bell Laboratories, Murray Hill, NJ 07974 }
+     @Institution { Bell Laboratories }
+     @Address { Murray Hill, NJ 07974 }
      @Year { 1976 }
 }
 
 { @Reference
-     @Tag { kernighan75 }
-     @Type { JournalArticle }
-     @Author { Kernighan, Brian W. and Cherry, Lorinda L. }
+     @Tag { kernighan1975eqn }
+     @Type { Article }
+     @Author { Brian W. Kernighan and Lorinda L. Cherry }
      @Title { A system for typesetting mathematics }
      @Journal { Communications of the ACM }
      @Volume { 18 }
@@ -58,20 +69,21 @@ of Programming Languages (POPL), Las Vegas NV }
 }
 
 { @Reference
-     @Tag { lesk76 }
+     @Tag { lesk1976tbl }
      @Type { TechReport }
-     @Author { Lesk, M. E. }
+     @Author { M. E. Lesk }
      @Title { Tbl -- a program to format tables }
      @Number { 49 }
-     @Institution { Bell Laboratories, Murray Hill, NJ 07974 }
+     @Institution { AT"&"T Bell Laboratories }
+     @Address { Murray Hill, NJ 07974 }
      @Year { 1976 }
 }
 
 { @Reference
-     @Tag { kernighan82 }
-     @Type { JournalArticle }
-     @Author { Kernighan, Brian W. }
-     @Title { PIC -- A language for typesetting graphics}
+     @Tag { kernighan1982pic }
+     @Type { Article }
+     @Author { Brian W. Kernighan }
+     @Title { PIC -- A language for typesetting graphics }
      @Journal { Software Practice and Experience }
      @Volume { 12 }
      @Pages { 1--21 }
@@ -79,103 +91,90 @@ of Programming Languages (POPL), Las Vegas NV }
 }
 
 { @Reference
-     @Tag { kingston93basser }
-     @Type { Software }
-     @Author { Kingston, Jeffrey H. }
-     @Title { The Basser Lout Document Formatter, Version 2.05 }
-     @Year { 1993 }
-     @Comment { Computer program, publicly available in the
+     @Tag { bentley1984grap }
+     @Type { TechReport }
+     @Author { Jon L. Bentley and Brian W. Kernighan }
+     @Title { GRAP -- a language for typesetting graphs }
+     @Number { 114 (Computing Science) }
+     @Institution { AT"&"T Bell Laboratories }
+     @Address { Murray Hill, NJ 07974 }
+     @Year { 1984 }
+}
+
+{ @Reference
+     @Tag { ellis1990cpp }
+     @Type { Book }
+     @Author { Margaret A. Ellis and Bjarne Stroustrup }
+     @Title { The annotated C++ reference manual }
+     @Publisher { Addison-Wesley }
+     @Year { 1990 }
+}
+
+{ @Reference
+     @Tag { kingston1994lout.program }
+     @Type { Book }
+     @Author { Jeffrey H. Kingston }
+     @Title { The Basser Lout Document Formatting System (Version 3) }
+     @TitleNote { Computer program }
+     @Year { 1994 }
+     @Note { Publicly available in the
 @I jeff subdirectory of the home directory of @I ftp to host
 @I ftp.cs.su.oz.au with login name @I anonymous or @I ftp and any
 non-empty password (e.g. {@I none}).  Lout distributions are also
-available from the comp.sources.misc newsgroup.  All enquiries to
-"jeff@cs.su.oz.au". }
+available from the @I comp.sources.misc newsgroup, and by electronic
+mail from the author.  All enquiries to {@I "jeff@cs.su.oz.au" }. }
 }
 
 { @Reference
-     @Tag { kingston92 }
+     @Tag { kingston1994lout.expert }
+     @Type { Book }
+     @Author { Jeffrey H. Kingston }
+     @Title { An Expert's Guide to the Lout Document Formatting
+System (Version 3) }
+     @Institution { Basser Department of Computer Science }
+     @Address { University of Sydney }
+     @Year { 1994 }
+}
+
+{ @Reference
+     @Tag { kingston1994lout.user }
+     @Type { Book }
+     @Author { Jeffrey H. Kingston }
+     @Title { A User's Guide to the Lout Document Formatting
+System (Version 3) }
+     @Institution { Basser Department of Computer Science }
+     @Address { University of Sydney }
+     @Year { 1994 }
+}
+
+{ @Reference
+     @Tag { kingston1994lout.overheads }
      @Type { TechReport }
-     @Author { Kingston, Jeffrey H. }
-     @Title { Document Formatting with Lout (Second Edition) }
-     @Number { 449 }
-     @Institution { Basser Department of Computer
-Science F09, University of Sydney 2006, Australia }
-     @Year { 1992 }
+     @TRType { Overhead transparencies }
+     @Author { Jeffrey H. Kingston }
+     @Title { A Practical Introduction to the Lout Document Formatting
+System }
+     @Institution { Basser Department of Computer Science }
+     @Address { University of Sydney }
+     @Year { 1994 }
 }
 
 { @Reference
-     @Tag { kingston92begin }
-     @Type { TechReport }
-     @Author { Kingston, Jeffrey H. }
-     @Title { A beginners' guide to Lout }
-     @Number { 450 }
-     @Institution { Basser Department of Computer
-Science F09, University of Sydney 2006, Australia }
-     @Year { 1992 }
+     @Tag { kingston1993lout.design }
+     @Type { Article }
+     @Author { Jeffrey H. Kingston }
+     @Title { The design and implementation of the Lout document
+formatting language }
+     @Journal { Software---Practice and Experience }
+     @Volume { 23 }
+     @Pages { 1001--1041 }
+     @Year { 1993 }
 }
 
 { @Reference
-     @Tag { kingston92eq }
-     @Type { TechReport }
-     @Author { Kingston, Jeffrey H. }
-     @Title { Eq -- a Lout package for typesetting mathematics }
-     @Number { 452 }
-     @Institution { Basser Department of Computer
-Science F09, University of Sydney 2006, Australia }
-     @Year { 1992 }
-     @Comment { Contains an appendix describing the Pas Pascal
-formatter. }
-}
-
-{ @Reference
-     @Tag { kingston92fig }
-     @Type { TechReport }
-     @Author { Kingston, Jeffrey H. }
-     @Title { Fig -- a Lout package for drawing figures }
-     @Number { 453 }
-     @Institution { Basser Department of Computer
-Science F09, University of Sydney 2006, Australia }
-     @Year { 1992 }
-}
-
-{ @Reference
-     @Tag { kingston91over }
-     @Type { TechReport }
-     @Author { Kingston, Jeffrey H. }
-     @Title { A new approach to document formatting }
-     @Number { 412 }
-     @Institution { Basser Department of Computer
-Science F09, University of Sydney 2006, Australia }
-     @Year { 1991 }
-}
-
-{ @Reference
-     @Tag { kingston92tab }
-     @Type { TechReport }
-     @Author { Kingston, Jeffrey H. }
-     @Title { Tab -- a Lout package for formatting tables }
-     @Number { 451 }
-     @Institution { Basser Department of Computer
-Science F09, University of Sydney 2006, Australia }
-     @Year { 1992 }
-}
-
-{ @Reference
-     @Tag { kingston92design }
-     @Type { TechReport }
-     @Author { Kingston, Jeffrey H. }
-     @Title { The design and implementation of the Lout document formatting language }
-     @Number { 442 }
-     @Institution { Basser Department of Computer
-Science F09, University of Sydney 2006, Australia }
-     @Year { 1992 }
-     @Comment { To appear in @I { Software---Practice and Experience. } }
-}
-
-{ @Reference
-     @Tag { wirth71 }
-     @Type { JournalArticle }
-     @Author { Wirth, N. }
+     @Tag { wirth1971pascal }
+     @Type { Article }
+     @Author { N. Wirth }
      @Title { The programming language Pascal }
      @Journal { Acta Informatica }
      @Volume { 1 }
@@ -184,21 +183,19 @@ Science F09, University of Sydney 2006, Australia }
 }
 
 { @Reference
-     @Tag { brooks91 }
-     @Type { JournalArticle }
-     @Author { Brooks, Kenneth P. }
-     @Title { Lilac: a two-view document editor }
+     @Tag { brooks1991lilac }
+     @Type { Article }
+     @Author { Kenneth P. Brooks }
+     @Title { Lilac:  a two-view document editor }
      @Journal { IEEE Computer }
-     @Volume { @Null }
      @Pages { 7--19 }
      @Year { 1991 }
 }
 
 { @Reference
-     @Tag { furuta82 }
-     @Type { JournalArticle }
-     @Author { Furuta, Richard, Scofield, Jeffrey,
-and Shaw, Alan }
+     @Tag { furuta1982survey }
+     @Type { Article }
+     @Author { Richard Furuta, Jeffrey Scofield, and Alan Shaw }
      @Title { Document formatting systems:  survey,
 concepts, and issues }
      @Journal { Computing Surveys }
@@ -206,3 +203,74 @@ concepts, and issues }
      @Pages { 417--472 }
      @Year { 1982 }
 }
+
+{ @Reference
+     @Tag { kernighan1988c }
+     @Type { Book }
+     @Author { Brian W. Kernighan and Dennis M. Ritchie }
+     @Title { The C programming language (second edition) }
+     @Publisher { Prentice Hall }
+     @Year { 1988 }
+}
+
+{ @Reference
+     @Tag { vanleunen1992handbook }
+     @Type { Book }
+     @Author { Mary-Claire van Leunen }
+     @Title { A Handbook for Scholars }
+     @Publisher { Oxford }
+     @Edition { Revised }
+     @Year { 1992 }
+}
+
+{ @Reference
+     @Tag { homer.odyssey }
+     @Type { Book }
+     @Author { Homer }
+     @Title { The Odyssey }
+     @TitleNote { Translated by E. V. Rieu }
+     @Pinpoint { Chapter VI }
+     @Pages { 102--111 }
+     @Page { 102 }
+     @Publisher { Penguin Books }
+     @Address { Harmondsworth, Middlesex }
+     @Edition { Penguin Classics }
+     @Month { August }
+     @Year { 1942 }
+     @Note { The date of composition is unknown, but
+is thought to be about the tenth century BC }
+}
+
+{ @Reference
+     @Tag { rieu1942intro }
+     @Type { InBook }
+     @Author { E. V. Rieu }
+     @Title { Introduction to @I { The Odyssey } }
+     @InAuthor { Homer }
+     @InTitle { The Odyssey }
+     @Publisher { Penguin }
+     @Year { 1942 }
+}
+
+{ @Reference
+     @Tag { christofides1976tsp }
+     @Type { TechReport }
+     @Author { N. Christofides }
+     @Title { Worst-case analysis of a new heuristic
+for the travelling salesman problem }
+     @Number { 388 }
+     @Institution { Graduate School of Industrial
+Administration, Carnegie-Mellon University }
+     @Address { Pittsburgh, PA }
+     @Year { 1976 }
+}
+
+{ @Reference
+     @Tag { lamport1986latex }
+     @Type { Book }
+     @Author { Leslie Lamport }
+     @Title { @LaTeX User's Guide and Reference Manual }
+     @Publisher { Addison-Wesley }
+     @Year { 1986 }
+}
+

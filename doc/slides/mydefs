@@ -1,0 +1,7 @@
+
+def @Code right x { { Helvetica Base -2p } @Font lines @Break x }
+
+def @ShowPage right x
+{
+    @Box margin { 1i } 4i @Wide 5i @High { x // }
+}

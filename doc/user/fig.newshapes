@@ -1,0 +1,195 @@
+@Section
+   @Title { Creating new shapes }
+   @Tag { newshapes }
+@Begin
+@PP
+If the shape you need is not provided by {@Code "@Fig"}, you can create
+figure.fig @Index { @Code "@Figure" within @Code "@Fig" }
+it using the @Code "@Figure" symbol (within {@Code "@Fig"}, the meaning of
+@Code "@Figure" is not that of Section {@NumberOf figures}).  @Code "@Figure"
+takes all the options we have already seen, plus another one called
+shape. @Index { @Code "shape" option of @Code "@Figure" }
+{@Code shape}:
+@ID {
+@Code {
+"@Figure"
+"   shape {"
+"      0 0  xsize 0"
+"      0 ysize  0 0"
+"   }"
+"{ 4c @High 3c @Wide }"
+}
+||7ct
+@Fig {
+@Figure
+   shape { 0 0  xsize 0
+           0 ysize  0 0
+         }
+{ 4c @High 3c @Wide }
+}
+}
+The expression @Code "4c @High 3c @Wide {}" (recall that an empty
+object is inserted automatically when required) produces a four
+centimetre high, three centimetre wide blank space.  The pairs of
+numbers define points in a coordinate system whose origin is the lower
+left corner of the right parameter; the upper right corner
+is @Code xsize {@Code ysize}, and the point where the right parameter's
+marks cross is {@Code "xmark ymark"}:
+@FootNote {
+Marks are used for aligning an object with nearby objects; they are
+explained in the expert's guide @Cite { $kingston1994lout.expert }.  Expert
+users will note that this arrangement is identical with that for the
+@Code "@Graphic" symbol of raw Lout. }
+@ID 10p @Font
+{
+   { &1rt @I ysize /0ik &1rt @I ymark /0ik &1rt 0 } |0.4c
+   {  /
+      |0ik @ShowMarks { 1c @High 1.5c @Wide ^| 3c @Wide ^/ 2c @High }
+      |0ik /
+   }
+   /0.3c
+   | 0 | @I xmark | @I xsize
+}
+A sequence of points defines a shape, like the triangle above.  Arrowheads
+are drawn pointing forwards from the last segment and backwards from the
+first, as requested; the @Code margin option has default value {@Code 0c}.
+@PP
+Normally, the points are connected by straight lines to form the shape,
+which is then painted and drawn in the usual way, depending on the other
+options.
+@PP
+If two points in the shape are separated by {@Code {"[" &0.5s "]"}}, no
+line will be drawn between them.  This permits a shape to consist of two
+or more disconnected parts.
+@PP
+If two points in the shape are separated by
+{@Code "[" & @Eq{x ``` y} & @Code "]"}, where
+@Eq {x} and @Eq {y} are numbers, the two points will be joined by an
+circular.arc @Index { circular arcs }
+elliptical.arc @Index { elliptical arcs }
+anticlockwise arc whose centre is the point @Eq {(x, y)}.  This arc
+will be circular if possible, otherwise it will be part of an ellipse
+whose axes are oriented horizontally and vertically.  The notation
+@Code "[" & @Eq {x ``` y} @Code "clockwise]" makes the arc go
+clockwise.  For example,
+@ID {
+@Code {
+"@Figure"
+"   shape {"
+"      0 -0.5 cm"
+"      0 0.5 cm"
+"      1 cm 0  0 -0.5 cm [" &0.5s "]"
+"      1 cm 0 [ 1.1 cm 0 ]"
+"      1 cm 0"
+"   }"
+"{}"
+}
+||7ct
+@Fig { //0.5c
+@Figure
+   shape { 0 -0.5 cm  0 0.5 cm
+           1 cm 0  0 -0.5 cm []
+           1 cm 0 [ 1.1 cm 0 ] 1 cm 0
+         }
+{}
+}
+}
+We have recklessly disregarded the size of the following object when
+drawing this shape, a dangerous thing to do since Lout thinks that the
+figure is the same size as the following object.
+@PP
+Finally, two points may be separated by
+@Eq { [x sub 1 ``` y sub 1 ```  x sub 2 ``` y sub 2 & ] }, which requests
+that a Bezier curve be drawn between them with control points
+bezier.curve @Index { Bezier curve }
+@Eq { (x sub 1 & , y sub 1 & ) } and
+@Eq { (x sub 2 & , y sub 2 & ) }:
+@ID @Fig {
+@Figure
+   margin { 0c }
+   shape { 1 cm 2 cm 4 cm 3.5 cm  9 cm 2 cm 2 cm 0.6 cm }
+   linestyle { dashed }
+@Figure
+   margin { 0c }
+   shape { 1 cm 2 cm [4 cm 3.5 cm  9 cm 2 cm] 2 cm 0.6 cm }
+{ 7c @Wide 4c @High }
+
+// { -0.3  cm 2.0 cm } @BaseOf @Eq { (x sub 0 & , y sub 0 & )}
+// {  4.2  cm 3.5 cm } @BaseOf @Eq { (x sub 1 & , y sub 1 & )}
+// {  9.1  cm 2.0 cm } @BaseOf @Eq { (x sub 2 & , y sub 2 & )}
+// {  2.1  cm 0.0 cm } @BaseOf @Eq { (x sub 3 & , y sub 3 & )}
+}
+The curve is attracted toward the control points, without reaching
+them; it is tangent to the straight line from the start point to the
+first control point, and from the second control point to the finishing
+point, and it lies wholly inside the quadrilateral formed by the four
+points.  Owing to the author's laziness, dashes and dots do not fit as
+neatly onto Bezier curves as they do onto lines and arcs.
+@PP
+Lines, arrows and arcs at any angle can be produced using {@Code "@Figure"}:
+@ID {
+@Code {
+"@Figure"
+"   shape { 0 0  xsize ysize }"
+"   arrow { forward }"
+"{ 2c @High 3c @Wide }"
+}
+||7ct
+@Fig {
+@Figure
+   shape { 0 0  xsize ysize }
+   arrow { forward }
+{ 2c @High 3c @Wide }
+}
+}
+However, for convenience there are @Code "@Line" and @Code "@Arrow"
+line. @Index { @Code "@Line" }
+arrow. @Index { @Code "@Arrow" }
+symbols which have two options, @Code "from" and {@Code "to"}, for
+specifying the endpoints:
+@ID {
+@Code {
+"@Arrow"
+"   from { 0 0 }"
+"   to { xsize ysize }"
+"{ 2c @High 3c @Wide }"
+}
+||7ct
+@Fig {
+@Arrow
+   from { 0 0 }
+   to { xsize ysize }
+{ 2c @High 3c @Wide }
+}
+}
+There is also an @Code "@Arc" symbol, which draws a circular or
+arc. @Index { @Code "@Arc" }
+elliptical arc from one point to another about a given centre, with
+the usual options:
+@ID {
+@Code {
+"@Arc"
+"   from { 0 0 }"
+"   to { xsize ysize }"
+"   ctr { 0 ysize }"
+"   direction { anticlockwise }"
+"   arrow { forward }"
+"   linestyle { dashed }"
+"{ 2c @High 3c @Wide }"
+}
+||7ct
+@Fig {
+@Arc
+   from { 0 0 }
+   to { xsize ysize }
+   ctr { 0 ysize }
+   direction { anticlockwise }
+   arrow { forward }
+   linestyle { dashed }
+{ 2c @High 3c @Wide }
+}
+}
+The arc goes either @Code clockwise (the default) or @Code anticlockwise
+about the centre, depending on the @Code direction option.  Any
+arrowhead will point in a direction tangent to the arc.
+@End @Section

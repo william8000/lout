@@ -1,0 +1,209 @@
+@Section
+   @Title { Basic shapes }
+   @Tag { shapes }
+@Begin
+@PP
+@Code "@Fig" has a repertoire of basic shapes, whose size varies
+depending on what they enclose:
+@IL
+@LI {
+@Code "@Ellipse { hello, world }"
+||7ct
+@Fig {
+@Ellipse { hello, world }
+}
+}
+@LI {
+@Code "@Box { 2c @High }"
+||7ct
+@Fig {
+@Box { 2c @High }
+}
+}
+@EL
+There are six such shapes: {@Code "@Box"}, {@Code "@Square"},
+box.fig @Index { @Code "@Box" in @Code "@Fig" }
+square. @Index @Code "@Square"
+{@Code "@Diamond"}, {@Code "@Polygon"}, {@Code "@Ellipse"}, and
+diamond. @Index @Code "@Diamond"
+ellipse. @Index @Code "@Ellipse"
+circle. @Index @Code "@Circle"
+{@Code "@Circle"}; the result of each is the following object,
+enclosed in a small margin, with the shape around it.
+@PP
+There are options for changing the appearance of these shapes.  The
+boundary line's style may be {@Code solid}, {@Code dashed},
+dashed. @Index { dashed lines }
+dotted. @Index { dotted lines }
+{@Code cdashed}, {@Code dotted}, or {@Code noline} (that is, no line is
+drawn), and the length of the dashes may be changed:
+@ID {
+@Code {
+"@Circle"
+"   linestyle { cdashed }"
+"   dashlength { 0.2 cm }"
+"@Eq { X sub 2 }"
+}
+||7ct
+@Fig {
+@Circle
+   linestyle { cdashed }
+   dashlength { 0.2 cm }
+@Eq { X sub 2 }
+}
+}
+If the line style is not mentioned, it becomes @Code solid by default.  The
+@Code dashed option makes all dashes the same length; @Code cdashed
+halves the length of the first and last dash on each segment, which
+looks better in some cases.  The distance between dashes or dots will be
+at most {@Code dashlength}, reduced to make the dashes or dots fit evenly.
+@PP
+Shapes may be painted any of the colours listed in Section
+{@NumberOf colour}, using the @Code "paint" option:
+@ID {
+@Code {
+"@Box"
+"   margin { 0c }"
+"   paint { grey }"
+"@Diamond"
+"   linestyle { noline }"
+"   paint { white }"
+"{ hello, world }"
+}
+||7ct
+@Fig {
+@Box
+   margin { 0c }
+   paint { grey }
+@Diamond
+   linestyle { noline }
+   paint { white }
+{ hello, world }
+}
+}
+The default value of @Code "paint" is {@Code nopaint}, a special value (not
+a colour) meaning don't use any paint.  In this example, the right parameter
+of @Code "@Box" is a diamond containing {@Code "hello, world"}.  There is no
+limit to the amount of this sort of nesting; the following object may be
+any object.
+@PP
+When painting it is important to know what order things are done in,
+because anything put down earlier will disappear under the paint.  This
+is why @Code nopaint and @Code white are different.  Painting is done
+first, then boundaries, and finally the right parameter.
+@PP
+The @Code "@Polygon" shape has a @Code sides option for specifying the number
+polygon. @Index @Code "@Polygon"
+of sides, and an @Code angle option for specifying what angle anticlockwise
+from vertically beneath the centre the first corner will appear at:
+@IL
+@LI {
+@Code {
+"@Polygon"
+"   sides { 5 }"
+"{}"
+}
+||7ct
+@Fig {
+//0.5c 
+@Polygon
+   sides { 5 }
+{}
+}
+}
+
+@LI {
+@Code {
+"@Polygon"
+"   sides { 5 }"
+"   angle { 0 dg }"
+"{}"
+}
+||7ct
+@Fig {
+//0.5c 
+@Polygon
+   sides { 5 }
+   angle { 0 dg }
+{}
+}
+}
+@EL
+The defaults are 3 sides and the angle that gives the polygon a
+horizontal base (i.e. 180 degrees divided by the number of sides).  Thus
+the two cases with symmetry about a vertical axis are obtained by the
+default angle and @Code "0 dg" respectively, which is convenient.
+@PP
+Although lines and arrows do not enclose things in the way that boxes and
+circles do, @Code "@Fig" treats them as it does the other shapes.  The line
+or arrow is drawn along the mark of the right parameter, either
+hline. @Index @Code "@HLine"
+harrow. @Index @Code "@HArrow"
+vline. @Index @Code "@VLine"
+varrow. @Index @Code "@VArrow"
+horizontally or vertically:
+@IL
+@LI {
+@Code "@HLine { //0.2c hello, world }"
+||7ct
+@Fig {
+@HLine { //0.2c hello, world }
+}
+}
+@LI {
+@Code "@VArrow { 2c @High X ^|0.2c }"
+||7ct
+@Fig {
+@VArrow { 2c @High X ^|0.2c }
+}
+}
+@EL
+The usual line style options are available; the default margin is
+{@Code "0c"}.  Arrows can be {@Code forward} (the default), {@Code back},
+{@Code both}, or {@Code noarrow} (which just draws a line); the style of
+the arrowhead can be {@Code open} (the default), {@Code halfopen}, or
+{@Code closed}:
+@ID {
+@Code {
+"@HArrow"
+"   arrow { both }"
+"   headstyle { closed }"
+"{ 3c @Wide }"
+}
+||7ct
+@Fig {
+@HArrow
+   arrow { both }
+   headstyle { closed }
+{ 3c @Wide }
+}
+}
+It is also possible to change the shape of the arrowhead, using the
+@Code headwidth and @Code headlength options:
+@ID @Fig {
+{
+@Figure
+   shape {
+      {0 ysize} ** 0.4 @Label SB
+      {0 ysize} ** 0.6 @Label ST
+      {xsize 0} ** 0.7 @Label HB
+      SB
+      SB ++ HB
+      HB
+      {xsize 0} ++ {0 ysize} ** 0.5
+      HB ++ {0 ysize}
+      HB ++ ST
+      ST
+      SB
+   }
+   paint { grey }
+{ 10c @Wide 3c @High }
+//0.3c
+7c @Wide {} & @HArrow headstyle { closed } arrow {both }
+3c @Wide { //0.2c |0.5rt @I -2p @Font headlength }
+} |0.3c @VArrow headstyle { closed } arrow {both }
+1.5c @High { /0.5rt |0.2c @I -2p @Font headwidth |0io }
+}
+Their default values are @Code "0.05 cm" and @Code "0.15 cm"
+respectively.
+@End @Section

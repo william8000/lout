@@ -1,7 +1,7 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -32,6 +32,29 @@
 
 /*****************************************************************************/
 /*                                                                           */
+/*  OBJECT InterposeVScale(y, scale_factor)                                  */
+/*                                                                           */
+/*  Interpose a @VScale symbol above y with the given scale factor.          */
+/*                                                                           */
+/*****************************************************************************/
+
+static OBJECT InterposeVScale(y, scale_factor)
+OBJECT y;  int scale_factor;
+{ OBJECT res;
+  res = New(VSCALE);
+  FposCopy(fpos(res), fpos(y));
+  back(res, COL) = back(y, COL);
+  fwd(res, COL)  = fwd(y, COL);
+  back(res, ROW) = (back(y, ROW) * scale_factor) / SF;
+  fwd(res, ROW)  = (fwd(y, ROW) * scale_factor) / SF;
+  ReplaceNode(res, y);
+  Link(res, y);
+  return res;
+} /* end InterposeVScale */
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  DetachGalley(hd)                                                         */
 /*                                                                           */
 /*  Detach galley hd from its target.                                        */
@@ -41,8 +64,8 @@
 DetachGalley(hd)
 OBJECT hd;
 { OBJECT prnt, index;
-  debug1(DGA, D, "DetachGalley( %s )", EchoObject(hd));
   assert( type(hd) == HEAD && Up(hd) != hd, "DetachGalley: precondition!" );
+  debug1(DGA, D, "DetachGalley( %s )", SymName(actual(hd)));
   Parent(prnt, Up(hd));
   assert( Up(prnt) != prnt, "DetachGalley: parent!" );
   index = New(UNATTACHED);
@@ -70,7 +93,7 @@ OBJECT hd;
 OBJECT SearchGalley(start, sym, forwards, subgalleys, closures, input)
 OBJECT start, sym;  BOOLEAN forwards, subgalleys, closures, input;
 { OBJECT y, res, z, zlink, link;
-  debug5(DGA, D, "[SearchGalley( start, %s, %s, %s, %s, %s )", SymName(sym),
+  debug5(DGA, DDD, "[ SearchGalley(start, %s, %s, %s, %s, %s)", SymName(sym),
 	forwards ? "fwd" : "back", subgalleys ? "subgalleys" : "nosubgalleys",
 	closures ? "closures" : "noclosures", input ? "input" : "noinput");
   assert( type(start) == LINK || type(start) == HEAD, "SearchGalley: start!" );
@@ -79,12 +102,12 @@ OBJECT start, sym;  BOOLEAN forwards, subgalleys, closures, input;
   res = nil;
   while( res == nil && type(link) != HEAD )
   { Child(y, link);
-    debug1(DGA, DD, "  examining %s", EchoObject(y));
     switch( type(y) )
     {
       case UNATTACHED:
       case RECEIVING:
 	
+        debug1(DGA, DDD, "  examining %s", EchoIndex(y));
 	if( subgalleys )
 	for( zlink = Down(y); zlink!=y && res==nil;  zlink = NextDown(zlink) )
 	{ Child(z, zlink);
@@ -97,6 +120,7 @@ OBJECT start, sym;  BOOLEAN forwards, subgalleys, closures, input;
 
       case RECEPTIVE:
 	
+        debug1(DGA, DDD, "  examining %s", EchoIndex(y));
 	if( closures && type(actual(y)) == CLOSURE
 		     && SearchUses(actual(actual(y)), sym) )  res = y;
 	else if( input && actual(actual(y)) == InputSym )  res = y;
@@ -110,14 +134,14 @@ OBJECT start, sym;  BOOLEAN forwards, subgalleys, closures, input;
     }
     link = forwards ? NextDown(link) : PrevDown(link);
   }
-  debug1(DGA, D, "]SearchGalley returning %s", EchoObject(res));
+  debug1(DGA, DDD, "] SearchGalley returning %s", EchoIndex(res));
   return res;
 } /* end SearchGalley */
 
 
 /*@@**************************************************************************/
 /*                                                                           */
-/*  AttachGalley(hd, inners)                                                 */
+/*  int AttachGalley(hd, inners)                                             */
 /*                                                                           */
 /*  Attach galley hd, which may be unsized, to a destination.  This involves */
 /*  searching for a destination forward or back from the attachment point of */
@@ -127,11 +151,43 @@ OBJECT start, sym;  BOOLEAN forwards, subgalleys, closures, input;
 /*  galleys which should be flushed, even if the attach is itself not        */
 /*  successful.  These are returned in *inners, or nil if none.              */
 /*                                                                           */
+/*  The integer returned by AttachGalley indicates what happened to hd:      */
+/*                                                                           */
+/*    ATTACH_KILLED     The galley was sized to begin with but no target     */
+/*                      for it could be found.  The galley has been killed   */
+/*                      and that's the end of it.                            */
+/*                                                                           */
+/*    ATTACH_INPUT      When searching for a target for the galley we came   */
+/*                      upon InputSym, suggesting that the target might be   */
+/*                      still to be read.  So the galley has been linked to  */
+/*                      that InputSym and must now wait.                     */
+/*                                                                           */
+/*    ATTACH_NOTARGET   The galley is unsized and no target could be found   */
+/*                      for it.  This is fine, it just means that we can't   */
+/*                      flush the galley now and we must try again later.    */
+/*                                                                           */
+/*    ATTACH_SUSPEND    The galley is sized and a target was found for it,   */
+/*                      but the first component of the galley proved to be   */
+/*                      indefinite so could not be promoted.  The galley     */
+/*                      remains unattached but is moved to just before its   */
+/*                      target so that it can find it easily later when its  */
+/*                      first component becomes definite and it is flushed.  */
+/*                                                                           */
+/*    ATTACH_NULL       The galley is sized and a target was found for it,   */
+/*                      but the body of the galley proved to be null (i.e.   */
+/*                      there were no definite components to be flushed).    */
+/*                      This is to be treated just like the normal case      */
+/*                      following, except that the target is replaced by     */
+/*                      @Null rather than by its body.                       */
+/*                                                                           */
+/*    ATTACH_ACCEPT     The galley is sized and a target was found for it,   */
+/*                      and one component of the galley has been promoted.   */
+/*                                                                           */
 /*****************************************************************************/
 
-AttachGalley(hd, inners)
-OBJECT hd, *inners;
-{ OBJECT index;			/* the index of hd in the enclosing galley   */
+int AttachGalley(hd, inners, suspend_point)
+OBJECT hd, *inners, *suspend_point;
+{ OBJECT hd_index;		/* the index of hd in the enclosing galley   */
   OBJECT hd_inners;		/* inner galleys of hd, if unsized           */
   OBJECT dest;			/* the target @Galley hd empties into        */
   OBJECT dest_index;		/* the index of dest                         */
@@ -146,13 +202,13 @@ OBJECT hd, *inners;
   OBJECT env, n1, tmp, zlink, z, sym;	/* placeholders and temporaries	     */
   BOOLEAN was_sized;		/* true if sized(hd) initially               */
 
-  debug2(DGA, D, "[AttachGalley(Galley %s into %s)",
+  debug2(DGA, D, "[ AttachGalley(Galley %s into %s)",
 	SymName(actual(hd)), SymName(whereto(hd)));
-  ifdebug(DGA, DD, DebugObject(hd));
+  ifdebug(DGA, DD, DebugGalley(hd, 4));
   assert( Up(hd) != hd, "AttachGalley: no index!" );
-  Parent(index, Up(hd));
-  assert( type(index) == UNATTACHED, "AttachGalley: not UNATTACHED!" );
-  *inners = hd_inners = tg_inners = nil;
+  Parent(hd_index, Up(hd));
+  assert( type(hd_index) == UNATTACHED, "AttachGalley: not UNATTACHED!" );
+  hd_inners = tg_inners = nil;
   was_sized = sized(hd);
 
   for(;;)
@@ -171,7 +227,7 @@ OBJECT hd, *inners;
     if( sized(hd) )
     {
       /* sized galley case: search on from current spot */
-      target_index = SearchGalley(Up(index), sym, TRUE, FALSE, TRUE, TRUE);
+      target_index = SearchGalley(Up(hd_index), sym, TRUE, FALSE, TRUE, TRUE);
       if( target_index == nil )
       {	
 	/* search failed to find any new target, so kill the galley */
@@ -181,40 +237,44 @@ OBJECT hd, *inners;
 	  if( is_definite(type(y)) )  break;
 	}
 	if( link != hd )
-	    Error(WARN, &fpos(y), "galley %s deleted from here: no target",
-		SymName(actual(hd)));
-	debug0(DGA, D, "calling KillGalley from AttachGalley (a)");
+	  Error(19, 1, "galley %s deleted from here (no target)",
+	    WARN, &fpos(y), SymName(actual(hd)));
+	if( hd_inners != nil )  DisposeObject(hd_inners), hd_inners = nil;
+	if( tg_inners != nil )  DisposeObject(tg_inners), tg_inners = nil;
 	KillGalley(hd);
-	debug0(DGA, D, "]AttachGalley returning: no target for sized galley");
-	return;
+	*inners = nil;
+	debug0(DGA, D, "] AttachGalley returning ATTACH_KILLED");
+	return ATTACH_KILLED;
       }
       else if( actual(actual(target_index)) == InputSym )
       {
 	/* search found input object, so suspend on that */
-	DeleteNode(index);
+	DeleteNode(hd_index);
 	Link(target_index, hd);
-	debug0(DGA, D, "]AttachGalley returning: InputSym");
-	return;
+	*inners = nil;
+	debug0(DGA, D, "] AttachGalley returning ATTACH_INPUT");
+	return ATTACH_INPUT;
       }
 
     }
     else /* unsized galley, either backwards or normal */
     {
       if( backward(hd) )
-      {	target_index= SearchGalley(Up(index), sym, FALSE, TRUE, TRUE, FALSE);
+      {	target_index= SearchGalley(Up(hd_index), sym, FALSE, TRUE,TRUE,FALSE);
 	need_precedes = FALSE;
       }
       else
-      {	target_index = SearchGalley(Up(index), sym, FALSE, TRUE, FALSE, FALSE);
+      {	target_index = SearchGalley(Up(hd_index), sym, FALSE,TRUE,FALSE,FALSE);
 	need_precedes = (target_index != nil);
 	if( target_index == nil )
-	  target_index = SearchGalley(Up(index), sym, TRUE, TRUE, TRUE, FALSE);
+	  target_index = SearchGalley(Up(hd_index), sym, TRUE,TRUE,TRUE,FALSE);
       }
 
       /* if no luck, exit without error */
       if( target_index == nil )
-      {	debug0(DGA, D, "]AttachGalley returning: no target for unsized galley");
-	return;
+      {	*inners = nil;
+	debug0(DGA, D, "] AttachGalley returning ATTACH_NOTARGET");
+	return ATTACH_NOTARGET;
       }
     }
     assert( type(target_index) == RECEPTIVE, "AttachGalley: target_index!" );
@@ -230,11 +290,12 @@ OBJECT hd, *inners;
     backward(target_galley) = must_expand(target_galley) = FALSE;
     sized(target_galley) = FALSE;
     Constrained(target, &c, COL);
-    if( !constrained(c) )  Error(FATAL, &fpos(target),
-       "receptive symbol %s has unconstrained width", SymName(actual(target)));
+    if( !constrained(c) )
+      Error(19, 2, "receptive symbol %s has unconstrained width",
+	FATAL, &fpos(target), SymName(actual(target)));
     debug2(DSC, D, "Constrained( %s, COL ) = %s",
 	EchoObject(target), EchoConstraint(&c));
-    debug1(DGA, DD, "  expanding %s", EchoObject(target));
+    debug1(DGA, DDD, "  expanding %s", EchoObject(target));
     tmp = CopyObject(target, no_fpos);
     Link(target_galley, tmp);
     if( !FitsConstraint(0, 0, c) )
@@ -245,11 +306,12 @@ OBJECT hd, *inners;
     SizeGalley(target_galley, env, external(target), threaded(target),
 	non_blocking(target_index), trigger_externs(target_index),
 	&save_style(target), &c, whereto(hd), &dest_index, &recs, &tg_inners);
+    debug1(DGA, DD, "  SizeGalley tg_inners: %s", DebugInnersNames(tg_inners));
     if( recs != nil )  ExpandRecursives(recs);
     dest = actual(dest_index);
 
     /* verify that hd satisfies any horizontal constraint on dest */
-    debug1(DGA, DD, "  checking COL fit of hd in %s", SymName(actual(dest)));
+    debug1(DGA, DDD, "  checking COL fit of hd in %s", SymName(actual(dest)));
     Constrained(dest, &c, COL);
     debug2(DSC, D, "Constrained( %s, COL ) = %s",
 	EchoObject(dest), EchoConstraint(&c));
@@ -269,6 +331,7 @@ OBJECT hd, *inners;
       *** */
       SizeGalley(hd, env, TRUE, threaded(dest), non_blocking(target_index),
 	TRUE, &save_style(dest), &c, nil, &n1, &recs, &hd_inners);
+      debug1(DGA,DD,"  SizeGalley hd_inners: %s", DebugInnersNames(hd_inners));
       if( recs != nil )  ExpandRecursives(recs);
       if( need_precedes )		/* need an ordering constraint */
       {	OBJECT index1 = New(PRECEDES);
@@ -276,7 +339,7 @@ OBJECT hd, *inners;
 	blocked(index2) = FALSE;
 	tmp = MakeWord(WORD, STR_EMPTY, no_fpos);
 	Link(index1, tmp);  Link(index2, tmp);
-	Link(Up(index), index1);
+	Link(Up(hd_index), index1);
 	Link(Down(hd), index2);
 	debug0(DGA, D, "  inserting PRECEDES and FOLLOWS");
       }
@@ -286,23 +349,24 @@ OBJECT hd, *inners;
     { debug3(DGA, D, "  reject: hd %s,%s does not fit target_galley %s",
 	EchoLength(back(hd, COL)), EchoLength(fwd(hd, COL)),
 	EchoConstraint(&c));
-      Error(WARN, &fpos(hd),"too little horizontal space for galley %s at %s",
-	SymName(actual(hd)), SymName(actual(dest)));
+      Error(19, 3, "too little horizontal space for galley %s at %s",
+	WARN, &fpos(hd), SymName(actual(hd)), SymName(actual(dest)));
       goto REJECT;
     }
 
     /* check status of first component of hd */
-    debug0(DGA, DD, "  now ready to attach; hd =");
-    ifdebug(DGA, DD, DebugObject(hd));
+    debug0(DGA, DDD, "  now ready to attach; hd =");
+    ifdebug(DGA, DDD, DebugObject(hd));
     for( link = Down(hd);  link != hd;  link = NextDown(link) )
     {
       Child(y, link);
-      debug1(DGA, DD, "  examining %s", EchoObject(y));
+      debug1(DGA, DDD, "  examining %s", EchoIndex(y));
       if( type(y) == SPLIT )  Child(y, DownDim(y, ROW));
       switch( type(y) )
       {
 
 	case EXPAND_IND:
+	case SCALE_IND:
 	case GALL_PREC:
 	case GALL_FOLL:
 	case GALL_TARG:
@@ -326,16 +390,20 @@ OBJECT hd, *inners;
 
 	case RECEPTIVE:
 
+	  /* ***
 	  if( non_blocking(y) )
 	  { link = PrevDown(link);
 	    DeleteNode(y);
 	  }
-	  else goto SUSPEND;
+	  else
+	  *** */
+	  goto SUSPEND;
 	  break;
 
 
 	case RECEIVING:
 	    
+	  /* ***
 	  if( non_blocking(y) )
 	  { while( Down(y) != y )
 	    { Child(z, Down(y));
@@ -345,7 +413,9 @@ OBJECT hd, *inners;
 	    link = PrevDown(link);
 	    DeleteNode(y);
 	  }
-	  else goto SUSPEND;
+	  else
+	  *** */
+	  goto SUSPEND;
 	  break;
 
 
@@ -385,8 +455,8 @@ OBJECT hd, *inners;
 
 
 	case CLOSURE:
-	case NULL_CLOS:
 	case CROSS:
+	case NULL_CLOS:
 
 	  break;
 
@@ -397,6 +467,8 @@ OBJECT hd, *inners;
 	case ONE_ROW:
 	case WIDE:
 	case HIGH:
+	case HSHIFT:
+	case VSHIFT:
 	case HSCALE:
 	case VSCALE:
 	case HCONTRACT:
@@ -458,14 +530,25 @@ OBJECT hd, *inners;
 	    debug2(DSC, D, "Constrained( %s, ROW ) = %s",
 	      EchoObject(dest), EchoConstraint(&c));
 	    if( !FitsConstraint(back(y, ROW), fwd(y, ROW), c) )
-	    { Error(WARN, &fpos(y),
-		"this component of %s did not fit into its nearest target",
-		SymName(actual(hd)));
-	      debug3(DGA, D, "  reject: vsize %s,%s in %s; y=",
-		EchoLength(back(y, ROW)), EchoLength(fwd(y, ROW)),
-		EchoConstraint(&c));
-	      ifdebug(DGA, D, DebugObject(y));
-	      goto REJECT;
+	    {
+	      /* if forcing galley doesn't fit, try scaling the first component */
+	      if( actual(hd) != nil && force_target(actual(hd)) && size(y, ROW) > 0 )
+	      { int scale_factor;
+		scale_factor = (bfc(c) * SF) / size(y, ROW);
+		Error(19, 7, "%.1fc object too high for %.1fc space; %s inserted",
+		  WARN, &fpos(y), (float) size(y, ROW) / CM,
+		  (float) bfc(c) / CM, KW_VSCALE);
+		y = InterposeVScale(y, scale_factor);
+	      }
+	      else
+	      { Error(19, 4, "this component of %s did not fit into its nearest target",
+		  WARN, &fpos(y), SymName(actual(hd)));
+	        debug3(DGA, D, "  reject: vsize %s,%s in %s; y=",
+		  EchoLength(back(y, ROW)), EchoLength(fwd(y, ROW)),
+		  EchoConstraint(&c));
+	        ifdebug(DGA, D, DebugObject(y));
+	        goto REJECT;
+	      }
 	    }
 	    debug0(DSA, D, "calling AdjustSize from AttachGalley (a)");
 	    AdjustSize(dest, back(y, ROW), fwd(y, ROW), ROW);
@@ -479,14 +562,25 @@ OBJECT hd, *inners;
 	    assert( back(z, ROW) >= 0 && fwd(z, ROW) >= 0,
 			"AttachGalley: negative z sizes!" );
 	    if( !FitsConstraint(back(z, ROW), fwd(z, ROW), c) )
-	    { Error(WARN, &fpos(y),
-		"this component of %s did not fit into its nearest target",
-		SymName(actual(hd)));
-	      debug3(DGA, D, "  reject: size was %s,%s in %s; y =",
-		EchoLength(back(z, ROW)), EchoLength(fwd(z, ROW)),
-		EchoConstraint(&c));
-	      ifdebug(DGA, D, DebugObject(y));
-	      goto REJECT;
+	    {
+	      /* if forcing galley doesn't fit, try scaling the first component */
+	      if( actual(hd) != nil && force_target(actual(hd)) && size(z, ROW) > 0 )
+	      { int scale_factor;
+		scale_factor = (bfc(c) * SF) / size(z, ROW);
+		Error(19, 7, "%.1fc object too high for %.1fc space; %s inserted",
+		  WARN, &fpos(z), (float) size(z, ROW) / CM, (float) bfc(c) / CM,
+		  KW_VSCALE);
+		z = InterposeVScale(z, scale_factor);
+	      }
+	      else
+	      { Error(19, 5, "this component of %s did not fit into its nearest target",
+	          WARN, &fpos(y), SymName(actual(hd)));
+	        debug3(DGA, D, "  reject: size was %s,%s in %s; y =",
+		  EchoLength(back(z, ROW)), EchoLength(fwd(z, ROW)),
+		  EchoConstraint(&c));
+	        ifdebug(DGA, D, DebugObject(y));
+	        goto REJECT;
+	      }
 	    }
 	    debug0(DSA, D, "calling AdjustSize from AttachGalley (b)");
 	    AdjustSize(target, back(z, ROW), fwd(z, ROW), ROW);
@@ -496,26 +590,52 @@ OBJECT hd, *inners;
 
 	default:
 	    
-	  Error(INTERN, &fpos(y), "AttachGalley: %s", Image(type(y)));
+	  Error(19, 6, "AttachGalley: %s", INTERN, &fpos(y), Image(type(y)));
 	  break;
 
       } /* end switch */
     } /* end for */
 
-    /* empty galley; promote any indexes, kill the galley, and exit */
-    /* this bypasses target_galley, which is not expanded in the empty case */
-    debug0(DGA, D, "  empty galley");
+    /* null galley: promote whole galley without expanding the target */
+    debug0(DGA, D, "  null galley");
     if( tg_inners != nil )  DisposeObject(tg_inners), tg_inners = nil;
     DisposeObject(target_galley);
     LeaveErrorBlock(FALSE);
-    if( LastDown(hd) != hd )  Promote(hd, hd, target_index);
-    debug0(DGA, D, "calling KillGalley from AttachGalley (b)");
-    KillGalley(hd);
+
+    /* kill off any null objects within the galley, then transfer it */
+    /* don't use Promote() since it does extra unwanted things here  */
+    for( link = Down(hd);  link != hd;  link = NextDown(link) )
+    { Child(y, link);
+      switch( type(y) )
+      {
+
+	case GAP_OBJ:
+	case CLOSURE:
+	case CROSS:
+	case NULL_CLOS:
+	
+	  link = PrevDown(link);
+	  debug1(DGA, D, "  null galley, disposing %s", Image(type(y)));
+	  DisposeChild(NextDown(link));
+	  break;
+
+	
+	default:
+	
+	  break;
+      }
+    }
+    TransferLinks(NextDown(hd), hd, Up(target_index));
+
+    /* attach hd temporarily to target_index */
+    MoveLink(Up(hd), target_index, PARENT);
+    assert( type(hd_index) == UNATTACHED, "AttachGalley: type(hd_index)!" );
+    DeleteNode(hd_index);
 
     /* return; only hd_inners needs to be flushed now */
     *inners = hd_inners;
-    debug0(DGA, D, "]AttachGalley returning killed: empty galley");
-    return;
+    debug0(DGA, D, "] AttachGalley returning ATTACH_NULL");
+    return ATTACH_NULL;
 
 
     REJECT:
@@ -527,12 +647,12 @@ OBJECT hd, *inners;
       if( backward(hd) && !sized(hd) )
       {
 	/* move to just before the failed target */
-	MoveLink(Up(index), Up(target_index), PARENT);
+	MoveLink(Up(hd_index), Up(target_index), PARENT);
       }
       else
       {
 	/* move to just after the failed target */
-	MoveLink(Up(index), NextDown(Up(target_index)), PARENT);
+	MoveLink(Up(hd_index), NextDown(Up(target_index)), PARENT);
       }
       continue;
 
@@ -540,28 +660,30 @@ OBJECT hd, *inners;
     SUSPEND:
 	
       /* suspend at first component */
-      debug1(DGA, D, "  suspend %s", EchoObject(y));
+      debug1(DGA, D, "  suspend %s", EchoIndex(y));
       blocked(y) = TRUE;
       LeaveErrorBlock(FALSE);
       if( tg_inners != nil )  DisposeObject(tg_inners), tg_inners = nil;
       DisposeObject(target_galley);
-      MoveLink(Up(index), Up(target_index), PARENT);
+      MoveLink(Up(hd_index), Up(target_index), PARENT);
       if( was_sized )
       { /* nothing new to flush if suspending and already sized */
 	if( hd_inners != nil )  DisposeObject(hd_inners), hd_inners = nil;
+	*inners = nil;
       }
       else
       { /* flush newly discovered inners if not sized before */
 	*inners = hd_inners;
       }
-      debug0(DGA, D, "]AttachGalley returning: suspending.");
-      return;
+      debug0(DGA, D, "] AttachGalley returning ATTACH_SUSPEND");
+      *suspend_point = y;
+      return ATTACH_SUSPEND;
 
 
     ACCEPT:
 	
       /* accept first component; now committed to the attach */
-      debug1(DGA, D, "  accept %s", EchoObject(y));
+      debug1(DGA, D, "  accept %s", EchoIndex(y));
       LeaveErrorBlock(TRUE);
 
       /* adjust horizontal sizes */
@@ -573,13 +695,13 @@ OBJECT hd, *inners;
 		
       /* attach hd to dest */
       MoveLink(Up(hd), dest_index, PARENT);
-      assert( type(index) == UNATTACHED, "AttachGalley: type(index)!" );
-      DeleteNode(index);
+      assert( type(hd_index) == UNATTACHED, "AttachGalley: type(hd_index)!" );
+      DeleteNode(hd_index);
 
       /* move first component of hd into dest */
       /* nb Interpose must be done after all AdjustSize calls */
       if( !external(dest) )   Interpose(dest, VCAT, hd, y);
-      Promote(hd, NextDown(link), dest_index);
+      Promote(hd, link == hd ? hd : NextDown(link), dest_index);
 
       /* move target_galley into target */
       /* nb Interpose must be done after all AdjustSize calls */
@@ -603,8 +725,8 @@ OBJECT hd, *inners;
 	DeleteNode(hd_inners);
 	*inners = tg_inners;
       }
-      debug0(DGA, D, "]AttachGalley returning (accept)");
-      return;
+      debug0(DGA, D, "] AttachGalley returning ATTACH_ACCEPT");
+      return ATTACH_ACCEPT;
 
   } /* end for */
 } /* end AttachGalley */

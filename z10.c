@@ -1,7 +1,7 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -33,10 +33,132 @@
 #define	NO_TARGET	0
 #define	SEEN_TARGET	1
 #define	WRITTEN_TARGET	2
+#define INIT_CROSSREF_NUM	100
+
 static OBJECT RootCross = nil;			/* header for all crs        */
 
-
 /*****************************************************************************/
+/*                                                                           */
+/*  CROSSREF_TABLE                                                           */
+/*                                                                           */
+/*  A symbol table permitting access to cross reference generated tags by    */
+/*  a mapping (symbol x file) -> current tag.                                */
+/*                                                                           */
+/*     crtab_getnext(sym, fnum, S)   Get next value associated with sym,fnum */
+/*     crtab_debug(S, fp)            Debug print of table S to file fp       */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef struct crossref_rec
+{ struct crossref_rec	*crtab_next;
+  OBJECT		crtab_sym;
+  FILE_NUM		crtab_fnum;
+  int			crtab_value;
+} *CROSSREF_ENTRY;
+
+typedef struct
+{ int tab_size;					/* size of table             */
+  int tab_count;				/* number of entries held    */
+  CROSSREF_ENTRY tab_chains[1];			/* the chains of entries     */
+} *CROSSREF_TABLE;
+
+#define	crtab_size(S)	(S)->tab_size
+#define	crtab_count(S)	(S)->tab_count
+#define	crtab_chain(S,i) (S)->tab_chains[i]
+
+#define hash(pos, sym, fnum, S)						\
+{ pos = ( ((int) sym) + fnum ) % crtab_size(S);				\
+}
+
+static CROSSREF_TABLE crtab_new(newsize)
+int newsize;
+{ CROSSREF_TABLE S;  int i;
+  S = (CROSSREF_TABLE)
+    malloc(2*sizeof(int) + newsize*sizeof(CROSSREF_ENTRY));
+  if( S == (CROSSREF_TABLE) NULL )
+    Error(10, 1, "run out of memory enlarging crossref table", FATAL, no_fpos);
+  crtab_size(S) = newsize;
+  crtab_count(S) = 0;
+  for( i = 0;  i < newsize;  i++ )
+    crtab_chain(S, i) = (CROSSREF_ENTRY) nil;
+  return S;
+} /* end crtab_new */
+
+static CROSSREF_TABLE crtab_rehash(S, newsize)
+CROSSREF_TABLE S;  int newsize;
+{ CROSSREF_TABLE NewS;  int i, newpos;  CROSSREF_ENTRY p, q;
+  NewS = crtab_new(newsize);
+  for( i = 0;  i < crtab_size(S);  i++ )
+  { p = crtab_chain(S, i);
+    while( p != NULL )
+    { q = p->crtab_next;
+      hash(newpos, p->crtab_sym, p->crtab_fnum, NewS);
+      p->crtab_next = crtab_chain(NewS, newpos);
+      crtab_chain(NewS, newpos) = p;
+      crtab_count(NewS)++;
+      p = q;
+    }
+  }
+  free(S);
+  return NewS;
+} /* end crtab_rehash */
+
+static int crtab_getnext(sym, fnum, S)
+OBJECT sym;  FILE_NUM fnum;  CROSSREF_TABLE *S;
+{ CROSSREF_ENTRY x;  int pos;
+
+  /* if S is NULL, create a new table */
+  if( *S == NULL )  *S = crtab_new(INIT_CROSSREF_NUM);
+
+  /* if (sym, fnum) exists, increment its value and return it */
+  hash(pos, sym, fnum, *S);
+  for( x = crtab_chain(*S, pos);  x != NULL;  x = x->crtab_next )
+  { if( x->crtab_sym == sym && x->crtab_fnum == fnum )
+    return ++x->crtab_value;
+  }
+
+  /* if table is full, rehash */
+  if( crtab_count(*S) == crtab_size(*S) )
+  { *S = crtab_rehash(*S, 2*crtab_size(*S));
+    hash(pos, sym, fnum, *S);
+  }
+
+  /* insert a new entry for (sym, fnum) with value 1 */
+  x = (CROSSREF_ENTRY) GetMem(sizeof(struct crossref_rec), no_fpos);
+  x->crtab_sym = sym;
+  x->crtab_fnum = fnum;
+  x->crtab_next = crtab_chain(*S, pos);
+  crtab_chain(*S, pos) = x;
+  crtab_count(*S)++;
+  return x->crtab_value = 1;
+
+} /* end crtab_getnext */
+
+#if DEBUG_ON
+static crtab_debug(S, fp)
+CROSSREF_TABLE S;  FILE *fp;
+{ int i;  CROSSREF_ENTRY x;
+  if( S == NULL )
+  { fprintf(fp, "  null table\n");
+    return;
+  }
+  fprintf(fp, "  table size: %d;  current count: %d\n",
+    crtab_size(S), crtab_count(S));
+  for( i = 0;  i < crtab_size(S);  i++ )
+  { fprintf(fp, "crtab_chain(S, %d) =", i);
+    for( x = crtab_chain(S, i);  x != NULL;  x = x->crtab_next )
+    { fprintf(fp, " %s:%s,%d",
+	SymName(x->crtab_sym), FileName(x->crtab_fnum), x->crtab_value);
+    }
+    fprintf(fp, "\n");
+  }
+} /* end crtab_debug */
+#endif
+
+static CROSSREF_TABLE crossref_tab = NULL;
+
+
+/*@@**************************************************************************/
 /*                                                                           */
 /*  CrossInit(sym)     Initialize cross_sym(sym).                            */
 /*                                                                           */
@@ -48,10 +170,8 @@ OBJECT sym;
   target_state(cs) = NO_TARGET;  target_seq(cs) = 0;
   cr_file(cs) = NO_FILE;
   gall_seq(cs) = 0;  gall_tag(cs) = nil;
-  gall_tfile(cs) = NO_FILE;  gentag_file(cs) = NO_FILE;
+  gall_tfile(cs) = NO_FILE;
   symb(cs) = sym;  cross_sym(sym) = cs;
-  gentag_fseq(cs) = NewWord(WORD, MAX_FILES, no_fpos);
-  for( i = 0;  i < MAX_FILES;  i++ ) string(gentag_fseq(cs))[i] = 0;
   if( RootCross == nil )  RootCross = New(CR_ROOT);  Link(RootCross, cs);
 }
 
@@ -87,7 +207,7 @@ OBJECT sym, val;  int ctype;
 OBJECT GallTargEval(sym, dfpos)
 OBJECT sym; FILE_POS *dfpos;
 { OBJECT cs, res;
-  FULL_CHAR buff[MAX_LINE], *str;
+  FULL_CHAR buff[MAX_BUFF], *str;
   debug2(DCR, DD, "GallTargEval( %s,%s )", SymName(sym), EchoFilePos(dfpos));
   if( cross_sym(sym) == nil )  CrossInit(sym);
   cs = cross_sym(sym);
@@ -96,10 +216,10 @@ OBJECT sym; FILE_POS *dfpos;
     gall_seq(cs)   = 0;
   }
   str = FileName(gall_tfile(cs));
-  if( StringLength(str) + 6 >= MAX_LINE )
-    Error(FATAL, dfpos, "automatically generated tag %s&%d is too long",
-	str, ++gall_seq(cs));
   ++gall_seq(cs);
+  if( StringLength(str) + 6 >= MAX_BUFF )
+    Error(10, 2, "automatically generated tag %s&%d is too long",
+	FATAL, dfpos, str, gall_seq(cs));
   StringCopy(buff, str);
   StringCat(buff, AsciiToFull("&"));
   StringCat(buff, StringInt(gall_seq(cs)));
@@ -120,30 +240,28 @@ OBJECT sym; FILE_POS *dfpos;
 
 static OBJECT CrossGenTag(x)
 OBJECT x;
-{ FULL_CHAR buff[MAX_LINE], *str1, *str2;
-  OBJECT sym, cs, gt, res;  FILE_NUM fnum;
-  FULL_CHAR *sgt;
+{ FULL_CHAR buff[MAX_BUFF], *str1, *str2;
+  OBJECT sym, cs, res;  FILE_NUM fnum;
   int seq;
   debug1(DCR, D, "CrossGenTag( %s )", SymName(actual(x)));
   sym = actual(x);
   if( cross_sym(sym) == nil )  CrossInit(sym);
   cs = cross_sym(sym);
   fnum = file_num(fpos(x));
-  /* ***
-  if( fnum != gentag_file(cs) )
-  { gentag_file(cs) = fnum;
-    gentag_seq(cs)  = 0;
-  }
-  *** */
-  str1 = FullSymName(sym, AsciiToFull("."));
+  str1 = SymName(sym);
   str2 = FileName(fnum);
-  gt = gentag_fseq(cs);
-  sgt = string(gt);
-  seq = ++(sgt[fnum]);
-  if( StringLength(str1) + StringLength(str2) + 10 >= MAX_LINE )
-    Error(FATAL,no_fpos, "automatically generated tag \"%s.%s.%d\" is too long",
-	str1, str2, seq);
+  seq = crtab_getnext(sym, fnum, &crossref_tab);
+  debug3(DCR, D, "%d = crtab_getnext(%s, %s, S); S =",
+	seq, SymName(sym), FileName(fnum));
+  ifdebug(DCR, DD, crtab_debug(crossref_tab, stderr));
+  if( StringLength(str1) + StringLength(str2) + 10 >= MAX_BUFF )
+    Error(10, 3, "automatically generated tag %s.%s.%d is too long",
+	FATAL, no_fpos, str1, str2, seq);
+  /* *** make shorter, little risk
   StringCopy(buff, str1);
+  StringCat(buff, AsciiToFull("."));
+  *** */
+  StringCopy(buff, StringInt(line_num(fpos(sym))));
   StringCat(buff, AsciiToFull("."));
   StringCat(buff, str2);
   StringCat(buff, AsciiToFull("."));
@@ -165,15 +283,15 @@ OBJECT x;
 CrossAddTag(x)
 OBJECT x;
 { OBJECT link, par, ppar, y;
-  if( has_tag(actual(x)) )
+  debug1(DCR, D, "CrossAddTag( %s )", EchoObject(x));
+
+  /* search the parameter list of x for a @Tag parameter */
+  for( link = Down(x);  link != x;  link = NextDown(link) )
+  { Child(par, link);
+    if( type(par) == PAR && is_tag(actual(par)) )  break;
+  }
+  if( link == x )
   { 
-    /* search the parameter list of x for a @Tag parameter */
-    for( link = Down(x);  link != x;  link = NextDown(link) )
-    { Child(par, link);
-      if( type(par) == PAR && is_tag(actual(par)) )  break;
-    }
-    if( link == x )
-    { 
       /* search the definition of x for name of its @Tag parameter */
       ppar = nil;
       for( link=Down(actual(x));  link != actual(x);  link = NextDown(link) )
@@ -200,7 +318,7 @@ OBJECT x;
 	  case NPAR:	link = Down(x);
 			if( Down(x) != x )
 			{ Child(y, Down(x));
-			  if( type(y) == PAR && type(actual(par)) == LPAR )
+			  if( type(y) == PAR && type(actual(y)) == LPAR )
 				link = NextDown(link);
 			}
 			break;
@@ -213,8 +331,8 @@ OBJECT x;
 	}
 	Link(link, par);
       }
-    }
   }
+  debug1(DCR, D, "CrossAddTag returning %s", EchoObject(x));
 } /* end CrossAddTag */
 
 
@@ -234,8 +352,8 @@ static OBJECT ntarget = nil;
 OBJECT CrossExpand(x, env, style, crs_wanted, crs, res_env)
 OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
 { OBJECT sym, res, tag, y, cs, link, db, tmp, index;
-  int ctype;  FULL_CHAR buff[MAX_LINE], seq[MAX_LINE], *str;
-  FILE_NUM fnum, dfnum;
+  int ctype, count, i;  FULL_CHAR buff[MAX_BUFF], seq[MAX_BUFF], *str;
+  FILE_NUM fnum, dfnum;  BOOLEAN tagerror = FALSE;
   long cont, dfpos;
   assert( type(x) == CROSS, "CrossExpand: x!" );
   debug2(DCR, DD, "CrossExpand( %s, %s )", EchoObject(x), EchoObject(*crs));
@@ -244,14 +362,14 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
   /* manifest and tidy the right parameter */
   Child(tag, LastDown(x));
   tag = Manifest(tag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
-  tag = ReplaceWithTidy(tag);
+  tag = ReplaceWithTidy(tag, FALSE);
 
   /* extract sym (the symbol name) and tag (the tag value) from x */
   Child(y, Down(x));
-  if( type(y) == CLOSURE )  sym = actual(y);
-  ctype = type(y) != CLOSURE ? 1 :
-	  !is_word(type(tag)) ? 2 :
-	  StringEqual(string(tag), STR_EMPTY) ? 3 :
+  assert( type(y) == CLOSURE, "ClosureExpand: type(y) != COLSURE!" );
+  sym = actual(y);
+  ctype = !is_word(type(tag)) ? 1 :
+	  StringEqual(string(tag), STR_EMPTY) ? 2 :
 	  StringEqual(string(tag), KW_PRECEDING) ? CROSS_PREC :
 	  StringEqual(string(tag), KW_FOLLOWING) ? CROSS_FOLL : CROSS_LIT;
 
@@ -261,21 +379,15 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
 
     case 1:
 
-      Error(WARN, &fpos(y), "left parameter of %s is not a symbol", KW_CROSS);
+      Error(10, 5, "value of right parameter of %s is not a simple word",
+	WARN, &fpos(tag), KW_CROSS);
       break;
 
 
     case 2:
-
-      Error(WARN, &fpos(tag),
-	"value of right parameter of %s is not a simple word", KW_CROSS);
-      break;
-
-
-    case 3:
     
-      Error(WARN, &fpos(tag),
-	"value of right parameter of %s is an empty word", KW_CROSS);
+      Error(10, 6, "value of right parameter of %s is an empty word",
+	WARN, &fpos(tag), KW_CROSS);
       break;
 
 
@@ -287,13 +399,25 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
       {	/* this is a request for the current time */
 	res = StartMoment();
       }
-      else for( link = NextUp(Up(cs));  link != cs;  link = NextUp(link) )
-      {	Parent(db, link);
-	assert( is_word(type(db)), "CrossExpand: db!" );
-	if( DbRetrieve(db, FALSE, sym, string(tag), seq, &dfnum,&dfpos,&cont) )
-	{ res = ReadFromFile(dfnum, dfpos, sym);
-	  if( db != OldCrossDb )  AttachEnv(env, res);
-	  break;
+      else
+      { if( !has_tag(sym) )
+	{ Error(10, 7, "symbol %s used in cross reference has no %s parameter",
+	    WARN, &fpos(x), SymName(sym), KW_TAG);
+	  tagerror = TRUE;
+	}
+	for( link = NextUp(Up(cs));  link != cs;  link = NextUp(link) )
+        { Parent(db, link);
+	  assert( is_word(type(db)), "CrossExpand: db!" );
+	  if( DbRetrieve(db, FALSE, sym, string(tag),seq,&dfnum,&dfpos,&cont) )
+	  { SwitchScope(nil);
+	    count = 0;
+	    SetScope(env, &count);
+	    res = ReadFromFile(dfnum, dfpos);
+	    for( i = 1;  i <= count;  i++ )  PopScope();
+	    UnSwitchScope(nil);
+	    if( db != OldCrossDb )  AttachEnv(env, res);
+	    break;
+	  }
 	}
       }
       break;
@@ -302,50 +426,62 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
     case CROSS_PREC:
     case CROSS_FOLL:
     
-      if( cross_sym(sym) == nil )  CrossInit(sym);
-      cs = cross_sym(sym);
-      assert( cs != nil, "CrossExpand/CROSS_FOLL: cs == nil!" );
-      assert( type(cs) == CROSS_SYM, "CrossExpand/CROSS_FOLL: type(cs)!" );
-      fnum = file_num(fpos(tag));
-      if( fnum != cr_file(cs) )
-      {	cr_file(cs) = fnum;
-	cr_seq(cs) = 0;
+      if( has_tag(sym) )
+      { if( cross_sym(sym) == nil )  CrossInit(sym);
+        cs = cross_sym(sym);
+        assert( cs != nil, "CrossExpand/CROSS_FOLL: cs == nil!" );
+        assert( type(cs) == CROSS_SYM, "CrossExpand/CROSS_FOLL: type(cs)!" );
+        fnum = file_num(fpos(tag));
+        if( fnum != cr_file(cs) )
+        { cr_file(cs) = fnum;
+	  cr_seq(cs) = 0;
+        }
+        str = FileName(fnum);
+        ++cr_seq(cs);
+        if( StringLength(str) + 5 >= MAX_BUFF )
+	  Error(10, 8, "automatically generated tag %s_%d is too long",
+	    FATAL, &fpos(x), str, cr_seq(cs));
+        StringCopy(buff, str);
+        StringCat(buff, AsciiToFull("_"));
+        StringCat(buff, StringInt(cr_seq(cs)));
+        tmp = CrossMake(sym, MakeWord(WORD, buff, &fpos(tag)), ctype);
+        index = New(ctype);
+        actual(index) = tmp;
+        Link(index, tmp);
+        if( crs_wanted )
+        { if( *crs == nil )  *crs = New(CR_LIST);
+	  link = Link(*crs, index);
+        }
+        else Error(10, 9, "%s or %s tag not allowed here",
+	  FATAL, &fpos(x), KW_PRECEDING, KW_FOLLOWING);
+        if( AllowCrossDb &&
+	    DbRetrieve(OldCrossDb, FALSE, sym, buff, seq,&dfnum,&dfpos,&cont) )
+	{
+	  SwitchScope(nil);
+	  res = ReadFromFile(dfnum, dfpos);
+	  UnSwitchScope(nil);
+	}
       }
-      str = FileName(fnum);
-      ++cr_seq(cs);
-      if( StringLength(str) + 5 >= MAX_LINE )
-	Error(FATAL, &fpos(x), "automatically generated tag %s_%d is too long",
-	  str, cr_seq(cs));
-      StringCopy(buff, str);
-      StringCat(buff, AsciiToFull("_"));
-      StringCat(buff, StringInt(cr_seq(cs)));
-      tmp = CrossMake(sym, MakeWord(WORD, buff, &fpos(tag)), ctype);
-      index = New(ctype);
-      actual(index) = tmp;
-      Link(index, tmp);
-      if( crs_wanted )
-      {	if( *crs == nil )  *crs = New(CR_LIST);
-	link = Link(*crs, index);
+      else
+      {	Error(10, 10, "symbol %s used in cross reference has no %s parameter",
+	  WARN, &fpos(x), SymName(sym), KW_TAG);
+	tagerror = TRUE;
       }
-      else Error(FATAL, &fpos(x), "%s or %s tag not allowed here",
-	KW_PRECEDING, KW_FOLLOWING);
-      if( AllowCrossDb &&
-	  DbRetrieve(OldCrossDb, FALSE, sym, buff, seq, &dfnum, &dfpos,&cont) )
-	res = ReadFromFile(dfnum, dfpos, nil);
       break;
 
 
     default:
     
-      Error(INTERN, no_fpos, "CrossExpand switch!");
+      Error(10, 11, "CrossExpand: %d", INTERN, no_fpos, ctype);
       break;
 
 
   } /* end switch */
   if( res == nil )
   { OBJECT envt;
-    if( ctype > 1 )  Error(WARN, &fpos(x), "%s%s%s unknown",
-		SymName(sym), KW_CROSS, string(tag));
+    if( ctype > 1 && !tagerror )
+      Error(10, 12, "unresolved cross reference %s%s%s",
+	WARN, &fpos(x), SymName(sym), KW_CROSS, string(tag));
 
     /* build dummy result with environment attached */
     /* nb at present we are not adding dummy import closures to this! */
@@ -389,7 +525,7 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
 CrossSequence(x)
 OBJECT x;
 { OBJECT sym, tag, val, tmp, cs, par, key, link, y;
-  unsigned ctype;  FULL_CHAR buff[MAX_LINE], *str, *seq;
+  unsigned ctype;  FULL_CHAR buff[MAX_BUFF], *str, *seq;
   FILE_NUM dfnum;  int dfpos;
 
   /* if suppressing cross-referencing, dispose x and quit */
@@ -400,6 +536,8 @@ OBJECT x;
   }
 
   /* get interesting fragments from x */
+  debugcond1(DCR, D, type(x) != CROSS, "  type(x) = %s, x =", Image(type(x)));
+  ifdebugcond(DCR, D, type(x) != CROSS, DebugObject(x));
   assert( type(x) == CROSS, "CrossSequence: type(x)!" );
   ctype = cross_type(x);
   Child(tmp, Down(x));
@@ -431,7 +569,7 @@ OBJECT x;
 	if( type(par) == PAR && (is_key(actual(par)) || is_tag(actual(par))) )
 	{ assert( Down(par) != par, "CrossSequence: PAR child!" );
 	  Child(key, Down(par));
-	  key = ReplaceWithTidy(key);
+	  key = ReplaceWithTidy(key, FALSE);
 	}
       }
 
@@ -450,11 +588,11 @@ OBJECT x;
 	seq = buff;
       }
       else if( !is_word(type(key)) )
-      {	Error(WARN, &fpos(key), "%s parameter is not a word", KW_KEY);
+      {	Error(10, 13, "%s parameter is not a word", WARN, &fpos(key), KW_KEY);
 	seq = STR_BADKEY;
       }
       else if( StringEqual(string(key), STR_EMPTY) )
-      {	Error(WARN, &fpos(key), "%s parameter is empty word", KW_KEY);
+      {	Error(10, 14, "%s parameter is an empty word", WARN,&fpos(key),KW_KEY);
 	seq = STR_BADKEY;
       }
       else seq = string(key);
@@ -462,8 +600,8 @@ OBJECT x;
       /* either write out the index immediately or store it for later */
       if( ctype == GALL_PREC )
       {	if( gall_tag(cs) == nil )
-	{ Error(WARN, &fpos(val), "no %s precedes this %s%s%s",
-		SymName(sym), SymName(sym), KW_CROSS, KW_PRECEDING);
+	{ Error(10, 15, "no %s precedes this %s%s%s", WARN, &fpos(val),
+	    SymName(sym), SymName(sym), KW_CROSS, KW_PRECEDING);
 	  debug0(DCR, DD, "  ... so substituting \"none\"");
 	  gall_tag(cs) = MakeWord(WORD, STR_NONE, &fpos(val));
 	}
@@ -472,8 +610,8 @@ OBJECT x;
 			"CrossSequence: gall_tag!" );
 	debug3(DCR, D, "  inserting galley (prec) %s&%s %s", SymName(sym),
 	  string(gall_tag(cs)), seq);
-	DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), seq,
-			dfnum, (long) dfpos);
+	DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos, seq,
+			dfnum, (long) dfpos, FALSE);
       }
       else
       {	tmp = MakeWord(WORD, seq, &fpos(val));
@@ -508,8 +646,8 @@ OBJECT x;
 	{
 	  debug3(DCR, D, "  inserting galley (foll) %s&%s %s", SymName(sym),
 	    string(gall_tag(cs)), string(y));
-	  DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), string(y),
-			file_num(fpos(y)), (long) gall_pos(y));
+	  DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos,
+	    string(y), file_num(fpos(y)), (long) gall_pos(y), FALSE);
 	  link = PrevDown(link);
 	  DisposeChild(NextDown(link));
 	}
@@ -520,8 +658,8 @@ OBJECT x;
     case CROSS_PREC:
 
       if( target_state(cs) == NO_TARGET )
-      {	Error(WARN, &fpos(tag), "no invokation of %s precedes this %s%s%s",
-		SymName(sym), SymName(sym), KW_CROSS, KW_PRECEDING);
+      {	Error(10, 16, "no %s precedes this %s%s%s", WARN, &fpos(tag),
+	  SymName(sym), SymName(sym), KW_CROSS, KW_PRECEDING);
 	break;
       }
       if( target_state(cs) == SEEN_TARGET )
@@ -542,8 +680,8 @@ OBJECT x;
       }
       debug3(DCR, D, "  inserting cross (prec) %s&%s %s", SymName(sym),
 	    string(tag), "0");
-      DbInsert(NewCrossDb, FALSE, sym, string(tag), STR_ZERO,
-	target_file(cs), (long) target_pos(cs));
+      DbInsert(NewCrossDb, FALSE, sym, string(tag), &fpos(tag), STR_ZERO,
+	target_file(cs), (long) target_pos(cs), TRUE);
       DisposeObject(tag);
       break;
 
@@ -551,8 +689,8 @@ OBJECT x;
     case CROSS_FOLL:
 
       if( !is_word(type(tag)) )
-      {	Error(WARN, &fpos(tag), "tag of %s is not a simple word",
-		SymName(symb(cs)));
+      {	Error(10, 17, "tag of %s is not a simple word",
+	  WARN, &fpos(tag), SymName(symb(cs)));
 	debug1(DCR, DD, "  tag = %s", EchoObject(tag));
       }
       else if( StringEqual(string(tag), STR_EMPTY) )
@@ -597,10 +735,10 @@ OBJECT x;
 	if( type(par) == PAR && is_tag(actual(par)) )
 	{ assert( Down(par) != par, "CrossSequence: Down(PAR)!" );
 	  Child(tag, Down(par));
-	  tag = ReplaceWithTidy(tag);
+	  tag = ReplaceWithTidy(tag, FALSE);
 	  if( !is_word(type(tag)) )
-	  { Error(WARN, &fpos(tag), "%s tag is not a simple word",
-			SymName(actual(target_val(cs))));
+	  { Error(10, 18, "tag of %s is not a simple word",
+	      WARN, &fpos(tag), SymName(actual(target_val(cs))));
 	    debug1(DCR, DD, "  tag = %s", EchoObject(tag));
 	  }
 	  else if( StringEqual(string(tag), STR_EMPTY) )
@@ -633,8 +771,8 @@ OBJECT x;
 	  {
 	    debug3(DCR, D, "  inserting cross (foll) %s&%s %s", SymName(sym),
 	      string(tag), "0");
-	    DbInsert(NewCrossDb, FALSE, sym, string(tag),
-	      STR_ZERO, target_file(cs), (long) target_pos(cs));
+	    DbInsert(NewCrossDb, FALSE, sym, string(tag), &fpos(tag), 
+	      STR_ZERO, target_file(cs), (long) target_pos(cs), TRUE);
 	    link = PrevDown(link);
 	    DisposeChild(NextDown(link));
 	  }
@@ -646,7 +784,7 @@ OBJECT x;
 
     default:
 
-      Error(INTERN, &fpos(tag), "CrossSequence: ctype = %s", Image(ctype));
+      Error(10, 19, "CrossSequence: %s", INTERN, &fpos(tag), Image(ctype));
       break;
 
   } /* end switch */
@@ -668,7 +806,7 @@ OBJECT x;
 CrossClose()
 { OBJECT link, cs, ylink, y, sym;  BOOLEAN g;  int len, count;
   FILE_NUM dfnum;  long dfpos, cont;
-  FULL_CHAR buff[MAX_LINE], seq[MAX_LINE], tag[MAX_LINE];
+  FULL_CHAR buff[MAX_BUFF], seq[MAX_BUFF], tag[MAX_BUFF];
   debug0(DCR, D, "CrossClose()");
   ifdebug(DCR, DD, if( RootCross != nil ) DebugObject(RootCross));
 
@@ -686,17 +824,18 @@ CrossClose()
       count = 0;  ylink = Down(cs);
       while( ylink != cs && count <= 5 )
       {	Child(y, ylink);
-	Error(WARN, &fpos(y), "no invokation of %s follows this %s%s%s",
+	Error(10, 20, "no %s follows this %s%s%s", WARN, &fpos(y),
 	  SymName(symb(cs)), SymName(symb(cs)), KW_CROSS, KW_FOLLOWING);
 	debug2(DCR, D, "gall_rec(y) = %s, y = %s",
 	  bool(gall_rec(y)), EchoObject(y));
 	if( gall_rec(y) )
-	  DbInsert(NewCrossDb, TRUE, symb(cs), STR_NONE,
-	    string(y), file_num(fpos(y)), (long) gall_pos(y));
+	  DbInsert(NewCrossDb, TRUE, symb(cs), STR_NONE, no_fpos,
+	    string(y), file_num(fpos(y)), (long) gall_pos(y), FALSE);
 	count++;  ylink = NextDown(ylink);
       }
-      if( ylink != cs )  Error(WARN, no_fpos, "and more undefined %s%s%s",
-				SymName(symb(cs)), KW_CROSS, KW_FOLLOWING);
+      if( ylink != cs )
+	Error(10, 21, "and more undefined %s%s%s", WARN, no_fpos,
+	  SymName(symb(cs)), KW_CROSS, KW_FOLLOWING);
       ifdebug(ANY, D,
 	if( target_state(cs) == SEEN_TARGET )  DisposeObject(target_val(cs));
 	if( gall_tag(cs) != nil )  DisposeObject(gall_tag(cs));
@@ -706,13 +845,14 @@ CrossClose()
   }
 
   /* add to NewCrossDb those entries of OldCrossDb from other source files */
+  /* but set check to FALSE so that we don't worry about duplication there */
   cont = 0L;  len = StringLength(DATA_SUFFIX);
   while( DbRetrieveNext(OldCrossDb, &g, &sym, tag, seq, &dfnum, &dfpos, &cont) )
   { if( g ) continue;
     StringCopy(buff, FileName(dfnum));
     StringCopy(&buff[StringLength(buff) - len], STR_EMPTY);
     if( FileNum(buff, STR_EMPTY) == NO_FILE )
-      DbInsert(NewCrossDb, FALSE, sym, tag, seq, dfnum, dfpos);
+      DbInsert(NewCrossDb, FALSE, sym, tag, no_fpos, seq, dfnum, dfpos, FALSE);
   }
 
   /* close OldCrossDb's .li file so that NewCrossDb can use its name */
@@ -722,4 +862,5 @@ CrossClose()
   DbConvert(NewCrossDb, TRUE);
 
   debug0(DCR, D, "CrossClose returning.");
+  ifdebug(DCR, D, crtab_debug(crossref_tab, stderr));
 } /* end CrossClose */

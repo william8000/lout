@@ -1,7 +1,7 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -37,20 +37,39 @@
 #define	NO_FONT		  0	/* the not-a-font font number                */
 #define	MAX_CHARS	256	/* maximum number of chars in a font         */
 #define SZ_DFT	       1000	/* default lout size is 50p                  */
+#define	INIT_FINFO_SIZE	100	/* initial number of sized fonts set aside   */
 
-struct metrics {
-  LENGTH up;
-  LENGTH down;
-  LENGTH left;
-  LENGTH right;
-};
+/*****************************************************************************/
+/*                                                                           */
+/* these definitions have been placed in "externs" because z24.c needs them  */
+/*                                                                           */
+/*  struct metrics {							     */
+/*    LENGTH up;							     */
+/*    LENGTH down;							     */
+/*    LENGTH left;							     */
+/*    LENGTH right;							     */
+/*  };							     		     */
+/*  									     */
+/*  typedef struct font_rec {						     */
+/*    struct metrics	*size_table;		   metrics of sized fonts    */
+/*    FULL_CHAR		*lig_table;		   ligatures                 */
+/*    OBJECT		font_table;		   record of sized fonts     */
+/*    OBJECT            original_font;             font rec before resizing  */
+/*    unsigned short	*kern_table;		   first kerning chars       */
+/*    FULL_CHAR		*kern_chars;		   second kerning chars      */
+/*    unsigned char	*kern_value;		   points into kern_lengths  */
+/*    LENGTH		*kern_sizes;		   sizes of kernings         */
+/*  } FONT_INFO;							     */
+/*                                                                           */
+/*****************************************************************************/
 
-static struct metrics	*size_table[MAX_FONT];	/* metrics of sized fonts    */
-static FULL_CHAR	*lig_table[MAX_FONT];	/* ligatures                 */
-static OBJECT		font_table[MAX_FONT];	/* record of sized fonts     */
-static OBJECT		font_root;		/* root of tree of fonts     */
-static FONT_NUM		fontcount;		/* number of sized fonts     */
-static int		font_seqnum;		/* unique number for a font  */
+	int		font_curr_page;		/* current page number       */
+	FONT_INFO	*finfo;			/* all the font table info   */
+static	int		finfo_size;		/* current finfo array size  */
+static	OBJECT		font_root;		/* root of tree of fonts     */
+static	OBJECT		font_used;		/* fonts used on this page   */
+static	FONT_NUM	font_count;		/* number of sized fonts     */
+static	int		font_seqnum;		/* unique number for a font  */
 
 
 /*@::FontInit(), FontDebug()@*************************************************/
@@ -62,10 +81,15 @@ static int		font_seqnum;		/* unique number for a font  */
 /*****************************************************************************/
 
 FontInit()
-{ debug0(DFT, D, "FontInit()");
-  fontcount	= 0;
+{ char *malloc();
+  debug0(DFT, D, "FontInit()");
+  font_curr_page = 1;
+  font_count	= 0;
   font_root	= New(ACAT);
+  font_used	= New(ACAT);
   font_seqnum	= 0;
+  finfo         = (FONT_INFO *) malloc(INIT_FINFO_SIZE * sizeof(FONT_INFO));
+  finfo_size    = INIT_FINFO_SIZE;
   debug0(DFT, D, "FontInit returning.");
 }
 
@@ -96,8 +120,9 @@ static FontDebug()
       fprintf(stderr, "%s\n", string(filename));
     }
   }
-  for( i = 1;  i <= fontcount;  i++ )
-    fprintf(stderr, "  font_table[%d] = %s\n", i, EchoObject(font_table[i]));
+  for( i = 1;  i <= font_count;  i++ )
+    fprintf(stderr, "  finfo[%d].font_table = %s\n", i,
+      EchoObject(finfo[i].font_table));
 } /* end FontDebug */
 #endif
 
@@ -115,12 +140,14 @@ FontDefine(family, face, inside)
 OBJECT family, face, inside;
 { OBJECT font_name, AFMfilename, CEVfilename, recode;
   OBJECT short_name, link, y, val[4]; int i;
+  static ReadFont();
   debug3(DFT, D, "FontDefine( %s, %s, %s )", string(family),
     string(face), EchoObject(inside));
 
   /* extract font_name, AFMfilename, CEVfilename, and recode */
   if( type(inside) != ACAT )
-  { Error(WARN, &fpos(inside), "fontdef is not a sequence of words");
+  { Error(37, 1, "font definition does not contain a sequence of words",
+      WARN, &fpos(inside));
     DisposeObject(inside);  return;
   }
   for( i = 0;  Down(inside) != inside && i != 4;  i++ )
@@ -128,12 +155,13 @@ OBJECT family, face, inside;
     DeleteLink(Up(val[i]));
     if( type(val[i]) == GAP_OBJ )  DisposeObject(val[i--]);
     else if( !is_word(type(val[i])) )
-    { Error(WARN, &fpos(val[i]), "fontdef contains a non-word");
+    { Error(37, 2, "font definition contains a non-word", WARN, &fpos(val[i]));
       DisposeObject(inside);  return;
     }
   }
   if( Down(inside) != inside || i != 4 )
-  { Error(WARN, &fpos(inside), "fontdef does not contain exactly four words");
+  { Error(37, 3, "font definition does not contain exactly four words",
+      WARN, &fpos(inside));
     DisposeObject(inside);  return;
   }
   font_name = val[0];    AFMfilename = val[1];
@@ -147,11 +175,20 @@ OBJECT family, face, inside;
   }
   if( link == font_root )  Link(font_root, family);
 
-  /* insert face into family, or error if already present */
+  /* insert face into family, or error if already present and different */
   for( link = Down(family);  link != family;  link = NextDown(link) )
   { Child(y, link);
     if( StringEqual(string(y), string(face)) )
-    { Error(WARN, &fpos(face), "font %s %s already defined at%s",
+    { OBJECT other_name, other_AFMname;
+      Child(other_AFMname, Down(y));
+      Child(other_name, NextDown(Down(other_AFMname)));
+      if( StringEqual(string(other_name), string(font_name)) &&
+          StringEqual(string(other_AFMname), string(AFMfilename)) )
+      { debug0(DFT, D, "FontDefine returning: font redefined");
+        Dispose(face);
+        return;
+      }
+      Error(37, 4, "font %s %s already defined at%s", WARN, &fpos(face),
 	string(family), string(face), EchoFilePos(&fpos(y)));
       debug0(DFT, D, "FontDefine returning: font already defined");
       Dispose(face);
@@ -175,9 +212,50 @@ OBJECT family, face, inside;
   { font_recoded(face) = FALSE;
     font_encoding(AFMfilename) = EvLoad(CEVfilename, FALSE);
   }
-  else Error(FATAL, &fpos(recode), "expecting either Recode or NoRecode here");
+  else Error(37, 5, "expecting either Recode or NoRecode here",
+	 FATAL, &fpos(recode));
+
+  /* say that this font is currently unused on any page */
+  font_page(face) = 0;
+  font_firstpage(face) = FALSE;
+
+  /* if initializing run, read the font just to make sure */
+  if( InitializeAll )
+  { ReadFont(face, face);
+  }
+
   debug0(DFT, D, "FontDefine returning.");
 } /* end FontDefine */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  DebugKernTable(fnum)                                                     */
+/*                                                                           */
+/*  Print debug output of kern table for font fnum.                          */
+/*                                                                           */
+/*****************************************************************************/
+#if DEBUG_ON
+
+static DebugKernTable(fnum)
+FONT_NUM fnum;
+{ int i, j;
+  unsigned short *kt = finfo[fnum].kern_table;
+  FULL_CHAR      *kc = finfo[fnum].kern_chars;
+  unsigned char  *kv = finfo[fnum].kern_value;
+  LENGTH         *ks = finfo[fnum].kern_sizes;
+  debug1(DFT, DD, "DebugKernTable(%d)", fnum);
+  for( i = 0;  i < MAX_CHARS;  i++ )
+  { if( kt[i] != 0 )
+    { debug1(DFT, DD, "kt[%d]:", i);
+      for( j = kt[i];  kc[j] != '\0';  j++ )
+      { debug3(DFT, DD, "KPX %c %c %d", i, kc[j], ks[kv[j]]);
+      }
+    }
+  }
+  debug1(DFT, DD, "DebugKernTable(%d) returning", fnum);
+} /* DebugKernTable */
+#endif
 
 
 /*@::ReadFont()@**************************************************************/
@@ -191,20 +269,29 @@ OBJECT family, face, inside;
 static ReadFont(face, err)
 OBJECT face, err;
 { OBJECT filename, fontname;
-  FULL_CHAR buff[MAX_LINE], command[MAX_LINE], ch;
+  FULL_CHAR buff[MAX_BUFF], command[MAX_BUFF], ch;
   int wx, llx, lly, urx, ury, xheight2, i, lnum, ligtop;
   BOOLEAN xhfound, wxfound, bfound;
   FILE_NUM fnum;  FILE *fp;
   struct metrics *fnt;
   FULL_CHAR *lig, ligchar;
+  unsigned short *kt;  FULL_CHAR *kc;  unsigned char *kv;  LENGTH *ks;
   OBJECT x;
-  char *malloc();
+  char *malloc(), *realloc();
   assert( is_word(type(face)), "ReadFont: !is_word(type(face))!" );
   debug1(DFT, DD, "ReadFont( %s, err )", string(face));
 
-  /* get a new font number for this font */
-  if( ++fontcount >= MAX_FONT )  Error(FATAL, &fpos(err),
-    "too many different fonts and sizes (max is %d)", MAX_FONT - 1);
+  /* get a new font number for this font, possibly requiring realloc */
+  if( ++font_count >= finfo_size )
+  { if( font_count > MAX_FONT )
+      Error(37, 6, "too many different fonts and sizes (maximum is %d)",
+	FATAL, &fpos(err),MAX_FONT);
+    finfo_size *= 2;
+    finfo = (FONT_INFO *) realloc(finfo, finfo_size * sizeof(FONT_INFO));
+    if( finfo == (FONT_INFO *) NULL )
+      Error(37, 7, "run out of memory when increasing font table size",
+	FATAL, &fpos(err));
+  }
 
   /* open the Adobe font metrics (AFM) file of the font */
   assert( Down(face) != face, "ReadFont: filename missing!" );
@@ -214,31 +301,44 @@ OBJECT face, err;
     FONT_FILE, FONT_PATH);
   fp = OpenFile(fnum, FALSE, FALSE);
   if( fp == NULL )
-    Error(FATAL, &fpos(filename), "cannot open font file %s", FileName(fnum));
+    Error(37, 8, "cannot open font file %s", FATAL, &fpos(filename),
+      FileName(fnum));
 
   /* check that the AFM file begins, as it should, with "StartFontMetrics" */
-  if( StringFGets(buff, MAX_LINE, fp) == NULL ||
+  if( StringFGets(buff, MAX_BUFF, fp) == NULL ||
 	sscanf( (char *) buff, "%s", command) != 1 ||
 	!StringEqual(command, "StartFontMetrics")  )
   { debug1(DFT, D, "first line of AFM file:%s", buff);
     debug1(DFT, D, "command:%s", command);
-    Error(FATAL, &fpos(filename),
-      "font file %s does not begin with StartFontMetrics", FileName(fnum));
+    Error(37, 9, "font file %s does not begin with StartFontMetrics",
+      FATAL, &fpos(filename), FileName(fnum));
   }
 
-  /* initialise font metrics and ligature tables for the new font */
+  /* initialise font metrics table for the new font */
   fnt = (struct metrics *) malloc(MAX_CHARS * sizeof(struct metrics));
-  if( fnt == (struct metrics *) NULL )  Error(FATAL, &fpos(err),
-    "run out of memory reading font file %s", FileName(fnum));
+  if( fnt == (struct metrics *) NULL )
+    Error(37, 10, "run out of memory while reading font file %s",
+      FATAL, &fpos(err), FileName(fnum));
   lig = (FULL_CHAR *) malloc(2*MAX_CHARS*sizeof(FULL_CHAR));
-  if( lig == (FULL_CHAR *) NULL )  Error(FATAL, &fpos(err),
-    "run out of memory reading font file %s", FileName(fnum));
+
+  /* initialise ligature table for the new font */
+  if( lig == (FULL_CHAR *) NULL )
+    Error(37, 11, "run out of memory while reading font file %s",
+      FATAL, &fpos(err), FileName(fnum));
   for( i = 0;  i < MAX_CHARS;  i++ )  lig[i] = 1;	/* i.e. char unknown */
   ligtop = MAX_CHARS+2;		/* must avoid ligtop - MAX_CHARS == 0 or 1 */
 
+  /* initialise kerning table for the new font */
+  kt = (unsigned short *) malloc(MAX_CHARS * sizeof(unsigned short));
+  if( kt == (unsigned short *) NULL )
+    Error(37, 12, "run out of memory while reading font file %s",
+      FATAL, &fpos(err), FileName(fnum));
+  for( i = 0;  i < MAX_CHARS;  i++ )  kt[i] = 0;  /* i.e. no kerns */
+  ks = (LENGTH *) NULL;				  /* i.e. no kern sizes */
+
   /* read font metrics file */
   xhfound = FALSE;  fontname = nil;  lnum = 1;
-  while ( ( StringFGets(buff, MAX_LINE, fp) ) != NULL )
+  while ( ( StringFGets(buff, MAX_BUFF, fp) ) != NULL )
   {
     lnum++;
     sscanf( (char *) buff, "%s", command);
@@ -249,8 +349,8 @@ OBJECT face, err;
 
 	if( StringEqual(command, AsciiToFull("XHeight")) ) 
 	{ if( xhfound )
-	  { Error(FATAL, &fpos(filename),
-	      "XHeight found twice in font file (line %d)", lnum);
+	  { Error(37, 13, "XHeight found twice in font file (line %d)",
+	      FATAL, &fpos(filename), lnum);
 	  }
 	  sscanf( (char *) buff, "XHeight %d", &xheight2);
 	  xheight2 = xheight2 / 2;
@@ -263,21 +363,18 @@ OBJECT face, err;
 
 	if( StringEqual(command, AsciiToFull("FontName")) )
 	{ if( fontname != nil )
-	  { Error(FATAL, &fpos(filename),
-	      "FontName found twice in font file %s (line %d)",
-	      FileName(fnum), lnum);
+	  { Error(37, 14, "FontName found twice in font file %s (line %d)",
+	      FATAL, &fpos(filename), FileName(fnum), lnum);
 	  }
 	  sscanf( (char *) buff, "FontName %s", command);
 	  if( StringEqual(command, STR_EMPTY) )
-	  { Error(FATAL, &fpos(filename),
-	      "FontName empty in font file %s (line %d)",
-	      FileName(fnum), lnum);
+	  { Error(37, 15, "FontName empty in font file %s (line %d)",
+	      FATAL, &fpos(filename), FileName(fnum), lnum);
 	  }
 	  Child(x, LastDown(filename));
 	  if( !StringEqual(command, string(x)) )
-	  Error(FATAL, &fpos(filename),
-	    "FontName in AFM file (%s) and in fontdef (%s) disagree",
-	    command, string(x));
+	  Error(37, 16, "FontName in font file (%s) and fontdef (%s) disagree",
+	    FATAL, &fpos(filename), command, string(x));
 	  fontname = MakeWord(WORD, command, &fpos(filename));
 	}
 	break;
@@ -285,22 +382,23 @@ OBJECT face, err;
 
       case 'S':
 
-	if( !StringEqual(command, AsciiToFull("StartCharMetrics")) )
-	  continue;
-	if( fontname == nil )  Error(FATAL, &fpos(filename),
-	  "FontName missing in file %s", FileName(fnum));
-	if( !xhfound )  xheight2 = DEFAULT_XHEIGHT / 2;
-	while( StringFGets(buff, MAX_LINE, fp) != NULL &&
-	       !StringBeginsWith(buff, AsciiToFull("EndCharMetrics")) )
+	if( StringEqual(command, AsciiToFull("StartCharMetrics")) )
 	{
-	  /* read one line containing metric info for one character */
-	  debug1(DFT, DD, "ReadFont reading %s", buff);
-	  lnum++;  ch = '\0';  
-	  wxfound = bfound = FALSE;
-	  i = 0;  while( buff[i] == ' ' )  i++;
-	  while( buff[i] != '\n' )
+	  if( fontname == nil )
+	    Error(37, 17, "FontName missing in file %s",
+	      FATAL, &fpos(filename), FileName(fnum));
+	  if( !xhfound )  xheight2 = DEFAULT_XHEIGHT / 2;
+	  while( StringFGets(buff, MAX_BUFF, fp) != NULL &&
+	         !StringBeginsWith(buff, AsciiToFull("EndCharMetrics")) )
 	  {
-	      debug2(DFT, DD, "  ch = %d, &buff[i] = %s", ch, &buff[i]);
+	    /* read one line containing metric info for one character */
+	    debug1(DFT, DDD, "ReadFont reading %s", buff);
+	    lnum++;  ch = '\0';  
+	    wxfound = bfound = FALSE;
+	    i = 0;  while( buff[i] == ' ' )  i++;
+	    while( buff[i] != '\n' )
+	    {
+	      debug2(DFT, DDD, "  ch = %d, &buff[i] = %s", ch, &buff[i]);
 	      sscanf( (char *) &buff[i], "%s", command);
 	      if( StringEqual(command, "N") )
 	      { sscanf( (char *) &buff[i], "N %s", command);
@@ -315,7 +413,8 @@ OBJECT face, err;
 		  &llx, &lly, &urx, &ury);
 		bfound = TRUE;
 	      }
-	      else if( StringEqual(command, "L") && ch != '\0' )
+	      else if( StringEqual(command, "L") &&
+		BackEnd == POSTSCRIPT && ch != '\0' )
 	      { if( lig[ch] == 1 )  lig[ch] = ligtop - MAX_CHARS;
 		lig[ligtop++] = ch;
 		i++;  /* skip L */
@@ -325,14 +424,13 @@ OBJECT face, err;
 		  ligchar = EvRetrieve(command, font_encoding(filename));
 		  if( ligchar != '\0' )  lig[ligtop++] = ligchar;
 		  else
-		  { Error(WARN, &fpos(filename),
-		    "ignoring ligature character %s in font file %s (line %d%s",
-		    command, FileName(fnum), lnum, ") as it is not encoded");
+		  { Error(37, 18, "ignoring unencoded ligature character %s in font file %s (line %d)",
+		      WARN, &fpos(filename), command, FileName(fnum), lnum);
 		    lig[ch] = 1;
 		  }
-		  if( ligtop > 2*MAX_CHARS - 5 )  Error(FATAL, &fpos(filename),
-		    "too many ligature characters in font file %s (line %d)",
-		    FileName(fnum), lnum);
+		  if( ligtop > 2*MAX_CHARS - 5 )
+		    Error(37, 19, "too many ligature characters in font file %s (line %d)",
+		    FATAL, &fpos(filename), FileName(fnum), lnum);
 		  while( buff[i] != ' ' && buff[i] != ';' )  i++;
 		  while( buff[i] == ' ' ) i++;
 		}
@@ -342,46 +440,160 @@ OBJECT face, err;
 	      if( buff[i] == ';' )
 	      { i++;  while( buff[i] == ' ' ) i++;
 	      }
-	  }
-	  if( ch > '\0' )
-	  { 
-	    if( !wxfound )
-	    { Error(FATAL, &fpos(filename),
-	        "WX missing in font file %s (line %d)", FileName(fnum), lnum);
 	    }
-	    if( !bfound )
-	    { Error(FATAL, &fpos(filename),
-	        "B missing in font file %s (line %d)", FileName(fnum), lnum);
+	    if( ch > '\0' )
+	    { 
+	      if( !wxfound )
+	      { Error(37, 20, "WX missing in font file %s (line %d)",
+		  FATAL, &fpos(filename), FileName(fnum), lnum);
+	      }
+	      if( !bfound )
+	      { Error(37, 21, "B missing in font file %s (line %d)",
+		  FATAL, &fpos(filename), FileName(fnum), lnum);
+	      }
+	      if( lig[ch] == 1 )  lig[ch] = 0;	/* set to known if unknown */
+	      else if( lig[ch] > 1 )		/* add '\0' to end of ligs */
+	        lig[ligtop++] = '\0';
+	      switch( BackEnd )
+	      {
+		case POSTSCRIPT: fnt[ch].left  = llx;
+				 fnt[ch].down  = lly - xheight2;
+				 fnt[ch].right = wx;
+				 fnt[ch].up    = ury - xheight2;
+				 break;
+
+		case PLAINTEXT:  fnt[ch].left  = 0;
+				 fnt[ch].down  = - PlainCharHeight / 2;
+				 fnt[ch].right = PlainCharWidth;
+				 fnt[ch].up    = PlainCharHeight / 2;
+				 break;
+	      }
+	      debug5(DFT, DDD, "  fnt[%c] = (%d,%d,%d,%d)", ch, fnt[ch].left,
+	        fnt[ch].down, fnt[ch].right, fnt[ch].up);
 	    }
-	    if( lig[ch] == 1 )  lig[ch] = 0;	/* set to known if unknown */
-	    else if( lig[ch] > 1 )		/* add '\0' to end of ligs */
-	      lig[ligtop++] = '\0';
-	    fnt[ch].left  = llx;
-	    fnt[ch].down  = lly - xheight2;
-	    fnt[ch].right = wx;
-	    fnt[ch].up    = ury - xheight2;
-	    debug5(DFT, DD, "  fnt[%c] = (%d,%d,%d,%d)", ch, fnt[ch].left,
-	      fnt[ch].down, fnt[ch].right, fnt[ch].up);
 	  }
 	}
+	else if( BackEnd == POSTSCRIPT && Kern &&
+	  StringEqual(command, AsciiToFull("StartKernPairs")) )
+	{ FULL_CHAR ch1, ch2, last_ch1;
+	  FULL_CHAR name1[30], name2[30];
+	  int kc_top, ks_top, pos, num_pairs, ksize;
 
-	/* make a new font record and insert into font tree */
-	font_num(fontname) = fontcount;
-	font_size(fontname) = SZ_DFT;
-	font_xheight2(fontname) = xheight2;
-	font_encoding(fontname) = font_encoding(filename);
-	ch = EvRetrieve(STR_PS_SPACENAME, font_encoding(fontname));
-	font_spacewidth(fontname) = ch == '\0' ? 0 : fnt[ch].right;
-	font_table[fontcount] = fontname;
-	size_table[fontcount] = fnt;
-	lig_table[fontcount] = lig;
-	Link(face, fontname);
+	  if( sscanf( (char *) buff, "StartKernPairs %d", &num_pairs) != 1 )
+	    Error(37, 22, "syntax error on StartKernPairs line in font file %s (line %d)",
+	      FATAL, &fpos(filename), FileName(fnum), lnum);
+	  kc_top = 1;  ks_top = 1;
+	  kc = (FULL_CHAR *) malloc(2 * num_pairs * sizeof(FULL_CHAR));
+	  kv = (unsigned char *) malloc(2 * num_pairs * sizeof(unsigned char));
+	  ks = (LENGTH *) malloc(num_pairs * sizeof(LENGTH));
+	  last_ch1 = '\0';
+	  while( StringFGets(buff, MAX_BUFF, fp) == (char *) buff &&
+	    !StringBeginsWith(buff, AsciiToFull("EndKernPairs")) )
+	  {
+	    debug1(DFT, DD, "ReadFont reading %s", buff);
+	    lnum++;
+	    if( StringBeginsWith(buff, AsciiToFull("KPX")) )
+	    {
+	      /* get the two character names and kern size from buff */
+	      if( sscanf((char *)buff, "KPX %s %s %d",name1,name2,&ksize)!=3 )
+		Error(37, 23, "syntax error in font file %s (line %d): %s",
+		  FATAL, &fpos(filename), FileName(fnum), lnum, buff);
 
-	/* close file, debug and exit */
-	fclose(fp);
-	debug4(DFT, D, "ReadFont returning: %d, name %s, fs %d, xh2 %d",
-		fontcount, string(fontname), font_size(fontname), xheight2);
-	return;
+	      /* ignore size 0 kern pairs (they are frequent, why?) */
+	      if( ksize == 0 )  continue;
+
+	      /* check that both characters are encoded */
+	      ch1 = EvRetrieve(name1, (ENCODING) font_encoding(filename));
+	      if( ch1 == '\0' )
+	      { Error(37, 24, "unencoded kern character %s in font file %s (line %d)",
+		  WARN, &fpos(filename), name1, FileName(fnum), lnum);
+		continue;
+	      }
+	      ch2 = EvRetrieve(name2, (ENCODING) font_encoding(filename));
+	      if( ch2 == '\0' )
+	      { Error(37, 25, "unencoded kern character %s in font file %s (line %d)",
+		  WARN, &fpos(filename), name2, FileName(fnum), lnum);
+		continue;
+	      }
+
+	      /* check that ch1 is contiguous with previous occurrences */
+	      if( ch1 != last_ch1 && kt[ch1] != 0 )
+	      { Error(37, 26, "non-contiguous kerning pair %s %s in font file %s (line %d)",
+		  WARN, &fpos(filename), name1, name2, FileName(fnum), lnum);
+		continue;
+	      }
+	      last_ch1 = ch1;
+
+	      /* if ch1 never seen before, make new entry in kt[] and kc[] */
+	      if( kt[ch1] == 0 )
+	      { debug2(DFT, DD, "  kt[%d] = %d", ch1, kc_top);
+		kt[ch1] = kc_top;
+		kc[kc_top] = (FULL_CHAR) '\0';
+		kv[kc_top] = 0;
+		kc_top++;
+	      }
+
+	      /* find kerning size in ks[] or else add it to the end */
+	      for( pos = 1;  pos < ks_top;  pos++ )
+	      { if( ks[pos] == ksize )  break;
+	      }
+	      if( pos == ks_top )
+	      { if( ks_top == num_pairs )
+		  Error(37, 27, "too many kerning pairs in font file %s (line %d)",
+		    FATAL, &fpos(filename), FileName(fnum), lnum);
+		debug2(DFT, DD, "  ks[%d] = %d", pos, ksize);
+		ks[pos] = ksize;
+		ks_top++;
+	      }
+
+	      /* insert ch2 into the kc entries (sorted decreasing) for ch1 */
+	      for( i = kc_top-1; i >= kt[ch1] && kc[i] < ch2;  i-- )
+	      { kc[i+1] = kc[i];
+		kv[i+1] = kv[i];
+	      }
+	      if( i >= kt[ch1] && kc[i] == ch2 )
+		Error(37, 28, "kerning pair %s %s appears twice in font file %s (line %d)",
+		  FATAL, &fpos(filename), name1, name2, FileName(fnum), lnum);
+	      kc[i+1] = ch2;
+	      kv[i+1] = pos;
+	      kc_top++;
+	    }
+	  }
+	  ks[0] = ks_top;
+	}
+	break;
+
+
+      case 'E':
+
+	if( StringEqual(command, AsciiToFull("EndFontMetrics")) )
+	{
+	  /* make a new font record and insert into font tree */
+	  font_num(face) = font_num(fontname) = font_count;
+	  font_size(fontname) =
+	    (BackEnd == POSTSCRIPT) ? SZ_DFT : PlainCharHeight;
+	  font_xheight2(fontname) =
+	    (BackEnd == POSTSCRIPT) ? xheight2 : PlainCharHeight / 4;
+	  font_encoding(fontname) = font_encoding(filename);
+	  ch = EvRetrieve(STR_PS_SPACENAME, font_encoding(fontname));
+	  font_spacewidth(fontname) = ch == '\0' ? 0 : fnt[ch].right;
+	  finfo[font_count].font_table = fontname;
+	  finfo[font_count].original_font = face;
+	  finfo[font_count].size_table = fnt;
+	  finfo[font_count].lig_table = lig;
+	  finfo[font_count].kern_table = kt;
+	  finfo[font_count].kern_chars = kc;
+	  finfo[font_count].kern_value = kv;
+	  finfo[font_count].kern_sizes = ks;
+	  Link(face, fontname);
+	  ifdebug(DFT, DD, DebugKernTable(font_count));
+
+	  /* close file, debug and exit */
+	  fclose(fp);
+	  debug4(DFT, D, "ReadFont returning: %d, name %s, fs %d, xh2 %d",
+		  font_count, string(fontname), font_size(fontname), xheight2);
+	  return;
+	}
 	break;
 
 
@@ -391,8 +603,8 @@ OBJECT face, err;
 
     }
   }
-  Error(FATAL, &fpos(filename),
-	"StartCharMetrics missing from font file %s", FileName(fnum));
+  Error(37, 29, "EndFontMetrics missing from font file %s",
+    FATAL, &fpos(filename), FileName(fnum));
 } /* end ReadFont */
 
 
@@ -404,6 +616,9 @@ OBJECT face, err;
 /*  according to word object x.  e.g. if current font is Roman 12p and x is  */
 /*  "-3p", then FontChange returns the internal font number of Roman 9p.     */
 /*                                                                           */
+/*  FontChange permits empty and null objects within x; these have no        */
+/*  effect.                                                                  */
+/*                                                                           */
 /*****************************************************************************/
 
 FontChange(style, x)
@@ -411,21 +626,30 @@ STYLE *style;  OBJECT x;
 { /* register */ int i;
   OBJECT par[3], family, face, fsize, y, link, new, old, tmpf;
   GAP gp;  LENGTH flen;  int num, c;  unsigned inc;
-  struct metrics *newfnt, *oldfnt;  FULL_CHAR *lig;  char *malloc();
+  struct metrics *newfnt, *oldfnt;  FULL_CHAR *lig;  char *malloc(), *realloc();
+  LENGTH *oldks, *newks;  int klen;
   debug2(DFT, D, "FontChange( %s, %s )", EchoStyle(style), EchoObject(x));
-  assert( font(*style) <= fontcount, "FontChange: fontcount!");
+  assert( font(*style) <= font_count, "FontChange: font_count!");
   /* ifdebug(DFT, DD, FontDebug()); */
 
   /* set par[0..num-1] to the 1, 2 or 3 parameters of the font operator */
   num = 0;
-  if( is_word(type(x)) )  par[num++] = x; 
+  if( type(x) == NULL_CLOS )
+  { /* acceptable, but do nothing */
+  }
+  else if( is_word(type(x)) )
+  {
+    if( !StringEqual(string(x), STR_EMPTY) ) par[num++] = x; 
+  }
   else if( type(x) == ACAT )
   { for( link = Down(x);  link != x;  link = NextDown(link) )
     { Child(y, link);
-      debug1(DFT, DD, "  pars examining y = %s", EchoObject(y));
-      if( type(y) == GAP_OBJ )  continue;
+      debug1(DFT, DDD, "  pars examining y = %s", EchoObject(y));
+      if( type(y) == GAP_OBJ || type(y)  == NULL_CLOS )  continue;
+      if( is_word(type(y)) && StringEqual(string(y), STR_EMPTY) )  continue;
       if( !is_word(type(y)) || num >= 3 )
-      {	Error(WARN, &fpos(x), "error in left parameter of %s", KW_FONT);
+      {	Error(37, 30, "error in left parameter of %s",
+	  WARN, &fpos(x), KW_FONT);
 	debug0(DFT, D, "FontChange returning: ACAT children");
 	return;
       }
@@ -433,11 +657,16 @@ STYLE *style;  OBJECT x;
     }
   }
   else
-  { Error(WARN, &fpos(x), "error in left parameter of %s", KW_FONT);
+  { Error(37, 31, "error in left parameter of %s", WARN, &fpos(x), KW_FONT);
     debug0(DFT, D, "FontChange returning: wrong type");
     return;
   }
-  debug1(DFT, DD, " found pars, num = %d", num);
+  debug1(DFT, DDD, " found pars, num = %d", num);
+  if( num == 0 )
+  { debug1(DFT, D,"FontChange returning %d (empty parameter, no change)",
+      font(*style));
+    return;
+  }
 
   /* extract fsize parameter, if any */
   assert( num >= 1 && num <= 3, "FontChange: num!" );
@@ -449,7 +678,8 @@ STYLE *style;  OBJECT x;
 
   /* check for initial font case: must have family, face, and size */
   if( font(*style) == NO_FONT && (fsize == nil || num < 2) )
-    Error(FATAL, &fpos(x), "initial font must have family, face and size");
+    Error(37, 32, "initial font must have family, face and size",
+      FATAL, &fpos(x));
 
   /* get font family */
   if( num == 2 )
@@ -460,15 +690,16 @@ STYLE *style;  OBJECT x;
       if( StringEqual(string(family), string(par[0])) )  break;
     }
     if( link == font_root )
-    { Error(WARN,&fpos(par[0]), "font family %s not defined", string(par[0]));
+    { Error(37, 33, "font family %s not defined",
+	WARN, &fpos(par[0]), string(par[0]));
       return;
     }
   }
   else
   { /* preserve current family */
-    assert( Up(font_table[font(*style)]) != font_table[font(*style)],
-      "FontChange: Up(font_table[font(*style)]) !" );
-    Parent(face, Up(font_table[font(*style)]));
+    assert( Up(finfo[font(*style)].font_table)!=finfo[font(*style)].font_table,
+      "FontChange: Up(finfo[font(*style)].font_table) !" );
+    Parent(face, Up(finfo[font(*style)].font_table));
     assert( is_word(type(face)), "FontChange: type(face)!" );
     assert( Up(face) != face, "FontChange: Up(face)!" );
     Parent(family, Up(face));
@@ -491,42 +722,43 @@ STYLE *style;  OBJECT x;
 	if( StringEqual(string(tmpf), string(par[num-1])) )  break;
       }
       if( font_root == Down(font_root) )
-      {	Error(FATAL, &fpos(par[num-1]), "there are no fonts");
+      {	Error(37, 34, "there are no fonts", FATAL, &fpos(par[num-1]));
       }
       else if( link != font_root )
-      {	Error(WARN, &fpos(par[num-1]),
-	    "font family name %s must be accompanied by a face name",
-	    string(par[num-1]));
+      {	Error(37, 35, "font family name %s must be accompanied by a face name",
+	  WARN, &fpos(par[num-1]), string(par[num-1]));
       }
-      else Error(WARN, &fpos(par[num-1]),
-	    "font face name %s not defined in font family %s",
-		string(par[num-1]), string(family));
+      else Error(37, 36, "font face name %s not defined in font family %s",
+	     WARN, &fpos(par[num-1]), string(par[num-1]), string(family));
       return;
     }
   }
   else
   {
     /* preserve current face name */
-    Parent(face, Up(font_table[font(*style)]));
+    Parent(face, Up(finfo[font(*style)].font_table));
     assert( is_word(type(face)), "FontChange: type(face)!" );
     assert( Up(face) != face, "FontChange: Up(face)!" );
   }
 
   /* get font size */
-  if( fsize == nil )  flen = font_size(font_table[font(*style)]);
+  if( fsize == nil )  flen = font_size(finfo[font(*style)].font_table);
   else 
   { GetGap(fsize, style, &gp, &inc);
     if( inc == GAP_ABS )  flen = width(gp);
     else if( font(*style) == NO_FONT )
-      Error(FATAL, &fpos(fsize), "no font encloses this %s", string(fsize));
-    else if( inc==GAP_INC )  flen = font_size(font_table[font(*style)])+width(gp);
-    else if( inc==GAP_DEC )  flen = font_size(font_table[font(*style)])-width(gp);
-    else Error(INTERN, &fpos(x), "GetGap returned inc = %d!", inc);
+      Error(37, 37, "no current font on which to base size change %s",
+	FATAL, &fpos(fsize), string(fsize));
+    else if( inc == GAP_INC )
+      flen = font_size(finfo[font(*style)].font_table) + width(gp);
+    else if( inc == GAP_DEC )
+      flen = font_size(finfo[font(*style)].font_table) - width(gp);
+    else Error(37, 38, "FontChange: %d", INTERN, &fpos(x), inc);
   }
 
   if( flen <= 0 )
-  { Error(WARN, &fpos(fsize), "%s %s ignored: result is not positive",
-      string(fsize), KW_FONT);
+  { Error(37, 39, "%s %s ignored (result is not positive)",
+      WARN, &fpos(fsize), string(fsize), KW_FONT);
     return;
   }
 
@@ -541,36 +773,47 @@ STYLE *style;  OBJECT x;
     if( font_size(fsize) == flen )
     { font(*style) = font_num(fsize);
       SetGap(space_gap(*style), FALSE, TRUE, FIXED_UNIT, EDGE_MODE,
-			font_spacewidth(fsize));
+	font_spacewidth(fsize));
       debug2(DFT, D,"FontChange returning (old) %d (XHeight2 = %d)",
-			font(*style), font_xheight2(font_table[font(*style)]));
+	font(*style), font_xheight2(finfo[font(*style)].font_table));
       return;
     }
   }
 
   /* now need to rescale the font; first create a sized font record */
-  if( ++fontcount >= MAX_FONT )  Error(FATAL, &fpos(x),
-    "too many different fonts and sizes (max is %d)", MAX_FONT - 1);
+  if( ++font_count >= finfo_size )
+  { if( font_count > MAX_FONT )
+      Error(37, 40, "too many different fonts and sizes (max is %d)",
+        FATAL, &fpos(x), MAX_FONT);
+    finfo_size *= 2;
+    finfo = (FONT_INFO *) realloc(finfo, finfo_size * sizeof(FONT_INFO));
+    if( finfo == (FONT_INFO *) NULL )
+      Error(37, 41, "run out of memory when increasing font table size",
+	FATAL, &fpos(x));
+  }
+
   assert( Down(face) != face && NextDown(Down(face)) != face, "FontChange!!" );
   Child(old, NextDown(Down(face)));
   assert( is_word(type(old)), "FontChange: old!" );
   new = MakeWord(WORD, string(old), no_fpos);
   Link(face, new);
-  font_size(new)        = flen;
+  font_size(new)        = BackEnd == POSTSCRIPT ? flen : font_size(old);
   font_xheight2(new)    = font_xheight2(old) * font_size(new) / font_size(old);
   font_encoding(new)	= font_encoding(old);
   font_spacewidth(new)	= font_spacewidth(old) * font_size(new)/font_size(old);
-  font_num(new)         = fontcount;
-  font_table[fontcount] = new;
-  size_table[fontcount] =
+  font_num(new)         = font_count;
+  finfo[font_count].font_table = new;
+  finfo[font_count].original_font = face;
+  finfo[font_count].size_table =
 	(struct metrics *) malloc(MAX_CHARS * sizeof(struct metrics));
-  if( size_table[fontcount] == (struct metrics *) NULL )
-    Error(FATAL, &fpos(x), "run out of memory when changing font or font size");
-  lig_table[fontcount]  = lig = lig_table[font_num(old)];
+  if( finfo[font_count].size_table == (struct metrics *) NULL )
+    Error(37, 42, "run out of memory when changing font or font size",
+      FATAL, &fpos(x));
+  finfo[font_count].lig_table  = lig = finfo[font_num(old)].lig_table;
 
   /* scale old font to new size */
-  newfnt = size_table[font_num(new)];
-  oldfnt = size_table[font_num(old)];
+  newfnt = finfo[font_num(new)].size_table;
+  oldfnt = finfo[font_num(old)].size_table;
   for( i = 0;  i < MAX_CHARS;  i++ )  if( lig[i] != 1 )
   { newfnt[i].left  = (oldfnt[i].left  * font_size(new)) / font_size(old);
     newfnt[i].right = (oldfnt[i].right * font_size(new)) / font_size(old);
@@ -578,14 +821,53 @@ STYLE *style;  OBJECT x;
     newfnt[i].up    = (oldfnt[i].up    * font_size(new)) / font_size(old);
   }
 
+  /* copy and scale kerning tables */
+  finfo[font_count].kern_table = finfo[font_num(old)].kern_table;
+  finfo[font_count].kern_chars = finfo[font_num(old)].kern_chars;
+  finfo[font_count].kern_value = finfo[font_num(old)].kern_value;
+  oldks = finfo[font_num(old)].kern_sizes;
+  if( oldks != (LENGTH *) NULL )
+  { klen = oldks[0];
+    finfo[font_count].kern_sizes = newks =
+      (LENGTH *) malloc(klen * sizeof(LENGTH));
+    if( newks == (LENGTH *) NULL )
+      Error(37, 43, "run out of memory when changing font or font size",
+	FATAL, &fpos(x));
+    newks[0] = klen;
+    for( i = 1;  i < klen;  i++ )
+      newks[i] = (oldks[i] * font_size(new)) / font_size(old);
+  }
+  else finfo[font_count].kern_sizes = (LENGTH *) NULL;
+
   /* return new font number and exit */
-  font(*style) = fontcount;
+  font(*style) = font_count;
   SetGap(space_gap(*style), FALSE, TRUE, FIXED_UNIT, EDGE_MODE,
     font_spacewidth(new));
   debug2(DFT, D,"FontChange returning (scaled) %d (XHeight2 = %d)",
-    font(*style), font_xheight2(font_table[font(*style)]));
+    font(*style), font_xheight2(finfo[font(*style)].font_table));
   /* FontDebug(); */
 } /* end FontChange */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  KernLength(fnum, ch1, ch2, res)                                          */
+/*                                                                           */
+/*  Set res to the kern length between ch1 and ch2 in font fnum, or 0 if     */
+/*  none.                                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+#define KernLength(fnum, ch1, ch2, res)					\
+{ int i = finfo[fnum].kern_table[ch1], j;				\
+  if( i == 0 )  res = 0;						\
+  else									\
+  { FULL_CHAR *kc = finfo[fnum].kern_chars;				\
+    for( j = i;  kc[j] > ch2;  j++ );					\
+    res = (kc[j]==ch2) ?						\
+      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;		\
+  }									\
+} /* end KernLength */
 
 
 /*@::FontWordSize()@**********************************************************/
@@ -600,16 +882,20 @@ STYLE *style;  OBJECT x;
 FontWordSize(x)
 OBJECT x;
 { FULL_CHAR *p, *q, *a, *b, *lig;  OBJECT tmp;
-  int r, u, d; struct metrics *fnt;
+  int r, u, d, ksize; struct metrics *fnt;
   debug2(DFT, D, "FontWordSize( %s ), font = %d", string(x), word_font(x));
   assert( is_word(type(x)), "FontWordSize: !is_word(type(x))!" );
 
   p = q = string(x);
   if( *p )
-  { if ( word_font(x) < 1 || word_font(x) > fontcount )
-      Error(FATAL, &fpos(x), "no current font at word %s", string(x));
-    fnt = size_table[word_font(x)];
-    lig = lig_table[word_font(x)];
+  { if ( word_font(x) < 1 || word_font(x) > font_count )
+      Error(37, 44, "no current font at word %s", FATAL, &fpos(x), string(x));
+    if ( word_colour(x) == 0 )
+      Error(37, 45, "no current colour at word %s", FATAL, &fpos(x), string(x));
+    if ( word_language(x) == 0 )
+      Error(37, 46, "no current language at word %s", FATAL, &fpos(x),string(x));
+    fnt = finfo[word_font(x)].size_table;
+    lig = finfo[word_font(x)].lig_table;
     d = u = r = 0;
     do
     { 
@@ -619,9 +905,9 @@ OBJECT x;
 	if( lig[*q] == 1 )
 	{ tmp = MakeWord(QWORD, STR_SPACE, &fpos(x));
 	  string(tmp)[0] = *q;
-	  Error(WARN, &fpos(x),
-	    "character %s left out (it has no glyph in font %s)",
-	     StringQuotedWord(tmp), FontFamilyAndFace(word_font(x)));
+	  Error(37, 47, "character %s omitted (it has no glyph in font %s)",
+	    WARN, &fpos(x),
+	    StringQuotedWord(tmp), FontFamilyAndFace(word_font(x)));
 	  Dispose(tmp);
 	  continue;
 	}
@@ -649,8 +935,20 @@ OBJECT x;
       r += fnt[*q++].right;
     } while( *p );
     *q++ = '\0';
-    back(x, COL) = 0; fwd(x, COL)  = r;
-    back(x, ROW) = u; fwd(x, ROW)  = -d;
+
+    /* add kern lengths to r */
+    for( p = string(x), q = p+1;  *q;  p++, q++ )
+    { KernLength(word_font(x), *p, *q, ksize);
+      debugcond3(DFT, D, ksize != 0, "  KernLength(fnum, %c, %c) = %d",
+	*p, *q, ksize);
+      r += ksize;
+    }
+
+    /* set sizes of x */
+    back(x, COL) = 0;
+    fwd(x, COL)  = min(MAX_LEN, r);
+    back(x, ROW) = min(MAX_LEN, u);
+    fwd(x, ROW)  = min(MAX_LEN, -d);
   } 
   else back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
   debug4(DFT, D, "FontWordSize returning %hd %hd %hd %hd",
@@ -669,10 +967,11 @@ OBJECT x;
 LENGTH FontSize(fnum, x)
 FONT_NUM fnum;  OBJECT x;
 { debug1(DFT, D, "FontSize( %d )", fnum);
-  assert( fnum <= fontcount, "FontSize!" );
-  if( fnum <= 0 )  Error(FATAL, &fpos(x), "no current font at this point");
-  debug1(DFT, D, "FontSize returning %d", font_size(font_table[fnum]));
-  return font_size(font_table[fnum]);
+  assert( fnum <= font_count, "FontSize!" );
+  if( fnum <= 0 )
+    Error(37, 48, "no current font at this point", FATAL, &fpos(x));
+  debug1(DFT, D, "FontSize returning %d", font_size(finfo[fnum].font_table));
+  return font_size(finfo[fnum].font_table);
 } /* end FontSize */
 
 
@@ -687,10 +986,11 @@ FONT_NUM fnum;  OBJECT x;
 LENGTH FontHalfXHeight(fnum)
 FONT_NUM fnum;
 { debug1(DFT, D, "FontHalfXHeight( %d )", fnum);
-  assert( fnum <= fontcount, "FontHalfXHeight!" );
-  debug1(DFT,D,"FontHalfXHeight returning %d", font_xheight2(font_table[fnum]));
-  return font_xheight2(font_table[fnum]);
-} /* end FontSize */
+  assert( fnum <= font_count, "FontHalfXHeight!" );
+  debug1(DFT,D,"FontHalfXHeight returning %d",
+    font_xheight2(finfo[fnum].font_table));
+  return font_xheight2(finfo[fnum].font_table);
+} /* end FontHalfXHeight */
 
 
 /*****************************************************************************/
@@ -704,10 +1004,11 @@ FONT_NUM fnum;
 ENCODING FontEncoding(fnum)
 FONT_NUM fnum;
 { debug1(DFT, D, "FontEncoding( %d )", fnum);
-  assert( fnum <= fontcount, "FontSize!" );
-  debug1(DFT, D, "FontEncoding returning %d", font_encoding(font_table[fnum]));
-  return font_encoding(font_table[fnum]);
-} /* end FontSize */
+  assert( fnum <= font_count, "FontEncoding!" );
+  debug1(DFT, D, "FontEncoding returning %d",
+    font_encoding(finfo[fnum].font_table));
+  return font_encoding(finfo[fnum].font_table);
+} /* end FontEncoding */
 
 
 /*****************************************************************************/
@@ -722,14 +1023,14 @@ FULL_CHAR *FontName(fnum)
 FONT_NUM fnum;
 { OBJECT face, AFMfilename, short_name;
   debug1(DFT, D, "FontName( %d )", fnum);
-  assert( fnum <= fontcount, "FontName!" );
-  Parent(face, Up(font_table[fnum]));
+  assert( fnum <= font_count, "FontName!" );
+  Parent(face, Up(finfo[fnum].font_table));
   Child(AFMfilename, Down(face));
   Child(short_name, Down(AFMfilename));
   assert( is_word(type(short_name)), "FontName: short_name!" );
   debug1(DFT, D, "FontName returning %s", string(short_name));
   return string(short_name);
-} /* end FontSize */
+} /* end FontName */
 
 
 /*@::FontFamilyAndFace(), FontPrintAll()@*************************************/
@@ -744,12 +1045,12 @@ FULL_CHAR *FontFamilyAndFace(fnum)
 FONT_NUM fnum;
 { OBJECT face, family; static FULL_CHAR buff[80];
   debug1(DFT, D, "FontFamilyAndFace( %d )", fnum);
-  assert( fnum <= fontcount, "FontName!" );
-  Parent(face, Up(font_table[fnum]));
+  assert( fnum <= font_count, "FontName!" );
+  Parent(face, Up(finfo[fnum].font_table));
   Parent(family, Up(face));
   if( StringLength(string(family)) + StringLength(string(face)) + 1 > 80 )
-    Error(FATAL, no_fpos, "family and face names %s %s are too long",
-      string(family), string(face));
+    Error(37, 49, "family and face names %s %s are too long",
+      FATAL, no_fpos, string(family), string(face));
   StringCopy(buff, string(family));
   StringCat(buff, STR_SPACE);
   StringCat(buff, string(face));
@@ -800,6 +1101,127 @@ FILE *fp;
   fputs("\n", fp);
   debug0(DFT, DD, "FontPrintAll returning.");
 } /* end FontPrintAll */
+
+
+/*@@**************************************************************************/
+/*                                                                           */
+/*  FontPrintPageSetup(fp)             	                                     */
+/*                                                                           */
+/*  Print all font encoding commands needed for the current page onto fp.    */
+/*                                                                           */
+/*****************************************************************************/
+
+FontPrintPageSetup(fp)
+FILE *fp;
+{ OBJECT family, face, AFMfilename, short_name, ps_name, link;
+  assert( font_root != nil && type(font_root)==ACAT, "FontDebug: font_root!" );
+  assert( font_used != nil && type(font_used)==ACAT, "FontDebug: font_used!" );
+  debug0(DFT, DD, "FontPrintPageSetup(fp)");
+  for( link = Down(font_used);  link != font_used;  link = NextDown(link) )
+  {
+    Child(face, link);
+    assert( is_word(type(face)), "FontPrintPageSetup: face!" );
+    assert( Down(face) != face, "FontDebug: Down(face)!");
+
+    /* record that face is used on the first page, if this is the first page */
+    if( font_curr_page == 1 )  font_firstpage(face) = TRUE;
+
+    /* print font encoding command unless already done */
+    if( !font_firstpage(face) || font_curr_page == 1 )
+    { Child(AFMfilename, Down(face));
+      assert( is_word(type(AFMfilename)), "FontPrintPageSetup: filename!" );
+      assert( Down(AFMfilename) != AFMfilename, "FontPrintPageSetup: 1!" );
+      assert( LastDown(AFMfilename)!=Down(AFMfilename), "FontPrintPageSetup!");
+      Child(short_name, Down(AFMfilename));
+      assert( is_word(type(short_name)), "FontPrintPageSetup: short_name!" );
+      Child(ps_name, LastDown(AFMfilename));
+      assert( is_word(type(ps_name)), "FontPrintPageSetup: ps_name!" );
+      fprintf(fp, "%%%%IncludeResource: font %s\n", string(ps_name));
+      if( font_recoded(face) )
+      { fprintf(fp, "/%s%s %s /%s LoutRecode\n",
+	  string(ps_name), string(short_name),
+	  EvName(font_encoding(AFMfilename)), string(ps_name));
+        fprintf(fp, "/%s { /%s%s LoutFont } def\n", string(short_name),
+	  string(ps_name), string(short_name));
+      }
+      else fprintf(fp, "/%s { /%s LoutFont } def\n", string(short_name),
+	    string(ps_name));
+    }
+  }
+  debug0(DFT, DD, "FontPrintPageSetup returning.");
+} /* end FontPrintPageSetup */
+
+
+/*@@**************************************************************************/
+/*                                                                           */
+/*  FontPrintPageResources(fp)        	                                     */
+/*                                                                           */
+/*  Print all page resources (i.e. fonts needed or supplied) onto fp.        */
+/*                                                                           */
+/*****************************************************************************/
+
+FontPrintPageResources(fp)
+FILE *fp;
+{ OBJECT family, face, AFMfilename, short_name, ps_name, link;
+  BOOLEAN first;
+  assert( font_root != nil && type(font_root)==ACAT, "FontDebug: font_root!" );
+  assert( font_used != nil && type(font_used)==ACAT, "FontDebug: font_used!" );
+  debug0(DFT, DD, "FontPrintPageResources(fp)");
+  first = TRUE;
+  for( link = Down(font_used);  link != font_used;  link = NextDown(link) )
+  {
+    Child(face, link);
+    assert( is_word(type(face)), "FontPrintPageResources: face!" );
+    assert( Down(face) != face, "FontDebug: Down(face)!");
+
+    Child(AFMfilename, Down(face));
+    assert( is_word(type(AFMfilename)), "FontPrintPageResources: filename!" );
+    assert( Down(AFMfilename) != AFMfilename, "FontPrintPageResources: 1!" );
+    assert( LastDown(AFMfilename)!=Down(AFMfilename), "FontPrintPageRes!");
+    Child(short_name, Down(AFMfilename));
+    assert( is_word(type(short_name)), "FontPrintPageResources: short_name!" );
+    Child(ps_name, LastDown(AFMfilename));
+    assert( is_word(type(ps_name)), "FontPrintPageResources: ps_name!" );
+    fprintf(fp, "%s font %s\n",
+      first ? "%%PageResources:" : "%%+", string(ps_name));
+    first = FALSE;
+  }
+  debug0(DFT, DD, "FontPrintPageResources returning.");
+} /* end FontPrintPageResources */
+
+
+/*@@**************************************************************************/
+/*                                                                           */
+/*  FontAdvanceCurrentPage()        	                                     */
+/*                                                                           */
+/*  Advance the current page.                                                */
+/*                                                                           */
+/*****************************************************************************/
+
+FontAdvanceCurrentPage()
+{ debug0(DFT, DD, "FontAdvanceCurrentPage()");
+  while( Down(font_used) != font_used )  DeleteLink(Down(font_used));
+  font_curr_page++;
+  debug0(DFT, DD, "FontAdvanceCurrentPage() returning.");
+} /* end FontAdvanceCurrentPage */
+
+
+/*@::FontPageUsed()@**********************************************************/
+/*                                                                           */
+/*  OBJECT FontPageUsed(face)                                                */
+/*                                                                           */
+/*  Declares that font face is used on the current page.                     */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT FontPageUsed(face)
+OBJECT face;
+{ debug1(DFT, DD, "FontPageUsed(%d)", font_num(face));
+  assert( font_page(face) < font_curr_page, "FontPageUsed!" );
+  Link(font_used, face);
+  font_page(face) = font_curr_page;
+  debug0(DFT, DD, "FontPageUsed returning");
+} /* end FontPageUsed */
 
 
 /*@::FontNeeded()@************************************************************/

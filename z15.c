@@ -1,7 +1,7 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -422,6 +422,19 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
       break;
 
 
+    case HSHIFT:
+    case VSHIFT:
+
+      if( (type(y) == HSHIFT) == (dim == COL) )
+      { Constrained(y, &yc, dim);
+	tf = FindShift(y, x, dim);
+	SetConstraint(*xc,
+	  min(bc(yc), bfc(yc)) - tf, bfc(yc), min(fc(yc), bfc(yc)) + tf);
+      }
+      else Constrained(y, xc, dim);
+      break;
+
+
     case HEAD:
     
       if( dim == ROW ) SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
@@ -499,7 +512,7 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
       break;
 
 
-    default:  Error(INTERN, &fpos(y), "Constrained: %s", Image(type(y)) );
+    default:  Error(15, 1, "Constrained: %s", INTERN, &fpos(y),Image(type(y)));
 	      break;
   }
   debug1(DSC, DD, "] Constrained returning %s", EchoConstraint(xc));
@@ -612,7 +625,7 @@ OBJECT x;
 
     default:
     
-      Error(INTERN, &fpos(x), "DebugConstrained: type(x)= %s", Image(type(x)) );
+      Error(15, 2, "DebugConstrained: %s", INTERN, &fpos(x), Image(type(x)));
       break;
 
   }

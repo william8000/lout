@@ -1,0 +1,29 @@
+The Lout mailing list
+
+A public mailing list has been set up for discussion
+of the Lout document formatting system.  Thanks to
+Rodrigo Vanegas of Brown University for undertaking
+this.  To subscribe to the list, send mail to
+
+	lout-request@cs.brown.edu
+
+containing the word
+
+	subscribe
+
+in the Subject line (it MUST be in the Subject line).
+To unsubscribe, send mail to lout-request@cs.brown.edu
+containing the word unsubscribe in the Subject line.
+Wait for one full working day after subscribing before
+expecting to receive any items.
+
+To post an item, send mail to
+
+	lout@cs.brown.edu
+
+It will be forwarded by email to all current subscribers.
+
+Please note that this public list is quite separate from
+the private list maintained by Jeff Kingston.  Messages
+about new releases, etc. from Jeff will henceforth be
+sent to both lists.

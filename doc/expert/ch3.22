@@ -1,0 +1,28 @@
+@Section
+   @Title { The cross reference symbol "&&" }
+   @Tag { crossref }
+@Begin
+@PP
+The cross reference symbol @Code "&&" takes the name of a symbol (not an
+object) for its left parameter, and an object whose value must be a
+simple word for its right parameter.  The result is a cross reference,
+which may be thought of as an arrow pointing from the cross reference
+symbol to the beginning of an invocation of the named symbol.
+@PP
+The invocation pointed to, known as the @I target of the cross
+reference, is generally one whose @@Tag parameter has value equal
+to the right parameter of the cross reference symbol.  Two special tags,
+@Code preceding and {@Code following}, point respectively
+to the first invocation preceding the cross reference in the final
+printed document, and the first following it.
+@PP
+A cross reference may be used in four ways:  where an object is
+expected, in which case its value is a copy of the target; with the
+@@Open and @@Use symbols; with the @@Tagged symbol; and in the
+@Code into clause of a galley definition, in which case the value of
+the tag must be @Code preceding or {@Code following}.
+@PP
+Except within an @Code into clause, the symbol referred to must have
+a @@Tag parameter.  This is so even if the right parameter of the cross
+reference is @Code preceding or {@Code following}.
+@End @Section

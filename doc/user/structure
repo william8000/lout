@@ -1,0 +1,17 @@
+@Chapter
+    @Title { Adding Structure to Documents }
+    @Tag { structure }
+@Begin
+@BeginSections
+@Include { structure.displays }
+@Include { structure.lists }
+@Include { structure.footnotes }
+@Include { structure.figures }
+@Include { structure.largescale }
+@Include { structure.cross }
+@Include { structure.contents }
+@Include { structure.indexes }
+@Include { structure.columns }
+@Include { structure.definitions }
+@EndSections
+@End @Chapter

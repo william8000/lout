@@ -1,7 +1,7 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -24,8 +24,8 @@
 /*                                                                           */
 /*  FILE:         z24.c                                                      */
 /*  MODULE:       Print Service                                              */
-/*  EXTERNS:      PrintInit(), PrintPrologue(), PrintOriginIncrement(),      */
-/*                PrintWord(), PrintClose(), CoordTranslate(),               */
+/*  EXTERNS:      PrintInit(), PrintBeforeFirst(), PrintBetween(),           */
+/*                PrintWord(), PrintAfterLast(), CoordTranslate(),           */
 /*                CoordRotate(), CoordScale(), SaveGraphicState(),           */
 /*                RestoreGraphicState(), PrintGraphicObject(),               */
 /*                DefineGraphicNames(), PrintGraphicInclude()                */
@@ -34,8 +34,10 @@
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
+#define	StartUpResource	"LoutStartUp"
 #define DEFAULT_XHEIGHT 500
-#define	NO_FONT	0			/* actually stolen from z37.c        */
+#define	NO_FONT		0		/* actually stolen from z37.c        */
+#define	NO_COLOUR	0
 
 #define printnum(x, fp)							\
 { char buff[20];  register int i, y;					\
@@ -44,19 +46,28 @@
   i = 0;								\
   do { buff[i++] = numtodigitchar(y % 10);				\
      } while( y = y / 10 );						\
-  do { putc(buff[--i], fp);						\
+  do { --i; putc(buff[i], fp);						\
      } while( i );							\
 }
 
 static FILE	*out_fp;		/* output file                       */
-static FONT_NUM	currentfont;		/* font of most recent atom          */
-static short	currentxheight2;	/* half xheight in current font      */
-static BOOLEAN	cpexists;		/* true if a current point exists    */
-static LENGTH	currenty;		/* if cpexists, its y coordinate     */
-static int	wordcount;		/* atoms printed since last newline  */
-static int	pagecount;		/* total number of pages printed     */
-static BOOLEAN	prologue_done;		/* TRUE after prologue is printed    */
-static OBJECT	needs;			/* Resource needs of included EPSFs  */
+
+/* these variables used by PLAINTEXT back end only                           */
+static int	hsize;			/* horizontal size of page in chars  */
+static int	vsize;			/* vertical size of page in chars    */
+static FULL_CHAR *page;			/* the page (two-dim array of chars) */
+
+/* these variables used by POSTSCRIPT back end only                          */
+static FONT_NUM		currentfont;	/* font of most recent atom          */
+static COLOUR_NUM	currentcolour;	/* colour of most recent atom        */
+static short		currentxheight2;/* half xheight in current font      */
+static BOOLEAN		cpexists;	/* true if a current point exists    */
+static LENGTH		currenty;	/* if cpexists, its y coordinate     */
+static int		wordcount;	/* atoms printed since last newline  */
+static int		pagecount;	/* total number of pages printed     */
+static BOOLEAN		prologue_done;	/* TRUE after prologue is printed    */
+static OBJECT		needs;		/* Resource needs of included EPSFs  */
+static OBJECT		supplied;	/* Resources supplied by this file   */
 
 
 /*****************************************************************************/
@@ -69,22 +80,32 @@ static OBJECT	needs;			/* Resource needs of included EPSFs  */
 
 PrintInit(file_ptr)
 FILE *file_ptr;
-{ debug0(DFT, D, "PrintInit()");
+{ debug0(DGP, D, "PrintInit()");
   out_fp = file_ptr;  prologue_done = FALSE;
-  currentfont = NO_FONT;  cpexists = FALSE;
-  wordcount = pagecount = 0;  needs = New(ACAT);
-  debug0(DFT, D, "PrintInit returning.");
+  currentfont = NO_FONT;
+  currentcolour = NO_COLOUR;
+  cpexists = FALSE;
+  wordcount = pagecount = 0;
+  needs = New(ACAT);
+  supplied = New(ACAT);
+  debug0(DGP, D, "PrintInit returning.");
 }
 
 
-/*@::PrintPrologue@***********************************************************/
+/*@::PrintBeforeFirst@********************************************************/
 /*                                                                           */
-/*  PrintPrologue(h, v)                                                      */
+/*  PrintBeforeFirst(h, v)                                                   */
 /*                                                                           */
-/*  Generate the standard PostScript prologue, augmented with any @Prologue  */
-/*  or @SysPrologue files specified by the user.                             */
-/*  The first non-empty page has width h and height v in Lout units.         */
-/*  The following PostScript operators are defined:                          */
+/*  This procedure is called just before starting to print the first         */
+/*  component of the output.  Its size is h, v.                              */
+/*                                                                           */
+/*  If BackEnd is PLAINTEXT, this procedure obtains a two-dimensional array  */
+/*  of characters large enough to hold the first component, and clears it.   */
+/*                                                                           */
+/*  If BackEnd is POSTSCRIPT, this procedure generates the PostScript        */
+/*  prologue, augmented with any @PrependGraphic or @SysPrependGraphic       */
+/*  files specified by the user.  The following PostScript operators are     */
+/*  defined:                                                                 */
 /*                                                                           */
 /*      scale_factor  fnt       scale and set font                           */
 /*      x_coordinate  x         move to x_coordinate, current y coordinate   */
@@ -106,152 +127,245 @@ FILE *file_ptr;
 /*                                                                           */
 /*****************************************************************************/
 
-PrintPrologue(h, v)
+PrintBeforeFirst(h, v)
 LENGTH h, v;
-{ FILE_NUM fnum;
-  debug2(DGP, DD, "PrintPrologue: v = %d   h = %d", v, h);
+{ FILE_NUM fnum;  int i, j;
+  debug2(DGP, DD, "PrintBeforeFirst(%d, %d)", h, v);
 
-  /* print header comments for PostScript DSC 3.0 output */
-  if( Encapsulated )
-    fprintf(out_fp, "%%%!PS-Adobe-3.0 EPSF-3.0\n");
-  else
-    fprintf(out_fp, "%%%!PS-Adobe-3.0\n");
-  fprintf(out_fp, "%%%%Creator: %s\n", LOUT_VERSION);
-  fprintf(out_fp, "%%%%CreationDate: %s", TimeString());
-  fprintf(out_fp, "%%%%DocumentNeededResources: (atend)\n");
-  fprintf(out_fp, "%%%%Pages: (atend)\n");
-  fprintf(out_fp, "%%%%BoundingBox: 0 0 %d %d\n", h/PT, v/PT);
-  fprintf(out_fp, "%%%%EndComments\n\n");
+  switch( BackEnd )
+  {
+    case PLAINTEXT:
 
-  /* print procedure definitions part of header */
-  fprintf(out_fp, "%%%%BeginProlog\n");
-  fprintf(out_fp, "%%%%BeginResource: procset LoutStartUp\n");
-  fprintf(out_fp, "/x { currentpoint exch pop moveto } def\n");
-  fprintf(out_fp, "/s { show } def\n");
-  fprintf(out_fp, "/in { %d mul } def\n", IN);
-  fprintf(out_fp, "/cm { %d mul } def\n", CM);
-  fprintf(out_fp, "/pt { %d mul } def\n", PT);
-  fprintf(out_fp, "/em { %d mul } def\n", EM);
-  fprintf(out_fp, "/sp { louts mul } def\n");
-  fprintf(out_fp, "/vs { loutv mul } def\n");
-  fprintf(out_fp, "/ft { loutf mul } def\n");
-  fprintf(out_fp, "/dg {           } def\n\n");
-
-  fputs("/LoutGraphic {\n",					  out_fp);
-  fputs("  /louts exch def\n",					  out_fp);
-  fputs("  /loutv exch def\n",					  out_fp);
-  fputs("  /loutf exch def\n",					  out_fp);
-  fputs("  /ymark exch def\n",					  out_fp);
-  fputs("  /xmark exch def\n",					  out_fp);
-  fputs("  /ysize exch def\n",					  out_fp);
-  fputs("  /xsize exch def\n} def\n\n",				  out_fp);
-
-  /* print definition used by Lout output to recode fonts                 */
-  /* adapted from PostScript Language Reference Manual (2nd Ed), page 275 */
-  /* usage: /<fullname> <encodingvector> /<originalname> LoutRecode -     */
-
-  fputs("/LoutFont\n",                                            out_fp);
-  fputs("{ findfont exch scalefont setfont\n",                    out_fp);
-  fputs("} bind def\n\n",					  out_fp);
-
-  fputs("/LoutRecode {\n",                                        out_fp);
-  fputs("  { findfont dup length dict begin\n",                   out_fp);
-  fputs("    {1 index /FID ne {def} {pop pop} ifelse} forall\n",  out_fp);
-  fputs("    /Encoding exch def\n",                               out_fp);
-  fputs("    currentdict end definefont pop\n",                   out_fp);
-  fputs("  }\n",                                                  out_fp);
-  fputs("  stopped {}\n",                                         out_fp);
-  fputs("} bind def\n\n",                                         out_fp);
-
-  /* print definitions used by Lout output when including EPSF files      */
-  /* copied from PostScript Language Reference Manual (2nd Ed.), page 726 */
-
-  fputs("/BeginEPSF {\n",					  out_fp);
-  fputs("  /LoutEPSFState save def\n",				  out_fp);
-  fputs("  /dict_count countdictstack def\n",			  out_fp);
-  fputs("  /op_count count 1 sub def\n",			  out_fp);
-  fputs("  userdict begin\n",					  out_fp);
-  fputs("  /showpage { } def\n",				  out_fp);
-  fputs("  0 setgray 0 setlinecap\n",				  out_fp);
-  fputs("  1 setlinewidth 0 setlinejoin\n",			  out_fp);
-  fputs("  10 setmiterlimit [] 0 setdash newpath\n",		  out_fp);
-  fputs("  /languagelevel where\n",				  out_fp);
-  fputs("  { pop languagelevel\n",				  out_fp);
-  fputs("    1 ne\n",						  out_fp);
-  fputs("    { false setstrokeadjust false setoverprint\n",	  out_fp);
-  fputs("    } if\n",						  out_fp);
-  fputs("  } if\n",						  out_fp);
-  fputs("} bind def\n\n",					  out_fp);
-
-  fputs("/EndEPSF {\n",						  out_fp);
-  fputs("  count op_count sub { pop } repeat\n",		  out_fp);
-  fputs("  countdictstack dict_count sub { end } repeat\n",	  out_fp);
-  fputs("  LoutEPSFState restore\n",				  out_fp);
-  fputs("} bind def\n",						  out_fp);
-
-  fputs("%%EndResource\n\n",					  out_fp);
-
-  /* print encoding vectors and font recoding commands */
-  EvPrintAll(out_fp);
-  FontPrintAll(out_fp);
-
-  /* print prepend files (assumed to be organized as DSC 3.0 Resources) */
-  for( fnum=FirstFile(PREPEND_FILE);  fnum != NO_FILE;  fnum=NextFile(fnum) )
-  { FULL_CHAR buff[MAX_LINE];  FILE *fp;
-    if( (fp = OpenFile(fnum, FALSE, FALSE)) == null )
-      Error(WARN, PosOfFile(fnum), "cannot open %s file %s",
-	KW_PREPEND, FileName(fnum));
-    else if( StringFGets(buff, MAX_LINE, fp) == NULL )
-      Error(WARN, PosOfFile(fnum), "%s file %s is empty",
-	KW_PREPEND, FileName(fnum));
-    else
-    {
-      if( !StringBeginsWith(buff, AsciiToFull("%%BeginResource:")) )
-	Error(WARN, PosOfFile(fnum),
-	  "%s file %s lacks PostScript DSC 3.0 \"%%%%BeginResource:\" comment",
-	  KW_PREPEND, FileName(fnum));
-      StringFPuts(buff, out_fp);
-      fprintf(out_fp, "\n%% %s file %s\n", KW_PREPEND, FileName(fnum));
-      while( StringFGets(buff, MAX_LINE, fp) != NULL )
-	StringFPuts(buff, out_fp);
-    }
-  }
-
-  fputs("\n%%EndProlog\n\n", out_fp);
-  fprintf(out_fp, "%%%%Page: ? %d\n", ++pagecount);
-  fprintf(out_fp, "%%%%BeginPageSetup\n");
-  fprintf(out_fp, "/pgsave save def\n");
-  fprintf(out_fp, "%.4f dup scale %d setlinewidth\n", 1.0 / PT, PT/2);
-  fprintf(out_fp, "%%%%EndPageSetup\n");
-  prologue_done = TRUE;
-} /* end PrintPrologue */
+      /* get a new page[] and clear it */
+      hsize = ceiling(h, PlainCharWidth);
+      vsize = ceiling(v, PlainCharHeight);
+      debug2(DGP, DD, "  PlainCharWidth: %d;  PlainCharHeight: %d",
+	PlainCharWidth, PlainCharHeight);
+      debug2(DGP, DD, "  PrintBeforeFirst allocating %d by %d", hsize, vsize);
+      page = (FULL_CHAR *) malloc(hsize * vsize * sizeof(FULL_CHAR));
+      for( i = 0;  i < vsize;  i++ )
+	for( j = 0;  j < hsize;  j++ )
+	  page[i*hsize + j] = ' ';
+      break;
 
 
-/*@::PrintOriginIncrement(), EightBitsToPrintForm[]@**************************/
+    case POSTSCRIPT:
+
+      /* print header comments for PostScript DSC 3.0 output */
+      if( Encapsulated )
+        fprintf(out_fp, "%%!PS-Adobe-3.0 EPSF-3.0\n");
+      else
+        fprintf(out_fp, "%%!PS-Adobe-3.0\n");
+      fprintf(out_fp, "%%%%Creator: %s\n", LOUT_VERSION);
+      fprintf(out_fp, "%%%%CreationDate: %s", TimeString());
+      fprintf(out_fp, "%%%%DocumentData: Binary\n");
+      fprintf(out_fp, "%%%%DocumentNeededResources: (atend)\n");
+      fprintf(out_fp, "%%%%DocumentSuppliedResources: (atend)\n");
+      fprintf(out_fp, "%%%%Pages: (atend)\n");
+      fprintf(out_fp, "%%%%BoundingBox: 0 0 %d %d\n", h/PT, v/PT);
+      fprintf(out_fp, "%%%%EndComments\n\n");
+
+      /* print procedure definitions part of header */
+      fprintf(out_fp, "%%%%BeginProlog\n");
+      fprintf(out_fp, "%%%%BeginResource: procset %s\n", StartUpResource);
+      fprintf(out_fp, "/m { 3 1 roll moveto show } bind def\n");
+      fprintf(out_fp, "/s { exch currentpoint exch pop moveto show } bind def\n");
+      fprintf(out_fp, "/k { exch neg 0 rmoveto show } bind def\n");
+      fprintf(out_fp, "/in { %d mul } def\n", IN);
+      fprintf(out_fp, "/cm { %d mul } def\n", CM);
+      fprintf(out_fp, "/pt { %d mul } def\n", PT);
+      fprintf(out_fp, "/em { %d mul } def\n", EM);
+      fprintf(out_fp, "/sp { louts mul } def\n");
+      fprintf(out_fp, "/vs { loutv mul } def\n");
+      fprintf(out_fp, "/ft { loutf mul } def\n");
+      fprintf(out_fp, "/dg {           } def\n\n");
+
+      fputs("/LoutGraphic {\n",					  out_fp);
+      fputs("  /louts exch def\n",				  out_fp);
+      fputs("  /loutv exch def\n",				  out_fp);
+      fputs("  /loutf exch def\n",				  out_fp);
+      fputs("  /ymark exch def\n",				  out_fp);
+      fputs("  /xmark exch def\n",				  out_fp);
+      fputs("  /ysize exch def\n",				  out_fp);
+      fputs("  /xsize exch def\n} def\n\n",			  out_fp);
+
+      /* print definition used by Lout output to recode fonts                */
+      /* adapted from PostScript Language Reference Manual (2nd Ed), p. 275  */
+      /* usage: /<fullname> <encodingvector> /<originalname> LoutRecode -    */
+
+      fputs("/LoutFont\n",                                            out_fp);
+      fputs("{ findfont exch scalefont setfont\n",                    out_fp);
+      fputs("} bind def\n\n",					      out_fp);
+
+      fputs("/LoutRecode {\n",                                        out_fp);
+      fputs("  { findfont dup length dict begin\n",                   out_fp);
+      fputs("    {1 index /FID ne {def} {pop pop} ifelse} forall\n",  out_fp);
+      fputs("    /Encoding exch def\n",                               out_fp);
+      fputs("    currentdict end definefont pop\n",                   out_fp);
+      fputs("  }\n",                                                  out_fp);
+      fputs("  stopped {}\n",                                         out_fp);
+      fputs("} bind def\n\n",                                         out_fp);
+
+      /* print definitions used by Lout output when including EPSF files     */
+      /* copied from PostScript Language Reference Manual (2nd Ed.), p. 726  */
+
+      fputs("/BeginEPSF {\n",					  out_fp);
+      fputs("  /LoutEPSFState save def\n",			  out_fp);
+      fputs("  /dict_count countdictstack def\n",		  out_fp);
+      fputs("  /op_count count 1 sub def\n",			  out_fp);
+      fputs("  userdict begin\n",				  out_fp);
+      fputs("  /showpage { } def\n",				  out_fp);
+      fputs("  0 setgray 0 setlinecap\n",			  out_fp);
+      fputs("  1 setlinewidth 0 setlinejoin\n",			  out_fp);
+      fputs("  10 setmiterlimit [] 0 setdash newpath\n",	  out_fp);
+      fputs("  /languagelevel where\n",				  out_fp);
+      fputs("  { pop languagelevel\n",				  out_fp);
+      fputs("    1 ne\n",					  out_fp);
+      fputs("    { false setstrokeadjust false setoverprint\n",	  out_fp);
+      fputs("    } if\n",					  out_fp);
+      fputs("  } if\n",						  out_fp);
+      fputs("} bind def\n\n",					  out_fp);
+
+      fputs("/EndEPSF {\n",					  out_fp);
+      fputs("  count op_count sub { pop } repeat\n",		  out_fp);
+      fputs("  countdictstack dict_count sub { end } repeat\n",	  out_fp);
+      fputs("  LoutEPSFState restore\n",			  out_fp);
+      fputs("} bind def\n",					  out_fp);
+
+      fputs("%%EndResource\n\n",				  out_fp);
+
+      /* print encoding vectors as resources */
+      EvPrintEncodings(out_fp);
+
+      /* print prepend files (assumed to be organized as DSC 3.0 Resources) */
+      for( fnum=FirstFile(PREPEND_FILE);  fnum!=NO_FILE;  fnum=NextFile(fnum) )
+      { FULL_CHAR buff[MAX_BUFF];  FILE *fp;
+        if( (fp = OpenFile(fnum, FALSE, FALSE)) == null )
+          Error(24, 1, "cannot open %s file %s",
+	    WARN, PosOfFile(fnum), KW_PREPEND, FileName(fnum));
+        else if( StringFGets(buff, MAX_BUFF, fp) == NULL )
+          Error(24, 2, "%s file %s is empty",
+	    WARN, PosOfFile(fnum), KW_PREPEND, FileName(fnum));
+        else
+        {
+          if( StringBeginsWith(buff, AsciiToFull("%%BeginResource:")) )
+	  { OBJECT tmp;
+	    tmp = MakeWord(WORD, &buff[strlen("%%BeginResource:")], no_fpos);
+	    Link(supplied, tmp);
+	  }
+	  else
+	    Error(24, 3, "%s file %s lacks PostScript BeginResource comment",
+	      WARN, PosOfFile(fnum), KW_PREPEND, FileName(fnum));
+          StringFPuts(buff, out_fp);
+          fprintf(out_fp, "%% %s file %s\n", KW_PREPEND, FileName(fnum));
+          while( StringFGets(buff, MAX_BUFF, fp) != NULL )
+	    StringFPuts(buff, out_fp);
+	  fprintf(out_fp, "\n");
+        }
+      }
+
+      fputs("%%EndProlog\n\n", out_fp);
+      fputs("%%BeginSetup\n", out_fp);
+      FontPrintPageSetup(out_fp);
+      fputs("%%EndSetup\n\n", out_fp);
+      fprintf(out_fp, "%%%%Page: ? %d\n", ++pagecount);
+      fprintf(out_fp, "%%%%BeginPageSetup\n");
+      FontPrintPageResources(out_fp);
+      FontAdvanceCurrentPage();
+      fprintf(out_fp, "/pgsave save def\n");
+      fprintf(out_fp, "%.4f dup scale %d setlinewidth\n", 1.0 / PT, PT/2);
+      fprintf(out_fp, "%%%%EndPageSetup\n\n");
+      break;
+
+ } /* end switch */
+ prologue_done = TRUE;
+} /* end PrintBeforeFirst */
+
+
+/*@::PrintBetween(), EightBitsToPrintForm[]@**********************************/
 /*                                                                           */
-/*  PrintOriginIncrement(y)                                                  */
+/*  PrintBetween(h, v)                                                       */
 /*                                                                           */
-/*  Move current vertical origin down by y.                                  */
+/*  Start a new output component, of size h by v.                            */
 /*                                                                           */
 /*****************************************************************************/
 
-PrintOriginIncrement(y)
-LENGTH y;
-{ debug1(DGP, D, "PrintOriginIncrement( %d )", y );
-  fprintf(out_fp, "\npgsave restore\nshowpage\n");
-  cpexists = FALSE;
-  currentfont = NO_FONT;
-  if( Encapsulated )
-  { PrintClose();
-    Error(FATAL, no_fpos, "truncating -EPS document at end of first page");
-  }
-  fprintf(out_fp, "\n%%%%Page: ? %d\n", ++pagecount);
-  fprintf(out_fp, "%%%%BeginPageSetup\n");
-  fprintf(out_fp, "/pgsave save def\n");
-  fprintf(out_fp, "%.4f dup scale %d setlinewidth\n", 1.0 / PT, PT/2);
-  fprintf(out_fp, "%%%%EndPageSetup\n");
-  wordcount = 0;
-}
+PrintBetween(h, v)
+LENGTH h, v;
+{ int new_hsize, new_vsize, i, j;
+  debug2(DGP, DD, "PrintBetween(%d, %d)", h, v);
+
+  switch( BackEnd )
+  {
+    case PLAINTEXT:
+
+      /* print the page that has just ended */
+      ifdebug(DGP, D,
+	putc('+', out_fp);
+	for( j = 0;  j < hsize;  j++ )  putc('-', out_fp);
+	putc('+', out_fp);
+	putc('\n', out_fp);
+      );
+      for( i = vsize - 1;  i >= 0;  i-- )
+      { ifdebug(DGP, D, putc('|', out_fp));
+	for( j = 0;  j < hsize;  j++ )
+	  putc(page[i*hsize + j], out_fp);
+        ifdebug(DGP, D, putc('|', out_fp));
+	putc('\n', out_fp);
+      }
+      ifdebug(DGP, D,
+	putc('+', out_fp);
+	for( j = 0;  j < hsize;  j++ )  putc('-', out_fp);
+	putc('+', out_fp);
+	putc('\n', out_fp);
+      );
+
+      /* separate the page from the next one with a form-feed if required */
+      if( PlainFormFeed ) putc('\f', out_fp);
+
+      /* if page size has changed, get a new page[] array */
+      new_hsize = ceiling(h, PlainCharWidth);
+      new_vsize = ceiling(v, PlainCharHeight);
+      if( new_hsize != hsize || new_vsize != vsize )
+      { free(page);
+	hsize = new_hsize;
+	vsize = new_vsize;
+        debug2(DGP, DD, "  PrintBetween allocating %d by %d", hsize, vsize);
+        page = (FULL_CHAR *) malloc(hsize * vsize * sizeof(FULL_CHAR));
+      }
+
+      /* clear page[] for the new page just beginning */
+      for( i = 0;  i < vsize;  i++ )
+	for( j = 0;  j < hsize;  j++ )
+	  page[i*hsize + j] = ' ';
+      break;
+
+
+    case POSTSCRIPT:
+
+      fprintf(out_fp, "\npgsave restore\nshowpage\n");
+      cpexists = FALSE;
+      currentfont = NO_FONT;
+      currentcolour = NO_COLOUR;
+      if( Encapsulated )
+      { PrintAfterLast();
+        Error(24, 4, "truncating -EPS document at end of first page",
+	  FATAL, no_fpos);
+      }
+      fprintf(out_fp, "\n%%%%Page: ? %d\n", ++pagecount);
+      fprintf(out_fp, "%%%%BeginPageSetup\n");
+      FontPrintPageResources(out_fp);
+      fprintf(out_fp, "/pgsave save def\n");
+      FontPrintPageSetup(out_fp);
+      FontAdvanceCurrentPage();
+      fprintf(out_fp, "%.4f dup scale %d setlinewidth\n", 1.0 / PT, PT/2);
+      fprintf(out_fp, "%%%%EndPageSetup\n");
+      wordcount = 0;
+      break;
+
+  } /* end switch */
+} /* end PrintBetween */
+
 
 /*@::EightBitToPrintForm()@***************************************************/
 /*                                                                           */
@@ -339,6 +453,28 @@ If you are trying to compile this you have the wrong CHAR_OUT value!
 #endif
 };
 
+
+/*****************************************************************************/
+/*                                                                           */
+/*  KernLength(fnum, ch1, ch2, res)                                          */
+/*                                                                           */
+/*  Set res to the kern length between ch1 and ch2 in font fnum, or 0 if     */
+/*  none.                                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+#define KernLength(fnum, ch1, ch2, res)					\
+{ int i = finfo[fnum].kern_table[ch1], j;				\
+  if( i == 0 )  res = 0;						\
+  else									\
+  { FULL_CHAR *kc = finfo[fnum].kern_chars;				\
+    for( j = i;  kc[j] > ch2;  j++ );					\
+    res = (kc[j] == ch2) ?						\
+      finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;		\
+  }									\
+} /* end KernLength */
+
+
 /*@::PrintWord()@*************************************************************/
 /*                                                                           */
 /*  PrintWord(x, hpos, vpos)                                                 */
@@ -349,93 +485,164 @@ If you are trying to compile this you have the wrong CHAR_OUT value!
 
 PrintWord(x, hpos, vpos)
 OBJECT x;  int hpos, vpos;
-{ FULL_CHAR *p;
+{ FULL_CHAR *p;  int i, h, v, ksize;  char command;
 
-  debug4(DGP, DD, "PrintWord( %s, %d, %d ) font %d", string(x),
-	hpos, vpos, word_font(x));
+  debug5(DGP, DD, "PrintWord( %s, %d, %d ) font %d colour %d", string(x),
+	hpos, vpos, word_font(x), word_colour(x));
 
-  /* if font is different to previous word then print change */
-  if( word_font(x) != currentfont )
-  { currentfont = word_font(x);
-    currentxheight2 = FontHalfXHeight(currentfont);
-    fprintf(out_fp, "\n%hd %s\n", FontSize(currentfont, x), FontName(currentfont));
-  }
+  switch( BackEnd )
+  {
+    case PLAINTEXT:
 
-  /* move to coordinate of x */
-  debug1(DGP, DDD, "  currentxheight2 = %d", currentxheight2);
-  vpos = vpos - currentxheight2;
-  if( cpexists && currenty == vpos )
-  { printnum(hpos, out_fp);
-    fputs(" x", out_fp);
-  }
-  else
-  { currenty = vpos;
-    printnum(hpos, out_fp);
-    fputs(" ", out_fp);
-    printnum(currenty, out_fp);
-    fputs(" moveto", out_fp);
-    cpexists = TRUE;
-  }
+      h = hpos / PlainCharWidth;
+      v = vpos / PlainCharHeight;
+      p = &page[v*hsize + h];
+      for( i = 0;  string(x)[i] != '\0';  i++ )
+	*p++ = string(x)[i];
+      break;
 
-  /* show string(x) */
-  fputs("(", out_fp);
-  for( p = string(x);  *p;  p++ )  fputs(EightBitToPrintForm[*p], out_fp);
-  if( ++wordcount >= 5 )
-  { fputs(")s\n", out_fp);  wordcount = 0;
-  }
-  else fputs(")s ", out_fp);
 
+    case POSTSCRIPT:
+
+      /* if font is different to previous word then print change */
+      if( word_font(x) != currentfont )
+      { currentfont = word_font(x);
+        currentxheight2 = FontHalfXHeight(currentfont);
+        fprintf(out_fp, "%hd %s", FontSize(currentfont, x),
+          FontName(currentfont));
+        if( ++wordcount >= 5 )
+        { fputs("\n", out_fp);
+          wordcount = 0;
+        }
+        else fputs(" ", out_fp);
+      }
+
+      /* if colour is different to previous word then print change */
+      if( word_colour(x) != currentcolour )
+      { currentcolour = word_colour(x);
+	if( currentcolour > 0 )
+	{ fprintf(out_fp, "%s", ColourCommand(currentcolour));
+          if( ++wordcount >= 5 )
+          { fputs("\n", out_fp);
+            wordcount = 0;
+          }
+          else fputs(" ", out_fp);
+	}
+      }
+
+      /* move to coordinate of x */
+      debug1(DGP, DDD, "  currentxheight2 = %d", currentxheight2);
+      vpos = vpos - currentxheight2;
+      if( cpexists && currenty == vpos )
+      { printnum(hpos, out_fp);
+        command = 's';
+      }
+      else
+      { currenty = vpos;
+        printnum(hpos, out_fp);
+        fputs(" ", out_fp);
+        printnum(currenty, out_fp);
+        command = 'm';
+        cpexists = TRUE;
+      }
+
+      /* show string(x) */
+      fputs("(", out_fp);
+      p = string(x);
+      fputs(EightBitToPrintForm[*p], out_fp);
+      for( p++; *p;  p++ )
+      { KernLength(word_font(x), *(p-1), *p, ksize);
+        if( ksize != 0 )
+        { fprintf(out_fp, ")%c %d(", command, -ksize);
+          ++wordcount;
+          command = 'k';
+        }
+        fputs(EightBitToPrintForm[*p], out_fp);
+      }
+      if( ++wordcount >= 5 )
+      { fprintf(out_fp, ")%c\n", command);
+        wordcount = 0;
+      }
+      else fprintf(out_fp, ")%c ", command);
+      break;
+
+  } /* end switch */
   debug0(DGP, DDD, "PrintWord returning");
 } /* end PrintWord */
 
 
-/*@::PrintClose(), CoordTranslate()@******************************************/
+/*@::PrintAfterLast(), CoordTranslate()@**************************************/
 /*                                                                           */
-/*  PrintClose()                                                             */
+/*  PrintAfterLast()                                                         */
 /*                                                                           */
 /*  Clean up this module and close output stream.                            */
 /*                                                                           */
 /*****************************************************************************/
 
-PrintClose()
-{ OBJECT x, link;  BOOLEAN first_need;
+PrintAfterLast()
+{ OBJECT x, link;  BOOLEAN first_need;  int i, j;
   if( prologue_done )
-  { fprintf(out_fp, "\npgsave restore\nshowpage\n");
-    fprintf(out_fp, "%%%%Trailer\n");
+  { 
+    switch( BackEnd )
+    {
+      case PLAINTEXT:
 
-    /* print document fonts line */
-    /* *** obsolete DSC 1.0 version
-    fprintf(out_fp, "%%%%DocumentFonts:");
-    for( link = Down(font_root); link != font_root; link = NextDown(link) )
-    { OBJECT flink, family, face;
-      Child(family, link);
-      for( flink = Down(family);  flink != family;  flink = NextDown(flink) )
-      {	Child(face, flink);
-	if( LastDown(face) != Down(face) )
-	{ Child(x, LastDown(face));
-	  fprintf(out_fp, " %s", string(x));
+        /* print the page that has just ended (exists since prologue_done) */
+	ifdebug(DGP, D,
+	  putc('+', out_fp);
+	  for( j = 0;  j < hsize;  j++ )  putc('-', out_fp);
+	  putc('+', out_fp);
+	  putc('\n', out_fp);
+	);
+        for( i = vsize - 1;  i >= 0;  i-- )
+        { ifdebug(DGP, D, putc('|', out_fp));
+	  for( j = 0;  j < hsize;  j++ )
+	    putc(page[i*hsize + j], out_fp);
+          ifdebug(DGP, D, putc('|', out_fp));
+	  putc('\n', out_fp);
+        }
+	ifdebug(DGP, D,
+	  putc('+', out_fp);
+	  for( j = 0;  j < hsize;  j++ )  putc('-', out_fp);
+	  putc('+', out_fp);
+	  putc('\n', out_fp);
+	);
+	break;
+    
+
+      case POSTSCRIPT:
+
+        fprintf(out_fp, "\npgsave restore\nshowpage\n");
+        fprintf(out_fp, "\n%%%%Trailer\n");
+
+        /* print resource requirements (DSC 3.0 version) - fonts */
+        first_need = FontNeeded(out_fp);
+
+        /* print resource requirements (DSC 3.0 version) - included EPSFs  */
+        for( link = Down(needs); link != needs; link = NextDown(link) )
+        { Child(x, link);
+          assert(is_word(type(x)), "PrintAfterLast: needs!" );
+          fprintf(out_fp, "%s %s",
+	    first_need ? "%%DocumentNeededResources:" : "%%+", string(x));
+          first_need = FALSE;
+        }
+
+	/* print resources supplied */
+	fprintf(out_fp,
+	  "%%%%DocumentSuppliedResources: procset %s\n", StartUpResource);
+	for( link = Down(supplied);  link != supplied;  link = NextDown(link) )
+	{ Child(x, link);
+	  fprintf(out_fp, "%%%%+ %s", string(x));
 	}
-      }
-    }
-    fprintf(out_fp, "\n");
-    *** */
+        EvPrintResources(out_fp);
 
-    /* print resource requirements (DSC 3.0 version) - fonts */
-    first_need = FontNeeded(out_fp);
+        fprintf(out_fp, "%%%%Pages: %d\n", pagecount);
+        fprintf(out_fp, "%%%%EOF\n");
+	break;
 
-    /* print resource requirements (DSC 3.0 version) - included EPSFs  */
-    for( link = Down(needs); link != needs; link = NextDown(link) )
-    { Child(x, link);
-      assert(is_word(type(x)), "PrintClose: needs!" );
-      fprintf(out_fp, "%s %s",
-	first_need ? "%%DocumentNeededResources:" : "%%+", string(x));
-      first_need = FALSE;
-    }
-
-    fprintf(out_fp, "%%%%Pages: %d\n", pagecount);
-    fprintf(out_fp, "%%%%EOF\n");
-  }
-} /* end PrintClose */
+    } /* end switch */
+  } /* end if prologue_done */
+} /* end PrintAfterLast */
 
 
 /*****************************************************************************/
@@ -450,8 +657,11 @@ CoordTranslate(xdist, ydist)
 LENGTH xdist, ydist;
 { debug2(DRS,D,"CoordTranslate(%s, %s)",
     EchoLength(xdist), EchoLength(ydist));
+  assert( BackEnd == POSTSCRIPT, "CoordTranslate: BackEnd!" );
   fprintf(out_fp, "%d %d translate\n", xdist, ydist);
-  cpexists = FALSE;  currentfont = NO_FONT;
+  cpexists = FALSE;
+  currentfont = NO_FONT;
+  currentcolour = NO_COLOUR;
   debug0(DRS, D, "CoordTranslate returning.");
 } /* end CoordTranslate */
 
@@ -466,9 +676,11 @@ LENGTH xdist, ydist;
 CoordRotate(amount)
 LENGTH amount;
 { debug1(DRS, D, "CoordRotate(%.1f degrees)", (float) amount / DG);
+  assert( BackEnd == POSTSCRIPT, "CoordRotate: BackEnd!" );
   fprintf(out_fp, "%.4f rotate\n", (float) amount / DG);
   cpexists = FALSE;
   currentfont = NO_FONT;
+  currentcolour = NO_COLOUR;
   debug0(DRS, D, "CoordRotate returning.");
 } /* end CoordRotate */
 
@@ -484,11 +696,13 @@ LENGTH amount;
 CoordScale(hfactor, vfactor)
 float hfactor, vfactor;
 { char buff[20];
+  assert( BackEnd == POSTSCRIPT, "CoordScale: BackEnd!" );
   ifdebug(DRS, D, sprintf(buff, "%.3f, %.3f", hfactor, vfactor));
   debug1(DRS, D, "CoordScale(%s)", buff);
   fprintf(out_fp, "%.4f %.4f scale\n", hfactor, vfactor);
   cpexists = FALSE;
   currentfont = NO_FONT;
+  currentcolour = NO_COLOUR;
   debug0(DRS, D, "CoordScale returning.");
 } /* end CoordScale */
 
@@ -503,6 +717,7 @@ float hfactor, vfactor;
 
 SaveGraphicState()
 { debug0(DRS, D, "SaveGraphicState()");
+  assert( BackEnd == POSTSCRIPT, "SaveGraphicState: BackEnd!" );
   fprintf(out_fp, "gsave\n");
   debug0(DRS, D, "SaveGraphicState returning.");
 } /* end SaveGraphicState */
@@ -521,9 +736,11 @@ SaveGraphicState()
 
 RestoreGraphicState()
 { debug0(DRS, D, "RestoreGraphicState()");
+  assert( BackEnd == POSTSCRIPT, "RestoreGraphicState: BackEnd!" );
   fprintf(out_fp, "\ngrestore\n");
   cpexists = FALSE;
   currentfont = NO_FONT;
+  currentcolour = NO_COLOUR;
   debug0(DRS, D, "RestoreGraphicState returning.");
 } /* end RestoreGraphicState */
 
@@ -539,6 +756,7 @@ RestoreGraphicState()
 PrintGraphicObject(x)
 OBJECT x;
 { OBJECT y, link;
+  assert( BackEnd == POSTSCRIPT, "PrintGraphicObject: BackEnd!" );
   switch( type(x) )
   {
     case WORD:
@@ -559,7 +777,8 @@ OBJECT x;
 	else if( is_word(type(y)) || type(y) == ACAT )  PrintGraphicObject(y);
 	else if( type(y) != WIDE && !is_index(type(y)) )
 		/* @Wide, indexes are sometimes inserted by Manifest */
-	{ Error(WARN, &fpos(x), "error in left parameter of %s", KW_GRAPHIC);
+	{ Error(24, 5, "error in left parameter of %s",
+	    WARN, &fpos(x), KW_GRAPHIC);
 	  debug1(DGP, D, "  type(y) = %s, y =", Image(type(y)));
 	  ifdebug(DGP, D, DebugObject(y));
 	}
@@ -569,7 +788,7 @@ OBJECT x;
 
     default:
     
-      Error(WARN, &fpos(x), "error in left parameter of %s", KW_GRAPHIC);
+      Error(24, 6, "error in left parameter of %s", WARN, &fpos(x), KW_GRAPHIC);
       debug1(DGP, D, "  type(x) = %s, x =", Image(type(x)));
       ifdebug(DGP, D, DebugObject(x));
       break;
@@ -588,19 +807,38 @@ OBJECT x;
 DefineGraphicNames(x)
 OBJECT x;
 { assert( type(x) == GRAPHIC, "PrintGraphic: type(x) != GRAPHIC!" );
+  assert( BackEnd == POSTSCRIPT, "DefineGraphicNames: BackEnd!" );
   debug1(DRS, D, "DefineGraphicNames( %s )", EchoObject(x));
   debug1(DRS, DD, "  style = %s", EchoStyle(&save_style(x)));
 
+  /* if font is different to previous word then print change */
+  if( font(save_style(x)) != currentfont )
+  { currentfont = font(save_style(x));
+    if( currentfont > 0 )
+    { currentxheight2 = FontHalfXHeight(currentfont);
+      fprintf(out_fp, "%hd %s ", FontSize(currentfont, x),
+        FontName(currentfont));
+    }
+  }
+
+  /* if colour is different to previous word then print change */
+  if( colour(save_style(x)) != currentcolour )
+  { currentcolour = colour(save_style(x));
+    if( currentcolour > 0 )
+    { fprintf(out_fp, "%s ", ColourCommand(currentcolour));
+    }
+  }
+
   fprintf(out_fp, "%d %d %d %d %d %d %d LoutGraphic\n",
     size(x, COL), size(x, ROW), back(x, COL), fwd(x, ROW),
-    font(save_style(x)) <= 0 ? 12*PT : FontSize(font(save_style(x)), x),
+    currentfont <= 0 ? 12*PT : FontSize(currentfont, x),
     width(line_gap(save_style(x))), width(space_gap(save_style(x))));
 
   debug0(DRS, D, "DefineGraphicNames returning.");
 } /* end DefineGraphicNames */
 
 
-/*@::PrintGraphicIncldue()@***************************************************/
+/*@::PrintGraphicInclude()@***************************************************/
 /*                                                                           */
 /*  PrintGraphicInclude(x, colmark, rowmark)                                 */
 /*                                                                           */
@@ -615,6 +853,9 @@ OBJECT x;
 /*  file inclusion step.  e.g. on my system %%EOF causes problems, so I      */
 /*  strip it out.                                                            */
 /*                                                                           */
+/*  May 1994: I've just discovered that %%Trailer causes problems for        */
+/*  the mpage Unix utility, so now I'm stripping it out as well.             */
+/*                                                                           */
 /*****************************************************************************/
 #define	SKIPPING	0
 #define	READING_DNR	1
@@ -622,15 +863,17 @@ OBJECT x;
 
 static BOOLEAN strip_out(buff)
 FULL_CHAR *buff;
-{ if( StringBeginsWith(buff, AsciiToFull("%%EOF")) )  return TRUE;
+{ if( StringBeginsWith(buff, AsciiToFull("%%EOF"))     )  return TRUE;
+  if( StringBeginsWith(buff, AsciiToFull("%%Trailer")) )  return TRUE;
   return FALSE;
 } /* end strip_out */
 
 PrintGraphicInclude(x, colmark, rowmark)
 OBJECT x; LENGTH colmark, rowmark;
-{ OBJECT y, full_name;  FULL_CHAR buff[MAX_LINE];
+{ OBJECT y, full_name;  FULL_CHAR buff[MAX_BUFF];
   FILE *fp;  int state;
   debug0(DRS, D, "PrintGraphicInclude(x)");
+  assert( BackEnd == POSTSCRIPT, "PrintGraphicInclude: BackEnd!" );
   assert(type(x)==INCGRAPHIC || type(x)==SINCGRAPHIC, "PrintGraphicInclude!");
   assert(sparec(constraint(x)), "PrintGraphicInclude: sparec(constraint(x))!");
 
@@ -638,6 +881,21 @@ OBJECT x; LENGTH colmark, rowmark;
   Child(y, Down(x));
   fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y));
   assert( fp != NULL, "PrintGraphicInclude: fp!" );
+
+  /* if font is different to previous word then print change */
+  if( font(save_style(x)) != currentfont )
+  { currentfont = font(save_style(x));
+    currentxheight2 = FontHalfXHeight(currentfont);
+    fprintf(out_fp, "%hd %s\n", FontSize(currentfont, x), FontName(currentfont));
+  }
+
+  /* if colour is different to previous word then print change */
+  if( colour(save_style(x)) != currentcolour )
+  { currentcolour = colour(save_style(x));
+    if( currentcolour > 0 )
+    { fprintf(out_fp, "%s\n", ColourCommand(currentcolour));
+    }
+  }
 
   /* generate appropriate header code */
   fprintf(out_fp, "BeginEPSF\n");
@@ -648,7 +906,7 @@ OBJECT x; LENGTH colmark, rowmark;
 
   /* copy through the include file, except divert resources lines to needs */
   /* and strip out some comment lines that cause problems                  */
-  state = (StringFGets(buff, MAX_LINE, fp) == NULL) ? FINISHED : SKIPPING;
+  state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
   while( state != FINISHED ) switch(state)
   {
     case SKIPPING:
@@ -658,17 +916,17 @@ OBJECT x; LENGTH colmark, rowmark;
       { x = MakeWord(WORD, &buff[StringLength("%%DocumentNeededResources:")],
 	      no_fpos);
         Link(needs, x);
-	state = (StringFGets(buff,MAX_LINE,fp)==NULL) ? FINISHED : READING_DNR;
+	state = (StringFGets(buff,MAX_BUFF,fp)==NULL) ? FINISHED : READING_DNR;
       }
       else
       { if( StringBeginsWith(buff, AsciiToFull("%%LanguageLevel:")) )
-	  Error(WARN, &fpos(x), "ignoring \"%%%%LanguageLevel\" in %s file %s",
-		KW_INCGRAPHIC, string(full_name));
+	  Error(24, 7, "ignoring LanguageLevel comment in %s file %s",
+	    WARN, &fpos(x), KW_INCGRAPHIC, string(full_name));
 	if( StringBeginsWith(buff, AsciiToFull("%%Extensions:")) )
-	  Error(WARN, &fpos(x), "ignoring \"%%%%Extensions\" in %s file %s",
-		KW_INCGRAPHIC, string(full_name));
+	  Error(24, 8, "ignoring Extensions comment in %s file %s",
+	    WARN, &fpos(x), KW_INCGRAPHIC, string(full_name));
 	if( !strip_out(buff) )  StringFPuts(buff, out_fp);
-	state = (StringFGets(buff, MAX_LINE, fp) == NULL) ? FINISHED : SKIPPING;
+	state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
       }
       break;
 
@@ -677,11 +935,11 @@ OBJECT x; LENGTH colmark, rowmark;
       if( StringBeginsWith(buff, AsciiToFull("%%+")) )
       {	x = MakeWord(WORD, &buff[StringLength(AsciiToFull("%%+"))], no_fpos);
 	Link(needs, x);
-	state = (StringFGets(buff,MAX_LINE,fp)==NULL) ? FINISHED : READING_DNR;
+	state = (StringFGets(buff,MAX_BUFF,fp)==NULL) ? FINISHED : READING_DNR;
       }
       else
       { if( !strip_out(buff) )  StringFPuts(buff, out_fp);
-	state = (StringFGets(buff, MAX_LINE, fp) == NULL) ? FINISHED : SKIPPING;
+	state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
       }
       break;
   }
@@ -690,5 +948,6 @@ OBJECT x; LENGTH colmark, rowmark;
   DisposeObject(full_name);
   fclose(fp);
   fprintf(out_fp, "%%%%EndDocument\nEndEPSF\n");
+  wordcount = 0;
   debug0(DRS, D, "PrintGraphicInclude returning.");
 } /* end PrintGraphicInclude */

@@ -1,0 +1,303 @@
+@Section
+   @Title { Books }
+   @Tag { books }
+@Begin
+@PP
+To produce a book, start off with the @Code book setup file and the
+books. @Index { books }
+book. @Index @Code "@Book"
+@Code "@Book" symbol:
+@ID @Code {
+"@SysInclude { book }"
+"@Book"
+"    @Title {}"
+"    @Author {}"
+"    @Edition {}"
+"    @Publisher {}"
+"    @BeforeTitlePage {}"
+"    @AfterTitlePage {}"
+"    @InitialFont { Times Base 12p }"
+"    @InitialBreak { adjust 1.2fx hyphen }"
+"    @InitialLanguage { English }"
+"    @PageHeaders { Titles }"
+"    @FirstPageNumber { 1 }"
+"    @ColumnNumber { 1 }"
+"//"
+}
+This shows all the options of @Code "@Book" with their default values.  As
+usual with options, these may be given in any order, and only those
+that must be changed need be given at all.  The meaning of the
+@Code "//" symbol after the last option is beyond our scope, but total
+disaster will ensue if it is forgotten.
+@PP
+The {@Code "@Title"}, {@Code "@Author"}, and {@Code "@Edition"} options
+will appear on the title page, in the @Code "clines" paragraph breaking
+style which centres each line (Section {@NumberOf paras}).  The
+@Code "@Publisher" option will appear at the foot of the title page.
+@PP
+The {@Code "@BeforeTitlePage"} option will come out on the page (or
+pages) preceding the title page.  This is where publishers traditionally
+advertise other books of a similar kind, perhaps from a series.  If this
+option is empty or omitted, there will be no such pages.  If it is
+non-empty, there will be a pre-title page (a title page with just the
+title on it) first.
+@PP
+The {@Code "@AfterTitlePage"} option will come out on the page
+(or pages) following the title page.  This is where publishers
+traditionally put copyright notices, information about production,
+and cataloguing-in-publication data.  If this option is empty or
+omitted, there will be no such pages.
+@PP
+The remaining options are a selection of setup file options (Section
+{@NumberOf setup}) that frequently need to be changed.  If your changes
+to the overall formatting are confined to these options, you can change
+them here and avoid having your own setup file.  If you already have
+your own setup file, change them in either place and omit them in
+the other.
+@PP
+@Code "@InitialFont" is the font in which the bulk of the book will be
+set, and should contain a family, a face, and a size.  The default
+value selects the Times family, the Base face, and the 12 point size.
+@PP
+@Code "@InitialBreak" controls the behaviour of paragraph breaking in
+the bulk of the book.  It should have three parts:  a paragraph
+breaking style ({@Code adjust}, {@Code ragged}, etc.), an inter-line
+spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
+double spacing, and so on), and either @Code "hyphen" or
+@Code "nohyphen" for turning hyphenation on or off.
+@PP
+@Code "@InitialLanguage" determines the language of the bulk of the
+book.
+@PP
+@Code "@PageHeaders" determines the appearance of page headers and
+footers throughout the book.  Its value may be {@Code None},
+{@Code Simple}, {@Code Titles}, or {@Code NoTitles}.  Section
+{@NumberOf headers} has the details, but just briefly, {@Code None}
+and {@Code Simple} are not really suitable for books, @Code Titles
+produces full running titles as in the present document, and
+@Code "NoTitles" is like @Code "Titles" with the running titles
+omitted, leaving just the page numbers.
+@PP
+@Code "@FirstPageNumber" is the page number given to the first
+non-introductory page.
+@PP
+@Code "@ColumnNumber" is the number of columns per page in the bulk of
+the book, and may be anything from {@Code 1} (the default value) to
+{@Code 10}.  Irrespective of its value, all prefatory material, all
+chapter and appendix headings, and all figures and tables will be
+printed full width.  There is a separate @Code "@IndexColumnNumber"
+option in the setup file which determines the number of columns in
+the index (Section {@NumberOf indexes}).
+@PP
+After the compulsory @Code "//" comes an optional preface:
+preface. @Index @Code "@Preface"
+@ID @Code {
+"@Preface"
+"    @Title { About this book }"
+"@Begin"
+"@PP"
+"..."
+"@End @Preface"
+}
+Since the title of most prefaces is simply Preface, that is the default
+value in English of the @Code "@Title" option.  After the preface there
+will automatically appear a table of contents listing the introduction,
+chapters, sections, subsections, appendices, sub-appendices, bibliography,
+and index as appropriate.
+@PP
+The pages up to this point will be numbered in lower case Roman
+numerals; subsequent pages will be numbered in Arabic starting from
+the @Code "@FirstPageNumber" option of {@Code "@Book"}.
+@PP
+Next comes an optional introduction, exactly like the preface except that
+its name is @Code "@Introduction" and the default title in English is
+introduction. @Index @Code "@Introduction"
+Introduction:
+@ID @Code {
+"@Introduction"
+"@Begin"
+"@PP"
+"..."
+"@End @Introduction"
+}
+After that comes a sequence of chapters in the usual style:
+chapter. @Index @Code "@Chapter"
+@ID @Code {
+"@Chapter"
+"    @Title { Australian Native Plants }"
+"@Begin"
+"@PP"
+"..."
+"@End @Chapter"
+}
+No @Code "@BeginChapters" or @Code "@EndChapters" symbols are
+beginchapters. @Index @Code "@BeginChapters"
+endchapters. @Index @Code "@EndChapters"
+needed, because these chapters are not inside any other large-scale
+structure symbol.  Within a chapter, there may be a sequence of sections,
+each introduced by @Code "@Section" in the usual way, all bracketed
+section.books @SubIndex { in books }
+by @Code "@BeginSections" and {@Code "@EndSections"}:
+beginsections.books @SubIndex { in books }
+endsections.books @SubIndex { in books }
+@ID @Code {
+"preceding text"
+"@BeginSections"
+"@Section ... @End @Section"
+"@Section ... @End @Section"
+"..."
+"@Section ... @End @Section"
+"@EndSections"
+}
+Within each section there may be subsections, each introduced by
+{@Code "@SubSection"}, and the sequence as a whole bracketed by
+@Code "@BeginSubSections" and {@Code "@EndSubSections"}:
+subsection.books @SubIndex { in books }
+beginsubsections.books @SubIndex { in books }
+endsubsections.books @SubIndex { in books }
+@ID @Code {
+"preceding text"
+"@BeginSubSections"
+"@SubSection ... @End @SubSection"
+"@SubSection ... @End @SubSection"
+"..."
+"@SubSection ... @End @SubSection"
+"@EndSubSections"
+}
+The subsections may contain sub-subsections following the same
+subsubsection.books @SubIndex { in books }
+beginsubsubsections.books @SubIndex { in books }
+endsubsubsections.books @SubIndex { in books }
+pattern.  There are no sub-sub-subsections.
+@PP
+After the chapters comes an optional sequence of appendices, each
+introduced by @Code "@Appendix" in the usual way:
+appendix.books @SubIndex { in books }
+@ID @Code {
+"@Appendix"
+"    @Title { Climatic Regions of Australia }"
+"@Begin"
+"@PP"
+"..."
+"@End @Appendix"
+}
+No @Code "@BeginAppendices" or @Code "@EndAppendices" symbols are
+beginappendices.books @SubIndex { in books }
+endappendices.books @SubIndex { in books }
+needed, because (like chapters) these appendices do not lie inside
+any other large-scale structure symbol.  The appendices are numbered
+A, B, C, etc., as is conventional for them.  Within each appendix
+there may be a sequence of subappendices, obtained with the
+@Code "@SubAppendix" symbol and bracketed by
+subappendix.books @SubIndex { in books }
+@Code "@BeginSubAppendices" and {@Code "@EndSubAppendices"}:
+beginsubappendices.books @SubIndex { in books }
+endsubappendices.books @SubIndex { in books }
+@ID @Code {
+"preceding text"
+"@BeginSubAppendices"
+"@SubAppendix ... @End @SubAppendix"
+"@SubAppendix ... @End @SubAppendix"
+"..."
+"@SubAppendix ... @End @SubAppendix"
+"@EndSubAppendices"
+}
+There are sub-subappendices following the same pattern, but no
+subsubappendix.books @SubIndex { in books }
+beginsubsubappendices.books @SubIndex { in books }
+endsubsubappendices.books @SubIndex { in books }
+sub-sub-subappendices.
+@PP
+The book ends with the last chapter or appendix; any reference list or
+index will be appended automatically.  Although we have described how to
+create books as though everything was in one large file, in practice it
+is much better to divide the book into multiple files, following the
+method given in Section {@NumberOf organizing}.
+@PP
+In addition to the {@Code "@Title"} option, each large-scale structure
+symbol (i.e. {@Code "@Preface"}, {@Code "@Introduction"}, {@Code "@Chapter"},
+{@Code "@Section"}, {@Code "@SubSection"}, {@Code "@SubSubSection"},
+{@Code "@Appendix"}, {@Code "@SubAppendix"}, and {@Code "@SubSubAppendix"})
+has a @Code "@Tag" option for cross referencing (Section {@NumberOf cross}),
+an @Code "@InitialLanguage" option for changing the language of that
+part of the document, and a @Code "@RunningTitle" option which will be
+used in place of @Code "@Title" in running headers if given.  This last
+is useful when the full title is rather long.
+@PP
+The @Code "@Chapter" symbol has three additional options for dividing
+parts. @Index { parts of books }
+the book into parts:
+part.number @Index @Code "@PartNumber"
+part.title @Index @Code "@PartTitle"
+part.text @Index @Code "@PartText"
+@ID @Code {
+"@Chapter"
+"    @PartNumber { Part A }"
+"    @PartTitle { The Ancient World }"
+"    @PartText { ... }"
+}
+Any chapter with a non-empty @Code "@PartTitle" option will become the
+first chapter of a part.  It will be preceded by two pages containing the
+part number, part title, and part text, and there will also be an entry
+made in the table of contents.  @Code "@PartNumber" and @Code "@PartText"
+may be omitted if desired.  Parts are @I not numbered automatically:  you
+have to supply your own numbers or letters as in the example above.
+@PP
+The features described in other chapters are all available within
+books.  A table of contents and index will appear automatically, and
+you will need to change the setup file to avoid them.  Endnotes will
+appear at the end of the enclosing preface, introduction, chapter, or
+appendix.  The numbering of figures and tables includes a chapter or
+appendix number:  the first figure of Appendix C will be Figure C.1,
+and so on.  Figures and tables within the preface or introduction are
+numbered 1, 2, 3, etc.  A figure or table will never appear on the
+same page as the beginning of a chapter or appendix.  References work
+as described in Chapter {@NumberOf biblio}.  As explained there, it is
+possible to have a list of references at the end of each chapter as well
+as at the end of the book.
+@PP
+Within the @Code "book" setup file there is a @Code "@BookLayout"
+booklayout. @Index @Code "@BookLayout"
+symbol whose options control the appearance of features specific to books
+(in other words, the features described in this section).  Here is a
+representative sample of these options, showing their default values:
+@ID @Code {
+"@Use { @BookLayout"
+"    # @TitlePageFont { Helvetica Base }"
+"    # @ChapterNumbers { Arabic }"
+"    # @ChapterHeadingFont { Bold 2.00f }"
+"    # @AboveChapterGap { 3.00f }"
+"    # @ChapterInContents { Yes }"
+"}"
+}
+Section {@NumberOf setup} explains how to make your own setup file and
+change its options.  @Code "@TitlePageFont" is the font used on the title
+title.page.font. @Index @Code "@TitlePageFont"
+page of the book, not including a size.  The other four options control
+the appearance of chapters, and there are similar options for
+controlling the other large-scale structure symbols.
+@PP
+@Code "@ChapterNumbers" determines how chapters will be numbered, and may
+be @Code { None }, @Code { Arabic }, @Code { Roman }, @Code { UCRoman },
+@Code { Alpha }, or @Code { UCAlpha }.  The default value is @Code Arabic
+for chapters and also for all large-scale structure symbols except
+appendices, for which it is {@Code UCAlpha}.  This produces the appendices
+numbered in upper-case letters (A, B, C, etc.) that were mentioned earlier.
+@PP
+@Code "@ChapterHeadingFont" is the font used for chapter headings.  For
+consistency this font is also used for other major headings as well.  The
+default value shown above produces the bold face from the family of the
+initial font, at twice the initial size.  A family name is acceptable
+here as well.
+@PP
+Every chapter and appendix begins on a new page.  @Code "@AboveChapterGap"
+determines how much space is left blank above the chapter title; the
+default value is three times the initial font size.  There are similar
+options for other large-scale structure symbols, which determine how
+much space is left before each one.
+@PP
+@Code "@ChapterInContents" determines whether or not an entry is made in
+the table of contents for each chapter; it may be @Code Yes or {@Code No},
+but would always be {@Code Yes}.  The default value of the corresponding
+options for sub-subsections and sub-subappendices, however, is {@Code No}.
+@End @Section

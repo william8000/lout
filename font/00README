@@ -1,0 +1,11 @@
+Directory lout/font - font metrics files
+
+This directory contains Adobe Systems font metrics (formerly .AFM)
+files for all the fonts mentioned in file lout/include/ft.  These
+files are the source of Lout's information about the height and width
+of all characters.  The files are exactly as distributed publicly by
+Adobe Systems except that erroneous ligature information has been
+removed from the four Courier font files.
+
+Jeffrey H. Kingston
+3 July 1994

@@ -1,0 +1,373 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @CPrint package for formatting C and C++ programs (Version 1.0)       #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, March 1994.                            #
+#                                                                             #
+#  This package uses a filtered body parameter to convert C and C++ source    #
+#  code into Lout source.  The filter program is c2lout which is distributed  #
+#  with Basser Lout Version 3.  The list of keywords and tokens is from       #
+#  Stroustrup, 2nd Edition.  See "User's Guide to the Lout Document           #
+#  Formatting System" for user information.                                   #
+#                                                                             #
+###############################################################################
+
+export @CP
+def @CPrint
+    named style              { fixed     }  # print style
+
+    named fixedfont          { Courier   }  # font family if fixed
+    named fixedstrings       { Base      }  # string face if fixed
+    named fixedidentifiers   { Base      }  # identifier face if fixed
+    named fixedcomments      { Base      }  # comment face if fixed
+    named fixedkeywords      { Base      }  # keyword face if fixed
+    named fixednumbers       { Base      }  # number face if fixed
+    named fixedoperators     { Base      }  # operator face if fixed
+    named fixedsize          { -1.0p     }  # font size if fixed
+    named fixedline          { 1.0vx     }  # line-space if fixed
+    named fixedtabin	     { 8	 }  # tab interval if fixed
+    named fixedtabout	     { 8s	 }  # tab width if fixed
+
+    named varyingfont        {           }  # font family if varying
+    named varyingstrings     { Slope     }  # string face if varying
+    named varyingidentifiers { Slope     }  # identifier face if varying
+    named varyingcomments    { Base      }  # comment face if varying
+    named varyingkeywords    { Bold      }  # keyword face if varying
+    named varyingnumbers     { Base      }  # number face if varying
+    named varyingoperators   { Base      }  # operator face if varying
+    named varyingsize        { 1.0f      }  # font size if varying
+    named varyingline        { 1.0vx     }  # line-space if varying
+    named varyingtabin       { 8	 }  # tab interval if varying
+    named varyingtabout      { 3f	 }  # tab width if varying
+
+    named symbolfont         {           }  # font family if symbol
+    named symbolstrings      { Slope     }  # string face if symbol
+    named symbolidentifiers  { Slope     }  # identifier face if symbol
+    named symbolcomments     { Base      }  # comment face if symbol
+    named symbolkeywords     { Bold      }  # keyword face if symbol
+    named symbolnumbers      { Base      }  # number face if symbol
+    named symboloperators    { Base      }  # operator face if symbol
+    named symbolsize         { 1.0f      }  # font size if symbol
+    named symbolline         { 1.0vx     }  # line-space if symbol
+    named symboltabin        { 8	 }  # tab interval if symbol
+    named symboltabout       { 3f	 }  # tab width if symbol
+
+@Begin
+
+    export
+    
+	"$$" "$>" "`" @L @S @C
+
+	"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+
+	"!" "%" "^" "&" "*" "(" ")" "-" "+" "=" "${" "$}" "|" "~"
+	"[" "]"     ";" "'" ":" "<" ">" "?" "," "."  "/"
+
+	"->" "++" "--" ".*" "->*" "<<" ">>"  "<="  ">=" "==" "!=" "&&"
+	"||" "*=" "/=" "%=" "+="  "-=" "<<=" ">>=" "&=" "^=" "|=" "::"
+
+	asm       continue  float     new       signed    try
+	auto      default   for       operator  sizeof    typedef
+	break     delete    friend    private   static    union
+	case      do        goto      protected struct    unsigned
+	catch     double    if        public    switch    virtual
+	char      else      inline    register  template  void
+	class     enum      int       return    this      volatile
+	const     extern    long      short     throw     while
+
+    def @CP
+	named style        { style         }  # style
+	named font         { dft           }  # font family
+	named strings      { dft           }  # string font
+	named identifiers  { dft           }  # ident. font
+	named comments     { dft           }  # comment font
+	named keywords     { dft           }  # keyword font
+	named numbers      { dft           }  # number font
+	named operators    { dft           }  # operator font
+	named size         { dft           }  # font size
+	named line         { dft           }  # line-space
+	named tabin          { dft           }  # tab interval
+	named tabout     { dft           }  # tab width
+	body @Body			      # filtered, see below
+    @Begin
+
+	def @Test	# returns x unless x is dft
+	    left x
+	    named iffixed {}
+	    named ifvarying {}
+	    named ifsymbol {}
+	{
+	    x @Case {
+		dft @Yield {
+		    style @Case {
+			fixed   @Yield { iffixed   }
+			varying @Yield { ifvarying }
+			symbol  @Yield { ifsymbol  }
+		    }
+		}
+		else @Yield x
+	    }
+	}
+
+	def @InitTab
+	{
+	  tabin @Test
+	      iffixed   { fixedtabin   }
+	      ifvarying { varyingtabin }
+	      ifsymbol  { symboltabin  }
+	}
+
+	def @InitTabWidth
+	{
+	  tabout @Test
+	      iffixed   { fixedtabout   }
+	      ifvarying { varyingtabout }
+	      ifsymbol  { symboltabout  }
+	}
+
+	def @Filter
+	{
+	    c2lout -r -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
+	      -t{@InitTab} -T{@InitTabWidth}
+	}
+
+	def @InitFontFamily
+	{
+	  font @Test
+	      iffixed   { fixedfont   }
+	      ifvarying { varyingfont }
+	      ifsymbol  { symbolfont  }
+	}
+
+	def @InitSize
+	{
+	  size @Test
+	      iffixed   { fixedsize   }
+	      ifvarying { varyingsize }
+	      ifsymbol  { symbolsize  }
+	}
+
+	def @InitLine
+	{
+	  line @Test
+	      iffixed   { fixedline   }
+	      ifvarying { varyingline }
+	      ifsymbol  { symbolline  }
+	}
+
+	def @S		# for formatting C strings
+	    right x
+	{
+	    "\"" &
+	    strings @Test
+	      iffixed   { fixedstrings   }
+	      ifvarying { varyingstrings }
+	      ifsymbol  { symbolstrings  }
+	    @Font x
+	    & "\""
+	}
+
+	def "`"
+	{
+	    style @Case {
+		symbol	@Yield { "`" }
+		else	@Yield { "'" }
+	    }
+	}
+
+	def @L		# for formatting C character literals
+	    right x
+	{
+	    ` &
+	    strings @Test
+	      iffixed   { fixedstrings   }
+	      ifvarying { varyingstrings }
+	      ifsymbol  { symbolstrings  }
+	    @Font x
+	    & '
+	}
+
+	def @Ident	# for formatting C identifiers
+	{
+	    identifiers @Test
+	      iffixed   { fixedidentifiers   }
+	      ifvarying { varyingidentifiers }
+	      ifsymbol  { symbolidentifiers  }
+	}
+
+	def @C		# for formatting C comments
+	    right x
+	{
+	    comments @Test
+	      iffixed   { fixedcomments   }
+	      ifvarying { varyingcomments }
+	      ifsymbol  { symbolcomments  }
+	    @Font x
+	}
+
+	def @K		# for formatting C keywords
+	    right x
+	{
+	    keywords @Test
+	      iffixed   { fixedkeywords   }
+	      ifvarying { varyingkeywords }
+	      ifsymbol  { symbolkeywords  }
+	    @Font x
+	}
+
+	def @N		# for formatting C numbers
+	    right x
+	{
+	    numbers @Test
+	      iffixed   { fixednumbers   }
+	      ifvarying { varyingnumbers }
+	      ifsymbol  { symbolnumbers  }
+	    @Font x
+	}
+
+	def @O		# for formatting C operators
+	    right x
+	{
+	    operators @Test
+	      iffixed   { fixedoperators   }
+	      ifvarying { varyingoperators }
+	      ifsymbol  { symboloperators  }
+	    @Font x
+	}
+
+	def @A		# get characters from the Adobe Symbol font
+	    left sym
+	    right x
+	{
+	    style @Case {
+		symbol	@Yield { { Symbol Base } @Font @Char sym }
+		else	@Yield { x			}
+	    }
+	}
+
+	macro "$>" { {} & }
+
+	def "$$" { "#" }
+
+	def "0"		{ @N "0"			}
+	def "1"		{ @N "1"			}
+	def "2"		{ @N "2"			}
+	def "3"		{ @N "3"			}
+	def "4"		{ @N "4"			}
+	def "5"		{ @N "5"			}
+	def "6"		{ @N "6"			}
+	def "7"		{ @N "7"			}
+	def "8"		{ @N "8"			}
+	def "9"		{ @N "9"			}
+
+	def "!"		{ 		  @O "!"	}
+	def "%"		{		  @O "%"	}
+	def "^"		{		  @O "^"	}
+	def "&"		{		  @O "&"	}
+	def "*"		{ asteriskmath @A @O "*"	}
+	def "("		{		  @O "("	}
+	def ")"		{		  @O ")"	}
+	def "-"		{ minus @A	  @O "-"	}
+	def "+"		{ plus  @A	  @O "+"	}
+	def "="		{ equal @A	  @O "="	}
+	def "${"	{		  @O "{"	}
+	def "$}"	{		  @O "}"	}
+	def "|"		{		  @O "|"	}
+	def "~"		{		  @O "~"	}
+	def "["		{		  @O "["	}
+	def "]"		{		  @O "]"	}
+	def ";"		{		  @O ";"	}
+	def "'"		{		  @O "'"	}
+	def ":"		{		  @O ":"	}
+	def "<"		{ less @A	  @O "<"	}
+	def ">"		{ greater @A	  @O ">"	}
+	def "?"		{		  @O "?"	}
+	def ","		{		  @O ","	}
+	def "."		{		  @O "."	}
+	def "/"		{		  @O "/"	}
+	def "->"	{ arrowright @A	  @O "->"	}
+	def "++"	{		     { + }{ + }	}
+	def "--"	{		     { - }{ - }	}
+	def ".*"	{		     { . }{ * } }
+	def "->*"	{		     { ->}{ * }	}
+	def "<<"	{		     { < }{ < }	}
+	def ">>"	{		     { > }{ > }	}
+	def "<="	{ lessequal @A	  @O "<="	}
+	def ">="	{ greaterequal @A @O ">="	}
+	def "=="	{		     { = }{ = } }
+	def "!="	{ notequal @A	  @O "!="	}
+	def "&&"	{		     { & }{ & }	}
+	def "||"	{		     { | }{ | }	}
+	def "*="	{		     { * }{ = }	}
+	def "/="	{		     { / }{ = } }
+	def "%="	{		     { % }{ = } }
+	def "+="	{		     { + }{ = }	}
+	def "-="	{		     { - }{ = }	}
+	def "<<="	{		     { <<}{ = }	}
+	def ">>="	{		     { >>}{ = }	}
+	def "&="	{		     { & }{ = }	}
+	def "^="	{		     { ^ }{ = } }
+	def "|="	{		     { | }{ = }	}
+	def "::"	{		     { : }{ : }	}
+
+	def asm		{ @K "asm"			}
+	def auto	{ @K "auto"			}
+	def break	{ @K "break"			}
+	def case	{ @K "case"			}
+	def catch	{ @K "catch"			}
+	def char	{ @K "char"			}
+	def class	{ @K "class"			}
+	def const	{ @K "const"			}
+
+	def continue	{ @K "continue"			}
+	def default	{ @K "default"			}
+	def delete	{ @K "delete"			}
+	def do		{ @K "do"			}
+	def double	{ @K "double"			}
+	def else	{ @K "else"			}
+	def enum	{ @K "enum"			}
+	def extern 	{ @K "extern"			}
+
+	def float	{ @K "float"			}
+	def for		{ @K "for"			}
+	def friend	{ @K "friend"			}
+	def goto	{ @K "goto"			}
+	def if		{ @K "if"			}
+	def inline	{ @K "inline"			}
+	def int		{ @K "int"			}
+	def long	{ @K "long"			}
+
+	def new		{ @K "new"			}
+	def operator	{ @K "operator"			}
+	def private	{ @K "private"			}
+	def protected	{ @K "protected"		}
+	def public	{ @K "public"			}
+	def register	{ @K "register"			}
+	def return	{ @K "return"			}
+	def short	{ @K "short"			}
+
+	def signed	{ @K "signed"			}
+	def sizeof	{ @K "sizeof"			}
+	def static	{ @K "static"			}
+	def struct	{ @K "struct"			}
+	def switch	{ @K "switch"			}
+	def template	{ @K "template"			}
+	def this	{ @K "this"			}
+	def throw	{ @K "throw"			}
+
+	def try		{ @K "try"			}
+	def typedef	{ @K "typedef"			}
+	def union	{ @K "union"			}
+	def unsigned	{ @K "unsigned"			}
+	def virtual	{ @K "virtual"			}
+	def void	{ @K "void"			}
+	def volatile	{ @K "volatile"			}
+	def while	{ @K "while"			}
+
+	{ @InitFontFamily Base } @Font { @Ident @InitSize } @Font
+	{ @InitLine lines } @Break @Body
+
+    @End @CP
+
+@End @CPrint

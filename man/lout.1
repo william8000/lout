@@ -2,7 +2,7 @@
 .SH NAME
 lout - prepare Lout document for printing
 .SH SYNOPSIS
-lout [ -i<filename> ] files
+lout [ -s ] files
 .SH DESCRIPTION
 Invoke the Basser Lout interpreter on the concatenation of the named
 files, producing a PostScript file on standard output suitable for
@@ -16,21 +16,31 @@ files.  When invoking files ending in this suffix the suffix may be
 omitted.
 .SH OPTIONS
 .TP 16
--i<filename>  
-Search the directories of the include file path (see below) for
-<filename> or <filename>.lout and include it.  There may be
-multiple -i options.
-.TP
 -s
 Suppress all reading and writing of the cross reference database;
-other databases are not affected.  Useful when many simple documents that
-don't do any cross referencing are stored in one directory.
+other databases are not affected.  Useful when many simple documents
+that don't do any cross referencing are stored in one directory.
+.TP
+-EPS
+Produce output in the form of an EPS (Encapsulated PostScript) file,
+suitable for inclusion in another document.
+.TP
+-p
+Produce plain text output instead of PostScript.
+.TP
+-P
+Like -p but with a form-feed character between pages.
 .TP
 -e<filename>
 Direct error messages to <filename> instead of to stderr.
 .TP
 -o<filename>
 Direct PostScript output to <filename> instead of to stdout.
+.TP
+-i<filename>  
+Search the directories of the include file path (see below) for
+<filename> or <filename>.lout and include it.  There may be
+multiple -i options.
 .TP
 -I<dirname>
 Add <dirname> to the list of directories searched for @Include files
@@ -52,6 +62,12 @@ Add <dirname> to the list of directories searched for font metrics
 searched in the order given, and finally the default font metrics
 directory is searched (see below).
 .TP
+-H<dirname>
+Add <dirname> to the list of directories searched for hyphenation
+patterns files, both unpacked (.lh) and packed (.lp).  There may be
+multiple -H options; the directories are searched in the order given,
+and finally the default hyphenation directory is searched (see below).
+.TP
 -D<dirname>
 Add <dirname> to the list of directories searched for Lout database
 files.  There may be multiple -D options.  @Database searches the
@@ -59,41 +75,44 @@ current directory, then the -D directories in the order given, and
 finally searches the default databases directory (see below).
 @SysDatabase omits the search of the current directory.
 .TP
+-x
+Initializing run, not for ordinary use: read and check all font files
+mentioned in font definitions, read and check all hyphenation files
+mentioned in language definitions and build compressed versions, read
+and check all database files mentioned in database clauses and build
+index files.  If using locales, read a colon-separated list of locales
+following the -x flag (e.g. -xfr:en) and build error message catalogues
+for those locales.
+.TP
 -u
 Print usage information on stderr.
 .TP
 -V
 Print version information on stderr.
-.TP
--EPS
-Produce output in the form of an EPS (Encapsulated PostScript) file,
-suitable for inclusion in another document.
-.SH LIMITS
-.nf
-At most 255 input files (no limit on @IncludeGraphic files)
-At most 255 characters per input line
-At most 100 fonts (each different size counts as one font)
-At most 5 deep nesting of @Include files
 .SH FILES
 .nf
 Binary file:                    <BINDIR>/lout
 Default include file directory: <LIBDIR>/include
 Default databases directory:    <LIBDIR>/data
 Default font metrics directory: <LIBDIR>/font
+Default hyphenation directory:  <LIBDIR>/hyph
 Default encoding vectors dir.:  <LIBDIR>/evec
 Lout documentation directory:   <DOCDIR>
 .fi
 .SH SEE ALSO
 .P
-lpr(1), ghostview(1)
+c2lout(1), lpr(1), ghostview(1)
+.SH MAILING LIST
+.P
+A public mailing list for discussion of Lout exists.  To
+subscribe, mail lout-request@cs.brown.edu with the word
+subscribe in the Subject line, then wait one working day.
+To post an item, mail it to lout@cs.brown.edu.
 .SH REFERENCES
 .P
-For a description of the Lout document formatting system,
-see Jeffrey H. Kingston, "Document Formatting with Lout",
-Tech. Rep. 449, Basser Dept. of Computer Science, The
-University of Sydney 2006, Australia (December 1992).
-See Adobe Systems Inc., "PostScript Language Reference Manual
-(Second Edition)", Addison-Wesley, 1990, for PostScript.
+Jeffrey H. Kingston, "A User's Guide to the Lout Document
+Formatting System," and "An Expert's Guide to the Lout
+Document Formatting System."
 .SH AUTHOR
 .P
 Jeffrey H. Kingston

@@ -257,7 +257,11 @@ def @Fig
 	    {
 		nopaint @Yield {}
 
-		{ white light grey gray dark black } @Yield
+		{ nochange darkblue blue lightblue darkgreen green lightgreen
+		  darkred red lightred darkcyan cyan lightcyan darkmagenta
+		  magenta lightmagenta darkyellow yellow lightyellow darkgray
+		  gray lightgray darkgrey grey lightgrey black white }
+		@Yield
 		{ "/lfig"paint "[" shape "] gsave lfigpaintpath grestore" }
 	    }
 

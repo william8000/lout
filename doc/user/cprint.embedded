@@ -1,0 +1,158 @@
+@Section
+   @Title { Embedded mode }
+   @Tag { embedded }
+@Begin
+@PP
+When the C program texts are to be embedded in a larger Lout document,
+the procedure is somewhat different.  For each setup file ({@Code "doc"},
+{@Code "report"}, {@Code "book"}, etc.), there is a corresponding
+alternative setup file whose name begins with @Code "c" ({@Code "cdoc"},
+cdoc @Index { @Code "cdoc" file }
+creport @Index { @Code "creport" file }
+cbook @Index { @Code "cbook" file }
+{@Code "creport"}, {@Code "cbook"}, etc.).  So your document might look
+like this:
+@ID @Code {
+"@SysInclude { cdoc }"
+"@Doc @Text @Begin"
+"..."
+"@End @Text"
+}
+These alternative setup files are identical to the original ones except
+that they include the wherewithal to do C program formatting.
+@PP
+The C parts of the document are enclosed in @Code "@CP { ... }" like this:
+@ID @Code {
+"@IndentedDisplay @CP {"
+"#include <stdio.h>"
+""
+"treeprint(p)        /* print tree p recursively */"
+"struct tnode *p;"
+"{"
+"        if (p != NULL) {"
+"                treeprint(p->left);"
+"                printf(\"%4d %s\\n\", p->count, p->word);"
+"                treeprint(p->right);"
+"        }"
+"}"
+"}"
+}
+Although C programs violate the rules of legal Lout input in many ways,
+these rules are suspended by the @Code "@CP" symbol, allowing the C
+text to be incorporated with absolutely no modifications.  The result is
+@ID @CP {
+#include <stdio.h>
+
+treeprint(p)        /* print tree p recursively */
+struct tnode *p;
+{
+        if (p != NULL) {
+                treeprint(p->left);
+                printf("%4d %s\n", p->count, p->word);
+                treeprint(p->right);
+        }
+}
+}
+We have chosen to use the @Code "@IndentedDisplay" symbol from Section
+{@NumberOf displays} to obtain an indented display, but in fact
+@Code "@CP" may appear anywhere at all.  When including a C text within
+a paragraph, use @Code "@OneCol @CP { ... }" to prevent it being broken
+across two lines, if desired.
+@PP
+In cases where the C text has unbalanced braces, it is necessary to
+use the alternative form @Code "@CP @Begin ... @End @CP" so that
+Lout does not confuse C braces with Lout braces.
+@PP
+The @Code "@CP" symbol has a @Code "style" option for changing the
+printing style.  The default value of @Code "style" is {@Code "fixed"},
+which produces the style shown above.  To obtain a varying-width font
+style, use @Code "style { varying }" like this:
+@ID @Code {
+"@CP"
+"    style { varying }"
+"{"
+"#include <stdio.h>"
+""
+"treeprint(p)        /* print tree p recursively */"
+"struct tnode *p;"
+"{"
+"        if (p != NULL) {"
+"                treeprint(p->left);"
+"                printf(\"%4d %s\\n\", p->count, p->word);"
+"                treeprint(p->right);"
+"        }"
+"}"
+"}"
+}
+The result in this case will be
+@ID @CP style { varying }
+{
+#include <stdio.h>
+
+treeprint(p)        /* print tree p recursively */
+struct tnode *p;
+{
+        if (p != NULL) {
+                treeprint(p->left);
+                printf("%4d %s\n", p->count, p->word);
+                treeprint(p->right);
+        }
+}
+}
+There is also a third style called @Code "style { symbol }" which is
+similar to @Code "varying" except that it uses characters from the
+Adobe Symbol font to produce a more mathematical-looking result:
+@ID @CP style { symbol }
+{
+#include <stdio.h>
+
+treeprint(p)        /* print tree p recursively */
+struct tnode *p;
+{
+        if (p != NULL) {
+                treeprint(p->left);
+                printf("%4d %s\n", p->count, p->word);
+                treeprint(p->right);
+        }
+}
+}
+The @Code "@CP" symbol has additional options which allow a finer
+control over the style.  Here they all are, with their default values:
+@ID @Code {
+"@CP"
+"    style { fixed }"
+"    font { Courier }"
+"    strings { Base }"
+"    identifiers { Base }"
+"    comments { Base }"
+"    keywords { Base }"
+"    numbers { Base }"
+"    operators { Base }"
+"    size { -1.0p }"
+"    line { 1.0vx }"
+"    tabin { 8 }"
+"    tabout { 8s }"
+"{"
+"    ..."
+"}"
+}
+We are already familiar with {@Code "style"}.  After that comes
+{@Code "font"}, which determines the font family to use, followed
+by six options giving the particular faces within that family in which to
+print C strings, identifiers, comments, keywords, numbers, and
+operators.  {@Code "Base"} means the basic face; other commonly available
+choices are {@Code "Slope"} and {@Code "Bold"}.  These options may all be
+set to different faces if desired.  The default values shown are correct
+for @Code "style { fixed }" only; the other styles have other defaults
+(Section {@NumberOf cpsetup}).
+@PP
+The @Code "size" option is the font size to use, and @Code "line" is the
+inter-line spacing.  The default values specify that @Code "size" is
+to be one point smaller than in the surrounding document; this was done
+to compensate for Courier's relatively large appearance compared
+to other fonts of the same nominal size.  Again, these defaults are
+different for different values of {@Code "style"}.
+@PP
+The @Code "tabin" and @Code "tabout" options are the subject of
+Section {@NumberOf tabs}.
+@End @Section

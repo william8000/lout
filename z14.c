@@ -1,7 +1,7 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -32,7 +32,7 @@
 #define TOO_LOOSE_BAD	65536	/* 2^16; the max badness of a too loose line */
 #define	TIGHT_BAD	4096	/* 2^12; the max badness of a tight line     */
 #define	LOOSE_BAD	4096	/* 2^12; the max badness of a loose line     */
-#define	HYPH_BAD	2048	/* 2^11; threshold for calling hyphenation   */
+#define	HYPH_BAD	1024	/* 2^10; threshold for calling hyphenation   */
 #define SQRT_TOO_LOOSE	256	/* 2^ 8; sqrt(TOO_LOOSE_BAD)                 */
 #define	SQRT_TIGHT_BAD	64	/* 2^ 6; sqrt(TIGHT_BAD)                     */
 #define	SQRT_LOOSE_BAD	64	/* 2^ 6; sqrt(LOOSE_BAD)                     */
@@ -43,15 +43,15 @@
 typedef struct {
   OBJECT llink;			/* link to gap before left end of interval   */
   OBJECT rlink;			/* link to gap before right end of interval  */
-  LENGTH nat_width;		/* natural width of interval                 */
-  LENGTH space_width;		/* natural width of spaces in the interval   */
+  int nat_width;		/* natural width of interval                 */
+  int space_width;		/* natural width of spaces in the interval   */
   int	 badness;		/* badness of this interval		     */
   unsigned char   class;	/* badness class of this interval	     */
   unsigned char	 tab_count;	/* number of gaps with tab mode in interval  */
-  LENGTH tab_pos;		/* if tab_count > 0, this holds the position */
+  int tab_pos;			/* if tab_count > 0, this holds the position */
 				/*  of the left edge of the object following */
 				/*  the rightmost tab gap in the interval    */
-  LENGTH width_to_tab;		/* if tab_count > 0, the interval width up   */
+  int width_to_tab;		/* if tab_count > 0, the interval width up   */
 				/*  to but not including the rightmost tab   */
 } INTERVAL;
 
@@ -86,7 +86,7 @@ typedef struct {
 
 #define SetIntervalBadness(I, max_width, etc_width)			\
 { OBJECT g; int badness;						\
-  LENGTH col_width;							\
+  int col_width;							\
   if( I.llink == x )							\
   { col_width = max_width;						\
     I.badness = 0;							\
@@ -97,7 +97,11 @@ typedef struct {
     I.badness = save_badness(g);					\
   }									\
 									\
-  if( I.tab_count > 0 && I.width_to_tab > I.tab_pos )			\
+  if( col_width <= 0 )							\
+  { I.class = TIGHT;							\
+    I.badness += TOO_TIGHT_BAD;						\
+  }									\
+  else if( I.tab_count > 0 && I.width_to_tab > I.tab_pos )		\
   { I.class = TAB_OVERLAP;						\
     I.badness += TOO_TIGHT_BAD;						\
   }									\
@@ -111,7 +115,8 @@ typedef struct {
     badness = (SQRT_LOOSE_BAD*(col_width - I.nat_width)) / col_width;	\
     I.badness += badness * badness;					\
   }									\
-  else if( MAX_SHRINK*(I.nat_width-col_width) <= I.space_width )	\
+  else if( BackEnd == POSTSCRIPT &&					\
+    MAX_SHRINK*(I.nat_width-col_width) <= I.space_width )		\
   { I.class = TIGHT;							\
     badness = (SQRT_TIGHT_BAD*(col_width - I.nat_width)) / col_width;	\
     I.badness += badness * badness;					\
@@ -119,9 +124,9 @@ typedef struct {
   else { I.class = TOO_TIGHT;  I.badness += TOO_TIGHT_BAD; }		\
 } /* end macro SetIntervalBadness */
 
-/*@::CorrectOversizeError()@**************************************************/
+/*@::CorrectOversizeProblem()@************************************************/
 /*                                                                           */
-/*  CorrectOversizeError(x, link, y, etc_width)                              */
+/*  CorrectOversizeProblem(x, link, y, etc_width)                            */
 /*                                                                           */
 /*  Child y of x, whose link is link, has caused an oversize error, either   */
 /*  because it is wider than etc_width, or because it is joined by zero-     */
@@ -131,26 +136,46 @@ typedef struct {
 /*                                                                           */
 /*****************************************************************************/
 
-static CorrectOversizeError(x, link, y, etc_width, hyph_allowed)
-OBJECT x, link, y;  LENGTH etc_width;  BOOLEAN hyph_allowed;
-{ OBJECT tmp, g;  BOOLEAN done = FALSE;
+static CorrectOversizeProblem(x, link, y, etc_width, hyph_allowed)
+OBJECT x, link, y;  int etc_width;  BOOLEAN hyph_allowed;
+{ OBJECT tmp, g, prevlink, nextlink;  BOOLEAN done = FALSE;
 
-  if( PrevDown(link) != x ) /* make any preceding unbreakable gap breakable */
-  { Child(g, PrevDown(link));
-    assert( type(g) == GAP_OBJ, "CorrectOversizeError: left gap!" );
-    if( unbreakable(gap(g), hyph_allowed) )
-    { done = TRUE;  SetGap(gap(g), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 1);
-      Error(WARN, &fpos(g), "line break may occur here due to wide object");
-    }
+  if( PrevDown(link) != x )
+  {
+     /* there is a preceding gap, so delete it along with x */
+     Error(14, 1, "%s object deleted (too wide for %s paragraph)",
+       WARN, &fpos(y), EchoLength(size(y, COL)), EchoLength(etc_width));
+     Child(g, PrevDown(link));
+     assert( type(g) == GAP_OBJ, "CorrectOversizeProblem: left gap!" );
+     DisposeChild(PrevDown(link));
+     DisposeChild(link);
   }
-  if( !done ) /* else replace the wide object by an empty object */
-  { Error(WARN, &fpos(y), "%s object deleted (too wide for %s paragraph)",
-		EchoLength(size(y, COL)), EchoLength(etc_width));
+  else if( NextDown(link) != x && NextDown(NextDown(link)) != x &&
+	   NextDown(NextDown(NextDown(link))) != x )
+  {
+     /* there is a following gap which is not the concluding &1rt {}, */
+     /* so delete it along with x                                     */
+     Error(14, 2, "%s object deleted (too wide for %s paragraph)",
+       WARN, &fpos(y), EchoLength(size(y, COL)), EchoLength(etc_width));
+     Child(g, NextDown(link));
+     assert( type(g) == GAP_OBJ, "CorrectOversizeProblem: right gap!" );
+     DisposeChild(NextDown(link));
+     DisposeChild(link);
+  }
+  else
+  {
+    /* x is the only object in the paragraph, so replace it by an empty */
+    if( size(y, COL) <= 0 )
+      Error(14, 3, "oversize object has size zero or less", INTERN, &fpos(y));
+    Error(14, 4, "%s object deleted (too wide for %s paragraph)",
+      WARN, &fpos(y), EchoLength(size(y, COL)), EchoLength(etc_width));
     tmp = MakeWord(WORD, STR_EMPTY, &fpos(x));
     back(tmp, COL) = fwd(tmp, COL) = back(tmp, ROW) = fwd(tmp, ROW) = 0;
-    word_font(tmp) = 0;  Link(link, tmp);  DisposeChild(link);
+    word_font(tmp) = word_colour(tmp) = 0;
+    word_language(tmp) = word_hyph(tmp) = 0;
+    Link(link, tmp);  DisposeChild(link);
   }
-} /* end CorrectOversizeError */
+} /* end CorrectOversizeProblem */
 
 
 /*@::MoveRightToGap()@********************************************************/
@@ -166,6 +191,7 @@ OBJECT x, link, y;  LENGTH etc_width;  BOOLEAN hyph_allowed;
 #define MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word)	\
 { OBJECT newg, foll;							\
   BOOLEAN zero_at_right = FALSE;					\
+  debug0(DOF, DD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
 									\
   /* search onwards to find newg, the next true breakpoint */		\
   NextDefiniteWithGap(x, rlink, foll, newg);				\
@@ -174,6 +200,7 @@ OBJECT x, link, y;  LENGTH etc_width;  BOOLEAN hyph_allowed;
   if( rlink != x )							\
   { 									\
     /* set save_space(newg) now so that it is OK to forget right */	\
+    debug0(DOF, DD, "  MoveRightToGap setting save_space(newg)");	\
     if( mode(gap(newg)) == TAB_MODE )					\
     { save_space(newg) = ActualGap(0, back(foll,COL), fwd(foll,COL),	\
 	  &gap(newg), etc_width, 0) - back(foll, COL);			\
@@ -193,9 +220,13 @@ OBJECT x, link, y;  LENGTH etc_width;  BOOLEAN hyph_allowed;
 	 !(string(right)[StringLength(string(right))-1] == CH_HYPHEN) )	\
       {									\
 	/* make sure hyph_word exists and is of the right font */	\
+	debug0(DOF, DD, "  MoveRightToGap checking hyph_word");		\
 	if( hyph_word == nil )						\
 	{ hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
 	  word_font(hyph_word) = 0;					\
+	  word_colour(hyph_word) = colour(save_style(x));		\
+	  word_language(hyph_word) = language(save_style(x));		\
+	  word_hyph(hyph_word) = hyph_style(save_style(x)) == HYPH_ON;	\
 	}								\
 	if( word_font(hyph_word) != font(save_style(x)) )		\
 	{ word_font(hyph_word) = font(save_style(x));			\
@@ -205,7 +236,7 @@ OBJECT x, link, y;  LENGTH etc_width;  BOOLEAN hyph_allowed;
 									\
 	mode(gap(newg)) = ADD_HYPH;					\
 	I.nat_width += size(hyph_word, COL);				\
-	debug0(DOF, DD, "   adding hyph_word from nat_width\n");	\
+	debug0(DOF, DD, "   adding hyph_word from nat_width");		\
       }									\
     }									\
     else if( unbreakable(gap(newg), hyph_allowed) ) zero_at_right=TRUE;	\
@@ -214,7 +245,11 @@ OBJECT x, link, y;  LENGTH etc_width;  BOOLEAN hyph_allowed;
   }									\
   else I.rlink = x;							\
   SetIntervalBadness(I, max_width, etc_width);				\
-  if( zero_at_right )  I.class = ZERO_AT_RIGHT;				\
+  if( zero_at_right )							\
+    I.class = ZERO_AT_RIGHT;						\
+  else if( I.class == TIGHT && mode(gap(newg)) == TAB_MODE )		\
+    I.class = TOO_TIGHT, I.badness = TOO_TIGHT_BAD;			\
+  debug0(DOF, DD, "MoveRightToGap returning.");				\
 }
 
 /*@::IntervalInit(), IntervalShiftRightEnd()@*********************************/
@@ -227,6 +262,8 @@ OBJECT x, link, y;  LENGTH etc_width;  BOOLEAN hyph_allowed;
 
 #define IntervalInit(I, x, max_width, etc_width, hyph_word)		\
 { OBJECT rlink, right;							\
+  debug2(DOF, DD, "IntervalInit(I, x, %s, %s, hyph_word)",		\
+      EchoLength(max_width), EchoLength(etc_width));			\
   I.llink = x;								\
 									\
   FirstDefinite(x, rlink, right);					\
@@ -241,6 +278,7 @@ OBJECT x, link, y;  LENGTH etc_width;  BOOLEAN hyph_allowed;
     /* move to gap, check hyphenation there etc. */			\
     MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word); 	\
   }									\
+  debug0(DOF, DD, "IntervalInit returning.");				\
 } /* end macro IntervalInit */
 
 
@@ -400,7 +438,9 @@ INTERVAL I;  OBJECT x;
       else for( i = 1;  i <= hspace(g) + vspace(g); i++ )
 	     StringCat(res, STR_SPACE);
     }
-    else StringCat(res, is_word(type(z)) ? string(z) : Image(type(z)));
+    else if( is_word(type(y)) )
+	StringCat(res, string(y)[0] == '\0' ? AsciiToFull("{}") : string(y));
+    else StringCat(res, Image(type(y)));
   }
   StringCat(res, AsciiToFull("] n"));
   StringCat(res, EchoLength(I.nat_width));
@@ -436,11 +476,15 @@ INTERVAL I;  OBJECT x;
 OBJECT FillObject(x, c)
 OBJECT x;  CONSTRAINT *c;
 { INTERVAL I, BestI;  OBJECT res, gp, tmp, z, y, link, prev;
-  LENGTH max_width, etc_width, outdent_margin, f;
+  int max_width, etc_width, outdent_margin, f;
   static OBJECT hyph_word = nil;
   BOOLEAN can_hyphenate;    /* TRUE when it is possible to call Hyphenate() */
   BOOLEAN hyph_allowed;	    /* TRUE when hyphenation of words is permitted  */
   assert( type(x) == ACAT, "FillObject: type(x) != ACAT!" );
+
+  debug2(DOF, D, "FillObject(x, %s); %s",
+	EchoConstraint(c), EchoStyle(&save_style(x)));
+  ifdebug(DOF, DD, DebugObject(x); fprintf(stderr, "\n\n") );
 
   /* set max_width (width of 1st line) and etc_width (width of later lines) */
   max_width = min(fc(*c), bfc(*c));
@@ -451,6 +495,22 @@ OBJECT x;  CONSTRAINT *c;
   else etc_width = max_width;
   assert( size(x, COL) > max_width, "FillObject: initial size!" );
 
+  /* if column width is ridiculously small, exit with error message */
+  if( max_width <= 3 * FontSize(font(save_style(x)), x) )
+  {
+    Error(14, 5, "paragraph deleted (assigned width %s is too narrow)",
+       WARN, &fpos(x), EchoLength(max_width));
+    res = MakeWord(WORD, STR_EMPTY, &fpos(x));
+    word_font(res) = font(save_style(x));
+    word_colour(res) = colour(save_style(x));
+    word_language(res) = language(save_style(x));
+    word_hyph(res) = hyph_style(save_style(x)) == HYPH_ON;
+    back(res, COL) = fwd(res, COL) = 0;
+    ReplaceNode(res, x);
+    DisposeObject(x);
+    return res;
+  }
+
   /* add &1rt {} to end of paragraph */
   gp = New(GAP_OBJ);  hspace(gp) = 1;  vspace(gp) = 0;
   SetGap(gap(gp), FALSE, TRUE, AVAIL_UNIT, TAB_MODE, 1*FR);
@@ -459,15 +519,16 @@ OBJECT x;  CONSTRAINT *c;
   tmp = MakeWord(WORD, STR_EMPTY, &fpos(x));
   back(tmp, COL) = fwd(tmp, COL) = back(tmp, ROW) = fwd(tmp, ROW) = 0;
   word_font(tmp) = 0;
+  word_colour(tmp) = 0;
+  word_language(tmp) = 0;
+  word_hyph(tmp) = 0;
   Link(x, tmp);
-  debug2(DOF, D, "FillObject(x, %s); %s",
-	EchoConstraint(c), EchoStyle(&save_style(x)));
-  ifdebug(DOF, DD, DebugObject(x); fprintf(stderr, "\n\n") );
 
   /* initially we can hyphenate if hyphenation is on, but not first pass */
   if( hyph_style(save_style(x)) == HYPH_UNDEF )
-    Error(FATAL, &fpos(x), "hyphen or nohyphen option missing");
-  can_hyphenate = (hyph_style(save_style(x)) == HYPH_ON);
+    Error(14, 6, "hyphen or nohyphen option missing", FATAL, &fpos(x));
+  /* ** can_hyphenate = (hyph_style(save_style(x)) == HYPH_ON);  ** */
+  can_hyphenate = TRUE;
   hyph_allowed = FALSE;
 
   /* initialize I to first interval, BestI to best ending here, and run */
@@ -482,7 +543,7 @@ OBJECT x;  CONSTRAINT *c;
       case TOO_LOOSE:
       
 	/* too loose, so save best and shift right end */
-	if( IntervalBadness(BestI) < IntervalBadness(I) )  I = BestI;
+	if( IntervalBadness(BestI) <= IntervalBadness(I) )  I = BestI;
 	debug1(DOF, D, "BestI: %s\n", IntervalPrint(I, x));
 	/* NB no break */
 
@@ -519,14 +580,14 @@ OBJECT x;  CONSTRAINT *c;
 	  can_hyphenate = FALSE;
 	  hyph_allowed = TRUE;
 	}
-	else CorrectOversizeError(x, I.llink, y, etc_width, hyph_allowed);
+	else CorrectOversizeProblem(x, I.llink, y, etc_width, hyph_allowed);
 	goto RESTART;
 	break;
 
 
       default:
       
-	Error(INTERN, &fpos(x), "FillObject: unknown interval class!");
+	Error(14, 7, "FillObject: %d", INTERN, &fpos(x), IntervalClass(I));
 	break;
 
     }
@@ -582,6 +643,9 @@ OBJECT x;  CONSTRAINT *c;
 	t1 = MakeWord(WORD, STR_EMPTY, &fpos(x));
 	back(t1, COL) = fwd(t1, COL) = back(t1, ROW) = fwd(t1, ROW) = 0;
 	word_font(t1) = 0;
+	word_colour(t1) = 0;
+	word_language(t1) = 0;
+	word_hyph(t1) = 0;
 	t2 = New(WIDE);
 	SetConstraint(constraint(t2), MAX_LEN, outdent_margin, MAX_LEN);
 	back(t2, COL) = 0;  fwd(t2, COL) = outdent_margin;
@@ -606,6 +670,9 @@ OBJECT x;  CONSTRAINT *c;
 	Link(x, z);
 	z = MakeWord(WORD, STR_HYPHEN, &fpos(y));
 	word_font(z) = font(save_style(x));
+	word_colour(z) = colour(save_style(x));
+	word_language(z) = language(save_style(x));
+	word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
 	FontWordSize(z);
 	Link(x, z);
       }
@@ -629,17 +696,28 @@ OBJECT x;  CONSTRAINT *c;
 	display_style(save_style(x)) == DISPLAY_OUTDENT )
 	  display_style(save_style(x)) = DO_ADJUST;
 
-    /* delete the final &1rt {} from the last line, to help clines */
+    /* if last line contains only the {} from final &1rt {}, delete the line */
+    /* and the preceding gap                                                 */
     Child(y, LastDown(res));
-    assert( Down(y) != LastDown(y), "FillObject: empty last line!" );
-    Child(z, LastDown(y));
-    assert( type(z)==WORD && string(z)[0] == '\0', "FillObject: last word!" );
-    DisposeChild(LastDown(y));
-    Child(z, LastDown(y));
-    assert( type(z) == GAP_OBJ, "FillObject: last gap_obj!" );
-    DisposeChild(LastDown(y));
+    if( Down(y) == LastDown(y) )
+    { DisposeChild(LastDown(res));
+      assert( Down(res) != LastDown(res), "almost empty paragraph!" );
+      DisposeChild(LastDown(res));
+    }
 
-    /* recalculate the width of the last line, since it is smaller */
+    /* else delete the final &1rt {} from the last line, to help clines */
+    else
+    { Child(z, LastDown(y));
+      assert( type(z)==WORD && string(z)[0]=='\0', "FillObject: last word!" );
+      DisposeChild(LastDown(y));
+      Child(z, LastDown(y));
+      assert( type(z) == GAP_OBJ, "FillObject: last gap_obj!" );
+      DisposeChild(LastDown(y));
+    }
+
+    /* recalculate the width of the last line, since it may now be smaller */
+    assert( LastDown(res) != res, "FillObject: empty paragraph!" );
+    Child(y, LastDown(res));
     FirstDefinite(y, link, z);
     assert( link != y, "FillObject: last line is empty!" );
     f = back(z, COL);  prev = z;
@@ -650,7 +728,7 @@ OBJECT x;  CONSTRAINT *c;
       prev = z;
       NextDefiniteWithGap(y, link, z, gp);
     }
-    fwd(y, COL) = f + fwd(prev, COL);
+    fwd(y, COL) = min(MAX_LEN, f + fwd(prev, COL));
 
     /* make last line DO_ADJUST if it is oversize */
     if( size(y, COL) > max_width )  display_style(save_style(y)) = DO_ADJUST;

@@ -1,7 +1,7 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -41,7 +41,7 @@
 OBJECT Next(x, inc, done)
 OBJECT x; int inc; BOOLEAN *done;
 { OBJECT y, link;  int l, r, n, len;
-  FULL_CHAR buff[MAX_LINE + 1];
+  FULL_CHAR buff[MAX_BUFF];
   debug3(DCS, DD, "Next( %s, %d, %s )", EchoObject(x), inc, bool(*done));
   switch( type(x) )
   {
@@ -57,10 +57,13 @@ OBJECT x; int inc; BOOLEAN *done;
       StringCopy(buff, string(x));
       StringCat(buff, StringInt(n+inc));
       StringCat(buff, &string(x)[r+1]);
-      if( StringLength(buff) >= MAX_LINE )
-	Error(FATAL, &fpos(x), "word %s is too long", buff);
+      if( StringLength(buff) >= MAX_BUFF )
+	Error(32, 1, "word %s is too long", FATAL, &fpos(x), buff);
       y = MakeWord(type(x), buff, &fpos(x));
       word_font(y) = word_font(x);
+      word_colour(y) = word_colour(x);
+      word_language(y) = word_language(x);
+      word_hyph(y) = word_hyph(x);
       MergeNode(y, x);  x = y;
       *done = TRUE;
       break;
@@ -80,6 +83,8 @@ OBJECT x; int inc; BOOLEAN *done;
     case ONE_ROW:
     case WIDE:
     case HIGH:
+    case HSHIFT:
+    case VSHIFT:
     case HCONTRACT:
     case VCONTRACT:
     case HEXPAND:
@@ -128,7 +133,7 @@ OBJECT x; int inc; BOOLEAN *done;
 
     default:
     
-      Error(INTERN,&fpos(x), "Next: type(x) = %s", Image(type(x)));
+      Error(32, 2, "Next: %s", Image(type(x)), INTERN, &fpos(x));
       break;
 
   } /* end switch */

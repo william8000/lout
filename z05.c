@@ -1,7 +1,7 @@
 /*@z05.c:Read Definitions:ReadFontDef()@**************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -57,22 +57,53 @@ OBJECT encl;
   SuppressScope();
   family = LexGetToken();
   if( !is_word(type(family)) )
-    Error(WARN, &fpos(family), "expected font family name here");
+    Error(5, 1, "expected font family name here", WARN, &fpos(family));
   face = LexGetToken();
   if( !is_word(type(face)) )
-    Error(WARN, &fpos(face), "expected font face name here");
+    Error(5, 2, "expected font face name here", WARN, &fpos(face));
   UnSuppressScope();
   t = LexGetToken();
   if( type(t) != LBR )
-  { Error(WARN, &fpos(t), "expected opening %s of fontdef here", KW_LBR);
+  { Error(5, 3, "expected opening %s of fontdef here", WARN, &fpos(t), KW_LBR);
     Dispose(t);
     return;
   }
   inside = Parse(&t, encl, FALSE, FALSE);
-  inside = ReplaceWithTidy(inside);
+  inside = ReplaceWithTidy(inside, FALSE);
   FontDefine(family, face, inside);
   return;
 } /* end ReadFontDef */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  static ReadLangDef(encl)                                                 */
+/*                                                                           */
+/*  Read one language definition and pass it on to the language module.  The */
+/*  syntax is  langdef <name> ... <name> { <object> }                        */
+/*                                                                           */
+/*****************************************************************************/
+
+static ReadLangDef(encl)
+OBJECT encl;
+{ OBJECT t, names, family, face, inside;
+  
+  names = New(ACAT);
+  t = LexGetToken();
+  while( is_word(type(t)) )
+  { Link(names, t);
+    t = LexGetToken();
+  }
+  if( type(t) != LBR )
+  { Error(5, 4, "expected opening %s of langdef here", WARN, &fpos(t), KW_LBR);
+    Dispose(t);
+    return;
+  }
+  inside = Parse(&t, encl, FALSE, FALSE);
+  inside = ReplaceWithTidy(inside, FALSE);
+  LanguageDefine(names, inside);
+  return;
+} /* end ReadLangDef */
 
 
 /*@::ReadPrependDef(), ReadDatabaseDef()@*************************************/
@@ -88,15 +119,15 @@ unsigned typ;  OBJECT encl;
 { OBJECT t, fname;  FILE_NUM fnum;
   t = LexGetToken();
   if( type(t) != LBR )
-  { Error(WARN, &fpos(t), "symbol name or %s expected here in %s declaration",
-      KW_LBR, KW_PREPEND);
+  { Error(5, 5, "left brace expected here in %s declaration",
+      WARN, &fpos(t), KW_PREPEND);
     Dispose(t);
     return;
   }
   fname = Parse(&t, encl, FALSE, FALSE);
-  fname = ReplaceWithTidy(fname);
+  fname = ReplaceWithTidy(fname, FALSE);
   if( !is_word(type(fname)) )
-  { Error(WARN, &fpos(fname), "name of %s file expected here", KW_PREPEND);
+  { Error(5, 6, "name of %s file expected here", WARN, &fpos(fname),KW_PREPEND);
     DisposeObject(fname);
     return;
   }
@@ -119,48 +150,52 @@ unsigned typ;  OBJECT encl;
 { OBJECT symbs, t, db, fname;
   symbs = New(ACAT);
   t = LexGetToken();
-  while( type(t) == CLOSURE )
-  { Link(symbs, t);
+  while( type(t)==CLOSURE || (type(t)==WORD && string(t)[0]==CH_SYMSTART) )
+  { if( type(t) == CLOSURE )  Link(symbs, t);
+    else
+    { Error(5, 44, "unknown or misspelt symbol %s", WARN, &fpos(t), string(t));
+      Dispose(t);
+    }
     t = LexGetToken();
   }
   if( type(t) != LBR )
-  { Error(WARN, &fpos(t), "symbol name or %s expected here in %s declaration",
-      KW_LBR, KW_DATABASE);
+  { Error(5, 7, "symbol name or %s expected here (%s declaration)",
+      WARN, &fpos(t), KW_LBR, KW_DATABASE);
     Dispose(t);
     return;
   }
   if( Down(symbs) == symbs )
-  { Error(WARN, &fpos(t), "symbol names missing in %s declaration",
-      KW_DATABASE);
-    Dispose(t);
-    return;
+  { Error(5, 8, "symbol names missing in %s declaration",
+      WARN, &fpos(t), KW_DATABASE);
   }
   fname = Parse(&t, encl, FALSE, FALSE);
-  fname = ReplaceWithTidy(fname);
+  fname = ReplaceWithTidy(fname, FALSE);
   if( !is_word(type(fname)) )
-  { Error(WARN, &fpos(fname), "name of %s file expected here", KW_DATABASE);
+  { Error(5, 9, "name of %s file expected here", WARN,&fpos(fname),KW_DATABASE);
     DisposeObject(fname);
     return;
   }
-  db = DbLoad(fname, typ == DATABASE ? DATABASE_PATH : SYSDATABASE_PATH,
-	 TRUE, symbs);
+  if( Down(symbs) != symbs )
+    db = DbLoad(fname, typ == DATABASE ? DATABASE_PATH : SYSDATABASE_PATH,
+      TRUE, symbs);
 } /* end ReadDatabaseDef */
 
 
 /*@::ReadTokenList()@*********************************************************/
 /*                                                                           */
-/*  static ReadTokenList(res)                                                */
+/*  static ReadTokenList(token, res)                                         */
 /*                                                                           */
 /*  Read a list of tokens from input and append them to sym_body(res).       */
-/*  The list is assumed to begin immediately after an LBR, and input is      */
-/*  to be read up to and including the matching RBR.                         */
+/*  The list is assumed to begin immediately after token, which is either    */
+/*  an LBR or a @Begin, and input is to be read up to and including the      */
+/*  matching RBR or @End @Sym.                                               */
 /*                                                                           */
 /*****************************************************************************/
 #define NextToken(t, res)						\
   t = LexGetToken(); sym_body(res) = Append(sym_body(res), t, PARENT);
 
-static ReadTokenList(res)
-OBJECT res;
+static ReadTokenList(token, res)
+OBJECT token, res;
 { OBJECT t, xsym, new_par;
   NextToken(t, res);
   for(;;) switch(type(t))
@@ -168,7 +203,7 @@ OBJECT res;
     case WORD:
 
       if( string(t)[0] == CH_SYMSTART )
-	Error(WARN, &fpos(t), "symbol %s unknown", string(t));
+	Error(5, 10, "symbol %s unknown or misspelt", WARN, &fpos(t),string(t));
       NextToken(t, res);
       break;
 
@@ -188,6 +223,8 @@ OBJECT res;
     case ONE_ROW:
     case WIDE:
     case HIGH:
+    case HSHIFT:
+    case VSHIFT:
     case HSCALE:
     case VSCALE:
     case SCALE:
@@ -201,10 +238,14 @@ OBJECT res;
     case ROTATE:
     case CASE:
     case YIELD:
+    case BACKEND:
     case XCHAR:
     case FONT:
     case SPACE:
     case BREAK:
+    case COLOUR:
+    case LANGUAGE:
+    case CURR_LANG:
     case NEXT:
     case TAGGED:
     case INCGRAPHIC:
@@ -215,32 +256,67 @@ OBJECT res;
       break;
 
 
+    case LUSE:
     case LVIS:
     case ENV:
     case USE:
-    case BEGIN:
-    case END:
     case DATABASE:
     case SYS_DATABASE:
     case PREPEND:
     case SYS_PREPEND:
     case OPEN:
 
-      Error(WARN, &fpos(t), "symbol %s not allowed in macro",
-	SymName(actual(t)));
+      Error(5, 11, "symbol %s not allowed in macro",
+	WARN, &fpos(t), SymName(actual(t)));
       NextToken(t, res);
       break;
 
 
     case LBR:
 
-      ReadTokenList(res);
+      ReadTokenList(t, res);
+      NextToken(t, res);
+      break;
+
+
+    case UNEXPECTED_EOF:
+
+      Error(5, 12, "unexpected end of input", FATAL, &fpos(t));
+      break;
+
+
+    case BEGIN:
+
+      Error(5, 13, "%s not expected here", WARN, &fpos(t), SymName(actual(t)));
       NextToken(t, res);
       break;
 
 
     case RBR:
 
+      if( type(token) != LBR )
+	Error(5, 14, "unmatched %s in macro", WARN, &fpos(t), KW_RBR);
+      return;
+
+
+    case END:
+
+      if( type(token) != BEGIN )
+	Error(5, 15, "unmatched %s in macro", WARN, &fpos(t), KW_END);
+      else
+      { NextToken(t, res);
+        if( type(t) != CLOSURE )
+	{
+	  if( type(t) == WORD && string(t)[0] == CH_SYMSTART )
+	    Error(5, 16, "symbol %s unknown or misspelt",
+	      WARN, &fpos(t), string(t));
+	  else
+	    Error(5, 17, "symbol name expected after %s", WARN,&fpos(t),KW_END);
+	}
+        else if( actual(token) != actual(t) )
+	  Error(5, 18, "%s %s does not match %s %s", WARN, &fpos(t),
+	    SymName(actual(token)), KW_BEGIN, SymName(actual(t)), KW_END);
+      }
       return;
 
 
@@ -261,12 +337,17 @@ OBJECT res;
       {	new_par = t;
 	NextToken(t, res);
 	if( type(t) != LBR )
-	{ Error(WARN, &fpos(new_par), "%s must follow name parameter %s",
-	    KW_LBR, SymName(actual(new_par)));
+	{ if( type(t) == RBR )
+	  { if( type(token) != LBR )
+	      Error(5, 19, "unmatched %s in macro", WARN, &fpos(t), KW_RBR);
+	    return;
+	  }
+	  Error(5, 20, "%s must follow named parameter %s",
+	    WARN, &fpos(new_par), KW_LBR, SymName(actual(new_par)));
 	  break;
 	}
 	PushScope(actual(new_par), FALSE, FALSE);
-	ReadTokenList(res);
+	ReadTokenList(t, res);
 	PopScope();
 
 	/* get next token, possibly another named parameter */
@@ -277,23 +358,26 @@ OBJECT res;
 
       /* read body parameter, if any */
       if( has_body(xsym) )
-      {	if( type(t) == LBR )
+      {
+	if( type(t) == LBR || type(t) == BEGIN )
 	{ PushScope(xsym, FALSE, TRUE);
 	  PushScope(ChildSym(xsym, RPAR), FALSE, FALSE);
-	  ReadTokenList(res);
+	  if( type(t) == BEGIN )  actual(t) = xsym;
+	  ReadTokenList(t, res);
 	  PopScope();
 	  PopScope();
 	  NextToken(t, res);
 	}
-	else Error(WARN, &fpos(t), "right parameter of %s must begin with %s",
-		SymName(xsym), KW_LBR);
+	else if( type(t) != RBR && type(t) != END )
+	  Error(5, 21, "right parameter of %s must begin with %s",
+	    WARN, &fpos(t), SymName(xsym), KW_LBR);
       }
       break;
 
+
     default:
 
-
-      Error(INTERN, &fpos(t), "unknown token type %s", Image(type(t)));
+      Error(5, 22, "ReadTokenList: %s", INTERN, &fpos(t), Image(type(t)));
       break;
 
   }
@@ -314,33 +398,33 @@ OBJECT res;
 
 static OBJECT ReadMacro(token, encl)
 OBJECT *token, encl;
-{ OBJECT t, res;
+{ OBJECT t, tmp, res;
 
   /* find macro name and insert into symbol table */
   SuppressScope();
   Dispose(*token);  t = LexGetToken();
   if( !is_word(type(t)) )
-  { Error(WARN, &fpos(t), "%s ignored - name is missing", KW_MACRO);
+  { Error(5, 23, "%s ignored (name is missing)", WARN, &fpos(t), KW_MACRO);
     debug1(ANY, D, "offending type is %s", Image(type(t)));
     UnSuppressScope();
     *token = t;
     return nil;
   }
   res = InsertSym(string(t), MACRO, &fpos(t), 0, FALSE, TRUE, 0, encl, nil);
+  UnSuppressScope();
 
   /* find opening left brace */
   t = LexGetToken();
-  if( !is_string(t, KW_LBR) )
-  { Error(WARN, &fpos(t), "%s ignored - opening %s missing", KW_MACRO, KW_LBR);
-    UnSuppressScope();
+  if( type(t) != LBR )
+  { Error(5, 24, "%s ignored (opening %s is missing)",
+      WARN, &fpos(t), KW_MACRO, KW_LBR);
     *token = t;
     return nil;
   }
-  Dispose(t);
   
   /* read macro body */
-  UnSuppressScope();
-  ReadTokenList(res);
+  ReadTokenList(t, res);
+  Dispose(t);
 
   /* clean up (kill final RBR, dispose macro name) and exit */
   sym_body(res) = DeleteAndDispose(pred(sym_body(res), PARENT), PARENT);
@@ -365,12 +449,19 @@ OBJECT *token, encl;
 ReadDefinitions(token, encl, res_type)
 OBJECT *token, encl;  unsigned char res_type;
 { OBJECT t, res, res_target, export_list, import_list, link, y, z;
+  OBJECT curr_encl;
   t = *token;
 
   while( res_type != LOCAL ? is_string(t, KW_NAMED) : TRUE )
   {
+    curr_encl = encl;
     if( is_string(t, KW_FONTDEF) )
     { ReadFontDef(encl);
+      t = LexGetToken();
+      continue;  /* next definition */
+    }
+    else if( is_string(t, KW_LANGDEF) )
+    { ReadLangDef(encl);
       t = LexGetToken();
       continue;  /* next definition */
     }
@@ -387,12 +478,12 @@ OBJECT *token, encl;  unsigned char res_type;
       continue;  /* next definition */
     }
 
-    if( !is_string(t, KW_DEF)   && !is_string(t, KW_MACRO)  &&
-	!is_string(t, KW_NAMED) && !is_string(t, KW_IMPORT) &&
-        !is_string(t, KW_EXPORT) )
+    if( !is_string(t, KW_DEF)    && !is_string(t, KW_MACRO)  &&
+	!is_string(t, KW_NAMED)  && !is_string(t, KW_IMPORT) &&
+        !is_string(t, KW_EXTEND) && !is_string(t, KW_EXPORT) )
       break;
 
-    /* get import list and change scope appropriately */
+    /* get import or extend list and change scope appropriately */
     BodyParNotAllowed();
     import_list = New(ACAT);
     if( is_string(t, KW_IMPORT) )
@@ -407,12 +498,38 @@ OBJECT *token, encl;  unsigned char res_type;
 	    Link(import_list, t);
 	  }
 	  else
-	  { Error(WARN, &fpos(t), "import name expected here");
+	  { Error(5, 25, "import name expected here", WARN, &fpos(t));
 	    Dispose(t);
 	  }
 	}
 	else
-	{ Error(WARN,&fpos(t),"import %s not in scope", string(t));
+	{ Error(5, 26, "import %s not in scope", WARN, &fpos(t), string(t));
+	  Dispose(t);
+	}
+	t = LexGetToken();
+      }
+    }
+    else if( is_string(t, KW_EXTEND) )
+    { Dispose(t);
+      t = LexGetToken();
+      while( type(t) == CLOSURE ||
+	       (type(t)==WORD && !is_string(t,KW_EXPORT) && !is_string(t,KW_DEF)
+	       && !is_string(t, KW_MACRO)) )
+      {	if( type(t) == CLOSURE )
+	{ if( type(actual(t)) == LOCAL )
+	  { PushScope(actual(t), FALSE, FALSE);
+	    curr_encl = actual(t);
+            debug1(DRD, D, "  curr_encl = %s", SymName(curr_encl));
+	    Link(import_list, t);
+	  }
+	  else
+	  { Error(5, 27, "%s symbol name expected here",
+	      WARN, &fpos(t), KW_EXTEND);
+	    Dispose(t);
+	  }
+	}
+	else
+	{ Error(5, 28, "extend symbol %s not in scope", WARN,&fpos(t),string(t));
 	  Dispose(t);
 	}
 	t = LexGetToken();
@@ -434,18 +551,19 @@ OBJECT *token, encl;  unsigned char res_type;
 
 
     if( res_type == LOCAL && !is_string(t, KW_DEF) && !is_string(t, KW_MACRO) )
-    { Error(WARN,&fpos(t),"keyword %s or %s expected here", KW_DEF, KW_MACRO);
+    { Error(5, 29, "keyword %s or %s expected here", WARN, &fpos(t),
+	KW_DEF, KW_MACRO);
       break;
     }
     if( res_type == NPAR && !is_string(t, KW_NAMED) )
-    { Error(WARN, &fpos(t), "keyword %s expected here", KW_NAMED);
+    { Error(5, 30, "keyword %s expected here", WARN, &fpos(t), KW_NAMED);
       break;
     }
 
     if( is_string(t, KW_MACRO) )
     { if( Down(export_list) != export_list )
-	Error(WARN, &fpos(t), "ignoring %s list of %s", KW_EXPORT, KW_MACRO);
-      res = ReadMacro(&t, encl);
+	Error(5, 31, "ignoring export list of macro", WARN, &fpos(t));
+      res = ReadMacro(&t, curr_encl);
     }
     else
     {
@@ -453,14 +571,15 @@ OBJECT *token, encl;  unsigned char res_type;
 
       /* find name of symbol and insert it */
       if( !is_word(type(t)) )
-      { Error(WARN, &fpos(t), "cannot find symbol name");
+      { Error(5, 32, "symbol name expected here", WARN, &fpos(t));
 	debug1(ANY, D, "offending type is %s", Image(type(t)));
 	UnSuppressScope();
 	*token = t;
 	return;
       }
       res = InsertSym(string(t), res_type, &fpos(t), DEFAULT_PREC,
-		FALSE, FALSE, 0, encl, nil);
+		FALSE, FALSE, 0, curr_encl, nil);
+      if( curr_encl != encl )  visible(res) = TRUE;
       t = LexGetToken();
 
       /* find force, if any */
@@ -468,7 +587,7 @@ OBJECT *token, encl;  unsigned char res_type;
       {	force_target(res) = TRUE;
 	Dispose(t);  t = LexGetToken();
 	if( !is_string(t, KW_INTO) )
-	   Error(WARN, &fpos(t), "%s expected after %s", KW_INTO, KW_FORCE);
+	   Error(5, 33, "%s expected here", WARN, &fpos(t), KW_INTO);
       }
 	
       /* find into clause, if any */
@@ -477,13 +596,13 @@ OBJECT *token, encl;  unsigned char res_type;
       { UnSuppressScope();
 	Dispose(t);  t = LexGetToken();
 	if( type(t) != LBR )
-	{ Error(WARN, &fpos(t), "%s expected after %s", KW_LBR, KW_INTO);
+	{ Error(5, 34, "%s expected here", WARN, &fpos(t), KW_LBR);
 	  debug1(ANY, D, "offending type is %s", Image(type(t)));
 	  UnSuppressScope();
 	  *token = t;
 	  return;
 	}
-	res_target = Parse(&t, encl, FALSE, FALSE);
+	res_target = Parse(&t, curr_encl, FALSE, FALSE);
 	SuppressScope();
 	if( t == nil )  t = LexGetToken();
       }
@@ -500,13 +619,13 @@ OBJECT *token, encl;  unsigned char res_type;
 	}
 
 	if( prec < MIN_PREC )
-	{ Error(WARN, &fpos(t), "%s is too low - %d substituted",
-	    KW_PRECEDENCE, MIN_PREC);
+	{ Error(5, 35, "precedence is too low (%d substituted)",
+	    WARN, &fpos(t), MIN_PREC);
 	  prec = MIN_PREC;
 	}
 	else if( prec > MAX_PREC )
-	{ Error(WARN, &fpos(t), "%s is too high - %d substituted",
-	    KW_PRECEDENCE, MAX_PREC);
+	{ Error(5, 36, "precedence is too high (%d substituted)",
+	    WARN, &fpos(t), MAX_PREC);
 	  prec = MAX_PREC;
 	}
 	precedence(res) = prec;
@@ -517,7 +636,7 @@ OBJECT *token, encl;  unsigned char res_type;
       {	Dispose(t);  t = LexGetToken();
 	if( is_string(t, KW_LEFT) )  right_assoc(res) = FALSE;
 	else if( !is_string(t, KW_RIGHT) )
-	  Error(WARN, &fpos(t), "%s replaced by %s", KW_ASSOC, KW_RIGHT);
+	  Error(5, 37, "associativity altered to %s", WARN, &fpos(t), KW_RIGHT);
 	Dispose(t);  t = LexGetToken();
       }
 
@@ -525,7 +644,7 @@ OBJECT *token, encl;  unsigned char res_type;
       if( is_string(t, KW_LEFT) )
       {	Dispose(t);  t = LexGetToken();
 	if( type(t) != WORD )
-	{ Error(WARN, &fpos(t), "cannot find %s parameter name", KW_LEFT);
+	{ Error(5, 38, "cannot find %s parameter name", WARN, &fpos(t), KW_LEFT);
 	  debug1(ANY, D, "offending type is %s", Image(type(t)));
 	  UnSuppressScope();
 	  *token = t;
@@ -546,7 +665,7 @@ OBJECT *token, encl;  unsigned char res_type;
 	SuppressScope();
 	Dispose(t);  t = LexGetToken();
 	if( type(t) != WORD )
-	{ Error(WARN, &fpos(t), "cannot find %s parameter name", KW_RIGHT);
+	{ Error(5, 39, "cannot find %s parameter name", WARN,&fpos(t),KW_RIGHT);
 	  debug1(ANY, D, "offending type is %s", Image(type(t)));
 	  UnSuppressScope();
 	  *token = t;
@@ -573,8 +692,8 @@ OBJECT *token, encl;  unsigned char res_type;
 	t = z;
       }
       else if( type(t) != LBR && type(t) != BEGIN )
-	Error(FATAL, &fpos(t), "opening %s or %s of %s expected",
-	 KW_LBR, KW_BEGIN, SymName(res));
+	Error(5, 40, "opening left brace or @Begin of %s expected",
+	  FATAL, &fpos(t), SymName(res));
       if( type(t) == BEGIN )  actual(t) = res;
       PushScope(res, FALSE, FALSE);
       BodyParAllowed();
@@ -585,13 +704,13 @@ OBJECT *token, encl;  unsigned char res_type;
       {	Child(y, link);
 	z = SearchSym(string(y), StringLength(string(y)));
 	if( z == nil || enclosing(z) != res )
-	  Error(WARN, &fpos(y), "exported symbol %s not defined in %s",
-		string(y), SymName(res));
+	  Error(5, 41, "exported symbol %s is not defined in %s",
+	    WARN, &fpos(y), string(y), SymName(res));
 	else if( has_body(res) && type(z) == RPAR )
-	  Error(WARN, &fpos(y), "body parameter %s may not be exported",
-		string(y));
+	  Error(5, 42, "body parameter %s may not be exported",
+	    WARN, &fpos(y), string(y));
 	else if( visible(z) )
-	  Error(WARN, &fpos(y), "symbol %s exported twice", string(y));
+	  Error(5, 43, "symbol %s exported twice", WARN, &fpos(y), string(y));
 	else visible(z) = TRUE;
       }
       DisposeObject(export_list);
@@ -603,11 +722,11 @@ OBJECT *token, encl;  unsigned char res_type;
     /* pop import scopes and store imports in sym tab */
     for( link=Down(import_list);  link != import_list;  link=NextDown(link) )
       PopScope();
-    if( Down(import_list) == import_list )
-    { Dispose(import_list);
+    if( Down(import_list) == import_list || curr_encl != encl )
+    { DisposeObject(import_list);
       import_list = nil;
     }
-    if( res != nil )  imports(res) = import_list;
+    else imports(res) = import_list;
 
     BodyParAllowed();
     if( t == nil ) t = LexGetToken();

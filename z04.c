@@ -1,7 +1,7 @@
 /*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -97,7 +97,7 @@ unsigned xtype;  BOOLEAN xmark, xjoin;
     case ACAT:	return	(xmark ? xjoin ? KW_ACAT_MJ : AsciiToFull("??")
 			       : xjoin ? KW_ACAT_NJ : AsciiToFull("??") );
 
-    default:	Error(INTERN, no_fpos, "EchoCatOp: xtype = %d", xtype);
+    default:	Error(4, 1, "EchoCatOp: %d", INTERN, no_fpos, xtype);
 		return STR_EMPTY;
 
   } /* end switch */
@@ -140,6 +140,7 @@ OBJECT x;
       break;
 
 
+    case UNEXPECTED_EOF:
     case BEGIN:
     case END:
     case ENV:
@@ -152,6 +153,8 @@ OBJECT x;
     case ONE_ROW:
     case WIDE:
     case HIGH:
+    case HSHIFT:
+    case VSHIFT:
     case HSCALE:
     case VSCALE:
     case SCALE:
@@ -165,10 +168,14 @@ OBJECT x;
     case ROTATE:
     case CASE:
     case YIELD:
+    case BACKEND:
     case XCHAR:
     case FONT:
     case SPACE:
     case BREAK:
+    case COLOUR:
+    case LANGUAGE:
+    case CURR_LANG:
     case NEXT:
     case OPEN:
     case TAGGED:
@@ -183,14 +190,16 @@ OBJECT x;
     case SYS_PREPEND:
     case DATABASE:
     case SYS_DATABASE:
+    case LUSE:
+    case LVIS:
     
-      return SymName(actual(x));
+      return actual(x) != nil ? SymName(actual(x)) : Image(type(x));
       break;
 
 
     default:
     
-      Error(INTERN, &fpos(x), "EchoToken: %s", Image(type(x)));
+      Error(4, 2, "EchoToken: %s", INTERN, &fpos(x), Image(type(x)));
       return STR_EMPTY;
       break;
   }

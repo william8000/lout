@@ -1,7 +1,7 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
-/*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -53,7 +53,7 @@ OBJECT x;
 /*                                                                           */
 /*  DisposeObject(x)                                                         */
 /*                                                                           */
-/*  Dispose object x recrusively, leaving intact any shared descendants.     */
+/*  Dispose object x recursively, leaving intact any shared descendants.     */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -134,7 +134,7 @@ OBJECT x;  FILE_POS *pos;
 
     case GAP_OBJ:
     
-      res = New(type(x));
+      res = New(GAP_OBJ);
       mark(gap(res)) = mark(gap(x));
       join(gap(res)) = join(gap(x));
       if( Down(x) != x )
@@ -156,6 +156,8 @@ OBJECT x;  FILE_POS *pos;
     case ONE_ROW:
     case WIDE:
     case HIGH:
+    case HSHIFT:
+    case VSHIFT:
     case HSCALE:
     case VSCALE:
     case SCALE:
@@ -169,10 +171,14 @@ OBJECT x;  FILE_POS *pos;
     case ROTATE:
     case CASE:
     case YIELD:
+    case BACKEND:
     case XCHAR:
     case FONT:
     case SPACE:
     case BREAK:
+    case COLOUR:
+    case LANGUAGE:
+    case CURR_LANG:
     case NEXT:
     case OPEN:
     case TAGGED:
@@ -188,6 +194,16 @@ OBJECT x;  FILE_POS *pos;
       {	Child(y, link);
 	tmp = CopyObject(y, pos);
 	Link(res, tmp);
+      }
+      break;
+
+
+    case FILTERED:
+
+      res = New(type(x));
+      for( link = Down(x);  link != x;  link = NextDown(link) )
+      {	Child(y, link);
+	Link(res, y);	/* do not copy children of FILTERED */
       }
       break;
 
@@ -211,7 +227,7 @@ OBJECT x;  FILE_POS *pos;
 
     case CLOSURE:
     
-      res = New(type(x));
+      res = New(CLOSURE);
       for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
 	assert( type(y) != CLOSURE, "CopyObject: CLOSURE!" );
@@ -225,7 +241,7 @@ OBJECT x;  FILE_POS *pos;
 
     default:
     
-      Error(INTERN, pos, "CopyObject: %s found", Image(type(x)));
+      Error(7, 1, "CopyObject: %s", INTERN, pos, Image(type(x)));
       break;
 
   } /* end switch */
