@@ -1,6 +1,6 @@
-/*@z31.c:Memory Allocator:zz_free[], GetMemory() etc.@************************/
+/*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,7 +24,7 @@
 /*                                                                           */
 /*  FILE:         z31.c                                                      */
 /*  MODULE:       Memory Allocator                                           */
-/*  EXTERNS:      zz_free[], GetMemory(), DebugMemory()                      */
+/*  EXTERNS:      DebugMemory(), zz_free[], MemInit(), GetMemory()           */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -62,7 +62,7 @@ DebugMemory()
 #endif
 
 
-/*****************************************************************************/
+/*@::zz_free[], zz_lengths[], MemInit()@**************************************/
 /*                                                                           */
 /*  OBJECT         zz_free[], zz_hold, zz_tmp, zz_res                        */
 /*  int            zz_size                                                   */
@@ -81,7 +81,7 @@ unsigned char	zz_lengths[DISPOSED];		/* DISPOSED is 1 + max type */
 OBJECT 		xx_link, xx_tmp, xx_res, xx_hold;
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  MemInit()                                                                */
 /*                                                                           */
@@ -92,6 +92,7 @@ OBJECT 		xx_link, xx_tmp, xx_res, xx_hold;
 MemInit()
 {
   zz_lengths[ WORD        ] = 0;
+  zz_lengths[ QWORD       ] = 0;
   zz_lengths[ LINK        ] = ceiling( sizeof(struct link_type), sizeof(ALIGN));
 
   /* object types, except closure NB have actual() field in token phase! */
@@ -120,6 +121,7 @@ MemInit()
   zz_lengths[ SCALE       ] =
   zz_lengths[ CASE        ] =
   zz_lengths[ YIELD       ] =
+  zz_lengths[ XCHAR       ] =
   zz_lengths[ FONT        ] =
   zz_lengths[ SPACE       ] =
   zz_lengths[ BREAK       ] =
@@ -140,6 +142,8 @@ MemInit()
   zz_lengths[ BEGIN       ] =
   zz_lengths[ END         ] =
   zz_lengths[ USE         ] =
+  zz_lengths[ PREPEND     ] =
+  zz_lengths[ SYS_PREPEND ] =
   zz_lengths[ DATABASE    ] =
   zz_lengths[ SYS_DATABASE] =
   zz_lengths[ GSTUB_NONE  ] =
@@ -187,7 +191,7 @@ MemInit()
 } /* end MemInit() */
 
 
-/*@@**************************************************************************/
+/*@::GetMemory()@*************************************************************/
 /*                                                                           */
 /*  OBJECT GetMemory(siz, pos)                                               */
 /*                                                                           */

@@ -70,11 +70,11 @@ following symbols:
 }
 where @Code "1f" is the current font size.  These symbols have low
 precedence.  The @Code "&" symbol from standard Lout is also available;
-the @Code "s" unit has value 0 and so is not very useful, but one can write
-@Code "&2m" for example for a two em space.  Since the full names are tedious
-to remember, Eq provides a symbol @Code "non" which removes spaces from
-its right parameter; thus @Code "non <=" is equivalent to {@Code "lessequal"},
-for example.  There are also symbols {@Code "rel"}, {@Code "bin"}, and
-{@Code "punct"} for telling Eq to add space to the following symbol as
+the @Code "s" unit has value 0 and so is not very useful, but one can
+write @Code "&2m" for example for a two em space.  The full names are
+tedious to remember, so Eq provides a @Code "non" symbol which removes
+spaces from its right parameter; thus @Code "non <=" is equivalent to
+{@Code "lessequal"}.  There are also {@Code "rel"}, {@Code "bin"}, and
+{@Code "punct"} symbols for telling Eq to add space to the following symbol as
 though it was a relation symbol, binary operator, or punctuation symbol.
 @End @Section

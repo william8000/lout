@@ -26,10 +26,11 @@ The DocumentLayout package provides sections, like this:
 @Code "@BeginSections" and @Code "@EndSections" symbols must
 bracket the sections, and paragraph symbols are needed at the
 beginning of each section but not before or after the whole group.  The
-@Code "@Title" option of @Code "@Section" is made into a numbered heading,
-like those in the present document, preceded by a conditional new page
-symbol (Section {@NumberOf cnp}).  The body of each section is enclosed in
-@Code "@Begin" and {@Code "@End @Section"}, although @Code "{" and @Code "}"
+@OneCol @Code "@Title" option of @OneCol @Code "@Section" is made into
+a numbered heading, like those in the present document, preceded by a
+conditional new page symbol (Section {@NumberOf cnp}).  The body of
+each section is enclosed in @OneCol @Code "@Begin" and
+@OneCol {@Code "@End @Section"}, although @Code "{" and @Code "}"
 are sufficient if preferred.  The former are more long-winded but less
 prone to error.
 @PP

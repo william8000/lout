@@ -10,6 +10,12 @@
 #  simple documents, technical reports, and books.  See "A Beginners' Guide   #
 #  to Lout" for user information.                                             #
 #                                                                             #
+#  Modified by Jeffrey H. Kingston, 22 June 1993, to (a) add an option to     #
+#  turn off running titles; (b) fix a bug which was allowing an odd number    #
+#  of introductory pages to be generated; (c) bring English-language          #
+#  specific parts to the surface so that they can be changed easily; (d)      #
+#  fix a bug with @BeginFigures and @BeginTables.                             #
+#                                                                             #
 ###############################################################################
 
 export
@@ -20,9 +26,9 @@ export
     @Roman @UCRoman @Alpha @UCAlpha @Months @ShortMonths
     @WeekDays @ShortWeekDays
 
-    "--" "---" @Bullet @ParSym @SectSym @Dagger @DaggerDbl @CDot @Sterling
-    @Yen @Florin @Star @Degree @Minute @Second @Multiply @Divide @Lozenge
-    @Register @CopyRight @TradeMark
+    "``" "''" "--" "---" @Bullet @ParSym @SectSym @Dagger @DaggerDbl @CDot
+    @Sterling @Yen @Florin @Star @Degree @Minute @Second @Multiply @Divide
+    @Lozenge @Register @CopyRight @TradeMark
 
     @R @I @B @S @MajorHeading @Heading @MinorHeading "^" "&-" @Date
 
@@ -187,6 +193,7 @@ def @DocumentLayout
 
     named @PageNumbers       {  Yes            } # Want page numbers? Yes or No
     named @FirstPageNumber   {  1              } # Number of first page 
+    named @RunningTitles     {  Yes            } # Want running titles? Yes/No
     named @PageOneTopFormat  right @PageNum { @Null               }
     named @PageOneFootFormat right @PageNum { @Null               }
     named @PageTopFormat     right @PageNum { |0.5rt - @PageNum - }
@@ -194,6 +201,27 @@ def @DocumentLayout
     named @BookTitleFormat   right @Title   { Bold @Font @Title   } 
 
 @Begin
+
+    ###########################################################################
+    #                                                                         #
+    #  Complete list of English-language-specific output in this package.     #
+    #  To translate to another language, change these but also change the     #
+    #  "standard" database in $(LIBDIR)/data/standard.ld (don't forget to     #
+    #  delete standard.li if you change standard.ld).                         #
+    #                                                                         #
+    ###########################################################################
+
+    def @ContentsWord		{ Contents	}
+    def @ReferencesWord		{ References	}
+    def @FigureWord		{ Figure	}
+    def @TableWord		{ Table		}
+    def @AbstractWord		{ ABSTRACT	}
+    def @PrefaceWord		{ Preface	}
+    def @IntroductionWord	{ Introduction	}
+    def @ChapterWord		{ Chapter	}
+    def @AppendixWord		{ Appendix	}
+    def @IndexWord		{ Index		}
+
 
     ###########################################################################
     #                                                                         #
@@ -245,7 +273,7 @@ def @DocumentLayout
 
     @SysDatabase @Roman @UCRoman @Alpha @UCAlpha @Months
 		 @ShortMonths @WeekDays @ShortWeekDays
-    { "standard"  }
+    { standard  }
 
 
     ###########################################################################
@@ -254,27 +282,29 @@ def @DocumentLayout
     #                                                                         #
     ###########################################################################
 
-    def "--"		{ "\261" 			}
-    def "---"		{ "\320" 			}
-    def @Bullet		{ "\267"			}
-    def @ParSym		{ "\266"			}
-    def @SectSym	{ "\247"			}
-    def @Dagger		{ "\262"			}
-    def @DaggerDbl	{ "\263"			}
-    def @CDot		{ "\264"			}
-    def @Sterling	{ "\243"			}
-    def @Yen		{ "\245"			}
-    def @Florin		{ "\246"			}
-    def @Star		{ { Symbol Base } @Font "\052"	}
-    def @Degree		{ { Symbol Base } @Font "\260"	}
-    def @Minute		{ { Symbol Base } @Font "\242"	}
-    def @Second		{ { Symbol Base } @Font "\262"	}
-    def @Multiply	{ { Symbol Base } @Font "\264"	}
-    def @Divide		{ { Symbol Base } @Font "\270"	}
-    def @Lozenge	{ { Symbol Base } @Font "\340"	}
-    def @Register	{ { Symbol Base } @Font "\342"	}
-    def @CopyRight	{ { Symbol Base } @Font "\343"	}
-    def @TradeMark	{ { Symbol Base } @Font "\344"	}
+    def "``"		{ @Char "quotedblleft" 				}
+    def "''"		{ @Char "quotedblright"				}
+    def "--"		{ @Char "endash" 				}
+    def "---"		{ @Char "emdash" 				}
+    def @Bullet		{ @Char "bullet"				}
+    def @ParSym		{ @Char "paragraph"				}
+    def @SectSym	{ @Char "section"				}
+    def @Dagger		{ @Char "dagger"				}
+    def @DaggerDbl	{ @Char "daggerdbl"				}
+    def @CDot		{ @Char "periodcentered"			}
+    def @Sterling	{ @Char "sterling"				}
+    def @Yen		{ @Char "yen"					}
+    def @Florin		{ @Char "florin"				}
+    def @Star		{ { Symbol Base } @Font @Char "asteriskmath"	}
+    def @Degree		{ { Symbol Base } @Font @Char "degree"		}
+    def @Minute		{ { Symbol Base } @Font @Char "minute"		}
+    def @Second		{ { Symbol Base } @Font @Char "second"		}
+    def @Multiply	{ { Symbol Base } @Font @Char "multiply"	}
+    def @Divide		{ { Symbol Base } @Font @Char "divide"		}
+    def @Lozenge	{ { Symbol Base } @Font @Char "lozenge"		}
+    def @Register	{ { Symbol Base } @Font @Char "registersans"	}
+    def @CopyRight	{ { Symbol Base } @Font @Char "copyrightsans"	}
+    def @TradeMark	{ { Symbol Base } @Font @Char "trademarksans"	}
 
 
     ###########################################################################
@@ -315,6 +345,21 @@ def @DocumentLayout
     def reformation   { "ref" &- "or" &- "ma" &- "tion"			}
     def retribution   { "ret" &- "ri" &- "bu" &- "tion"			}
     def table         { "ta" &- "ble"					}
+
+    def Associate     { "As" &- "so" &- "ciate"				}
+    def Associates    { "As" &- "so" &- "ciates"			}
+    def Declination   { "Dec" &- "li" &- "na" &- "tion"			}
+    def Obligatory    { "Oblig" &- "a" &- "tory"			}
+    def Philanthropic { "Phil" &- "an" &- "thropic"			}
+    def Present       { "Present"					}
+    def Presents      { "Presents"					}
+    def Project       { "Project"					}
+    def Projects      { "Projects"					}
+    def Reciprocity   { "Reci" &- "procity"				}
+    def Recognizance  { "Re" &- "cog" &- "ni" &- "zance"		}
+    def Reformation   { "Ref" &- "or" &- "ma" &- "tion"			}
+    def Retribution   { "Ret" &- "ri" &- "bu" &- "tion"			}
+    def Table         { "Ta" &- "ble"					}
 
 
     ###########################################################################
@@ -889,7 +934,7 @@ def @DocumentLayout
 
     ###########################################################################
     #                                                                         #
-    #  Introductory page (with @IntroFullPlace and @IntroColPlace).           #
+    #  Definitions for laying out introductory pages.                         #
     #                                                                         #
     ###########################################################################
 
@@ -915,22 +960,6 @@ def @DocumentLayout
 
 	}
     }
-
-    def @OneIntroPage
-	named @Columns {}
-	named @PageTop {}
-	named @PageFoot {}
-    {
-	@Page {
-	    @PageTop
-	    //@MidGap @TopList
-	    //@MidGap @IntroFullPlace
-	    //@MidGap @IntroColList @Columns
-	    //@MidGap @IndexColList @IndexColumns
-	    // //1rt @OneRow { //@MidGap @FootSect //@MidGap @PageFoot }
-	}
-    }
-
 
     ###########################################################################
     #                                                                         #
@@ -1024,7 +1053,8 @@ def @DocumentLayout
 
     ###########################################################################
     #                                                                         #
-    #  Page list for introductory pages of books.                             #
+    #  Page list for introductory pages of books.  Unlike @OddPageList and    #
+    #  @EvenPageList, this one always generates an even number of pages.      #
     #                                                                         #
     ###########################################################################
 
@@ -1035,18 +1065,32 @@ def @DocumentLayout
 	    @PageMarker @Roman&&@PageNum
 	//  @Runner&&following @Open
 	    {
-		@OneIntroPage
-		    @Columns { @Columns }
-		    @PageTop { @TopOdd @Roman&&@PageNum }
-		    @PageFoot { @FootOdd @Roman&&@PageNum }
+		@Page {
+		    @TopOdd @Roman&&@PageNum
+		    //@MidGap @TopList
+		    //@MidGap @IntroFullPlace
+		    //@MidGap @IntroColList @Columns
+		    //@MidGap @IndexColList @IndexColumns
+		    // //1rt @OneRow
+		    {  //@MidGap @FootSect
+		       //@MidGap @FootOdd @Roman&&@PageNum
+		    }
+		}
 	    }
 	//  @PageMarker @Roman&&{@Next @PageNum}
 	//  @Runner&&following @Open
 	    {
-		@OneIntroPage
-		    @Columns { @Columns }
-		    @PageTop { @TopEven @Roman&&{@Next @PageNum} }
-		    @PageFoot { @FootEven @Roman&&{@Next @PageNum} }
+		@Page {
+		    @TopEven @Roman&&{@Next @PageNum}
+		    //@MidGap @TopList
+		    //@MidGap @IntroFullPlace
+		    //@MidGap @IntroColList @Columns
+		    //@MidGap @IndexColList @IndexColumns
+		    // //1rt @OneRow
+		    {	//@MidGap @FootSect
+			//@MidGap @FootEven @Roman&&{@Next @PageNum}
+		    }
+		}
 	    }
 	//  @IntroOddPageList
 		@Columns { @Columns }
@@ -1094,7 +1138,7 @@ def @DocumentLayout
 	def @ContentsList { @ContentsPlace // @ContentsList }
 
 	@TableOfContents @Case {
-	    {Yes yes} @Yield { @BookTitleFormat Contents // @ContentsList }
+	    {Yes yes} @Yield { @BookTitleFormat @ContentsWord // @ContentsList }
 	    else      @Yield @Null
 	}
     }
@@ -1190,7 +1234,7 @@ def @DocumentLayout
     def @ChapRefPlace { @Galley }
 
     def @ChapRefSection
-	named @Title		{ References }
+	named @Title		{ @ReferencesWord }
 	named style right tag	{ tag. }
 	named indent		{ @DispIndent }
 	named gap		{ @DispGap }
@@ -1245,7 +1289,7 @@ def @DocumentLayout
 
     def @ReferenceSection
 	named @Tag		{}
-	named @Title		{ References }
+	named @Title		{ @ReferencesWord }
 	named @RunningTitle	{ dft }
 	named style right tag	{ tag. }
 	named headstyle right @Title { @Heading @Title }
@@ -1269,7 +1313,13 @@ def @DocumentLayout
 	//@DispGap  @RefList start
 	//  @Runner
 		@TopEven { @B @PageNum }
-		@TopOdd  { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+		@TopOdd  {
+		  @RunningTitles @Case {
+		    { Yes yes } @Yield @I {@RunningTitle @OrElse @Title}
+		    else        @Yield {}
+		  }
+		  |1rt @B @PageNum
+		}
     }
 
 
@@ -1311,7 +1361,7 @@ def @DocumentLayout
 	    ||0.5rt
 	    @NumberMarker&&preceding @Tagged @Tag
 	    @PageMarker&&preceding @Tagged @Tag
-	    @B { Figure {@NumberOf @Tag}. }  @Caption
+	    @B { @FigureWord {@NumberOf @Tag}. }  @Caption
 	}
     }
 
@@ -1354,7 +1404,7 @@ def @DocumentLayout
 	    ||0.5rt
 	    @NumberMarker&&preceding @Tagged @Tag
 	    @PageMarker&&preceding @Tagged @Tag
-	    @B { Table {@NumberOf @Tag}. }  @Caption
+	    @B { @TableWord {@NumberOf @Tag}. }  @Caption
 	}
     }
 
@@ -1468,7 +1518,7 @@ def @DocumentLayout
 
     export @FootNote
     def @Abstract into { @AbstractPlace&&preceding }
-	named @Title { ABSTRACT }
+	named @Title { @AbstractWord }
 	body x
     {  
 	def @FootNote right x { @FullFootNote x }
@@ -1489,13 +1539,13 @@ def @DocumentLayout
     export @FootNote @BeginFigures @BeginTables
     def @Preface force into { @PrefacePlace&&preceding }
 	named @Tag {}
-	named @Title { Preface }
+	named @Title { @PrefaceWord }
 	named @RunningTitle { dft }
 	body @Body
     {
 	def @FootNote right x { @ColFootNote x }
-	macro @BeginFigures { // @FigureGalley {} // }
-	macro @BeginTables  { // @TableGalley  {} // }
+	macro @BeginFigures { @FigureGalley {} }
+	macro @BeginTables  { @TableGalley  {} }
 
 	    ragged @Break @BookTitleFormat @Title
 	//  @PageMarker&&preceding @Tagged @Tag
@@ -1515,13 +1565,13 @@ def @DocumentLayout
     export @FootNote @BeginFigures @BeginTables
     def @Introduction force into { @IntroductionPlace&&preceding }
 	named @Tag {}
-	named @Title { Introduction }
+	named @Title { @IntroductionWord }
 	named @RunningTitle { dft }
 	body @Body
     {
 	def @FootNote right x { @ColFootNote x }
-	macro @BeginFigures { // @FigureGalley {} // }
-	macro @BeginTables  { // @TableGalley  {} // }
+	macro @BeginFigures { @FigureGalley {} }
+	macro @BeginTables  { @TableGalley  {} }
 
 	    ragged @Break @BookTitleFormat @Title
 	//  @Runner
@@ -1533,7 +1583,13 @@ def @DocumentLayout
 	//@SectionGap	@ChapRefSection
 	//  @Runner
 		@TopEven { @B @PageNum }
-		@TopOdd { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+		@TopOdd  {
+		  @RunningTitles @Case {
+		    { Yes yes } @Yield @I {@RunningTitle @OrElse @Title}
+		    else        @Yield {}
+		  }
+		  |1rt @B @PageNum
+		}
     }
 
 
@@ -1552,8 +1608,8 @@ def @DocumentLayout
 	body @Body
     {
 	def @FootNote right x { @ColFootNote x }
-	macro @BeginFigures { // @FigureGalley {@NumberOf @Tag}. // }
-	macro @BeginTables  { // @TableGalley  {@NumberOf @Tag}. // }
+	macro @BeginFigures { @FigureGalley {@NumberOf @Tag}. }
+	macro @BeginTables  { @TableGalley  {@NumberOf @Tag}. }
 
 	def @EndSectionsPlace { @Galley }
 	def @EndSections force into { @EndSectionsPlace&&preceding } {}
@@ -1599,7 +1655,7 @@ def @DocumentLayout
 		//  @NumberMarker&&preceding    @Tagged @Tag
 		//  @PageMarker&&preceding      @Tagged @Tag
 		//  {&5f @SubSectionTitle} @ContentsEntry {@PageOf @Tag}
-		//0io @Body
+		//  @Body
 	    }
 
 	    def @SectionTitle
@@ -1620,14 +1676,14 @@ def @DocumentLayout
 	    //  @NumberMarker&&preceding @Tagged @Tag
 	    //  @PageMarker&&preceding   @Tagged @Tag
 	    //  { &3f @SectionTitle } @ContentsEntry {@PageOf @Tag}
-	    //0io @Body
+	    //  @Body
 
 	}
 
 	def @ChapterTitle
 	{
 	    @ChapterNumbers @Case {
-		{Yes yes} @Yield { Chapter {@NumberOf @Tag}.  |2s  @Title }
+		{Yes yes} @Yield { @ChapterWord {@NumberOf @Tag}.  |2s  @Title }
 		else      @Yield @Title
 	    }
 	}
@@ -1635,7 +1691,7 @@ def @DocumentLayout
 	def @ChapterNum
 	{
 	    @ChapterNumbers @Case {
-		{Yes yes} @Yield { Chapter {@NumberOf @Tag} }
+		{Yes yes} @Yield { @ChapterWord {@NumberOf @Tag} }
 		else      @Yield @Null
 	    }
 	}
@@ -1655,7 +1711,13 @@ def @DocumentLayout
 	//@SectionGap @ChapRefSection
 	//  @Runner
 		@TopEven { @B @PageNum |1rt @I @ChapterNum }
-		@TopOdd  { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+		@TopOdd  {
+		  @RunningTitles @Case {
+		    { Yes yes } @Yield @I {@RunningTitle @OrElse @Title}
+		    else        @Yield {}
+		  }
+		  |1rt @B @PageNum
+		}
     }
 
 
@@ -1674,8 +1736,8 @@ def @DocumentLayout
 	body @Body
     {
 	def @FootNote right x { @ColFootNote x }
-	macro @BeginFigures { // @FigureGalley {@NumberOf @Tag}. // }
-	macro @BeginTables  { // @TableGalley  {@NumberOf @Tag}. // }
+	macro @BeginFigures { @FigureGalley {@NumberOf @Tag}. }
+	macro @BeginTables  { @TableGalley  {@NumberOf @Tag}. }
 
 	def @EndSubSectsPlace { @Galley }
 	def @EndSubSections force into { @EndSubSectsPlace&&preceding }  {}
@@ -1705,7 +1767,7 @@ def @DocumentLayout
 	    //	@SectionList&&preceding    @Tagged @Tag
 	    //	@NumberMarker&&preceding   @Tagged @Tag
 	    //	@PageMarker&&preceding     @Tagged @Tag
-	    //0io @Body
+	    //  @Body
 	}
 
 	def @SectionTitle
@@ -1723,7 +1785,7 @@ def @DocumentLayout
 	//  @SectionList&&preceding  @Tagged @Tag
 	//  @NumberMarker&&preceding @Tagged @Tag
 	//  @PageMarker&&preceding   @Tagged @Tag
-	//0io @Body
+	//  @Body
     }
 
 
@@ -1742,8 +1804,8 @@ def @DocumentLayout
 	body  @Body
     {
 	def @FootNote right x { @ColFootNote x }
-	macro @BeginFigures { // @FigureGalley {@NumberOf @Tag}. // }
-	macro @BeginTables  { // @TableGalley  {@NumberOf @Tag}. // }
+	macro @BeginFigures { @FigureGalley {@NumberOf @Tag}. }
+	macro @BeginTables  { @TableGalley  {@NumberOf @Tag}. }
 
 	def @EndSubAppendicesPlace { @Galley }
 	def @EndSubAppendices force into {@EndSubAppendicesPlace&&preceding} {}
@@ -1774,14 +1836,14 @@ def @DocumentLayout
 	    //	@NumberMarker&&preceding   @Tagged @Tag
 	    //	@PageMarker&&preceding     @Tagged @Tag
 	    //	@SubAppendixTitle @ContentsEntry {@PageOf @Tag}
-	    //0io @Body
+	    //  @Body
 	}
 
 	def @AppendixTitle
 	{
 	    @AppendixNumbers @Case {
-		{Yes yes} @Yield { Appendix {@NumberOf @Tag}.  |2s  @Title }
-		else      @Yield { Appendix.  @Title }
+		{Yes yes} @Yield { @AppendixWord {@NumberOf @Tag}. |2s @Title }
+		else      @Yield { @AppendixWord.  @Title }
 	    }
 	}
 
@@ -1807,8 +1869,14 @@ def @DocumentLayout
 	//  @Body
 	//@SectionGap @ChapRefSection
 	//  @Runner
-		@TopEven { @B @PageNum |1rt @I { Appendix @AppendixNum } }
-		@TopOdd  { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+		@TopEven { @B @PageNum |1rt @I { @AppendixWord @AppendixNum } }
+		@TopOdd  {
+		  @RunningTitles @Case {
+		    { Yes yes } @Yield @I {@RunningTitle @OrElse @Title}
+		    else        @Yield {}
+		  }
+		  |1rt @B @PageNum
+		}
     }
 
 
@@ -1822,7 +1890,7 @@ def @DocumentLayout
 
     def @IndexSection
 	named @Tag {}
-	named @Title { Index }
+	named @Title { @IndexWord }
 	named @RunningTitle { dft }
 	named headstyle right @Title { @Heading @Title //@DispGap }
     {
@@ -1831,7 +1899,13 @@ def @DocumentLayout
 	{ // @IndexList
 	  // @Runner
 		@TopEven { @B @PageNum }
-		@TopOdd  { @I {@RunningTitle @OrElse @Title} |1rt @B @PageNum }
+		@TopOdd  {
+		  @RunningTitles @Case {
+		    { Yes yes } @Yield @I {@RunningTitle @OrElse @Title}
+		    else        @Yield {}
+		  }
+		  |1rt @B @PageNum
+		}
 	}
 
         def indexsection

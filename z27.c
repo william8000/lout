@@ -1,6 +1,6 @@
-/*@z27.c:Debug Service:DebugInit(), Debug()@**********************************/
+/*@z27.c:Debug Service:Debug flags@*******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -31,51 +31,52 @@
 #include "externs"
 
 #if DEBUG_ON
-
 struct dbs  dbg[] = {
-    (unsigned char *) "zz",    0, 0, 0,		/* - unused -                */
-    (unsigned char *) "sp",    0, 0, 0,		/* Supervise                 */
-    (unsigned char *) "la",    0, 0, 0,		/* Lexical Analyser          */
-    (unsigned char *) "fs",    0, 0, 0,		/* File Service              */
-    (unsigned char *) "ts",    0, 0, 0,		/* Token Service             */
-    (unsigned char *) "rd",    0, 0, 0,		/* Read Definitions          */
-    (unsigned char *) "op",    0, 0, 0,		/* Object Parser             */
-    (unsigned char *) "os",    0, 0, 0,		/* Object Service            */
-    (unsigned char *) "om",    0, 0, 0,		/* Object Manifest           */
-    (unsigned char *) "ce",    0, 0, 0,		/* Closure Expansion         */
-    (unsigned char *) "cr",    0, 0, 0,		/* Cross References          */
-    (unsigned char *) "ss",    0, 0, 0,		/* Style Service             */
-    (unsigned char *) "sf",    0, 0, 0,		/* Size Finder               */
-    (unsigned char *) "ob",    0, 0, 0,		/* Object Breaking           */
-    (unsigned char *) "of",    0, 0, 0,		/* Object Filling            */
-    (unsigned char *) "sc",    0, 0, 0,		/* Size Constraints          */
-    (unsigned char *) "sa",    0, 0, 0,		/* Size Adjustments          */
-    (unsigned char *) "gw",    0, 0, 0,		/* Gap Widths                */
-    (unsigned char *) "gt",    0, 0, 0,		/* Galley Transfer           */
-    (unsigned char *) "ga",    0, 0, 0,		/* Galley Attaching          */
-    (unsigned char *) "gf",    0, 0, 0,		/* Galley Flusher            */
-    (unsigned char *) "gm",    0, 0, 0,		/* Galley Maker              */
-    (unsigned char *) "gs",    0, 0, 0,		/* Galley Service            */
-    (unsigned char *) "gp",    0, 0, 0,		/* Galley Printer            */
-    (unsigned char *) "ft",    0, 0, 0,		/* Font Tables               */
-    (unsigned char *) "oe",    0, 0, 0,		/* Object Echo               */
-    (unsigned char *) "es",    0, 0, 0,		/* Echo Service              */
-    (unsigned char *) "zz",    0, 0, 0,		/* Debug Service (unused)    */
-    (unsigned char *) "yy",    0, 0, 0,		/* Error Service             */
-    (unsigned char *) "st",    0, 0, 0,		/* Symbol Table              */
-    (unsigned char *) "su",    0, 0, 0,		/* Symbol Uses               */
-    (unsigned char *) "ma",    0, 0, 0,		/* Memory Allocator          */
-    (unsigned char *) "cs",    0, 0, 0,		/* Counter Service           */
-    (unsigned char *) "bs",    0, 0, 0,		/* Database Service          */
-    (unsigned char *) "rs",    0, 0, 0,		/* Rotation Service          */
-    (unsigned char *) "tk",    0, 0, 0,		/* Time Keeper               */
-    (unsigned char *) "hy",    0, 0, 0,		/* Hyphenation               */
-    (unsigned char *) "pp",    0, 0, 0,		/* Profiling                 */
-    (unsigned char *) "",      0, 0, 0,		/* any                       */
+    "zz",    0, 0, 0,		/* - unused -                */
+    "sp",    0, 0, 0,		/* Supervise                 */
+    "la",    0, 0, 0,		/* Lexical Analyser          */
+    "fs",    0, 0, 0,		/* File Service              */
+    "ts",    0, 0, 0,		/* Token Service             */
+    "rd",    0, 0, 0,		/* Read Definitions          */
+    "op",    0, 0, 0,		/* Object Parser             */
+    "os",    0, 0, 0,		/* Object Service            */
+    "om",    0, 0, 0,		/* Object Manifest           */
+    "ce",    0, 0, 0,		/* Closure Expansion         */
+    "cr",    0, 0, 0,		/* Cross References          */
+    "ss",    0, 0, 0,		/* Style Service             */
+    "sf",    0, 0, 0,		/* Size Finder               */
+    "ob",    0, 0, 0,		/* Object Breaking           */
+    "of",    0, 0, 0,		/* Object Filling            */
+    "sc",    0, 0, 0,		/* Size Constraints          */
+    "sa",    0, 0, 0,		/* Size Adjustments          */
+    "gw",    0, 0, 0,		/* Gap Widths                */
+    "gt",    0, 0, 0,		/* Galley Transfer           */
+    "ga",    0, 0, 0,		/* Galley Attaching          */
+    "gf",    0, 0, 0,		/* Galley Flusher            */
+    "gm",    0, 0, 0,		/* Galley Maker              */
+    "gs",    0, 0, 0,		/* Galley Service            */
+    "gp",    0, 0, 0,		/* Galley Printer            */
+    "ps",    0, 0, 0,		/* Print Service             */
+    "oe",    0, 0, 0,		/* Object Echo               */
+    "es",    0, 0, 0,		/* Echo Service              */
+    "zz",    0, 0, 0,		/* Debug Service (unused)    */
+    "yy",    0, 0, 0,		/* Error Service             */
+    "st",    0, 0, 0,		/* Symbol Table              */
+    "su",    0, 0, 0,		/* Symbol Uses               */
+    "ma",    0, 0, 0,		/* Memory Allocator          */
+    "cs",    0, 0, 0,		/* Counter Service           */
+    "bs",    0, 0, 0,		/* Database Service          */
+    "rs",    0, 0, 0,		/* Rotation Service          */
+    "tk",    0, 0, 0,		/* Time Keeper               */
+    "hy",    0, 0, 0,		/* Hyphenation               */
+    "ft",    0, 0, 0,		/* Font Tables               */
+    "ev",    0, 0, 0,		/* Encoding Vextors          */
+    "sh",    0, 0, 0,		/* String Handler            */
+    "pp",    0, 0, 0,		/* Profiling                 */
+    "",      0, 0, 0,		/* any                       */
 };
 
-
-/*****************************************************************************/
+/*@::DebugInit(), Debug()@****************************************************/
 /*                                                                           */
 /*  DebugInit(str)                                                           */
 /*                                                                           */
@@ -84,19 +85,19 @@ struct dbs  dbg[] = {
 /*****************************************************************************/
 
 DebugInit(str)
-unsigned char *str;
+FULL_CHAR *str;
 { int j, urg;
-  for( urg = 0;  urg < 2 && str[urg+2] == 'd';  urg++ );
+  for( urg = 0;  urg < 2 && str[urg+2] == CH_FLAG_DEBUG;  urg++ );
   for( j = 1;  ;  j++ )
-  { if( strcmp(dbg[j].flag, &str[urg+2]) == 0 )  break;
-    if( strcmp(dbg[j].flag, ""         ) == 0 )
+  { if( StringEqual(AsciiToFull(dbg[j].flag), &str[urg+2]) )  break;
+    if( StringEqual(AsciiToFull(dbg[j].flag), STR_EMPTY) )
       Error(FATAL, no_fpos, "unknown debug flag %s", str);
   }
   for( ;  urg >= 0;  urg-- )  dbg[j].on[urg] = dbg[ANY].on[urg] = TRUE;
 } /* end DebugInit */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  Debug(category, urgency, str, p1, p2, p3, p4, p5, p6, p7, p8)            */
 /*                                                                           */
@@ -107,7 +108,7 @@ unsigned char *str;
 
 /*VARARGS3*/
 Debug(category, urgency, str, p1, p2, p3, p4, p5, p6, p7, p8)
-int category, urgency;  unsigned char *str;  int p1, p2, p3, p4, p5, p6, p7, p8;
+int category, urgency;  char *str;  int p1, p2, p3, p4, p5, p6, p7, p8;
 { static BOOLEAN first_message = TRUE;
   if( first_message )
   { fprintf(stderr, "\nLout Debug Output:\n");
@@ -120,11 +121,18 @@ int category, urgency;  unsigned char *str;  int p1, p2, p3, p4, p5, p6, p7, p8;
 } /* end Debug */
 
 
+/*@::ProfileOn(), ProfileOff(), ProfilePrint()@*******************************/
+/*                                                                           */
+/*  ProfileOn(str)                                                           */
+/*                                                                           */
+/*  Start profiling label str.                                               */
+/*                                                                           */
+/*****************************************************************************/
 #define MAXPROF	20
 #include <time.h>
 
 struct profrec
-{ unsigned char *label;			/* label of the profile              */
+{ char *label;			/* label of the profile              */
   int calls;			/* number of calls with this label   */
   long time;			/* total time of this label          */
 };
@@ -133,16 +141,8 @@ static struct profrec profstack[MAXPROF];
 static struct profrec profstore[MAXPROF];
 static int proftop = 0, profsize = 0;
 
-/*****************************************************************************/
-/*                                                                           */
-/*  ProfileOn(str)                                                           */
-/*                                                                           */
-/*  Start profiling label str.                                               */
-/*                                                                           */
-/*****************************************************************************/
-
 ProfileOn(str)
-unsigned char *str;
+char *str;
 { int i;  long raw_time;
   for( i = 0;  i < proftop;  i++ )
   { if( strcmp(profstack[i].label, str) == 0 )
@@ -152,10 +152,8 @@ unsigned char *str;
     }
   }
   if( proftop == MAXPROF )  Error(INTERN, no_fpos, "ProfileOn: overflow");
-  time(&raw_time);
-  profstack[proftop].label = str;
-  profstack[proftop].time  = raw_time;
-  proftop++;
+  time(&raw_time);  profstack[proftop].label = str;
+  profstack[proftop++].time  = raw_time;
 } /* end ProfileOn */
 
 
@@ -168,22 +166,19 @@ unsigned char *str;
 /*****************************************************************************/
 
 ProfileOff(str)
-unsigned char *str;
+char *str;
 { int i;  long raw_time;
   if( proftop == 0 || strcmp(profstack[proftop-1].label, str) != 0 )
     Error(INTERN, no_fpos, "ProfileOff: %s is not the current label", str);
   for( i = 0;  i < profsize && strcmp(profstore[i].label, str) != 0; i++ );
   if( i >= profsize )
-  { if( profsize == MAXPROF )  Error(INTERN, no_fpos, "ProfileOff: overflow");
-    profsize++;
+  { if( profsize++ == MAXPROF )  Error(INTERN, no_fpos, "ProfileOff: overflow");
     profstore[i].label = str;
     profstore[i].calls = 0;
     profstore[i].time  = 0;
   }
-  time(&raw_time);
-  profstore[i].calls += 1;
-  profstore[i].time  += (raw_time - profstack[proftop-1].time);
-  proftop--;
+  time(&raw_time);  profstore[i].calls += 1;
+  profstore[i].time  += (raw_time - profstack[--proftop].time);
 } /* end ProfileOff */
 
 

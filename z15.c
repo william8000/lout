@@ -1,6 +1,6 @@
-/*@z15.c:Size Constraints:EchoConstraint(), Constrained()@********************/
+/*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,7 +24,10 @@
 /*                                                                           */
 /*  FILE:         z15.c                                                      */
 /*  MODULE:       Size Constraints                                           */
-/*  EXTERNS:      EchoConstraint(), Constrained(), DebugConstrained()        */
+/*  EXTERNS:      MinConstraint(), EnlargeToConstraint(),                    */
+/*                ReflectConstraint(), SemiRotateConstraint(),               */
+/*                RotateConstraint(), InvScaleConstraint(), Constrained(),   */
+/*                EchoConstraint(), DebugConstrained()                       */
 /*                                                                           */
 /*****************************************************************************/
 #include <math.h>
@@ -66,6 +69,27 @@ LENGTH *b, *f;  CONSTRAINT *c;
 } /* end EnlargeToConstraint */
 
 
+/*@::InvScaleConstraint(), ReflectConstraint(), etc.@*************************/
+/*                                                                           */
+/*  InvScaleConstraint(yc, sf, xc)                                           */
+/*                                                                           */
+/*  Scale constraint xc to the inverse of the scale factor sf.               */
+/*                                                                           */
+/*****************************************************************************/
+
+InvScaleConstraint(yc, sf, xc)
+CONSTRAINT *yc;  LENGTH sf;  CONSTRAINT *xc;
+{ char buff[10];
+  ifdebug(DSC, D, sprintf(buff, "%.3f", (float) sf / SF));
+  debug2(DSC, D, "InvScaleConstraint(yc, %s, %s)", buff, EchoConstraint(xc));
+  assert( sf > 0, "InvScaleConstraint: sf <= 0!" );
+  bc(*yc)  = bc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, bc(*xc)  * SF / sf);
+  bfc(*yc) = bfc(*xc) == MAX_LEN ? MAX_LEN : min(MAX_LEN, bfc(*xc) * SF / sf);
+  fc(*yc)  = fc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, fc(*xc)  * SF / sf);
+  debug1(DSC, D, "InvScaleConstraint returning %s", EchoConstraint(yc));
+} /* end InvScaleConstraint */
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  ReflectConstraint(xc, yc)                                                */
@@ -77,7 +101,7 @@ LENGTH *b, *f;  CONSTRAINT *c;
 #define ReflectConstraint(xc, yc)  SetConstraint(xc, fc(yc), bfc(yc), bc(yc))
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  static SemiRotateConstraint(xc, u, v, angle, yc)                         */
 /*                                                                           */
@@ -87,7 +111,7 @@ LENGTH *b, *f;  CONSTRAINT *c;
 
 static SemiRotateConstraint(xc, u, v, angle, yc)
 CONSTRAINT *xc;  LENGTH u, v;  float angle; CONSTRAINT *yc;
-{ float cs, sn;  unsigned char buff[20];
+{ float cs, sn;  char buff[20];
   ifdebug(DSC, D, sprintf(buff, "%.1f", angle * 360.0 / (2 * M_PI)));
   debug4(DSC, D, "SemiRotateConstraint(xc, %s, %s, %sd, %s",
     EchoLength(u), EchoLength(v), buff, EchoConstraint(yc));
@@ -103,7 +127,7 @@ CONSTRAINT *xc;  LENGTH u, v;  float angle; CONSTRAINT *yc;
 } /* end SemiRotateConstraint */
 
 
-/*@@**************************************************************************/
+/*@::RotateConstraint()@******************************************************/
 /*                                                                           */
 /*  RotateConstraint(c, y, angle, hc, vc, dim)                               */
 /*                                                                           */
@@ -119,7 +143,7 @@ CONSTRAINT *xc;  LENGTH u, v;  float angle; CONSTRAINT *yc;
 RotateConstraint(c, y, angle, hc, vc, dim)
 CONSTRAINT *c;  OBJECT y;  LENGTH angle;  CONSTRAINT *hc, *vc;  int dim;
 { CONSTRAINT c1, c2, c3, dc;  float theta, psi;
-  unsigned char buff[20];
+  char buff[20];
   ifdebug(DSC, D, sprintf(buff, "%.1f", (float) angle / DG ));
   debug4(DSC, D, "RotateConstraint(c, y, %sd, %s, %s, %s)",
 	buff, EchoConstraint(hc), EchoConstraint(vc), dimen(dim));
@@ -130,7 +154,7 @@ CONSTRAINT *c;  OBJECT y;  LENGTH angle;  CONSTRAINT *hc, *vc;  int dim;
   while( theta >= 2 * M_PI ) theta -= 2 * M_PI;
   assert( 0 <= theta && theta <= 2 * M_PI, "RotateConstraint: theta!" );
 
-  /* determine theta, c1, and c2 depending on which quadrant we're in */
+  /* determine theta, c1, and c2 depending on which quadrant we are in */
   if( theta <= M_PI / 2.0 )   /* first quadrant */
   { theta = theta;
     CopyConstraint(c1, *hc);
@@ -171,28 +195,7 @@ CONSTRAINT *c;  OBJECT y;  LENGTH angle;  CONSTRAINT *hc, *vc;  int dim;
 } /* end RotateConstraint */
 
 
-/*****************************************************************************/
-/*                                                                           */
-/*  InvScaleConstraint(yc, sf, xc)                                           */
-/*                                                                           */
-/*  Scale constraint xc to the inverse of the scale factor sf.               */
-/*                                                                           */
-/*****************************************************************************/
-
-InvScaleConstraint(yc, sf, xc)
-CONSTRAINT *yc;  LENGTH sf;  CONSTRAINT *xc;
-{ unsigned char buff[10];
-  ifdebug(DSC, D, sprintf(buff, "%.3f", (float) sf / SF));
-  debug2(DSC, D, "InvScaleConstraint(yc, %s, %s)", buff, EchoConstraint(xc));
-  assert( sf > 0, "InvScaleConstraint: sf <= 0!" );
-  bc(*yc)  = bc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, bc(*xc)  * SF / sf);
-  bfc(*yc) = bfc(*xc) == MAX_LEN ? MAX_LEN : min(MAX_LEN, bfc(*xc) * SF / sf);
-  fc(*yc)  = fc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, fc(*xc)  * SF / sf);
-  debug1(DSC, D, "InvScaleConstraint returning %s", EchoConstraint(yc));
-} /* end InvScaleConstraint */
-
-
-/*@@**************************************************************************/
+/*@::CatConstrained()@********************************************************/
 /*                                                                           */
 /*  static CatConstrained(x, xc, ratm, y, dim)                               */
 /*                                                                           */
@@ -219,7 +222,7 @@ CONSTRAINT *yc;  LENGTH sf;  CONSTRAINT *xc;
 
 static CatConstrained(x, xc, ratm, y, dim)
 OBJECT x;  CONSTRAINT *xc; BOOLEAN ratm;  OBJECT y;  int dim;
-{ int side;			/* x's side of add-set y: BACK, ON or FWD    */
+{ int side;			/* the size of y that x is on: BACK, ON, FWD */
   CONSTRAINT yc;		/* constraints on y                          */
   LENGTH backy, fwdy;		/* back(y), fwd(y) would be if x was (0, 0)  */
   LENGTH be, fe;		/* amount back(x), fwd(x) can be for free    */
@@ -232,10 +235,8 @@ OBJECT x;  CONSTRAINT *xc; BOOLEAN ratm;  OBJECT y;  int dim;
   Constrained(y, &yc, dim);
   if( constrained(yc) )
   {
-    /* find x's link, and its neighbours and their links */
+    /* find the link of x, and its neighbours and their links */
     link = UpDim(x, dim);
-
-    /* find neighbouring definite objects, if any */
     SetNeighbours(link, ratm, &pg, &prec_def, &sg, &sd, &side);
 
     /* amount of space available at x without changing the size of y */
@@ -347,7 +348,7 @@ OBJECT x;  CONSTRAINT *xc; BOOLEAN ratm;  OBJECT y;  int dim;
 } /* end CatConstrained */
 
 
-/*@@**************************************************************************/
+/*@::Constrained()@***********************************************************/
 /*                                                                           */
 /*  Constrained(x, xc, dim)                                                  */
 /*                                                                           */
@@ -357,27 +358,23 @@ OBJECT x;  CONSTRAINT *xc; BOOLEAN ratm;  OBJECT y;  int dim;
 
 Constrained(x, xc, dim)
 OBJECT x;  CONSTRAINT *xc;  int dim;
-{ OBJECT y, link, lp, rp, z, tlink, g;
-  CONSTRAINT yc, hc, vc;
-  BOOLEAN ratm;
-  LENGTH xback, xfwd;
-  int tb, tf, tbf, tbc, tfc;
-  debug2(DSC, DD, "[ Constrained( %s, xc, %s )", EchoObject(null,x),dimen(dim));
+{ OBJECT y, link, lp, rp, z, tlink, g;  CONSTRAINT yc, hc, vc;
+  BOOLEAN ratm;  LENGTH xback, xfwd;  int tb, tf, tbf, tbc, tfc;
+  debug2(DSC, DD, "[ Constrained( %s, xc, %s )", EchoObject(x), dimen(dim));
   assert( Up(x) != x, "Constrained: x has no parent!" );
 
-  /* find x's parent, y */
+  /* find y, the parent of x */
   link = UpDim(x, dim);  ratm = FALSE;
   for( tlink = NextDown(link);  type(tlink) == LINK;  tlink = NextDown(tlink) )
   { Child(g, tlink);
     if( type(g) == GAP_OBJ && mark(gap(g)) )  ratm = TRUE;
   }
   y = tlink;
-  debug1(DSC, DDD, "x's parent y = %s", Image(type(y)));
-  ifdebug(DSC, DDD, EchoObject(stderr, y));
+  debug1(DSC, DDD, "parent y = %s", Image(type(y)));
+  ifdebug(DSC, DDD, DebugObject(y));
 
   switch( type(y) )
   {
-
     case GRAPHIC:
     case ONE_COL:
     case ONE_ROW:
@@ -397,9 +394,8 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
     case VSCALE:
     case HSCALE:
     
-      if( (dim == COL) == (type(y) == HSCALE) )
-	SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
-      else Constrained(y, xc, dim);
+      if( (dim == COL) != (type(y) == HSCALE) )  Constrained(y, xc, dim);
+      else SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
       break;
 
 
@@ -413,8 +409,7 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
 
     case ROTATE:
     
-      Constrained(y, &hc, COL);
-      Constrained(y, &vc, ROW);
+      Constrained(y, &hc, COL);  Constrained(y, &vc, ROW);
       RotateConstraint(xc, x, sparec(constraint(y)), &hc, &vc, dim);
       break;
 
@@ -423,8 +418,7 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
     case HIGH:
     
       Constrained(y, xc, dim);
-      if( (type(y)==WIDE) == (dim==COL) )
-        MinConstraint(xc, &constraint(y));
+      if( (type(y)==WIDE) == (dim==COL) )  MinConstraint(xc, &constraint(y));
       break;
 
 
@@ -434,7 +428,7 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
       else
       {	CopyConstraint(yc, constraint(y));
 	debug1(DSC, DD, "  head: %s; val is:", EchoConstraint(&yc));
-	ifdebug(DSC, DD, EchoObject(stderr, y));
+	ifdebug(DSC, DD, DebugObject(y));
 	goto REST_OF_HEAD;   /* a few lines down */
       }
       break;
@@ -492,8 +486,7 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
 	  for(link = NextDown(lp); link != rp;  link = NextDown(link) )
 	  { Child(z, link);
 	    if( type(z) == GAP_OBJ || is_index(type(z)) )  continue;
-	    xback = max(xback, back(z, dim));
-	    xfwd  = max(xfwd,  fwd(z, dim));
+	    xback = max(xback, back(z, dim));  xfwd = max(xfwd, fwd(z, dim));
 	  }
 	  debug2(DSC, DD, "  lp != rp; xback,xfwd = %s,%s",
 			EchoLength(xback), EchoLength(xfwd));
@@ -506,29 +499,25 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
       break;
 
 
-    default:
-    
-      Error(INTERN, &fpos(y), "Constrained: %s", Image(type(y)) );
-      break;
-
+    default:  Error(INTERN, &fpos(y), "Constrained: %s", Image(type(y)) );
+	      break;
   }
-
   debug1(DSC, DD, "] Constrained returning %s", EchoConstraint(xc));
 } /* end Constrained */
 
 
-/*@@**************************************************************************/
+/*@::EchoConstraint(), DebugConstrained()@************************************/
 /*                                                                           */
-/*  unsigned char *EchoConstraint(c)                                         */
+/*  FULL_CHAR *EchoConstraint(c)                                             */
 /*                                                                           */
 /*  Returns a string showing constraint *c, in centimetres.                  */
 /*                                                                           */
 /*****************************************************************************/
 #if DEBUG_ON
 
-unsigned char *EchoConstraint(c)
+FULL_CHAR *EchoConstraint(c)
 CONSTRAINT *c;
-{ static unsigned char str[2][40];
+{ static char str[2][40];
   static int i = 0;
   i = (i+1) % 2;
   sprintf(str[i], "<");
@@ -538,7 +527,7 @@ CONSTRAINT *c;
   else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bfc(*c)/CM);
   if( fc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF>");
   else sprintf(&str[i][strlen(str[i])], "%.3fc>", (float) fc(*c)/CM);
-  return str[i];
+  return AsciiToFull(str[i]);
 } /* end EchoConstraint */
 
 
@@ -547,7 +536,7 @@ CONSTRAINT *c;
 /*  DebugConstrained(x)                                                      */
 /*                                                                           */
 /*  Calculate and print the constraints of all closures lying within         */
-/*  object x.                                                                */
+/*  sized object x.                                                          */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -555,7 +544,7 @@ DebugConstrained(x)
 OBJECT x;
 { OBJECT y, link;
   CONSTRAINT c;
-  debug1(DSC, DDD, "DebugConstrained( %s )", EchoObject(null, x) );
+  debug1(DSC, DDD, "DebugConstrained( %s )", EchoObject(x) );
   switch( type(x) )
   {
 
@@ -565,6 +554,7 @@ OBJECT x;
     case SINCGRAPHIC:
     case GRAPHIC:
     case WORD:
+    case QWORD:
     
       break;
 
@@ -573,10 +563,10 @@ OBJECT x;
     
       Constrained(x, &c, COL);
       debug2(DSC, D, "Constrained( %s, &c, COL ) = %s",
-	EchoObject(null, x), EchoConstraint(&c));
+	EchoObject(x), EchoConstraint(&c));
       Constrained(x, &c, ROW);
       debug2(DSC, D, "Constrained( %s, &c, ROW ) = %s",
-	EchoObject(null, x), EchoConstraint(&c));
+	EchoObject(x), EchoConstraint(&c));
       break;
 
 

@@ -1,6 +1,6 @@
-/*@externs:External Declarations@*********************************************/
+/*@externs:External Declarations:Directories and file conventions@************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -37,28 +37,29 @@
 /*  LATIN               Non-zero means compile for ISO-LATIN-1 char set.     */
 /*  INCL_DIR            The system directory where @Include files are kept   */
 /*  FONT_DIR            The system directory where .AFM font files are kept  */
+/*  EVEC_DIR            The system directory where .CEV files are kept       */
 /*  DATA_DIR            The system directory where database files are kept   */
+/*  CHAR_IN             Determines assignment of input chars to lex classes  */
+/*  CHAR_OUT            Determines appearance of literal chars in output     */
 /*  DEBUG_ON            Non-zero means compile debug code (lout -d)          */
 /*  ASSERT_ON           Non-zero means test assertions                       */
 /*                                                                           */
-/*  #define  LATIN      0                                                    */
 /*  #define  INCL_DIR   "/usr/local/lib/lout/include"                        */
 /*  #define  FONT_DIR   "/usr/local/lib/lout/font"                           */
+/*  #define  EVEC_DIR   "/usr/local/lib/lout/evec"                           */
 /*  #define  DATA_DIR   "/usr/local/lib/lout/data"                           */
+/*  #define  CHAR_IN    0                                                    */
+/*  #define  CHAR_OUT   0                                                    */
 /*  #define  DEBUG_ON   0                                                    */
 /*  #define  ASSERT_ON  1                                                    */
-/*                                                                           */
-/*****************************************************************************/
-
-
-/*****************************************************************************/
 /*                                                                           */
 /*  File naming conventions and version                                      */
 /*                                                                           */
 /*  LOUT_VERSION        Version information                                  */
 /*  CROSS_DB            The default name of the cross reference database     */
+/*  SOURCE_SUFFIX       Optional suffix of source files and include files    */
 /*  INDEX_SUFFIX        The suffix of database index files                   */
-/*  NEW_INDEX_SUFFIX    The additional suffix of new database index files    */
+/*  NEW_INDEX_SUFFIX    The suffix of new database index files               */
 /*  DATA_SUFFIX         The suffix of database data files                    */
 /*  NEW_DATA_SUFFIX     The additional suffix of new database data files     */
 /*  HYPH_FILENAME       The default name of the unpacked hyphenation file    */
@@ -66,16 +67,17 @@
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION		"Basser Lout Version 2.03 (April 1993)"
-#define	CROSS_DB		"lout"
-#define	INDEX_SUFFIX		".li"
-#define	NEW_INDEX_SUFFIX	"x"
-#define	DATA_SUFFIX		".ld"
-#define	NEW_DATA_SUFFIX		"x"
-#define	HYPH_FILENAME		"lout.hyph"
-#define	HYPH_SUFFIX		".packed"
+#define	LOUT_VERSION	  AsciiToFull("Basser Lout Version 2.05 (July 1993)")
+#define	CROSS_DB	  AsciiToFull("lout")
+#define	SOURCE_SUFFIX	  AsciiToFull(".lout")
+#define	INDEX_SUFFIX	  AsciiToFull(".li")
+#define	NEW_INDEX_SUFFIX  AsciiToFull(".lix")
+#define	DATA_SUFFIX	  AsciiToFull(".ld")
+#define	NEW_DATA_SUFFIX	  AsciiToFull("x")
+#define	HYPH_FILENAME	  AsciiToFull("lout.hyph")
+#define	HYPH_SUFFIX	  AsciiToFull(".pk")
 
-/*****************************************************************************/
+/*@::Significant limits@******************************************************/
 /*                                                                           */
 /*  Significant Limits (other insignificant ones appear in other files)      */
 /*                                                                           */
@@ -84,8 +86,8 @@
 /*  MAX_FILES           1 + the maximum number of files.  This cannot        */
 /*                      exceed 256 without changing type FILE_NUM; and       */
 /*                      it cannot exceed 255 without increasing MAX_WORD     */
-/*                      (a WORD is used to hold an array indexed by filenum  */
-/*                      in file z10.c).                                      */
+/*                      (a WORD is used to hold an array indexed by          */
+/*                      filenum in file z10.c).                              */
 /*                                                                           */
 /*  MAX_LINE            1 + the maximum length of an input line, in files    */
 /*                      of all types.  This cannot exceed 256, at least in   */
@@ -126,15 +128,15 @@
 /*                                                                           */
 /*****************************************************************************/
 
-#define	BOOLEAN		unsigned	/* changed from: short unsigned      */
+#define	BOOLEAN		unsigned
 #define	FALSE		0
 #define	TRUE		1
-#define	bool(x)		(x ? "TRUE" : "FALSE")
+#define	bool(x)		(x ? AsciiToFull("TRUE") : AsciiToFull("FALSE") )
 #define	CHILD		0
 #define	PARENT		1
 #define	COL		0
 #define	ROW		1
-#define	dimen(x)	(x == COL ? "COL" : "ROW" )
+#define	dimen(x)	(x == COL ? AsciiToFull("COL") : AsciiToFull("ROW") )
 #define	nil		( (OBJECT) NULL )
 #define	null		( (FILE *) NULL )
 
@@ -144,18 +146,18 @@
 #define is_odd(x)	( (x) & 1 )		/* TRUE if x is odd number   */
 
 
-/*****************************************************************************/
+/*@::ALIGN, LENGTH, FONT_NUM, ENCODING, FULL_CHAR@****************************/
 /*                                                                           */
-/*  ALIGN - the most restrictive memory alignment type.                      */
+/*  typedef ALIGN - the most restrictive memory alignment type.              */
 /*                                                                           */
 /*****************************************************************************/
 
-typedef int ALIGN;
+typedef char *ALIGN;
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  LENGTH - a distance measured in integral multiples of the basic unit.    */
+/*  typedef LENGTH - an integer physical distance.                           */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -164,7 +166,7 @@ typedef short int LENGTH;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  FONT_NUM - internal name for a font                                      */
+/*  FONT_NUM - internal name for a font.                                     */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -173,7 +175,168 @@ typedef unsigned char FONT_NUM;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  GAP - what separates one object from another                             */
+/*  ENCODING - internal name for a character encoding vector.                */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef unsigned char ENCODING;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  typedef FULL_CHAR - one of the characters manipulated by Lout.           */
+/*                                                                           */
+/*  This program does not deal with 7-bit ASCII characters.  Instead, its    */
+/*  characters are defined by the FULL_CHAR typedef, and could be anything   */
+/*  from 7-bit ASCII to 8-bit ISO-LATIN-1 to 16-bit UNICODE and beyond.      */
+/*                                                                           */
+/*  Unfortunately C favours signed 8-bit characters: literal strings are     */
+/*  pointers to them, argv[] and the standard libraries assume them.  We get */
+/*  around these problems by using our own library, including AsciiToFull()  */
+/*  to convert an ASCII string (such as a C string) into a FULL_CHAR string. */
+/*                                                                           */
+/*  Formally this library appears in module z39.c; however since this        */
+/*  implementation uses 8-bit unsigned characters, most of the routines      */
+/*  can be implemented by macros containing type-cast calls to C standard    */
+/*  library routines.  These appear in the z39.c externs list below.         */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef unsigned char FULL_CHAR;
+
+
+/*@::Character literals@******************************************************/
+/*                                                                           */
+/*  Character Literals                                                       */
+/*                                                                           */
+/*  The following macros ensure that no Lout source is ever compared to a    */
+/*  literal character other than '\0':                                       */
+/*                                                                           */
+/*****************************************************************************/
+
+#define	CH_FLAG_OUTFILE		'o'	/* the -o command line flag          */
+#define	CH_FLAG_SUPPRESS	's'	/* the -s command line flag          */
+#define	CH_FLAG_CROSS		'c'	/* the -c command line flag          */
+#define	CH_FLAG_ERRFILE		'e'	/* the -e command line flag          */
+#define	CH_FLAG_EPSFIRST	'E'	/* first letter of the -EPS flag     */
+#define	CH_FLAG_DIRPATH		'D'	/* the -D command line flag          */
+#define	CH_FLAG_ENCPATH		'C'	/* the -C command line flag          */
+#define	CH_FLAG_FNTPATH		'F'	/* the -F command line flag          */
+#define	CH_FLAG_INCPATH		'I'	/* the -I command line flag          */
+#define	CH_FLAG_INCLUDE		'i'	/* the -i command line flag          */
+#define	CH_FLAG_HYPHEN		'h'	/* the -h command line flag          */
+#define	CH_FLAG_VERSION		'V'	/* the -V command line flag          */
+#define	CH_FLAG_USAGE		'u'	/* the -u command line flag          */
+#define	CH_FLAG_DEBUG		'd'	/* the -d command line flag          */
+
+#define	CH_SPACE		' '	/* space character                   */
+#define	CH_NEWLINE		'\n'	/* the newline character             */
+#define	CH_SYMSTART		'@'	/* extra letter symbols may have     */
+#define	CH_QUOTE		'"'	/* the quote character		     */
+#define	CH_ZERO			'0'	/* the first digit character, zero   */
+#define	CH_INCGAP		'+'	/* begins an incrementing gap	     */
+#define	CH_DECGAP		'-'	/* begins a decrementing gap	     */
+#define	CH_MINUS		'-'	/* minus sign                        */
+#define	CH_HYPHEN		'-'	/* the hyphen character		     */
+
+#define	CH_UNIT_CM		'c'	/* unit of measurement: centimetres  */
+#define	CH_UNIT_IN		'i'	/* unit of measurement: inches       */
+#define	CH_UNIT_PT		'p'	/* unit of measurement: points       */
+#define	CH_UNIT_EM		'm'	/* unit of measurement: ems          */
+#define	CH_UNIT_FT		'f'	/* unit of measurement: fontsizes    */
+#define	CH_UNIT_SP		's'	/* unit of measurement: spacewidths  */
+#define	CH_UNIT_VS		'v'	/* unit of measurement: vspaces      */
+#define	CH_UNIT_WD		'w'	/* unit of measurement: follwidths   */
+#define	CH_UNIT_BD		'b'	/* unit of measurement: boundwidths  */
+#define	CH_UNIT_RL		'r'	/* unit of measurement: relwidths    */
+#define	CH_UNIT_DG		'd'	/* unit of measurement: degrees      */
+
+#define	CH_MODE_EDGE		'e'	/* spacing mode: edge-to-edge        */
+#define	CH_MODE_HYPH		'h'	/* spacing mode: hyphenation         */
+#define	CH_MODE_MARK		'x'	/* spacing mode: mark-to-mark        */
+#define	CH_MODE_OVER		'o'	/* spacing mode: overstrike          */
+#define	CH_MODE_KERN		'k'	/* spacing mode: kerning             */
+#define	CH_MODE_TABL		't'	/* spacing mode: tabulation          */
+
+#define octaldigit(ch)		( (ch) >= '0' && (ch) <= '7' )
+#define decimaldigit(ch)	( (ch) >= '0' && (ch) <= '9' )
+#define	digitchartonum(ch)	( (ch) - '0' )
+#define	numtodigitchar(ch)	( (ch) + '0' )
+#define	beginsbreakstyle(ch)	( (ch) >= 'a' && (ch) <= 'z' )
+#define	numericchar(ch)		( decimaldigit(ch) || (ch) == '.' )
+
+
+/*@::String literals, FULL_CHAR type@*****************************************/
+/*                                                                           */
+/*  String Literals.                                                         */
+/*                                                                           */
+/*  All significant string literals are defined here.  The program has many  */
+/*  others, however: format strings, debug output, etc.                      */
+/*                                                                           */
+/*****************************************************************************/
+
+#define	STR_EMPTY		AsciiToFull("")
+#define	STR_QUOTE		AsciiToFull("\"")
+#define	STR_ESCAPE		AsciiToFull("\\")
+#define	STR_COMMENT		AsciiToFull("#")
+#define	STR_SPACE		AsciiToFull(" ")
+#define	STR_TAB			AsciiToFull("\t")
+#define	STR_NEWLINE		AsciiToFull("\n")
+#define	STR_LETTERS_LOWER	AsciiToFull("abcdefghijklmnopqrstuvwxyz")
+#define	STR_LETTERS_UPPER	AsciiToFull("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+#define	STR_LETTERS_SYMSTART	AsciiToFull("@")
+
+#if CHAR_IN==0
+#define	STR_LETTERS_EXTRA0	AsciiToFull("")
+#define	STR_LETTERS_EXTRA1	AsciiToFull("")
+#define	STR_LETTERS_EXTRA2	AsciiToFull("")
+#define	STR_LETTERS_EXTRA3	AsciiToFull("")
+#define	STR_LETTERS_EXTRA4	AsciiToFull("")
+#define	STR_LETTERS_EXTRA5	AsciiToFull("")
+#define	STR_LETTERS_EXTRA6	AsciiToFull("")
+#define	STR_LETTERS_EXTRA7	AsciiToFull("")
+#else
+#define	STR_LETTERS_EXTRA0	AsciiToFull("\300\301\302\303\304\305\306\307")
+#define	STR_LETTERS_EXTRA1	AsciiToFull("\310\311\312\313\314\315\316\317")
+#define	STR_LETTERS_EXTRA2	AsciiToFull("\320\321\322\323\324\325\326")
+#define	STR_LETTERS_EXTRA3	AsciiToFull("\330\331\332\333\334\335\336\337")
+#define	STR_LETTERS_EXTRA4	AsciiToFull("\340\341\342\343\344\345\346\347")
+#define	STR_LETTERS_EXTRA5	AsciiToFull("\350\351\352\353\354\355\356\357")
+#define	STR_LETTERS_EXTRA6	AsciiToFull("\360\361\362\363\364\365\366")
+#define	STR_LETTERS_EXTRA7	AsciiToFull("\370\371\372\373\374\375\376\377")
+#endif
+
+#define	STR_STDIN		AsciiToFull("-")
+#define	STR_STDOUT		AsciiToFull("-")
+#define	STR_HYPHEN		AsciiToFull("-")
+#define	STR_EPS			AsciiToFull("EPS")
+#define	STR_ELSE		AsciiToFull("else")
+#define	STR_NOCROSS		AsciiToFull("??")
+#define	STR_BADKEY		AsciiToFull("badkey")
+#define	STR_NONE		AsciiToFull("none")
+#define	STR_ZERO		AsciiToFull("0")
+#define	STR_PS_SPACENAME	AsciiToFull("space")
+#define	STR_FONT_RECODE		AsciiToFull("Recode")
+#define	STR_FONT_NORECODE	AsciiToFull("NoRecode")
+
+#define	STR_BREAK_HYPHEN	AsciiToFull("hyphen")
+#define	STR_BREAK_NOHYPHEN	AsciiToFull("nohyphen")
+#define	STR_BREAK_ADJUST	AsciiToFull("adjust")
+#define	STR_BREAK_OUTDENT	AsciiToFull("outdent")
+#define	STR_BREAK_RAGGED	AsciiToFull("ragged")
+#define	STR_BREAK_CRAGGED	AsciiToFull("cragged")
+#define	STR_BREAK_RRAGGED	AsciiToFull("rragged")
+#define	STR_BREAK_LINES		AsciiToFull("lines")
+#define	STR_BREAK_CLINES	AsciiToFull("clines")
+#define	STR_BREAK_RLINES	AsciiToFull("rlines")
+
+#define	STR_GAP_RJUSTIFY	AsciiToFull("1rt")
+#define	STR_GAP_ZERO_HYPH	AsciiToFull("0ch")
+
+
+/*@::GAP, STYLE@**************************************************************/
+/*                                                                           */
+/*  typedef GAP - what separates one object from another.                    */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -207,7 +370,7 @@ typedef struct
 
 /*****************************************************************************/
 /*                                                                           */
-/*  STYLE - information about how to break text, etc.                        */
+/*  typedef STYLE - information about how to break text, etc.                */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -240,9 +403,9 @@ typedef struct
 )
 
 
-/*****************************************************************************/
+/*@::CONSTRAINT, FILE_NUM, FILE_POS, LIST@************************************/
 /*                                                                           */
-/*  CONSTRAINT - a size constraint                                           */
+/*  typedef CONSTRAINT - a size constraint.                                  */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -267,15 +430,22 @@ typedef struct
 #define	ig_xtrans(x)	bfc(constraint(x))
 #define	ig_ytrans(x)	fc(constraint(x))
 
+
 /*****************************************************************************/
 /*                                                                           */
-/*  FILE_NUM - the internal representation of a file                         */
-/*  FILE_POS - a position in the set of input files                          */
+/*  typedef FILE_NUM - the internal representation of a file.                */
 /*                                                                           */
 /*****************************************************************************/
 
 typedef unsigned char	FILE_NUM;
 #define	NO_FILE		0
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  typedef FILE_POS - a position in the set of input files.                 */
+/*                                                                           */
+/*****************************************************************************/
 
 typedef	struct
 { FILE_NUM	ofile_num;		/* no. of file this record is from   */
@@ -293,134 +463,204 @@ typedef	struct
   col_num(x)  = col_num(y)						\
 )
 
-/*@::declaration of OBJECT@***************************************************/
+
+/*****************************************************************************/
 /*                                                                           */
-/*  OBJECT - pointer to an arbitrary object (parse tree, symbol table, ...)  */
+/*  typedef LIST - two pointers used to make one doubly linked list          */
 /*                                                                           */
 /*****************************************************************************/
 
-#define LIST struct { union rec *opred, *osucc; }
+typedef struct { union rec *opred, *osucc; } LIST;
+
+
+/*@::FIRST_UNION@*************************************************************/
+/*                                                                           */
+/*  typedef FIRST_UNION - first four bytes of object record (after 2 LISTs). */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef union
+{
+  struct /* used by WORD and QWORD when they are tokens */
+  {	unsigned char	otype, orec_size;
+	unsigned char	ohspace, ovspace;
+  } os11;
+
+  struct /* used by all non-WORD tokens, including CLOSURE and GAP_OBJ */
+  {	unsigned char	otype, oprecedence;
+	unsigned char	ohspace, ovspace;
+  } os12;
+
+  struct /* used by WORD and QWORD when they are objects */
+  {	unsigned char	otype, orec_size;
+	BOOLEAN		ogall_rec    : 1;
+	BOOLEAN		obroken      : 1;
+	BOOLEAN		othreaded    : 1;
+	BOOLEAN		oexternal    : 1;
+	BOOLEAN		oblocked     : 1;
+	BOOLEAN		obackward    : 1;
+	BOOLEAN		otrigger_ext : 1;
+	BOOLEAN	        omust_expand : 1;
+	FONT_NUM	oword_font;
+  } os13;
+
+  struct /* used by all non-WORD objects, including CLOSURE */
+  {	unsigned char	otype, ospare;
+	BOOLEAN		ogall_rec    : 1;
+	BOOLEAN		obroken      : 1;
+	BOOLEAN		othreaded    : 1;
+	BOOLEAN		oexternal    : 1;
+	BOOLEAN		oblocked     : 1;
+	BOOLEAN		obackward    : 1;
+	BOOLEAN		otrigger_ext : 1;
+	BOOLEAN	        omust_expand : 1;
+	unsigned char	ocross_type;	     /* CROSS objects only */
+  } os14;
+
+  struct /* used by WORD and QWORD when they are database nodes */
+  {	unsigned char	otype, orec_size;
+	unsigned	oreading     :	1;
+	unsigned 	oleft_pos    : 15;
+  } os15;
+
+  struct /* used by WORD and QWORD when they are font records */
+  {	unsigned char	otype, orec_size;
+	FONT_NUM	ofont_num;
+	BOOLEAN		ofont_recoded:  1;
+  } os16;
+
+  struct /* used by symbol table entries */
+  {	unsigned char	otype, oprecedence;
+	BOOLEAN		ois_tag		     : 1;
+	BOOLEAN		ohas_tag             : 1;
+	BOOLEAN		ohas_lpar            : 1;
+	BOOLEAN		ohas_rpar            : 1;
+	BOOLEAN		oright_assoc         : 1;
+	BOOLEAN		ois_target           : 1;
+	BOOLEAN		ohas_target          : 1;
+	BOOLEAN		oforce_target	     : 1;
+	BOOLEAN		ohas_body            : 1;
+	BOOLEAN		oindefinite          : 1;
+	BOOLEAN		orecursive           : 1;
+	BOOLEAN		ouses_extern_target  : 1;
+	BOOLEAN		ois_extern_target    : 1;
+	BOOLEAN		ois_key		     : 1;
+	BOOLEAN		ohas_key	     : 1;
+	BOOLEAN		odirty               : 1;
+  } os17;
+
+} FIRST_UNION;
+
+/*@::SECOND_UNION, THIRD_UNION, FOURTH_UNION@*********************************/
+/*                                                                           */
+/*  typedef SECOND_UNION - four bytes usually holding a file position.       */
+/*                                                                           */
+/*  The fpos is overwritten in WORDs and QWORDs during FixAndPrintObject by  */
+/*  the horizontal coordinate of the word, which has to be remembered.       */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef union
+{
+  FILE_POS	ofpos;
+  int		oword_save_mark;
+
+} SECOND_UNION;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  typedef THIRD_UNION - eight bytes usually holding an object size.        */
+/*                                                                           */
+/*  In database records this space is used for a file pointer; in certain    */
+/*  WORD objects used privately in z10.c it is used for a galley-position.   */
+/*  In font records it holds the font size, space width, etc.                */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef union
+{
+  struct
+  {	LENGTH	oback[2];
+	LENGTH	ofwd[2];
+  } os31;
+
+  FILE *ofilep;
+  int	ogall_pos;
+
+  struct
+  {	LENGTH	ofont_size;
+	LENGTH	ofont_xheight2;
+	LENGTH	ofont_spacewidth;
+	ENCODING ofont_encoding;
+  } os32;
+
+} THIRD_UNION;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  typedef FOURTH_UNION - eight bytes holding a STYLE or CONSTRAINT.        */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef union
+{
+  STYLE		osave_style;
+  CONSTRAINT	oconstraint;
+
+} FOURTH_UNION;
+
+
+/*@::OBJECT@******************************************************************/
+/*                                                                           */
+/*  typedef OBJECT - the general-purpose record used throughout Lout.        */
+/*                                                                           */
+/*****************************************************************************/
 
 typedef union rec
 {
-  struct word_type		/* all fields of WORD, both token and object */
-  {  LIST	olist[2];
-     union
-     {	struct word_as_token
-	{	unsigned char	otype;
-		unsigned char	ohspace;
-		unsigned char	ovspace;
-		unsigned char	orec_size;
-	} oi1;
-
-	struct word_as_object
-	{	unsigned char	otype;
-		BOOLEAN		ogall_rec    : 1;
-		BOOLEAN		obroken      : 1;
-		BOOLEAN		othreaded    : 1;
-		BOOLEAN		oexternal    : 1;
-		BOOLEAN		oblocked     : 1;
-		BOOLEAN		obackward    : 1;
-		BOOLEAN		otrigger_externs   : 1;
-		BOOLEAN	        omust_expand : 1;
-		FONT_NUM	oword_font;
-		unsigned char	orec_size;
-	} oi2;
-     } ou1;
-     union
-     {	FILE_POS	ofpos;
-	int		oword_save_mark;
-     } ou5;
-     union
-     {  LENGTH	oback[2];
-	FILE	*ofilep;
-	/* union rec *ogall_sym; */
-     } ou3;
-     union
-     {	LENGTH	ofwd[2];
-	int	ogall_pos;
-     } ou4;
-     unsigned char ostring[4];
+  struct word_type	/* all fields of WORD and QWORD, token and object */
+  {  LIST		olist[2];
+     FIRST_UNION	ou1;
+     SECOND_UNION	ou2;
+     THIRD_UNION	ou3;
+     FULL_CHAR		ostring[4];
   } os1;
 
-  struct closure_type		/* CLOSURE, both as token and object */
-  {  LIST	olist[2];
-     union
-     {	struct closure_as_token
-	{	unsigned char	otype;
-		unsigned char	ohspace;
-		unsigned char	ovspace;
-		unsigned char	oprecedence;
-	} oi1;
-
-	struct closure_as_object
-	{	unsigned char	otype;
-		BOOLEAN		ogall_rec    : 1;
-		BOOLEAN		obroken      : 1;
-		BOOLEAN		othreaded    : 1;
-		BOOLEAN		oexternal    : 1;
-		BOOLEAN		oblocked     : 1;
-		BOOLEAN		obackward    : 1;
-		BOOLEAN		otrigger_externs   : 1;
-		BOOLEAN	        omust_expand : 1;
-		unsigned short	ocross_type;
-	} oi2;
-     } ou1;
-     FILE_POS	ofpos;
-     LENGTH	oback[2];
-     LENGTH	ofwd[2];
-     union
-     {	STYLE		osave_style;
-	CONSTRAINT	oconstraint;
-     } ou2;
-     union rec *oactual;
+  struct closure_type	/* all fields of CLOSURE, both as token and object */
+  {  LIST		olist[2];
+     FIRST_UNION	ou1;
+     SECOND_UNION	ou2;
+     THIRD_UNION	ou3;
+     FOURTH_UNION	ou4;
+     union rec		*oactual;
      union
      { union rec *owhereto;
        LENGTH    osave_mark;
-     } ou3;
+     } oux;
      union rec *oready_galls;
   } os2;
   
-  struct object_type		/* the general OBJECT */
-  {  LIST	olist[2];
-     union
-     {
-	struct
-	{	unsigned char	otype;
-		BOOLEAN		ogall_rec    : 1;
-		BOOLEAN		obroken      : 1;
-		BOOLEAN		othreaded    : 1;
-		BOOLEAN		oexternal    : 1;
-		BOOLEAN		oblocked     : 1;
-		BOOLEAN		obackward    : 1;
-		BOOLEAN		otrigger_externs   : 1;
-		BOOLEAN	        omust_expand : 1;
-		unsigned short	ocross_type;
-	} oi2;
-     } ou1;
-     FILE_POS	ofpos;
-     LENGTH	oback[2];
-     LENGTH	ofwd[2];
-     union
-     {	STYLE		osave_style;
-	CONSTRAINT	oconstraint;
-     } ou2;
+  struct object_type	/* the general OBJECT */
+  {  LIST		olist[2];
+     FIRST_UNION	ou1;
+     SECOND_UNION	ou2;
+     THIRD_UNION	ou3;
+     FOURTH_UNION	ou4;
   } os3;
 
-  struct link_type		/* LINK */
+  struct link_type	/* LINK */
   {  LIST		olist[2];
      unsigned char	otype;
      unsigned char	onumber;
      unsigned char	odb_targ;
   } os4;
   
-  struct gapobj_type		/* GAP_OBJ */
+  struct gapobj_type	/* GAP_OBJ */
   {  LIST		olist[2];
-     unsigned char	otype;
-     unsigned char	ohspace;
-     unsigned char	ovspace;
-     unsigned char	oprecedence;
-     FILE_POS		ofpos;
+     FIRST_UNION	ou1;
+     SECOND_UNION	ou2;
      GAP		ogap;
      int		osave_badness;		/* optimum paragraph breaker */
      LENGTH		osave_space;		/* optimum paragraph breaker */
@@ -429,40 +669,23 @@ typedef union rec
   } os5;
 
   struct symbol_type
-  {  LIST	olist[2];
-     unsigned char otype;
-     BOOLEAN	ohas_lpar            : 1;
-     BOOLEAN	ohas_rpar            : 1;
-     BOOLEAN	oright_assoc         : 1;
-     BOOLEAN	ois_target           : 1;
-     BOOLEAN	ohas_target          : 1;
-     BOOLEAN	oforce_target	     : 1;
-     BOOLEAN	ois_tag              : 1;
-     BOOLEAN	ohas_tag             : 1;
-     BOOLEAN	ohas_body            : 1;
-     BOOLEAN	oindefinite          : 1;
-     BOOLEAN	orecursive           : 1;
-     BOOLEAN	ouses_extern_target  : 1;
-     BOOLEAN	ois_extern_target    : 1;
-     BOOLEAN	ois_key		     : 1;
-     BOOLEAN	ohas_key	     : 1;
-     unsigned	odirty               : 1;
-     unsigned	char oprecedence;
-     FILE_POS	ofpos;
-     union rec	*oenclosing;
-     union rec	*osym_body;
-     union rec	*obase_uses;
-     union rec	*ouses;
-     union rec	*omarker;
-     union rec	*ocross_sym;
-     union rec	*oimports;
-     unsigned char ouses_count;
-     BOOLEAN	ovisible	     : 1;
-     BOOLEAN	ohas_mark	     : 1;
-     BOOLEAN	ohas_join	     : 1;
-     BOOLEAN	ohas_par             : 1;
-     BOOLEAN	ouses_galley	     : 1;
-     short unsigned opredefined;
+  {  LIST		olist[2];
+     FIRST_UNION	ou1;
+     SECOND_UNION	ou2;
+     union rec		*oenclosing;
+     union rec		*osym_body;
+     union rec		*obase_uses;
+     union rec		*ouses;
+     union rec		*omarker;
+     union rec		*ocross_sym;
+     union rec		*oimports;
+     short unsigned 	opredefined;
+     unsigned char	ouses_count;
+     BOOLEAN		ovisible	     : 1;
+     BOOLEAN		ohas_mark	     : 1;
+     BOOLEAN		ohas_join	     : 1;
+     BOOLEAN		ohas_par             : 1;
+     BOOLEAN		ouses_galley	     : 1;
   } os6;
 
   struct cr_type
@@ -504,109 +727,130 @@ typedef union rec
 
 } *OBJECT;
 
-#define	succ(x, dim)	(x)->os1.olist[dim].osucc
-#define	pred(x, dim)	(x)->os1.olist[dim].opred
-#define type(x)		(x)->os1.ou1.oi1.otype
-#define	gall_rec(x)	(x)->os1.ou1.oi2.ogall_rec
-#define	non_blocking(x)	gall_rec(x)
-#define	broken(x)	(x)->os1.ou1.oi2.obroken
-#define	external(x)	(x)->os1.ou1.oi2.oexternal
-#define	threaded(x)	(x)->os1.ou1.oi2.othreaded
-#define	blocked(x)	(x)->os1.ou1.oi2.oblocked
-#define	backward(x)	(x)->os1.ou1.oi2.obackward
-#define	sized(x)	broken(x)
-#define	seen_nojoin(x)	blocked(x)
-#define	must_expand(x)	(x)->os1.ou1.oi2.omust_expand
-#define	trigger_externs(x) (x)->os1.ou1.oi2.otrigger_externs
-#define	hspace(x)	(x)->os1.ou1.oi1.ohspace
-#define	vspace(x)	(x)->os1.ou1.oi1.ovspace
-#define	word_font(x)	(x)->os1.ou1.oi2.oword_font
-#define	rec_size(x)	(x)->os1.ou1.oi2.orec_size
-#define	fpos(x)		(x)->os2.ofpos
-#define	back(x, dim)	(x)->os2.oback[dim]
-#define	fwd(x, dim)	(x)->os2.ofwd[dim]
-#define	size(x, dim)	(back(x, dim) + fwd(x, dim))
-#define word_save_mark(x) (x)->os1.ou5.oword_save_mark
-#define string(x)	(x)->os1.ostring
 
-#define	precedence(x)	(x)->os2.ou1.oi1.oprecedence
-#define	cross_type(x)	(x)->os2.ou1.oi2.ocross_type
-#define	thr_state(x)	cross_type(x)
-#define	save_style(x)	(x)->os2.ou2.osave_style
-#define	constraint(x)	(x)->os2.ou2.oconstraint
-#define actual(x)	(x)->os2.oactual
-#define whereto(x)	(x)->os2.ou3.owhereto
-#define save_mark(x)	(x)->os2.ou3.osave_mark
-#define ready_galls(x)	(x)->os2.oready_galls
+/*@::macros for fields of OBJECT@*********************************************/
+/*                                                                           */
+/*  Macros for fields of OBJECT.                                             */
+/*                                                                           */
+/*****************************************************************************/
 
-#define	number(x)	(x)->os4.onumber
-#define	db_targ(x)	(x)->os4.odb_targ
-#define	gap(x)		(x)->os5.ogap
-#define	save_space(x)	(x)->os5.osave_space
-#define	save_badness(x)	(x)->os5.osave_badness
-#define	save_actual_gap(x)  (x)->os5.osave_actual_gap
-#define	save_prev(x)	(x)->os5.osave_prev
+#define	succ(x, dim)		(x)->os1.olist[dim].osucc
+#define	pred(x, dim)		(x)->os1.olist[dim].opred
 
-#define	has_lpar(x)	(x)->os6.ohas_lpar
-#define	has_rpar(x)	(x)->os6.ohas_rpar
-#define	right_assoc(x)	(x)->os6.oright_assoc
-#define	is_target(x)	(x)->os6.ois_target
-#define	has_target(x)	(x)->os6.ohas_target
-#define	force_target(x)	(x)->os6.oforce_target
-#define	is_tag(x)	(x)->os6.ois_tag
-#define	has_tag(x)	(x)->os6.ohas_tag
-#define	has_body(x)	(x)->os6.ohas_body
-#define	indefinite(x)	(x)->os6.oindefinite
-#define	recursive(x)	(x)->os6.orecursive
-#define	predefined(x)	(x)->os6.opredefined
-#define	dirty(x)	(x)->os6.odirty
-#define	enclosing(x)	(x)->os6.oenclosing
-#define	sym_body(x)	(x)->os6.osym_body
-#define	base_uses(x)	(x)->os6.obase_uses
-#define	uses(x)		(x)->os6.ouses
-#define	marker(x)	(x)->os6.omarker
-#define	cross_sym(x)	(x)->os6.ocross_sym
-#define	imports(x)	(x)->os6.oimports
-#define	uses_count(x)	(x)->os6.ouses_count
-#define	visible(x)	(x)->os6.ovisible
-#define	has_mark(x)	(x)->os6.ohas_mark
-#define	has_join(x)	(x)->os6.ohas_join
-#define	has_par(x)	(x)->os6.ohas_par
-#define	uses_galley(x)	(x)->os6.ouses_galley
-#define	is_extern_target(x) (x)->os6.ois_extern_target
-#define	uses_extern_target(x) (x)->os6.ouses_extern_target
-#define	is_key(x)	(x)->os6.ois_key
-#define	has_key(x)	(x)->os6.ohas_key
+#define type(x)			(x)->os1.ou1.os11.otype
+#define	rec_size(x)		(x)->os1.ou1.os11.orec_size
+#define	hspace(x)		(x)->os1.ou1.os11.ohspace
+#define	vspace(x)		(x)->os1.ou1.os11.ovspace
+#define	precedence(x)		(x)->os2.ou1.os12.oprecedence
 
-#define	target_state(x)	(x)->os7.otarget_state
-#define	target_val(x)	(x)->os7.otarget_val
-#define	target_file(x)	(x)->os7.otarget_file
-#define	target_seq(x)	(x)->os7.otarget_seq
-#define	target_pos(x)	(x)->os7.otarget_pos
-#define	cr_file(x)	(x)->os7.ocr_file
-#define	cr_seq(x)	(x)->os7.ocr_seq
-#define	gall_seq(x)	(x)->os7.ogall_seq
-#define	symb(x)		(x)->os7.osymb
-#define	gall_tag(x)	(x)->os7.ogall_tag
-#define	gall_tfile(x)	(x)->os7.ogall_tfile
-#define	gentag_file(x)	(x)->os7.ogentag_file
-#define	gentag_seq(x)	(x)->os7.ogentag_seq
-#define	gentag_fseq(x) (x)->os7.ogentag_fseq
+#define	gall_rec(x)		(x)->os1.ou1.os13.ogall_rec
+#define	non_blocking(x)		gall_rec(x)
+#define	broken(x)		(x)->os1.ou1.os13.obroken
+#define	sized(x)		broken(x)
+#define	threaded(x)		(x)->os1.ou1.os13.othreaded
+#define	external(x)		(x)->os1.ou1.os13.oexternal
+#define	blocked(x)		(x)->os1.ou1.os13.oblocked
+#define	seen_nojoin(x)		blocked(x)
+#define	backward(x)		(x)->os1.ou1.os13.obackward
+#define	trigger_externs(x)	(x)->os1.ou1.os13.otrigger_ext
+#define	must_expand(x)		(x)->os1.ou1.os13.omust_expand
+#define	word_font(x)		(x)->os1.ou1.os13.oword_font
+#define	cross_type(x)		(x)->os1.ou1.os14.ocross_type
+#define	thr_state(x)		cross_type(x)
 
-#define	filep(x)	(x)->os1.ou3.ofilep
-/* #define	gall_sym(x)	(x)->os1.ou3.ogall_sym */
-#define	gall_pos(x)	(x)->os1.ou4.ogall_pos
-#define	left_pos(x)	fwd(x, COL)
-#define	save_scope(x)	fwd(x, ROW)
+#define	reading(x)		(x)->os1.ou1.os15.oreading
+#define	left_pos(x)		(x)->os1.ou1.os15.oleft_pos
 
-#define	eg_fnum(x)	(x)->os8.oeg_fnum
-#define	eg_fpos(x)	(x)->os8.oeg_fpos
-#define	eg_cont(x)	(x)->os8.oeg_cont
-#define	eg_symbol(x)	(x)->os8.oeg_symbol
-#define	eg_scope(x)	(x)->os8.oeg_scope
+#define	has_lpar(x)		(x)->os1.ou1.os17.ohas_lpar
+#define	has_rpar(x)		(x)->os1.ou1.os17.ohas_rpar
+#define	right_assoc(x)		(x)->os1.ou1.os17.oright_assoc
+#define	is_target(x)		(x)->os1.ou1.os17.ois_target
+#define	has_target(x)		(x)->os1.ou1.os17.ohas_target
+#define	force_target(x)		(x)->os1.ou1.os17.oforce_target
+#define	is_tag(x)		(x)->os1.ou1.os17.ois_tag
+#define	has_tag(x)		(x)->os1.ou1.os17.ohas_tag
+#define	has_body(x)		(x)->os1.ou1.os17.ohas_body
+#define	indefinite(x)		(x)->os1.ou1.os17.oindefinite
+#define	recursive(x)		(x)->os1.ou1.os17.orecursive
+#define	uses_extern_target(x)	(x)->os1.ou1.os17.ouses_extern_target
+#define	is_extern_target(x)	(x)->os1.ou1.os17.ois_extern_target
+#define	is_key(x)		(x)->os1.ou1.os17.ois_key
+#define	has_key(x)		(x)->os1.ou1.os17.ohas_key
+#define	dirty(x)		(x)->os1.ou1.os17.odirty
 
-#define	item(x)		(x)->os9.oitem
-#define	next(x)		(x)->os9.onext
+#define	fpos(x)			(x)->os1.ou2.ofpos
+#define word_save_mark(x)	(x)->os1.ou2.oword_save_mark
+
+#define	back(x, dim)		(x)->os1.ou3.os31.oback[dim]
+#define	fwd(x, dim)		(x)->os1.ou3.os31.ofwd[dim]
+#define	size(x, dim)		(back(x, dim) + fwd(x, dim))
+#define	filep(x)		(x)->os1.ou3.ofilep
+#define	gall_pos(x)		(x)->os1.ou3.ogall_pos
+
+#define string(x)		(x)->os1.ostring
+
+#define	save_style(x)		(x)->os2.ou4.osave_style
+#define	constraint(x)		(x)->os2.ou4.oconstraint
+
+#define actual(x)		(x)->os2.oactual
+#define whereto(x)		(x)->os2.oux.owhereto
+#define save_mark(x)		(x)->os2.oux.osave_mark
+#define ready_galls(x)		(x)->os2.oready_galls
+
+#define	number(x)		(x)->os4.onumber
+#define	db_targ(x)		(x)->os4.odb_targ
+
+#define	gap(x)			(x)->os5.ogap
+#define	save_badness(x)		(x)->os5.osave_badness
+#define	save_space(x)		(x)->os5.osave_space
+#define	save_actual_gap(x)	(x)->os5.osave_actual_gap
+#define	save_prev(x)		(x)->os5.osave_prev
+
+#define	enclosing(x)		(x)->os6.oenclosing
+#define	sym_body(x)		(x)->os6.osym_body
+#define	base_uses(x)		(x)->os6.obase_uses
+#define	uses(x)			(x)->os6.ouses
+#define	marker(x)		(x)->os6.omarker
+#define	cross_sym(x)		(x)->os6.ocross_sym
+#define	imports(x)		(x)->os6.oimports
+#define	predefined(x)		(x)->os6.opredefined
+#define	uses_count(x)		(x)->os6.ouses_count
+#define	visible(x)		(x)->os6.ovisible
+#define	has_mark(x)		(x)->os6.ohas_mark
+#define	has_join(x)		(x)->os6.ohas_join
+#define	has_par(x)		(x)->os6.ohas_par
+#define	uses_galley(x)		(x)->os6.ouses_galley
+
+#define	target_state(x)		(x)->os7.otarget_state
+#define	target_file(x)		(x)->os7.otarget_file
+#define	cr_file(x)		(x)->os7.ocr_file
+#define	target_val(x)		(x)->os7.otarget_val
+#define	target_seq(x)		(x)->os7.otarget_seq
+#define	target_pos(x)		(x)->os7.otarget_pos
+#define	cr_seq(x)		(x)->os7.ocr_seq
+#define	gall_seq(x)		(x)->os7.ogall_seq
+#define	symb(x)			(x)->os7.osymb
+#define	gall_tag(x)		(x)->os7.ogall_tag
+#define	gall_tfile(x)		(x)->os7.ogall_tfile
+#define	gentag_file(x)		(x)->os7.ogentag_file
+#define	gentag_seq(x)		(x)->os7.ogentag_seq
+#define	gentag_fseq(x)		(x)->os7.ogentag_fseq
+
+#define	eg_fnum(x)		(x)->os8.oeg_fnum
+#define	eg_fpos(x)		(x)->os8.oeg_fpos
+#define	eg_cont(x)		(x)->os8.oeg_cont
+#define	eg_symbol(x)		(x)->os8.oeg_symbol
+
+#define	item(x)			(x)->os9.oitem
+#define	next(x)			(x)->os9.onext
+
+#define	font_num(x)		(x)->os1.ou1.os16.ofont_num
+#define	font_recoded(x)		(x)->os1.ou1.os16.ofont_recoded
+#define	font_size(x)		(x)->os1.ou3.os32.ofont_size
+#define	font_xheight2(x)	(x)->os1.ou3.os32.ofont_xheight2
+#define	font_spacewidth(x)	(x)->os1.ou3.os32.ofont_spacewidth
+#define	font_encoding(x)	(x)->os1.ou3.os32.ofont_encoding
+
 
 /*@::object types@************************************************************/
 /*                                                                           */
@@ -630,97 +874,100 @@ typedef union rec
 #define	HEAD		 5		/*  o  n  a galley header            */
 #define	SPLIT		 6		/*  o     @Split                     */
 #define	PAR		 7		/*  o     a parameter of a closure   */
-#define	WORD		 8		/*  o     a literal word             */
-#define	ROW_THR		 9		/*  o     a row thread               */
-#define	COL_THR		10		/*  o     a column thread            */
-#define	ACAT		11		/* to s   a sequence of &-ed objs    */
-#define	HCAT		12		/* to s   a sequence of |-ed objs    */
-#define	VCAT		13		/* to s   a sequence of /-ed objs    */
-#define	ONE_COL		14		/* to s   @OneCol                    */
-#define	ONE_ROW		15		/* to s   @OneRow                    */
-#define	WIDE		16		/* to s   @Wide                      */
-#define	HIGH		17		/* to s   @High                      */
-#define	HSCALE		18		/* to s   @HScale                    */
-#define	VSCALE		19		/* to s   @HScale                    */
-#define	SCALE		20		/* to s   @Scale                     */
-#define	HCONTRACT	21		/* to s   @HContract                 */
-#define	VCONTRACT	22		/* to s   @VContract                 */
-#define	HEXPAND		23		/* to s   @HExpand                   */
-#define	VEXPAND		24		/* to s   @VExpand                   */
-#define	PADJUST		25		/* to s   @PAdjust                   */
-#define	HADJUST		26		/* to s   @HAdjust                   */
-#define	VADJUST		27		/* to s   @VAdjust                   */
-#define	ROTATE		28		/* to s   @Rotate                    */
-#define	CASE		29		/* to s   @Case                      */
-#define	YIELD		30		/* to s   @Yield                     */
-#define	FONT		31		/* to s   @Font                      */
-#define	SPACE		32		/* to s   @Space                     */
-#define	BREAK		33		/* to s   @Break                     */
-#define	NEXT		34		/* to s   @Next                      */
-#define	ENV		35		/* to s   @LEnv                      */
-#define	CLOS		36		/* to s   @LClos                     */
-#define	LVIS		37		/* to s   @LVis                      */
-#define	OPEN		38		/* to s   @Open                      */
-#define	TAGGED		39		/* to s   @Tagged                    */
-#define	INCGRAPHIC	40		/* to s   @IncludeGraphic            */
-#define	SINCGRAPHIC	41		/* to s   @SysIncludeGraphic         */
-#define	GRAPHIC		42		/* to s   @Graphic                   */
+#define	WORD		 8		/*  o     a word                     */
+#define	QWORD		 9		/*  o     a word (was quoted in i/p) */
+#define	ROW_THR		10		/*  o     a row thread               */
+#define	COL_THR		11		/*  o     a column thread            */
+#define	ACAT		12		/* to s   a sequence of &-ed objs    */
+#define	HCAT		13		/* to s   a sequence of |-ed objs    */
+#define	VCAT		14		/* to s   a sequence of /-ed objs    */
+#define	ONE_COL		15		/* to s   @OneCol                    */
+#define	ONE_ROW		16		/* to s   @OneRow                    */
+#define	WIDE		17		/* to s   @Wide                      */
+#define	HIGH		18		/* to s   @High                      */
+#define	HSCALE		19		/* to s   @HScale                    */
+#define	VSCALE		20		/* to s   @HScale                    */
+#define	SCALE		21		/* to s   @Scale                     */
+#define	HCONTRACT	22		/* to s   @HContract                 */
+#define	VCONTRACT	23		/* to s   @VContract                 */
+#define	HEXPAND		24		/* to s   @HExpand                   */
+#define	VEXPAND		25		/* to s   @VExpand                   */
+#define	PADJUST		26		/* to s   @PAdjust                   */
+#define	HADJUST		27		/* to s   @HAdjust                   */
+#define	VADJUST		28		/* to s   @VAdjust                   */
+#define	ROTATE		29		/* to s   @Rotate                    */
+#define	CASE		30		/* to s   @Case                      */
+#define	YIELD		31		/* to s   @Yield                     */
+#define	XCHAR		32		/* to s   @Char                      */
+#define	FONT		33		/* to s   @Font                      */
+#define	SPACE		34		/* to s   @Space                     */
+#define	BREAK		35		/* to s   @Break                     */
+#define	NEXT		36		/* to s   @Next                      */
+#define	ENV		37		/* to s   @LEnv                      */
+#define	CLOS		38		/* to s   @LClos                     */
+#define	LVIS		39		/* to s   @LVis                      */
+#define	OPEN		40		/* to s   @Open                      */
+#define	TAGGED		41		/* to s   @Tagged                    */
+#define	INCGRAPHIC	42		/* to s   @IncludeGraphic            */
+#define	SINCGRAPHIC	43		/* to s   @SysIncludeGraphic         */
+#define	GRAPHIC		44		/* to s   @Graphic                   */
 
-#define	TSPACE		43		/* t      a space token, parser only */
-#define	TJUXTA		44		/* t      a juxta token, parser only */
-#define	LBR		45		/* t  s   left brace token           */
-#define	RBR		46		/* t  s   right brace token          */
-#define	BEGIN		47		/* t  s   @Begin token               */
-#define	END		48		/* t  s   @End token                 */
-#define	USE		49		/* t  s   @Use                       */
-#define	GSTUB_NONE	50		/* t      a galley stub, no rpar     */
-#define	GSTUB_INT	51		/* t      galley stub internal rpar  */
-#define	GSTUB_EXT	52		/* t      galley stub external rpar  */
-#define	INCLUDE		53		/*    s   @Include                   */
-#define	SYS_INCLUDE	54		/*    s   @SysInclude                */
-#define	PREPEND		55		/*    s   @Prepend                   */
-#define	SYS_PREPEND	56		/*    s   @SysPrepend                */
-#define	DATABASE	57		/*    s   @Database                  */
-#define	SYS_DATABASE	58		/*    s   @SysDatabase               */
-#define	START		59		/*    s   \Start                     */
+#define	TSPACE		45		/* t      a space token, parser only */
+#define	TJUXTA		46		/* t      a juxta token, parser only */
+#define	LBR		47		/* t  s   left brace token           */
+#define	RBR		48		/* t  s   right brace token          */
+#define	BEGIN		49		/* t  s   @Begin token               */
+#define	END		50		/* t  s   @End token                 */
+#define	USE		51		/* t  s   @Use                       */
+#define	GSTUB_NONE	52		/* t      a galley stub, no rpar     */
+#define	GSTUB_INT	53		/* t      galley stub internal rpar  */
+#define	GSTUB_EXT	54		/* t      galley stub external rpar  */
+#define	INCLUDE		55		/*    s   @Include                   */
+#define	SYS_INCLUDE	56		/*    s   @SysInclude                */
+#define	PREPEND		57		/*    s   @Prepend                   */
+#define	SYS_PREPEND	58		/*    s   @SysPrepend                */
+#define	DATABASE	59		/*    s   @Database                  */
+#define	SYS_DATABASE	60		/*    s   @SysDatabase               */
+#define	START		61		/*    s   \Start                     */
 
-#define	DEAD		60		/*   i    a dead galley              */
-#define	UNATTACHED	61		/*   i    an inner, unsized galley   */
-#define	CLOSE_INDEX	62		/*   i    synchronize galley closing */
-#define	RECEPTIVE	63		/*   i    a receptive object index   */
-#define	RECEIVING	64		/*   i    a receiving object index   */
-#define	RECURSIVE	65		/*   i    a recursive definite obj.  */
-#define	PRECEDES	66		/*   i    an ordering constraint     */
-#define	FOLLOWS		67		/*   i    other end of ordering c.   */
-#define	CROSS_FOLL	68		/*   i    following type cross-ref   */
-#define	GALL_FOLL	69		/*   i    galley with &&following    */
-#define	CROSS_TARG	70		/*   i    value of cross-ref         */
-#define	GALL_TARG	71		/*   i    target of these galleys    */
-#define	GALL_PREC	72		/*   i    galley with &&preceding    */
-#define	CROSS_PREC	73		/*   i    preceding type cross-ref   */
-#define	EXPAND_IND	74		/*   i    index of HEXPAND or VEXPD  */
-#define	THREAD		75		/*        a sequence of threads      */
-#define	CROSS_SYM	76		/*        cross-ref info             */
-#define	CR_ROOT		77		/*        RootCross                  */
-#define	MACRO		78		/*        a macro symbol             */
-#define	LOCAL		79		/*        a local symbol             */
-#define	LPAR		80		/*        a left parameter           */
-#define	NPAR		81		/*        a named parameter          */
-#define	RPAR		82		/*        a right parameter          */
-#define	EXT_GALL	83		/*        an external galley         */
-#define	CR_LIST		84		/*        a list of cross references */
-#define	DISPOSED	85		/*        a disposed record          */
+#define	DEAD		63		/*   i    a dead galley              */
+#define	UNATTACHED	64		/*   i    an inner, unsized galley   */
+#define	RECEPTIVE	65		/*   i    a receptive object index   */
+#define	RECEIVING	66		/*   i    a receiving object index   */
+#define	RECURSIVE	67		/*   i    a recursive definite obj.  */
+#define	PRECEDES	68		/*   i    an ordering constraint     */
+#define	FOLLOWS		69		/*   i    other end of ordering c.   */
+#define	CROSS_FOLL	70		/*   i    following type cross-ref   */
+#define	GALL_FOLL	71		/*   i    galley with &&following    */
+#define	CROSS_TARG	72		/*   i    value of cross-ref         */
+#define	GALL_TARG	73		/*   i    target of these galleys    */
+#define	GALL_PREC	74		/*   i    galley with &&preceding    */
+#define	CROSS_PREC	75		/*   i    preceding type cross-ref   */
+#define	EXPAND_IND	76		/*   i    index of HEXPAND or VEXPD  */
+#define	THREAD		77		/*        a sequence of threads      */
+#define	CROSS_SYM	78		/*        cross-ref info             */
+#define	CR_ROOT		79		/*        RootCross                  */
+#define	MACRO		80		/*        a macro symbol             */
+#define	LOCAL		81		/*        a local symbol             */
+#define	LPAR		82		/*        a left parameter           */
+#define	NPAR		83		/*        a named parameter          */
+#define	RPAR		84		/*        a right parameter          */
+#define	EXT_GALL	85		/*        an external galley         */
+#define	CR_LIST		86		/*        a list of cross references */
+#define	DISPOSED	87		/*        a disposed record          */
 
 #define is_indefinite(x)  ((x) >= CLOSURE && (x) <= HEAD)
 #define is_definite(x) 	 ((x) >= SPLIT && (x) <= GRAPHIC)
 #define	is_par(x)	((x) >= LPAR   && (x) <= RPAR)
 #define	is_index(x)	((x) >= DEAD && (x) <= EXPAND_IND)
 #define	is_type(x)	((x) >= LINK && (x) < DISPOSED)
-#define	is_filecom(x)	((x) >= INCLUDE && (x) <= SYS_DATABASE)
+#define	is_word(x)	((x) == WORD || (x) == QWORD)
+#define is_cat_op(x)    (((x)>=ACAT && (x)<=VCAT) || (x)==TSPACE || (x)<=TJUXTA)
+
 
 /*@::miscellaneous constants@*************************************************/
 /*                                                                           */
-/*  Miscellaneous Globally Defined Constants                                 */
+/*  Miscellaneous globally defined constants                                 */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -754,25 +1001,25 @@ typedef union rec
 #define	DO_ADJUST	6		/* placed in ACATs when adjust need  */
 
 /* sides of a mark */
-#define	BACK		86		/* means 'lies to left of mark'      */
-#define	ON		87		/* means 'lies on mark'              */
-#define	FWD		88		/* means 'lies to right of mark'     */
+#define	BACK		88		/* means lies to left of mark        */
+#define	ON		89		/* means lies on mark                */
+#define	FWD		90		/* means lies to right of mark       */
 
 /* statuses of thread objects */
 #define	NOTSIZED	 0		/* this thread object is not sized   */
 #define	SIZED		 1		/* thread is sized but not printed   */
-#define	FINALSIZE	 2		/* thread object's size is now final */
+#define	FINALSIZE	 2		/* thread object size is now final   */
 
 /* constraint statuses */
-#define	PROMOTE		89		/* this component may be promoted    */
-#define	CLOSE		90		/* must close dest before promoting  */
-#define	BLOCK		91		/* cannot promote this component     */
-#define	CLEAR		92		/* this constraint is now satisfied  */
+#define	PROMOTE		91		/* this component may be promoted    */
+#define	CLOSE		92		/* must close dest before promoting  */
+#define	BLOCK		93		/* cannot promote this component     */
+#define	CLEAR		94		/* this constraint is now satisfied  */
 
 /* gap increment types */
-#define	ABS		93		/* absolute,  e.g.  3p               */
-#define	INC		94		/* increment, e.g. +3p               */
-#define	DEC		95		/* decrement, e.g. -3p               */
+#define	GAP_ABS		95		/* absolute,  e.g.  3p               */
+#define	GAP_INC		96		/* increment, e.g. +3p               */
+#define	GAP_DEC		97		/* decrement, e.g. -3p               */
 
 /* file types */
 #define	SOURCE_FILE	 0		/* input file from command line      */
@@ -784,6 +1031,7 @@ typedef union rec
 #define	PREPEND_FILE	 6		/* PostScript prologue file          */
 #define	HYPH_FILE	 7		/* hyphenation file                  */
 #define	HYPH_PACKED_FILE 8		/* packed hyphenation file           */
+#define	ENCODING_FILE	 9		/* encoding vector file              */
 
 /* path types (i.e. sequences of directories for file searching) */
 #define	SOURCE_PATH	 0		/* path to search for source files   */
@@ -791,15 +1039,16 @@ typedef union rec
 #define	SYSINCLUDE_PATH	 2		/* path for @SysInclude files        */
 #define	DATABASE_PATH	 3		/* path for @Database files          */
 #define	SYSDATABASE_PATH 4		/* path for @SysDatabase files       */
-#define	FONT_PATH	 5		/* path for fontdef files            */
+#define	FONT_PATH	 5		/* path for font metrics (AFM) files */
+#define	ENCODING_PATH	 6		/* path for encoding (CEV) files     */
 
 /* units of measurement */
 #define	NO_UNIT		 0		/* no unit - for error detection     */
 #define	FIXED_UNIT	 1		/* inches, cm, points, ems           */
-#define	FRAME_UNIT	 2		/* f's (frame widths)                */
-#define	AVAIL_UNIT	 3		/* a's (available spaces)            */
-#define	DEG_UNIT	 4		/* d's (degrees)                     */
-#define	NEXT_UNIT	 5		/* b's (inners)                      */
+#define	FRAME_UNIT	 2		/* f unit (frame widths)             */
+#define	AVAIL_UNIT	 3		/* r unit (available spaces)         */
+#define	DEG_UNIT	 4		/* d unit (degrees)                  */
+#define	NEXT_UNIT	 5		/* b unit (inners)                   */
  
 /* units of distance as multiples of the basic unit */
 #define	CM	       567		/* 1 centimetre                      */
@@ -812,10 +1061,10 @@ typedef union rec
 
 /* precedences */
 #define	NO_PREC		 0		/* lower than any precedence         */
-#define	BEGIN_PREC	 1		/* precedence of '@Begin'            */
-#define	END_PREC	 2		/* precedence of '@End'              */
-#define	LBR_PREC	 3		/* precedence of '{'                 */
-#define	RBR_PREC	 4		/* precedence of '}'                 */
+#define	BEGIN_PREC	 1		/* precedence of @Begin              */
+#define	END_PREC	 2		/* precedence of @End                */
+#define	LBR_PREC	 3		/* precedence of {                   */
+#define	RBR_PREC	 4		/* precedence of }                   */
 #define	VCAT_PREC	 5		/* precedence of /                   */
 #define	HCAT_PREC	 6		/* precedence of |                   */
 #define	ACAT_PREC	 7		/* precedence of & and white space   */
@@ -832,99 +1081,115 @@ typedef union rec
 #define	FATAL	1			/* fatal error, abort now            */
 #define	WARN	2			/* warning, non-fatal                */
 
-/*@::keywords@****************************************************************/
+
+/*@::Keywords@****************************************************************/
 /*                                                                           */
-/*  KEYWORDS                                                                 */
+/*  Keywords.                                                                */
 /*                                                                           */
 /*****************************************************************************/
 
-#define	KW_DEF		"def"
-#define	KW_FONTDEF	"fontdef"
-#define	KW_FORCE	"force"
-#define	KW_INTO		"into"
-#define	KW_IMPORT	"import"
-#define	KW_EXPORT	"export"
-#define	KW_PRECEDENCE	"precedence"
-#define	KW_ASSOC	"associativity"
-#define	KW_LEFT		"left"
-#define	KW_RIGHT	"right"
-#define	KW_BODY		"body"
-#define	KW_MACRO	"macro"
-#define	KW_NAMED	"named"
-#define	KW_NEXT		"@Next"
-#define	KW_WIDE		"@Wide"
-#define	KW_HIGH		"@High"
-#define	KW_ONE_COL	"@OneCol"
-#define	KW_ONE_ROW	"@OneRow"
-#define	KW_HSCALE	"@HScale"
-#define	KW_VSCALE	"@VScale"
-#define	KW_SCALE	"@Scale"
-#define	KW_HCONTRACT	"@HContract"
-#define	KW_VCONTRACT	"@VContract"
-#define	KW_HEXPAND	"@HExpand"
-#define	KW_VEXPAND	"@VExpand"
-#define	KW_PADJUST	"@PAdjust"
-#define	KW_HADJUST	"@HAdjust"
-#define	KW_VADJUST	"@VAdjust"
-#define	KW_ROTATE	"@Rotate"
-#define	KW_INCGRAPHIC	"@IncludeGraphic"
-#define	KW_SINCGRAPHIC	"@SysIncludeGraphic"
-#define	KW_GRAPHIC	"@Graphic"
-#define	KW_CASE		"@Case"
-#define	KW_YIELD	"@Yield"
-#define	KW_FONT		"@Font"
-#define	KW_SPACE	"@Space"
-#define	KW_BREAK	"@Break"
-#define	KW_ENV		"@LEnv"
-#define	KW_CLOS		"@LClos"
-#define	KW_LVIS		"@LVis"
-#define	KW_OPEN		"@Open"
-#define	KW_USE		"@Use"
-#define	KW_TAGGED	"@Tagged"
-#define	KW_DATABASE	"@Database"
-#define	KW_SYSDATABASE	"@SysDatabase"
-#define	KW_INCLUDE	"@Include"
-#define	KW_SYSINCLUDE	"@SysInclude"
-#define	KW_PREPEND	"@PrependGraphic"
-#define	KW_SYSPREPEND	"@SysPrependGraphic"
-#define	KW_TARGET	"@Target"
-#define	KW_FOLLOWING	"following"
-#define	KW_PRECEDING	"preceding"
-#define	KW_NOW		"now"
-#define	KW_NULL		"@Null"
-#define	KW_GALLEY	"@Galley"
-#define	KW_INPUT	"@LInput"
-#define	KW_SPLIT	"@Split"
-#define	KW_TAG		"@Tag"
-#define	KW_KEY		"@Key"
-#define	KW_CROSS	"&&"
+#define	KW_START		AsciiToFull("\\Start")
+#define	KW_PRINT		AsciiToFull("\\Print")
+#define	KW_DEF			AsciiToFull("def")
+#define	KW_FONTDEF		AsciiToFull("fontdef")
+#define	KW_FORCE		AsciiToFull("force")
+#define	KW_INTO			AsciiToFull("into")
+#define	KW_IMPORT		AsciiToFull("import")
+#define	KW_EXPORT		AsciiToFull("export")
+#define	KW_PRECEDENCE		AsciiToFull("precedence")
+#define	KW_ASSOC		AsciiToFull("associativity")
+#define	KW_LEFT			AsciiToFull("left")
+#define	KW_RIGHT		AsciiToFull("right")
+#define	KW_BODY			AsciiToFull("body")
+#define	KW_MACRO		AsciiToFull("macro")
+#define	KW_NAMED		AsciiToFull("named")
+#define	KW_NEXT			AsciiToFull("@Next")
+#define	KW_WIDE			AsciiToFull("@Wide")
+#define	KW_HIGH			AsciiToFull("@High")
+#define	KW_ONE_COL		AsciiToFull("@OneCol")
+#define	KW_ONE_ROW		AsciiToFull("@OneRow")
+#define	KW_HSCALE		AsciiToFull("@HScale")
+#define	KW_VSCALE		AsciiToFull("@VScale")
+#define	KW_SCALE		AsciiToFull("@Scale")
+#define	KW_HCONTRACT		AsciiToFull("@HContract")
+#define	KW_VCONTRACT		AsciiToFull("@VContract")
+#define	KW_HEXPAND		AsciiToFull("@HExpand")
+#define	KW_VEXPAND		AsciiToFull("@VExpand")
+#define	KW_PADJUST		AsciiToFull("@PAdjust")
+#define	KW_HADJUST		AsciiToFull("@HAdjust")
+#define	KW_VADJUST		AsciiToFull("@VAdjust")
+#define	KW_ROTATE		AsciiToFull("@Rotate")
+#define	KW_INCGRAPHIC		AsciiToFull("@IncludeGraphic")
+#define	KW_SINCGRAPHIC		AsciiToFull("@SysIncludeGraphic")
+#define	KW_GRAPHIC		AsciiToFull("@Graphic")
+#define	KW_CASE			AsciiToFull("@Case")
+#define	KW_YIELD		AsciiToFull("@Yield")
+#define	KW_XCHAR		AsciiToFull("@Char")
+#define	KW_FONT			AsciiToFull("@Font")
+#define	KW_SPACE		AsciiToFull("@Space")
+#define	KW_BREAK		AsciiToFull("@Break")
+#define	KW_ENV			AsciiToFull("@LEnv")
+#define	KW_CLOS			AsciiToFull("@LClos")
+#define	KW_LVIS			AsciiToFull("@LVis")
+#define	KW_OPEN			AsciiToFull("@Open")
+#define	KW_USE			AsciiToFull("@Use")
+#define	KW_TAGGED		AsciiToFull("@Tagged")
+#define	KW_DATABASE		AsciiToFull("@Database")
+#define	KW_SYSDATABASE		AsciiToFull("@SysDatabase")
+#define	KW_INCLUDE		AsciiToFull("@Include")
+#define	KW_SYSINCLUDE		AsciiToFull("@SysInclude")
+#define	KW_PREPEND		AsciiToFull("@PrependGraphic")
+#define	KW_SYSPREPEND		AsciiToFull("@SysPrependGraphic")
+#define	KW_TARGET		AsciiToFull("@Target")
+#define	KW_FOLLOWING		AsciiToFull("following")
+#define	KW_PRECEDING		AsciiToFull("preceding")
+#define	KW_NOW			AsciiToFull("now")
+#define	KW_NULL			AsciiToFull("@Null")
+#define	KW_GALLEY		AsciiToFull("@Galley")
+#define	KW_INPUT		AsciiToFull("@LInput")
+#define	KW_SPLIT		AsciiToFull("@Split")
+#define	KW_TAG			AsciiToFull("@Tag")
+#define	KW_KEY			AsciiToFull("@Key")
+#define	KW_CROSS		AsciiToFull("&&")
+#define	KW_LBR			AsciiToFull("{")
+#define	KW_RBR			AsciiToFull("}")
+#define	KW_BEGIN		AsciiToFull("@Begin")
+#define	KW_END			AsciiToFull("@End")
+#define	KW_VCAT_NN		AsciiToFull("//")
+#define	KW_VCAT_MN		AsciiToFull("^//")
+#define	KW_VCAT_NJ		AsciiToFull("/")
+#define	KW_VCAT_MJ		AsciiToFull("^/")
+#define	KW_HCAT_NN		AsciiToFull("||")
+#define	KW_HCAT_MN		AsciiToFull("^||")
+#define	KW_HCAT_NJ		AsciiToFull("|")
+#define	KW_HCAT_MJ		AsciiToFull("^|")
+#define	KW_ACAT_NJ		AsciiToFull("&")
+#define	KW_ACAT_MJ		AsciiToFull("^&")
+#define	KW_MOMENT		AsciiToFull("@Moment")
+#define	KW_SECOND		AsciiToFull("@Second")
+#define	KW_MINUTE		AsciiToFull("@Minute")
+#define	KW_HOUR			AsciiToFull("@Hour")
+#define	KW_DAY			AsciiToFull("@Day")
+#define	KW_MONTH		AsciiToFull("@Month")
+#define	KW_YEAR			AsciiToFull("@Year")
+#define	KW_CENTURY		AsciiToFull("@Century")
+#define	KW_WEEKDAY		AsciiToFull("@WeekDay")
+#define	KW_YEARDAY		AsciiToFull("@YearDay")
+#define	KW_DAYLIGHTSAVING	AsciiToFull("@DaylightSaving")
 
-#define	KW_LBR		"{"
-#define	KW_RBR		"}"
-#define	KW_BEGIN	"@Begin"
-#define	KW_END		"@End"
 
-#define	KW_VCAT_NN	"//"
-#define	KW_VCAT_MN	"^//"
-#define	KW_VCAT_NJ	"/"
-#define	KW_VCAT_MJ	"^/"
-#define	KW_HCAT_NN	"||"
-#define	KW_HCAT_MN	"^||"
-#define	KW_HCAT_NJ	"|"
-#define	KW_HCAT_MJ	"^|"
-#define	KW_ACAT_NJ	"&"
-#define	KW_ACAT_MJ	"^&"
-
-
-/*@::memory allocation and list macros@***************************************/
+/*@::GetMem(), New(), NewWord(), PutMem(), Dispose()@*************************/
 /*                                                                           */
 /*  OBJECT GetMem(siz, pos)                                                  */
 /*  OBJECT New(typ)                                                          */
-/*  OBJECT NewWord(len, pos)                                                 */
+/*  OBJECT NewWord(typ, len, pos)                                            */
+/*         PutMem(x, siz)                                                    */
+/*         Dispose(x)                                                        */
 /*                                                                           */
 /*  Return a pointer to a new record, of appropriate length (in ALIGNs).     */
 /*  The New and NewWord versions initialise LIST, type and rec_size fields.  */
-/*  Note that NewWord must be used for WORD objects.                         */
+/*  Note that NewWord must be used for WORD and QWORD objects.               */
+/*  Dispose x, which is of size siz.  Dispose works out the size itself.     */
 /*                                                                           */
 /*****************************************************************************/
 #define	USES_SIZE ceiling( sizeof(struct uses_type), sizeof(ALIGN) )
@@ -936,9 +1201,8 @@ typedef union rec
 #endif
 
 #define	GetMem(siz, pos)						\
-( newcount								\
-  (zz_size=(siz))>=MAX_OBJECT_REC ?					\
-      (OBJECT) Error(FATAL,pos,"word is too long")			\
+( newcount (zz_size=(siz))>=MAX_OBJECT_REC ?				\
+      (OBJECT) Error(FATAL, pos, "word is too long")			\
   : zz_free[zz_size] == nil ? zz_hold = GetMemory(zz_size, pos)		\
   : (zz_hold = zz_free[zz_size],					\
 	zz_free[zz_size] = pred(zz_hold, CHILD), zz_hold)		\
@@ -953,30 +1217,18 @@ typedef union rec
 #endif
 
 #define	New(typ)							\
-( checknew(typ)								\
-  GetMem(zz_lengths[typ], no_fpos),					\
-  type(zz_hold) = typ,							\
+( checknew(typ) GetMem(zz_lengths[typ], no_fpos), type(zz_hold) = typ,	\
   pred(zz_hold, CHILD)  = succ(zz_hold, CHILD)  =			\
   pred(zz_hold, PARENT) = succ(zz_hold, PARENT) = zz_hold		\
 )
 
-#define NewWord(len, pos)						\
-( zz_size = sizeof(struct word_type) + (len) - 3,			\
+#define NewWord(typ, len, pos)						\
+( zz_size = sizeof(struct word_type) - 4 + ((len)+1)*sizeof(FULL_CHAR),	\
   GetMem(ceiling(zz_size, sizeof(ALIGN)), pos),  /* RESETS zz_size */	\
-  rec_size(zz_hold) = zz_size,  type(zz_hold) = WORD,			\
+  rec_size(zz_hold) = zz_size,  type(zz_hold) = typ,			\
   pred(zz_hold, CHILD)  = succ(zz_hold, CHILD)  =			\
   pred(zz_hold, PARENT) = succ(zz_hold, PARENT) = zz_hold		\
 )
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  PutMem(x, siz)                                                           */
-/*  Dispose(x)                                                               */
-/*                                                                           */
-/*  Dispose x, which is of size siz.  Dispose works out the size itself.     */
-/*                                                                           */
-/*****************************************************************************/
 
 #if DEBUG_ON
 #define disposecount zz_disposecount++,
@@ -987,12 +1239,8 @@ typedef union rec
 #endif
 
 #define PutMem(x, siz)							\
-( disposecount								\
-  zz_hold = (x),							\
-  zz_size = (siz),							\
-  pred(zz_hold, CHILD) = zz_free[zz_size],				\
-  zz_free[zz_size] = zz_hold						\
-)
+( disposecount zz_hold = (x), zz_size = (siz),				\
+  pred(zz_hold, CHILD) = zz_free[zz_size], zz_free[zz_size] = zz_hold )
 
 #define Dispose(x)							\
 ( zz_hold = (x),							\
@@ -1000,12 +1248,10 @@ typedef union rec
   assert( succ(zz_hold, CHILD)  == zz_hold, "Dispose: succ(CHILD)!"  ),	\
   assert( pred(zz_hold, PARENT) == zz_hold, "Dispose: pred(PARENT)!" ),	\
   assert( succ(zz_hold, PARENT) == zz_hold, "Dispose: succ(PARENT)!" ),	\
-  PutMem(zz_hold, type(zz_hold) == WORD ? rec_size(zz_hold)		\
-				  : zz_lengths[type(zz_hold)])		\
-  setdisposed								\
-)
+  PutMem(zz_hold, is_word(type(zz_hold)) ? rec_size(zz_hold)		\
+			  : zz_lengths[type(zz_hold)]) setdisposed  )
 
-/*@@**************************************************************************/
+/*@::Append(), Delete(), DeleteAndDispose()@**********************************/
 /*                                                                           */
 /*  OBJECT Append(x, y, dir)                                                 */
 /*                                                                           */
@@ -1079,12 +1325,12 @@ for( y = pred(link, PARENT);  type(y) == LINK;  y = pred(y, PARENT) )
 for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 
 
-/*****************************************************************************/
+/*@::UpDim(), DownDim(), Link(), DeleteLink(), etc.@**************************/
 /*                                                                           */
 /*  UpDim(x, dim)                                                            */
 /*  DownDim(x, dim)                                                          */
 /*                                                                           */
-/*  Returns the dim'th child or parent link of node x (dim == COL or ROW).   */
+/*  Returns the dim child or parent link of node x (dim == COL or ROW).      */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -1124,7 +1370,7 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 )
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  DisposeChild(link)                                                       */
 /*                                                                           */
@@ -1155,7 +1401,7 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 ) /* end MoveLink */
 
 
-/*****************************************************************************/
+/*@::TransferLinks(), DeleteNode(), etc.@*************************************/
 /*                                                                           */
 /*  TransferLinks(start_link, stop_link, dest_link)                          */
 /*                                                                           */
@@ -1222,7 +1468,7 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 ) /* end ReplaceNode */
 
 
-/*@::scanning catenation objects@*********************************************/
+/*@::FirstDefinite(), NextDefinite(), etc.@***********************************/
 /*                                                                           */
 /*  FirstDefinite(x, link, y)                                                */
 /*                                                                           */
@@ -1300,8 +1546,7 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
   }									\
 } /* end NextDefiniteWithGap */
 
-
-/*****************************************************************************/
+/*@@**************************************************************************/
 /*                                                                           */
 /*  LastDefinite(x, link, y)                                                 */
 /*                                                                           */
@@ -1350,13 +1595,13 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 } /* end PrevDefinite */
 
 
-/*@::module declarations@*****************************************************/
+/*@::Module Declarations@*****************************************************/
 /*                                                                           */
 /*  MODULE DECLARATIONS                                                      */
 /*                                                                           */
 /*****************************************************************************/
 
-/*****  z01.c		Start Up		******************************/
+/*****  z01.c		Supervise		******************************/
 extern			main();			/* main program              */
 extern	OBJECT		StartSym;		/* sym tab entry for \Start  */
 extern	OBJECT		GalleySym;		/* sym tab entry for @Galley */
@@ -1364,8 +1609,6 @@ extern	OBJECT		InputSym;		/* sym tab entry for \Input  */
 extern	OBJECT		PrintSym;		/* sym tab entry for \Print  */
 extern	BOOLEAN		AllowCrossDb;		/* true when -s flag absent  */
 extern	BOOLEAN		Encapsulated;		/* true when eps wanted      */
-extern	BOOLEAN		StringBeginsWith();	/* string compare            */
-extern	BOOLEAN		StringContains();	/* string search             */
 
 /*****  z02.c		Lexical Analyser	******************************/
 extern			LexInit();		/* initialise lex. analyser  */
@@ -1383,9 +1626,9 @@ extern	FILE_NUM	DefineFile();		/* declare input file        */
 extern	FILE_NUM	FirstFile();		/* first file of given type  */
 extern	FILE_NUM	NextFile();		/* next file of given type   */
 extern	FILE_NUM	FileNum();		/* file with given name      */
-extern	unsigned char	*FileName();		/* file name of file         */
-extern	unsigned char	*EchoFilePos();		/* string value of FILE_POS  */
-extern	FILE_POS	*PosOfFile();		/* string of file's FILE_POS */
+extern	FULL_CHAR	*FileName();		/* file name of file         */
+extern	FULL_CHAR	*EchoFilePos();		/* string value of FILE_POS  */
+extern	FILE_POS	*PosOfFile();		/* string of file FILE_POS   */
 extern	FILE		*OpenFile();		/* open file for reading     */
 extern	FILE		*OpenIncGraphicFile();	/* open @IncludeGraphic file */
 extern	OBJECT		ReadFromFile();		/* read object from file     */
@@ -1395,19 +1638,21 @@ extern			CloseFiles();		/* close database files      */
 /*****  z04.c		Token Service	        ******************************/
 extern	OBJECT		NewToken();		/* get a new token           */
 extern	OBJECT		CopyTokenList();	/* copy a list of tokens     */
-extern	unsigned char	*EchoCatOp();		/* string value of CAT op    */
-extern	unsigned char	*EchoToken();		/* returns image of token    */
+extern	FULL_CHAR	*EchoCatOp();		/* string value of CAT op    */
+extern	FULL_CHAR	*EchoToken();		/* returns image of token    */
 
-/*****  z05.c		Definitions Reader	******************************/
+/*****  z05.c		Read Definitions  	******************************/
+extern			ReadPrependDef();	/* read @Prepend ...         */
+extern			ReadDatabaseDef();	/* read @Database ...        */
 extern			ReadDefinitions();	/* read definitions          */
 
-/*****  z06.c		Parser			******************************/
+/*****  z06.c		Object Parser	        ******************************/
 extern			InitParser();		/* initialise parser         */
 extern	OBJECT		Parse();		/* parser                    */
 
 /*****  z07.c		Object Service	        ******************************/
-extern	OBJECT		MakeWord();		/* a new WORD object         */
-extern	OBJECT		MakeWordTwo();		/* a new WORD object         */
+extern	OBJECT		MakeWord();		/* a new WORD or QWORD       */
+extern	OBJECT		MakeWordTwo();		/* a new WORD from 2 strings */
 extern	OBJECT		CopyObject();		/* make a copy of an object  */
 extern			DisposeObject();	/* dispose an object         */
 extern	BOOLEAN		SplitIsDefinite();	/* TRUE if SPLIT is definite */
@@ -1426,7 +1671,7 @@ extern	OBJECT		ClosureExpand();	/* expand a user-def CLOSURE */
 
 /*****  z10.c		Cross References	******************************/
 extern			CrossInit();		/* initialize cr record      */
-extern	OBJECT		CrossGenTag();		/* generates a tag           */
+extern			CrossAddTag();		/* add auto tag to closure   */
 extern	OBJECT		CrossMake();		/* returns a cross-reference */
 extern	OBJECT		GallTargEval();		/* returns the value of a cr */
 extern	OBJECT		CrossExpand();		/* returns the value of a cr */
@@ -1436,7 +1681,7 @@ extern			CrossClose();		/* close down this module    */
 /*****  z11.c		Style Service		******************************/
 extern			BreakChange();		/* change line spacing       */
 extern			SpaceChange();		/* change word spacing       */
-extern	unsigned char	*EchoStyle();		/* string value of a style   */
+extern	FULL_CHAR	*EchoStyle();		/* string value of a style   */
 
 /*****  z12.c		Size Finder		******************************/
 extern	OBJECT		MinSize();		/* min. possible size of obj */
@@ -1449,7 +1694,7 @@ extern	OBJECT		FillObject();		/* optimal paragraph breaker */
 extern	OBJECT		SimpleFillObject();	/* simple paragraph breaker  */
 
 /*****  z15.c		Size Constraints	******************************/
-extern	unsigned char	*EchoConstraint();	/* string value of a constr. */
+extern	FULL_CHAR	*EchoConstraint();	/* string value of a constr. */
 extern			MinConstraint();	/* take minimum of two const */
 extern			EnlargeToConstraint();	/* enlarge obj to constraint */
 extern			RotateConstraint();	/* rotate constraints        */
@@ -1466,7 +1711,7 @@ extern			GetGap();		/* convert string gap to num */
 extern	LENGTH		MinGap();		/* min. possible gap width   */
 extern	LENGTH		ExtraGap();		/* extra available gap width */
 extern	LENGTH		ActualGap();		/* gap width for output      */
-extern	unsigned char	*EchoGap();		/* echo gap (cat. operator)  */
+extern	FULL_CHAR	*EchoGap();		/* echo gap (cat. operator)  */
 
 /*****  z18.c		Galley Transfer		******************************/
 extern			TransferInit();		/* initialise this module    */
@@ -1499,16 +1744,11 @@ extern	int		CheckConstraint();	/* check ordering constraint */
 /*****  z23.c		Galley Printer		******************************/
 extern			FixAndPrintObject();	/* fix and print component   */
 
-/*****  z24.c		Back End                ******************************/
+/*****  z24.c		Print Service           ******************************/
 extern			PrintInit();		/* initialise this module    */
-extern			FontStripQuotes();	/* convert quoted string     */
-extern			FontDefine();		/* define a font             */
-extern			FontChange();		/* change current font       */
-extern			FontAtomSize();		/* set sizes of an atom      */
-extern	LENGTH		FontSize();		/* size of current font      */
 extern			PrintPrologue();	/* print output prologue     */
 extern			PrintOriginIncrement();	/* reset current o/p origin  */
-extern			PrintAtom();		/* print atom at given pos   */
+extern			PrintWord();		/* print word at given pos   */
 extern			PrintClose();		/* wrapup output stream      */
 extern			CoordTranslate();	/* translate coord system    */
 extern			CoordRotate();		/* rotate coord system       */
@@ -1520,14 +1760,15 @@ extern			PrintGraphicObject();	/* print PostScript object   */
 extern			PrintGraphicInclude();	/* include PostScript file   */
 
 /*****  z25.c		Object Echo	        ******************************/
-extern	unsigned char	*EchoObject();		/* print object, file or str */
+extern	FULL_CHAR	*EchoObject();		/* return object as string   */
+extern			DebugObject();		/* print object on stderr    */
 
 /*****  z26.c		Echo Service	        ******************************/
 extern			BeginString();		/* begin string accumulator  */
 extern			AppendString();		/* append to current string  */
-extern	unsigned char	*EndString();		/* return current string     */
-extern	unsigned char	*EchoLength();		/* echo a length             */
-extern	unsigned char	*Image();		/* string value of type(x)   */
+extern	FULL_CHAR	*EndString();		/* return current string     */
+extern	FULL_CHAR	*EchoLength();		/* echo a length             */
+extern	FULL_CHAR	*Image();		/* string value of type(x)   */
 
 /*****	z27.c		Debug Service		******************************/
 extern			DebugInit();		/* set debug flag            */
@@ -1540,7 +1781,7 @@ extern			ProfilePrint();		/* print profiling results   */
 extern			ErrorInit();		/* initialise log file       */
 extern			Error();		/* print error message       */
 extern	BOOLEAN		ErrorSeen();		/* TRUE after first error    */
-extern			EnterErrorBlock();	/* new block of error mess's */
+extern			EnterErrorBlock();	/* new error message block   */
 extern			LeaveErrorBlock();	/* commit or discard block   */
 
 /*****  z29.c		Symbol Table		******************************/
@@ -1553,13 +1794,13 @@ extern			SuppressScope();	/* suppress all scoping      */
 extern			UnSuppressScope();	/* unsuppress scoping        */
 extern			SwitchScope();		/* switch to a saved scope   */
 extern			UnSwitchScope();	/* switch back from saved s. */
-extern			BodyParAllowed();	/* let body par be invoked   */
-extern			BodyParNotAllowed();	/* don't let body par be inv */
+extern			BodyParAllowed();	/* body par is invokable     */
+extern			BodyParNotAllowed();	/* body par is not invokable */
 extern	OBJECT		SearchSym();		/* search table for symbol   */
 extern	OBJECT		InsertSym();		/* insert a new symbol       */
 extern			DeleteEverySym();	/* dispose all symbols       */
-extern	unsigned char	*SymName();		/* string name of a symbol   */
-extern	unsigned char	*FullSymName();		/* full path name of symbol  */
+extern	FULL_CHAR	*SymName();		/* string name of a symbol   */
+extern	FULL_CHAR	*FullSymName();		/* full path name of symbol  */
 extern	OBJECT		ChildSym();		/* return a child of a sym   */
 extern			CheckSymSpread();	/* check hash table spread   */
 
@@ -1576,7 +1817,7 @@ extern	OBJECT		GetMemory();		/* get some fresh memory     */
 extern			DebugMemory();		/* print memory usage        */
 extern	OBJECT		zz_free[];		/* array of free lists       */
 extern	unsigned char	zz_lengths[];		/* array of record lengths   */
-extern	int		zz_newcount;		/* debug count of New calls  */
+extern	int		zz_newcount;		/* debug count of News       */
 extern	int		zz_disposecount;	/* debug count of Disposes   */
 extern	OBJECT		zz_hold;		/* temporary variable only   */
 extern	OBJECT		zz_tmp;			/* temporary variable only   */
@@ -1597,6 +1838,7 @@ extern			DbConvert();		/* con. writable to readable */
 extern	OBJECT		DbLoad();		/* open readable database    */
 extern	BOOLEAN		DbRetrieve();		/* retrieve from database    */
 extern	BOOLEAN		DbRetrieveNext();	/* next entry from database  */
+extern			DbClose();		/* close a readable database */
 
 /*****  z34.c		Rotation Service    	******************************/
 extern			RotateSize();		/* calculate rotated size    */
@@ -1605,12 +1847,48 @@ extern			RotateSize();		/* calculate rotated size    */
 extern	OBJECT		MomentSym;		/* the @Moment symbol        */
 extern			InitTime();		/* initialize this module    */
 extern	OBJECT		StartMoment();		/* a copy of the init time   */
-extern	unsigned char	*TimeString();		/* a string containing time  */
+extern	FULL_CHAR	*TimeString();		/* a string containing time  */
 
 /*****  z36.c		Hyphenation     	******************************/
 extern	OBJECT		Hyphenate();		/* hyphenate a paragraph     */
 
-/*@::assert and debug code@***************************************************/
+/*****  z37.c		Font Service             *****************************/
+extern			FontInit();		/* intialize this module     */
+extern			FontDefine();		/* define a font             */
+extern			FontChange();		/* change current font       */
+extern			FontWordSize();		/* set sizes of a word       */
+extern	LENGTH		FontSize();		/* size of a font            */
+extern	LENGTH		FontHalfXHeight();	/* xheight/2 of a font       */
+extern	ENCODING	FontEncoding();		/* encoding vector of a font */
+extern	FULL_CHAR	*FontName();		/* output name of a font     */
+extern	FULL_CHAR	*FontFamilyAndFace();	/* Lout name of a font       */
+extern	BOOLEAN		FontNeeded();		/* writes out font needs     */
+
+/*****  z38.c		Encoding Vectors	******************************/
+extern	ENCODING	EvLoad();		/* load one encoding vector  */
+extern	FULL_CHAR	EvRetrieve();		/* convert char name to code */
+extern	FULL_CHAR	*EvName();		/* name of encoding vector   */
+extern			EvPrintAll();		/* print encoding vectors    */
+
+/*****  z39.c		String Handler          ******************************/
+#define			AsciiToFull(x)		( (FULL_CHAR *) (x) )
+#define			StringEqual(a, b) (strcmp((char *)(a), (char *)(b))==0)
+#define			StringLessEqual(a, b) (strcmp((char*)(a),(char*)(b))<=0)
+#define			StringCat(a, b)		strcat((char *)(a),(char *)(b))
+#define			StringCopy(a, b)	strcpy((char *)(a),(char *)(b))
+#define			StringLength(a)		strlen((char *)(a))
+#define			StringFOpen(a, b)	fopen( (char *) (a), (b) )
+#define			StringFPuts(a, b)	fputs( (char *) (a), (b) )
+#define			StringFGets(a, b, c)	fgets( (char *) (a), (b), (c) )
+#define			StringUnlink(a)		unlink((char *)(a))
+#define			StringLink(a, b)	link((char *)(a),(char *)(b))
+extern	BOOLEAN		StringBeginsWith();	/* string compare            */
+extern	BOOLEAN		StringContains();	/* string search             */
+extern	FULL_CHAR	*StringInt();		/* returns integer as string */
+extern	FULL_CHAR	*StringFiveInt();	/* returns integer as string */
+extern	FULL_CHAR	*StringQuotedWord();	/* returns string in Lout    */
+
+/*@::assert(), debug(), debug flags@******************************************/
 /*                                                                           */
 /*  ASSERT AND DEBUG CODE                                                    */
 /*                                                                           */
@@ -1626,7 +1904,7 @@ extern	OBJECT		Hyphenate();		/* hyphenate a paragraph     */
 #if DEBUG_ON
 
 struct dbs
-{	unsigned char	*flag;		/* external names for debug flags    */
+{	char	*flag;			/* external names for debug flags    */
 	BOOLEAN	on[3];			/* the debug flags                   */
 };
 extern	struct dbs 	dbg[];
@@ -1684,7 +1962,7 @@ extern	struct dbs 	dbg[];
 #define	DGM	21		/*  z21.c   -dgm   Galley Maker              */
 #define	DGS	22		/*  z22.c   -dgs   Galley Service            */
 #define	DGP	23		/*  z23.c   -dgp   Galley Printer            */
-#define	DFT	24		/*  z24.c   -dft   Font Tables               */
+#define	DPS	24		/*  z24.c   -dps   Print Service             */
 #define	DOE	25		/*  z25.c   -doe   Object Echo               */
 #define	DES	26		/*  z26.c   -des   Echo Service		     */
 #define	DZZ	27		/*  z27.c   -dzz   Debug Service             */
@@ -1697,8 +1975,11 @@ extern	struct dbs 	dbg[];
 #define	DRS	34		/*  z34.c   -drs   Rotation Service          */
 #define	DTK	35		/*  z35.c   -dtk   Time Keeper               */
 #define	DHY	36		/*  z36.c   -dhy   Hyphenation               */
-#define	DPP	37		/*          -dpp   Profiling                 */
-#define	ANY	38		/*          -d     any                       */
+#define	DFT	37		/*  z37.c   -dft   Font Service              */
+#define	DEV	38		/*  z38.c   -dev   Encoding Vectors          */
+#define	DSH	39		/*  z39.c   -dsh   String Handler            */
+#define	DPP	40		/*          -dpp   Profiling                 */
+#define	ANY	41		/*          -d     any                       */
 
 #else
 #define ifdebug(cat, urg, x)

@@ -1,6 +1,6 @@
-/*@z08.c:Object Manifest:Manifest()@******************************************/
+/*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -31,9 +31,8 @@
 
 #define errorcase()							\
 									\
-    y = MakeWord("", &fpos(x));						\
-    ReplaceNode(y, x);							\
-    DisposeObject(x);							\
+    y = MakeWord(WORD, STR_EMPTY, &fpos(x));				\
+    ReplaceNode(y, x);  DisposeObject(x);				\
     x = Manifest(y, env, style, bthr, fthr, target, crs, ok, FALSE);	\
     break;
 
@@ -54,7 +53,7 @@
 static OBJECT insert_split(x, bthr, fthr)
 OBJECT x;  OBJECT bthr[2], fthr[2];
 { OBJECT res, new_op;  int dim;
-  debug1(DOM, DD, "ReplaceWithSplit(%s, -)", EchoObject(null, x));
+  debug1(DOM, DD, "ReplaceWithSplit(%s, -)", EchoObject(x));
   assert( type(x) != SPLIT, "ReplaceWithSplit: type(x) already SPLIT!" );
   res = New(SPLIT);
   FposCopy(fpos(res), fpos(x));
@@ -66,117 +65,96 @@ OBJECT x;  OBJECT bthr[2], fthr[2];
       fwd(new_op, 1-dim) = 0;	/* will hold max frame_size */
       back(new_op, 1-dim) = 0;	/* will hold max frame_origin */
       FposCopy(fpos(new_op), fpos(x));
-      Link(res, new_op);
-      Link(new_op, x);
+      Link(res, new_op);  Link(new_op, x);
       if( bthr[dim] )  Link(bthr[dim], new_op);
       if( fthr[dim] )  Link(fthr[dim], new_op);
     }
     else Link(res, x);
   }
 
-  debug1(DOM, DD, "ReplaceWithSplit returning %s", EchoObject(null, res));
+  debug1(DOM, DD, "ReplaceWithSplit returning %s", EchoObject(res));
   return res;
 } /* end insert_split */
 
-
-/*@@**************************************************************************/
+/*@::ReplaceWithTidy()@*******************************************************/
 /*                                                                           */
 /*  OBJECT ReplaceWithTidy(x)                                                */
 /*                                                                           */
 /*  Replace object x with a tidier version in which juxtapositions are       */
-/*  folded, etc.  If this is not possible, return the original object.       */
+/*  folded.  If this is not possible, return the original object.            */
 /*                                                                           */
 /*****************************************************************************/
 
 OBJECT ReplaceWithTidy(x)
 OBJECT x;
-{
-  static unsigned char buff[MAX_LINE];
-  static int buff_len;
-  static FILE_POS buff_pos;
-
-  OBJECT link, y, tmp, res;
-  debug1(DOM, DD, "ReplaceWithTidy( %s )", EchoObject(null, x));
+{ static FULL_CHAR	buff[MAX_LINE];		/* the growing current word */
+  static int		buff_len;		/* length of current word   */
+  static FILE_POS	buff_pos;		/* filepos of current word  */
+  static unsigned	buff_typ;		/* WORD or QWORD of current */
+  OBJECT                link, y, tmp, res;	/* temporaries              */
+  debug1(DOM, DD, "ReplaceWithTidy( %s )", EchoObject(x));
   switch( type(x) )
   {
     case ACAT:
     
-      /* flatten any sub-acats, recursively */
       for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
 	if( type(y) == ACAT )
-	{ tmp = Down(y);
-	  TransferLinks(tmp, y, link);
-	  DisposeChild(link);
-	  link = PrevDown(tmp);
+	{ tmp = Down(y);  TransferLinks(tmp, y, link);
+	  DisposeChild(link);  link = PrevDown(tmp);
 	}
       }
-
-      /* now scan along and do the tidying */
-      res = nil;
-      buff_len = 0;
-      FposCopy(buff_pos, fpos(x));
+      res = nil;  buff_len = 0;  buff_typ = WORD;  FposCopy(buff_pos, fpos(x));
       for( link = Down(x); link != x; link = NextDown(link) )
       {	Child(y, link);
-	if( type(y) == WORD )
-	{ if( buff_len + strlen(string(y)) >= MAX_LINE )
-	    Error(WARN, &fpos(y),"word is too long");
+	if( is_word(type(y)) )
+	{ if( buff_len + StringLength(string(y)) >= MAX_LINE )
+	    Error(WARN, &fpos(y), "word is too long");
 	  else
 	  { if( buff_len == 0 )  FposCopy(buff_pos, fpos(y));
-	    strcpy(&buff[buff_len], string(y));
-	    buff_len += strlen(string(y));
+	    StringCopy(&buff[buff_len], string(y));
+	    buff_len += StringLength(string(y));
+	    if( type(y) == QWORD )  buff_typ = QWORD;
 	  }
 	}
 	else if( type(y) == GAP_OBJ )
 	{ if( Down(y) != y || hspace(y) + vspace(y) > 0 )
-	  { FontStripQuotes(buff, &buff_pos);
-	    if( strlen(buff) > 0 )
-	    { tmp = MakeWord(buff, &buff_pos);
-	      buff_len = 0;
-	      if( res == nil )
-	      {	res = New(ACAT);
-		FposCopy(fpos(res), fpos(x));
-	      }
-	      Link(res, tmp);
-	      Link(res, y);
-	    }
+	  { tmp = MakeWord(buff_typ, buff, &buff_pos);
+	    buff_len = 0;  buff_typ = WORD;
+	    if( res == nil ) { res = New(ACAT); FposCopy(fpos(res), fpos(x)); }
+	    Link(res, tmp);  Link(res, y);
 	  }
 	}
 	else /* error */
 	{ if( res != nil )  DisposeObject(res);
-	  debug1(DOM, DD, "ReplaceWithTidy returning %s (unchanged)",
-			EchoObject(null, x));
+	  debug0(DOM, DD, "ReplaceWithTidy returning unchanged");
 	  return x;
 	}
       }
-      FontStripQuotes(buff, &buff_pos);
-      tmp = MakeWord(buff, &buff_pos);
+      tmp = MakeWord(buff_typ, buff, &buff_pos);
       if( res == nil )  res = tmp;
       else Link(res, tmp);
-      ReplaceNode(res, x);
-      DisposeObject(x);
-      debug1(DOM, DD, "ReplaceWithTidy returning %s", EchoObject(null, res));
+      ReplaceNode(res, x);  DisposeObject(x);
+      debug1(DOM, DD, "ReplaceWithTidy returning %s", EchoObject(res));
       return res;
 
 
     case WORD:
+    case QWORD:
 
-      FontStripQuotes(string(x), &fpos(x));
-      debug1(DOM, DD, "ReplaceWithTidy returning %s", EchoObject(null, x));
+      debug1(DOM, DD, "ReplaceWithTidy returning %s", EchoObject(x));
       return x;
 
 
     default:
 
-      debug1(DOM, DD, "ReplaceWithTidy returning %s (unchanged)",
-		EchoObject(null, x));
+      debug0(DOM, DD, "ReplaceWithTidy returning unchanged");
       return x;
-
   }
 } /* end ReplaceWithTidy */
 
 
-/*@@**************************************************************************/
+/*@::GetScaleFactor()@********************************************************/
 /*                                                                           */
 /*  static float GetScaleFactor(x, str)                                      */
 /*                                                                           */
@@ -186,13 +164,13 @@ OBJECT x;
 /*****************************************************************************/
 
 static float GetScaleFactor(x, str)
-OBJECT x;  unsigned char *str;
+OBJECT x;  char *str;
 { float scale_factor;
-  if( type(x) != WORD )
+  if( !is_word(type(x)) )
   { Error(WARN, &fpos(x), "replacing invalid %s by 1.0", str);
     scale_factor = 1.0;
   }
-  else if( sscanf(string(x), "%f", &scale_factor) != 1 )
+  else if( sscanf( (char *) string(x), "%f", &scale_factor) != 1 )
   { Error(WARN, &fpos(x), "replacing invalid %s %s by 1.0", str, string(x));
     scale_factor = 1.0;
   }
@@ -212,7 +190,7 @@ static OBJECT nbt[2] = { nil, nil };		/* constant nil threads      */
 static OBJECT nft[2] = { nil, nil };		/* constant nil threads      */
 static OBJECT ntarget = nil;			/* constant nil target       */
 
-/*@@**************************************************************************/
+/*@::Manifest()@**************************************************************/
 /*                                                                           */
 /*  OBJECT Manifest(x, env, style, bthr, fthr, target, crs, ok, need_expand) */
 /*                                                                           */
@@ -260,10 +238,10 @@ BOOLEAN ok, need_expand;
   OBJECT res, res_env, res_env2, hold_env, hold_env2, first_bt, last_ft, z;
   OBJECT firsttag, firstres, prev;  float scale_factor;
   int par, perp;  GAP res_gap;  unsigned res_inc;  STYLE new_style;
-  BOOLEAN still_backing, done, multiline, symbol_free;
+  BOOLEAN still_backing, done, multiline, symbol_free;  FULL_CHAR ch;
 
-  debug2(DOM, D,   "[Manifest(%s %s )", Image(type(x)), EchoObject(null, x));
-  debug1(DOM, DD,  "  environment: %s", EchoObject(null, env));
+  debug2(DOM, D,   "[Manifest(%s %s )", Image(type(x)), EchoObject(x));
+  debug1(DOM, DD,  "  environment: %s", EchoObject(env));
   debug6(DOM, DD,  "  style: %s;  target: %s;  threads: %s%s%s%s",
 	EchoStyle(style), SymName(*target),
 	bthr[COL] ? " up"    : "",  fthr[COL] ? " down"  : "",
@@ -284,25 +262,27 @@ BOOLEAN ok, need_expand;
       { Child(y, link);
 	assert( type(y) == PAR, "Manifest/CLOSURE: type(y) != PAR!" );
 	Child(z, Down(y));
-	if( type(z) != WORD && !has_par(actual(y)) )
+	if( !is_word(type(z)) && !has_par(actual(y)) )
 	{ if( is_tag(actual(y)) || is_key(actual(y)) || type(z) == NEXT )
 	  { z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
 	    z = ReplaceWithTidy(z);
 	  }
 	}
-	if( type(z) != WORD )  symbol_free = FALSE;
+	if( !is_word(type(z)) )  symbol_free = FALSE;
       }
 
       /* if all parameters are free of symbols, optimize environment */
       if( symbol_free && imports(sym) == nil && enclosing(sym) != StartSym )
       {	y = SearchEnv(env, enclosing(sym));
 	if( y != nil && type(y) == CLOSURE )
-	{ env = SetEnv(y, nil);
+	{ 
+	  debug0(DCR, DD, "calling SetEnv from Manifest (a)");
+	  env = SetEnv(y, nil);
 	  hold_env2 = New(ACAT);  Link(hold_env2, env);
 	}
 	else
 	{ Error(WARN, &fpos(x), "symbol %s used outside %s",
-		SymName(sym), SymName(enclosing(sym)));
+	    SymName(sym), SymName(enclosing(sym)));
 	  hold_env2 = nil;
 	}
       }
@@ -336,7 +316,7 @@ BOOLEAN ok, need_expand;
       {
 	/* expand the closure and manifest the result */
 	debug1(DOM, DD, "expanding; style: %s", EchoStyle(style));
-	x = ClosureExpand(x, env, style, TRUE, crs, &res_env);
+	x = ClosureExpand(x, env, TRUE, crs, &res_env);
 	hold_env = New(ACAT);  Link(hold_env, res_env);
 	debug1(DOM, DD, "recursive call; style: %s", EchoStyle(style));
 	x = Manifest(x, res_env, style, bthr, fthr, target, crs, ok, FALSE);
@@ -369,7 +349,7 @@ BOOLEAN ok, need_expand;
       assert( type(x) == CLOSURE, "Manifest/CROSS: type(x)!" );
       hold_env = New(ACAT);  Link(hold_env, res_env);
       /* expand here (calling Manifest immediately makes unwanted cr) */
-      x = ClosureExpand(x, res_env, style, FALSE, crs, &res_env2);
+      x = ClosureExpand(x, res_env, FALSE, crs, &res_env2);
       hold_env2 = New(ACAT);  Link(hold_env2, res_env2);
       x = Manifest(x, res_env2, style, bthr, fthr, target, crs, ok, TRUE);
       DisposeObject(hold_env);
@@ -378,6 +358,7 @@ BOOLEAN ok, need_expand;
 
 
     case WORD:
+    case QWORD:
     
       if( !ok || *crs == nil )
       {	word_font(x) = font(*style);
@@ -400,11 +381,11 @@ BOOLEAN ok, need_expand;
       multiline = FALSE;
 
       /* manifest first child and insert any cross references */
-      if( type(y) == WORD )  word_font(y) = font(*style);
+      if( is_word(type(y)) )  word_font(y) = font(*style);
       else y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE);
       if( ok && *crs != nil )
       {	
-	debug1(DCR, D, "  insinuating %s", EchoObject(null, *crs));
+	debug1(DCR, D, "  insinuating %s", EchoObject(*crs));
 	TransferLinks(Down(*crs), *crs, link);
 	DisposeObject(*crs);
 	*crs = nil;
@@ -422,13 +403,13 @@ BOOLEAN ok, need_expand;
 
 	/* manifest the next child */
         debug1(DOM, DD, "  in ACAT (3), style = %s", EchoStyle(style));
-	if( type(y) == WORD ) word_font(y) = font(*style);
+	if( is_word(type(y)) ) word_font(y) = font(*style);
 	else y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE);
 
 	/* manifest the gap object */
 	if( Down(g) != g )
 	{
-	  /* explicit & operator whose value is g's child */
+	  /* explicit & operator whose value is the child of g */
 	  Child(z, Down(g));
 	  z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
 	  z = ReplaceWithTidy(z);
@@ -445,15 +426,18 @@ BOOLEAN ok, need_expand;
         debug1(DOM, DD, "  in ACAT, gap = %s", EchoLength(width(gap(g))));
 
 	/* compress adjacent juxtaposed words of equal font */
-	if( type(y) == WORD && width(gap(g)) == 0 && vspace(g)+hspace(g) == 0 )
+	if( is_word(type(y)) && width(gap(g)) == 0 && vspace(g)+hspace(g) == 0 )
 	{ if( units(gap(g)) == FIXED_UNIT && mode(gap(g)) == EDGE_MODE )
-	  { if( prev!=nil && type(prev)==WORD && word_font(prev)==word_font(y) )
-	    { if( !mark(gap(g)) )
-	      {	if( strlen(string(prev)) + strlen(string(y)) >= MAX_LINE )
+	  { if( prev != nil && is_word(type(prev)) )
+	    { if( !mark(gap(g)) && word_font(prev)==word_font(y) )
+	      {	unsigned typ;
+		if( StringLength(string(prev)) + StringLength(string(y))
+		      >= MAX_LINE )
 		  Error(FATAL, &fpos(prev), "word %s%s is too long",
 			string(prev), string(y));
 		z = y;
-		y = MakeWordTwo(string(prev), string(y), &fpos(prev));
+		typ = type(prev) == QWORD || type(y) == QWORD ? QWORD : WORD;
+		y = MakeWordTwo(typ, string(prev), string(y), &fpos(prev));
 		word_font(y) = word_font(prev);
 		MoveLink(link, y, CHILD);
 		DisposeObject(z);
@@ -468,7 +452,7 @@ BOOLEAN ok, need_expand;
 	/* insinuate any cross-references */
 	if( ok && *crs != nil )
 	{
-	  debug1(DCR, D, "  insinuating %s", EchoObject(null, *crs));
+	  debug1(DCR, D, "  insinuating %s", EchoObject(*crs));
 	  TransferLinks(Down(*crs), *crs, link);
 	  DisposeObject(*crs);
 	  *crs = nil;
@@ -493,7 +477,7 @@ BOOLEAN ok, need_expand;
 	    width(gap(g)) *= vspace(g);
 	    new_acat = New(ACAT);
 	    if( hspace(g) > 0 )
-	    { z = MakeWord("", &fpos(g));
+	    { z = MakeWord(WORD, STR_EMPTY, &fpos(g));
 	      Link(new_acat, z);
 	      z = New(GAP_OBJ);
 	      hspace(z) = hspace(g);
@@ -545,7 +529,7 @@ BOOLEAN ok, need_expand;
       y = Manifest(y, env, style, bt, ft, target, crs, ok, FALSE);
       if( type(x) == VCAT && ok && *crs != nil )
       {
-	debug1(DCR, D, "  insinuating %s", EchoObject(null, *crs));
+	debug1(DCR, D, "  insinuating %s", EchoObject(*crs));
 	TransferLinks(Down(*crs), *crs, link);
 	DisposeObject(*crs);
 	*crs = nil;
@@ -585,7 +569,7 @@ BOOLEAN ok, need_expand;
 	y = Manifest(y, env, style, bt, ft, target, crs, ok, FALSE);
 	if( type(x) == VCAT && ok && *crs != nil )
         {
-	  debug1(DCR, D, "  insinuating %s", EchoObject(null, *crs));
+	  debug1(DCR, D, "  insinuating %s", EchoObject(*crs));
 	  TransferLinks(Down(*crs), *crs, link);
 	  DisposeObject(*crs);
 	  *crs = nil;
@@ -619,11 +603,6 @@ BOOLEAN ok, need_expand;
 	  /* attach leftover back threads to first_bt if required */
 	  if( rlink != bt[par] )
 	  { 
-	    /* ***
-	    Error(WARN, &fpos(y), type(x) == VCAT ?
-	      "number of columns above exceeds number here" :
-	      "number of rows to left exceeds number here");
-	    *** */
 	    if( still_backing )  TransferLinks(rlink, bt[par], first_bt);
 	  }
 	  DisposeObject(bt[par]);
@@ -631,11 +610,6 @@ BOOLEAN ok, need_expand;
 	  /* attach leftover forward threads to ft[par] if required */
 	  if( llink != last_ft )
 	  {
-	    /* ***
-	    Error(WARN, &fpos(y), type(x) == VCAT ?
-	      "number of columns here exceeds number above" :
-	      "number of rows here exceeds number to left");
-	    *** */
 	    if( goes_through )  TransferLinks(llink, last_ft, ft[par]);
 	  }
 	  DisposeObject(last_ft);
@@ -669,7 +643,7 @@ BOOLEAN ok, need_expand;
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
       y = ReplaceWithTidy(y);
       GetGap(y, style, &res_gap, &res_inc);
-      if( res_inc != ABS || mode(res_gap) != EDGE_MODE ||
+      if( res_inc != GAP_ABS || mode(res_gap) != EDGE_MODE ||
 	units(res_gap) != FIXED_UNIT )
       {	Error(WARN, &fpos(y), "replacing invalid left parameter of %s by 2i",
 		    Image(type(x)) );
@@ -713,7 +687,7 @@ BOOLEAN ok, need_expand;
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
       y = ReplaceWithTidy(y);
       GetGap(y, style, &res_gap, &res_inc);
-      if( res_inc != ABS || mode(res_gap) != EDGE_MODE ||
+      if( res_inc != GAP_ABS || mode(res_gap) != EDGE_MODE ||
 		units(res_gap) != DEG_UNIT )
       {	Error(WARN, &fpos(y), "replacing invalid left parameter of %s by 0d",
 		    Image(type(x)) );
@@ -776,16 +750,9 @@ BOOLEAN ok, need_expand;
       /* make sure left parameter (the tag) is in order */
       debug0(DOM, DD, "  manifesting CASE now");
       Child(tag, Down(x));
-      debug1(DOM, DD, "  manifesting CASE tag %s now", EchoObject(null, tag));
+      debug1(DOM, DD, "  manifesting CASE tag %s now", EchoObject(tag));
       tag = Manifest(tag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
       tag = ReplaceWithTidy(tag);
-      /* *** allowing this now; non-word matches "else" only ***
-      if( type(tag) != WORD )
-      {	Error(WARN, &fpos(tag), "%s deleted: left parameter is not a word",
-	  KW_CASE);
-	errorcase();
-      }
-      *** */
 
       /* make sure the right parameter is an ACAT */
       Child(y, LastDown(x));
@@ -813,13 +780,13 @@ BOOLEAN ok, need_expand;
 	Child(ytag, Down(yield));
 	ytag = Manifest(ytag, env, style, nbt, nft, &ntarget, crs, FALSE,FALSE);
 	ytag = ReplaceWithTidy(ytag);
-	if( type(ytag) == WORD )
+	if( is_word(type(ytag)) )
 	{ if( firsttag == nil )
 	  { firsttag = ytag;
 	    Child(firstres, LastDown(yield));
 	  }
-	  if( (type(tag) == WORD && strcmp(string(ytag), string(tag)) == 0) ||
-	      strcmp(string(ytag), "else"     ) == 0 )
+	  if( (is_word(type(tag)) && StringEqual(string(ytag), string(tag))) ||
+	      StringEqual(string(ytag), STR_ELSE)  )
 	  { Child(res, LastDown(yield));
 	    break;
 	  }
@@ -829,38 +796,71 @@ BOOLEAN ok, need_expand;
 	  for( zlink = Down(z);  zlink != z;  zlink = NextDown(zlink) )
 	  { Child(ytag, zlink);
 	    if( type(ytag) == GAP_OBJ )  continue;
-	    if( type(ytag) != WORD )
-	    { Error(WARN,&fpos(ytag),"error in left parameter of %s",KW_YIELD);
+	    if( !is_word(type(ytag)) )
+	    { Error(WARN, &fpos(ytag), "error in left parameter of %s",
+		KW_YIELD);
 	      break;
 	    }
 	    if( firsttag == nil )
 	    { firsttag = ytag;
 	      Child(firstres, LastDown(yield));
 	    }
-	    if( (type(tag) == WORD && strcmp(string(ytag), string(tag)) == 0) ||
-	        strcmp(string(ytag), "else"     ) == 0 )
+	    if( (is_word(type(tag)) && StringEqual(string(ytag), string(tag)))
+	        || StringEqual(string(ytag), STR_ELSE) )
 	    { Child(res, LastDown(yield));
 	      break;
 	    }
 	  }
 	}
-	else Error(WARN,&fpos(ytag),"error in left parameter of %s",KW_YIELD);
+	else Error(WARN,&fpos(ytag), "error in left parameter of %s", KW_YIELD);
       }
       if( res == nil )
       { if( firsttag != nil )
 	{ Error(WARN, &fpos(tag), "replacing unkown %s option %s by %s",
-		KW_CASE, string(tag), string(firsttag));
+	    KW_CASE, string(tag), string(firsttag));
 	  res = firstres;
 	}
 	else
 	{ Error(WARN, &fpos(tag), "%s deleted: selection %s unknown",
-		KW_CASE, string(tag));
+	    KW_CASE, string(tag));
 	  errorcase();
 	}
       }
 
       /* now manifest the result and replace x with it */
       DeleteLink(Up(res));
+      ReplaceNode(res, x);
+      DisposeObject(x);
+      x = Manifest(res, env, style, bthr, fthr, target, crs, ok, FALSE);
+      break;
+
+
+    case XCHAR:
+
+      Child(y, Down(x));
+      y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
+      y = ReplaceWithTidy(y);
+      if( !is_word(type(y)) )
+      {	Error(WARN, &fpos(x), "%s dropped: parameter is not a simple word",
+	  KW_XCHAR);
+	res = MakeWord(WORD, STR_EMPTY, &fpos(x));
+      }
+      else if( word_font(y) == 0 )
+      {	Error(WARN, &fpos(x), "%s dropped: no current font at this point",
+	  KW_XCHAR);
+	res = MakeWord(WORD, STR_EMPTY, &fpos(x));
+      }
+      else if( (ch=EvRetrieve(string(y), FontEncoding(word_font(y)))) == '\0' )
+      {	type(y) = QWORD;
+	Error(WARN, &fpos(x), "%s dropped: character %s unknown in font %s",
+	  KW_XCHAR, StringQuotedWord(y),
+	  FontFamilyAndFace(word_font(y)));
+	res = MakeWord(WORD, STR_EMPTY, &fpos(x));
+      }
+      else
+      {	res = MakeWord(QWORD, STR_SPACE, &fpos(x));
+	string(res)[0] = ch;
+      }
       ReplaceNode(res, x);
       DisposeObject(x);
       x = Manifest(res, env, style, bthr, fthr, target, crs, ok, FALSE);
@@ -891,13 +891,13 @@ BOOLEAN ok, need_expand;
 
       assert( Down(x) != x, "Manifest/NEXT: Down(x) == x!" );
       Child(y, Down(x));
-      debug1(DCS, D, "  Manifesting Next( %s, 1 )", EchoObject(null, y));
+      debug1(DCS, D, "  Manifesting Next( %s, 1 )", EchoObject(y));
       y = Manifest(y, env, style, bthr, fthr, target, crs, FALSE, FALSE);
-      debug1(DCS, D, "  calling Next( %s, 1 )", EchoObject(null, y));
+      debug1(DCS, D, "  calling Next( %s, 1 )", EchoObject(y));
       done = FALSE;
       y = Next(y, 1, &done);
       debug2(DCS, D, "  Next(done = %s) returning %s",
-			bool(done), EchoObject(null, y));
+			bool(done), EchoObject(y));
       DeleteLink(Down(x));
       MergeNode(y, x);  x = y;
       break;
@@ -910,6 +910,7 @@ BOOLEAN ok, need_expand;
       if( type(y) == CLOSURE )
       { AttachEnv(env, y);
 	StyleCopy(save_style(y), *style);
+	debug0(DCR, DD, "calling SetEnv from Manifest (b)");
 	res_env = SetEnv(y, nil);
 	hold_env = New(ACAT);  Link(hold_env, res_env);
 	res = Manifest(res, res_env, style, bthr, fthr, target, crs, ok, FALSE);
@@ -919,6 +920,7 @@ BOOLEAN ok, need_expand;
       {	debug0(DCR, DD, "  calling CrossExpand from Manifest/OPEN");
 	y = CrossExpand(y, env, style, TRUE, crs, &res_env);
 	AttachEnv(res_env, y);
+	debug0(DCR, DD, "calling SetEnv from Manifest (c)");
 	res_env = SetEnv(y, env);
 	hold_env = New(ACAT);  Link(hold_env, res_env);
 	res = Manifest(res, res_env, style, bthr, fthr, target, crs, ok, FALSE);
@@ -942,7 +944,7 @@ BOOLEAN ok, need_expand;
       Child(y, Down(x));
       if( type(y) != CROSS )
       {	Error(WARN, &fpos(y), "left parameter of %s is not a cross-reference",
-					KW_TAGGED);
+	  KW_TAGGED);
 	errorcase();
       }
 
@@ -954,18 +956,19 @@ BOOLEAN ok, need_expand;
       }
       if( !has_tag(actual(z)) )
       {	Error(WARN, &fpos(z), "symbol %s illegal with %s since it has no %s",
-			SymName(actual(z)), KW_TAGGED, KW_TAG);
+	  SymName(actual(z)), KW_TAGGED, KW_TAG);
 	errorcase();
       }
       Child(z, NextDown(Down(y)));
       z = Manifest(z, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
-      if( type(z) == WORD && strcmp(string(z), KW_PRECEDING) == 0 )
+      z = ReplaceWithTidy(z);
+      if( is_word(type(z)) && StringEqual(string(z), KW_PRECEDING) )
 	cross_type(y) = CROSS_PREC;
-      else if( type(z) == WORD && strcmp(string(z), KW_FOLLOWING) == 0 )
+      else if( is_word(type(z)) && StringEqual(string(z), KW_FOLLOWING) )
 	cross_type(y) = CROSS_FOLL;
       else
       {	Error(WARN, &fpos(z), "%s of left parameter of %s must be %s or %s",
-		KW_TAG, KW_TAGGED, KW_PRECEDING, KW_FOLLOWING);
+	  KW_TAG, KW_TAGGED, KW_PRECEDING, KW_FOLLOWING);
 	errorcase();
       }
 
@@ -973,10 +976,10 @@ BOOLEAN ok, need_expand;
       Child(tag, LastDown(x));
       tag = Manifest(tag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
       tag = ReplaceWithTidy(tag);
-      if( type(tag) != WORD )
+      if( !is_word(type(tag)) )
       {	Error(WARN, &fpos(tag), "right parameter of %s must be a simple word",
-								KW_TAGGED);
-	ifdebug(DOM, D, EchoObject(stderr, tag));
+	  KW_TAGGED);
+	ifdebug(DOM, D, DebugObject(tag));
 	errorcase();
       }
 
@@ -1008,15 +1011,11 @@ BOOLEAN ok, need_expand;
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
       y = ReplaceWithTidy(y);
-      if( type(y) != WORD )
+      if( !is_word(type(y)) )
       { Error(WARN, &fpos(y), "%s deleted: invalid right parameter",
 	  type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC);
 	errorcase();
       }
-      /* *** no longer defining these files (uses too many file numbers) ***
-      sparec(constraint(x)) = DefineFile(MakeWord(string(y), &fpos(y)),
-	INCGRAPHIC_FILE, type(x)==INCGRAPHIC ? INCLUDE_PATH : SYSINCLUDE_PATH);
-      *** */
       ReplaceWithSplit(x, bthr, fthr);
       break;
 	
@@ -1028,11 +1027,11 @@ BOOLEAN ok, need_expand;
 
   } /* end switch */
 
-  debug2(DOM,D,"]Manifest returning %s %s",Image(type(x)),EchoObject(null, x));
+  debug2(DOM, D, "]Manifest returning %s %s", Image(type(x)), EchoObject(x));
   debug1(DOM, DD, "  at exit, style = %s", EchoStyle(style));
-  debug1(DOM, DDD, "up:    ", EchoObject(null, bthr[COL]) );
-  debug1(DOM, DDD, "down:  ", EchoObject(null, fthr[COL]) );
-  debug1(DOM, DDD, "left:  ", EchoObject(null, bthr[ROW]) );
-  debug1(DOM, DDD, "right: ", EchoObject(null, fthr[ROW]) );
+  debug1(DOM, DDD, "up:    ", EchoObject(bthr[COL]));
+  debug1(DOM, DDD, "down:  ", EchoObject(fthr[COL]));
+  debug1(DOM, DDD, "left:  ", EchoObject(bthr[ROW]));
+  debug1(DOM, DDD, "right: ", EchoObject(fthr[ROW]));
   return x;
 } /* end Manifest */

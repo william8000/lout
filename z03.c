@@ -1,6 +1,6 @@
-/*@z03.c:File Service:DefineFile(), FirstFile()@**************************** */
+/*@z03.c:File Service:Declarations, no_fpos@******************************** */
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -26,12 +26,13 @@
 /*  MODULE:       File Service                                               */
 /*  EXTERNS:      InitFiles(), AddToPath(), DefineFile(), FirstFile(),       */
 /*                NextFile(), FileNum(), FileName(), EchoFilePos(),          */
-/*                OpenFile(), ReadFromFile(), AppendToFile(), CloseFiles()   */
+/*                PosOfFile(), OpenFile(), OpenIncGraphicFile(),             */
+/*                ReadFromFile(), AppendToFile(), CloseFiles()               */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
-#define MAX_TYPES	  9			/* number of file types      */
-#define MAX_PATHS	  6			/* number of search paths    */
+#define MAX_TYPES	 10			/* number of file types      */
+#define MAX_PATHS	  7			/* number of search paths    */
 #define	TAB_MASK	0xFF			/* mask forces <= MAX_FILES  */
 
 #define	file_number(x)	word_font(x)		/* file number of file x     */
@@ -42,10 +43,10 @@ static	int	file_count;			/* total number of files     */
 static	OBJECT	fvec[MAX_FILES] = { nil };	/* the file table            */
 static	OBJECT	file_list[MAX_TYPES];		/* files of each type        */
 static	OBJECT	file_path[MAX_PATHS];		/* the search paths          */
-#ifdef DEBUG_ON
+#if DEBUG_ON
 static	char	*file_types[]		/* the type names for debug  */
-		= { "source", "include", "incgraphic", "database",
-		    "index", "font", "prepend", "hyph", "hyphpacked" };
+		= { "source", "include", "incgraphic", "database", "index",
+		    "font", "prepend", "hyph", "hyphpacked", "encoding" };
 #endif
 
 
@@ -59,7 +60,6 @@ static	char	*file_types[]		/* the type names for debug  */
 
 static FILE_POS no_file_pos = {0, 0, 0};
 FILE_POS *no_fpos = &no_file_pos;
-
 
 /*****************************************************************************/
 /*                                                                           */
@@ -76,8 +76,7 @@ FILE_POS *no_fpos = &no_file_pos;
   val = (val * 8) & TAB_MASK;						\
 }
 
-
-/*****************************************************************************/
+/*@::InitFiles(), AddToPath(), DefineFile()@**********************************/
 /*                                                                           */
 /*  InitFiles()                                                              */
 /*                                                                           */
@@ -94,7 +93,7 @@ InitFiles()
 } /* end InitFiles */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  AddToPath(fpath, dirname)                                                */
 /*                                                                           */
@@ -103,55 +102,56 @@ InitFiles()
 /*****************************************************************************/
 
 AddToPath(fpath, dirname)
-int fpath; unsigned char *dirname;
+int fpath; FULL_CHAR *dirname;
 { OBJECT x;
-  x = MakeWord(dirname, no_fpos);
+  x = MakeWord(WORD, dirname, no_fpos);
   Link(file_path[fpath], x);
 } /* end AddToPath */
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  FILE_NUM DefineFile(x, ftype, fpath)                                     */
+/*  FILE_NUM DefineFile(str, suffix, xfpos, ftype, fpath)                    */
 /*                                                                           */
-/*  Declare file x, which is a WORD object containing the file name.         */
-/*  ftype is the file's type; fpath is its search path.                      */
+/*  Declare a file whose name is str plus suffix and whose fpos is xfpos.    */
+/*  The file type is ftype, and its search path is fpath.                    */
 /*                                                                           */
 /*****************************************************************************/
 
-FILE_NUM DefineFile(x, ftype, fpath)
-OBJECT x;  int ftype, fpath;
-{ register unsigned char *p;
+FILE_NUM DefineFile(str, suffix, xfpos, ftype, fpath)
+FULL_CHAR *str, *suffix; FILE_POS *xfpos;  int ftype, fpath;
+{ register FULL_CHAR *p;
   register int i;
-  assert( type(x) == WORD, "DefineFile: type(x) != WORD!" );
   assert( ftype < MAX_TYPES, "DefineFile: ftype!" );
-  debug3(DFS, D, "DefineFile( %s, %s, %d )",
-    EchoObject(null,x), file_types[ftype], fpath);
-  if( ftype == SOURCE_FILE && (i = strlen(string(x))) >= 3 )
+  debug5(DFS, D, "DefineFile(%s, %s,%s, %s, %d)",
+    str, suffix, EchoFilePos(xfpos), file_types[ftype], fpath);
+  if( ftype == SOURCE_FILE && (i = StringLength(str)) >= 3 )
   {
     /* check that file name does not end in ".li" or ".ld" */
-    if( strcmp(&string(x)[i-strlen(DATA_SUFFIX)], DATA_SUFFIX) == 0 )
-      Error(FATAL, &fpos(x),
-	"database file %s where source file expected", string(x));
-    if( strcmp(&string(x)[i-strlen(INDEX_SUFFIX)], INDEX_SUFFIX) == 0 )
-      Error(FATAL, &fpos(x),
-	"database index file %s where source file expected", string(x));
+    if( StringEqual(&str[i-StringLength(DATA_SUFFIX)], DATA_SUFFIX) )
+      Error(FATAL, xfpos,
+	"database file %s where source file expected", str);
+    if( StringEqual(&str[i-StringLength(INDEX_SUFFIX)], INDEX_SUFFIX) )
+      Error(FATAL, xfpos,
+	"database index file %s where source file expected", str);
   }
-  if( ++file_count >= MAX_FILES ) Error(FATAL, &fpos(x), "too many file names");
-  hash(string(x), i);
+  if( ++file_count >= MAX_FILES ) Error(FATAL, xfpos, "too many file names");
+  hash(str, i);
   while( fvec[i] != nil )
     if( ++i >= MAX_FILES ) i = 0;
-  fvec[i] = x;
-  Link(file_list[ftype], x);
-  file_number(x) = i;
-  path(x) = fpath;
+  if( StringLength(str) + StringLength(suffix) >= MAX_LINE )
+    Error(FATAL, no_fpos, "file name %s%s too long", str, suffix);
+  fvec[i] = MakeWordTwo(WORD, str, suffix, xfpos);
+  Link(file_list[ftype], fvec[i]);
+  file_number(fvec[i]) = i;
+  path(fvec[i]) = fpath;
   debug1(DFS, D, "DefineFile returning %s",
-    i == NO_FILE ? (unsigned char *) "none" : FileName( (FILE_NUM) i));
+    i == NO_FILE ? STR_NONE : FileName( (FILE_NUM) i));
   return (FILE_NUM) i;
 } /* end DefineFile */
 
 
-/*****************************************************************************/
+/*@::FirstFile(), NextFile(), FileNum()@**************************************/
 /*                                                                           */
 /*  FILE_NUM FirstFile(ftype)                                                */
 /*                                                                           */
@@ -170,89 +170,89 @@ int ftype;
   { Child(y, link);
     i = file_number(y);
   }
-  debug1(DFS, D, "FirstFile returning %s",
-    i == NO_FILE ? (unsigned char *) "none" : FileName(i));
+  debug1(DFS, D, "FirstFile returning %s", i==NO_FILE ? STR_NONE : FileName(i));
   return i;
 } /* end FirstFile */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  FILE_NUM NextFile(i)                                                     */
 /*                                                                           */
-/*  Returns the next file after file i of i's type, else NO_FILE.            */
+/*  Returns the next file after file i of the type of i, else NO_FILE.       */
 /*                                                                           */
 /*****************************************************************************/
 
 FILE_NUM NextFile(i)
 FILE_NUM i;
 { OBJECT link, y;
-  debug1(DFS, D, "NextFile( %s )", EchoObject(null, fvec[i]));
+  debug1(DFS, D, "NextFile( %s )", EchoObject(fvec[i]));
   link = NextDown(Up(fvec[i]));
   if( type(link) == ACAT )  i = NO_FILE;
   else
   { Child(y, link);
     i = file_number(y);
   }
-  debug1(DFS, D, "NextFile returning %s",
-    i == NO_FILE ? (unsigned char *) "none" : FileName(i));
+  debug1(DFS, D, "NextFile returning %s", i==NO_FILE ? STR_NONE : FileName(i));
   return i;
 } /* end NextFile */
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  FILE_NUM FileNum(str)                                                    */
+/*  FILE_NUM FileNum(str, suffix)                                            */
 /*                                                                           */
-/*  Return the file number of the file with name str, else NO_FILE.          */
+/*  Return the number of the file with name str plus suffix, else NO_FILE.   */
 /*                                                                           */
 /*****************************************************************************/
 
-FILE_NUM FileNum(str)
-unsigned char *str;
-{ register unsigned char *p;
+FILE_NUM FileNum(str, suffix)
+FULL_CHAR *str, *suffix;
+{ register FULL_CHAR *p;
   register int i;
-  debug1(DFS, D, "FileNum( %s )", str);
+  FULL_CHAR buff[MAX_LINE];
+  debug2(DFS, D, "FileNum(%s, %s)", str, suffix);
   hash(str, i);
-  while( fvec[i] != nil && strcmp(string(fvec[i]), str) != 0 )
+  if( StringLength(str) + StringLength(suffix) >= MAX_LINE )
+    Error(FATAL, no_fpos, "file name %s%s too long", str, suffix);
+  StringCopy(buff, str);
+  StringCat(buff, suffix);
+  while( fvec[i] != nil && !StringEqual(string(fvec[i]), buff) )
     if( ++i >= MAX_FILES ) i = 0;
   if( fvec[i] == nil ) i = 0;
   debug1(DFS, D, "FileNum returning %s",
-    i == NO_FILE ? (unsigned char *) "none" : FileName( (FILE_NUM) i));
+    i == NO_FILE ? STR_NONE : FileName( (FILE_NUM) i));
   return (FILE_NUM) i;
 } /* end FileNum */
 
 
-/*****************************************************************************/
+/*@::FileName(), EchoFilePos(), PosOfFile()@**********************************/
 /*                                                                           */
-/*  unsigned char *FileName(fnum)                                            */
+/*  FULL_CHAR *FileName(fnum)                                                */
 /*                                                                           */
-/*  Return the string name of the file with this number.  This is the name   */
-/*  provided by DefineFile until OpenFile is called, after which it is the   */
-/*  full path name.                                                          */
+/*  Return the string name of this file.  This is as given to DefineFile     */
+/*  until OpenFile is called, after which it is the full path name.          */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *FileName(fnum)
+FULL_CHAR *FileName(fnum)
 FILE_NUM fnum;
 { OBJECT x;
-  assert( fnum > 0 , "FileName: num!" );
-  assert( fvec[fnum] != nil, "FileName: fvec[fnum] == nil!" );
-  x = fvec[fnum];
-  if( Down(x) != x )  Child(x, Down(x));
+  assert( fnum > 0 && fvec[fnum] != nil, "FileName: fvec[fnum] == nil!" );
+  x = fvec[fnum];  if( Down(x) != x )  Child(x, Down(x));
   return string(x);
 } /* end FileName */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
-/*  unsigned char *EchoFilePos(pos)                                          */
+/*  FULL_CHAR *EchoFilePos(pos)                                              */
 /*                                                                           */
 /*  Returns a string reporting the value of file position pos.               */
 /*                                                                           */
 /*****************************************************************************/
 
-static unsigned char buff[2][MAX_LINE];  static bp = 1;
+static FULL_CHAR buff[2][MAX_LINE];  static bp = 1;
 
 static append_fpos(pos)
 FILE_POS *pos;
@@ -261,21 +261,29 @@ FILE_POS *pos;
   assert( x != nil, "EchoFilePos: fvec[] entry is nil!" );
   if( file_num(fpos(x)) > 0 )
   { append_fpos( &fpos(x) );
-    if( strlen(buff[bp]) + 2 >= MAX_LINE )
+    if( StringLength(buff[bp]) + 2 >= MAX_LINE )
       Error(FATAL,no_fpos,"file position %s... is too long to print", buff[bp]);
-    strcat(buff[bp], " /");
+    StringCat(buff[bp], STR_SPACE);
+    StringCat(buff[bp], AsciiToFull("/"));
   }
-  if( strlen(buff[bp]) + strlen(string(x)) + 13 >= MAX_LINE )
+  if( StringLength(buff[bp]) + StringLength(string(x)) + 13 >= MAX_LINE )
     Error(FATAL, no_fpos, "file position %s... is too long to print", buff[bp]);
-  sprintf(&buff[bp][strlen(buff[bp])], " \"%s\"", string(x));
+  StringCat(buff[bp], STR_SPACE);
+  StringCat(buff[bp], STR_QUOTE);
+  StringCat(buff[bp], string(x));
+  StringCat(buff[bp], STR_QUOTE);
   if( line_num(*pos) != 0 )
-    sprintf(&buff[bp][strlen(buff[bp])]," %d,%d",line_num(*pos), col_num(*pos));
+  { StringCat(buff[bp], STR_SPACE);
+    StringCat(buff[bp], StringInt(line_num(*pos)));
+    StringCat(buff[bp], AsciiToFull(","));
+    StringCat(buff[bp], StringInt( (int) col_num(*pos)));
+  }
 } /* end append_fpos */
 
-unsigned char *EchoFilePos(pos)
+FULL_CHAR *EchoFilePos(pos)
 FILE_POS *pos;
 { bp = (bp + 1) % 2;
-  strcpy(buff[bp], "");
+  StringCopy(buff[bp], STR_EMPTY);
   if( file_num(*pos) > 0 )  append_fpos(pos);
   return buff[bp];
 } /* end EchoFilePos */
@@ -291,16 +299,14 @@ FILE_POS *pos;
 
 FILE_POS *PosOfFile(fnum)
 FILE_NUM fnum;
-{ OBJECT x;
-  x = fvec[fnum];
+{ OBJECT  x = fvec[fnum];
   assert( x != nil, "PosOfFile: fvec[] entry is nil!" );
   return &fpos(x);
 }
 
-
-/*****************************************************************************/
+/*@::SearchPath()@************************************************************/
 /*                                                                           */
-/*  FILE *SearchPath(str, fpath, check_ld, full_name, xfpos)                 */
+/*  static FILE *SearchPath(str, fpath, check_ld, check_lt, full_name, xfpos)*/
 /*                                                                           */
 /*  Search the given path for a file whose name is str.  If found, open      */
 /*  it; return the resulting FILE *.                                         */
@@ -309,53 +315,67 @@ FILE_NUM fnum;
 /*  and OpenFile() is required to check whether the corresponding .ld file   */
 /*  is present.  If it is, then the search must stop.                        */
 /*                                                                           */
+/*  If check_lt is TRUE, it means that the file to be opened is a source     */
+/*  file and OpenFile() is required to check for a .lt suffix version if     */
+/*  the file does not open.                                                  */
+/*                                                                           */
 /*  Also return the full path name in object *full_name if reqd, else nil.   */
 /*                                                                           */
 /*****************************************************************************/
 
-static FILE *SearchPath(str, fpath, check_ld, full_name, xfpos)
-unsigned char *str;  OBJECT fpath;  BOOLEAN check_ld;
+static FILE *SearchPath(str, fpath, check_ld, check_lt, full_name, xfpos)
+FULL_CHAR *str;  OBJECT fpath;  BOOLEAN check_ld, check_lt;
 OBJECT *full_name;  FILE_POS *xfpos;
 { 
-  unsigned char buff[MAX_LINE];  OBJECT link, y;  FILE *fp;
-  debug3(DFS, DD, "SearchPath(%s, %s, %s, -)", str, EchoObject(null, fpath),
-	bool(check_ld));
+  FULL_CHAR buff[MAX_LINE];  OBJECT link, y;  FILE *fp;
+  debug4(DFS, DD, "SearchPath(%s, %s, %s, %s, -)", str, EchoObject(fpath),
+	bool(check_ld), bool(check_lt));
   *full_name = nil;
-  if( strcmp(str, "-") == 0 )
+  if( StringEqual(str, STR_STDIN) )
   { fp = stdin;
     debug0(DFS, DD, "  opened stdin");
   }
-  else if( str[0] == '/' )
-  { fp = fopen(str, "r");
+  else if( StringBeginsWith(str, AsciiToFull("/")) )
+  { fp = StringFOpen(str, "r");
     debug1(DFS, DD, fp==null ? "  failed on %s" : "  succeeded on %s", str);
   }
   else
   { fp = null;
     for( link = Down(fpath);  fp==null && link != fpath; link = NextDown(link) )
     { Child(y, link);
-      if( string(y)[0] == '\0' )
-      { strcpy(buff, str);
-	fp = fopen(str, "r");
+      if( StringLength(string(y)) == 0 )
+      { StringCopy(buff, str);
+	fp = StringFOpen(str, "r");
 	debug1(DFS, DD, fp==null ? "  failed on %s" : "  succeeded on %s", str);
       }
       else
-      {	if( strlen(string(y)) + 1 + strlen(str) >= MAX_LINE )
+      {	if( StringLength(string(y)) + 1 + StringLength(str) >= MAX_LINE )
 	  Error(FATAL, &fpos(y), "file path name %s/%s is too long",
 		string(y), str);
-	sprintf(buff, "%s/%s", string(y), str);
-	fp = fopen(buff, "r");
+	StringCopy(buff, string(y));
+	StringCat(buff, AsciiToFull("/"));
+	StringCat(buff, str);
+	fp = StringFOpen(buff, "r");
 	debug1(DFS, DD, fp==null ? "  failed on %s" : "  succeeded on %s",buff);
-	if( fp != null ) *full_name = MakeWord(buff, xfpos);
+	if( fp != null ) *full_name = MakeWord(WORD, buff, xfpos);
       }
       if( fp == null && check_ld )
-      {	strcpy(&buff[strlen(buff) - strlen(INDEX_SUFFIX)], DATA_SUFFIX);
-	fp = fopen(buff, "r");
+      {	StringCopy(&buff[StringLength(buff) - StringLength(INDEX_SUFFIX)],
+	  DATA_SUFFIX);
+	fp = StringFOpen(buff, "r");
 	debug1(DFS,DD,fp==null ? "  failed on %s" : "  succeeded on %s", buff);
 	if( fp != null )
 	{ fclose(fp);
 	  debug0(DFS, D, "SearchPath returning null (adjacent .ld file)");
 	  return null;
 	}
+      }
+      if( fp == null && check_lt )
+      {	StringCopy(&buff[StringLength(buff)], SOURCE_SUFFIX);
+	fp = StringFOpen(buff, "r");
+	debug1(DFS,DD,fp==null ? "  failed on %s" : "  succeeded on %s", buff);
+	StringCopy(&buff[StringLength(buff) - StringLength(SOURCE_SUFFIX)], STR_EMPTY);
+	if( fp != null ) *full_name = MakeWord(WORD, buff, xfpos);
       }
     }
   }
@@ -364,9 +384,9 @@ OBJECT *full_name;  FILE_POS *xfpos;
 } /* end SearchPath */
 
 
-/*****************************************************************************/
+/*@::OpenFile(), OpenIncGraphicFile()@****************************************/
 /*                                                                           */
-/*  FILE *OpenFile(fnum, check_ld)                                           */
+/*  FILE *OpenFile(fnum, check_ld, check_lt)                                 */
 /*                                                                           */
 /*  Open for reading the file whose number is fnum.  This involves           */
 /*  searching for it along its path if not previously opened.                */
@@ -375,21 +395,25 @@ OBJECT *full_name;  FILE_POS *xfpos;
 /*  and OpenFile() is required to check whether the corresponding .ld file   */
 /*  is present.  If it is, then the search must stop.                        */
 /*                                                                           */
+/*  If check_lt is TRUE, it means that the file to be opened is a source     */
+/*  file and OpenFile() is required to check for a .lout suffix version      */
+/*  if the file does not open without it.                                    */
+/*                                                                           */
 /*****************************************************************************/
 
-FILE *OpenFile(fnum, check_ld)
-FILE_NUM fnum;  BOOLEAN check_ld;
+FILE *OpenFile(fnum, check_ld, check_lt)
+FILE_NUM fnum;  BOOLEAN check_ld, check_lt;
 { FILE *fp;  OBJECT full_name, y;
   ifdebug(DPP, D, ProfileOn("OpenFile"));
   debug2(DFS, D, "OpenFile(%s, %s)", FileName(fnum), bool(check_ld));
   if( Down(fvec[fnum]) != fvec[fnum] )
   { Child(y, Down(fvec[fnum]));
-    fp = fopen(string(y), "r");
+    fp = StringFOpen(string(y), "r");
     debug1(DFS,DD,fp==null ? "  failed on %s" : "  succeeded on %s", string(y));
   }
   else
   { fp = SearchPath(string(fvec[fnum]), file_path[path(fvec[fnum])],
-		check_ld, &full_name, &fpos(fvec[fnum]));
+	   check_ld, check_lt, &full_name, &fpos(fvec[fnum]));
     if( full_name != nil )  Link(fvec[fnum], full_name);
   }
   ifdebug(DPP, D, ProfileOff("OpenFile"));
@@ -408,20 +432,20 @@ FILE_NUM fnum;  BOOLEAN check_ld;
 /*****************************************************************************/
 
 FILE *OpenIncGraphicFile(str, typ, full_name, xfpos)
-unsigned char *str;  unsigned char typ;  OBJECT *full_name;  FILE_POS *xfpos;
+FULL_CHAR *str;  unsigned char typ;  OBJECT *full_name;  FILE_POS *xfpos;
 { FILE *fp;  int p;
   debug2(DFS, D, "OpenIncGraphicFile(%s, %s, -)", str, Image(typ));
   assert( typ == INCGRAPHIC || typ == SINCGRAPHIC, "OpenIncGraphicFile!" );
   p = (typ == INCGRAPHIC ? INCLUDE_PATH : SYSINCLUDE_PATH);
-  fp = SearchPath(str, file_path[p], FALSE, full_name, xfpos);
-  if( *full_name == nil )  *full_name = MakeWord(str, xfpos);
+  fp = SearchPath(str, file_path[p], FALSE, FALSE, full_name, xfpos);
+  if( *full_name == nil )  *full_name = MakeWord(WORD, str, xfpos);
   debug2(DFS, D, "OpenIncGraphicFile returning (fp %s null, *full_name = %s)",
     fp==null ? "==" : "!=", string(*full_name));
   return fp;
 } /* end OpenIncGraphicFile */
 
 
-/*@@**************************************************************************/
+/*@::ReadFromFile()@**********************************************************/
 /*                                                                           */
 /*  OBJECT ReadFromFile(fnum, pos, sym)                                      */
 /*                                                                           */
@@ -451,7 +475,7 @@ FILE_NUM fnum; long pos;  OBJECT sym;
   }
   UnSwitchScope(sym);
   LexPop();
-  debug1(DFS, D, "ReadFromFile returning %s", EchoObject(null, res));
+  debug1(DFS, D, "ReadFromFile returning %s", EchoObject(res));
   ifdebug(DPP, D, ProfileOff("ReadFromFile"));
   return res;
 } /* end ReadFromFile */
@@ -461,7 +485,7 @@ static FILE_NUM	last_write_fnum = NO_FILE;
 static FILE	*last_write_fp  = null;
 
 
-/*****************************************************************************/
+/*@::WriteClosure()@**********************************************************/
 /*                                                                           */
 /*  static WriteClosure(x)                                                   */
 /*                                                                           */
@@ -493,7 +517,7 @@ OBJECT x;
 	assert( Down(y) != y, "WriteObject/CLOSURE: LPAR!" );
 	Child(z, Down(y));
 	WriteObject(z, (int) precedence(sym));
-	fputs(" ", last_write_fp);
+	StringFPuts(STR_SPACE, last_write_fp);
 	break;
 
 
@@ -503,17 +527,23 @@ OBJECT x;
 	Child(z, Down(y));
 	if( !name_printed )
 	{ if( need_lvis(sym) )
-	  { fputs(KW_LVIS, last_write_fp);
-	    fputs(" ", last_write_fp);
+	  { StringFPuts(KW_LVIS, last_write_fp);
+	    StringFPuts(STR_SPACE, last_write_fp);
 	  }
-	  fputs(SymName(sym), last_write_fp);
+	  StringFPuts(SymName(sym), last_write_fp);
 	  name_printed = TRUE;
 	}
-	fputs("\n   ", last_write_fp);
-	fputs(SymName(actual(y)), last_write_fp);
-	fprintf(last_write_fp, " %s ", KW_LBR);
+	StringFPuts(STR_NEWLINE, last_write_fp);
+	StringFPuts(STR_SPACE, last_write_fp);
+	StringFPuts(STR_SPACE, last_write_fp);
+	StringFPuts(STR_SPACE, last_write_fp);
+	StringFPuts(SymName(actual(y)), last_write_fp);
+	StringFPuts(STR_SPACE, last_write_fp);
+	StringFPuts(KW_LBR, last_write_fp);
+	StringFPuts(STR_SPACE, last_write_fp);
 	WriteObject(z, NO_PREC);
-	fprintf(last_write_fp, " %s", KW_RBR);
+	StringFPuts(STR_SPACE, last_write_fp);
+	StringFPuts(KW_RBR, last_write_fp);
 	npar_seen = TRUE;
 	break;
 
@@ -524,19 +554,20 @@ OBJECT x;
 	Child(z, Down(y));
 	if( !name_printed )
 	{ if( need_lvis(sym) )
-	  { fputs(KW_LVIS, last_write_fp);
-	    fputs(" ", last_write_fp);
+	  { StringFPuts(KW_LVIS, last_write_fp);
+	    StringFPuts(STR_SPACE, last_write_fp);
 	  }
-	  fputs(SymName(sym), last_write_fp);
+	  StringFPuts(SymName(sym), last_write_fp);
 	  name_printed = TRUE;
 	}
-	fputs(npar_seen ? "\n" : " ", last_write_fp);
+	StringFPuts(npar_seen ? STR_NEWLINE : STR_SPACE, last_write_fp);
 	if( has_body(sym) )
-	{ fputs(KW_LBR, last_write_fp);
-	  fputs(" ", last_write_fp);
+	{
+	  StringFPuts(KW_LBR, last_write_fp);
+	  StringFPuts(STR_SPACE, last_write_fp);
 	  WriteObject(z, NO_PREC);
-	  fputs(" ", last_write_fp);
-	  fputs(KW_RBR, last_write_fp);
+	  StringFPuts(STR_SPACE, last_write_fp);
+	  StringFPuts(KW_RBR, last_write_fp);
 	}
 	else WriteObject(z, (int) precedence(sym));
 	break;
@@ -551,15 +582,16 @@ OBJECT x;
   } /* end for each parameter */
   if( !name_printed )
   { if( need_lvis(sym) )
-    { fputs(KW_LVIS, last_write_fp);
-      fputs(" ", last_write_fp);
+    { StringFPuts(KW_LVIS, last_write_fp);
+      StringFPuts(STR_SPACE, last_write_fp);
     }
-    fputs(SymName(sym), last_write_fp);
+    StringFPuts(SymName(sym), last_write_fp);
     name_printed = TRUE;
   }
 } /* end WriteClosure */
 
-/*****************************************************************************/
+
+/*@::WriteObject()@***********************************************************/
 /*                                                                           */
 /*  static WriteObject(x, outer_prec)                                        */
 /*                                                                           */
@@ -570,18 +602,24 @@ OBJECT x;
 
 static WriteObject(x, outer_prec)
 OBJECT x;  int outer_prec;
-{ OBJECT link, y, gap_obj, sym, env;  unsigned char *name;
+{ OBJECT link, y, gap_obj, sym, env;  FULL_CHAR *name;
   int prec, i, last_prec;  BOOLEAN braces_needed;
   switch( type(x) )
   {
 
     case WORD:
 
-      if( strlen(string(x)) == 0 && outer_prec > ACAT_PREC )
-      {	fputs(KW_LBR, last_write_fp);
-	fputs(KW_RBR, last_write_fp);
+      if( StringLength(string(x)) == 0 && outer_prec > ACAT_PREC )
+      { StringFPuts(KW_LBR, last_write_fp);
+	StringFPuts(KW_RBR, last_write_fp);
       }
-      else fputs(string(x), last_write_fp);
+      else StringFPuts(string(x), last_write_fp);
+      break;
+
+    
+    case QWORD:
+
+      StringFPuts(StringQuotedWord(x), last_write_fp);
       break;
 
     
@@ -590,24 +628,27 @@ OBJECT x;  int outer_prec;
     case ACAT:  prec = ACAT_PREC;  goto ETC;
 
       ETC:
-      if( prec < outer_prec )  fputs(KW_LBR, last_write_fp);
+      if( prec < outer_prec )  StringFPuts(KW_LBR, last_write_fp);
       last_prec = prec;
       for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
 	if( type(y) == GAP_OBJ )
 	{ if( Down(y) == y )
 	  { assert( type(x) == ACAT, "WriteObject: Down(y) == y!" );
-	    for( i = 1;  i <= vspace(y);  i++ )  fputs("\n", last_write_fp);
-	    for( i = 1;  i <= hspace(y);  i++ )  fputs(" ",  last_write_fp);
+	    for( i = 1;  i <= vspace(y);  i++ )
+	      StringFPuts(STR_NEWLINE, last_write_fp);
+	    for( i = 1;  i <= hspace(y);  i++ )
+	      StringFPuts(STR_SPACE,  last_write_fp);
 	    last_prec = (vspace(y) + hspace(y) == 0) ? JUXTA_PREC : ACAT_PREC;
 	  }
 	  else
 	  { Child(gap_obj, Down(y));
-	    fprintf(last_write_fp, type(x) == ACAT ? " %s" : "\n%s",
-		EchoCatOp( (unsigned) type(x), mark(gap(y)), join(gap(y))));
-	    if( type(gap_obj) != WORD || strlen(string(gap_obj)) != 0 )
+	    StringFPuts(type(x)==ACAT ? STR_SPACE : STR_NEWLINE, last_write_fp);
+	    StringFPuts(EchoCatOp(type(x), mark(gap(y)), join(gap(y))),
+	      last_write_fp);
+	    if( !is_word(type(gap_obj)) || StringLength(string(gap_obj)) != 0 )
 		WriteObject(gap_obj, FORCE_PREC);
-	    fputs(" ", last_write_fp);
+	    StringFPuts(STR_SPACE, last_write_fp);
 	    last_prec = prec;
 	  }
 	}
@@ -626,7 +667,7 @@ OBJECT x;  int outer_prec;
 	  else WriteObject(y, prec);
 	}
       }
-      if( prec < outer_prec )  fputs(KW_RBR, last_write_fp);
+      if( prec < outer_prec )  StringFPuts(KW_RBR, last_write_fp);
       break;
 
 
@@ -642,10 +683,10 @@ OBJECT x;  int outer_prec;
 	Child(env, LastDown(y));
 	assert( type(env) == ENV, "WriteObject: ENV/env!" );
 	WriteObject(env, NO_PREC);
-	fputs(KW_LBR, last_write_fp);
+	StringFPuts(KW_LBR, last_write_fp);
 	WriteClosure(y);
-	fputs(KW_RBR, last_write_fp);
-	fputs("\n",   last_write_fp);
+	StringFPuts(KW_RBR, last_write_fp);
+	StringFPuts(STR_NEWLINE, last_write_fp);
       }
       else
       {	Child(env, LastDown(x));
@@ -671,25 +712,25 @@ OBJECT x;  int outer_prec;
 
       /* print environment */
       if( env != nil )
-      {	fputs(KW_ENV, last_write_fp);
-      	fputs("\n", last_write_fp);
+      {	StringFPuts(KW_ENV, last_write_fp);
+      	StringFPuts(STR_NEWLINE, last_write_fp);
 	WriteObject(env, NO_PREC);
       }
 
       /* print left brace if needed */
-      if( braces_needed )  fputs(KW_LBR, last_write_fp);
+      if( braces_needed )  StringFPuts(KW_LBR, last_write_fp);
 	
       /* print the closure proper */
       WriteClosure(x);
 
       /* print closing brace if needed */
-      if( braces_needed )  fputs(KW_RBR, last_write_fp);
+      if( braces_needed )  StringFPuts(KW_RBR, last_write_fp);
 
       /* print closing environment if needed */
       if( env != nil )
-      { fputs("\n", last_write_fp);
-	fputs(KW_CLOS, last_write_fp);
-      	fputs("\n", last_write_fp);
+      { StringFPuts(STR_NEWLINE, last_write_fp);
+	StringFPuts(KW_CLOS, last_write_fp);
+      	StringFPuts(STR_NEWLINE, last_write_fp);
       }
       break;
 
@@ -698,65 +739,67 @@ OBJECT x;  int outer_prec;
 
       Child(y, Down(x));
       assert( type(y) == CLOSURE, "WriteObject/CROSS: type(y) != CLOSURE!" );
-      fputs(SymName(actual(y)), last_write_fp);
-      fputs(KW_CROSS, last_write_fp);
+      StringFPuts(SymName(actual(y)), last_write_fp);
+      StringFPuts(KW_CROSS, last_write_fp);
       Child(y, LastDown(x));
       WriteObject(y, FORCE_PREC);
       break;
 
 
-    case NULL_CLOS:	name = (unsigned char *) KW_NULL;	goto SETC;
-    case ONE_COL:	name = (unsigned char *) KW_ONE_COL;	goto SETC;
-    case ONE_ROW:	name = (unsigned char *) KW_ONE_ROW;	goto SETC;
-    case WIDE:		name = (unsigned char *) KW_WIDE;	goto SETC;
-    case HIGH:		name = (unsigned char *) KW_HIGH;	goto SETC;
-    case HSCALE:	name = (unsigned char *) KW_HSCALE;	goto SETC;
-    case VSCALE:	name = (unsigned char *) KW_VSCALE;	goto SETC;
-    case SCALE:		name = (unsigned char *) KW_SCALE;	goto SETC;
-    case HCONTRACT:	name = (unsigned char *) KW_HCONTRACT;	goto SETC;
-    case VCONTRACT:	name = (unsigned char *) KW_VCONTRACT;	goto SETC;
-    case HEXPAND:	name = (unsigned char *) KW_HEXPAND;	goto SETC;
-    case VEXPAND:	name = (unsigned char *) KW_VEXPAND;	goto SETC;
-    case PADJUST:	name = (unsigned char *) KW_PADJUST;	goto SETC;
-    case HADJUST:	name = (unsigned char *) KW_HADJUST;	goto SETC;
-    case VADJUST:	name = (unsigned char *) KW_VADJUST;	goto SETC;
-    case ROTATE:	name = (unsigned char *) KW_ROTATE;	goto SETC;
-    case CASE:		name = (unsigned char *) KW_CASE;	goto SETC;
-    case YIELD:		name = (unsigned char *) KW_YIELD;	goto SETC;
-    case FONT:		name = (unsigned char *) KW_FONT;	goto SETC;
-    case SPACE:		name = (unsigned char *) KW_SPACE;	goto SETC;
-    case BREAK:		name = (unsigned char *) KW_BREAK;	goto SETC;
-    case NEXT:		name = (unsigned char *) KW_NEXT;	goto SETC;
-    case OPEN:		name = (unsigned char *) KW_OPEN;	goto SETC;
-    case TAGGED:	name = (unsigned char *) KW_TAGGED;	goto SETC;
-    case INCGRAPHIC:	name = (unsigned char *) KW_INCGRAPHIC;	goto SETC;
-    case SINCGRAPHIC:	name = (unsigned char *) KW_SINCGRAPHIC;goto SETC;
-    case GRAPHIC:	name = (unsigned char *) KW_GRAPHIC;	goto SETC;
+    case NULL_CLOS:	name = KW_NULL;		goto SETC;
+    case ONE_COL:	name = KW_ONE_COL;	goto SETC;
+    case ONE_ROW:	name = KW_ONE_ROW;	goto SETC;
+    case WIDE:		name = KW_WIDE;		goto SETC;
+    case HIGH:		name = KW_HIGH;		goto SETC;
+    case HSCALE:	name = KW_HSCALE;	goto SETC;
+    case VSCALE:	name = KW_VSCALE;	goto SETC;
+    case SCALE:		name = KW_SCALE;	goto SETC;
+    case HCONTRACT:	name = KW_HCONTRACT;	goto SETC;
+    case VCONTRACT:	name = KW_VCONTRACT;	goto SETC;
+    case HEXPAND:	name = KW_HEXPAND;	goto SETC;
+    case VEXPAND:	name = KW_VEXPAND;	goto SETC;
+    case PADJUST:	name = KW_PADJUST;	goto SETC;
+    case HADJUST:	name = KW_HADJUST;	goto SETC;
+    case VADJUST:	name = KW_VADJUST;	goto SETC;
+    case ROTATE:	name = KW_ROTATE;	goto SETC;
+    case CASE:		name = KW_CASE;		goto SETC;
+    case YIELD:		name = KW_YIELD;	goto SETC;
+    case XCHAR:		name = KW_XCHAR;	goto SETC;
+    case FONT:		name = KW_FONT;		goto SETC;
+    case SPACE:		name = KW_SPACE;	goto SETC;
+    case BREAK:		name = KW_BREAK;	goto SETC;
+    case NEXT:		name = KW_NEXT;		goto SETC;
+    case OPEN:		name = KW_OPEN;		goto SETC;
+    case TAGGED:	name = KW_TAGGED;	goto SETC;
+    case INCGRAPHIC:	name = KW_INCGRAPHIC;	goto SETC;
+    case SINCGRAPHIC:	name = KW_SINCGRAPHIC;	goto SETC;
+    case GRAPHIC:	name = KW_GRAPHIC;	goto SETC;
 
       /* print left parameter, if present */
       SETC:
-      if( DEFAULT_PREC <= outer_prec )  fputs(KW_LBR, last_write_fp);
+      if( DEFAULT_PREC <= outer_prec )  StringFPuts(KW_LBR, last_write_fp);
       if( Down(x) != LastDown(x) )
       {	Child(y, Down(x));
 	WriteObject(y, DEFAULT_PREC);
-	fputs(" ", last_write_fp);
+	StringFPuts(STR_SPACE, last_write_fp);
       }
 
-      /* print the symbol's name */
-      fputs(name, last_write_fp);
+      /* print the name of the symbol */
+      StringFPuts(name, last_write_fp);
 
       /* print right parameter, if present */
       if( LastDown(x) != x )
       {	Child(y, LastDown(x));
-	fputs(" ", last_write_fp);
+	StringFPuts(STR_SPACE, last_write_fp);
 	if( type(x) == OPEN )
-	{ fputs(KW_LBR, last_write_fp);
+	{ StringFPuts(KW_LBR, last_write_fp);
 	  WriteObject(y, NO_PREC);
-	  fputs(KW_RBR, last_write_fp);
+	  StringFPuts(KW_RBR, last_write_fp);
 	}
 	else WriteObject(y, DEFAULT_PREC);
       }
-      if( DEFAULT_PREC <= outer_prec )  fputs(KW_RBR, last_write_fp);
+      if( DEFAULT_PREC <= outer_prec )
+	StringFPuts(KW_RBR, last_write_fp);
       break;
 
 
@@ -769,7 +812,7 @@ OBJECT x;  int outer_prec;
 } /* end WriteObject */
 
 
-/*****************************************************************************/
+/*@::AppendToFile(), CloseFiles()@********************************************/
 /*                                                                           */
 /*  AppendToFile(x, fnum, pos)                                               */
 /*                                                                           */
@@ -780,38 +823,36 @@ OBJECT x;  int outer_prec;
 
 AppendToFile(x, fnum, pos)
 OBJECT x;  FILE_NUM fnum;  int *pos;
-{ unsigned char buff[MAX_LINE], *str;
-  ifdebug(DPP, D, ProfileOn("AppendToFile"));
-  debug2(DFS, D, "AppendToFile( %s, %s )", EchoObject(null, x), FileName(fnum));
+{ FULL_CHAR buff[MAX_LINE], *str;
+  debug2(DFS, D, "AppendToFile( %s, %s )", EchoObject(x), FileName(fnum));
 
   /* open file fnum for writing */
   if( last_write_fnum != fnum )
   { if( last_write_fnum != NO_FILE )  fclose(last_write_fp);
     str = FileName(fnum);
-    if( strlen(str) + strlen(NEW_DATA_SUFFIX) >= MAX_LINE )
+    if( StringLength(str) + StringLength(NEW_DATA_SUFFIX) >= MAX_LINE )
       Error(FATAL, PosOfFile(fnum), "file name %s%s is too long",
 	str, NEW_DATA_SUFFIX);
-    sprintf(buff, "%s%s", str, NEW_DATA_SUFFIX);
-    last_write_fp = fopen(buff, "a");
+    StringCopy(buff, str);  StringCat(buff, NEW_DATA_SUFFIX);
+    last_write_fp = StringFOpen(buff, "a");
     if( last_write_fp == null )  Error(FATAL, &fpos(fvec[fnum]),
 		"cannot append to database file %s", buff);
     last_write_fnum = fnum;
   }
 
-  /* write x out */
+  /* write x out and record the fact that fnum has changed */
   *pos = (int) ftell(last_write_fp);
-  fputs(KW_LBR, last_write_fp);
+  StringFPuts(KW_LBR, last_write_fp);
   WriteObject(x, NO_PREC);
-  fprintf(last_write_fp, "%s\n\n", KW_RBR);
-
-  /* record the fact that fnum has changed */
+  StringFPuts(KW_RBR, last_write_fp);
+  StringFPuts(STR_NEWLINE, last_write_fp);
+  StringFPuts(STR_NEWLINE, last_write_fp);
   updated(fvec[fnum]) = TRUE;
-  ifdebug(DPP, D, ProfileOff("AppendToFile"));
   debug0(DFS, D, "AppendToFile returning.");
 } /* end AppendToFile */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  CloseFiles()                                                             */
 /*                                                                           */
@@ -820,8 +861,7 @@ OBJECT x;  FILE_NUM fnum;  int *pos;
 /*****************************************************************************/
 
 CloseFiles()
-{ FILE_NUM fnum;
-  unsigned char buff[MAX_LINE];
+{ FILE_NUM fnum;  FULL_CHAR buff[MAX_LINE];
   ifdebug(DPP, D, ProfileOn("CloseFiles"));
   debug0(DFS, D, "CloseFiles()");
 
@@ -830,22 +870,22 @@ CloseFiles()
 
   /* get rid of old database files */
   for( fnum = FirstFile(SOURCE_FILE);  fnum != NO_FILE;  fnum = NextFile(fnum) )
-  { sprintf(buff, "%s%s", FileName(fnum), DATA_SUFFIX);
-    unlink(buff);
+  { StringCopy(buff, FileName(fnum));
+    StringCat(buff, DATA_SUFFIX);  StringUnlink(buff);
   }
 
   /* move any new database files to the old names, if updated */
   for( fnum = FirstFile(DATABASE_FILE); fnum != NO_FILE; fnum = NextFile(fnum) )
   { if( updated(fvec[fnum]) )
-    { sprintf(buff, "%s%s", string(fvec[fnum]), NEW_DATA_SUFFIX);
+    { StringCopy(buff, string(fvec[fnum]));
+      StringCat(buff, NEW_DATA_SUFFIX);
       debug1(DFS, D, "unlink(%s)", string(fvec[fnum]));
-      unlink(string(fvec[fnum])); /* may fail if old version does not exist */
+      StringUnlink(string(fvec[fnum])); /* may fail if no old version */
       debug2(DFS, D, "link(%s, %s)", buff, string(fvec[fnum]));
-      if( link(buff, string(fvec[fnum])) != 0 )
+      if( StringLink(buff, string(fvec[fnum])) != 0 )
         Error(INTERN, no_fpos, "link(%s, %s) failed", buff, string(fvec[fnum]));
       debug1(DFS, D, "unlink(%s)", buff);
-      if( unlink(buff) != 0 )
-       	Error(INTERN, no_fpos, "unlink(%s) failed", buff);
+      if( StringUnlink(buff) != 0 )  Error(INTERN, no_fpos, "unlink(%s)", buff);
     }
   }
   debug0(DFS, D, "CloseFiles returning.");

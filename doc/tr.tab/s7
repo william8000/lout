@@ -3,7 +3,7 @@
 @Begin
 @PP
 In conclusion, here is the input for a relatively large table:
-@ID 10p @Font @Code 1.2fx @Break {
+@ID 10p @Font @Code 1.18fx @Break {
 "@OneRow 10p @Font 1.15fx @Break @Tab"
 "    linewidth { 1.0 pt }"
 "    vmargin { 0.4v }"

@@ -16,8 +16,7 @@ breaking:
 @ID @Code {
 "@IndentedDisplay ragged @Break {"
 "This little paragraph will appear with"
-"ragged ends to its lines."
-"}"
+"ragged ends to its lines. }"
 }
 has result
 @IndentedDisplay 4c @Wide ragged @Break {

@@ -31,12 +31,12 @@ BookLayout package [{@Ref kingston92begin}].  A symbol called
 "{}"
 }
 @Code "@Runner" produces nothing at all, which means that we may place
-the invokation
+the invocation
 @ID @Code {
 "@Runner { Chapter"
 "8:  Sorting }"
 }
-at the end of a chapter without harm.  This invisible invokation will be
+at the end of a chapter without harm.  This invisible invocation will be
 carried along with the chapter and will end up on some page of the final
 printed document.
 @PP
@@ -46,14 +46,14 @@ page a header line containing the expression
 "@Runner&&following"
 "@Open { @Val }"
 }
-This means `find the nearest following invokation of @Code "@Runner" in the
+This means `find the nearest following invocation of @Code "@Runner" in the
 final printed document and retrieve its @Code "@Val" parameter.' Every page
 of Chapter 8 will find the correct running header, since @Code "@Runner"
-was placed at the end of the chapter.  The invokation @Code "@Runner {}"
+was placed at the end of the chapter.  The invocation @Code "@Runner {}"
 placed at the beginning of the chapter will suppress the header on the
 first page of the chapter, as it is conventional to do.
 @PP
-These invokations of @Code "@Runner" are hidden from the non-expert user
+These invocations of @Code "@Runner" are hidden from the non-expert user
 within the definition of the @Code "@Chapter" operator.  The result is a
 reliable implementation of a notoriously difficult feature.
 @End @Section

@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -50,17 +50,18 @@ OBJECT x;  int dim;  OBJECT *extras;
   int b, f, dble_fwd, llx, lly, urx, ury, status;
   float fllx, flly, furx, fury;
   BOOLEAN dble_found, found, will_expand, first_line;
-  FILE *fp;  float scale_factor; unsigned char buff[MAX_LINE];
+  FILE *fp;  FULL_CHAR buff[MAX_LINE];
 
-  debug2(DSF, DD, "[ MinSize( %s, %s, extras )", EchoObject(null,x),dimen(dim));
-  ifdebug(DSF, DDD, EchoObject(stderr, x));
+  debug2(DSF, DD, "[ MinSize( %s, %s, extras )", EchoObject(x), dimen(dim));
+  ifdebug(DSF, DDD, DebugObject(x));
 
   switch( type(x) )
   {
 
     case WORD:
+    case QWORD:
     
-      if( dim == COL )  FontAtomSize(x);
+      if( dim == COL )  FontWordSize(x);
       break;
 
 
@@ -68,10 +69,10 @@ OBJECT x;  int dim;  OBJECT *extras;
 
       /* add index to the cross-ref */
       if( dim == ROW )
-      {	z = New( (int) cross_type(x));
+      {	z = New(cross_type(x));
 	actual(z) = x;
 	Link(*extras, z);
-	debug1(DCR, DDD, "  MinSize: %s", EchoObject(null, z));
+	debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
       }
       back(x, dim) = fwd(x, dim) = 0;
       break;
@@ -100,14 +101,14 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  actual(z) = CrossMake(whereto(x), t, (int) type(z));
 	  Link(*extras, z);
 	  DisposeObject(x);
-	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(null, z));
+	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
 	else
 	{
 	  /* galley is following, make UNATTACHED */
 	  z = New(UNATTACHED);  Link(z, x);
 	  Link(*extras, z);
-	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(null, z));
+	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
 	x = y;	/* now sizing y, not x */
       }
@@ -124,13 +125,13 @@ OBJECT x;  int dim;  OBJECT *extras;
 	{ z = New(RECEPTIVE);
 	  actual(z) = x;
 	  Link(*extras, z);
-	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(null, z));
+	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
 	else if( recursive(actual(x)) )
 	{ z = New(RECURSIVE);
 	  actual(z) = x;
 	  Link(*extras, z);
-	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(null, z));
+	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
 	else Error(INTERN,&fpos(x), "MinSize: definite non-recursive CLOSURE!");
       }
@@ -167,7 +168,7 @@ OBJECT x;  int dim;  OBJECT *extras;
       {	z = New(EXPAND_IND);
 	actual(z) = x;
 	Link(*extras, z);
-	debug1(DCR, DDD, "  MinSize: %s", EchoObject(null, z));
+	debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
       }	
       break;
 
@@ -255,7 +256,7 @@ OBJECT x;  int dim;  OBJECT *extras;
       { if( !FitsConstraint(back(y, dim), fwd(y, dim), constraint(x)) )
         { Error(WARN, &fpos(x), "forced to enlarge %s", KW_HIGH);
 	  debug0(DSF, D, "offending object was:");
-	  ifdebug(DSF, D, EchoObject(stderr, y));
+	  ifdebug(DSF, D, DebugObject(y));
 	  SetConstraint(constraint(x), MAX_LEN, size(y, dim), MAX_LEN);
         }
         back(x, dim) = back(y, dim);
@@ -317,11 +318,11 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  }
 	  else if( type(y) == GAP_OBJ )  g = y;
 	  else /* calculate size of y and accumulate it */
-	  { if( type(y) == WORD )
+	  { if( is_word(type(y)) )
 	    { if( dim == COL )
-	      {	FontAtomSize(y);
-		debug4(DSF, DD, "FontAtomSize( %s ) font %d = %s,%s",
-		EchoObject(null, y), word_font(y),
+	      {	FontWordSize(y);
+		debug4(DSF, DD, "FontWordSize( %s ) font %d = %s,%s",
+		EchoObject(y), word_font(y),
 		EchoLength(back(y, COL)), EchoLength(fwd(y, COL)));
 	      }
 	    }
@@ -414,8 +415,8 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  else /* found object */
 	  {
 	    /* calculate size of subobject y */
-	    if( type(y) == WORD )
-	    { if( dim == COL )  FontAtomSize(y);
+	    if( is_word(type(y)) )
+	    { if( dim == COL )  FontWordSize(y);
 	    }
 	    else y = MinSize(y, dim, extras);
 	    if( found )
@@ -485,16 +486,16 @@ OBJECT x;  int dim;  OBJECT *extras;
       /* *** fp = OpenFile(fnum = sparec(constraint(x)), FALSE); */
       if( fp == NULL )  status = IG_NOFILE;
       first_line = TRUE;
-      while( status == IG_LOOKING && fgets(buff, MAX_LINE, fp) != NULL )
+      while( status == IG_LOOKING && StringFGets(buff, MAX_LINE, fp) != NULL )
       {
-	if( first_line && (buff[0] != '%' || buff[1] != '!') )
+	if( first_line && !StringBeginsWith(buff, AsciiToFull("%!")) )
 	  status = IG_BADFILE;
 	else
 	{ first_line = FALSE;
-	  if( buff[0] == '%' &&
-	      StringBeginsWith(buff, (unsigned char *) "%%BoundingBox:") &&
-	      !StringContains(buff, "(atend)") )
-	  { if( sscanf(buff, "%%%%BoundingBox: %f %f %f %f",
+	  if( buff[0] == '%'
+	      && StringBeginsWith(buff, AsciiToFull("%%BoundingBox:"))
+	      && !StringContains(buff, AsciiToFull("(atend)")) )
+	  { if( sscanf( (char *) buff, "%%%%BoundingBox: %f %f %f %f",
 		&fllx, &flly, &furx, &fury) == 4 )
 	    {
 	      status = IG_OK;
@@ -579,13 +580,13 @@ OBJECT x;  int dim;  OBJECT *extras;
 
 
   } /* end switch */
-  debug1(DSF, DD,  "] MinSize returning, x = %s", EchoObject(null, x));
+  debug1(DSF, DD,  "] MinSize returning, x = %s", EchoObject(x));
   debug3(DSF, DD, "  (%s size is %s, %s)", dimen(dim),
 		EchoLength(back(x, dim)), EchoLength(fwd(x, dim)) );
-  ifdebug(DSF, DDD, EchoObject(stderr, x));
+  ifdebug(DSF, DDD, DebugObject(x));
 
-  assert( type(x) == WORD || back(x, dim) >= 0, "MinSize: back(x, dim) < 0!" );
-  assert( type(x) == WORD || fwd(x, dim)  >= 0, "MinSize: fwd(x, dim)  < 0!" );
+  assert( back(x, dim) >= 0, "MinSize: back(x, dim) < 0!" );
+  assert( fwd(x, dim)  >= 0, "MinSize: fwd(x, dim)  < 0!" );
 
   return x;
 } /* end MinSize */

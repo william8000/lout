@@ -1,6 +1,6 @@
-/*@z26.c:Echo Service:BeginString(), AppendString(), EndString(), Image()@****/
+/*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,7 +24,8 @@
 /*                                                                           */
 /*  FILE:         z26.c                                                      */
 /*  MODULE:       Echo Service                                               */
-/*  EXTERNS:      BeginString(), AppendString(), EndString(), Image()        */
+/*  EXTERNS:      BeginString(), AppendString(), EndString(),                */
+/*                EchoLength(), Image()                                      */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -32,7 +33,7 @@
 #if DEBUG_ON
 #define	MULTI	  7			/* max no of simultaneous calls      */
 
-static	unsigned char buff[MULTI][MAX_LINE];	/* buffers for strings       */
+static	FULL_CHAR buff[MULTI][MAX_LINE];/* buffers for strings       */
 static	int	curr = 1;		/* current buffer in use             */
 static	int	bp;			/* next free space in buff[curr]     */
 static	BOOLEAN	instring = FALSE;	/* TRUE while making a string        */
@@ -50,11 +51,11 @@ BeginString()
 { if( instring ) Error(INTERN, no_fpos, "BeginString: currently in string!");
   instring = TRUE;  curr = (curr + 1) % MULTI;
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
-  strcpy(buff[curr], "");  bp = 0;
+  StringCopy(buff[curr], "");  bp = 0;
 }
 
 
-/*****************************************************************************/
+/*@::AppendString(), EndString(), EchoLength()@*******************************/
 /*                                                                           */
 /*  AppendString(str, p1, p2, p3, p4, p5, p6)                                */
 /*                                                                           */
@@ -64,19 +65,19 @@ BeginString()
 
 /*VARARGS1*/
 AppendString(str, p1, p2, p3, p4, p5, p6)
-unsigned char *str;  int p1, p2, p3, p4, p5, p6;
+FULL_CHAR *str;  int p1, p2, p3, p4, p5, p6;
 { int len;
   if( !instring ) Error(INTERN, no_fpos, "AppendString: no current string!");
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
   if( bp == MAX_LINE ) return;		/* no space, do nothing */
 
-  len = strlen(str);
+  len = StringLength(str);
   if( len + bp >= MAX_LINE )
-  { strcpy( &buff[curr][MAX_LINE/2], " ... <too long to print>" );
+  { StringCopy( &buff[curr][MAX_LINE/2], AsciiToFull(" ... <too long>") );
     bp = MAX_LINE;
   }
   else
-  { sprintf( &buff[curr][bp], str, p1, p2, p3, p4, p5, p6 );
+  { sprintf( (char *) &buff[curr][bp], str, p1, p2, p3, p4, p5, p6 );
     while( buff[curr][bp] != '\0' )  bp++;
     if( bp >= MAX_LINE )  Error(INTERN, no_fpos, "AppendString abort");
   }
@@ -85,13 +86,13 @@ unsigned char *str;  int p1, p2, p3, p4, p5, p6;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  unsigned char *EndString()                                               */
+/*  FULL_CHAR *EndString()                                                   */
 /*                                                                           */
 /*  Return the string constructed by previous AppendString operations.       */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *EndString()
+FULL_CHAR *EndString()
 { if( !instring ) Error(INTERN, no_fpos, "EndString: no current string!");
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
   instring = FALSE;
@@ -102,139 +103,141 @@ unsigned char *EndString()
 
 /*****************************************************************************/
 /*                                                                           */
-/*  unsigned char *EchoLength(len)                                           */
+/*  FULL_CHAR *EchoLength(len)                                               */
 /*                                                                           */
 /*  Echo a length.                                                           */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *EchoLength(len)
+FULL_CHAR *EchoLength(len)
 int len;
-{ static unsigned char buff[6][20];
+{ static FULL_CHAR buff[6][20];
   static int i = 0;
   i = (i + 1) % 6;
-  sprintf(buff[i], "%.3fc", (float) len/CM);
+  sprintf( (char *) buff[i], "%.3fc", (float) len/CM);
   return buff[i];
 } /* end EchoLength */
 
 
-/*@@**************************************************************************/
+/*@::Image()@*****************************************************************/
 /*                                                                           */
-/*  unsigned char *Image(c)                                                  */
+/*  FULL_CHAR *Image(c)                                                      */
 /*                                                                           */
 /*  Returns the string value of type c.                                      */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *Image(c)
+FULL_CHAR *Image(c)
 unsigned int c;
-{ static unsigned char b[20];
+{ static FULL_CHAR b[20];
   switch(c)
   {
 
-    case LINK:		return (unsigned char *) "link";
+    case LINK:		return  AsciiToFull("link");
 
-    case SPLIT:		return (unsigned char *) "split";
-    case HEAD:		return (unsigned char *) "head";
-    case PAR:		return (unsigned char *) "par";
-    case WORD:		return (unsigned char *) "word";
-    case GAP_OBJ:	return (unsigned char *) "gap_obj";
-    case ROW_THR:	return (unsigned char *) "row_thr";
-    case COL_THR:	return (unsigned char *) "col_thr";
-    case CLOSURE:	return (unsigned char *) "closure";
-    case NULL_CLOS:	return (unsigned char *) KW_NULL;
-    case CROSS:		return (unsigned char *) KW_CROSS;
-    case ONE_COL:	return (unsigned char *) KW_ONE_COL;
-    case ONE_ROW:	return (unsigned char *) KW_ONE_ROW;
-    case WIDE:		return (unsigned char *) KW_WIDE;
-    case HIGH:		return (unsigned char *) KW_HIGH;
-    case HSCALE:	return (unsigned char *) KW_HSCALE;
-    case VSCALE:	return (unsigned char *) KW_VSCALE;
-    case HCONTRACT:	return (unsigned char *) KW_HCONTRACT;
-    case VCONTRACT:	return (unsigned char *) KW_VCONTRACT;
-    case HEXPAND:	return (unsigned char *) KW_HEXPAND;
-    case VEXPAND:	return (unsigned char *) KW_VEXPAND;
-    case PADJUST:	return (unsigned char *) KW_PADJUST;
-    case HADJUST:	return (unsigned char *) KW_HADJUST;
-    case VADJUST:	return (unsigned char *) KW_VADJUST;
-    case ROTATE:	return (unsigned char *) KW_ROTATE;
-    case SCALE:		return (unsigned char *) KW_SCALE;
-    case CASE:		return (unsigned char *) KW_CASE;
-    case YIELD:		return (unsigned char *) KW_YIELD;
-    case FONT:		return (unsigned char *) KW_FONT;
-    case SPACE:		return (unsigned char *) KW_SPACE;
-    case BREAK:		return (unsigned char *) KW_BREAK;
-    case NEXT:		return (unsigned char *) KW_NEXT;
-    case ENV:		return (unsigned char *) KW_ENV;
-    case CLOS:		return (unsigned char *) KW_CLOS;
-    case LVIS:		return (unsigned char *) KW_LVIS;
-    case OPEN:		return (unsigned char *) KW_OPEN;
-    case TAGGED:	return (unsigned char *) KW_TAGGED;
-    case INCGRAPHIC:	return (unsigned char *) KW_INCGRAPHIC;
-    case SINCGRAPHIC:	return (unsigned char *) KW_SINCGRAPHIC;
-    case GRAPHIC:	return (unsigned char *) KW_GRAPHIC;
-    case ACAT:		return (unsigned char *) "acat";
-    case HCAT:		return (unsigned char *) "hcat";
-    case VCAT:		return (unsigned char *) "vcat";
+    case SPLIT:		return  AsciiToFull("split");
+    case HEAD:		return  AsciiToFull("head");
+    case PAR:		return  AsciiToFull("par");
+    case WORD:		return  AsciiToFull("word");
+    case QWORD:		return  AsciiToFull("qword");
+    case GAP_OBJ:	return  AsciiToFull("gap_obj");
+    case ROW_THR:	return  AsciiToFull("row_thr");
+    case COL_THR:	return  AsciiToFull("col_thr");
+    case CLOSURE:	return  AsciiToFull("closure");
+    case NULL_CLOS:	return  KW_NULL;
+    case CROSS:		return  KW_CROSS;
+    case ONE_COL:	return  KW_ONE_COL;
+    case ONE_ROW:	return  KW_ONE_ROW;
+    case WIDE:		return  KW_WIDE;
+    case HIGH:		return  KW_HIGH;
+    case HSCALE:	return  KW_HSCALE;
+    case VSCALE:	return  KW_VSCALE;
+    case HCONTRACT:	return  KW_HCONTRACT;
+    case VCONTRACT:	return  KW_VCONTRACT;
+    case HEXPAND:	return  KW_HEXPAND;
+    case VEXPAND:	return  KW_VEXPAND;
+    case PADJUST:	return  KW_PADJUST;
+    case HADJUST:	return  KW_HADJUST;
+    case VADJUST:	return  KW_VADJUST;
+    case ROTATE:	return  KW_ROTATE;
+    case SCALE:		return  KW_SCALE;
+    case CASE:		return  KW_CASE;
+    case YIELD:		return  KW_YIELD;
+    case XCHAR:		return  KW_XCHAR;
+    case FONT:		return  KW_FONT;
+    case SPACE:		return  KW_SPACE;
+    case BREAK:		return  KW_BREAK;
+    case NEXT:		return  KW_NEXT;
+    case ENV:		return  KW_ENV;
+    case CLOS:		return  KW_CLOS;
+    case LVIS:		return  KW_LVIS;
+    case OPEN:		return  KW_OPEN;
+    case TAGGED:	return  KW_TAGGED;
+    case INCGRAPHIC:	return  KW_INCGRAPHIC;
+    case SINCGRAPHIC:	return  KW_SINCGRAPHIC;
+    case GRAPHIC:	return  KW_GRAPHIC;
+    case ACAT:		return  AsciiToFull("acat");
+    case HCAT:		return  AsciiToFull("hcat");
+    case VCAT:		return  AsciiToFull("vcat");
 
-    case TSPACE:	return (unsigned char *) "tspace";
-    case TJUXTA:	return (unsigned char *) "tjuxta";
-    case LBR:		return (unsigned char *) "lbr";
-    case RBR:		return (unsigned char *) "rbr";
-    case BEGIN:		return (unsigned char *) KW_BEGIN;
-    case END:		return (unsigned char *) KW_END;
-    case USE:		return (unsigned char *) KW_USE;
-    case GSTUB_NONE:	return (unsigned char *) "gstub_none";
-    case GSTUB_INT:	return (unsigned char *) "gstub_int";
-    case GSTUB_EXT:	return (unsigned char *) "gstub_ext";
-    case INCLUDE:	return (unsigned char *) KW_INCLUDE;
-    case SYS_INCLUDE:	return (unsigned char *) KW_SYSINCLUDE;
-    case PREPEND:	return (unsigned char *) KW_PREPEND;
-    case SYS_PREPEND:	return (unsigned char *) KW_SYSPREPEND;
-    case DATABASE:	return (unsigned char *) KW_DATABASE;
-    case SYS_DATABASE:	return (unsigned char *) KW_SYSDATABASE;
-    case START:	 	return (unsigned char *) "start";
+    case TSPACE:	return  AsciiToFull("tspace");
+    case TJUXTA:	return  AsciiToFull("tjuxta");
+    case LBR:		return  AsciiToFull("lbr");
+    case RBR:		return  AsciiToFull("rbr");
+    case BEGIN:		return  KW_BEGIN;
+    case END:		return  KW_END;
+    case USE:		return  KW_USE;
+    case GSTUB_NONE:	return  AsciiToFull("gstub_none");
+    case GSTUB_INT:	return  AsciiToFull("gstub_int");
+    case GSTUB_EXT:	return  AsciiToFull("gstub_ext");
+    case INCLUDE:	return  KW_INCLUDE;
+    case SYS_INCLUDE:	return  KW_SYSINCLUDE;
+    case PREPEND:	return  KW_PREPEND;
+    case SYS_PREPEND:	return  KW_SYSPREPEND;
+    case DATABASE:	return  KW_DATABASE;
+    case SYS_DATABASE:	return  KW_SYSDATABASE;
+    case START:	 	return  AsciiToFull("start");
 
-    case DEAD:		return (unsigned char *) "dead";
-    case UNATTACHED:	return (unsigned char *) "unattached";
-    case RECEPTIVE:	return (unsigned char *) "receptive";
-    case RECEIVING:	return (unsigned char *) "receiving";
-    case RECURSIVE:	return (unsigned char *) "recursive";
-    case PRECEDES:	return (unsigned char *) "precedes";
-    case FOLLOWS:	return (unsigned char *) "follows";
-    case CROSS_FOLL:	return (unsigned char *) "cross_foll";
-    case GALL_FOLL:	return (unsigned char *) "gall_foll";
-    case CROSS_TARG:	return (unsigned char *) "cross_targ";
-    case GALL_TARG:	return (unsigned char *) "gall_targ";
-    case GALL_PREC:	return (unsigned char *) "gall_prec";
-    case CROSS_PREC:	return (unsigned char *) "cross_prec";
-    case EXPAND_IND:	return (unsigned char *) "expand_ind";
-    case THREAD:	return (unsigned char *) "thread";
-    case CROSS_SYM:	return (unsigned char *) "cross_sym";
-    case CR_ROOT:	return (unsigned char *) "cr_root";
-    case MACRO:		return (unsigned char *) KW_MACRO;
-    case LOCAL:		return (unsigned char *) "local";
-    case LPAR:		return (unsigned char *) "lpar";
-    case NPAR:		return (unsigned char *) "npar";
-    case RPAR:		return (unsigned char *) "rpar";
-    case CR_LIST:	return (unsigned char *) "cr_list";
-    case EXT_GALL:	return (unsigned char *) "ext_gall";
-    case DISPOSED:	return (unsigned char *) "disposed";
+    case DEAD:		return  AsciiToFull("dead");
+    case UNATTACHED:	return  AsciiToFull("unattached");
+    case RECEPTIVE:	return  AsciiToFull("receptive");
+    case RECEIVING:	return  AsciiToFull("receiving");
+    case RECURSIVE:	return  AsciiToFull("recursive");
+    case PRECEDES:	return  AsciiToFull("precedes");
+    case FOLLOWS:	return  AsciiToFull("follows");
+    case CROSS_FOLL:	return  AsciiToFull("cross_foll");
+    case GALL_FOLL:	return  AsciiToFull("gall_foll");
+    case CROSS_TARG:	return  AsciiToFull("cross_targ");
+    case GALL_TARG:	return  AsciiToFull("gall_targ");
+    case GALL_PREC:	return  AsciiToFull("gall_prec");
+    case CROSS_PREC:	return  AsciiToFull("cross_prec");
+    case EXPAND_IND:	return  AsciiToFull("expand_ind");
+    case THREAD:	return  AsciiToFull("thread");
+    case CROSS_SYM:	return  AsciiToFull("cross_sym");
+    case CR_ROOT:	return  AsciiToFull("cr_root");
+    case MACRO:		return  KW_MACRO;
+    case LOCAL:		return  AsciiToFull("local");
+    case LPAR:		return  AsciiToFull("lpar");
+    case NPAR:		return  AsciiToFull("npar");
+    case RPAR:		return  AsciiToFull("rpar");
+    case CR_LIST:	return  AsciiToFull("cr_list");
+    case EXT_GALL:	return  AsciiToFull("ext_gall");
+    case DISPOSED:	return  AsciiToFull("disposed");
 
-    case BACK:		return (unsigned char *) "back";
-    case ON:		return (unsigned char *) "on";
-    case FWD:		return (unsigned char *) "fwd";
+    case BACK:		return  AsciiToFull("back");
+    case ON:		return  AsciiToFull("on");
+    case FWD:		return  AsciiToFull("fwd");
 
-    case PROMOTE:	return (unsigned char *) "promote";
-    case CLOSE:		return (unsigned char *) "close";
-    case BLOCK:		return (unsigned char *) "block";
-    case CLEAR:		return (unsigned char *) "clear";
+    case PROMOTE:	return  AsciiToFull("promote");
+    case CLOSE:		return  AsciiToFull("close");
+    case BLOCK:		return  AsciiToFull("block");
+    case CLEAR:		return  AsciiToFull("clear");
 
-    case ABS:		return (unsigned char *) "abs";
-    case INC:		return (unsigned char *) "inc";
-    case DEC:		return (unsigned char *) "dec";
+    case GAP_ABS:	return  AsciiToFull("abs");
+    case GAP_INC:	return  AsciiToFull("inc");
+    case GAP_DEC:	return  AsciiToFull("dec");
 
-    default:		sprintf(b, "??(%d)", c);
+    default:		sprintf( (char *) b, "??(%d)", c);
 			return b;
   } /* end switch */
 } /* end Image */

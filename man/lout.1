@@ -8,12 +8,18 @@ Invoke the Basser Lout interpreter on the concatenation of the named
 files, producing a PostScript file on standard output suitable for
 printing on PostScript printers using lpr(1).  If no files are named,
 stdin is used instead.  The special file name - may be used to denote
-standard input.
+standard input.  There may be white space between flags like -i and
+their associated <filename> or <dirname> values.
+.P
+An optional .lout suffix may be used for Lout source and include
+files.  When invoking files ending in this suffix the suffix may be
+omitted.
 .SH OPTIONS
 .TP 16
 -i<filename>  
 Search the directories of the include file path (see below) for
-<filename> and include it.  There may be multiple -i options.
+<filename> or <filename>.lout and include it.  There may be
+multiple -i options.
 .TP
 -s
 Suppress all reading and writing of the cross reference database;
@@ -34,18 +40,27 @@ order given, and finally searches the default include file directory
 (see below).  @SysInclude and the -i option omit the search of the
 current directory.
 .TP
+-C<dirname>
+Add <dirname> to the list of directories searched for character
+encoding (.CEV) files.  There may be multiple -C options; the directories
+are searched in the order given, and finally the default encoding
+vectors directory is searched (see below).
+.TP
 -F<dirname>
-Add <dirname> to the list of directories searched for font (.AFM) files.
-There may be multiple -F options; the directories are searched in the
-order given, and finally the default font file directory is searched
-(see below).
+Add <dirname> to the list of directories searched for font metrics
+(.AFM) files.  There may be multiple -F options; the directories are
+searched in the order given, and finally the default font metrics
+directory is searched (see below).
 .TP
 -D<dirname>
 Add <dirname> to the list of directories searched for Lout database
 files.  There may be multiple -D options.  @Database searches the
 current directory, then the -D directories in the order given, and
-finally searches the default database file directory (see below).
+finally searches the default databases directory (see below).
 @SysDatabase omits the search of the current directory.
+.TP
+-u
+Print usage information on stderr.
 .TP
 -V
 Print version information on stderr.
@@ -61,11 +76,12 @@ At most 100 fonts (each different size counts as one font)
 At most 5 deep nesting of @Include files
 .SH FILES
 .nf
-<BINDIR>/lout  -  Binary file
-<LIBDIR>/include  -  Default include file dir.
-<LIBDIR>/data  -  Default standard databases dir.
-<LIBDIR>/font  -  Default font metrics files dir.
-<DOCDIR>  -  Directory containing Lout documentation
+Binary file:                    <BINDIR>/lout
+Default include file directory: <LIBDIR>/include
+Default databases directory:    <LIBDIR>/data
+Default font metrics directory: <LIBDIR>/font
+Default encoding vectors dir.:  <LIBDIR>/evec
+Lout documentation directory:   <DOCDIR>
 .fi
 .SH SEE ALSO
 .P

@@ -1,6 +1,6 @@
-/*@z33.c:Database Service:DbCreate(), DbRetrieve()@***************************/
+/*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -25,11 +25,11 @@
 /*  FILE:         z33.c                                                      */
 /*  MODULE:       Database Service                                           */
 /*  EXTERNS:      OldCrossDb, NewCrossDb, DbCreate(), DbInsert(),            */
-/*                DbConvert(), DbLoad(), DbRetrieve(), DbRetrieveNext()      */
+/*                DbConvert(), DbClose(), DbLoad(), DbRetrieve(),            */
+/*                DbRetrieveNext()                                           */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
-#define	reading(x)	threaded(x)
 
 
 /*****************************************************************************/
@@ -40,27 +40,6 @@
 /*****************************************************************************/
 
 OBJECT OldCrossDb, NewCrossDb;
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  OBJECT DbCreate(str, fpos)                                               */
-/*                                                                           */
-/*  Create a new writable database with name (i.e. file stem) str and file   */
-/*  position fpos for error messages.                                        */
-/*                                                                           */
-/*****************************************************************************/
-
-OBJECT DbCreate(str, fposn)
-unsigned char *str;  FILE_POS *fposn;
-{ OBJECT db;
-  debug2(DBS, D, "DbCreate( %s,%s )", str, EchoFilePos(fposn));
-  db = MakeWord(str, fposn);
-  reading(db) = FALSE;
-  filep(db) = null;
-  debug1(DBS, D, "DbCreate returning %s", EchoObject(null, db));
-  return db;
-} /* end DbCreate */
 
 
 /*****************************************************************************/
@@ -96,7 +75,7 @@ unsigned char *str;  FILE_POS *fposn;
 } /* end SymToNum */
 
 
-/*@@**************************************************************************/
+/*@::NumToSym(), DbCreate()@**************************************************/
 /*                                                                           */
 /*  #define NumToSym(db, num, sym)                                           */
 /*                                                                           */
@@ -118,6 +97,26 @@ unsigned char *str;  FILE_POS *fposn;
 
 /*****************************************************************************/
 /*                                                                           */
+/*  OBJECT DbCreate(x)                                                       */
+/*                                                                           */
+/*  Create a new writable database with name (i.e. file stem) x and file     */
+/*  position fpos for error messages.                                        */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT DbCreate(x)
+OBJECT x;
+{ OBJECT db = x;
+  debug1(DBS, D, "DbCreate(%s)", string(db));
+  assert( is_word(type(x)), "DbCreate: !is_word(type(x))" );
+  reading(db) = FALSE;  filep(db) = null;
+  debug1(DBS, D, "DbCreate returning %s", EchoObject(db));
+  return db;
+} /* end DbCreate */
+
+
+/*@::DbInsert()@**************************************************************/
+/*                                                                           */
 /*  DbInsert(db, gall, sym, tag, seq, dfnum, dfpos)                          */
 /*                                                                           */
 /*  Insert a new entry into writable database db.  The primary key of the    */
@@ -128,8 +127,9 @@ unsigned char *str;  FILE_POS *fposn;
 /*      tag         The tag of this target (must be a non-null string)       */
 /*                                                                           */
 /*  There is also an auxiliary key, seq, which enforces an ordering on       */
-/*  entries with equal primary keys.  This is used for sorted galleys.       */
-/*  The value of the entry has the following parts:                          */
+/*  entries with equal primary keys but is not itself ever retrieved.  This  */
+/*  ordering is used for sorted galleys.  The value of the entry has the     */
+/*  following parts:                                                         */
 /*                                                                           */
 /*      dfnum       The file containing the object                           */
 /*      dfpos       The position of the object in that file                  */
@@ -137,36 +137,46 @@ unsigned char *str;  FILE_POS *fposn;
 /*****************************************************************************/
 
 DbInsert(db, gall, sym, tag, seq, dfnum, dfpos)
-OBJECT db;  BOOLEAN gall;  OBJECT sym;  unsigned char *tag, *seq;
+OBJECT db;  BOOLEAN gall;  OBJECT sym;  FULL_CHAR *tag, *seq;
 FILE_NUM dfnum;  long dfpos;
 { int symnum;
-  unsigned char buff[MAX_LINE];
-  assert( type(db) == WORD, "DbInsert: db!" );
+  FULL_CHAR buff[MAX_LINE];
+  assert( is_word(type(db)), "DbInsert: db!" );
   assert( tag[0] != '\0', "DbInsert: null tag!" );
   assert( seq[0] != '\0', "DbInsert: null seq!" );
   ifdebug(DPP, D, ProfileOn("DbInsert"));
   debug6(DBS, D, "DbInsert(%s, %s, %s, %s, %s, %s, dfpos)",
 	string(db), bool(gall), SymName(sym), tag, seq,
-	dfnum == NO_FILE ? (unsigned char *) "." : FileName(dfnum));
+	dfnum == NO_FILE ? AsciiToFull(".") : FileName(dfnum));
   if( reading(db) )  Error(INTERN, &fpos(db), "insert into reading database!");
   if( filep(db) == null )
-  { if( strlen(string(db)) + strlen(NEW_INDEX_SUFFIX) >= MAX_LINE )
+  { if( StringLength(string(db)) + StringLength(NEW_INDEX_SUFFIX) >= MAX_LINE )
       Error(FATAL, no_fpos, "database file name %s%s is too long",
 	string(db), NEW_INDEX_SUFFIX);
-    sprintf(buff, "%s%s", string(db), NEW_INDEX_SUFFIX);
-    filep(db) = fopen(buff, "w");
+    StringCopy(buff, string(db));
+    StringCat(buff, NEW_INDEX_SUFFIX);
+    filep(db) = StringFOpen(buff, "w");
     if( filep(db) == null )
       Error(FATAL, &fpos(db), "cannot write to database file %s", buff);
   }
+  if( dfnum != NO_FILE )
+  { StringCopy(buff, FileName(dfnum));
+    StringCopy(&buff[StringLength(buff)-StringLength(DATA_SUFFIX)], STR_EMPTY);
+  }
+  else StringCopy(buff, AsciiToFull("."));
   SymToNum(db, sym, symnum, gall);
+  ifdebug(DBS, D,
+  fprintf(stderr, "  -> %s%d&%s\t%s\t%ld\t%s\n", gall ? "&" : "", symnum,
+    tag, seq, dfpos, buff);
+  );
   fprintf(filep(db), "%s%d&%s\t%s\t%ld\t%s\n", gall ? "&" : "", symnum,
-    tag, seq, dfpos, dfnum==NO_FILE ? (unsigned char *) "." : FileName(dfnum));
+    tag, seq, dfpos, buff);
   debug0(DBS, D, "DbInsert returning.");
   ifdebug(DPP, D, ProfileOff("DbInsert"));
 } /* end DbInsert */
 
 
-/*@@**************************************************************************/
+/*@::DbConvert(), DbClose()@**************************************************/
 /*                                                                           */
 /*  DbConvert(db, full_name)                                                 */
 /*                                                                           */
@@ -177,27 +187,32 @@ FILE_NUM dfnum;  long dfpos;
 
 DbConvert(db, full_name)
 OBJECT db;  BOOLEAN full_name;
-{ unsigned char buff[2*MAX_LINE + 20], oldname[MAX_LINE+10], newname[MAX_LINE];
+{ FULL_CHAR oldname[MAX_LINE+10], newname[MAX_LINE];
+  char buff[2*MAX_LINE + 20];
   OBJECT link, y;
   ifdebug(DPP, D, ProfileOn("DbConvert"));
   debug2(DBS, D, "DbConvert( %d %s )", (int) db,string(db));
   if( reading(db) )  Error(INTERN, &fpos(db), "DbConvert: reading database!");
-  sprintf(newname, "%s", string(db));
-  sprintf(oldname, "%s%s", string(db), NEW_INDEX_SUFFIX);
+  StringCopy(newname, string(db));
+  StringCat(newname, INDEX_SUFFIX);
+  StringCopy(oldname, string(db));
+  StringCat(oldname, NEW_INDEX_SUFFIX);
   if( filep(db) != null )
   { for( link = Down(db);  link != db;  link = NextDown(link) )
     { Child(y, link);
       assert( type(y) == CROSS_SYM || type(y) == ACAT, "DbConvert: y!" );
       if( type(y) != CROSS_SYM )  continue;
-      fprintf(filep(db), "%s %d %s\n", db_targ(link) ? "#target" : "#symbol",
-	number(link), full_name ? FullSymName(symb(y)," ") : SymName(symb(y)));
+      fprintf(filep(db), "%s %d %s\n",
+	db_targ(link) ? "#target" : "#symbol",
+	number(link),
+	full_name ? FullSymName(symb(y), AsciiToFull(" ")) : SymName(symb(y)));
     }
     fclose(filep(db));
     sprintf(buff, "sort -o %s %s", newname, oldname);
     system(buff);
   }
-  else unlink(newname);
-  unlink(oldname);
+  else StringUnlink(newname);
+  StringUnlink(oldname);
   DeleteNode(db);
   debug0(DBS, D, "DbConvert returning.");
   ifdebug(DPP, D, ProfileOff("DbConvert"));
@@ -206,42 +221,55 @@ OBJECT db;  BOOLEAN full_name;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  OBJECT DbLoad(index_fnum, str, fpos, create, symbs)                      */
+/*  DbClose(db)                                                              */
 /*                                                                           */
-/*  Open the database whose name (i.e. <stem>.li) is str for reading.        */
-/*  This file has already been defined; its internal name is index_fnum.     */
-/*  If it won't open and create is true, try to create it from <stem>.ld.    */
+/*  Close readable database db.                                              */
+/*                                                                           */
+/*****************************************************************************/
+
+DbClose(db)
+OBJECT db;
+{ if( db != nil && filep(db) != NULL )
+  {  fclose(filep(db));
+     filep(db) = NULL;
+  }
+} /* end DbClose */
+
+
+/*@::DbLoad()@****************************************************************/
+/*                                                                           */
+/*  OBJECT DbLoad(stem, fpath, create, symbs)                                */
+/*                                                                           */
+/*  Open for reading the database whose index file name is string(stem).li.  */
+/*  This file has not yet been defined; its search path is fpath.  If it     */
+/*  will not open and create is true, try creating it from string(stem).ld.  */
 /*                                                                           */
 /*  symbs is an ACAT of CLOSUREs showing the symbols that the database may   */
 /*  contain; or nil if the database may contain any symbol.                  */
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT DbLoad(index_fnum, str, fposn, create, symbs)
-FILE_NUM index_fnum;  unsigned char *str;  FILE_POS *fposn;
-BOOLEAN create;  OBJECT symbs;
+OBJECT DbLoad(stem, fpath, create, symbs)
+OBJECT stem;  int fpath;  BOOLEAN create;  OBJECT symbs;
 { FILE *fp;  OBJECT db, t, res, tag, par, sym, link, y;
-  int i, lnum, num, count;  unsigned char line[MAX_LINE];
-  unsigned char indexname[MAX_LINE], dataname[MAX_LINE], sym_name[MAX_LINE];
-  FILE_NUM dfnum;  long dfpos;  BOOLEAN gall;
+  int i, lnum, num, count;  FILE_NUM index_fnum, dfnum;  long dfpos;
+  BOOLEAN gall;  FULL_CHAR line[MAX_LINE], sym_name[MAX_LINE];
   ifdebug(DPP, D, ProfileOn("DbLoad"));
-  debug4(DBS, D, "DbLoad(%s, %s, %s, %s, symbs)", FileName(index_fnum),
-    str, EchoFilePos(fposn), bool(create));
+  debug3(DBS, D, "DbLoad(%s, %d, %s, -)", string(stem), fpath, bool(create));
 
   /* open or else create index file fp */
-  fp = OpenFile(index_fnum, create);
+  index_fnum = DefineFile(string(stem), INDEX_SUFFIX, &fpos(stem), INDEX_FILE,
+		 fpath);
+  fp = OpenFile(index_fnum, create, FALSE);
   if( fp == null && create )
   { db = nil;
-    strcpy(dataname, str);
-    strcpy(&dataname[strlen(dataname) - strlen(INDEX_SUFFIX)], DATA_SUFFIX);
-    dfnum = DefineFile(MakeWord(dataname, fposn), DATABASE_FILE, DATABASE_PATH);
-    dfpos = 0L;
-    LexPush(dfnum, 0, DATABASE_FILE);
-    t = LexGetToken();
+    dfnum = DefineFile(string(stem), DATA_SUFFIX, &fpos(stem),
+      DATABASE_FILE, DATABASE_PATH);
+    dfpos = 0L;  LexPush(dfnum, 0, DATABASE_FILE);  t = LexGetToken();
     while( type(t) == LBR )
     { res = Parse(&t, StartSym, FALSE, FALSE);
-      if( t != nil || type(res) != CLOSURE )
-	Error(FATAL, &fpos(res), "syntax error in database file %s", dataname);
+      if( t != nil || type(res) != CLOSURE )  Error(FATAL, &fpos(res),
+	"syntax error in database file %s", FileName(dfnum));
       assert( symbs != nil, "DbLoad: create && symbs == nil!" );
       if( symbs != nil )
       {	for( link = Down(symbs);  link != symbs;  link = NextDown(link) )
@@ -252,8 +280,7 @@ BOOLEAN create;  OBJECT symbs;
 	  "%s found in database but not declared in %s line",
 	  SymName(actual(res)), KW_DATABASE);
       }
-      tag = nil;
-      for( link = Down(res);  link != res;  link = NextDown(link) )
+      for( tag = nil, link = Down(res);  link != res;  link = NextDown(link) )
       {	Child(par, link);
 	if( type(par) == PAR && is_tag(actual(par)) && Down(par) != par )
 	{ Child(tag, Down(par));
@@ -263,39 +290,43 @@ BOOLEAN create;  OBJECT symbs;
       if( tag == nil )
 	Error(FATAL, &fpos(res), "database symbol %s has no tag", SymName(res));
       tag = ReplaceWithTidy(tag);
-      if( type(tag) != WORD )
-	Error(FATAL, &fpos(res), "database symbol's tag is not a simple word");
-      if( string(tag)[0] == '\0' )
-	Error(FATAL, &fpos(res), "database symbol's tag is an empty word");
+      if( !is_word(type(tag)) )
+	Error(FATAL, &fpos(res), "database symbol tag is not a simple word");
+      if( StringEqual(string(tag), STR_EMPTY) )
+	Error(FATAL, &fpos(res), "database symbol tag is an empty word");
       if( db == nil )
-      {	strcpy(indexname, FileName(dfnum));
-	strcpy(&indexname[strlen(indexname)-strlen(DATA_SUFFIX)], INDEX_SUFFIX);
-	db = DbCreate(indexname, fposn);
+      {	StringCopy(line, FileName(dfnum));
+	i = StringLength(line) - StringLength(INDEX_SUFFIX);
+	assert( i > 0, "DbLoad: FileName(dfnum) (1)!" );
+	StringCopy(&line[i], STR_EMPTY);
+	db = DbCreate(MakeWord(WORD, line, &fpos(stem)));
       }
-      DbInsert(db, FALSE, actual(res), string(tag), "0", NO_FILE, dfpos);
-      DisposeObject(res);
-      dfpos = LexNextTokenPos();
-      t = LexGetToken();
+      DbInsert(db, FALSE, actual(res), string(tag), STR_ZERO, NO_FILE, dfpos);
+      DisposeObject(res);  dfpos = LexNextTokenPos();  t = LexGetToken();
     }
     if( type(t) != END )
       Error(FATAL, &fpos(t), "%s or end of file expected here", KW_LBR);
     LexPop();
     if( db == nil )
-    { strcpy(indexname, FileName(dfnum));
-      strcpy(&indexname[strlen(indexname)-strlen(DATA_SUFFIX)], INDEX_SUFFIX);
-      db = DbCreate(indexname, fposn);
+    { StringCopy(line, FileName(dfnum));
+      i = StringLength(line) - StringLength(INDEX_SUFFIX);
+      assert( i > 0, "DbLoad: FileName(dfnum) (2)!" );
+      StringCopy(&line[i], STR_EMPTY);
+      db = DbCreate(MakeWord(WORD, line, &fpos(stem)));
     }
     DbConvert(db, FALSE);
-    fp = OpenFile(index_fnum, FALSE);
-    if( fp == null )
-      Error(FATAL, &fpos(db), "cannot open database file %s", indexname);
+    if( (fp = OpenFile(index_fnum, FALSE, FALSE)) == null )
+      Error(FATAL, &fpos(db), "cannot open database file %s",
+      FileName(index_fnum));
   }
-  else strcpy(indexname, str);
 
   /* set up database record */
-  db = MakeWord(FileName(index_fnum), fposn);
-  reading(db) = TRUE;
-  filep(db) = fp;
+  StringCopy(line, FileName(index_fnum));
+  i = StringLength(line) - StringLength(INDEX_SUFFIX);
+  assert( i > 0, "DbLoad: FileName(index_fnum)!" );
+  StringCopy(&line[i], STR_EMPTY);
+  db = MakeWord(WORD, line, &fpos(stem));
+  reading(db) = TRUE;  filep(db) = fp;
   if( symbs != nil )
   { assert( type(symbs) = ACAT, "DbLoad: type(symbs)!" );
     Link(db, symbs);
@@ -307,23 +338,22 @@ BOOLEAN create;  OBJECT symbs;
   }
 
   /* read header lines of index file, find its symbols */
-  left_pos(db) = 0;
-  lnum = 0;
-  while( fgets(line, MAX_LINE, fp) != NULL && line[0] == '#' )
+  left_pos(db) = 0;  lnum = 0;
+  while( StringFGets(line, MAX_LINE, fp) != NULL && line[0] == '#' )
   { lnum++;
     left_pos(db) = (int) ftell(fp);
-    gall = line[1] == 't';
-    sscanf(line, gall ? "#target %d" : "#symbol %d", &num);
-    for( i = 8;  line[i] != ' ' && line[i] != '\0';  i++ );
+    gall = StringBeginsWith(line, AsciiToFull("#target "));
+    sscanf( (char *) line, gall ? "#target %d" : "#symbol %d", &num);
+    for( i = 8;  line[i] != CH_SPACE && line[i] != '\0';  i++ );
     if( symbs == nil )
     {
       /* any symbols are possible, full path names in index file required */
       count = 0;  sym = StartSym;
-      while( line[i] != '\n' && line[i] != '\0' )
+      while( line[i] != CH_NEWLINE && line[i] != '\0' )
       {	PushScope(sym, FALSE, FALSE);  count++;
-	sscanf(&line[i+1], "%s", sym_name);
-	sym = SearchSym(sym_name, strlen(sym_name));
-	i += strlen(sym_name) + 1;
+	sscanf( (char *) &line[i+1], "%s", sym_name);
+	sym = SearchSym(sym_name, StringLength(sym_name));
+	i += StringLength(sym_name) + 1;
       }
       for( i = 1;  i <= count;  i++ )  PopScope();
     }
@@ -331,11 +361,11 @@ BOOLEAN create;  OBJECT symbs;
     {
       /* only symbs symbols possible, full path names not required */
       sym = nil;
-      sscanf(&line[i+1], "%s", sym_name);
+      sscanf( (char *) &line[i+1], "%s", sym_name);
       for( link = Down(symbs);  link != symbs;  link = NextDown(link) )
       {	Child(y, link);
 	assert( type(y) == CLOSURE, "DbLoad: type(y) != CLOSURE!" );
-	if( strcmp(sym_name, SymName(actual(y))) == 0 )
+	if( StringEqual(sym_name, SymName(actual(y))) )
 	{ sym = actual(y);
 	  break;
 	}
@@ -344,16 +374,14 @@ BOOLEAN create;  OBJECT symbs;
     if( sym != nil && sym != StartSym )
     { if( cross_sym(sym) == nil )  CrossInit(sym);
       link = Link(db, cross_sym(sym));
-      number(link) = num;
-      db_targ(link) = gall;
+      number(link) = num;  db_targ(link) = gall;
       if( gall )  is_extern_target(sym) = uses_extern_target(sym) = TRUE;
     }
     else
     { Error(WARN, &fpos(db), "undefined symbol in database file %s (line %d)",
-			indexname, lnum);
+			FileName(index_fnum), lnum);
       debug1(DBS, D, "DbLoad returning %s (error)", string(db));
-      fclose(filep(db));	/* effectively an empty database */
-      filep(db) = null;
+      fclose(filep(db));  filep(db) = null;  /* effectively an empty database */
       ifdebug(DPP, D, ProfileOff("DbLoad"));
       return db;
     }
@@ -364,7 +392,7 @@ BOOLEAN create;  OBJECT symbs;
 } /* end DbLoad */
 
 
-/*@@**************************************************************************/
+/*@::SearchFile()@************************************************************/
 /*                                                                           */
 /*  static BOOLEAN SearchFile(fp, left, right, str, line)                    */
 /*                                                                           */
@@ -375,27 +403,27 @@ BOOLEAN create;  OBJECT symbs;
 /*****************************************************************************/
 
 static BOOLEAN SearchFile(fp, left, right, str, line)
-FILE *fp;  int left, right;  unsigned char *str, *line;
-{ int l, r, mid, mid_end;  unsigned char buff[MAX_LINE];  BOOLEAN res;
+FILE *fp;  int left, right;  FULL_CHAR *str, *line;
+{ int l, r, mid, mid_end;  FULL_CHAR buff[MAX_LINE];  BOOLEAN res;
   ifdebug(DPP, D, ProfileOn("SearchFile"));
   debug3(DBS, DD, "SearchFile(fp, %d, %d, %s, line)", left, right, str);
 
   l = left;  r = right;
   while( l <= r )
   {
-    /* loop invt: (l==0 or fp[l-1]=='\n') and (fp[r] == '\n')       */
-    /* and first key >= str lies in the range fp[l..r+1]            */
+    /* loop invt: (l==0 or fp[l-1]==CH_NEWLINE) and (fp[r] == CH_NEWLINE)    */
+    /* and first key >= str lies in the range fp[l..r+1]                     */
 
     /* find line near middle of the range; mid..mid_end brackets it */
     debug2(DBS, DD, "  start loop: l = %d, r = %d", l, r);
     mid = (l + r)/2;
     fseek(fp, (long) mid, 0);
-    do { mid++; } while( getc(fp) != '\n' );
+    do { mid++; } while( getc(fp) != CH_NEWLINE );
     if( mid == r + 1 )
     { mid = l;
       fseek(fp, (long) mid, 0);
     }
-    fgets(line, MAX_LINE, fp);
+    StringFGets(line, MAX_LINE, fp);
     mid_end = (int) ftell(fp) - 1;
     debug3(DBS, DD, "  mid: %d, mid_end: %d, line: %s", mid, mid_end, line);
     assert( l <= mid,      "SearchFile: l > mid!"        );
@@ -404,16 +432,16 @@ FILE *fp;  int left, right;  unsigned char *str, *line;
 
     /* compare str with this line and prepare next step */
     debug2(DBS, DD, "  comparing key %s with line %s", str, line);
-    if( strcmp(str, line) <= 0 )  r = mid - 1;
+    if( StringLessEqual(str, line) )  r = mid - 1;
     else l = mid_end + 1;
   } /* end while */
 
   /* now first key >= str lies in fp[l]; compare it with str */
   if( l < right )
   { fseek(fp, (long) l, 0);
-    fgets(line, MAX_LINE, fp);
-    sscanf(line, "%s", buff);
-    res = strcmp(str, buff) == 0;
+    StringFGets(line, MAX_LINE, fp);
+    sscanf( (char *) line, "%s", buff);
+    res = StringEqual(str, buff);
   }
   else res = FALSE;
   debug1(DBS, DD, "SearchFile returning %s", bool(res));
@@ -422,7 +450,7 @@ FILE *fp;  int left, right;  unsigned char *str, *line;
 } /* end SearchFile */
 
 
-/*@@**************************************************************************/
+/*@::DbRetrieve()@************************************************************/
 /*                                                                           */
 /*  BOOLEAN DbRetrieve(db, gall, sym, tag, seq, dfnum, dfpos, cont)          */
 /*                                                                           */
@@ -433,9 +461,9 @@ FILE *fp;  int left, right;  unsigned char *str, *line;
 /*****************************************************************************/
 
 BOOLEAN DbRetrieve(db, gall, sym, tag, seq, dfnum, dfpos, cont)
-OBJECT db;  BOOLEAN gall;  OBJECT sym;  unsigned char *tag, *seq;
+OBJECT db;  BOOLEAN gall;  OBJECT sym;  FULL_CHAR *tag, *seq;
 FILE_NUM *dfnum;  long *dfpos;  long *cont;
-{ int symnum;  unsigned char line[MAX_LINE], buff[MAX_LINE];  OBJECT y;
+{ int symnum;  FULL_CHAR line[MAX_LINE], buff[MAX_LINE];  OBJECT y;
   ifdebug(DPP, D, ProfileOn("DbRetrieve"));
   debug4(DBS, D, "DbRetrieve(%s, %s%s&%s)", string(db), gall ? "&" : "",
 	SymName(sym), tag);
@@ -445,21 +473,22 @@ FILE_NUM *dfnum;  long *dfpos;  long *cont;
     return FALSE;
   }
   SymToNum(db, sym, symnum, FALSE);
-  sprintf(buff, "%s%d&%s", gall ? "&" : "", symnum, tag);
+  sprintf( (char *) buff, "%s%d&%s", gall ? "&" : "", symnum, tag);
   fseek(filep(db), 0L, 2);
-  if( !SearchFile(filep(db), left_pos(db), (int) ftell(filep(db))-1,buff,line) )
+  if( !SearchFile(filep(db), (int) left_pos(db), (int) ftell(filep(db)) - 1,
+	buff, line) )
   { debug0(DBS, D, "DbRetrieve returning FALSE (key not present)");
     ifdebug(DPP, D, ProfileOff("DbRetrieve"));
     return FALSE;
   }
-  sscanf(line, "%*s\t%s\t%ld\t%[^\n]", seq, dfpos, buff);
-  if( strcmp(buff, ".") == 0 )
-  { strcpy(buff, string(db));
-    strcpy(&buff[strlen(buff) - strlen(INDEX_SUFFIX)], DATA_SUFFIX);
+  sscanf( (char *) line, "%*s\t%s\t%ld\t%[^\n]", seq, dfpos, buff);
+  if( StringEqual(buff, AsciiToFull(".")) )
+  { StringCopy(buff, string(db));
   }
-  *dfnum = FileNum(buff);
+  *dfnum = FileNum(buff, DATA_SUFFIX);
   if( *dfnum == NO_FILE )  /* can only occur in cross reference database */
-    *dfnum = DefineFile(MakeWord(buff, &fpos(db)), DATABASE_FILE, SOURCE_PATH);
+    *dfnum = DefineFile(buff, DATA_SUFFIX, &fpos(db),
+      DATABASE_FILE, SOURCE_PATH);
   *cont = ftell(filep(db));
   Child(y, Down(db));
   debug2(DBS, D, "DbRetrieve returning TRUE (in %s at %ld)",
@@ -469,20 +498,20 @@ FILE_NUM *dfnum;  long *dfpos;  long *cont;
 } /* end DbRetrieve */
 
 
-/*****************************************************************************/
+/*@::DbRetrieveNext()@********************************************************/
 /*                                                                           */
 /*  BOOLEAN DbRetrieveNext(db, gall, sym, tag, seq, dfnum, dfpos, cont)      */
 /*                                                                           */
 /*  Retrieve the entry of database db pointed to by *cont.                   */
-/*  Set *gall, *sym, *tag, *seq, *dfnum, *dfpos to the entry's value.        */
+/*  Set *gall, *sym, *tag, *seq, *dfnum, *dfpos to the value of the entry.   */
 /*  Reset *cont to the next entry for passing to the next DbRetrieveNext.    */
 /*                                                                           */
 /*****************************************************************************/
 
 BOOLEAN DbRetrieveNext(db, gall, sym, tag, seq, dfnum, dfpos, cont)
-OBJECT db;  BOOLEAN *gall;  OBJECT *sym;  unsigned char *tag, *seq;
+OBJECT db;  BOOLEAN *gall;  OBJECT *sym;  FULL_CHAR *tag, *seq;
 FILE_NUM *dfnum;  long *dfpos;  long *cont;
-{ unsigned char line[MAX_LINE], fname[MAX_LINE]; int symnum;
+{ FULL_CHAR line[MAX_LINE], fname[MAX_LINE]; int symnum;
   ifdebug(DPP, D, ProfileOn("DbRetrieveNext"));
   debug2(DBS, D, "DbRetrieveNext( %s, %ld )", string(db), *cont);
   if( !reading(db) )  Error(INTERN, &fpos(db), "DbRetrieveNext: writing!");
@@ -491,21 +520,22 @@ FILE_NUM *dfnum;  long *dfpos;  long *cont;
     ifdebug(DPP, D, ProfileOff("DbRetrieveNext"));
     return FALSE;
   }
-  fseek(filep(db), *cont == 0L ? left_pos(db) : *cont, 0);
-  if( fgets(line, MAX_LINE, filep(db)) == NULL )
+  fseek(filep(db), *cont == 0L ? (long) left_pos(db) : *cont, 0);
+  if( StringFGets(line, MAX_LINE, filep(db)) == NULL )
   { debug0(DBS, D, "DbRetrieveNext returning FALSE (no successor)");
     ifdebug(DPP, D, ProfileOff("DbRetrieveNext"));
     return FALSE;
   }
   *gall = (line[0] == '&' ? 1 : 0);
-  sscanf(&line[*gall], "%d&%s\t%s\t%ld\t%[^\n]", &symnum, tag, seq,dfpos,fname);
-  if( strcmp(fname, ".") == 0 )
-  { strcpy(fname, string(db));
-    strcpy(&fname[strlen(fname) - strlen(INDEX_SUFFIX)], DATA_SUFFIX);
+  sscanf( (char *) &line[*gall], "%d&%s\t%s\t%ld\t%[^\n]",
+    &symnum, tag, seq,dfpos,fname);
+  if( StringEqual(fname, AsciiToFull(".")) )
+  { StringCopy(fname, string(db));
   }
-  *dfnum = FileNum(fname);
+  *dfnum = FileNum(fname, DATA_SUFFIX);
   if( *dfnum == NO_FILE )  /* can only occur in cross reference database */
-    *dfnum = DefineFile(MakeWord(fname, &fpos(db)), DATABASE_FILE, SOURCE_PATH);
+    *dfnum = DefineFile(fname, DATA_SUFFIX, &fpos(db),
+      DATABASE_FILE, SOURCE_PATH);
   NumToSym(db, symnum, *sym);  *cont = ftell(filep(db));
   debug2(DBS, D, "DbRetrieveNext returning TRUE (in %s at %ld)",
     FileName(*dfnum), *dfpos);

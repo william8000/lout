@@ -1,5 +1,5 @@
-LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)
-COPYRIGHT (C) 1993 Jeffrey H. Kingston
+LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING
+BASSER LOUT VERSION 2.05 COPYRIGHT (C) 1993 Jeffrey H. Kingston
 
 Jeffrey H. Kingston
 Basser Department of Computer Science
@@ -25,23 +25,20 @@ You should have received a copy of the GNU General Public License
 (file gnu.gpl in this directory); if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-Version 2.xx is not completely upward compatible with the original October
-1991 release.  The Lout base language semantics have changed slightly (some
-objects come out wider than they used to), but more importantly the standard
-packages DocumentLayout, ReportLayout, and BookLayout have been coalesced
-into one, and some changes made to some of the symbols.  This means that
-most setup files will need to be changed.  The more specialized packages
-(Tab, Eq, Fig, and Pas) are compatible with the old versions.  Apologies for
-any inconvenience caused.
-
+Version 2.05 is substantially different from Version 2.03 in its
+low-level character handling and attention to strong typing, as well
+as in the major innovation of support for ISO-LATIN-1 characters and
+arbitrary PostScript encoding vectors.  There is also a change in the
+database index (.li) file format, which means that all old database
+index files should be deleted before using Version 2.05.
 
 This directory contains everything needed to install the Lout document
 formatting system on Unix.  It contains the following directories:
 
     include        Lout packages (in Lout) and hyphenation patterns file
     data           Lout databases (in Lout)
-    font0          Adobe Systems font metrics (.AFM) files (ASCII)
-    font1          Adobe Systems font metrics (.AFM) files (ISO-LATIN-1)
+    font           Adobe Systems font metrics (AFM) files
+    evec           Character encoding vectors (CEV) files
     doc            Lout documents (in Lout)
     man            Lout manual entry
 
@@ -51,5 +48,6 @@ and the following files:
     gnu.gpl        A copy of the GNU General Public License
     hyph.install   Information about how to change the hyphenation patterns
     makefile       A makefile for installing Lout
+    news.blurb	   A news blurb describing Lout
 
 Please see the makefile for installation instructions.

@@ -22,4 +22,4 @@
 
 @Use { @DocumentLayout }
 
-@SysDatabase @Reference { "loutrefs"  }
+@SysDatabase @Reference { loutrefs }

@@ -6,13 +6,14 @@
 prependgraphic.sym @Index { @@PrependGraphic symbol }
 sysprependgraphic.sym @Index { @@SysPrependGraphic symbol }
 postscript.prependgraphic @SubIndex { used by @@PrependGraphic }
-These symbols tell Lout to include the contents of a file in the
+These symbols, which may appear anywhere that a definition or @@Use
+symbol may appear, tell Lout to include the contents of a file in the
 preamble of its output.  For Basser Lout this means that the file must
 contain PostScript (and ideally it would begin and end with the
 @Code "%%BeginResource" and @Code "%%EndResource" comments of
 DSC 3.0).  For example,
 @ID @Code {
-"@SysPrependGraphic { \"fig_prepend\" }"
+"@SysPrependGraphic { fig_prepend }"
 }
 appears at the start of the Fig package; the file @Code fig_prepend
 contains a number of PostScript definitions used by Fig for drawing

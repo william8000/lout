@@ -1,6 +1,6 @@
-/*@z25.c:Object Echo:EchoObject()@********************************************/
+/*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,7 +24,7 @@
 /*                                                                           */
 /*  FILE:         z25.c                                                      */
 /*  MODULE:       Object Echo                                                */
-/*  EXTERNS:      EchoObject()                                               */
+/*  EXTERNS:      EchoObject(), PrintObject()                                */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -41,18 +41,24 @@ static	FILE	*fp;			/* current output file               */
 
 /*****************************************************************************/
 /*                                                                           */
-/*  static print(x)                                                          */
+/*  static aprint(x)                                                         */
+/*  static cprint(x)                                                         */
 /*                                                                           */
-/*  Print the string x onto the appropriate output.                          */
+/*  Print the ASCII or FULL_CHAR string x onto the appropriate output.       */
 /*                                                                           */
 /*****************************************************************************/
 
-static print(x)
-unsigned char *x;
-{ col += strlen(x);
+static cprint(x)
+FULL_CHAR *x;
+{ col += StringLength(x);
   if( fp == null ) AppendString(x);
-  else fputs(x, fp);
+  else StringFPuts(x, fp);
 } /* end print */
+
+static aprint(x)
+char *x;
+{ cprint(AsciiToFull(x));
+} /* end aprint */
 
 
 /*****************************************************************************/
@@ -65,13 +71,11 @@ unsigned char *x;
 
 static printnum(x)
 int x;
-{ static unsigned char buff[20];
-  sprintf(buff, "%d", x);
-  print(buff);
+{ cprint(StringInt(x));
 } /* end printnum */
 
 
-/*****************************************************************************/
+/*@::tab(), newline(), space()@***********************************************/
 /*                                                                           */
 /*  static tab(x)                                                            */
 /*                                                                           */
@@ -82,12 +86,12 @@ int x;
 static tab(x)
 int x;
 {  do
-     print(" ");
+     aprint(" ");
    while( col < x );
 } /* end tab */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  static newline()                                                         */
 /*                                                                           */
@@ -97,7 +101,7 @@ int x;
 /*****************************************************************************/
 
 static newline()
-{ if( fp == null )  AppendString(" ");
+{ if( fp == null )  AppendString(STR_SPACE);
   else
   { fputs("\n", fp);
     fflush(fp);
@@ -119,7 +123,7 @@ static space(n)
 int n;
 { int i;
   if( fp == null )
-    for( i = 0;  i < n;  i++ )  AppendString(" ");
+    for( i = 0;  i < n;  i++ )  AppendString(STR_SPACE);
   else if( col + n > limit )
   { fputs("\n", fp);
     for( col = 0;  col < n-1;  col++ )  fputs(" ", fp);
@@ -128,7 +132,7 @@ int n;
 } /* end space */
 
 
-/*@@**************************************************************************/
+/*@::echo()@******************************************************************/
 /*                                                                           */
 /*  static echo(x, outer_prec)                                               */
 /*                                                                           */
@@ -141,7 +145,7 @@ int n;
 static echo(x, outer_prec)
 OBJECT x;  unsigned outer_prec;
 { OBJECT link, y, tmp, sym;
-  unsigned char str[10], *op;  int prec, i;
+  char *op;  int prec, i;
   BOOLEAN npar_seen, name_printed, lbr_printed, braces_needed;
 
   switch( type(x) )
@@ -149,19 +153,19 @@ OBJECT x;  unsigned outer_prec;
 
     case DEAD:
 
-	print("#dead");
+	aprint("#dead");
 	break;
 
     case UNATTACHED:
     
-	print( "#unattached " );
+	aprint( "#unattached " );
 	moveright();
 	if( Down(x) != x )
 	{ Child(y, Down(x));
 	  if( y != x ) echo(y, NO_PREC);
-	  else print("<child is self!>");
+	  else aprint("<child is self!>");
 	}
-	else print("<no child!>");
+	else aprint("<no child!>");
 	moveleft();
 	break;
 
@@ -175,7 +179,7 @@ OBJECT x;  unsigned outer_prec;
     case CROSS_TARG:
     case RECURSIVE:
     
-	print("#"); print(Image(type(x))); print(" ");
+	aprint("#"); cprint(Image(type(x))); aprint(" ");
 	echo(actual(x), NO_PREC);
 	break;
 
@@ -183,15 +187,15 @@ OBJECT x;  unsigned outer_prec;
     case RECEPTIVE:
     case RECEIVING:
     
-	print(type(x) == RECEIVING ? "#receiving " : "#receptive ");
-	if( external(actual(x)) )  print("(external) ");
-	if( threaded(actual(x)) )  print("(threaded) ");
-	if( blocked(x) )           print("(blocked) " );
-	if( trigger_externs(x) )   print("(trigger_externs) " );
-	if( non_blocking(x) )      print("(non_blocking) " );
-	print( type(actual(x)) == CLOSURE ?
+	aprint(type(x) == RECEIVING ? "#receiving " : "#receptive ");
+	if( external(actual(x)) )  aprint("(external) ");
+	if( threaded(actual(x)) )  aprint("(threaded) ");
+	if( blocked(x) )           aprint("(blocked) " );
+	if( trigger_externs(x) )   aprint("(trigger_externs) " );
+	if( non_blocking(x) )      aprint("(non_blocking) " );
+	cprint( type(actual(x)) == CLOSURE ?
 		SymName(actual(actual(x))) : Image(type(actual(x))) );
-	print(" ");
+	aprint(" ");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  moveright();
@@ -203,23 +207,23 @@ OBJECT x;  unsigned outer_prec;
 
     case PRECEDES:
     
-	print("#precedes");
+	aprint("#precedes");
 	break;
 
 
     case FOLLOWS:
     
-	print("#follows");
-	if( blocked(x) )  print(" (blocked)");
+	aprint("#follows");
+	if( blocked(x) )  aprint(" (blocked)");
 	Child(y, Down(x));
-	if( Up(y) == LastUp(y) )  print(" (no precedes!)");
+	if( Up(y) == LastUp(y) )  aprint(" (no precedes!)");
 	break;
 
 
     case HEAD:
     
-	print("Galley ");  print(SymName(actual(x)));
-	print(" into ");   print(SymName(whereto(x)));
+	aprint("Galley ");  cprint(SymName(actual(x)));
+	aprint(" into ");   cprint(SymName(whereto(x)));
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  newline();
@@ -230,42 +234,42 @@ OBJECT x;  unsigned outer_prec;
 
     case ROW_THR:
 
-	print("{R ");
+	aprint("{R ");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  echo(y, VCAT_PREC);
 	  newline();
-	  if( NextDown(link) != x )  print("/R ");
+	  if( NextDown(link) != x )  aprint("/R ");
 	}
-	print("R}");
+	aprint("R}");
 	break;
 
 
     case COL_THR:
 
-	print("{C ");
+	aprint("{C ");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  echo(y, HCAT_PREC);
 	  newline();
-	  if( NextDown(link) != x )  print("|C ");
+	  if( NextDown(link) != x )  aprint("|C ");
 	}
-	print("C}");
+	aprint("C}");
 	break;
 
 
-    case VCAT: op = (unsigned char *) "/", prec = VCAT_PREC;  goto ETC;
-    case HCAT: op = (unsigned char *) "|", prec = HCAT_PREC;  goto ETC;
-    case ACAT: op = (unsigned char *) "&", prec = ACAT_PREC;  goto ETC;
+    case VCAT: op = "/", prec = VCAT_PREC;  goto ETC;
+    case HCAT: op = "|", prec = HCAT_PREC;  goto ETC;
+    case ACAT: op = "&", prec = ACAT_PREC;  goto ETC;
     
 	ETC:
 	if( Down(x) == x )
-	{ print(op);
-	  print("<empty>");
+	{ aprint(op);
+	  aprint("<empty>");
 	  break;
 	}
-	if( prec <= outer_prec ) print("{ ");
-	/* *** if( Down(x) == LastDown(x) )  print(op);  must be manifested */
+	if( prec <= outer_prec ) aprint("{ ");
+	/* *** if( Down(x) == LastDown(x) )  aprint(op);  must be manifested */
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  if( is_index(type(y)) )
@@ -275,7 +279,7 @@ OBJECT x;  unsigned outer_prec;
 	  if( type(y) == GAP_OBJ )  echo(y, type(x));
 	  else echo(y, prec);
 	}
-	if( prec <= outer_prec )  print(" }");
+	if( prec <= outer_prec )  aprint(" }");
 	break;
 
 
@@ -283,49 +287,53 @@ OBJECT x;  unsigned outer_prec;
 
 	/* in this case the outer_prec argument is VCAT, HCAT or ACAT */
 	if( Down(x) != x )
-	{ if( outer_prec == ACAT )  print(" ");
-	  print( EchoCatOp(outer_prec, mark(gap(x)), join(gap(x))) );
+	{ if( outer_prec == ACAT )  aprint(" ");
+	  cprint( EchoCatOp(outer_prec, mark(gap(x)), join(gap(x))) );
 	  Child(y, Down(x));
 	  echo(y, FORCE_PREC);
-	  print(" ");
+	  aprint(" ");
 	}
 	else if( outer_prec == ACAT )
 	{ for( i = 1;  i <= vspace(x);  i++ )  newline();
-	  for( i = 1;  i <= hspace(x);  i++ )  print(" ");
+	  for( i = 1;  i <= hspace(x);  i++ )  aprint(" ");
 	}
 	else
-	{ print( EchoCatOp(outer_prec, mark(gap(x)), join(gap(x))) );
-	  print( EchoGap(&gap(x)) );
-	  print(" ");
+	{ cprint( EchoCatOp(outer_prec, mark(gap(x)), join(gap(x))) );
+	  cprint( EchoGap(&gap(x)) );
+	  aprint(" ");
 	}
 	break;
 
 
     case WORD:
     
-	if( strlen(string(x)) == 0 )
-	{ print(KW_LBR);
-	  print(KW_RBR);
-	}
-	else print( string(x) );
+	if( StringLength(string(x)) == 0 )
+	  aprint("{}");
+	else cprint( string(x) );
+	break;
+
+
+    case QWORD:
+    
+	cprint( StringQuotedWord(x) );
 	break;
 
 
     case ENV:
     
 	/* debug only */
-	print("<");
+	aprint("<");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  if( type(y) == CLOSURE )
-	  { print( SymName(actual(y)) );
+	  { cprint( SymName(actual(y)) );
 	    echo(GetEnv(y), NO_PREC);
 	  }
 	  else if( type(y) == ENV )  echo(y, NO_PREC);
-	  else print(Image(type(y)));
-	  if( NextDown(link) != x )  print(" ");
+	  else cprint(Image(type(y)));
+	  if( NextDown(link) != x )  aprint(" ");
 	}
-	print(">");
+	aprint(">");
 	break;
 
 
@@ -333,18 +341,18 @@ OBJECT x;  unsigned outer_prec;
 
 	assert( Down(x) != x, "echo: CROSS Down(x)!" );
 	Child(y, Down(x));
-	if( type(y) == CLOSURE )  print(SymName(actual(y)));
+	if( type(y) == CLOSURE )  cprint(SymName(actual(y)));
 	else
-	{ print(KW_LBR);
+	{ cprint(KW_LBR);
 	  echo(y, NO_PREC);
-	  print(KW_RBR);
+	  cprint(KW_RBR);
 	}
-	print(KW_CROSS);
+	cprint(KW_CROSS);
 	if( NextDown(Down(x)) != x )
 	{ Child(y, NextDown(Down(x)));
 	  echo(y, NO_PREC);
 	}
-	else print("??");
+	else aprint("??");
 	break;
 
 
@@ -355,7 +363,7 @@ OBJECT x;  unsigned outer_prec;
 	    precedence(sym) <= outer_prec && (has_lpar(sym) || has_rpar(sym));
 
 	/* print brace if needed */
-	if( braces_needed )  print(KW_LBR), print(" ");
+	if( braces_needed )  aprint("{ ");
 
 	npar_seen = FALSE;  name_printed = FALSE;
 	for( link = Down(x); link != x;  link = NextDown(link) )
@@ -366,45 +374,45 @@ OBJECT x;  unsigned outer_prec;
 	    {
 	     case LPAR:	Child(tmp, Down(y));
 			echo(tmp, (unsigned) precedence(sym));
-			print(" ");
+			aprint(" ");
 			break;
 
 	     case NPAR:	if( !name_printed )
-			{ print(SymName(sym));
+			{ cprint(SymName(sym));
 			  if( external(x) || threaded(x) )
-			  { print(" #");
-			    if( external(x) )  print(" external");
-			    if( threaded(x) )  print(" threaded");
+			  { aprint(" #");
+			    if( external(x) )  aprint(" external");
+			    if( threaded(x) )  aprint(" threaded");
 			    newline();
 			  }
 			  name_printed = TRUE;
 			}
-			newline();  print("  ");
-			print( SymName(actual(y)) );
-			print(" ");  print(KW_LBR);  print(" ");
+			newline();  aprint("  ");
+			cprint( SymName(actual(y)) );
+			aprint(" { ");
 			Child(tmp, Down(y));
 			echo(tmp, NO_PREC);
-			print(" ");  print(KW_RBR);
+			aprint(" }");
 			npar_seen = TRUE;
 			break;
 
 	     case RPAR:	if( !name_printed )
-			{ print(SymName(sym));
+			{ cprint(SymName(sym));
 			  if( external(x) || threaded(x) )
-			  { print(" #");
-			    if( external(x) )  print(" external");
-			    if( threaded(x) )  print(" threaded");
+			  { aprint(" #");
+			    if( external(x) )  aprint(" external");
+			    if( threaded(x) )  aprint(" threaded");
 			    newline();
 			  }
 			  name_printed = TRUE;
 			}
 			if( npar_seen ) newline();
-			else print(" ");
+			else aprint(" ");
 			Child(tmp, Down(y));
 			if( has_body(sym) )
-			{ print(KW_LBR);  print(" ");
+			{ aprint("{ ");
 			  echo(tmp, NO_PREC);
-			  print(" ");  print(KW_RBR);
+			  aprint(" }");
 			}
 			else echo(tmp, (unsigned) precedence(sym));
 			break;
@@ -417,26 +425,26 @@ OBJECT x;  unsigned outer_prec;
 	  }
 	}
 	if( !name_printed )
-	{ print( SymName(sym) );
+	{ cprint( SymName(sym) );
 	  if( external(x) || threaded(x) )
-	  { print(" #");
-	    if( external(x) )  print(" external");
-	    if( threaded(x) )  print(" threaded");
+	  { aprint(" #");
+	    if( external(x) )  aprint(" external");
+	    if( threaded(x) )  aprint(" threaded");
 	    newline();
 	  }
 	}
 
 	/* print closing brace if needed */
-	if( braces_needed ) print(" "), print(KW_RBR);
+	if( braces_needed ) aprint(" }");
 	break;
 
 
     case SPLIT:
     
 	/* this should occur only in debug output case */
-	print(KW_SPLIT);  moveright();
+	cprint(KW_SPLIT);  moveright();
 	Child(y, DownDim(x, COL));
-	print(" ");
+	aprint(" ");
 	echo(y, FORCE_PREC);
 	moveleft();
 	break;
@@ -445,39 +453,39 @@ OBJECT x;  unsigned outer_prec;
     case PAR:
     
 	/* this should occur only in debug output case */
-	print("par ");  print(SymName(actual(x)));
+	aprint("par ");  cprint(SymName(actual(x)));
 	break;
 
 
     case CR_LIST:
 
-	print("(");
+	aprint("(");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  echo(y, NO_PREC);
-	  if( NextDown(link) != x )  print(", ");
+	  if( NextDown(link) != x )  aprint(", ");
 	}
-	print(")");
+	aprint(")");
 	break;
 
 
     case MACRO:
     
-	newline();  print(KW_MACRO);
-	print(" ");  print(SymName(x));
+	newline();  cprint(KW_MACRO);
+	aprint(" ");  cprint(SymName(x));
 	if( sym_body(x) != nil )
-	{ newline();  print(KW_LBR);
+	{ newline();  cprint(KW_LBR);
 	  y = sym_body(x);
 	  do
 	  { for( i = 1;  i <= vspace(y);  i++ )  newline();
-	    for( i = 1;  i <= hspace(y);  i++ )  print(" ");
-	    print(EchoToken(y));
+	    for( i = 1;  i <= hspace(y);  i++ )  aprint(" ");
+	    cprint(EchoToken(y));
 	    y = succ(y, PARENT);
 	  } while( y != sym_body(x) );
-	  newline();  print(KW_RBR);
+	  newline();  aprint(KW_RBR);
 	}
-	else print(" "), print(KW_LBR), print(KW_RBR);
-	if( visible(x) )  print(" # (visible)");
+	else aprint(" {}");
+	if( visible(x) )  aprint(" # (visible)");
 	break;
 
 
@@ -486,56 +494,55 @@ OBJECT x;  unsigned outer_prec;
     
 	/* print predefined operators in abbreviated form */
 	if( sym_body(x) == nil && enclosing(x) != nil )
-	{ tab(3); print("# sys ");
-	  print(SymName(x));
+	{ tab(3); aprint("# sys ");
+	  cprint(SymName(x));
 	  break;
 	}
 
 	/* print def line and miscellaneous debug info */
 	if( type(x) == LOCAL ) newline();
-	print(type(x) == NPAR ? KW_NAMED : KW_DEF);
-	print(" ");  print( SymName(x) );
+	cprint(type(x) == NPAR ? KW_NAMED : KW_DEF);
+	aprint(" ");  cprint( SymName(x) );
 	if( recursive(x) || indefinite(x) || visible(x) ||
 	    is_extern_target(x) || uses_extern_target(x) || uses_galley(x) )
-	{ tab(25);  print("#");
-	  if( visible(x)  )  print(" visible");
-	  if( recursive(x)  )  print(" recursive");
-	  if( indefinite(x) )  print(" indefinite");
-	  if( is_extern_target(x) )  print(" is_extern_target");
-	  if( uses_extern_target(x) )  print(" uses_extern_target");
-	  if( uses_galley(x) )  print(" uses_galley");
+	{ tab(25);  aprint("#");
+	  if( visible(x)  )  aprint(" visible");
+	  if( recursive(x)  )  aprint(" recursive");
+	  if( indefinite(x) )  aprint(" indefinite");
+	  if( is_extern_target(x) )  aprint(" is_extern_target");
+	  if( uses_extern_target(x) )  aprint(" uses_extern_target");
+	  if( uses_galley(x) )  aprint(" uses_galley");
 	}
 
 	/* print uses list, if necessary */
 	if( uses(x) != nil || dirty(x) )
-	{ newline();  print("   # ");
-	  if( dirty(x) ) print("dirty, ");
-	  print("uses");
+	{ newline();  aprint("   # ");
+	  if( dirty(x) ) aprint("dirty, ");
+	  aprint("uses");
 	  if( uses(x) != nil )
 	  { tmp = next(uses(x));
 	    do
-	    { print(" "), print( SymName(item(tmp)) );
+	    { aprint(" "), cprint( SymName(item(tmp)) );
 	      tmp = next(tmp);
 	    } while( tmp != next(uses(x)) );
 	  }
 	  /* ***
 	  for( tmp = uses(x);  tmp != nil;  tmp = next(tmp) )
-	  { print(" "), print( SymName(item(tmp)) );
+	  { aprint(" "), cprint( SymName(item(tmp)) );
 	  }
 	  *** */
 	}
 
 	/* print precedence, if necessary */
 	if( precedence(x) != DEFAULT_PREC )
-	{ newline();  print("   ");  print(KW_PRECEDENCE);
-	  sprintf(str, " %d", precedence(x));
-	  print(str);
+	{ newline();  aprint("   ");  cprint(KW_PRECEDENCE);
+	  aprint(" ");  printnum(precedence(x));
 	}
 
 	/* print associativity, if necessary */
 	if( !right_assoc(x) )
-	{ newline();  print("   ");
-	  print(KW_ASSOC);  print(" ");  print(KW_LEFT);
+	{ newline();  aprint("   ");
+	  cprint(KW_ASSOC);  aprint(" ");  cprint(KW_LEFT);
 	}
 
 	/* print named parameters and local objects */
@@ -546,19 +553,19 @@ OBJECT x;  unsigned outer_prec;
 	  switch( type(y) )
 	  {
 	    case LPAR:
-	    case RPAR:	newline();  print("   ");
-			print( type(y) == LPAR ? KW_LEFT :
+	    case RPAR:	newline();  aprint("   ");
+			cprint( type(y) == LPAR ? KW_LEFT :
 			    has_body(x) ? KW_BODY : KW_RIGHT);
-			print(" ");
-			print( SymName(y) );
-			print("   # uses_count = ");
+			aprint(" ");
+			cprint( SymName(y) );
+			aprint("   # uses_count = ");
 			printnum(uses_count(y));
-			if( visible(y) )  print(" (visible)");
+			if( visible(y) )  aprint(" (visible)");
 			break;
 
 	    case NPAR:	moveright();  newline();
 			echo(y, NO_PREC);
-			print("   # uses_count = ");
+			aprint("   # uses_count = ");
 			printnum(uses_count(y));
 			moveleft();
 			break;
@@ -566,7 +573,7 @@ OBJECT x;  unsigned outer_prec;
 	    case MACRO:
 	    case LOCAL:	if( !lbr_printed )
 			{ newline();
-			  print(KW_LBR);
+			  cprint(KW_LBR);
 			  lbr_printed = TRUE;
 			}
 			moveright();
@@ -579,19 +586,19 @@ OBJECT x;  unsigned outer_prec;
 			break;
 	  }
 	}
-	if( type(x) == NPAR && Down(x) == x )  print(" ");
+	if( type(x) == NPAR && Down(x) == x )  aprint(" ");
 	else newline();
 	if( !lbr_printed )
-	{ print(KW_LBR);  print("  ");
+	{ cprint(KW_LBR);  aprint("  ");
 	  lbr_printed = TRUE;
 	}
-	else print("   ");
+	else aprint("   ");
 
 	/* print body */
 	moveright();
 	if( sym_body(x) != nil )  echo(sym_body(x), NO_PREC);
 	moveleft();  if( type(x) == LOCAL ) newline();
-	print(KW_RBR);
+	cprint(KW_RBR);
 	break;
 
 
@@ -616,6 +623,7 @@ OBJECT x;  unsigned outer_prec;
     case SCALE:
     case CASE:
     case YIELD:
+    case XCHAR:
     case FONT:
     case SPACE:
     case BREAK:
@@ -624,29 +632,29 @@ OBJECT x;  unsigned outer_prec;
     
 	/* print enclosing left brace if needed */
 	braces_needed = (DEFAULT_PREC <= outer_prec);
-	if( braces_needed )  print(KW_LBR), print(" ");
+	if( braces_needed )  cprint(KW_LBR), aprint(" ");
 
 	/* print left parameter */
 	if( Down(x) != LastDown(x) )
 	{ Child(y, Down(x));
 	  echo(y, max(outer_prec, DEFAULT_PREC));
-	  print(" ");
+	  aprint(" ");
 	}
 
-	print(Image(type(x)));
+	cprint(Image(type(x)));
 
 	/* print right parameter */
 	assert( LastDown(x) != x, "echo: right parameter of predefined!" );
-	print(" ");
+	aprint(" ");
 	Child(y, LastDown(x));
 	echo(y, type(x)==OPEN ? FORCE_PREC : max(outer_prec,DEFAULT_PREC));
-	if( braces_needed )  print(" "), print(KW_RBR);
+	if( braces_needed )  aprint(" "), cprint(KW_RBR);
 	break;
 
 
     case NULL_CLOS:
     
-	print(Image(type(x)));
+	cprint(Image(type(x)));
 	break;
 
 
@@ -661,36 +669,36 @@ OBJECT x;  unsigned outer_prec;
 
     case CROSS_SYM:
 
-	print("Cross-references for ");
-	print(SymName(symb(x)));  newline();
+	aprint("Cross-references for ");
+	cprint(SymName(symb(x)));  newline();
 	switch( target_state(x) )
 	{
-	  case 0:	print("NO_TARGET");
+	  case 0:	aprint("NO_TARGET");
 			break;
 
-	  case 1:	print("SEEN_TARGET ");
+	  case 1:	aprint("SEEN_TARGET ");
 			printnum(target_seq(x));
-			print(": ");
+			aprint(": ");
 			echo(target_val(x), NO_PREC);
 			break;
 
-	  case 2:	print("WRITTEN_TARGET ");
+	  case 2:	aprint("WRITTEN_TARGET ");
 			printnum(target_seq(x));
-			print(": to file ");
-			print(FileName(target_file(x)));
-			print(" at ");
+			aprint(": to file ");
+			cprint(FileName(target_file(x)));
+			aprint(" at ");
 			printnum(target_pos(x));
 			break;
 	
-	  default:	print("ILLEGAL!");
+	  default:	aprint("ILLEGAL!");
 			break;
 	}
 	newline();
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
-	  print("   ");
-	  if( gall_rec(y) )  print("gall_rec!");
-	  else print(string(y));
+	  aprint("   ");
+	  if( gall_rec(y) )  aprint("gall_rec!");
+	  else cprint(string(y));
 	  newline();
 	}
 	break;
@@ -705,36 +713,48 @@ OBJECT x;  unsigned outer_prec;
 } /* end echo */
 
 
-/*@@**************************************************************************/
+/*@::EchoObject(), DebugObject()@*********************************************/
 /*                                                                           */
-/*  unsigned char *EchoObject(file_ptr, x)                                   */
+/*  FULL_CHAR *EchoObject(x)                                                 */
 /*                                                                           */
-/*  Send an image of unsized object x to result (if file_ptr is null) or to  */
-/*  file file_ptr if file_ptr is not null.                                   */
+/*  Return an image of unsized object x in result.                           */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *EchoObject(file_ptr, x)
-FILE *file_ptr;  OBJECT x;
+FULL_CHAR *EchoObject(x)
+OBJECT x;
 { debug0(DOE, D, "EchoObject()");
-  fp = file_ptr;
+  fp = null;;
   col = 0;
   indent = 0;
   limit  = 60;
   if( fp == null )
-  { BeginString();
-    if( x == nil )  AppendString("<nil>");
-    else echo(x, type(x) == GAP_OBJ ? VCAT : 0);
-    return EndString();
-  }
-  else
-  { if( x != nil )
-    { echo(x, type(x) == GAP_OBJ ? VCAT : 0);
-      fprintf(file_ptr, "\n");
-    }
-    else fprintf(file_ptr, "<nil>\n");
-    debug0(DOE, D, "EchoObject returning");
-    return (unsigned char *) "";
-  }
+  BeginString();
+  if( x == nil )  AppendString(AsciiToFull("<nil>"));
+  else echo(x, type(x) == GAP_OBJ ? VCAT : 0);
+  debug0(DOE, D, "EchoObject returning");
+  return EndString();
 } /* end EchoObject */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  DebugObject(x)                                                           */
+/*                                                                           */
+/*  Send an image of unsized object x to result.                             */
+/*                                                                           */
+/*****************************************************************************/
+
+DebugObject(x)
+OBJECT x;
+{ debug0(DOE, D, "DebugObject()");
+  fp = stderr;
+  col = 0;
+  indent = 0;
+  limit  = 60;
+  if( x == nil )  fprintf(stderr, "<nil>");
+  else echo(x, type(x) == GAP_OBJ ? VCAT : 0);
+  fprintf(stderr, "\n");
+  debug0(DOE, D, "DebugObject returning");
+} /* end DebugObject */
 #endif

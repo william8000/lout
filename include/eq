@@ -6,6 +6,11 @@
 #  Version 1.0 by Jeffrey H. Kingston, December 1990.                         #
 #  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
 #                                                                             #
+#  This package makes extensive use of the Adobe Systems Symbol font, and     #
+#  it assumes that the font has not been recoded.  It could be rewritten      #
+#  using the @Char symbol to be made independent of any recoding, but since   #
+#  there seems no reason to ever recode this font, I haven't bothered.        #
+#                                                                             #
 #  See "Eq - a Lout package for typesetting mathematics" for user             #
 #  information.  Acknowledgement:  the @Eq language is based closely on       #
 #  the Eqn language of B. W. Kernighan and L. L. Cherry; the spacing rules    #
@@ -499,8 +504,8 @@ def @Eq
    def otimes		{ bin circlemultiply			}
    def oslash		{`vctr 60d @Rotate @HContract {circle/0io &0.5rt minus`}}
    def odot		{ bin @OneRow @HContract {circle/0io &0.5rt dotmath}}
-   def dagger		{ bin @Base "\262"			}
-   def daggerdbl	{ bin @Base "\263"			}
+   def dagger		{ bin @Base @Char "dagger"		}
+   def daggerdbl	{ bin @Base @Char "daggerdbl"		}
    def amalg		{ bin 180d @Rotate vctr product		}
 
    ###################################################################

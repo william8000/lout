@@ -35,7 +35,7 @@ appears in the Eq equation formatting package [{@Ref kingston92eq}]:
 "    }"
 "}"
 }
-Invokations of @Code over return the object between the braces, with the
+Invocations of @Code over return the object between the braces, with the
 formal parameters @Code x and @Code y replaced by actual parameters
 which are objects found to the left and right of the @Code over symbol.
 @PP
@@ -73,7 +73,7 @@ has result
 Chapter 1  @Leaders  5
 }
 }
-The final invokation of @Code "@Leaders" is deleted along with any
+The final invocation of @Code "@Leaders" is deleted along with any
 preceding concatenation operator (or white space in this case).
 @PP
 The specification of page layout is a major problem for many document

@@ -69,6 +69,8 @@
 
   # @PageNumbers       {  Yes            } # Want page numbers? Yes or No
   # @FirstPageNumber   {  1              } # Number of first page 
+  # @RunningTitles     {  Yes            } # Want running titles? Yes/No
+
   # @PageOneTopFormat  { @Null               }
   # @PageOneFootFormat { @Null               }
   # @PageTopFormat     { |0.5rt - @PageNum - }

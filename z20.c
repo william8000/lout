@@ -1,6 +1,6 @@
-/*@z20.c:Galley Flushing:FlushGalley()@***************************************/
+/*@z20.c:Galley Flushing:ParentFlush()@***************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -51,7 +51,7 @@ if( prnt_flush )							\
 else if( kill )  DeleteNode(dest_index)
 
 
-/*****************************************************************************/
+/*@::FlushGalley()@***********************************************************/
 /*                                                                           */
 /*  FlushGalley(hd)                                                          */
 /*                                                                           */
@@ -79,7 +79,7 @@ OBJECT hd;
   OBJECT succ_gap;		/* the gap following dest, if any, else nil  */
   OBJECT succ_def;		/* the component following dest, if any      */
   OBJECT stop_link;		/* most recently seen gap link of hd         */
-  BOOLEAN prnt_flush;		/* TRUE when hd's parent needs a flush       */
+  BOOLEAN prnt_flush;		/* TRUE when the parent of hd needs a flush  */
   OBJECT zlink, z, tmp, prnt;
 
   debug1(DGF, D, "[ FlushGalley %s (hd)", SymName(actual(hd)));
@@ -88,7 +88,7 @@ OBJECT hd;
   RESUME:
   assert( type(hd) == HEAD, "FlushGalley: type(hd) != HEAD!" );
   debug1(DGF, D, "  resuming FlushGalley %s, hd =", SymName(actual(hd)));
-  ifdebug(DGF, DD, EchoObject(stderr, hd));
+  ifdebug(DGF, DD, DebugObject(hd));
   assert( Up(hd) != hd, "FlushGalley: resume found no parent to hd!" );
 
 
@@ -100,8 +100,8 @@ OBJECT hd;
   /*  this code does not return, then the galley is ready to flush into a    */
   /*  destination in the normal way, and the following variables are set:    */
   /*                                                                         */
-  /*      dest_index     the galley's parent and index of its destination    */
-  /*      dest           the galley's destination, a @Galley object          */
+  /*     dest_index   the parent of the galley and index of its destination  */
+  /*     dest         the destination of the galley, a @Galley object        */
   /*                                                                         */
   /***************************************************************************/
 
@@ -136,13 +136,13 @@ OBJECT hd;
       if( actual(hd) != nil && force_target(actual(hd)) )
       {	Parent(prnt, Up(dest_index));
 	debug0(DGA, DD, "  force: prnt =");
-	ifdebug(DGA, DD, EchoObject(stderr, prnt));
+	ifdebug(DGA, DD, DebugObject(prnt));
 	debug1(DGA, D,"  calling FreeGalley from FlushGalley(%s)",
 	  SymName(actual(hd)));
 	FreeGalley(prnt, Up(dest_index), &inners, Up(dest_index), whereto(hd));
 	prnt_flush = TRUE;
 	debug0(DGA, DD, "  force: after FreeGalley, prnt =");
-	ifdebug(DGA, DD, EchoObject(stderr, prnt));
+	ifdebug(DGA, DD, DebugObject(prnt));
       }
       else prnt_flush = prnt_flush || blocked(dest_index);
       debug1(DGF, D, "    prnt_flush = %s", bool(prnt_flush));
@@ -169,7 +169,7 @@ OBJECT hd;
       break;
   }
   dest = actual(dest_index);
-  debug1(DGF, DD, "  dest_index: %s", EchoObject(null, dest_index));
+  debug1(DGF, DD, "  dest_index: %s", EchoObject(dest_index));
 
 
   /*@@************************************************************************/
@@ -209,7 +209,7 @@ OBJECT hd;
   /*    prec_def         first definite object preceding dest (must exist)   */
   /*    dest_back        back(dest_encl) including effect of accepted compts */
   /*    dest_fwd         fwd(dest_encl) including effect of accepted compts  */
-  /*    dest_side        BACK or FWD indicating dest's side of the mark      */
+  /*    dest_side        BACK or FWD, i.e. which side of the mark dest is on */
   /*    dest_constraint  the size constraint on dest                         */
   /*    frame_size       size of frame enclosing dest_encl                   */
   /*                                                                         */
@@ -227,7 +227,7 @@ OBJECT hd;
   {
     Child(y, link);
     if( type(y) == SPLIT )  Child(y, DownDim(y, ROW));
-    debug1(DGF, DD, "  try to flush %s", EchoObject(null, y));
+    debug1(DGF, DD, "  try to flush %s", EchoObject(y));
     switch( type(y) )
     {
 
@@ -291,6 +291,7 @@ OBJECT hd;
 
 
       case WORD:
+      case QWORD:
       case ONE_COL:
       case ONE_ROW:
       case WIDE:
@@ -378,7 +379,7 @@ OBJECT hd;
 	} /* end if( !external(dest) ) */
 
 	/* accept this component into dest */
-	debug1(DGF, D, "  accept %s", EchoObject(null, y));
+	debug1(DGF, D, "  accept %s", EchoObject(y));
 	prnt_flush = prnt_flush || blocked(dest_index);
 	debug1(DGF, D, "    prnt_flush = %s", bool(prnt_flush));
 	if( inners != nil )
@@ -427,7 +428,7 @@ OBJECT hd;
   REJECT:
   
     /* reject this component and move to a new dest */
-    debug1(DGF, D, "  reject %s", EchoObject(null, y));
+    debug1(DGF, D, "  reject %s", EchoObject(y));
     assert(actual(dest) != PrintSym, "FlushGalley: reject print!");
     if( inners != nil )  DisposeObject(inners);
     if( stop_link != nil )
@@ -447,7 +448,7 @@ OBJECT hd;
   SUSPEND:
   
     /* suspend this component */
-    debug1(DGF, D, "  suspend %s", EchoObject(null, y));
+    debug1(DGF, D, "  suspend %s", EchoObject(y));
     if( inners != nil )  DisposeObject(inners);
     if( stop_link != nil )
     { Promote(hd, stop_link, dest_index);
@@ -460,7 +461,7 @@ OBJECT hd;
     /* check whether external galleys can remove the blockage */
     if( type(y) == RECEPTIVE && ready_galls(hd) != nil && AllowCrossDb )
     { OBJECT eg, val, index2, hd2, tag, seq, newsym;
-      BOOLEAN found, gall;  unsigned char newtag[MAX_LINE], newseq[MAX_LINE];
+      BOOLEAN found, gall;  FULL_CHAR newtag[MAX_LINE], newseq[MAX_LINE];
 
       /* get first ready galley in from cross reference database */
       Child(eg, Down(ready_galls(hd)));
@@ -494,13 +495,13 @@ OBJECT hd;
 	debug2(DGF, D, "  ext gall  new seq: %15s  old seq: %15s",
 			newseq, string(seq));
 	if( found )  found = gall && newsym == eg_symbol(eg) &&
-			strcmp(newtag, string(tag)) == 0;
-      } while( found && strcmp(newseq, string(seq)) == 0 );
+			StringEqual(newtag, string(tag));
+      } while( found && StringEqual(newseq, string(seq)) );
       if( found )
       {	DisposeChild(Up(tag));
 	DisposeChild(Up(seq));
-	tag = MakeWord(newtag, no_fpos);
-	seq = MakeWord(newseq, no_fpos);
+	tag = MakeWord(WORD, newtag, no_fpos);
+	seq = MakeWord(WORD, newseq, no_fpos);
 	Link(eg, tag);  Link(eg, seq);
 	debug1(DGF,D, "  another ext gall: into %s", SymName(newsym));
       }
@@ -523,7 +524,7 @@ OBJECT hd;
     }
     else if( type(y) == RECEPTIVE && trigger_externs(y) && AllowCrossDb )
     { OBJECT sym, cr, ins, tag, seq, eg, cnt;  BOOLEAN found;
-      unsigned char newseq[MAX_LINE];  FILE_NUM tfnum;  long tfpos, tcont;
+      FULL_CHAR newseq[MAX_LINE];  FILE_NUM tfnum;  long tfpos, tcont;
       debug1(DGF, D, "  ext gall target %s", SymName(actual(actual(y))));
       for( sym = FirstExternTarget(actual(actual(y)), &cnt);
 	     sym != nil;  sym = NextExternTarget(actual(actual(y)), &cnt) )
@@ -534,7 +535,7 @@ OBJECT hd;
 	actual(ins) = cr;
 	Link(Up(y), ins);
 	Child(tag, LastDown(cr));
-	assert( type(tag) == WORD, "FlushGalley: cr tag WORD!" );
+	assert( is_word(type(tag)), "FlushGalley: cr is_word(type(tag))!" );
 	found = DbRetrieve(OldCrossDb, TRUE, sym, string(tag),
 		newseq, &tfnum, &tfpos, &tcont);
 	if( found )
@@ -545,9 +546,9 @@ OBJECT hd;
 	  eg_fpos(eg) = tfpos;
 	  eg_symbol(eg) = sym;
 	  eg_cont(eg) = tcont;
-	  tag = MakeWord(string(tag), no_fpos);
+	  tag = MakeWord(WORD, string(tag), no_fpos);
 	  Link(eg, tag);
-	  seq = MakeWord(newseq, no_fpos);
+	  seq = MakeWord(WORD, newseq, no_fpos);
 	  Link(eg, seq);
 	  Link(ready_galls(hd), eg);
 	}

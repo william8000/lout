@@ -1,6 +1,6 @@
-/*@z07.c:Object Service:CopyObject(), DisposeObject()@************************/
+/*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,7 +24,7 @@
 /*                                                                           */
 /*  FILE:         z07.c                                                      */
 /*  MODULE:       Object Service                                             */
-/*  EXTERNS:      MakeWord(), DisposeObject(), CopyObject(),                 */
+/*  EXTERNS:      MakeWord(), MakeWordTwo(), DisposeObject(), CopyObject(),  */
 /*                SplitIsDefinite()                                          */
 /*                                                                           */
 /*****************************************************************************/
@@ -33,58 +33,82 @@
 
 /*****************************************************************************/
 /*                                                                           */
-/*  OBJECT MakeWord(str, pos)                                                */
-/*  OBJECT MakeWordTwo(str1, str2, pos)                                      */
+/*  BOOLEAN SplitIsDefinite(x)                                               */
 /*                                                                           */
-/*  Return an unsized WORD with the given string or concatenation of         */
-/*  strings, and the given filepos.                                          */
+/*  Return TRUE if x is a definite SPLIT object (both children definite)     */
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT MakeWord(str, pos)
-unsigned char *str;  FILE_POS *pos;
-{ OBJECT res = NewWord(strlen(str), pos);
-  strcpy( string(res), str );
-  FposCopy(fpos(res), *pos);
-  debug2(DOS, DD, "MakeWord(%s) returning %s", str, EchoObject(null, res));
-  return res;
-} /* end MakeWord */
-
-OBJECT MakeWordTwo(str1, str2, pos)
-unsigned char *str1, *str2;  FILE_POS *pos;
-{ int len1 = strlen(str1);
-  int len2 = strlen(str2);
-  OBJECT res = NewWord(len1 + len2, pos);
-  strcpy( string(res), str1 );
-  strcpy( &string(res)[len1], str2 );
-  FposCopy(fpos(res), *pos);
-  debug4(DOS, DD, "MakeWordTwo(%s, %s, %s) returning %s",
-    str1, str2, EchoFilePos(pos), EchoObject(null, res));
-  return res;
-} /* end MakeWordTwo */
+BOOLEAN SplitIsDefinite(x)
+OBJECT x;
+{ OBJECT y1, y2;
+  assert( type(x) == SPLIT, "SplitIsDefinite: x not a SPLIT!" );
+  Child(y1, DownDim(x, COL));
+  Child(y2, DownDim(x, ROW));
+  return is_definite(type(y1)) && is_definite(type(y2));
+} /* end SplitIsDefinite */
 
 
 /*****************************************************************************/
 /*                                                                           */
 /*  DisposeObject(x)                                                         */
 /*                                                                           */
-/*  Dispose object x.  If some of x's children are shared with other         */
-/*  parents, those children are left intact.                                 */
+/*  Dispose object x recrusively, leaving intact any shared descendants.     */
 /*                                                                           */
 /*****************************************************************************/
 
 DisposeObject(x)
 OBJECT x;
 { debug2(DOS,D,"[DisposeObject( %d ), type = %s, x =", (int) x, Image(type(x)));
-  ifdebug(DOS, DD, EchoObject(stderr, x));
+  ifdebug(DOS, DD, DebugObject(x));
   assert( Up(x) == x, "DisposeObject: x has a parent!" );
-  while( Down(x) != x )  DisposeChild(Down(x));
-  Dispose(x);
+  while( Down(x) != x )  DisposeChild(Down(x));   Dispose(x);
   debug0(DOS, D, "]DisposeObject returning.");
 } /* end DisposeObject */
 
 
-/*@@**************************************************************************/
+/*@::MakeWord(), MakeWordTwo()@***********************************************/
+/*                                                                           */
+/*  OBJECT MakeWord(typ, str, pos)                                           */
+/*                                                                           */
+/*  Return an unsized WORD or QWORD made from the given string and fpos.     */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT MakeWord(typ, str, pos)
+unsigned typ;  FULL_CHAR *str;  FILE_POS *pos;
+{ OBJECT res = NewWord(typ, StringLength(str), pos);
+  StringCopy(string(res), str);
+  FposCopy(fpos(res), *pos);
+  debug4(DOS, DD, "MakeWord(%s, %s, %s) returning %s",
+    Image(typ), str, EchoFilePos(pos), EchoObject(res));
+  return res;
+} /* end MakeWord */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  OBJECT MakeWordTwo(typ, str1, str2, pos)                                 */
+/*                                                                           */
+/*  Return an unsized WORD or QWORD made from the two strings and fpos.      */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT MakeWordTwo(typ, str1, str2, pos)
+unsigned typ;  FULL_CHAR *str1, *str2;  FILE_POS *pos;
+{ int len1 = StringLength(str1);
+  int len2 = StringLength(str2);
+  OBJECT res = NewWord(typ, len1 + len2, pos);
+  StringCopy(string(res), str1);
+  StringCopy(&string(res)[len1], str2);
+  FposCopy(fpos(res), *pos);
+  debug5(DOS, DD, "MakeWordTwo(%s, %s, %s, %s) returning %s",
+    Image(typ), str1, str2, EchoFilePos(pos), EchoObject(res));
+  return res;
+} /* end MakeWordTwo */
+
+
+/*@::CopyObject()@************************************************************/
 /*                                                                           */
 /*  OBJECT CopyObject(x, pos)                                                */
 /*                                                                           */
@@ -96,14 +120,15 @@ OBJECT CopyObject(x, pos)
 OBJECT x;  FILE_POS *pos;
 { OBJECT y, link, res, tmp;
 
-  debug2(DOS, DD, "CopyObject(%s,%s)", EchoObject(null, x), EchoFilePos(pos));
+  debug2(DOS, DD, "CopyObject(%s, %s)", EchoObject(x), EchoFilePos(pos));
   switch( type(x) )
   {
 
     case WORD:
+    case QWORD:
     
-      res = NewWord(strlen(string(x)), pos);
-      strcpy(string(res), string(x));
+      res = NewWord(type(x), StringLength(string(x)), pos);
+      StringCopy(string(res), string(x));
       break;
 
 
@@ -124,7 +149,7 @@ OBJECT x;  FILE_POS *pos;
       break;
 
 
-    case HEAD:
+    /* case HEAD: */
     case NULL_CLOS:
     case CROSS:
     case ONE_COL:
@@ -144,6 +169,7 @@ OBJECT x;  FILE_POS *pos;
     case ROTATE:
     case CASE:
     case YIELD:
+    case XCHAR:
     case FONT:
     case SPACE:
     case BREAK:
@@ -168,7 +194,7 @@ OBJECT x;  FILE_POS *pos;
 
     case ENV:
     
-      res = x;  /* don't copy environments */
+      res = x;  /* do not copy environments */
       break;
 
 
@@ -200,29 +226,11 @@ OBJECT x;  FILE_POS *pos;
     default:
     
       Error(INTERN, pos, "CopyObject: %s found", Image(type(x)));
-		  break;
+      break;
 
   } /* end switch */
   if( pos == no_fpos )  FposCopy(fpos(res), fpos(x));
   else FposCopy(fpos(res), *pos);
-  debug1(DOS, DD, "CopyObject returning %s", EchoObject(null, res));
+  debug1(DOS, DD, "CopyObject returning %s", EchoObject(res));
   return res;
 } /* end CopyObject */
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  BOOLEAN SplitIsDefinite(x)                                               */
-/*                                                                           */
-/*  Return TRUE if x is a definite SPLIT object (both children definite)     */
-/*                                                                           */
-/*****************************************************************************/
-
-BOOLEAN SplitIsDefinite(x)
-OBJECT x;
-{ OBJECT y1, y2;
-  assert( type(x) == SPLIT, "SplitIsDefinite: x not a SPLIT!" );
-  Child(y1, DownDim(x, COL));
-  Child(y2, DownDim(x, ROW));
-  return is_definite(type(y1)) && is_definite(type(y2));
-}

@@ -82,13 +82,14 @@ of Programming Languages (POPL), Las Vegas NV }
      @Tag { kingston93basser }
      @Type { Software }
      @Author { Kingston, Jeffrey H. }
-     @Title { The Basser Lout Document Formatter, Version 2.03 }
+     @Title { The Basser Lout Document Formatter, Version 2.05 }
      @Year { 1993 }
      @Comment { Computer program, publicly available in the
 @I jeff subdirectory of the home directory of @I ftp to host
 @I ftp.cs.su.oz.au with login name @I anonymous or @I ftp and any
-non-empty password (e.g. {@I none}).  Distribution via email is
-available for non-{@I ftp} sites.  All enquiries to "jeff@cs.su.oz.au". }
+non-empty password (e.g. {@I none}).  Lout distributions are also
+available from the comp.sources.misc newsgroup.  All enquiries to
+"jeff@cs.su.oz.au". }
 }
 
 { @Reference

@@ -1,6 +1,6 @@
-/*@z05.c:Read Definitions:ReadDefinitions()@**********************************/
+/*@z05.c:Read Definitions:ReadFontDef()@**************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,94 +24,130 @@
 /*                                                                           */
 /*  FILE:         z05.c                                                      */
 /*  MODULE:       Read Definitions                                           */
-/*  EXTERNS:      ReadDefinitions()                                          */
+/*  EXTERNS:      ReadPrependDef(), ReadDatabaseDef(), ReadDefinitions()     */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
 
+
 /*****************************************************************************/
 /*                                                                           */
-/*  check(typ, str, arg1, arg2)                                              */
+/*  is_string(t, str)                                                        */
 /*                                                                           */
-/*  If type(t) != typ, exit with error message.                              */
+/*  If t is a token denoting unquoted word str, return TRUE.                 */
 /*                                                                           */
 /*****************************************************************************/
 
-#define check(typ, str, arg1, arg2)					\
-if( type(t) != typ )							\
-{ Error(WARN, &fpos(t), str, arg1, arg2);				\
-  debug1(ANY, D, "offending type is %s", Image(type(t)));		\
-  UnSuppressScope();							\
-  *token = t;								\
-  return;								\
-} else
+#define is_string(t, str)    (type(t) == WORD && StringEqual(string(t), str) )
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  word_check(word, str, arg1, arg2)                                        */
-/*                                                                           */
-/*  If t is not the given word, exit with error message.                     */
-/*                                                                           */
-/*****************************************************************************/
-
-#define word_check(word, str, arg1, arg2)				\
-if( type(t) != WORD || strcmp(string(t), word) != 0 )			\
-{ Error(WARN, &fpos(t), str, arg1, arg2);				\
-  debug1(ANY, D, "offending object is %s",				\
-    type(t) == WORD ? string(t) : Image(type(t)));			\
-  UnSuppressScope();							\
-  *token = t;								\
-  return;								\
-} else
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  is_word(t, str)                                                          */
-/*                                                                           */
-/*  If t is a token denoting word str, return TRUE.                          */
-/*                                                                           */
-/*****************************************************************************/
-
-#define is_word(t, str)	    (type(t) == WORD && strcmp(string(t), str) == 0)
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  static ReadFontDef(token, encl)                                          */
+/*  static ReadFontDef(encl)                                                 */
 /*                                                                           */
 /*  Read one font definition and pass it on to the font module.  The         */
-/*  syntax is  fontdef <family> <face> { <word> }.                           */
+/*  syntax is  fontdef <family> <face> { <object> }.                         */
 /*                                                                           */
 /*****************************************************************************/
 
-static ReadFontDef(token, encl)
-OBJECT *token, encl;
-{ OBJECT t, res[5];  int i;
+static ReadFontDef(encl)
+OBJECT encl;
+{ OBJECT t, family, face, inside;
   
-  Dispose(*token);
   SuppressScope();
-  for( i = 0;  i < 5;  i++ )
-  { t = LexGetToken();
-    check(WORD, "syntax error in %s", KW_FONTDEF, 0);
-    if( type(t) == WORD && string(t)[0] == '"' )
-      FontStripQuotes(string(t), &fpos(t));
-    res[i] = t;
-  }
-  if( strcmp(string(res[2]), KW_LBR) != 0 )
-    Error(WARN, &fpos(res[2]), "missing %s in fontdef", KW_LBR);
-  if( strcmp(string(res[4]), KW_RBR) != 0 )
-    Error(WARN, &fpos(res[4]), "missing %s in fontdef", KW_RBR);
-  Dispose(res[2]);  Dispose(res[4]);
-  FontDefine(res[0], res[1], res[3]);
-  *token = nil;
+  family = LexGetToken();
+  if( !is_word(type(family)) )
+    Error(WARN, &fpos(family), "expected font family name here");
+  face = LexGetToken();
+  if( !is_word(type(face)) )
+    Error(WARN, &fpos(face), "expected font face name here");
   UnSuppressScope();
+  t = LexGetToken();
+  if( type(t) != LBR )
+  { Error(WARN, &fpos(t), "expected opening %s of fontdef here", KW_LBR);
+    Dispose(t);
+    return;
+  }
+  inside = Parse(&t, encl, FALSE, FALSE);
+  inside = ReplaceWithTidy(inside);
+  FontDefine(family, face, inside);
   return;
 } /* end ReadFontDef */
 
 
-/*@@**************************************************************************/
+/*@::ReadPrependDef(), ReadDatabaseDef()@*************************************/
+/*                                                                           */
+/*  ReadPrependDef(typ, encl)                                                */
+/*                                                                           */
+/*  Read @Prepend { <filename> } and record its presence.                    */
+/*                                                                           */
+/*****************************************************************************/
+
+ReadPrependDef(typ, encl)
+unsigned typ;  OBJECT encl;
+{ OBJECT t, fname;  FILE_NUM fnum;
+  t = LexGetToken();
+  if( type(t) != LBR )
+  { Error(WARN, &fpos(t), "symbol name or %s expected here in %s declaration",
+      KW_LBR, KW_PREPEND);
+    Dispose(t);
+    return;
+  }
+  fname = Parse(&t, encl, FALSE, FALSE);
+  fname = ReplaceWithTidy(fname);
+  if( !is_word(type(fname)) )
+  { Error(WARN, &fpos(fname), "name of %s file expected here", KW_PREPEND);
+    DisposeObject(fname);
+    return;
+  }
+  fnum = DefineFile(string(fname), STR_EMPTY, &fpos(fname), PREPEND_FILE,
+	   typ == PREPEND ? INCLUDE_PATH : SYSINCLUDE_PATH);
+
+} /* end ReadPrependDef */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  ReadDatabaseDef(typ, encl)                                               */
+/*                                                                           */
+/*  Read @Database <symname> ... <symname> { <filename> } and record it.     */
+/*                                                                           */
+/*****************************************************************************/
+
+ReadDatabaseDef(typ, encl)
+unsigned typ;  OBJECT encl;
+{ OBJECT symbs, t, db, fname;
+  symbs = New(ACAT);
+  t = LexGetToken();
+  while( type(t) == CLOSURE )
+  { Link(symbs, t);
+    t = LexGetToken();
+  }
+  if( type(t) != LBR )
+  { Error(WARN, &fpos(t), "symbol name or %s expected here in %s declaration",
+      KW_LBR, KW_DATABASE);
+    Dispose(t);
+    return;
+  }
+  if( Down(symbs) == symbs )
+  { Error(WARN, &fpos(t), "symbol names missing in %s declaration",
+      KW_DATABASE);
+    Dispose(t);
+    return;
+  }
+  fname = Parse(&t, encl, FALSE, FALSE);
+  fname = ReplaceWithTidy(fname);
+  if( !is_word(type(fname)) )
+  { Error(WARN, &fpos(fname), "name of %s file expected here", KW_DATABASE);
+    DisposeObject(fname);
+    return;
+  }
+  db = DbLoad(fname, typ == DATABASE ? DATABASE_PATH : SYSDATABASE_PATH,
+	 TRUE, symbs);
+} /* end ReadDatabaseDef */
+
+
+/*@::ReadTokenList()@*********************************************************/
 /*                                                                           */
 /*  static ReadTokenList(res)                                                */
 /*                                                                           */
@@ -131,8 +167,14 @@ OBJECT res;
   {
     case WORD:
 
-      if( string(t)[0] == '@' )
+      if( string(t)[0] == CH_SYMSTART )
 	Error(WARN, &fpos(t), "symbol %s unknown", string(t));
+      NextToken(t, res);
+      break;
+
+
+    case QWORD:
+
       NextToken(t, res);
       break;
 
@@ -159,6 +201,7 @@ OBJECT res;
     case ROTATE:
     case CASE:
     case YIELD:
+    case XCHAR:
     case FONT:
     case SPACE:
     case BREAK:
@@ -177,9 +220,14 @@ OBJECT res;
     case USE:
     case BEGIN:
     case END:
+    case DATABASE:
+    case SYS_DATABASE:
+    case PREPEND:
+    case SYS_PREPEND:
     case OPEN:
 
-      Error(WARN,&fpos(t),"symbol %s not allowed in macro", SymName(actual(t)));
+      Error(WARN, &fpos(t), "symbol %s not allowed in macro",
+	SymName(actual(t)));
       NextToken(t, res);
       break;
 
@@ -252,30 +300,42 @@ OBJECT res;
 } /* end ReadTokenList */
 
 
-/*@@**************************************************************************/
+/*@::ReadMacro()@*************************************************************/
 /*                                                                           */
-/*  static ReadMacro(token, encl)                                            */
+/*  static OBJECT ReadMacro(token, encl)                                     */
 /*                                                                           */
 /*  Read a macro from input and insert into symbol table.                    */
 /*  Token *token contains the "macro" keyword.  Input is read up to and      */
 /*  including the closing right brace, and nil is returned in *token if OK.  */
 /*  The proper scope for reading the macro body is open at entry and exit.   */
+/*  ReadMacro returns the new symbol table entry if successful, else nil.    */
 /*                                                                           */
 /*****************************************************************************/
 
 static OBJECT ReadMacro(token, encl)
 OBJECT *token, encl;
-{ OBJECT t, res;  int depth;
+{ OBJECT t, res;
 
   /* find macro name and insert into symbol table */
   SuppressScope();
   Dispose(*token);  t = LexGetToken();
-  check(WORD, "%s ignored - can't find name", KW_MACRO, 0);
+  if( !is_word(type(t)) )
+  { Error(WARN, &fpos(t), "%s ignored - name is missing", KW_MACRO);
+    debug1(ANY, D, "offending type is %s", Image(type(t)));
+    UnSuppressScope();
+    *token = t;
+    return nil;
+  }
   res = InsertSym(string(t), MACRO, &fpos(t), 0, FALSE, TRUE, 0, encl, nil);
 
   /* find opening left brace */
   t = LexGetToken();
-  word_check(KW_LBR, "%s ignored - can't find opening %s", KW_MACRO, KW_LBR);
+  if( !is_string(t, KW_LBR) )
+  { Error(WARN, &fpos(t), "%s ignored - opening %s missing", KW_MACRO, KW_LBR);
+    UnSuppressScope();
+    *token = t;
+    return nil;
+  }
   Dispose(t);
   
   /* read macro body */
@@ -290,7 +350,7 @@ OBJECT *token, encl;
 } /* end ReadMacro */
 
 
-/*@@**************************************************************************/
+/*@::ReadDefinitions()@*******************************************************/
 /*                                                                           */
 /*  ReadDefinitions(token, encl, res_type)                                   */
 /*                                                                           */
@@ -307,26 +367,40 @@ OBJECT *token, encl;  unsigned char res_type;
 { OBJECT t, res, res_target, export_list, import_list, link, y, z;
   t = *token;
 
-  
-  while( res_type != LOCAL ? is_word(t, KW_NAMED) :
-  	  is_word(t, KW_DEF) || is_word(t, KW_MACRO) || is_word(t, KW_FONTDEF)
-	  || is_word(t, KW_IMPORT) || is_word(t, KW_EXPORT) )
+  while( res_type != LOCAL ? is_string(t, KW_NAMED) : TRUE )
   {
-    if( is_word(t, KW_FONTDEF) )
-    { ReadFontDef(&t, encl);
-      if( t == nil ) t = LexGetToken();
+    if( is_string(t, KW_FONTDEF) )
+    { ReadFontDef(encl);
+      t = LexGetToken();
       continue;  /* next definition */
     }
+    else if( type(t) == PREPEND || type(t) == SYS_PREPEND )
+    { ReadPrependDef(type(t), encl);
+      Dispose(t);
+      t = LexGetToken();
+      continue;  /* next definition */
+    }
+    else if( type(t) == DATABASE || type(t) == SYS_DATABASE )
+    { ReadDatabaseDef(type(t), encl);
+      Dispose(t);
+      t = LexGetToken();
+      continue;  /* next definition */
+    }
+
+    if( !is_string(t, KW_DEF)   && !is_string(t, KW_MACRO)  &&
+	!is_string(t, KW_NAMED) && !is_string(t, KW_IMPORT) &&
+        !is_string(t, KW_EXPORT) )
+      break;
 
     /* get import list and change scope appropriately */
     BodyParNotAllowed();
     import_list = New(ACAT);
-    if( is_word(t, KW_IMPORT) )
+    if( is_string(t, KW_IMPORT) )
     { Dispose(t);
       t = LexGetToken();
       while( type(t) == CLOSURE ||
-	       (type(t)==WORD && !is_word(t,KW_EXPORT) && !is_word(t,KW_DEF)
-	       && !is_word(t, KW_MACRO)) )
+	       (type(t)==WORD && !is_string(t,KW_EXPORT) && !is_string(t,KW_DEF)
+	       && !is_string(t, KW_MACRO)) )
       {	if( type(t) == CLOSURE )
 	{ if( type(actual(t)) == LOCAL )
 	  { PushScope(actual(t), FALSE, TRUE);
@@ -338,7 +412,7 @@ OBJECT *token, encl;  unsigned char res_type;
 	  }
 	}
 	else
-	{ Error(WARN, &fpos(t), "import %s not in scope", string(t));
+	{ Error(WARN,&fpos(t),"import %s not in scope", string(t));
 	  Dispose(t);
 	}
 	t = LexGetToken();
@@ -347,29 +421,28 @@ OBJECT *token, encl;  unsigned char res_type;
 
     /* get export list and store for setting visible flags below */
     export_list = New(ACAT);
-    if( is_word(t, KW_EXPORT) )
+    if( is_string(t, KW_EXPORT) )
     { Dispose(t);
       SuppressScope();
       t = LexGetToken();
-      while( type(t) == WORD && !is_word(t, KW_DEF) )
-      {	if( string(t)[0] == '"' )  FontStripQuotes(string(t), &fpos(t));
-	Link(export_list, t);
+      while( is_word(type(t)) && !is_string(t, KW_DEF) )
+      { Link(export_list, t);
 	t = LexGetToken();
       }
       UnSuppressScope();
     }
 
 
-    if( res_type == LOCAL && !is_word(t, KW_DEF) && !is_word(t, KW_MACRO) )
+    if( res_type == LOCAL && !is_string(t, KW_DEF) && !is_string(t, KW_MACRO) )
     { Error(WARN,&fpos(t),"keyword %s or %s expected here", KW_DEF, KW_MACRO);
       break;
     }
-    if( res_type == NPAR && !is_word(t, KW_NAMED) )
+    if( res_type == NPAR && !is_string(t, KW_NAMED) )
     { Error(WARN, &fpos(t), "keyword %s expected here", KW_NAMED);
       break;
     }
 
-    if( is_word(t, KW_MACRO) )
+    if( is_string(t, KW_MACRO) )
     { if( Down(export_list) != export_list )
 	Error(WARN, &fpos(t), "ignoring %s list of %s", KW_EXPORT, KW_MACRO);
       res = ReadMacro(&t, encl);
@@ -379,68 +452,85 @@ OBJECT *token, encl;  unsigned char res_type;
       SuppressScope();  Dispose(t);  t = LexGetToken();
 
       /* find name of symbol and insert it */
-      check(WORD, "can't find symbol name", 0, 0);
+      if( !is_word(type(t)) )
+      { Error(WARN, &fpos(t), "cannot find symbol name");
+	debug1(ANY, D, "offending type is %s", Image(type(t)));
+	UnSuppressScope();
+	*token = t;
+	return;
+      }
       res = InsertSym(string(t), res_type, &fpos(t), DEFAULT_PREC,
 		FALSE, FALSE, 0, encl, nil);
       t = LexGetToken();
 
       /* find force, if any */
-      if( is_word(t, KW_FORCE) )
+      if( is_string(t, KW_FORCE) )
       {	force_target(res) = TRUE;
 	Dispose(t);  t = LexGetToken();
-	if( !is_word(t, KW_INTO) )
+	if( !is_string(t, KW_INTO) )
 	   Error(WARN, &fpos(t), "%s expected after %s", KW_INTO, KW_FORCE);
       }
 	
       /* find into clause, if any */
       res_target = nil;
-      if( is_word(t, KW_INTO) )
+      if( is_string(t, KW_INTO) )
       { UnSuppressScope();
 	Dispose(t);  t = LexGetToken();
-	check(LBR, "%s expected after %s", KW_LBR, KW_INTO);
+	if( type(t) != LBR )
+	{ Error(WARN, &fpos(t), "%s expected after %s", KW_LBR, KW_INTO);
+	  debug1(ANY, D, "offending type is %s", Image(type(t)));
+	  UnSuppressScope();
+	  *token = t;
+	  return;
+	}
 	res_target = Parse(&t, encl, FALSE, FALSE);
 	SuppressScope();
 	if( t == nil )  t = LexGetToken();
       }
 
       /* find precedence clause, if any */
-      if( is_word(t, KW_PRECEDENCE) )
+      if( is_string(t, KW_PRECEDENCE) )
       {	int prec = 0;
 	Dispose(t);
 	t = LexGetToken();
-	while( type(t) == WORD && string(t)[0] >= '0' && string(t)[0] <= '9' )
+	while( type(t) == WORD && decimaldigit(string(t)[0]) )
 	{
-	  /* check(WORD, "can't find value of %s", KW_PRECEDENCE, 0); */
-	  prec = prec * 10 + string(t)[0] - '0';
+	  prec = prec * 10 + digitchartonum(string(t)[0]);
 	  Dispose(t);  t = LexGetToken();
 	}
 
 	if( prec < MIN_PREC )
 	{ Error(WARN, &fpos(t), "%s is too low - %d substituted",
-		KW_PRECEDENCE, MIN_PREC );
+	    KW_PRECEDENCE, MIN_PREC);
 	  prec = MIN_PREC;
 	}
 	else if( prec > MAX_PREC )
 	{ Error(WARN, &fpos(t), "%s is too high - %d substituted",
-			KW_PRECEDENCE, MAX_PREC );
+	    KW_PRECEDENCE, MAX_PREC);
 	  prec = MAX_PREC;
 	}
 	precedence(res) = prec;
       }
 
       /* find associativity clause, if any */
-      if( is_word(t, KW_ASSOC) )
+      if( is_string(t, KW_ASSOC) )
       {	Dispose(t);  t = LexGetToken();
-	if( is_word(t, KW_LEFT) )  right_assoc(res) = FALSE;
-	else if( !is_word(t, KW_RIGHT) )
+	if( is_string(t, KW_LEFT) )  right_assoc(res) = FALSE;
+	else if( !is_string(t, KW_RIGHT) )
 	  Error(WARN, &fpos(t), "%s replaced by %s", KW_ASSOC, KW_RIGHT);
 	Dispose(t);  t = LexGetToken();
       }
 
       /* find left parameter, if any */
-      if( is_word(t, KW_LEFT) )
+      if( is_string(t, KW_LEFT) )
       {	Dispose(t);  t = LexGetToken();
-	check(WORD, "can't find %s parameter name", KW_LEFT, 0);
+	if( type(t) != WORD )
+	{ Error(WARN, &fpos(t), "cannot find %s parameter name", KW_LEFT);
+	  debug1(ANY, D, "offending type is %s", Image(type(t)));
+	  UnSuppressScope();
+	  *token = t;
+	  return;
+	}
 	InsertSym(string(t), LPAR, &fpos(t), DEFAULT_PREC, 
 	  FALSE, FALSE, 0, res, nil);
 	Dispose(t);  t = LexGetToken();
@@ -451,11 +541,17 @@ OBJECT *token, encl;  unsigned char res_type;
       ReadDefinitions(&t, res, NPAR);
 
       /* find right or body parameter, if any */
-      if( is_word(t, KW_RIGHT) || is_word(t, KW_BODY) )
-      {	has_body(res) = is_word(t, KW_BODY);
+      if( is_string(t, KW_RIGHT) || is_string(t, KW_BODY) )
+      {	has_body(res) = is_string(t, KW_BODY);
 	SuppressScope();
 	Dispose(t);  t = LexGetToken();
-	check(WORD, "can't find %s parameter name", KW_RIGHT, 0);
+	if( type(t) != WORD )
+	{ Error(WARN, &fpos(t), "cannot find %s parameter name", KW_RIGHT);
+	  debug1(ANY, D, "offending type is %s", Image(type(t)));
+	  UnSuppressScope();
+	  *token = t;
+	  return;
+	}
 	InsertSym(string(t), RPAR, &fpos(t), DEFAULT_PREC,
 	  FALSE, FALSE, 0, res, nil);
 	UnSuppressScope();
@@ -466,19 +562,19 @@ OBJECT *token, encl;  unsigned char res_type;
       if( res_target != nil )
 	InsertSym(KW_TARGET, LOCAL, &fpos(res_target), DEFAULT_PREC,
 			FALSE, FALSE, 0, res, res_target);
-      if( type(t) == WORD && strcmp(string(t), KW_LBR) == 0 )
+      if( type(t) == WORD && StringEqual(string(t), KW_LBR) )
       {	z = NewToken(LBR, &fpos(t), 0, 0, LBR_PREC, StartSym);
 	Dispose(t);
 	t = z;
       }
-      else if( type(t) == WORD && strcmp(string(t), KW_BEGIN) == 0 )
+      else if( type(t) == WORD && StringEqual(string(t), KW_BEGIN) )
       {	z = NewToken(BEGIN, &fpos(t), 0, 0, BEGIN_PREC, StartSym);
 	Dispose(t);
 	t = z;
       }
       else if( type(t) != LBR && type(t) != BEGIN )
 	Error(FATAL, &fpos(t), "opening %s or %s of %s expected",
-	  KW_LBR, KW_BEGIN, SymName(res));
+	 KW_LBR, KW_BEGIN, SymName(res));
       if( type(t) == BEGIN )  actual(t) = res;
       PushScope(res, FALSE, FALSE);
       BodyParAllowed();
@@ -487,7 +583,7 @@ OBJECT *token, encl;  unsigned char res_type;
       /* set visible flag of the exported symbols */
       for( link=Down(export_list);  link != export_list;  link=NextDown(link) )
       {	Child(y, link);
-	z = SearchSym(string(y), strlen(string(y)));
+	z = SearchSym(string(y), StringLength(string(y)));
 	if( z == nil || enclosing(z) != res )
 	  Error(WARN, &fpos(y), "exported symbol %s not defined in %s",
 		string(y), SymName(res));
@@ -511,7 +607,7 @@ OBJECT *token, encl;  unsigned char res_type;
     { Dispose(import_list);
       import_list = nil;
     }
-    imports(res) = import_list;
+    if( res != nil )  imports(res) = import_list;
 
     BodyParAllowed();
     if( t == nil ) t = LexGetToken();

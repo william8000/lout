@@ -73,10 +73,10 @@ simple words or an invocation of a symbol without parameters, as in
 @PP
 A gap consists of a length plus a gap mode.  A @I length
 length @Index { Length }
-is represented by an unsigned decimal number followed
+is represented by an decimal number (which may not be negative) followed
 by a unit of measurement.  For example, @Code "2.5c" represents the
-length 2.5 centimetres.  Figure {@NumberOf units} gives the full range
-of eleven units of measurement.
+length 2.5 centimetres.  Figure {@NumberOf units} gives the full selection
+of units of measurement.
 c.unit @Index { @Code c unit }
 p.unit @Index { @Code p unit }
 m.unit @Index { @Code m unit }

@@ -1,6 +1,6 @@
-/*@z16.c:Size Adjustment:SetNeighbours(), AdjustSize()@***********************/
+/*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -93,7 +93,7 @@ OBJECT *pg, *pdef, *sg, *sdef;  int *side;
 } /* end SetNeighbours */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  static CatAdjustSize(x, b, f, ratm, y, dim)                              */
 /*                                                                           */
@@ -113,9 +113,9 @@ OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
   debug6(DSA, D, "CatAdjustSize(%s x, %s, %s, %s, %s y, %s)", Image(type(x)),
     EchoLength(*b), EchoLength(*f), bool(ratm), Image(type(y)), dimen(dim));
   debug2(DSA,DD, "x(%s,%s) =", EchoLength(back(x,dim)), EchoLength(fwd(x,dim)));
-  ifdebug(DSA, DD, EchoObject(stderr, x));
+  ifdebug(DSA, DD, DebugObject(x));
   debug2(DSA,DD, "y(%s,%s) =", EchoLength(back(y,dim)), EchoLength(fwd(y,dim)));
-  ifdebug(DSA, DD, EchoObject(stderr, y));
+  ifdebug(DSA, DD, DebugObject(y));
 
   /* DO_ADJUST ACAT is a special case because adjustment affects its size */
   if( dim==COL && type(y)==ACAT && display_style(save_style(y)) == DO_ADJUST )
@@ -131,12 +131,12 @@ OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
     if( pg != nil && mode(gap(pg)) == NO_MODE )
     { debug1(DSA, D, "NO_MODE gap pg, is_indefinite(x) == %s, y =",
 	bool(is_indefinite(type(x))) );
-      ifdebug(DSA, D, EchoObject(stderr, y));
+      ifdebug(DSA, D, DebugObject(y));
     }
     if( sg != nil && mode(gap(sg)) == NO_MODE )
     { debug1(DSA, D, "NO_MODE gap sg, is_indefinite(x) == %s, y =",
 	bool(is_indefinite(type(x))) );
-      ifdebug(DSA, D, EchoObject(stderr, y));
+      ifdebug(DSA, D, DebugObject(y));
     }
   ); }
   if( is_indefinite(type(x)) )
@@ -181,9 +181,9 @@ OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
   }
   if( bb > MAX_LEN || ff > MAX_LEN )
   { debug2(DSA, D, "bb = %s, ff = %s, y =", EchoLength(bb), EchoLength(ff));
-    ifdebug(DSA, D, EchoObject(stderr, y));
+    ifdebug(DSA, D, DebugObject(y));
     debug0(DSA, D, "x was");
-    ifdebug(DSA, D, EchoObject(stderr, x));
+    ifdebug(DSA, D, DebugObject(x));
     Error(FATAL,&fpos(y),"maximum size (%s) exceeded", EchoLength(MAX_LEN));
   }
   *b = bb;  *f = ff;
@@ -191,7 +191,7 @@ OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
 } /* end CatAdjustSize */
 
 
-/*@@**************************************************************************/
+/*@::AdjustSize()@************************************************************/
 /*                                                                           */
 /*  AdjustSize(x, b, f, dim)                                                 */
 /*                                                                           */
@@ -209,7 +209,7 @@ OBJECT x;  LENGTH b, f;  int dim;
   debug6(DSA, D, "[ AdjustSize( %s(%s,%s), %s, %s, %s ), x =",
 	Image(type(x)), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
 	EchoLength(b), EchoLength(f), dimen(dim));
-  ifdebug(DSA, DD, EchoObject(stderr, x) );
+  ifdebug(DSA, DD, DebugObject(x) );
 
   while( b != back(x, dim) || f != fwd(x, dim) || is_indefinite(type(x)) )
   { assert( Up(x) != x, "AdjustSize: Up(x) == x!" );
@@ -239,7 +239,7 @@ OBJECT x;  LENGTH b, f;  int dim;
     debug5(DSA, DD, "  b = %s, f = %s, y = %s(%s,%s), x =",
 	EchoLength(b), EchoLength(f), Image(type(y)),
 	EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
-    ifdebug(DSA, DD, EchoObject(stderr, x) );
+    ifdebug(DSA, DD, DebugObject(x) );
 
     switch( type(y) )
     {
@@ -438,6 +438,7 @@ OBJECT x;  LENGTH b, f;  int dim;
 
 
       case WORD:
+      case QWORD:
       case CLOSURE:
       case NULL_CLOS:
       case CROSS:

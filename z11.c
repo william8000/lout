@@ -1,6 +1,6 @@
-/*@z11.c:Style Service:SpaceChange(), BreakChange(), EchoStyle()@*************/
+/*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,13 +24,54 @@
 /*                                                                           */
 /*  FILE:         z11.c                                                      */
 /*  MODULE:       Style Service                                              */
-/*  EXTERNS:      SpaceChange(), BreakChange(), EchoStyle()                  */
+/*  EXTERNS:      EchoStyle(), SpaceChange(), BreakChange()                  */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
 
 
+#if DEBUG_ON
 /*****************************************************************************/
+/*                                                                           */
+/*  FULL_CHAR *EchoStyle(style)                                              */
+/*                                                                           */
+/*  Returns a string showing the value of the style.                         */
+/*                                                                           */
+/*****************************************************************************/
+
+FULL_CHAR *EchoStyle(style)
+STYLE *style;
+{ FULL_CHAR buff1[100], buff2[100], buff3[100], buff4[100];
+  static FULL_CHAR res[100];
+  static char *hyphwords[] = { "hyph_undef", "hyph_off", "hyph_on" };
+  static char *fillwords[] = { "fill_undef", "fill_off", "fill_on" };
+  static char *displaywords[] = { "undef", "adjust", "outdent", "left",
+			     "centre", "right", "do" };
+
+  StringCopy(res, AsciiToFull("["));
+  StringCat(res, EchoCatOp(VCAT,mark(line_gap(*style)),join(line_gap(*style))));
+  StringCat(res, EchoGap(&line_gap(*style)));
+  StringCat(res, AsciiToFull(", "));
+  StringCat(res, font(*style) == 0 ?
+		   AsciiToFull("nofont") : FontFamilyAndFace(font(*style)));
+  StringCat(res, AsciiToFull(" ("));
+  StringCat(res, EchoGap(&space_gap(*style)));
+  StringCat(res, AsciiToFull("), "));
+  StringCat(res, AsciiToFull(hyph_style(*style) < 3 ?
+		    hyphwords[hyph_style(*style)] : "?"));
+  StringCat(res, AsciiToFull(":"));
+  StringCat(res, AsciiToFull(fill_style(*style) < 3 ?
+		    fillwords[fill_style(*style)] : "?"));
+  StringCat(res, AsciiToFull(":"));
+  StringCat(res, AsciiToFull(display_style(*style) < 7 ?
+		    displaywords[display_style(*style)] : "?"));
+  StringCat(res, AsciiToFull("]"));
+  return res;
+} /* end EchoStyle */
+#endif
+
+
+/*@::SpaceChange()@***********************************************************/
 /*                                                                           */
 /*  SpaceChange(style, x)                                                    */
 /*                                                                           */
@@ -41,20 +82,20 @@
 SpaceChange(style, x)
 STYLE *style;  OBJECT x;
 { GAP res_gap;  unsigned gap_inc;
-  debug2(DSS, D, "SpaceChange(%s, %s)", EchoStyle(style), EchoObject(null, x));
-  if( type(x) != WORD )
+  debug2(DSS, D, "SpaceChange(%s, %s)", EchoStyle(style), EchoObject(x));
+  if( !is_word(type(x)) )
   { Error(WARN, &fpos(x), "invalid left parameter to %s", KW_SPACE);
   }
   else
   { GetGap(x, style, &res_gap, &gap_inc);
-    if( gap_inc != ABS && units(res_gap) != units(space_gap(*style)) )
+    if( gap_inc != GAP_ABS && units(res_gap) != units(space_gap(*style)) )
     { Error(WARN, &fpos(x), "space %s incompatible with enclosing", string(x));
     }
     else
     { units(space_gap(*style)) = units(res_gap);
       mode(space_gap(*style))  = mode(res_gap);
-      width(space_gap(*style)) = gap_inc == ABS ? width(res_gap) :
-	     gap_inc == INC ? width(space_gap(*style)) + width(res_gap) :
+      width(space_gap(*style)) = gap_inc == GAP_ABS ? width(res_gap) :
+	     gap_inc == GAP_INC ? width(space_gap(*style)) + width(res_gap) :
 	     max(width(space_gap(*style)) - width(res_gap), 0);
     }
   }
@@ -62,7 +103,7 @@ STYLE *style;  OBJECT x;
 } /* end SpaceChange */
 
 
-/*****************************************************************************/
+/*@::BreakChange()@***********************************************************/
 /*                                                                           */
 /*  BreakChange(style, x)                                                    */
 /*                                                                           */
@@ -72,45 +113,42 @@ STYLE *style;  OBJECT x;
 
 static changebreak(style, x)
 STYLE *style;  OBJECT x;
-{ int i; GAP res_gap;  unsigned gap_inc;
-  if( string(x)[0] >= 'a' && string(x)[0] <= 'z' )
+{ GAP res_gap;  unsigned gap_inc;
+  if( beginsbreakstyle(string(x)[0]) )
   {
     /* should be a new break style option */
-    if( strcmp(string(x), "hyphen") == 0 )
+    if( StringEqual(string(x), STR_BREAK_HYPHEN) )
 	hyph_style(*style) = HYPH_ON;
-    else if( strcmp(string(x), "nohyphen") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_NOHYPHEN) )
 	hyph_style(*style) = HYPH_OFF;
-    else if( strcmp(string(x), "adjust") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_ADJUST) )
 	fill_style(*style) = FILL_ON, display_style(*style) = DISPLAY_ADJUST;
-    else if( strcmp(string(x), "outdent") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_OUTDENT) )
 	fill_style(*style) = FILL_ON, display_style(*style) = DISPLAY_OUTDENT;
-    else if( strcmp(string(x), "ragged") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_RAGGED) )
 	fill_style(*style) = FILL_ON, display_style(*style) = DISPLAY_LEFT;
-    else if( strcmp(string(x), "cragged") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_CRAGGED) )
 	fill_style(*style) = FILL_ON, display_style(*style) = DISPLAY_CENTRE;
-    else if( strcmp(string(x), "ragged") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_RRAGGED) )
 	fill_style(*style) = FILL_ON, display_style(*style) = DISPLAY_RIGHT;
-    else if( strcmp(string(x), "lines") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_LINES) )
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_LEFT;
-    else if( strcmp(string(x), "clines") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_CLINES) )
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_CENTRE;
-    else if( strcmp(string(x), "rlines") == 0 )
+    else if( StringEqual(string(x), STR_BREAK_RLINES) )
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_RIGHT;
     else Error(WARN, &fpos(x), "invalid %s option %s", KW_BREAK, string(x));
   }
-  else
-  {
-    /* should be a new inter-line gap */
-    GetGap(x, style, &res_gap, &gap_inc);
-    if( gap_inc != ABS && units(res_gap) != units(line_gap(*style)) )
-    { Error(WARN, &fpos(x),
+  else /* should be a new inter-line gap */
+  { GetGap(x, style, &res_gap, &gap_inc);
+    if( gap_inc != GAP_ABS && units(res_gap) != units(line_gap(*style)) )
+      Error(WARN, &fpos(x),
 		    "line spacing %s incompatible with enclosing", string(x));
-    }
     else
     { units(line_gap(*style)) = units(res_gap);
       mode(line_gap(*style))  = mode(res_gap);
-      width(line_gap(*style)) = gap_inc == ABS ? width(res_gap) :
-	gap_inc == INC ? width(line_gap(*style)) + width(res_gap) :
+      width(line_gap(*style)) = gap_inc == GAP_ABS ? width(res_gap) :
+	gap_inc == GAP_INC ? width(line_gap(*style)) + width(res_gap) :
 	max(width(line_gap(*style)) - width(res_gap), 0);
     }
   }
@@ -119,61 +157,26 @@ STYLE *style;  OBJECT x;
 BreakChange(style, x)
 STYLE *style;  OBJECT x;
 { OBJECT link, y;
-  debug2(DSS, D, "BreakChange(%s, %s)", EchoStyle(style), EchoObject(null, x));
+  debug2(DSS, D, "BreakChange(%s, %s)", EchoStyle(style), EchoObject(x));
   switch( type(x) )
   {
     case WORD:
-    
-      changebreak(style, x);
-      break;
+    case QWORD:	changebreak(style, x);
+		break;
 
 
-    case ACAT:
-    
-      for( link = Down(x);  link != x;  link = NextDown(link) )
-      {	Child(y, link);
-	if( type(y) == GAP_OBJ )  continue;
-	else if( type(y) == WORD )  changebreak(style, y);
-	else Error(WARN, &fpos(x), "invalid left parameter of %s", KW_BREAK);
-      }
-      break;
+    case ACAT:	for( link = Down(x);  link != x;  link = NextDown(link) )
+		{ Child(y, link);
+		  if( type(y) == GAP_OBJ )  continue;
+		  else if( is_word(type(y)) )  changebreak(style, y);
+		  else Error(WARN, &fpos(x), "invalid left parameter of %s",
+			 KW_BREAK);
+		}
+		break;
 
 
-    default:
-    
-      Error(WARN, &fpos(x), "invalid left parameter of %s", KW_BREAK);
-      break;
-
+    default:	Error(WARN, &fpos(x), "invalid left parameter of %s", KW_BREAK);
+		break;
   }
   debug1(DSS, D, "BreakChange returning %s", EchoStyle(style));
 } /* end BreakChange */
-
-
-#if DEBUG_ON
-/*****************************************************************************/
-/*                                                                           */
-/*  unsigned char *EchoStyle(style)                                          */
-/*                                                                           */
-/*  Returns a string showing the value of the style.                         */
-/*                                                                           */
-/*****************************************************************************/
-
-unsigned char *EchoStyle(style)
-STYLE *style;
-{ char buff1[100], buff2[100], buff3[100], buff4[100];
-  static char res[100];
-  static char *hyphwords[] = { "hyph_undef", "hyph_off", "hyph_on" };
-  static char *fillwords[] = { "fill_undef", "fill_off", "fill_on" };
-  static char *displaywords[] = { "undef", "adjust", "outdent", "left",
-			     "centre", "right", "do" };
-  strcpy(buff1, EchoCatOp(VCAT,mark(line_gap(*style)),join(line_gap(*style))));
-  strcpy(buff2, EchoGap(&line_gap(*style)));
-  strcpy(buff3, EchoGap(&space_gap(*style)));
-  sprintf(buff4, "%s:%s:%s",
-	hyph_style(*style) < 3 ? hyphwords[hyph_style(*style)] : "?",
-	fill_style(*style) < 3 ? fillwords[fill_style(*style)] : "?",
-	display_style(*style) < 7 ? displaywords[display_style(*style)] : "?");
-  sprintf(res, "[%s%s, %d (%s), %s]", buff1, buff2, font(*style), buff3, buff4);
-  return (unsigned char *) res;
-} /* end EchoStyle */
-#endif

@@ -1,6 +1,6 @@
-/*@z34.c:Rotation Service:RotateSize()@***************************************/
+/*@z34.c:Rotation Service:Declarations@***************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -45,7 +45,7 @@ rect.x = polar.radius * cos(polar.angle),			\
 rect.y = polar.radius * sin(polar.angle)
 
 
-/*****************************************************************************/
+/*@::RotateSize()@************************************************************/
 /*                                                                           */
 /*  RotateSize(xcb, xcf, xrb, xrf, y, theta)                                 */
 /*                                                                           */
@@ -57,12 +57,12 @@ RotateSize(xcb, xcf, xrb, xrf, y, theta)
 LENGTH *xcb, *xcf, *xrb, *xrf;  OBJECT y;  LENGTH theta;
 { rect_coord ycorners[4], xcorner;  polar_coord pol;
   double maxx, maxy, minx, miny, ang;  int i;
-  unsigned char buff1[20], buff2[20];
+  char buff1[20], buff2[20];
 
   /* calculate theta in radians */
   ang = (double) theta * 2 * M_PI / (double) (DG * 360);
   ifdebug(DRS, D, sprintf(buff2, "%.1f", ang));
-  debug2(DRS, D, "RotateSize( %s, %s )", EchoObject(null, y), buff2);
+  debug2(DRS, D, "RotateSize( %s, %s )", EchoObject(y), buff2);
   debug4(DRS, DD, "  ycb %s, ycf %s, yrb %s, yrf %s",
 	EchoLength(back(y, COL)), EchoLength(fwd(y, COL)),
 	EchoLength(back(y, ROW)), EchoLength(fwd(y, ROW)));

@@ -563,4 +563,4 @@ def @ShowMarks
     @MinorHeadingFont { Slope }
 }
 
-@Database @Reference { "oldrefs" }
+@Database @Reference { oldrefs }

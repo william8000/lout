@@ -1,6 +1,6 @@
-/*@z30.c:Symbol uses:InsertUses(), FlattenUses(), SearchUses()@***************/
+/*@z30.c:Symbol uses:InsertUses()@********************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,7 +24,8 @@
 /*                                                                           */
 /*  FILE:         z30.c                                                      */
 /*  MODULE:       Symbol Uses                                                */
-/*  EXTERNS:      InsertUses(), FlattenUses(), SearchUses(), TargetUsedBy()  */
+/*  EXTERNS:      InsertUses(), FlattenUses(), SearchUses(),                 */
+/*                FirstExternTarget(), NextExternTarget()                    */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -60,17 +61,17 @@ OBJECT x, y;
 } /* end InsertUses */
 
 
-/*****************************************************************************/
+/*@::GatherUses(), GatherAllUses(), FlattenUses()@****************************/
 /*                                                                           */
-/*  static gather_uses(x, sym)                                               */
-/*  static gather_all_uses(x)                                                */
+/*  static GatherUses(x, sym)                                                */
+/*  static GatherAllUses(x)                                                  */
 /*                                                                           */
-/*  gather_uses adds all the unmarked descendants of x to the uses relation  */
-/*  of sym;  gather_all_uses applies gather_uses to all descendants of x.    */
+/*  GatherUses adds all the unmarked descendants of x to the uses relation   */
+/*  of sym;  GatherAllUses applies gather_uses to all descendants of x.      */
 /*                                                                           */
 /*****************************************************************************/
 
-static gather_uses(x, sym)
+static GatherUses(x, sym)
 OBJECT x, sym;
 { OBJECT link, y, tmp;
   if( base_uses(x) != nil )
@@ -86,28 +87,28 @@ OBJECT x, sym;
 	  uses(sym) = tmp;
 	  if( indefinite(y) )  indefinite(sym) = TRUE;
 	  if( uses_extern_target(y) )  uses_extern_target(sym) = TRUE;
-	  gather_uses(y, sym);
+	  GatherUses(y, sym);
 	}
 	else recursive(sym) = TRUE;
       }
       link = next(link);
     } while( link != next(base_uses(x)) );
   }
-} /* end gather_uses */
+} /* end GatherUses */
 
 
-static gather_all_uses(x)
+static GatherAllUses(x)
 OBJECT x;
 { OBJECT link, y;
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
-    if( type(y) == LOCAL )  gather_uses(y, y);
-    gather_all_uses(y);
+    if( type(y) == LOCAL )  GatherUses(y, y);
+    GatherAllUses(y);
   }
-} /* end gather_all_uses */
+} /* end GatherAllUses */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  FlattenUses()                                                            */
 /*                                                                           */
@@ -117,15 +118,15 @@ OBJECT x;
 /*****************************************************************************/
 
 FlattenUses()
-{ gather_all_uses(StartSym);
+{ GatherAllUses(StartSym);
 } /* end FlattenUses */
 
 
-/*****************************************************************************/
+/*@::SearchUses(), FirstExternTarget(), NextExternTarget()@*******************/
 /*                                                                           */
 /*  BOOLEAN SearchUses(x, y)                                                 */
 /*                                                                           */
-/*  Determine whether symbol x uses symbol y by searching x's uses list.     */
+/*  Discover whether symbol x uses symbol y by searching the uses list of x. */
 /*                                                                           */
 /*****************************************************************************/
 

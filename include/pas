@@ -31,39 +31,39 @@ def @Pas
     def @B right x { Bold @Font x }
     def @S right x { { Symbol Base } @Font x }
 
-    def "0"	{ @R "0"	}
-    def "1"	{ @R "1"	}
-    def "2"	{ @R "2"	}
-    def "3"	{ @R "3"	}
-    def "4"	{ @R "4"	}
-    def "5"	{ @R "5"	}
-    def "6"	{ @R "6"	}
-    def "7"	{ @R "7"	}
-    def "8"	{ @R "8"	}
-    def "9"	{ @R "9"	}
-    def "."	{ @R "."	}
-    def ","	{ @R ","	}
-    def ":"	{ @R ":"	}
-    def ";"	{ @R ";"	}
-    def "'"	{ @R "'"	}
-    def "`"	{ @R "`"	}
-    def "+"	{ @S "+"	}
-    def "-"	{ @S "-"	}
-    def "*"	{ @S "\052"	}
-    def "/"	{ @R "\057"	}
-    def "("	{ @R "("	}
-    def ")"	{ @R ")"	}
-    def "["	{ @R "["	}
-    def "]"	{ @R "]"	}
-    def "^"	{ @S 0.8f @Font "\255"	}
-    def ".."	{ @R ".."	}
-    def "="	{ @S "\075"	}
-    def "<"	{ @S "\074"	}
-    def ">"	{ @S "\076"	}
-    def "<>"	{ @S "\271"	}
-    def "<="	{ @S "\243"	}
-    def ">="	{ @S "\263"	}
-    def ":="	{ :{//0.03fo =} }
+    def "0"	{ @R "0"			}
+    def "1"	{ @R "1"			}
+    def "2"	{ @R "2"			}
+    def "3"	{ @R "3"			}
+    def "4"	{ @R "4"			}
+    def "5"	{ @R "5"			}
+    def "6"	{ @R "6"			}
+    def "7"	{ @R "7"			}
+    def "8"	{ @R "8"			}
+    def "9"	{ @R "9"			}
+    def "."	{ @R "."			}
+    def ","	{ @R ","			}
+    def ":"	{ @R ":"			}
+    def ";"	{ @R ";"			}
+    def "'"	{ @R "'"			}
+    def "`"	{ @R "`"			}
+    def "+"	{ @S "+"			}
+    def "-"	{ @S "-"			}
+    def "*"	{ @S @Char "asteriskmath"	}
+    def "/"	{ @R @Char "fraction"		}
+    def "("	{ @R "("			}
+    def ")"	{ @R ")"			}
+    def "["	{ @R "["			}
+    def "]"	{ @R "]"			}
+    def "^"	{ @S 0.8f @Font @Char "arrowup"	}
+    def ".."	{ @R ".."			}
+    def "="	{ @S @Char "equal"		}
+    def "<"	{ @S @Char "less"		}
+    def ">"	{ @S @Char "greater"		}
+    def "<>"	{ @S @Char "notequal"		}
+    def "<="	{ @S @Char "lessequal"		}
+    def ">="	{ @S @Char "greaterequal"	}
+    def ":="	{ :{//0.03fo =}			}
 
     def and		{ @B "and"		}
     def array		{ @B "array"		}

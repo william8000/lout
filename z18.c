@@ -1,6 +1,6 @@
-/*@z18.c:Galley Transfer:TransferBegin(), TransferComponent()@****************/
+/*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -45,13 +45,13 @@ static debug_targets()
   { if( targets[i] == nil || Down(targets[i]) == targets[i] )  tmp = nil;
     else Child(tmp, Down(targets[i]));
     debug3(DGT, D, "  target[%d] %s = %s", i,
-      EchoConstraint(&constraints[i]), EchoObject(null, tmp));
+      EchoConstraint(&constraints[i]), EchoObject(tmp));
   }
 } /* end debug_targets */
 #endif
 
 
-/*@@**************************************************************************/
+/*@::TransferInit()@**********************************************************/
 /*                                                                           */
 /*  TransferInit(InitEnv)                                                    */
 /*                                                                           */
@@ -62,7 +62,7 @@ static debug_targets()
 TransferInit(InitEnv)
 OBJECT InitEnv;
 { OBJECT dest, x, y, recs, inners, nothing, dest_index, up_hd;
-  debug1(DGT, D, "TransferInit( %s )", EchoObject(null, InitEnv));
+  debug1(DGT, D, "TransferInit( %s )", EchoObject(InitEnv));
   SetConstraint(initial_constraint, MAX_LEN-1, MAX_LEN-1, MAX_LEN-1);
 
   /* save initial environment and style */
@@ -106,14 +106,14 @@ OBJECT InitEnv;
   Link(targets[itop], y);
   Constrained(actual(y), &constraints[itop], COL);
   debug2(DSC, D, "Constrained( %s, COL ) = %s",
-	EchoObject(null, y), EchoConstraint(&constraints[itop]));
+	EchoObject(y), EchoConstraint(&constraints[itop]));
 
   debug0(DGT, D, "TransferInit returning.");
   ifdebug(DGT, DD, debug_targets());
 } /* end TransferInit */
 
 
-/*@@**************************************************************************/
+/*@::TransferBegin()@*********************************************************/
 /*                                                                           */
 /*  OBJECT TransferBegin(x)                                                  */
 /*                                                                           */
@@ -125,9 +125,12 @@ OBJECT TransferBegin(x)
 OBJECT x;
 { OBJECT xsym, index, y, link, env, new_env, hold_env, res, hd, target;
   CONSTRAINT c;
-  debug1(DGT, D, "TransferBegin( %s )", EchoObject(null, x));
+  debug1(DGT, D, "TransferBegin( %s )", EchoObject(x));
   ifdebug(DGT, DD, debug_targets());
   assert( type(x) == CLOSURE, "TransferBegin: non-CLOSURE!" );
+
+  /* add an automatically generated @Tag parameter to x if required */
+  CrossAddTag(x);
 
   /* construct new (inner) env chain */
   if( Down(targets[itop]) == targets[itop] )
@@ -135,7 +138,7 @@ OBJECT x;
   Child(target, Down(targets[itop]));
   xsym = actual(x);
   env = GetEnv(actual(target));
-  debug1(DGT, DD, "  current env chain: %s", EchoObject(null, env));
+  debug1(DGT, DD, "  current env chain: %s", EchoObject(env));
   if( has_body(xsym) )
   {
     /* prepare a copy of x for inclusion in environment */
@@ -145,11 +148,12 @@ OBJECT x;
     AttachEnv(env, y);
 
     /* now the new environment is y catenated with the old one */
+    debug0(DCR, DD, "calling SetEnv from TransferBegin (a)");
     new_env = SetEnv(y, nil);
   }
   else new_env = env;
   hold_env = New(ACAT);  Link(hold_env, new_env);
-  debug1(DGT, DD, "  new env chain: %s", EchoObject(null, new_env));
+  debug1(DGT, DD, "  new env chain: %s", EchoObject(new_env));
 
   /* convert x into an unsized galley called hd */
   index = New(UNATTACHED);
@@ -178,7 +182,7 @@ OBJECT x;
     { Child(env, LastDown(x));
       if( type(env) == ENV )  DisposeChild(LastDown(x));
     }
-    debug1(DGT,D, "TransferBegin returning failed, x: %s", EchoObject(null, x));
+    debug1(DGT,D, "TransferBegin returning failed, x: %s", EchoObject(x));
     return x;
   }
 
@@ -196,7 +200,7 @@ OBJECT x;
 	if( FitsConstraint(0, 0, constraints[itop]) )
 	{ Link(targets[itop], y);  target = y;
 	  debug2(DSC, D, "Constrained( %s, COL ) = %s",
-	    EchoObject(null, y), EchoConstraint(&constraints[itop]));
+	    EchoObject(y), EchoConstraint(&constraints[itop]));
 	  env = DetachEnv(actual(y));
 	  AttachEnv(new_env, actual(y));
 	}
@@ -227,7 +231,7 @@ OBJECT x;
 } /* end TransferBegin */
 
 
-/*@@**************************************************************************/
+/*@::TransferComponent()@*****************************************************/
 /*                                                                           */
 /*  TransferComponent(x)                                                     */
 /*                                                                           */
@@ -238,7 +242,7 @@ OBJECT x;
 TransferComponent(x)
 OBJECT x;
 { OBJECT y, env, start_search, recs, inners, nothing, hd, dest, dest_index;
-  debug1(DGT, D, "TransferComponent( %s )", EchoObject(null, x));
+  debug1(DGT, D, "TransferComponent( %s )", EchoObject(x));
   ifdebug(DGT, DD, debug_targets());
 
   /* if no dest_index, discard x and exit */
@@ -258,7 +262,7 @@ OBJECT x;
   Link(hd, x);
   dest = actual(dest_index);
   env = GetEnv(dest);
-  debug1(DGT, DD, "  current env chain: %s", EchoObject(null, env));
+  debug1(DGT, DD, "  current env chain: %s", EchoObject(env));
   SizeGalley(hd, env, TRUE, threaded(dest), FALSE, TRUE, &save_style(dest),
 	&constraints[itop], nil, &nothing, &recs, &inners);
   if( recs != nil )  ExpandRecursives(recs);
@@ -301,7 +305,7 @@ OBJECT x;
 } /* end TransferComponent */
 
 
-/*@@**************************************************************************/
+/*@::TransferEnd()@***********************************************************/
 /*                                                                           */
 /*  TransferEnd(x)                                                           */
 /*                                                                           */
@@ -312,7 +316,7 @@ OBJECT x;
 TransferEnd(x)
 OBJECT x;
 { OBJECT recs, inners, nothing, z, env, dest, hd, dest_index, y, start_search;
-  debug1(DGT, D, "TransferEnd( %s )", EchoObject(null, x));
+  debug1(DGT, D, "TransferEnd( %s )", EchoObject(x));
   ifdebug(DGT, DD, debug_targets());
 
   /* if no dest_index, discard x and exit */
@@ -328,7 +332,7 @@ OBJECT x;
   actual(hd) = whereto(hd) = ready_galls(hd) = nil;
   backward(hd) = must_expand(hd) = sized(hd) = FALSE;
   Link(hd, x);  dest = actual(dest_index);  env = GetEnv(dest);
-  debug1(DGT, DD, "  current env chain: %s", EchoObject(null, env));
+  debug1(DGT, DD, "  current env chain: %s", EchoObject(env));
   SizeGalley(hd, env, external(dest), threaded(dest), FALSE, TRUE,
 	&save_style(dest), &constraints[itop], nil, &nothing, &recs, &inners);
   if( recs != nil )  ExpandRecursives(recs);
@@ -378,8 +382,7 @@ OBJECT x;
   ifdebug(DGT, DD, debug_targets());
 } /* end TransferEnd */
 
-
-/*****************************************************************************/
+/*@::TransferClose()@*********************************************************/
 /*                                                                           */
 /*  TransferClose()                                                          */
 /*                                                                           */

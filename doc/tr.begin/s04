@@ -4,11 +4,10 @@
 @Begin
 @PP
 This section explains how to gain access to the many different fonts and
-unusual characters available with Lout.
-@PP
-We are already familiar with the @Code "@I" symbol, which changes the font
-of the following thing to {@I Italic}.  Similarly, there is @Code "@B" for
-{@B Bold}, @Code "@S" for @S SMALL {@S CAPITALS},
+unusual characters available with Lout.  We have already seen the
+@Code "@I" symbol, which changes the font of the following thing to
+{@I Italic}.  Similarly, there is @Code "@B" for {@B Bold}, @Code "@S"
+for @S SMALL {@S CAPITALS},
 @FootNote {
 Owing to problems behind the scenes, if several words are grouped within one
 @Code "@S" symbol they will be kept together on one line, so to get small
@@ -20,13 +19,11 @@ and @Code "@R" for Roman.
 The @Code "@Font" symbol can be used to get many other fonts (a local
 expert should be able to supply the full list):
 @ID @Code {
-"{ Helvetica Slope } @Font Hello"
-"{ Courier Base } @Font { Hello there }"
+"{ Helvetica Slope } @Font { Hi there }" &0io
 }
 has result
 @ID {
-{ Helvetica Slope } @Font Hello
-{ Courier Base } @Font { Hello there }
+{ Helvetica Slope } @Font { Hi there }
 }
 Each font has a family name, such as Times, Helvetica, or Courier, and a
 face name, generally Base, Slope, or Bold.  The fonts that were
@@ -51,31 +48,38 @@ the second 3 points smaller, and the third in a 12 point font.  There are
 @PP
 There are symbols for some unusual characters that do not appear
 on keyboards:
-@ID {
-     @Code "--"		|0.35i	--	   
-/1vx @Code "---"	|	---	   
-/1vx @Code "@Bullet"	|	@Bullet	   
-/1vx @Code "@Star"	|	@Star	   
-/1vx @Code "@ParSym"	|	@ParSym	   
-/1vx @Code "@SectSym"	|	@SectSym   
-/1vx @Code "@Dagger"	|	@Dagger	   
-/1vx @Code "@DaggerDbl"	|	@DaggerDbl 
-/1vx @Code "@CDot"	|	@CDot	   
-/1vx @Code "@Sterling"	|	@Sterling  
-/1vx @Code "@Yen"	|	@Yen
-/1vx @Code "@Florin"	|	@Florin
-/1vx @Code "@Degree"	|	@Degree
-/1vx @Code "@Minute"	|	@Minute
-/1vx @Code "@Second"	|	@Second
-/1vx @Code "@Lozenge"	|	@Lozenge
-/1vx @Code "@Multiply"  |	@Multiply
-/1vx @Code "@Divide"    |	@Divide
-/1vx @Code "@CopyRight" |	@CopyRight
-/1vx @Code "@Register"  |	@Register
-/1vx @Code "@TradeMark" |	@TradeMark
-/1vx @Code "@Date"	|	@Date
+@ID @Tab
+    vmargin { 0.5vx }
+    @Fmta { @Col @Code A ! @Col B }
+{
+    @Rowa A { "``"		}  B {	``		}
+    @Rowa A { "''"		}  B {	''		}
+    @Rowa A { "--"		}  B {	--		}
+    @Rowa A { "---"		}  B {	---		}
+    @Rowa A { "@Bullet"		}  B {	@Bullet		}
+    @Rowa A { "@Star"		}  B {	@Star		}
+    @Rowa A { "@ParSym"		}  B {	@ParSym		}
+    @Rowa A { "@SectSym"	}  B {	@SectSym	}
+    @Rowa A { "@Dagger"		}  B {	@Dagger		}
+    @Rowa A { "@DaggerDbl"	}  B {	@DaggerDbl	}
+    @Rowa A { "@CDot"		}  B {	@CDot		}
+    @Rowa A { "@Sterling"	}  B {	@Sterling	}
+    @Rowa A { "@Yen"		}  B {	@Yen		}
+    @Rowa A { "@Florin"		}  B {	@Florin		}
+    @Rowa A { "@Degree"		}  B {	@Degree		}
+    @Rowa A { "@Minute"		}  B {	@Minute		}
+    @Rowa A { "@Second"		}  B {	@Second		}
+    @Rowa A { "@Lozenge"	}  B {	@Lozenge	}
+    @Rowa A { "@Multiply"	}  B {	@Multiply	}
+    @Rowa A { "@Divide"		}  B {	@Divide		}
+    @Rowa A { "@CopyRight"	}  B {	@CopyRight	}
+    @Rowa A { "@Register"	}  B {	@Register	}
+    @Rowa A { "@TradeMark"	}  B {	@TradeMark	}
+    @Rowa A { "@Date"		}  B {	@Date		}
 }
 These may be used anywhere.  The Adobe Systems Symbol font has many more such
 characters; the Eq equation formatting package [{@Ref kingston92eq}] has
-the complete list.  For example, @Code "@Eq { heart }" will give @Eq { heart }.
+the complete list.  For example, @Code "@Eq { heart }" will give
+@Eq { heart }.  Accented characters are also available (see Appendix
+{@NumberOf accented}).
 @End @Section

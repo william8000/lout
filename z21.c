@@ -1,6 +1,6 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -42,7 +42,7 @@
 /*    rows        TRUE if the resulting galley may have more than one row    */
 /*    joined      TRUE if the resulting galley must be simply joined         */
 /*    nonblock    Set the non_blocking() field of RECEPTIVEs to this value   */
-/*    trig        TRUE if galley's indefinites may trigger external galleys  */
+/*    trig        TRUE if indefinites of hd may trigger external galleys     */
 /*    *style      The initial style                                          */
 /*    *c          the width constraint hd should conform to                  */
 /*    target      if non-nil, expand indefinite objects to reveal a          */
@@ -68,9 +68,9 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
   debug6(DGM, D, "SizeGalley(hd, -, %s, %s, %s, %s, %s, %s, -, -, -), hd =",
 	bool(joined), bool(nonblock), bool(trig), EchoStyle(style),
 	EchoConstraint(c), SymName(target));
-  ifdebug(DGM, DD, EchoObject(stderr, hd));
+  ifdebug(DGM, DD, DebugObject(hd));
 
-  /* manifest hd's child, making sure it is simply joined if required */
+  /* manifest the child of hd, making sure it is simply joined if required */
   tmp1 = target;
   Child(y, Down(hd));
   crs = nil;
@@ -91,7 +91,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
 
   /* horizontally size and break hd */
   debug0(DGM, DD, "SizeGalley: after manifesting, hd =");
-  ifdebug(DGM, DD, EchoObject(stderr, hd));
+  ifdebug(DGM, DD, DebugObject(hd));
   debug0(DGM, DD, "SizeGalley horizontally sizing and breaking hd:");
   CopyConstraint(constraint(hd), *c);
   y = MinSize(y, COL, &extras);
@@ -111,7 +111,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
     debug0(DGM, DD, "SizeGalley cleaning up rows of hd:");
     for( link = hd;  NextDown(link) != hd;  link = NextDown(link) )
     { Child(y, NextDown(link));
-      debug2(DGM,DD,"  cleaning %s: %s", Image(type(y)), EchoObject(null,y));
+      debug2(DGM, DD, "  cleaning %s: %s", Image(type(y)), EchoObject(y));
       switch( type(y) )
       {
 	case GAP_OBJ:
@@ -179,26 +179,26 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
 
   /* size the rows of hd and attach indices where needed */
   debug0(DGM, DD, "SizeGalley sizing rows of hd =");
-  ifdebug(DGM, DD, EchoObject(stderr, hd));
+  ifdebug(DGM, DD, DebugObject(hd));
   *recs = *inners = *dest_index = nil;
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
   { Child(y, link);
     if( type(y) == GAP_OBJ || is_index(type(y)) )  continue;
     debug0(DGM, DDD, "  ROW sizing:");
-    ifdebug(DGM, DDD, EchoObject(stderr, y));
+    ifdebug(DGM, DDD, DebugObject(y));
     extras = New(ACAT);
     y = MinSize(y, ROW, &extras);
-    debug3(DSF, D, "MinSize( %s , ROW ) = %s,%s", EchoObject(null, y),
+    debug3(DSF, D, "MinSize( %s , ROW ) = %s,%s", EchoObject(y),
 	  EchoLength(back(y, ROW)), EchoLength(fwd(y, ROW)) );
     debug0(DGM, DDD, "  ROW result:");
-    ifdebug(DGM, DDD, EchoObject(stderr, y));
+    ifdebug(DGM, DDD, DebugObject(y));
 
     /* now attach indexes in front of y */
     for( zlink = Down(extras);  zlink != extras;  zlink = NextDown(zlink) )
     { Child(z, zlink);
       blocked(z) = FALSE;
-      /* debug1(DCR, D, "  extra: %s", EchoObject(null, z)); */
-      debug1(DGM, DD, "  extra: %s", EchoObject(null, z));
+      /* debug1(DCR, D, "  extra: %s", EchoObject(z)); */
+      debug1(DGM, DD, "  extra: %s", EchoObject(z));
       switch( type(z) )
       {
 	case RECEPTIVE:
@@ -233,7 +233,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
 	case CROSS_FOLL:
 	case CROSS_TARG:
 
-	  debug1(DCR, DD, "  SizeGalley: %s", EchoObject(null, z));
+	  debug1(DCR, DD, "  SizeGalley: %s", EchoObject(z));
 	  break;
 
 
@@ -264,7 +264,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
   debug3(DGM, D, "SizeGalley returning %s,%s  %s;  hd =",
     EchoLength(back(hd, COL)), EchoLength(fwd(hd, COL)),
     EchoConstraint(&constraint(hd)));
-  ifdebug(DGM, DD, EchoObject(stderr, hd));
+  ifdebug(DGM, DD, DebugObject(hd));
   sized(hd) = TRUE;
 
 } /* end SizeGalley */

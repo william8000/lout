@@ -1,0 +1,51 @@
+Directory lout/evec - character encoding vector (CEV) files
+
+This directory contains character encoding vector (CEV) files,
+describing mappings from 8-bit character codes to the character
+names found in AFM files.  The CEV format is hereby defined as
+256 character names, separated by arbitrary blank spaces and
+newlines.  Comments and other matter are not permitted.  See
+the accompanying files for examples.
+
+  Std.CEV        The StandardEncoding encoding vector, exactly
+                 as on page 598 of the PostScript LRM 2nd Ed.
+
+  Latin1.CEV     The ISOLatin1Encoding encoding vector, exactly
+                 as on page 599 of the PostScript LRM 2nd Ed.
+                 This is not usable with Lout as it stands
+                 because the ligature characters fi and fl have
+                 no encoding, and because the standard packages
+		 use characters that are not in this encoding.
+
+  LoutLatin1.CEV Equal to Latin1.CEV augmented with the following
+                 characters used by Lout and its standard packages:
+
+		   quotedblleft	  \205  used in DocumentLayout
+		   quotedblright  \206  used in DocumentLayout
+		   fi		  \207	must encode all ligatures
+		   fl		  \210	must encode all ligatures
+		   endash	  \211	used in DocumentLayout
+		   emdash	  \212	used in DocumentLayout
+		   bullet	  \213	used in DocumentLayout
+		   dagger	  \214	used in DocumentLayout
+		   daggerdbl	  \215	used in DocumentLayout
+		   florin	  \216	used in DocumentLayout
+		   fraction	  \217	used in Pas
+
+		 Also the character at position \055 has been
+		 changed from minus to hyphen; the minus character
+		 is not encoded in this vector.
+
+  Symb.CEV       The Symbol encoding vector, exactly as on page
+                 606 of the PostScript LRM 2nd Ed.
+
+  Ding.CEV       The Zapf Dingbats encoding vector, taken from
+                 the Zapf Dingbats AFM file.
+
+  null.oct       Useful skeleton files for building encoding
+  null.dec       vectors, given octal or decimal character code
+                 info.  Don't forget to delete the leftmost
+                 column, which is just a construction guide.
+
+Jeffrey H. Kingston
+6 June 1993

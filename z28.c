@@ -1,6 +1,6 @@
-/*@z28.c:Error Service:ErrorInit(), Error(), ErrorSeen()@*********************/
+/*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -34,7 +34,7 @@
 
 static BOOLEAN	print_block[MAX_BLOCKS];	/* TRUE if print this block  */
 static int	start_block[MAX_BLOCKS];	/* first message of block    */
-static unsigned char message[MAX_ERRORS][MAX_LINE]; /* the error messages    */
+static char	message[MAX_ERRORS][MAX_LINE];	/* the error messages    */
 static FILE	*fp = NULL;			/* file pointer of log file  */
 static BOOLEAN	error_seen = FALSE;		/* TRUE after first error    */
 static int	block_top = 0;			/* first free error block    */
@@ -50,10 +50,10 @@ static int	mess_top = 0;			/* first free error message  */
 /*****************************************************************************/
 
 ErrorInit(str)
-unsigned char *str;
+FULL_CHAR *str;
 { if( fp != NULL )
     Error(FATAL, no_fpos, "-e argument appears twice in command line");
-  fp = fopen(str, "w");
+  fp = StringFOpen(str, "w");
   if( fp == NULL )
     Error(FATAL, no_fpos, "cannot open error file \"%s\"", str);
 } /* end ErrorInit */
@@ -72,7 +72,7 @@ BOOLEAN ErrorSeen()
 } /* end ErrorSeen */
 
 
-/*****************************************************************************/
+/*@::EnterErrorBlock(), LeaveErrorBlock()@************************************/
 /*                                                                           */
 /*  EnterErrorBlock(ok_to_print)                                             */
 /*                                                                           */
@@ -92,7 +92,7 @@ BOOLEAN ok_to_print;
 } /* end EnterErrorBlock */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  LeaveErrorBlock(commit)                                                  */
 /*                                                                           */
@@ -116,7 +116,7 @@ BOOLEAN commit;
 } /* end LeaveErrorBlock */
 
 
-/*****************************************************************************/
+/*@::Error()@*****************************************************************/
 /*                                                                           */
 /*  Error(etype, pos, str, p1, p2, p3, p4, p5, p6)                           */
 /*                                                                           */
@@ -127,8 +127,8 @@ BOOLEAN commit;
 
 /*VARARGS3*/
 Error(etype, pos, str, p1, p2, p3, p4, p5, p6)
-int etype;  FILE_POS *pos;  unsigned char *str, *p1, *p2, *p3, *p4, *p5, *p6;
-{ unsigned char val[MAX_LINE];
+int etype;  FILE_POS *pos;  char *str, *p1, *p2, *p3, *p4, *p5, *p6;
+{ char val[MAX_LINE];
   sprintf(val, str, p1, p2, p3, p4, p5, p6);
   if( fp == NULL )  fp = stderr;
   switch( etype )
@@ -138,7 +138,7 @@ int etype;  FILE_POS *pos;  unsigned char *str, *p1, *p2, *p3, *p4, *p5, *p6;
     
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
       fprintf(fp, "lout%s internal error: %s\n", EchoFilePos(pos), val);
-#ifdef DEBUG_ON
+#if DEBUG_ON
       abort();
 #else
       exit(1);

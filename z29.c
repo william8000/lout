@@ -1,6 +1,6 @@
-/*@z29.c:Symbol Table:SearchSym(), InsertSym(), PushScope()@******************/
+/*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,9 +24,12 @@
 /*                                                                           */
 /*  FILE:         z29.c                                                      */
 /*  MODULE:       Symbol Table                                               */
-/*  EXTERNS:      PushScope(), PopScope(), BodyParAllowed(), BodyParNotAll() */
-/*                InitSym(), SearchSym(), InsertSym(), DeleteEverySym(),     */
-/*                SymName(), FullSymName(), ChildSym()                       */
+/*  EXTERNS:      InitSym(), PushScope(), PopScope(), SuppressVisible(),     */
+/*                UnSuppressVisible(), SuppressScope(), UnSuppressScope(),   */
+/*                SwitchScope(), UnSwitchScope(), BodyParAllowed(),          */
+/*                BodyParNotAllowed(), InsertSym(), SearchSym(),             */
+/*                SymName(), FullSymName(), ChildSym(), CheckSymSpread(),    */
+/*                DeleteEverySym()                                           */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -70,7 +73,7 @@ static	int		sym_count = 0;			/* symbol count      */
 }
 
 
-/*****************************************************************************/
+/*@::InitSym(), PushScope(), PopScope(), SuppressVisible(), etc.@*************/
 /*                                                                           */
 /*  InitSym()                                                                */
 /*                                                                           */
@@ -88,7 +91,7 @@ InitSym()
 } /* end InitSym */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  PushScope(x, npars, vis)                                                 */
 /*  PopScope()                                                               */
@@ -145,7 +148,7 @@ UnSuppressVisible()
 } /* end UnSuppressVisible */
 
 
-/*****************************************************************************/
+/*@::SuppressScope(), UnSuppressScope(), SwitchScope(), UnswitchScope()@******/
 /*                                                                           */
 /*  SuppressScope()                                                          */
 /*  UnSuppressScope()                                                        */
@@ -222,7 +225,7 @@ BodyParNotAllowed()
 } /* end BodyParNotAllowed */
 
 
-/*@@**************************************************************************/
+/*@::InsertSym()@*************************************************************/
 /*                                                                           */
 /*  OBJECT InsertSym(str, xtype, xfpos, xprecedence, indefinite, xrecursive, */
 /*                                         xpredefined, xenclosing, xbody)   */
@@ -237,7 +240,7 @@ BodyParNotAllowed()
 
 OBJECT InsertSym(str, xtype, xfpos, xprecedence, xindefinite, xrecursive,
 					     xpredefined, xenclosing, xbody)
-unsigned char *str;  unsigned char xtype;
+FULL_CHAR *str;  unsigned char xtype;
 FILE_POS *xfpos; unsigned char xprecedence;
 BOOLEAN xindefinite, xrecursive;  unsigned xpredefined;
 OBJECT xenclosing, xbody;
@@ -282,7 +285,7 @@ OBJECT xenclosing, xbody;
 
   has_target(s)  = FALSE;
   force_target(s) = FALSE;
-  if( strcmp(str, KW_TARGET) != 0 ) is_target(s) = FALSE;
+  if( !StringEqual(str, KW_TARGET) ) is_target(s) = FALSE;
   else
   { is_target(s) = has_target(enclosing(s)) = TRUE;
     if( has_key(enclosing(s)) && xbody != nil && type(xbody) == CROSS )
@@ -298,24 +301,27 @@ OBJECT xenclosing, xbody;
   }
 
   has_tag(s)  = FALSE;
-  if( strcmp(str, KW_TAG) != 0 ) is_tag(s) = FALSE;
+  if( !StringEqual(str, KW_TAG) ) is_tag(s) = FALSE;
   else is_tag(s) = has_tag(enclosing(s)) = dirty(enclosing(s)) = TRUE;
 
   has_key(s)  = FALSE;
-  if( strcmp(str, KW_KEY) != 0 ) is_key(s) = FALSE;
+  if( !StringEqual(str, KW_KEY) ) is_key(s) = FALSE;
   else is_key(s) = has_key(enclosing(s)) = TRUE;
 
   if( type(s) == RPAR && has_body(enclosing(s)) && (is_tag(s) || is_key(s)) )
     Error(WARN, &fpos(s), "a body parameter may not be named %s", str);
 
-  len = strlen(str);
+  if( type(s) == RPAR && has_target(enclosing(s)) && (is_tag(s) || is_key(s)) )
+    Error(WARN,&fpos(s), "the right parameter of a galley may not be %s", str);
+
+  len = StringLength(str);
   hash(str, len, sum);
 
   ifdebug(DST, D, sym_spread[sum]++;  sym_count++);
   entry = (OBJECT) &symtab[sum];
   for( plink = Down(entry);  plink != entry;  plink = NextDown(plink) )
   { Child(p, plink);
-    if( length(p) == len && strcmp(str, string(p)) == 0 )
+    if( length(p) == len && StringEqual(str, string(p)) )
     { for( link = Down(p);  link != p;  link = NextDown(link) )
       {	Child(q, link);
 	if( enclosing(s) == enclosing(q) )
@@ -329,9 +335,9 @@ OBJECT xenclosing, xbody;
   }
 
   /* need a new OBJECT as well as s */
-  p = NewWord(len, xfpos);
+  p = NewWord(WORD, len, xfpos);
   length(p) = len;
-  strcpy(string(p), str);
+  StringCopy(string(p), str);
   Link(entry, p);
 
  wrapup:
@@ -343,7 +349,7 @@ OBJECT xenclosing, xbody;
 } /* end InsertSym */
 
 
-/*****************************************************************************/
+/*@::SearchSym(), SymName()@**************************************************/
 /*                                                                           */
 /*  OBJECT SearchSym(str, len)                                               */
 /*                                                                           */
@@ -353,9 +359,9 @@ OBJECT xenclosing, xbody;
 /*****************************************************************************/
 
 OBJECT SearchSym(str, len)
-unsigned char *str;  int len;
+FULL_CHAR *str;  int len;
 { register int rlen, sum;
-  register unsigned char *x, *y;
+  register FULL_CHAR *x, *y;
   OBJECT p, q, link, plink, entry;
   int s;
 
@@ -394,54 +400,54 @@ unsigned char *str;  int len;
 } /* end SearchSym */
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
 /*                                                                           */
-/*  unsigned char *SymName(s)                                                */
+/*  FULL_CHAR *SymName(s)                                                    */
 /*                                                                           */
 /*  Return the string value of the name of symbol s.                         */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *SymName(s)
+FULL_CHAR *SymName(s)
 OBJECT s;
 { OBJECT p;
-  if( s == nil )  return (unsigned char *) "<nil>";
+  if( s == nil )  return AsciiToFull("<nil>");
   Parent(p, Up(s));
-  assert( type(p) == WORD, "SymName: type(p) != WORD!" );
+  assert( is_word(type(p)), "SymName: !is_word(type(p))!" );
   return string(p);
 } /* end SymName */
 	
 
-/*****************************************************************************/
+/*@::FullSymName(), ChildSym()@***********************************************/
 /*                                                                           */
-/*  unsigned char *FullSymName(x, str)                                       */
+/*  FULL_CHAR *FullSymName(x, str)                                           */
 /*                                                                           */
 /*  Return the path name of symbol x. with str separating each entry.        */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *FullSymName(x, str)
-OBJECT x;  unsigned char *str;
+FULL_CHAR *FullSymName(x, str)
+OBJECT x;  FULL_CHAR *str;
 { OBJECT stack[20];  int i;
-  static unsigned char buff[MAX_LINE], *sname;
-  if( x == nil )  return (unsigned char *) "<nil>";
+  static FULL_CHAR buff[MAX_LINE], *sname;
+  if( x == nil )  return AsciiToFull("<nil>");
   assert( enclosing(x) != nil, "FullSymName: enclosing(x) == nil!" );
   for( i = 0;  enclosing(x) != nil && i < 20;  i++ )
   { stack[i] = x;
     x = enclosing(x);
   }
-  strcpy(buff, "");
+  StringCopy(buff, STR_EMPTY);
   for( i--;  i > 0;  i-- )
   { sname = SymName(stack[i]);
-    if( strlen(sname) + strlen(str) + strlen(buff) >= MAX_LINE )
+    if( StringLength(sname)+StringLength(str)+StringLength(buff) >= MAX_LINE )
       Error(FATAL, &fpos(x), "full name of symbol is too long");
-    strcat(buff, sname);
-    strcat(buff, str);
+    StringCat(buff, sname);
+    StringCat(buff, str);
   }
   sname = SymName(stack[0]);
-  if( strlen(sname) + strlen(buff) >= MAX_LINE )
+  if( StringLength(sname) + StringLength(buff) >= MAX_LINE )
     Error(FATAL, &fpos(x), "full name of symbol is too long");
-  strcat(buff, sname);
+  StringCat(buff, sname);
   return buff;
 } /* end FullSymName */
 
@@ -466,14 +472,14 @@ OBJECT s;  unsigned typ;
 } /* end ChildSym */
 
 
-#if DEBUG_ON
-/*****************************************************************************/
+/*@::CheckSymSpread(), DeleteSymBody()@***************************************/
 /*                                                                           */
 /*  CheckSymSpread()                                                         */
 /*                                                                           */
 /*  Check the spread of symbols through the hash table.                      */
 /*                                                                           */
 /*****************************************************************************/
+#if DEBUG_ON
 
 CheckSymSpread()
 { int i, j, sum, usum;  OBJECT entry, plink;
@@ -530,7 +536,7 @@ OBJECT s;
 } /* end DeleteSymBody */
 
 
-/*****************************************************************************/
+/*@::DeleteEverySym()@********************************************************/
 /*                                                                           */
 /*  DeleteEverySym()                                                         */
 /*                                                                           */
@@ -553,7 +559,7 @@ DeleteEverySym()
     { Child(p, plink);
       for( link = Down(p);  link != p;  link = NextDown(link) )
       {	Child(x, link);  DeleteSymBody(x);
-	/* *** won't work now
+	/* *** will not work now
 	while( base_uses(x) != nil )
 	{ tmp = base_uses(x);  base_uses(x) = next(tmp);
 	  PutMem(tmp, USES_SIZE);

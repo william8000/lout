@@ -16,7 +16,7 @@ filled with the piteous cries of docu&-ment format designers in torment.
 Lout's solution to this problem is a feature called the @I galley, after
 the metal trays used in manual typesetting.  A galley consists of an
 object plus an indication that the object is to appear somewhere other
-than its invokation point.  For example,
+than its invocation point.  For example,
 @ID {
 @LittlePageList 1
 // @LittleEndRunPlace
@@ -57,7 +57,7 @@ They say that @Code "@TextPlace" (which the reader will recall as lying
 within the pages of {@Code "@PageList"}) is a placeholder for an
 incoming galley, and that @Code "@Text" is a galley whose result is to
 appear, not where @Code "@Text" is invoked, but rather at some
-@Code "@TextPlace" preceding that point of invokation in the final
+@Code "@TextPlace" preceding that point of invocation in the final
 printed document.
 @PP
 Although the abstraction can be understood in a static way, it is
@@ -82,8 +82,8 @@ The treatment of footnotes is the same, except that
 "    into { @FootPlace&&following }"
 }
 is used to make the footnote appear later in the finished document than its
-invokation point.  Basser Lout suspends the promotion of text into pages
-just after the component containing the footnote's invokation point is
+invocation point.  Basser Lout suspends the promotion of text into pages
+just after the component containing the footnote's invocation point is
 promoted, switches to the placement of the footnote galley, then resumes
 the body text.
 @PP

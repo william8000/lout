@@ -1,6 +1,6 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -28,7 +28,6 @@
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
-#define isdigit(x)	( (x) >= '0' && (x) <= '9' )
 
 /*****************************************************************************/
 /*                                                                           */
@@ -42,22 +41,25 @@
 OBJECT Next(x, inc, done)
 OBJECT x; int inc; BOOLEAN *done;
 { OBJECT y, link;  int l, r, n, len;
-  unsigned char buff[MAX_LINE + 1];
-  debug3(DCS, DD, "Next( %s, %d, %s )", EchoObject(null, x), inc, bool(*done));
+  FULL_CHAR buff[MAX_LINE + 1];
+  debug3(DCS, DD, "Next( %s, %d, %s )", EchoObject(x), inc, bool(*done));
   switch( type(x) )
   {
     case WORD:
+    case QWORD:
     
-      len = strlen(string(x));
-      for( r = len - 1;  r >= 0 && !isdigit(string(x)[r]);  r--);
+      len = StringLength(string(x));
+      for( r = len - 1;  r >= 0 && !decimaldigit(string(x)[r]);  r--);
       if( r < 0 ) break;
-      for( l = r-1;  l >= 0 && isdigit(string(x)[l]);  l-- );
-      sscanf(&string(x)[l+1], "%d", &n);
+      for( l = r-1;  l >= 0 && decimaldigit(string(x)[l]);  l-- );
+      sscanf( (char *) &string(x)[l+1], "%d", &n);
       string(x)[l+1] = '\0';
-      sprintf(buff, "%s%d%s", string(x), n+inc, &string(x)[r+1]);
-      if( strlen(buff) >= MAX_LINE )
+      StringCopy(buff, string(x));
+      StringCat(buff, StringInt(n+inc));
+      StringCat(buff, &string(x)[r+1]);
+      if( StringLength(buff) >= MAX_LINE )
 	Error(FATAL, &fpos(x), "word %s is too long", buff);
-      y = MakeWord(buff, &fpos(x));
+      y = MakeWord(type(x), buff, &fpos(x));
       word_font(y) = word_font(x);
       MergeNode(y, x);  x = y;
       *done = TRUE;
@@ -99,31 +101,12 @@ OBJECT x; int inc; BOOLEAN *done;
 
     case ACAT:
     
-      /* ***
-      x = ReplaceWithTidy(x);
-      *** */
-      if( type(x) == WORD )
-      {	len = strlen(string(x));
-	for( r = len-1; r >= 0 && !isdigit(string(x)[r]); r--);
-	if( r < 0 ) break;
-	for( l = r-1;  l >= 0 && isdigit(string(x)[l]);  l-- );
-	sscanf(&string(x)[l+1], "%d", &n);
-	string(x)[l+1] = '\0';
-	sprintf(buff,"%s%d%s",string(x),n+inc,&string(x)[r+1]);
-	y = MakeWord(buff, &fpos(x));
-	word_font(y) = word_font(x);
-	MergeNode(y, x);  x = y;
-	*done = TRUE;
-      }
-      else
-      {	assert( type(x) == ACAT, "Next: ACAT!" );
-	link = LastDown(x);
-	while( link != x && !*done )
-	{ Child(y, link);
-	  if( is_index(type(y)) )  continue;
-	  y = Next(y, inc, done);
-	  if( !*done )  link = PrevDown(link);
-	}
+      link = LastDown(x);
+      while( link != x && !*done )
+      {	Child(y, link);
+	if( is_index(type(y)) )  continue;
+	y = Next(y, inc, done);
+	if( !*done )  link = PrevDown(link);
       }
       break;
 
@@ -149,6 +132,6 @@ OBJECT x; int inc; BOOLEAN *done;
       break;
 
   } /* end switch */
-  debug1(DCS, DD, "Next returning %s", EchoObject(null, x));
+  debug1(DCS, DD, "Next returning %s", EchoObject(x));
   return x;
 } /* end Next */

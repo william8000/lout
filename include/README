@@ -5,6 +5,7 @@ a variety of standard packages and setup files:
 
    ft		A file of font definitions
    dl		The DocumentLayout package
+   tl		The ToyLayout package (for beginners to play with)
    doc		A setup file calling dl for simple documents
    report	A setup file calling dl for technical reports
    book		A setup file calling dl for books
@@ -18,3 +19,4 @@ a variety of standard packages and setup files:
 
 Jeffrey H. Kingston
 22 December 1992
+27 July 1993

@@ -72,7 +72,6 @@ the adjacent margins as well.  For example,
     @Fmta { @Col A }
 {
     @Rowa A { 5^.46 }
-    @Rowa A { 128^.2 }
     @Rowa A { 3^.4159 }
     @Rowa A { 5772^ }
     @Rowa A { @Line } vmargin { 0i }
@@ -85,7 +84,6 @@ is produced by
 "    @Fmta { @Col A }"
 "{"
 "    @Rowa A { 5^.46 }"
-"    @Rowa A { 128^.2 }"
 "    @Rowa A { 3^.4159 }"
 "    @Rowa A { 5772^ }"
 "    @Rowa A { @Line } vmargin { 0i }"
@@ -133,6 +131,6 @@ since @Code "@HAdjust" is not effective within displays.
 Expert users might occasionally find a use for the @Code "@MarkRow"
 symbols.  There is one of them for each @Code "@Row" symbol
 ({@Code "@MarkRowa"} for {@Code "@Rowa"}, etc.).  A @Code "@MarkRow"
-symbol causes the principal mark of the table to pass through that row,
-permitting its alignment with horizontally adjacent objects.
+symbol causes the principal mark of the table to pass through its row,
+permitting that row to be aligned with horizontally adjacent objects.
 @End @Section

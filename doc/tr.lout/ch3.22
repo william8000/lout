@@ -12,9 +12,8 @@ references.  In Basser Lout, for example,
 }
 means that there is a file called @Code "standard.ld" containing
 invocations of the previously defined symbols @Code "@Months" and
-{@Code "@WeekDays"}.  A @@Database symbol may appear anywhere, although
-it is most naturally placed immediately following the definitions of the
-symbols it refers to.  Different definitions packages may refer to a
+{@Code "@WeekDays"}.  A @@Database symbol may appear anywhere a definition
+or a @@Use symbol may appear.  Different definitions packages may refer to a
 common database, provided the definitions they give for its symbols are
 compatible.  An entry is interpreted as though it appears at the point
 where the cross reference that retrieves it does, which allows symbols

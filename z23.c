@@ -1,6 +1,6 @@
-/*@z23.c:Galley Printer:FixAndPrintObject@************************************/
+/*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -55,7 +55,7 @@ LENGTH avail_size, inner_size;
 }
 
 
-/*****************************************************************************/
+/*@::FindAdjustIncrement()@***************************************************/
 /*                                                                           */
 /*  static LENGTH FindAdjustIncrement(x, frame_size, dim)                    */
 /*                                                                           */
@@ -97,10 +97,10 @@ OBJECT x;  LENGTH frame_size;  int dim;
   else inc = 0;
   debug1(DGP, D, "FindAdjustIncrement returning %s", EchoLength(inc));
   return inc;
-} /* end FindAdjustIncrement *.
+} /* end FindAdjustIncrement */
 
 
-/*****************************************************************************/
+/*@::FixAndPrintObject()@*****************************************************/
 /*                                                                           */
 /*  FixAndPrintObject(x, xmk, xb, xf, dim, adjust, suppress, padj, pg,count) */
 /*                                                                           */
@@ -136,26 +136,26 @@ OBJECT x;  LENGTH frame_size;  int dim;
 /*  dim == ROW, it is used to generate PostScript for printing x.            */
 /*                                                                           */
 /*  Parameter pg records the height of the current page.  This is used       */
-/*  to correct for the fact that Lout's origin is at the top left, while     */
-/*  PostScript's is at the bottom left.  This correction cannot be made by   */
-/*  transforming user space.                                                 */
+/*  to correct for the fact that Lout places its origin is at the top left,  */
+/*  while PostScript places its origin at the bottom left.  This correction  */
+/*  cannot be made by transforming user space.                               */
 /*                                                                           */
-/*  x is the count'th child of its parent (used by COL_THR and ROW_THR only) */
+/*  x is child number count of its parent (used by COL_THR and ROW_THR only) */
 /*                                                                           */
 /*****************************************************************************/
 
 FixAndPrintObject(x, xmk, xb, xf, dim, adjust, suppress, padj, pg, count)
 OBJECT x;  LENGTH xmk, xb, xf; int dim, adjust;  BOOLEAN suppress;
 int padj;  LENGTH pg;  int count;
-{ OBJECT y, link, prev, g, uplink, z, p;
-  LENGTH mk, frame_size, back_edge, tb, tf, yb, yf, inc;
+{ OBJECT y, link, prev, g, uplink, z;
+  LENGTH mk, frame_size, back_edge, yb, yf, inc;
   int i; float scale_factor;
   debug8(DGP, D, "[ FixAndPrintObject(%s, %s, %s,%s, %s, %s, %s, %s, pg ), x =",
     Image(type(x)), EchoLength(xmk), EchoLength(xb), EchoLength(xf), dimen(dim),
     (adjust == LAST_ADJUST ? "last_adjust" : "all_adjust"),
     (suppress == SUPPRESS ? "suppress" : "no_suppress"),
     (padj   == LAST_ADJUST ? "last_adjust" : "all_adjust"));
-  ifdebug(DGP, DD, EchoObject(stderr, x));
+  ifdebug(DGP, DD, DebugObject(x));
 
   switch( type(x) )
   {
@@ -169,9 +169,10 @@ int padj;  LENGTH pg;  int count;
 
 
     case WORD:
+    case QWORD:
     
       if( dim == COL )  word_save_mark(x) = xmk;
-      else if( string(x)[0] != '\0' )  PrintAtom(x, word_save_mark(x), pg-xmk);
+      else if( string(x)[0] != '\0' )  PrintWord(x, word_save_mark(x), pg-xmk);
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
 
@@ -270,7 +271,7 @@ int padj;  LENGTH pg;  int count;
 		NO_SUPPRESS, padj, 0, count);
 	RestoreGraphicState();
       }
-      else if( type(y) != WORD || string(y)[0] != '\0' )
+      else if( !is_word(type(y)) || string(y)[0] != '\0' )
       {	Error(WARN, &fpos(x), "object deleted: cannot %s", KW_VSCALE);
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
@@ -288,7 +289,7 @@ int padj;  LENGTH pg;  int count;
         if( (scale_factor = ScaleFactor(xb+xf, size(y, COL))) > 0 )
 	  FixAndPrintObject(y, 0, back(y, COL), fwd(y, COL), dim, LAST_ADJUST,
 		NO_SUPPRESS, LAST_ADJUST, pg, count);
-        else if( type(y) != WORD || string(y)[0] != '\0' )
+        else if( !is_word(type(y)) || string(y)[0] != '\0' )
 	  Error(WARN, &fpos(y), "object deleted: cannot %s", KW_HSCALE);
       }
       else if( (scale_factor =
@@ -472,7 +473,7 @@ int padj;  LENGTH pg;  int count;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{
 	  Child(y, link);
-	  debug1(DGP, DD, "  examining %s", EchoObject(null, y));
+	  debug1(DGP, DD, "  examining %s", EchoObject(y));
 	  if( is_index(type(y)) )  continue;
 	  if( type(y) == GAP_OBJ )
 	  { 
@@ -632,7 +633,7 @@ int padj;  LENGTH pg;  int count;
 				  padj = LAST_ADJUST;
 				}
 				else padj = ALL_ADJUST;
-				debug1(DGP,DD, "cdisp %s", EchoObject(null,x));
+				debug1(DGP, DD, "cdisp %s", EchoObject(x));
 				break;
 
 	  case DISPLAY_RIGHT:	if( actual_size <= frame_size )
@@ -640,7 +641,7 @@ int padj;  LENGTH pg;  int count;
 				  padj = LAST_ADJUST;
 				}
 				else padj = ALL_ADJUST;
-				debug1(DGP,DD, "rdisp %s", EchoObject(null,x));
+				debug1(DGP, DD, "rdisp %s", EchoObject(x));
 				break;
 	}
 
@@ -651,7 +652,7 @@ int padj;  LENGTH pg;  int count;
 	else adjust_inc = inc = 0;
 
 	debug2(DGP, DD, "ACAT %s %s",
-	  EchoStyle(&save_style(x)), EchoObject(null, x));
+	  EchoStyle(&save_style(x)), EchoObject(x));
 	debug3(DGP,DD,"frame_size = %s, actual_size = %s, adjustable_gaps = %d",
 	  EchoLength(frame_size), EchoLength(actual_size), adjustable_gaps);
 	debug2(DGP,DD,"bad_gap = %s, adjust_inc = %s",
@@ -669,7 +670,7 @@ int padj;  LENGTH pg;  int count;
 	NextDefiniteWithGap(x, link, y, g);
 	while( link != x )
 	{
-	  /* fix previous definite now we know it isn't the last one  */
+	  /* fix previous definite now we know it is not the last one  */
 	  if( width(gap(g)) > 0 )
 	  { FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
 	      dim, adjust, NO_SUPPRESS, LAST_ADJUST, pg, count);
@@ -704,7 +705,7 @@ int padj;  LENGTH pg;  int count;
     case COL_THR:
     case ROW_THR:
 
-      /* find and delete the count'th child y */
+      /* find and delete the child number count of y */
       assert( (type(x) == COL_THR) == (dim == COL), "FixAndPrintObject: thr!" );
       for( link = Down(x), uplink = Up(x), i = 1;
 	link != x && uplink != x && i < count;

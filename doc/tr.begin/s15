@@ -40,7 +40,7 @@ situation, but it will be something like this:
 "  # @Columns { Single }"
 "  # @HeadingFont { Bold }"
 "  # @ParaIndent { 2.0f }"
-"  # @PageTop { |0.5rt - @PageNum - }"
+"  # @PageTop { |0.5rt - @PageNum - }" &0io ""
 "  # @PageFoot { @Null }"
 "}"
 }
@@ -76,6 +76,11 @@ numbers appear), and are best left to experts;  but, for example,
 @ID @Code "@PageTop { |1rt  @PageNum }"
 will make the page number appear at the top right of each page, without
 the @Code "-" characters.
+@PP
+The setup file is also the place to add your own definitions.  They should
+be placed just before the @Code "@Use" clause, as shown for example in
+Section 4 of the report describing the Eq equation formatting package
+[{@Ref kingston92eq}].
 @PP
 Those who wish to make more radical changes will have to copy the @Code dl
 file and change the definition of the DocumentLayout package.  This requires

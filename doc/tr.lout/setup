@@ -37,6 +37,7 @@
    def @@Database          { @Code "@Database"          }
    def @@End               { @Code "@End"               }
    def @@Font              { @Code "@Font"              }
+   def @@Char              { @Code "@Char"              }
    def @@Galley            { @Code "@Galley"            }
    def @@Graphic           { @Code "@Graphic"           }
    def @@HAdjust           { @Code "@HAdjust"           }

@@ -56,6 +56,6 @@ for example produces
     @Rowb A { 3^.4159 }
     @Rowb A { 5772^ }
 }
-Unfortunately, the aligned entries are left-justified in the column, when
-they should really be centred.
+Unfortunately, the aligned entries are left-justified in the column,
+not centred.
 @End @Section

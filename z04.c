@@ -1,6 +1,6 @@
-/*@z04.c:Token Service:NewToken(), CopyTokenList(), EchoToken()@**************/
+/*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -39,16 +39,13 @@
 /*****************************************************************************/
 
 OBJECT NewToken(xtype, xfpos, xvspace, xhspace, xprec, xactual)
-unsigned char xtype;  FILE_POS *xfpos;  unsigned char xvspace, xhspace;  unsigned char xprec;
-OBJECT xactual;
+unsigned char xtype;  FILE_POS *xfpos;  unsigned char xvspace, xhspace;
+unsigned char xprec;  OBJECT xactual;
 { OBJECT res;
   debug1(DTS, DDD, "NewToken(%s, ...)", Image(xtype));
-  res = New(xtype);
-  FposCopy(fpos(res), *xfpos);
-  vspace(res) = xvspace;
-  hspace(res) = xhspace;
-  precedence(res) = xprec;
-  actual(res) = xactual;
+  res = New(xtype);  FposCopy(fpos(res), *xfpos);
+  vspace(res) = xvspace;  hspace(res) = xhspace;
+  precedence(res) = xprec;  actual(res) = xactual;
   debug1(DTS, DDD, "NewToken returning %s", EchoToken(res));
   return res;
 } /* end NewToken */
@@ -66,14 +63,11 @@ OBJECT xactual;
 OBJECT CopyTokenList(x, pos)
 OBJECT x;  FILE_POS *pos;
 { OBJECT y, z, res;
-  res = nil;
-  y = x;
-  if( x != nil )
-  do
-  { if( type(y) == WORD )
-    { z = MakeWord(string(y), pos);
-      vspace(z) = vspace(y);
-      hspace(z) = hspace(y);
+  res = nil;  y = x;
+  if( x != nil ) do
+  { if( is_word(type(y)) )
+    { z = MakeWord(type(y), string(y), pos);
+      vspace(z) = vspace(y);  hspace(z) = hspace(y);
     }
     else z = NewToken(type(y), pos,vspace(y),hspace(y),precedence(y),actual(y));
     res = Append(res, z, PARENT);
@@ -82,33 +76,29 @@ OBJECT x;  FILE_POS *pos;
   return res;
 } /* end CopyTokenList */
 
-
-/*@@**************************************************************************/
+/*@::EchoCatOp(), EchoToken()@************************************************/
 /*                                                                           */
-/*  unsigned char *EchoCatOp(xtype, xmark, xjoin)                            */
+/*  FULL_CHAR *EchoCatOp(xtype, xmark, xjoin)                                */
 /*                                                                           */
 /*  Return the catenation operator with this type, mark and join.            */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *EchoCatOp(xtype, xmark, xjoin)
+FULL_CHAR *EchoCatOp(xtype, xmark, xjoin)
 unsigned xtype;  BOOLEAN xmark, xjoin;
 { switch( xtype )
   {
-      case VCAT:   return (unsigned char *)
-			(xmark	? xjoin	? KW_VCAT_MJ : KW_VCAT_MN
-				: xjoin	? KW_VCAT_NJ : KW_VCAT_NN);
+    case VCAT:	return	(xmark ? xjoin ? KW_VCAT_MJ : KW_VCAT_MN
+			       : xjoin ? KW_VCAT_NJ : KW_VCAT_NN);
 
-      case HCAT:   return (unsigned char *)
-			(xmark	? xjoin	? KW_HCAT_MJ : KW_HCAT_MN
-				: xjoin	? KW_HCAT_NJ : KW_HCAT_NN);
+    case HCAT:	return	(xmark ? xjoin ? KW_HCAT_MJ : KW_HCAT_MN
+			       : xjoin ? KW_HCAT_NJ : KW_HCAT_NN);
 
-      case ACAT:   return (unsigned char *)
-			(xmark	? xjoin	? KW_ACAT_MJ : "??"
-				: xjoin	? KW_ACAT_NJ : "??");
+    case ACAT:	return	(xmark ? xjoin ? KW_ACAT_MJ : AsciiToFull("??")
+			       : xjoin ? KW_ACAT_NJ : AsciiToFull("??") );
 
-      default:	   Error(INTERN, no_fpos, "EchoCatOp: xtype = %d", xtype);
-		   return (unsigned char *) "";
+    default:	Error(INTERN, no_fpos, "EchoCatOp: xtype = %d", xtype);
+		return STR_EMPTY;
 
   } /* end switch */
 } /* end EchoCatOp */
@@ -117,19 +107,25 @@ unsigned xtype;  BOOLEAN xmark, xjoin;
 #if DEBUG_ON
 /*****************************************************************************/
 /*                                                                           */
-/*  unsigned char *EchoToken(x)                                              */
+/*  FULL_CHAR *EchoToken(x)                                                  */
 /*                                                                           */
 /*  Return an image of token x.  Do not worry about preceding space.         */
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *EchoToken(x)
+FULL_CHAR *EchoToken(x)
 OBJECT x;
 { switch( type(x) )
   {
     case WORD:
     
       return string(x);
+      break;
+
+
+    case QWORD:
+    
+      return StringQuotedWord(x);
       break;
 
 
@@ -169,6 +165,7 @@ OBJECT x;
     case ROTATE:
     case CASE:
     case YIELD:
+    case XCHAR:
     case FONT:
     case SPACE:
     case BREAK:
@@ -182,6 +179,10 @@ OBJECT x;
     case HCAT:
     case VCAT:
     case CLOSURE:
+    case PREPEND:
+    case SYS_PREPEND:
+    case DATABASE:
+    case SYS_DATABASE:
     
       return SymName(actual(x));
       break;
@@ -190,8 +191,8 @@ OBJECT x;
     default:
     
       Error(INTERN, &fpos(x), "EchoToken: %s", Image(type(x)));
+      return STR_EMPTY;
       break;
   }
-  return (unsigned char *) "";
 } /* end EchoToken */
 #endif

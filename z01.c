@@ -1,6 +1,6 @@
-/*@z01.c:Supervise:main()@****************************************************/
+/*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,47 +24,18 @@
 /*                                                                           */
 /*  FILE:         z01.c                                                      */
 /*  MODULE:       Supervise                                                  */
-/*  EXTERNS:      main()                                                     */
+/*  EXTERNS:      main(), StartSym, GalleySym, InputSym, PrintSym,           */
+/*                AllowCrossDb, Encapsulated                                 */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
-
-/*****************************************************************************/
-/*                                                                           */
-/*  BOOLEAN StringBeginsWith(str, pattern)                                   */
-/*  BOOLEAN StringContains(str, pattern)                                     */
-/*                                                                           */
-/*  Check whether str begins with (or contains within it) pattern.  This     */
-/*  could be done by the standard function "strstr" except that not all      */
-/*  systems have it and in at least one case the implementation has a bug.   */
-/*                                                                           */
-/*****************************************************************************/
-
-BOOLEAN StringBeginsWith(str, pattern)
-unsigned char *str, *pattern;
-{ unsigned char *sp, *pp;
-  sp = str;  pp = pattern;
-  while( *sp != '\0' && *pp != '\0' )
-  { if( *sp++ != *pp++ )  return FALSE;
-  }
-  return (*pp == '\0');
-} /* end StringBeginsWith */
-
-BOOLEAN StringContains(str, pattern)
-unsigned char *str, *pattern;
-{ unsigned char *sp;
-  for( sp = str;  *sp != '\0';  sp++ )
-  { if( StringBeginsWith(sp, pattern) )  return TRUE;
-  }
-  return FALSE;
-} /* end StringContains */
 
 
 /*****************************************************************************/
 /*                                                                           */
 /*  StartSym      the symbol table entry for \Start (overall scope)          */
 /*  GalleySym     the symbol table entry for @Galley                         */
-/*  InputSym      the symbol table entry for @Input@                         */
+/*  InputSym      the symbol table entry for @LInput                         */
 /*  PrintSym      the symbol table entry for \Print (root target)            */
 /*                                                                           */
 /*****************************************************************************/
@@ -74,23 +45,17 @@ OBJECT StartSym, GalleySym, InputSym, PrintSym;
 /*****************************************************************************/
 /*                                                                           */
 /*  AllowCrossDb        Allow references to OldCrossDb and NewCrossDb        */
-/*                                                                           */
-/*****************************************************************************/
-
-BOOLEAN AllowCrossDb;
-
-/*****************************************************************************/
-/*                                                                           */
 /*  Encapsulated        Produce a one-page encapsulated PostScript file      */
 /*                                                                           */
 /*****************************************************************************/
 
+BOOLEAN AllowCrossDb;
 BOOLEAN Encapsulated;
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  OBJECT load(xstr, xpredefined, xleft, xright, xindef, xprec)             */
+/*  static OBJECT load(xstr, xpredefined, xleft, xright, xindef, xprec)      */
 /*                                                                           */
 /*  Load a predefined operator with these attributes into the symbol table.  */
 /*  If the operator has parameters, load symbols for those also.             */
@@ -98,20 +63,39 @@ BOOLEAN Encapsulated;
 /*****************************************************************************/
 
 static OBJECT load(xstr, xpre, xleft, xright, xindef, xprec)
-unsigned char *xstr;  unsigned  xpre;  BOOLEAN xleft, xright, xindef;
+FULL_CHAR *xstr;  unsigned  xpre;  BOOLEAN xleft, xright, xindef;
 unsigned char xprec;
 { OBJECT s;
   s = InsertSym(xstr, LOCAL, no_fpos, xprec, xindef, FALSE, xpre, StartSym,nil);
-  if( xleft )
-    InsertSym("pa", LPAR, no_fpos, DEFAULT_PREC, FALSE, FALSE, 0, s, nil);
-  if( xright )
-    InsertSym("pb", RPAR, no_fpos, DEFAULT_PREC, FALSE, FALSE, 0, s, nil);
+  if( xleft )  InsertSym( AsciiToFull("pa"), LPAR, no_fpos, DEFAULT_PREC,
+    FALSE, FALSE, 0, s, nil);
+  if( xright )  InsertSym( AsciiToFull("pb"), RPAR, no_fpos, DEFAULT_PREC,
+    FALSE, FALSE, 0, s, nil);
   if( xleft && xright )  right_assoc(s) = TRUE;
   return s;
 } /* end load */
 
 
-/*@@**************************************************************************/
+/*@::GetArg(), main()@********************************************************/
+/*                                                                           */
+/*  GetArg(arg, message)                                                     */
+/*                                                                           */
+/*  Get the next argument from the command line and store it in arg.         */
+/*  Print message as a fatal error if it isn't there.                        */
+/*                                                                           */
+/*****************************************************************************/
+
+#define GetArg(arg, message)						\
+{ if( !StringEqual(AsciiToFull(argv[i]+2), STR_EMPTY) )			\
+    arg = AsciiToFull(argv[i]+2);					\
+  else if( i < argc-1 && *argv[i+1] != CH_HYPHEN )			\
+    arg = AsciiToFull(argv[i++ +1]);					\
+  else									\
+    Error(FATAL, no_fpos, message);					\
+} /* end GetArg */
+
+
+/*****************************************************************************/
 /*                                                                           */
 /*  main(argc, argv)                                                         */
 /*                                                                           */
@@ -121,12 +105,12 @@ unsigned char xprec;
 /*****************************************************************************/
 
 main(argc, argv)
-int argc; unsigned char *argv[];
-{ int i;
-  OBJECT t, res, s;				/* current token, parser o/p */
-  BOOLEAN stdin_seen;				/* TRUE when stdin file seen */
-  unsigned char *cross_db;			/* name of cross ref database*/
-  unsigned char *outfile;			/* name of output file       */
+int argc; char *argv[];
+{ int i, len;  FULL_CHAR *arg;
+  OBJECT t, res, s;			/* current token, parser output      */
+  BOOLEAN stdin_seen;			/* TRUE when stdin file seen         */
+  FULL_CHAR *cross_db;			/* name of cross reference database  */
+  FULL_CHAR *outfile;			/* name of output file               */
   FILE *out_fp;
 
   /* initialise various modules, add current directory to search paths */
@@ -136,138 +120,194 @@ int argc; unsigned char *argv[];
   LexInit();
   MemInit();
   InitFiles();
-  AddToPath(FONT_PATH,     "");
-  AddToPath(SOURCE_PATH,   "");
-  AddToPath(DATABASE_PATH, "");
-  AddToPath(INCLUDE_PATH,  "");
+  AddToPath(SOURCE_PATH,   STR_EMPTY);
+  AddToPath(DATABASE_PATH, STR_EMPTY);
+  AddToPath(INCLUDE_PATH,  STR_EMPTY);
 
   /* read command line */
   stdin_seen = FALSE;
-  cross_db = (unsigned char *) CROSS_DB;
-  outfile = (unsigned char *) "-";
+  cross_db = CROSS_DB;
+  outfile = STR_STDOUT;
   for( i = 1;  i < argc;  i++ )
-  {  if( *argv[i] == '-' ) switch( *(argv[i]+1) )
-     {
-	case 'o':	/* read name of output file */
-			if( *(argv[i]+2) == '\0' )
-				Error(FATAL, no_fpos, "usage: -o<filename>");
-			outfile = argv[i]+2;
-			break;
+  { if( *argv[i] == CH_HYPHEN ) switch( *(argv[i]+1) )
+    {
+      case CH_FLAG_OUTFILE:
+     
+	/* read name of output file */
+	GetArg(outfile, "usage: -o<filename>");
+	break;
 
-	case 's':	/* suppress references to OldCrossDb and NewCrossDb */
-			AllowCrossDb = FALSE;
-			break;
 
-	case 'c':	/* read name of cross reference database */
-			cross_db = argv[i]+2;
-			break;
+      case CH_FLAG_SUPPRESS:
+     
+	/* suppress references to OldCrossDb and NewCrossDb */
+	AllowCrossDb = FALSE;
+	break;
 
-	case 'e':	/* read log file name */
-			if( *(argv[i]+2) == '\0' )
-				Error(FATAL, no_fpos, "usage: -e<filename>");
-			ErrorInit(argv[i]+2);
-			break;
 
-	case 'E':	/* -EPS produces encapsulated PostScript output */
-			if( strcmp(argv[i]+1, "EPS") != 0 )
-			  Error(FATAL, no_fpos, "usage: -EPS");
-			Encapsulated = TRUE;
-			break;
+      case CH_FLAG_CROSS:
+     
+	/* read name of cross reference database */
+	GetArg(cross_db, "usage: -c<filename>");
+	break;
 
-	case 'D':	/* add directory to database and sysdatabase paths */
-			if( *(argv[i]+2) == '\0' )
-				Error(FATAL, no_fpos, "usage: -D<dirname>");
-			AddToPath(DATABASE_PATH, argv[i]+2);
-			AddToPath(SYSDATABASE_PATH, argv[i]+2);
-			break;
 
-	case 'F':	/* add directory to font path */
-			if( *(argv[i]+2) == '\0' )
-				Error(FATAL, no_fpos, "usage: -F<dirname>");
-			AddToPath(FONT_PATH, argv[i]+2);
-			break;
+      case CH_FLAG_ERRFILE:
+     
+	/* read log file name */
+	GetArg(arg, "usage: -e<filename>");
+	ErrorInit(arg);
+	break;
 
-	case 'I':	/* add directory to include and sysinclude paths */
-			if( *(argv[i]+2) == '\0' )
-				Error(FATAL, no_fpos, "usage: -I<dirname>");
-			AddToPath(INCLUDE_PATH, argv[i]+2);
-			AddToPath(SYSINCLUDE_PATH, argv[i]+2);
-			break;
 
-	case 'i':	/* read sysinclude file */
-			if( *(argv[i]+2) == '\0' )
-				Error(FATAL, no_fpos, "usage: -i<filename>");
-			t = MakeWord(argv[i]+2, no_fpos);
-			DefineFile(t, SOURCE_FILE, SYSINCLUDE_PATH);
-			break;
+      case CH_FLAG_EPSFIRST:
+     
+	/* -EPS produces encapsulated PostScript output */
+	if( !StringEqual(AsciiToFull(argv[i]+1), STR_EPS) )
+	  Error(FATAL, no_fpos, "usage: -EPS");
+	Encapsulated = TRUE;
+	break;
 
-	case 'h':	/* declare hyphenation file */
-			if( FirstFile(HYPH_FILE) != NO_FILE )
-			  Error(FATAL, no_fpos, "two -h options illegal");
-			if( *(argv[i]+2) == '\0' )
-			  Error(FATAL, no_fpos, "usage: -h<filename>");
-			if( strlen(argv[i]+2) + strlen(HYPH_SUFFIX) >= MAX_LINE)			  Error(FATAL, no_fpos, "-h option too long");
-			t = MakeWord(argv[i] + 2, no_fpos);
-			DefineFile(t, HYPH_FILE, INCLUDE_PATH);
-			t = MakeWordTwo(string(t), HYPH_SUFFIX, no_fpos);
-			DefineFile(t, HYPH_PACKED_FILE, INCLUDE_PATH);
-			break;
 
-	case 'V':	fprintf(stderr, "%s\n", LOUT_VERSION);
-			break;
+      case CH_FLAG_DIRPATH:
+     
+	/* add directory to database and sysdatabase paths */
+	GetArg(arg, "usage: -D<dirname>");
+	AddToPath(DATABASE_PATH, arg);
+	AddToPath(SYSDATABASE_PATH, arg);
+	break;
 
-	case 'd':	debug_init(argv[i]);
-			break;
 
-	case '\0':	/* read stdin as file name */
-			if( stdin_seen )
-				Error(FATAL, no_fpos, "stdin read twice!");
-			stdin_seen = TRUE;
-			t = MakeWord("-", no_fpos);
-			DefineFile(t, SOURCE_FILE, SOURCE_PATH);
-			break;
+      case CH_FLAG_ENCPATH:
+     
+	/* add directory to encoding path */
+	GetArg(arg, "usage: -C<dirname>");
+	AddToPath(ENCODING_PATH, arg);
+	break;
 
-	default:	Error(FATAL, no_fpos,
-				"unknown command line flag %s", argv[i]);
-			break;
-     }
-     else DefineFile(MakeWord(argv[i], no_fpos), SOURCE_FILE, SOURCE_PATH);
+
+      case CH_FLAG_FNTPATH:
+     
+	/* add directory to font path */
+	GetArg(arg, "usage: -F<dirname>");
+	AddToPath(FONT_PATH, arg);
+	break;
+
+
+      case CH_FLAG_INCPATH:
+     
+	/* add directory to include and sysinclude paths */
+	GetArg(arg, "usage: -I<dirname>");
+	AddToPath(INCLUDE_PATH, arg);
+	AddToPath(SYSINCLUDE_PATH, arg);
+	break;
+
+
+      case CH_FLAG_INCLUDE:
+     
+	/* read sysinclude file and strip any .lt suffix */
+	GetArg(arg, "usage: -i<filename>");
+	len = StringLength(arg) - StringLength(SOURCE_SUFFIX);
+	if( len >= 0 && StringEqual(&arg[len], SOURCE_SUFFIX) )
+	  StringCopy(&arg[len], STR_EMPTY);
+	DefineFile(arg, STR_EMPTY, no_fpos,
+	  SOURCE_FILE, SYSINCLUDE_PATH);
+	break;
+
+
+      case CH_FLAG_HYPHEN:
+     
+	/* declare hyphenation file */
+	if( FirstFile(HYPH_FILE) != NO_FILE )
+	  Error(FATAL, no_fpos, "two -h options illegal");
+	GetArg(arg, "usage: -h<filename>");
+	DefineFile(arg, STR_EMPTY, no_fpos,
+	  HYPH_FILE, INCLUDE_PATH);
+	DefineFile(arg, HYPH_SUFFIX, no_fpos,
+	  HYPH_PACKED_FILE, INCLUDE_PATH);
+	break;
+
+
+      case CH_FLAG_VERSION:
+     
+	fprintf(stderr, "%s\n", LOUT_VERSION);
+	break;
+
+
+      case CH_FLAG_USAGE:
+     
+	fprintf(stderr, "usage: lout [ -i<filename> ] files\n");
+	exit(0);
+	break;
+
+
+      case CH_FLAG_DEBUG:
+     
+	debug_init(argv[i]);
+	break;
+
+
+      case '\0':
+     
+	/* read stdin as file name */
+	if( stdin_seen )  Error(FATAL, no_fpos, "stdin read twice!");
+	stdin_seen = TRUE;
+	DefineFile(STR_STDIN, STR_EMPTY, no_fpos, SOURCE_FILE, SOURCE_PATH);
+	break;
+
+
+      default:
+     
+	Error(FATAL, no_fpos, "unknown command line flag %s", argv[i]);
+	break;
+
+    }
+    else
+    {   /* argument is source file, strip any .lout suffix and define it */
+	arg = argv[i];
+	len = StringLength(arg) - StringLength(SOURCE_SUFFIX);
+	if( len >= 0 && StringEqual(&arg[len], SOURCE_SUFFIX) )
+	  StringCopy(&arg[len], STR_EMPTY);
+	DefineFile(AsciiToFull(argv[i]), STR_EMPTY, no_fpos,
+	    SOURCE_FILE, SOURCE_PATH);
+    }
   } /* for */
 
   /* define hyphenation file if not done already by -h flag */
   if( FirstFile(HYPH_FILE) == NO_FILE )
-  { t = MakeWord(HYPH_FILENAME, no_fpos);
-    DefineFile(t, HYPH_FILE, SYSINCLUDE_PATH);
-    t = MakeWordTwo(HYPH_FILENAME, HYPH_SUFFIX, no_fpos);
-    DefineFile(t, HYPH_PACKED_FILE, SYSINCLUDE_PATH);
+  { DefineFile(HYPH_FILENAME, STR_EMPTY, no_fpos, HYPH_FILE, SYSINCLUDE_PATH);
+    DefineFile(HYPH_FILENAME, HYPH_SUFFIX, no_fpos,
+      HYPH_PACKED_FILE, SYSINCLUDE_PATH);
   }
 
   /* start timing if required */
   ifdebug(DPP, D, ProfileOn("main"));
 
   /* open output file, or stdout if none specified, and initialize printer */
-  if( strcmp(outfile, "-") == 0 )  out_fp = stdout;
-  else if( (out_fp = fopen(outfile, "w")) == null )
+  if( StringEqual(outfile, STR_STDOUT) )  out_fp = stdout;
+  else if( (out_fp = StringFOpen(outfile, "w")) == null )
     Error(FATAL, no_fpos, "cannot open output file %s", outfile);
+  FontInit();
   PrintInit(out_fp);
 
   /* append default directories to file search paths */
-  AddToPath(FONT_PATH,         FONT_DIR);
-  AddToPath(SYSDATABASE_PATH,  DATA_DIR);
-  AddToPath(DATABASE_PATH,     DATA_DIR);
-  AddToPath(SYSINCLUDE_PATH,   INCL_DIR);
-  AddToPath(INCLUDE_PATH,      INCL_DIR);
+  AddToPath(FONT_PATH,         AsciiToFull(FONT_DIR));
+  AddToPath(ENCODING_PATH,     AsciiToFull(EVEC_DIR));
+  AddToPath(SYSDATABASE_PATH,  AsciiToFull(DATA_DIR));
+  AddToPath(DATABASE_PATH,     AsciiToFull(DATA_DIR));
+  AddToPath(SYSINCLUDE_PATH,   AsciiToFull(INCL_DIR));
+  AddToPath(INCLUDE_PATH,      AsciiToFull(INCL_DIR));
 
   /* use stdin if no source files were mentioned */
   if( FirstFile(SOURCE_FILE) == NO_FILE )
-    DefineFile(MakeWord("-", no_fpos), SOURCE_FILE, SOURCE_PATH);
+    DefineFile(STR_STDIN, STR_EMPTY, no_fpos, SOURCE_FILE, SOURCE_PATH);
 
   /* load predefined symbols into symbol table */
-  StartSym = nil;
-  StartSym  = load("\\Start",   0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
+  StartSym = nil;  /* Not a mistake */
+  StartSym  = load(KW_START,    0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
   GalleySym = load(KW_GALLEY,   0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
   InputSym  = load(KW_INPUT,    0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
-  PrintSym  = load("\\Print",   0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
+  PrintSym  = load(KW_PRINT,    0,     FALSE,  FALSE,  TRUE,  NO_PREC     );
 
   load(KW_BEGIN,       BEGIN,          FALSE,  FALSE,  FALSE, BEGIN_PREC  );
   load(KW_END,         END,            FALSE,  FALSE,  FALSE, END_PREC    );
@@ -285,6 +325,7 @@ int argc; unsigned char *argv[];
   load(KW_USE,         USE,            FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_CASE,        CASE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_YIELD,       YIELD,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_XCHAR,       XCHAR,          FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_FONT,        FONT,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_SPACE,       SPACE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_BREAK,       BREAK,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);

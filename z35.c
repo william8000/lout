@@ -1,6 +1,6 @@
-/*@z35.c:Time Keeper: InitTime()@*********************************************/
+/*@z35.c:Time Keeper: MomentSym(), TimeString()@******************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -24,7 +24,7 @@
 /*                                                                           */
 /*  FILE:         z35.c                                                      */
 /*  MODULE:       Time Keeper                                                */
-/*  EXTERNS:      InitTime()                                                 */
+/*  EXTERNS:      MomentSym, InitTime(), StartMoment(), TimeString()         */
 /*                                                                           */
 /*****************************************************************************/
 #include <time.h>
@@ -32,18 +32,18 @@
 
 #define load(str, typ, encl)						\
   sym = InsertSym(str, typ, no_fpos, DEFAULT_PREC,  			\
-  FALSE, FALSE, 0, encl, MakeWord("", no_fpos));			\
+  FALSE, FALSE, 0, encl, MakeWord(WORD, STR_EMPTY, no_fpos));		\
   if( typ == NPAR )  visible(sym) = TRUE
 
 #define add_par(format, val, sym)					\
-  sprintf(buff, format, val);						\
+  sprintf( (char *) buff, format, val);					\
   par = New(PAR);  actual(par) = sym;					\
   Link(current_moment, par);						\
-  tmp = MakeWord(buff, no_fpos);					\
+  tmp = MakeWord(WORD, buff, no_fpos);					\
   Link(par, tmp);
 
 static OBJECT current_moment = nil;
-static unsigned char time_string[30] = { '\0' };
+static FULL_CHAR time_string[30] = { '\0' };
 
 
 /*****************************************************************************/
@@ -57,7 +57,20 @@ static unsigned char time_string[30] = { '\0' };
 OBJECT MomentSym = nil;
 
 
-/*@@**************************************************************************/
+/*****************************************************************************/
+/*                                                                           */
+/*  FULL_CHAR *TimeString()                                                  */
+/*                                                                           */
+/*  Returns a pointer to a string containing the current time.               */
+/*                                                                           */
+/*****************************************************************************/
+
+FULL_CHAR *TimeString()
+{ return time_string;
+} /* end TimeString */
+
+
+/*@::InitTime(), StartMoment()@***********************************************/
 /*                                                                           */
 /*  InitTime()                                                               */
 /*                                                                           */
@@ -68,29 +81,30 @@ OBJECT MomentSym = nil;
 
 InitTime()
 { long raw_time; struct tm *now;
-  unsigned char buff[20]; OBJECT par, tmp, sym, env;
+  FULL_CHAR buff[20]; OBJECT par, tmp, sym, env;
   OBJECT tag, second, minute, hour, weekday,
 	monthday, yearday, month, year, century, dst;
   debug0(DTK, D, "InitTime()");
 
   /* define @Moment symbol with its host of named parameters */
-  MomentSym = load("@Moment",         LOCAL, StartSym);
+  MomentSym = load(KW_MOMENT,         LOCAL, StartSym);
   tag       = load(KW_TAG,            NPAR,  MomentSym);
-  second    = load("@Second",         NPAR,  MomentSym);
-  minute    = load("@Minute",         NPAR,  MomentSym);
-  hour      = load("@Hour",           NPAR,  MomentSym);
-  monthday  = load("@Day",            NPAR,  MomentSym);
-  month     = load("@Month",          NPAR,  MomentSym);
-  year      = load("@Year",           NPAR,  MomentSym);
-  century   = load("@Century",        NPAR,  MomentSym);
-  weekday   = load("@WeekDay",        NPAR,  MomentSym);
-  yearday   = load("@YearDay",        NPAR,  MomentSym);
-  dst       = load("@DaylightSaving", NPAR,  MomentSym);
+  second    = load(KW_SECOND,         NPAR,  MomentSym);
+  minute    = load(KW_MINUTE,         NPAR,  MomentSym);
+  hour      = load(KW_HOUR,           NPAR,  MomentSym);
+  monthday  = load(KW_DAY,            NPAR,  MomentSym);
+  month     = load(KW_MONTH,          NPAR,  MomentSym);
+  year      = load(KW_YEAR,           NPAR,  MomentSym);
+  century   = load(KW_CENTURY,        NPAR,  MomentSym);
+  weekday   = load(KW_WEEKDAY,        NPAR,  MomentSym);
+  yearday   = load(KW_YEARDAY,        NPAR,  MomentSym);
+  dst       = load(KW_DAYLIGHTSAVING, NPAR,  MomentSym);
 
   /* get current time and convert to ASCII */
-  time(&raw_time);
+  if( time(&raw_time) == -1 )
+    Error(WARN, no_fpos, "unable to obtain the current time");
   now = localtime(&raw_time);
-  strcpy(time_string, asctime(now));
+  StringCopy(time_string, AsciiToFull(asctime(now)));
 
   /* start of current_moment */
   current_moment = New(CLOSURE);
@@ -114,7 +128,7 @@ InitTime()
   AttachEnv(env, current_moment);
   debug0(DTK, D, "InitTime() returning.");
   debug0(DTK, DD, "current_moment =");
-  ifdebug(DTK, DD, EchoObject(stderr, current_moment));
+  ifdebug(DTK, DD, DebugObject(current_moment));
 } /* end InitTime */
 
 
@@ -132,19 +146,6 @@ OBJECT StartMoment()
   assert(current_moment != nil, "StartMoment: current_moment == nil!");
   res = CopyObject(current_moment, no_fpos);
   debug0(DTK, D, "StartMoment returning");
-  ifdebug(DTK, D, EchoObject(stderr, res));
+  ifdebug(DTK, D, DebugObject(res));
   return res;
 }
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  unsigned char *TimeString()                                              */
-/*                                                                           */
-/*  Returns a pointer to a string containing the current time.               */
-/*                                                                           */
-/*****************************************************************************/
-
-unsigned char *TimeString()
-{ return time_string;
-} /* end TimeString */

@@ -3,9 +3,9 @@
    @Title { Lists }
 @Begin
 @PP
-In the previous section, we saw that several consecutive displays are
-awkward to space correctly.  Provided they are not aligned or numbered,
-such displays are better treated as a {@I list}:
+We have just seen that consecutive displays are awkward to space
+correctly.  Provided they are not aligned or numbered,
+these are better treated as a {@I list}:
 @ID @Code {
 "... preceding text."
 "@IndentedList"
@@ -163,8 +163,8 @@ usual amount of space.
 Individual list items are kept together on one page or column.  However,
 a new page may be started between two list items.
 @PP
-As in the previous section, every symbol introduced in this section has
-an abbreviated form consisting of @Code "@" followed by its capital
-letters only.  For example, @Code "@RawNumberedList" can be abbreviated
-to {@Code "@RNL"}, and @Code "@ListItem" to {@Code "@LI"}.
+Every symbol introduced in this section has an abbreviated form consisting
+of @Code "@" followed by its capital letters only.  For example,
+@Code "@RawNumberedList" abbreviates to {@Code "@RNL"}, and
+@Code "@ListItem" to {@Code "@LI"}.
 @End @Section

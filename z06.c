@@ -1,6 +1,6 @@
-/*@z06.c:Parser:InitParser(), Parse()@****************************************/
+/*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.03)       */
+/*  LOUT: A HIGH-LEVEL LANGUAGE FOR DOCUMENT FORMATTING (VERSION 2.05)       */
 /*  COPYRIGHT (C) 1993 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -28,22 +28,10 @@
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
-#define	is_cat_op(x)	((x) >= ACAT && (x) <= TJUXTA)
 #define	LEFT_ASSOC	0
 #define	RIGHT_ASSOC	1
-static	OBJECT		cross_name;		/* name of the cr database   */
+static	OBJECT		cross_name;	/* name of the cr database   */
 
-
-/*****************************************************************************/
-/*                                                                           */
-/*  static Stack Handler ADT:                                                */
-/*                                                                           */
-/*      DebugStacks()       Print debug output of the stacks state           */
-/*      Shift()             Shift one token onto the stacks                  */
-/*      ShiftObj()          Optimized shift for object with no parameters    */
-/*      Reduce()            Perform one reduction of the stacks              */
-/*                                                                           */
-/*****************************************************************************/
 
 #define	MAX_STACK	50			/* size of parser stacks     */
 static	OBJECT		obj_stack[MAX_STACK];	/* stack of objects          */
@@ -85,6 +73,14 @@ static	BOOLEAN		obj_prev;		/* TRUE when object is prev  */
 #define	ObjTop		obj_stack[otop]
 
 
+/*@::DebugStacks(), InsertSpace(), Shift(), ShiftObj()@***********************/
+/*                                                                           */
+/*  DebugStacks()                                                            */
+/*                                                                           */
+/*  Print debug output of the stacks state                                   */
+/*                                                                           */
+/*****************************************************************************/
+
 #if DEBUG_ON
 static DebugStacks(initial_ttop)
 int initial_ttop;
@@ -92,7 +88,7 @@ int initial_ttop;
   fprintf(stderr, "obj_prev: %s; otop: %d; ttop: %d\n",
     bool(obj_prev), otop, ttop);
   for( i = 0;  i <= otop; i++ )
-    fprintf(stderr, "obj[%d] = %s\n", i, EchoObject(null, obj_stack[i]));
+    fprintf(stderr, "obj[%d] = %s\n", i, EchoObject(obj_stack[i]));
   for( i = 0;  i <= ttop;  i++ )
   { if( i == initial_ttop+1 ) fprintf(stderr, "$\n");
     fprintf(stderr, "tok[%d] = %s.%d\n", i, type(tok_stack[i]) == CLOSURE ?
@@ -102,65 +98,66 @@ int initial_ttop;
 }
 #endif
 
+
 /*****************************************************************************/
 /*                                                                           */
-/*  insert_space(t)                                                          */
+/*  InsertSpace(t)                                                           */
 /*                                                                           */
 /*  Add any missing catenation operator in front of token t.                 */
 /*                                                                           */
 /*****************************************************************************/
 
-#define insert_space(t)							\
+#define InsertSpace(t)							\
 if( obj_prev )								\
 { int typ, prec;							\
-  if( hspace(t) + vspace(t) > 0 )					\
-  { typ = TSPACE;							\
-    prec = ACAT_PREC;							\
-  }									\
-  else									\
-  { typ = TJUXTA;							\
-    prec = JUXTA_PREC;							\
-  }									\
+  if( hspace(t) + vspace(t) > 0 )  typ = TSPACE, prec = ACAT_PREC;	\
+  else typ = TJUXTA, prec = JUXTA_PREC;					\
   while( obj_prev && precedence(TokenTop) >= prec )  Reduce();		\
   if( obj_prev )							\
-  { tmp = New(typ);							\
-    precedence(tmp) = prec;						\
-    vspace(tmp) = vspace(t);						\
-    hspace(tmp) = hspace(t);						\
-    mark(gap(tmp)) = FALSE;						\
-    join(gap(tmp)) = TRUE;						\
-    FposCopy( fpos(tmp), fpos(t) );					\
+  { tmp = New(typ);  precedence(tmp) = prec;				\
+    vspace(tmp) = vspace(t);  hspace(tmp) = hspace(t);			\
+    mark(gap(tmp)) = FALSE;  join(gap(tmp)) = TRUE;			\
+    FposCopy(fpos(tmp), fpos(t));					\
     PushToken(tmp);							\
   }									\
-} /* end insert_space */
+} /* end InsertSpace */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  static Shift(t, prec, rassoc, leftpar, rightpar)                         */
+/*  static ShiftObj(t)                                                       */
+/*                                                                           */
+/*  Shift token or object t onto the stacks; it has the attributes shown.    */
+/*                                                                           */
+/*****************************************************************************/
 
 #define Shift(t, prec, rassoc, leftpar, rightpar)			\
 { if( leftpar )								\
   { for(;;)								\
     { if( !obj_prev )							\
-      {	PushObj( MakeWord("", &fpos(t)) );				\
+      {	PushObj( MakeWord(WORD, STR_EMPTY, &fpos(t)) );			\
 	obj_prev = TRUE;						\
       }									\
-      else if( precedence(TokenTop) >= prec + rassoc )			\
-      {	Reduce();							\
-      }									\
+      else if( precedence(TokenTop) >= prec + rassoc ) 	Reduce();	\
       else break;							\
     }									\
   }									\
-  else insert_space(t);							\
+  else InsertSpace(t);							\
   PushToken(t);								\
   if( rightpar )  obj_prev = FALSE;					\
-  else									\
-  { obj_prev = TRUE;							\
-    Reduce();								\
-  }									\
+  else { obj_prev = TRUE;  Reduce(); } 					\
 } /* end Shift */
 
-#define ShiftObj(t)							\
-{ insert_space(t);							\
-  PushObj(t);								\
-  obj_prev = TRUE;							\
-}
+#define ShiftObj(t) { InsertSpace(t); PushObj(t);  obj_prev = TRUE; }
+
+/*@::Reduce()@****************************************************************/
+/*                                                                           */
+/*  static Reduce()                                                          */
+/*                                                                           */
+/*  Perform a single reduction of the stacks.                                */
+/*                                                                           */
+/*****************************************************************************/
 
 static Reduce()
 { OBJECT p1, p2, p3, s1, s2, tmp;
@@ -208,6 +205,7 @@ static Reduce()
     case ROTATE:
     case CASE:
     case YIELD:
+    case XCHAR:
     case FONT:
     case SPACE:
     case BREAK:
@@ -263,7 +261,7 @@ static Reduce()
 
     case BEGIN:
     
-	Error(INTERN, &fpos(op), "Reduce: unmatched BEGIN");
+	Error(INTERN,&fpos(op), "Reduce: unmatched %s", KW_BEGIN);
 	break;
 
 
@@ -276,7 +274,7 @@ static Reduce()
 	else if( type(TokenTop) == BEGIN )
 	  Error(WARN, &fpos(op), "unmatched %s; inserted %s at%s (after %s)",
 	    KW_RBR, KW_LBR, EchoFilePos(&fpos(TokenTop)), KW_BEGIN);
-	else Error(INTERN, &fpos(op), "Reduce: unmatched RBR");
+	else Error(INTERN, &fpos(op), "Reduce: unmatched %s", KW_RBR);
 	Dispose(op);
 	break;
 
@@ -284,7 +282,7 @@ static Reduce()
     case END:
     
 	if( type(TokenTop) != BEGIN )
-	  Error(INTERN, &fpos(op), "Reduce: unmatched END");
+	  Error(INTERN, &fpos(op), "Reduce: unmatched %s", KW_END);
 	else
 	{ if( actual(op) != actual(TokenTop) )
 	    if( actual(op) == StartSym )
@@ -294,14 +292,13 @@ static Reduce()
 		KW_BEGIN, EchoFilePos(&fpos(TokenTop)) );
 	    else if( actual(op) == nil )
 	      Error(WARN, &fpos(op),
-		"%s replaced by %s %s to match %s at%s",
-		KW_END, KW_END, SymName(actual(TokenTop)),
+		"%s replaced by %s %s to match %s at%s", KW_END, KW_END,
+		SymName(actual(TokenTop)),
 		KW_BEGIN, EchoFilePos(&fpos(TokenTop)) );
 	    else
 	      Error(WARN, &fpos(op),
 		"%s %s replaced by %s %s to match %s at%s",
-		KW_END, SymName(actual(op)),
-		KW_END, SymName(actual(TokenTop)),
+		KW_END, SymName(actual(op)), KW_END, SymName(actual(TokenTop)),
 		KW_BEGIN, EchoFilePos(&fpos(TokenTop)) );
 	  Dispose( PopToken() );
 	}
@@ -362,7 +359,7 @@ static Reduce()
 } /* end Reduce */
 
 
-/*@@**************************************************************************/
+/*@::SetScope(), InitParser()@************************************************/
 /*                                                                           */
 /*  static SetScope(env, count)                                              */
 /*                                                                           */
@@ -374,7 +371,7 @@ static Reduce()
 static SetScope(env, count)
 OBJECT env;  int *count;
 { OBJECT link, y, yenv;
-  debug2(DOP, D, "SetScope( %s, %d )", EchoObject(null, env), *count);
+  debug2(DOP, D, "SetScope( %s, %d )", EchoObject(env), *count);
   assert( env != nil && type(env) == ENV, "SetScope: type(env) != ENV!" );
   if( Down(env) != env )
   { Child(y, Down(env));
@@ -399,16 +396,15 @@ OBJECT env;  int *count;
 /*****************************************************************************/
 
 InitParser(cross_db)
-unsigned char *cross_db;
-{ if( strlen(cross_db) + strlen(INDEX_SUFFIX) >= MAX_LINE )
-    Error(FATAL, no_fpos, "cross reference database file name %s%s is too long",
-	cross_db, INDEX_SUFFIX);
-  cross_name = MakeWordTwo(cross_db, INDEX_SUFFIX, no_fpos);
+FULL_CHAR *cross_db;
+{ if( StringLength(cross_db) >= MAX_LINE )  Error(FATAL, no_fpos,
+    "cross reference database file name %s is too long", cross_db);
+  cross_name = MakeWord(WORD, cross_db, no_fpos);
   PushToken( NewToken(GSTUB_EXT, no_fpos, 0, 0, DEFAULT_PREC, StartSym) );
 } /* end InitParser */
 
 
-/*@@**************************************************************************/
+/*@::ParseEnvClosure()@*******************************************************/
 /*                                                                           */
 /*  static OBJECT ParseEnvClosure(t, encl)                                   */
 /*                                                                           */
@@ -432,11 +428,13 @@ OBJECT t, encl;
 			"syntax error in cross reference database");
 		for( i = 1;  i <= count;  i++ )  PopScope();
 		AttachEnv(env, y);
+		debug0(DCR, DD, "  calling SetEnv from ParseEnvClosure (a)");
 		env = SetEnv(y, nil);
 		t = LexGetToken();
 		break;
 
     case ENV:	y = ParseEnvClosure(t, encl);
+		debug0(DCR, DD, "  calling SetEnv from ParseEnvClosure (b)");
 		env = SetEnv(y, env);
 		t = LexGetToken();
 		break;
@@ -449,14 +447,13 @@ OBJECT t, encl;
 	Error(FATAL, &fpos(env), "error in cross reference database");
   Child(res, Down(env));
   DeleteNode(env);
-  debug1(DOP, DD, "ParseEnvClosure returning %s", EchoObject(null, res));
+  debug1(DOP, DD, "ParseEnvClosure returning %s", EchoObject(res));
   assert( type(res) == CLOSURE, "ParseEnvClosure: type(res) != CLOSURE!" );
   return res;
 } /* end ParseEnvClosure */
 
 
-
-/*@@**************************************************************************/
+/*@::Parse()@*****************************************************************/
 /*                                                                           */
 /*  OBJECT Parse(token, encl, defs_allowed, transfer_allowed)                */
 /*                                                                           */
@@ -481,10 +478,9 @@ OBJECT Parse(token, encl, defs_allowed, transfer_allowed)
 OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 { OBJECT t, x, tmp, xsym, env, y, res;
   int i, initial_ttop = ttop;
-  unsigned char buff[MAX_LINE];  FILE_NUM index_fnum;
 
-  debug4(DOP, D, "[ Parse(%s, %s, %s, %s)", EchoToken(*token), SymName(encl),
-	bool(defs_allowed), bool(transfer_allowed));
+  debug4(DOP, D, "[ Parse(%s, %s, %s, %s)", EchoToken(*token),
+    SymName(encl), bool(defs_allowed), bool(transfer_allowed));
   assert( type(*token) == LBR || type(*token) == BEGIN, "Parse: *token!" );
 
   obj_prev = FALSE;
@@ -499,38 +495,51 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 
       /* load cross-references from previous run, open new cross refs */
       if( AllowCrossDb )
-      {	index_fnum = DefineFile(cross_name, INDEX_FILE, SOURCE_PATH);
-	OldCrossDb = DbLoad(index_fnum,string(cross_name),&fpos(t),FALSE,nil);
-	NewCrossDb = DbCreate(string(cross_name), &fpos(t));
+      {	NewCrossDb = DbCreate(MakeWord(WORD, string(cross_name), no_fpos));
+	OldCrossDb = DbLoad(cross_name, SOURCE_PATH, FALSE, nil);
       }
       else OldCrossDb = NewCrossDb = nil;
 
       /* tidy up and possibly print symbol table */
       FlattenUses();
-      ifdebug(DST, D, EchoObject(stderr, StartSym) );
+      ifdebug(DST, D, DebugObject(StartSym));
 
-      /* read @Use commands and construct env */
+      /* read @Use, @Database, and @Prepend commands and construct env */
       env = New(ENV);
-      while( type(t) == USE )
-      {
-	OBJECT crs, res_env;  STYLE style;
-	Dispose(t);  t = LexGetToken();
-	if( type(t) != LBR )
-	  Error(FATAL, &fpos(t), "%s expected after %s", KW_LBR, KW_USE);
-	y = Parse(&t, encl, FALSE, FALSE);
-	if( type(y) == CROSS )
-	{ y = CrossExpand(y, env, &style, FALSE, &crs, &res_env);
-	  AttachEnv(res_env, y);
-	  env = SetEnv(y, env);
+      for(;;)
+      {	if( type(t) == USE )
+	{
+	  OBJECT crs, res_env;  STYLE style;
+	  Dispose(t);  t = LexGetToken();
+	  if( type(t) != LBR )
+	    Error(FATAL, &fpos(t), "%s expected after %s", KW_LBR, KW_USE);
+	  y = Parse(&t, encl, FALSE, FALSE);
+	  if( type(y) == CROSS )
+	  { y = CrossExpand(y, env, &style, FALSE, &crs, &res_env);
+	    AttachEnv(res_env, y);
+	    debug0(DCR, DD, "  calling SetEnv from Parse (a)");
+	    env = SetEnv(y, env);
+	  }
+	  else if( type(y) == CLOSURE )
+	  { AttachEnv(env, y);
+	    debug0(DCR, DD, "  calling SetEnv from Parse (b)");
+	    env = SetEnv(y, nil);
+	  }
+	  else Error(FATAL, &fpos(y), "invalid parameter of %s", KW_USE);
+	  PushScope(actual(y), FALSE, TRUE);
+	  t = LexGetToken();
+        }
+	else if( type(t) == PREPEND || type(t) == SYS_PREPEND )
+	{ ReadPrependDef(type(t), encl);
+	  Dispose(t);
+	  t = LexGetToken();
 	}
-	else if( type(y) == CLOSURE )
-	{ AttachEnv(env, y);
-	  env = SetEnv(y, nil);
+	else if( type(t) == DATABASE || type(t) == SYS_DATABASE )
+	{ ReadDatabaseDef(type(t), encl);
+	  Dispose(t);
+	  t = LexGetToken();
 	}
-	else Error(FATAL, &fpos(y), "invalid parameter of %s", KW_USE);
-
-	PushScope(actual(y), FALSE, TRUE);
-	t = LexGetToken();
+	else break;
       }
       TransferInit(env);
     }
@@ -546,8 +555,15 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 
       case WORD:
       
-	if( string(t)[0] == '@' )
+	if( string(t)[0] == CH_SYMSTART )
 	  Error(WARN, &fpos(t), "symbol %s unknown or misspelt", string(t));
+	ShiftObj(t);
+	t = LexGetToken();
+	break;
+
+
+      case QWORD:
+      
 	ShiftObj(t);
 	t = LexGetToken();
 	break;
@@ -581,7 +597,7 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 	/* if op is followed by space, insert {} */
 	t = LexGetToken();
 	if( hspace(t) + vspace(t) > 0 )
-	{ ShiftObj(MakeWord("", &fpos(x)));
+	{ ShiftObj(MakeWord(WORD, STR_EMPTY, &fpos(x)));
 	}
 	break;
 
@@ -605,6 +621,7 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
       case ROTATE:
       case CASE:
       case YIELD:
+      case XCHAR:
       case FONT:
       case SPACE:
       case BREAK:
@@ -645,7 +662,7 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 	  Dispose(x);
 	  x = nil;
 	}
-	else if( type(x) == WORD && string(x)[0] == '@' )
+	else if( type(x) == WORD && string(x)[0] == CH_SYMSTART )
 	{ Error(WARN,&fpos(x),"unknown or misspelt symbol %s after %s deleted",
 		string(x), KW_END);
 	  actual(t) = nil;
@@ -661,7 +678,7 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 	{ ifdebug(DOP, DD, DebugStacks(initial_ttop));
 	  *token = x;
 	  debug0(DOP, D, "] Parse returning");
-	  ifdebug(DOP, D, EchoObject(stderr, ObjTop));
+	  ifdebug(DOP, D, DebugObject(ObjTop));
 	  obj_prev = FALSE;
 	  return PopObj();
 	}
@@ -676,7 +693,7 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 	{ ifdebug(DOP, DD, DebugStacks(initial_ttop));
 	  *token = nil;
 	  debug0(DOP, D, "] Parse returning");
-	  ifdebug(DOP, D, EchoObject(stderr, ObjTop));
+	  ifdebug(DOP, D, DebugObject(ObjTop));
 	  obj_prev = FALSE;
 	  return PopObj();
 	}
@@ -685,6 +702,10 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 				
 
       case USE:
+      case PREPEND:
+      case SYS_PREPEND:
+      case DATABASE:
+      case SYS_DATABASE:
       
 	Error(FATAL, &fpos(t), "%s symbol out of place", SymName(actual(t)));
 	break;
@@ -743,12 +764,12 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 	  t = LexGetToken();
 	  if( type(t) != LBR )
 	  { Error(WARN, &fpos(new_par), "%s must follow named parameter %s",
-		    KW_LBR, SymName(actual(new_par)) );
+	      KW_LBR, SymName(actual(new_par)));
 	    Dispose(new_par);
 	    break;
 	  }
 
-	  /* read the named parameter's body */
+	  /* read the body of the named parameter */
 	  PushScope(actual(new_par), FALSE, FALSE);
 	  tmp = Parse(&t, encl, FALSE, FALSE);
 	  type(new_par) = PAR;
@@ -797,12 +818,12 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 	      {	if( has_rpar(xsym) )
 		{ Child(tmp, LastDown(x));
 		  assert(type(tmp)==PAR && type(actual(tmp))==RPAR,
-				"Parse: can't undo rpar" );
+				"Parse: cannot undo rpar" );
 		  DisposeChild(LastDown(x));
 		  if( has_lpar(xsym) )
 		  { Child(tmp, Down(x));
 		    assert(type(tmp)==PAR && type(actual(tmp))==LPAR,
-				"Parse: can't undo lpar" );
+				"Parse: cannot undo lpar" );
 		    Child(tmp, Down(tmp));
 		    PushObj(tmp);
 		    DeleteLink(Up(tmp));
@@ -854,11 +875,11 @@ OBJECT *token, encl;  BOOLEAN defs_allowed, transfer_allowed;
 	}
 	t = LexGetToken();
 
-	if( xsym == nil )
-	  Error(WARN, &fpos(x), "invalid left parameter of %s", KW_OPEN);
+	if( xsym == nil )  Error(WARN, &fpos(x),
+	  "invalid left parameter of %s", KW_OPEN);
 	else if( type(t) != BEGIN && type(t) != LBR )
 	  Error(WARN, &fpos(t), "%s parameter of %s not enclosed in %s .. %s",
-		   KW_RIGHT, KW_OPEN, KW_LBR, KW_RBR);
+	    KW_RIGHT, KW_OPEN, KW_LBR, KW_RBR);
 	else
 	{ PushScope(xsym, FALSE, TRUE);
 	  tmp = Parse(&t, encl, FALSE, FALSE);
