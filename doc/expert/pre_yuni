@@ -25,7 +25,7 @@ The @@CurrYUnit and @@CurrZUnit symbols report the value of the @Code y
 and @Code z units, in points, truncated to the nearest integer.  For example,
 @ID @Code "1i @YUnit { The current value of the y unit is @CurrYUnit }"
 produces
-@ID @Code "1i @YUnit { The current value of the y unit is @CurrYUnit }"
+@ID 1i @YUnit { The current value of the y unit is @CurrYUnit }
 since there are 72 points in one inch (at least, Lout thinks there are).
 @PP
 These units are not used internally by Lout.  They are supplied as

@@ -42,12 +42,14 @@
   # @InitialFont	{ Times Base 12p	} # initial font
     @InitialFont	{ Times Base 20p	} # initial font
   # @InitialBreak	{{adjust 1.2fx hyphen} @OrIfPlain {ragged 1fx nohyphen}}
-    @InitialBreak	{ ragged 1.20fx nohyphen} # initial break
+    @InitialBreak	{ ragged 1.2fx nohyphen	} # initial break
+  # @InitialOutdent	{ 2f @OrIfPlain 4s	} # initial outdent
   # @InitialSpace	{ lout			} # initial space style
   # @InitialLanguage	{ English		} # initial language
   # @InitialColour	{ black			} # initial colour
   # @OptimizePages	{ No			} # optimize page breaks?
   # @HeadingFont	{ Bold			} # font for @Heading
+  # @FixedWidthFont	{ Courier Base -1p	} # font for @F
   # @ParaGap		{ 1.3vx @OrIfPlain 1f	} # gap between paragraphs
   # @ParaIndent		{ 2.00f	@OrIfPlain 5s	} # first-line indent for @PP
   # @DisplayGap		{ 1.00v	@OrIfPlain 1f	} # gap above, below displays
@@ -63,6 +65,7 @@
   # @ListLabelWidth	{ 2.00f	@OrIfPlain 5s	} # width allowed for list tags
   # @NumberSeparator	{ .			} # separates nums like 2.3.7
   # @CrossLinkFormat	{ @Body			} # format of cross links
+  # @ExternalLinkFormat	{ @Body			} # format of external links
 }
 
 
@@ -145,6 +148,7 @@
   # @RefListLabelWidth 	{ @ListLabelWidth	} # Labels column width
   # @RefListSortKey	{ @Tag			} # sorting key
   # @MakeIndex		{ No			} # make index? Yes or No
+  # @IndexText		{ @Null			} # index initial text
   # @IndexFont		{			} # index entries font
   # @IndexBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
   # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
@@ -153,6 +157,7 @@
   # @IndexCtdWord	{ continued		} # "ctd." in current lang.
   # @IndexCtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
   # @MakeIndexA		{ No 			} # make index A? Yes or No
+  # @IndexAText		{ @Null			} # index A initial text
   # @IndexAFont		{			} # index A entries font
   # @IndexABreak	{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
   # @IndexAColumnNumber	{ 2			} # index A columns (1 to 10)
@@ -161,6 +166,7 @@
   # @IndexACtdWord	{ continued		} # "ctd." in current lang.
   # @IndexACtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
   # @MakeIndexB		{ No 			} # make index B? Yes or No
+  # @IndexBText		{ @Null			} # index B initial text
   # @IndexBFont		{			} # index B entries font
   # @IndexBBreak	{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
   # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)

@@ -1,7 +1,7 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -222,10 +222,11 @@ typedef struct {
 	    word_colour(hyph_word) = colour(save_style(x));		\
 	    word_outline(hyph_word) = outline(save_style(x));		\
 	    word_language(hyph_word) = language(save_style(x));		\
+	    word_baselinemark(hyph_word) = baselinemark(save_style(x));	\
 	    word_hyph(hyph_word) = hyph_style(save_style(x))==HYPH_ON;	\
 	  }								\
-	  if( word_font(hyph_word) != font(save_style(x)) )		\
-	  { word_font(hyph_word) = font(save_style(x));			\
+	  if( word_font(hyph_word) != word_font(right) )		\
+	  { word_font(hyph_word) = word_font(right);			\
 	    FposCopy(fpos(hyph_word), fpos(x));				\
 	    FontWordSize(hyph_word);					\
 	  }								\
@@ -536,7 +537,9 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
     max_width = find_min(fc(*c), bfc(*c));
     if( display_style(save_style(x)) == DISPLAY_OUTDENT ||
         display_style(save_style(x)) == DISPLAY_ORAGGED )
-    { outdent_margin = 2 * FontSize(font(save_style(x)), x);
+    {
+      /* outdent_margin = 2 * FontSize(font(save_style(x)), x); */
+      outdent_margin = outdent_len(save_style(x));
       etc_width = max_width - outdent_margin;
     }
     else etc_width = max_width;
@@ -552,6 +555,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       word_colour(res) = colour(save_style(x));
       word_outline(res) = outline(save_style(x));
       word_language(res) = language(save_style(x));
+      word_baselinemark(res) = baselinemark(save_style(x));
       word_hyph(res) = hyph_style(save_style(x)) == HYPH_ON;
       back(res, COLM) = fwd(res, COLM) = 0;
       ReplaceNode(res, x);
@@ -572,6 +576,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   word_colour(tmp) = 0;
   word_outline(tmp) = 0;
   word_language(tmp) = 0;
+  word_baselinemark(tmp) = FALSE;
   word_hyph(tmp) = 0;
   underline(tmp) = UNDER_OFF;
   Link(x, tmp);
@@ -613,8 +618,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   IntervalInit(I, x, max_width, etc_width, hyph_word);  BestI = I;
   while( IntervalClass(I) != AT_END )
   {
-    debug0(DOF, D, "loop:");
-    debug1(DOF, D, "       %s", IntervalPrint(I, x));
+    debug0(DOF, DD, "loop:");
+    debug1(DOF, DD, "       %s", IntervalPrint(I, x));
     switch( IntervalClass(I) )
     {
 
@@ -625,7 +630,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	if( IntervalClass(I) == EMPTY_INTERVAL ||
 	    IntervalBadness(BestI) <= IntervalBadness(I) )
 	      I = BestI;
-	debug1(DOF, D, "BestI: %s\n", IntervalPrint(I, x));
+	debug1(DOF, DD, "BestI: %s\n", IntervalPrint(I, x));
 	/* NB no break */
 
 
@@ -746,6 +751,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	word_colour(t1) = 0;
 	word_outline(t1) = 0;
 	word_language(t1) = 0;
+	word_baselinemark(t1) = FALSE;
 	word_hyph(t1) = 0;
 	underline(t1) = UNDER_OFF;
 	New(t2, WIDE);
@@ -767,28 +773,30 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       /* add hyphen to end of previous line, if lgap is ADD_HYPH */
       Child(lgap, llink);
       if( mode(gap(lgap)) == ADD_HYPH )
-      { OBJECT z;  BOOLEAN under;
+      { OBJECT z, tmp;
 
-	/* work out whether the hyphen needs to be underlined */
-	Child(z, LastDown(x));
-	under = underline(z);
+	/* find word hyphen attaches to, since need its underline and font */
+	Child(tmp, PrevDown(LastDown(x)));  /* last is lgap, so one before */
+	debug2(DOF, D, "tmp = %s %s", Image(type(tmp)), EchoObject(tmp));
+	assert(is_word(type(tmp)), "FillObject: !is_word(type(tmp))!");
 
 	/* add zero-width gap object */
         New(z, GAP_OBJ);
 	debug0(DOF, DD, "   adding hyphen\n");
 	hspace(z) = vspace(z) = 0;
-	underline(z) = under;
+	underline(z) = underline(tmp);
 	SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
 	Link(x, z);
 
 	/* add hyphen */
 	z = MakeWord(WORD, STR_HYPHEN, &fpos(y));
-	word_font(z) = font(save_style(x));
-	word_colour(z) = colour(save_style(x));
-	word_outline(z) = outline(save_style(x));
-	word_language(z) = language(save_style(x));
+	word_font(z) = word_font(tmp);
+	word_colour(z) = word_colour(tmp);
+	word_outline(z) = word_outline(tmp);
+	word_language(z) = word_language(tmp);
+	word_baselinemark(z) = word_baselinemark(tmp);
 	word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
-	underline(z) = under;
+	underline(z) = underline(tmp);
 	FontWordSize(z);
 	Link(x, z);
       }
@@ -844,7 +852,6 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       nobreak(gap(gp)) = TRUE;
     }
 
-
     /* recalculate the width of the last line, since it may now be smaller */
     assert( LastDown(res) != res, "FillObject: empty paragraph!" );
     Child(y, LastDown(res));
@@ -882,9 +889,10 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	        word_colour(prev) == word_colour(next) &&
 	        word_outline(prev) == word_outline(next) &&
 	        word_language(prev) == word_language(next) &&
+	        word_baselinemark(prev) == word_baselinemark(next) &&
 	        underline(prev) == underline(next) )
 	    { 
-	      debug2(DOF, D, "joining %s with %s", EchoObject(prev),
+	      debug2(DOF, DD, "joining %s with %s", EchoObject(prev),
 		EchoObject(next));
 	      typ = type(prev) == QWORD || type(next) == QWORD ? QWORD : WORD;
 	      tmp = MakeWordTwo(typ, string(prev), string(next), &fpos(prev));
@@ -892,6 +900,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	      word_colour(tmp) = word_colour(prev);
 	      word_outline(tmp) = word_outline(prev);
 	      word_language(tmp) = word_language(prev);
+	      word_baselinemark(tmp) = word_baselinemark(prev);
 	      word_hyph(tmp) = word_hyph(prev);
 	      FontWordSize(tmp);
 	      underline(tmp) = underline(prev);

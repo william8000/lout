@@ -36,55 +36,13 @@ def @OrIfPlain
     }
 }
 
-    ###########################################################################
-    #                                                                         #
-    #   @Colour, @Color                                                       #
-    #                                                                         #
-    ###########################################################################
+###########################################################################
+#                                                                         #
+#   @ColourCommand, @Colour, @Color                                       #
+#                                                                         #
+###########################################################################
 
-    def @ColourCommand right col
-    {
-	def @ColourCoords
-	{
-	    col @Case {
-		darkblue	@Yield	{ 0.0 0.0 0.5 }
-		blue		@Yield	{ 0.0 0.0 1.0 }
-		lightblue	@Yield	{ 0.5 0.5 1.0 }
-		darkgreen	@Yield	{ 0.0 0.5 0.0 }
-		green		@Yield	{ 0.0 1.0 0.0 }
-		lightgreen	@Yield	{ 0.5 1.0 0.5 }
-		darkred		@Yield	{ 0.5 0.0 0.0 }
-		red		@Yield	{ 1.0 0.0 0.0 }
-		lightred	@Yield	{ 1.0 0.5 0.5 }
-		darkcyan	@Yield	{ 0.0 0.5 0.5 }
-		cyan		@Yield	{ 0.0 1.0 1.0 }
-		lightcyan	@Yield	{ 0.5 1.0 1.0 }
-		darkmagenta	@Yield	{ 0.5 0.0 0.5 }
-		magenta		@Yield	{ 1.0 0.0 1.0 }
-		lightmagenta	@Yield	{ 1.0 0.5 1.0 }
-		darkyellow	@Yield	{ 0.5 0.5 0.0 }
-		yellow		@Yield	{ 1.0 1.0 0.0 }
-		lightyellow	@Yield	{ 1.0 1.0 0.5 }
-		darkgray	@Yield	{ 0.2 0.2 0.2 }
-		gray		@Yield	{ 0.5 0.5 0.5 }
-		lightgray	@Yield	{ 0.8 0.8 0.8 }
-		darkgrey	@Yield	{ 0.2 0.2 0.2 }
-		grey		@Yield	{ 0.5 0.5 0.5 }
-		lightgrey	@Yield	{ 0.8 0.8 0.8 }
-		black		@Yield	{ 0.0 0.0 0.0 }
-		white		@Yield	{ 1.0 1.0 1.0 }
-	    }
-	}
-
-	col @Case {
-	    nochange @Yield { nochange }
-	    else @Yield { @BackEnd @Case {
-		PostScript	@Yield { @ColourCoords setrgbcolor }
-		PDF		@Yield { @ColourCoords rg @ColourCoords RG }
-		PlainText	@Yield ""
-	    } }
-	}
-    }
+@SysInclude { ccommand }
 
     def @Colour @Color left col right y { {@ColourCommand col} @SetColour y }
 
@@ -157,8 +115,8 @@ def @OrIfPlain
 
 export
 
-    @InitialFont @InitialBreak @InitialSpace @InitialLanguage @InitialColour
-    @OptimizePages @HeadingFont
+    @InitialFont @InitialBreak @InitialOutdent @InitialSpace @InitialLanguage
+    @InitialColour @OptimizePages @HeadingFont
     @ParaGap @ParaIndent @DisplayGap @DisplayIndent @DefaultIndent
     @DisplayNumStyle @WideIndent @VeryWideIndent
     @ListGap @ListIndent @ListRightIndent @ListLabelWidth
@@ -177,8 +135,9 @@ export
     @Date @Time @DateTimeFormat @DropCapTwo @DropCapThree @Centre @Right
     @NoDotSep @NoDotJoin @Join @Sep @DotSep @DotJoin @DashJoin @NumSep
     @OverStrike @Sup @Sub @FullWidthRule @LocalWidthRule
-    @Box @CurveBox @ShadowBox @BoundaryMarks @NumberMarker @NumberOf
-    @PageMarker @PageMark @NoLinkPageMark @PageOf @CrossLink
+    @Box @CurveBox @ShadowBox @BoundaryMarks
+    @NumberMarker @NumberOf @TitleMarker @TitleOf
+    @PageMarker @PageMark @NoLinkPageMark @PageOf @CrossLink @ExternalLink
 
     @BeginDisplayCounter
 
@@ -303,11 +262,13 @@ def @BasicSetup
     named @InitialFont	  { Times Base 12p	} # initial font
     named @InitialBreak	  { {adjust 1.20fx hyphen} @OrIfPlain
 			    {ragged 1fx nohyphen} } # initial break
+    named @InitialOutdent { 2f @OrIfPlain 4s	} # initial outdent
     named @InitialSpace	  { lout		} # initial space style
     named @InitialLanguage{ English		} # initial language
     named @InitialColour  { black		} # initial colour
     named @OptimizePages  { No			} # optimize page breaks?
     named @HeadingFont	  { Bold		} # font for @Heading
+    named @FixedWidthFont { Courier Base -1p	} # font for @F
     named @ParaGap	  { 1.3vx @OrIfPlain 1f	} # gap between paragraphs
     named @ParaIndent	  { 2.0f @OrIfPlain 5s	} # first-line indent for @PP
     named @DisplayGap	  { 1.0v @OrIfPlain 1f	} # gap above, below displays
@@ -326,6 +287,9 @@ def @BasicSetup
     import @BasicSetup
     named @CrossLinkFormat
 	right @Body	  { @Body		} # format for cross links
+    import @BasicSetup
+    named @ExternalLinkFormat
+	right @Body	  { @Body		} # format for external links
 @Begin
 
     ###########################################################################
@@ -341,7 +305,7 @@ def @BasicSetup
     def @B   right x { Bold @Font x			}
     def @BI  right x { BoldSlope @Font x		}
     def @S   right x { smallcaps @Font x		}
-    def @F   right x { { Courier Base -1p } @Font x 	}
+    def @F   right x { @FixedWidthFont @Font x 		}
 
     def @II
 	right x
@@ -1044,7 +1008,14 @@ def @BasicSetup
 
     ##########################################################################
     #                                                                        #
-    #  @NumberMarker, @NumberOf, @PageMarker, @PageMark, @PageOf, @CrossLink #
+    #  @NumberMarker, @NumberOf, @TitleMarker, @TitleOf,                     #
+    #  @PageMark, @PageOf, @CrossLink, @ExternalLink                         #
+    #                                                                        #
+    #  NB the default value ?? is desperately important for unsorted         #
+    #  reference lists numbered by first appearance (@NumberOf @Tag),        #
+    #  because it is the special sort key value that prevents merging,       #
+    #  hence allowing all the references to be printed even though           #
+    #  their sort keys are all ?? initially.                                 #
     #                                                                        #
     ##########################################################################
 
@@ -1060,6 +1031,21 @@ def @BasicSetup
 	right tag
     {
 	@NumberMarker&&tag @Open { @Value }
+    }
+
+
+    export @Tag @Value
+    def @TitleMarker
+	named @Tag {}
+	named @Value { "??" }
+    {
+	@Null
+    }
+
+    def @TitleOf
+	right tag
+    {
+	@TitleMarker&&tag @Open { @Value }
     }
 
 
@@ -1097,6 +1083,16 @@ def @BasicSetup
     {
 	@HContract @VContract {
 	    tag @LinkSource @Format obj
+	}
+    }
+
+    def @ExternalLink
+	left tag
+	named @Format right @Body { @ExternalLinkFormat @Body }
+	right obj
+    {
+	@HContract @VContract {
+	    tag @URLLink @Format obj
 	}
     }
 

@@ -24,13 +24,15 @@ def @IllustrationSetup
     def @Illustration
 	named @InitialFont { @InitialFont }
 	named @InitialBreak { @InitialBreak }
+	named @InitialOutdent { @InitialOutdent }
 	named @InitialSpace { @InitialSpace }
 	named @InitialLanguage { @InitialLanguage }
 	named @InitialColour { @InitialColour }
 	right x
     {
-        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
-	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
+        @InitialFont @Font { @InitialBreak setoutdent @InitialOutdent } @Break
+	@InitialLanguage @Language @InitialSpace @Space
+	{ @ColourCommand @InitialColour } @SetColour
 	@OneCol @OneRow x
     }
 

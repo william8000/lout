@@ -8,6 +8,16 @@
 }
 
 { @Reference
+     @Tag { adobe1996epsforms }
+     @Type { TechReport }
+     @Author { Adobe Systems, Inc. }
+     @Title { Using EPS files in PostScript Language Forms }
+     @TRType { Technical Note }
+     @Number { 5144 }
+     @Year { 1996 }
+}
+
+{ @Reference
      @Tag { adobe1990ps }
      @Type { Book }
      @Author { Adobe Systems, Inc. }

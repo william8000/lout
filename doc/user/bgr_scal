@@ -50,4 +50,20 @@ wide.scale @SubIndex { with @Code "@Scale" }
 produces
 @ID { 5c @Wide @Scale @Box WARNING! }
 which is 5 centimetres wide.
+@PP
+The @Code "@Scale" symbol will scale either up or down, whichever
+is required to fit the available space.  There is also a way to make
+it scale down if necessary but never scale up, by giving the
+@Code "downifneeded" keyword instead of an empty object:
+@ID @Code "5c @Wide downifneeded @Scale @Box WARNING!"
+produces no scaling:
+@ID 5c @Wide downifneeded @Scale @Box WARNING!
+but
+@ID @Code "1c @Wide downifneeded @Scale @Box WARNING!"
+does produce scaling:
+@ID 1c @Wide downifneeded @Scale @Box WARNING!
+This is a good option if scaling is being used when a display is
+around the same width as the page; it scales only if this is
+needed to fit the display into the column, not otherwise.
+slig
 @End @Section

@@ -1,7 +1,7 @@
 /*@z05.c:Read Definitions:ReadLangDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -99,6 +99,37 @@ void ReadPrependDef(unsigned typ, OBJECT encl)
   DefineFile(string(fname), STR_EMPTY, &fpos(fname), PREPEND_FILE,
 	   typ == PREPEND ? INCLUDE_PATH : SYSINCLUDE_PATH);
 
+} /* end ReadPrependDef */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  ReadIncGRepeatedDef(typ, encl)                                           */
+/*                                                                           */
+/*  Read @IncludeGraphicRepeated { <filename> } and record its presence.     */
+/*                                                                           */
+/*****************************************************************************/
+
+void ReadIncGRepeatedDef(unsigned typ, OBJECT encl)
+{ OBJECT t, fname;
+  t = LexGetToken();
+  if( type(t) != LBR )
+  { Error(5, 5, "left brace expected here in %s declaration",
+      WARN, &fpos(t), KW_INCG_REPEATED);
+    Dispose(t);
+    return;
+  }
+  fname = Parse(&t, encl, FALSE, FALSE);
+  fname = ReplaceWithTidy(fname, FALSE);
+  if( !is_word(type(fname)) )
+  { Error(5, 6, "name of %s file expected here", WARN, &fpos(fname),
+      KW_INCG_REPEATED);
+    DisposeObject(fname);
+    return;
+  }
+  debug0(DFS, D, "  calling PS_IncGRepeated from ReadPrependDef");
+  incg_type(fname) = (typ == INCG_REPEATED ? INCGRAPHIC : SINCGRAPHIC);
+  PS_IncGRepeated(fname);
 } /* end ReadPrependDef */
 
 
@@ -261,6 +292,7 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     case NOT_REVEALED:
 
       NextToken(t, res);
@@ -275,6 +307,8 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case SYS_DATABASE:
     case PREPEND:
     case SYS_PREPEND:
+    case INCG_REPEATED:
+    case SINCG_REPEATED:
     case OPEN:
 
       Error(5, 12, "symbol %s not allowed in macro", WARN, &fpos(t),
@@ -499,6 +533,12 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
     }
     else if( type(t) == PREPEND || type(t) == SYS_PREPEND )
     { ReadPrependDef(type(t), encl);
+      Dispose(t);
+      t = LexGetToken();
+      continue;  /* next definition */
+    }
+    else if( type(t) == INCG_REPEATED || type(t) == SINCG_REPEATED )
+    { ReadIncGRepeatedDef(type(t), encl);
       Dispose(t);
       t = LexGetToken();
       continue;  /* next definition */

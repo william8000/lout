@@ -4,7 +4,7 @@
 @Begin
 @PP
 The @@Break symbol influences the appearance of paragraphs (Section
-{@NumberOf concatenation}), offering a fixed set of nine styles:
+{@NumberOf concatenation}), offering a fixed set of styles:
 @IL
 
 @LI {
@@ -20,7 +20,7 @@ each paragraph;
 outdent.break @Index { @Code outdent @@Break }
 |2m Like {@Code adjust}, except that @Code "2.0f @Wide {} &0i" is
 inserted at the beginning of every line except the first, creating
-an outdented paragraph;
+an outdented paragraph (the outdent width may be changed -- see below);
 }
 
 @LI {
@@ -144,7 +144,20 @@ last lines of the paragraphs of {@I object}.
 These options work by adding the @Code "u" (unbreakable) suffix to the
 appropriate gaps during paragraph breaking, so their precise effect is
 as described for this suffix.  These options may be countermanded by
-@Code "breakablefirst @Break" and @Code "breakablelast @Break".
+@Code "breakablefirst @Break" and @Code "breakablelast @Break".  The
+width of the outdenting used in the @Code "outdent" style may be changed
+like this:
+@IL
+
+@LI {
+2i @Wide { |1rt @Code "{ setoutdent" @I width @Code "} @Break" @I object }
+|2m Within {@I object}, whenever outdenting is required, use @I width
+for the amount of outdenting.  Note that this does not itself cause a
+switch to outdenting style.  The width may be preceded by @Code "+" or
+@Code -- to indicate a change to the existing outdent value.
+}
+
+@EL
 @PP
 Several options may be given to the @@Break symbol simultaneously, in
 any order.  For example,

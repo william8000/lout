@@ -217,7 +217,7 @@ option:
 "@Data"
 "    colour { blue }"
 }
-For the complete list of acceptable colour names, see Section
+For the complete list of acceptable colours, see Section
 {@NumberOf colour}.  The @Code "colour" option's name may also be
 spelt @Code {"color"}.
 @PP
@@ -262,6 +262,8 @@ the original input had been
 "}"
 }
 There is also {@Code "xonly"}, which inserts y values 1, 2, and so on.  The
-default value, {@Code "xandy"}, gives the usual interpretation.  The
-layout of data on lines has no effect on the interpretation.
+default value, {@Code "xandy"}, gives the usual interpretation, and
+{@Code "swapxandy"} exchanges adjacent pairs of numbers in the data, so
+that the data is interpreted as @E { (y, x) } pairs rather than @E { (x, y) }
+pairs.  The layout of data on lines has no effect on the interpretation.
 @End @Section

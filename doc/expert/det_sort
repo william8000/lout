@@ -27,11 +27,11 @@ If several sorted galleys with the same key are sent to the same place,
 the default behaviour is to print only the first of them; the assumption
 is that the others are probably unwanted duplicates.  This holds good
 for sorted reference lists, for example:  we don't want two copies of
-a reference just because we happen to cite it twice.  However, the
-other common example of sorted galleys, index entries, requires something
-different:  @I merged galleys.
+a reference just because we happen to cite it twice.
 @PP
-Suppose that at some point of the document we insert the index entry
+The other common example of sorted galleys, index entries, requires
+something different from discarding duplicates:  @I merged
+galleys.  Suppose that at some point of the document we insert the index entry
 @ID @Code "aardvarks @IndexEntry { Aardvarks, 23 }"
 while at another point we insert
 @ID @Code "aardvarks @IndexEntry { Aardvarks, 359 }"
@@ -80,4 +80,12 @@ is @Eq { O ( n sup 2 ) } or somewhat higher (but always polynomial
 in @Eq { n }) depending on how many times the parameters occur
 within the body of @@Merge; to do it in the natural linear order
 would take Lout exponential time.
+@PP
+For horrible reasons concerning making it possible to print reference
+lists sorted by point of first citation, the particular sort key
+{@Code "??"} is treated differently.  If two galleys have this
+key, according to the rules above either the second would be
+discarded or else it would be merged with the first.  However,
+for this particular key only, the two galleys will in fact be
+kept distinct, just as though their sort keys had been different.
 @End @Section

@@ -1037,4 +1037,13 @@
     @Recode { No }
 }
 
+{ @FontDef
+    @Tag { BarCode-Base }
+    @Family { BarCode }
+    @Face { Base }
+    @Name { Code39 }
+    @Metrics { BC39 }
+    @Mapping { BC39.LCM }
+    @Recode { Yes }
+}
 

@@ -18,7 +18,7 @@ gnu. @Index { GNU Public License }
 primary source is directory
 @ID @Code "ftp://ftp.cs.usyd.edu.au/jeff/lout"
 in which may be found a gzipped tar file containing the main distribution
-(currently {@Code "lout-3.24.tar.gz"}), and various other things including
+(currently {@Code "lout-3.25.tar.gz"}), and various other things including
 a PostScript version of this guide.  The distribution contains source code,
 libraries, documentation, license, and installation instructions.
 @PP
@@ -61,7 +61,8 @@ hope that seeing their ideas adopted will be thanks enough.
 @DP
 @RLD lines @Break {
 Jeffrey H. Kingston
-Basser Department of Computer Science
+School of Information Technologies
+(formerly Basser Department of Computer Science)
 The University of Sydney 2006, Australia
 @Code "jeff@cs.usyd.edu.au"
 }

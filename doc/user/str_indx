@@ -258,6 +258,7 @@ There are eight setup file options for the index.  Here they are with
 their default values:
 @ID @OneRow @Code @Verbatim {
 @MakeIndex { No }
+@IndexText { @Null }
 @IndexFont { }
 @IndexBreak { oragged 1.2fx }
 @IndexColumnNumber { 2 }
@@ -272,6 +273,12 @@ determines whether to produce an index or not.  Although the default
 value is {@Code No}, any type of document may be given an index just
 by changing it to {@Code Yes}.  This has already been done in the
 @Code book setup file, but not in the others.
+@PP
+@Code "@IndexText" is some text to put at the start of the index,
+after the heading but before any index entries.  It will appear
+full width on the page.  This option is also available as an option
+of the {@Code "@Document"}, {@Code "@Report"}, and {@Code "@Book"}
+symbols.
 @PP
 @Code "@IndexFont" determines the font and font size of index entries
 indexfont. @Index @Code "@IndexFont"
@@ -320,7 +327,8 @@ output.  Just replace @Code Index by @Code IndexA to refer to index A,
 and by @Code IndexB to refer to index B.  For example,
 @ID @Code "smith.j @IndexA { Smith, John }"
 will insert an index entry to index A, and @Code "@IndexBBlanks"
-will insert the usual 25 blank entries into index B.
+will insert the usual 25 blank entries into index B.  There are
+setup file options to change the titles of indexes.
 @PP
 In large projects it might help to rename the @Code "@IndexA" symbol
 to something else, such as {@Code "@AuthorIndex"}.  This can

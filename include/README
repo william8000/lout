@@ -40,6 +40,7 @@ Source files (containing Lout and PostScript source code for the packages)
 --------------------------------------------------------------------------
 
        bsf              The BasicSetup package
+       ccommand         Definition of the @ColourCommand symbol
        bsf.lpg          A PostScript prepend file needed by BasicSetup
        dsf              The DocumentSetup package
        docf             The OrdinarySetup package
@@ -51,7 +52,6 @@ Source files (containing Lout and PostScript source code for the packages)
        tabf             The Tab table formatting package (OBSOLETE)
        tabf.lpg         A PostScript prepend file needed by tabf (OBSOLETE)
        tblf             The Tbl table formatting package
-       tblf.lpg         A PostScript prepend file needed by tblf
        eqf              The Eq equation formatting package
        figf             The Fig advanced graphics package (OBSOLETE)
        figf.lpg         A PostScript prepend file needed by figf (OBSOLETE)
@@ -83,4 +83,4 @@ Miscellaneous
 
 
 Jeffrey H. Kingston
-8 April 2000
+21 October 2001

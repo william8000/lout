@@ -1,17 +1,20 @@
-langdef Czech Cesky Cestina			{ czech		. : ! ? .) ?) !) .' !' ?' }
-langdef Danish Dansk				{ danish	. : ! ? .) ?) !) .' !' ?' }
-langdef Dutch Nederlands			{ dutch		. : ! ? .) ?) !) .' !' ?' }
-langdef English					{ english	. : ! ? .) ?) !) .' !' ?' }
-langdef EnglishUK				{ engluk	. : ! ? .) ?) !) .' !' ?' }
-langdef Finnish Suomi				{ finnish	. : ! ? .) ?) !) .' !' ?' }
-langdef French Francais "Fran\347ais"		{ french				  }
-langdef German Deutsch				{ german	. : ! ? .) ?) !) .' !' ?' }
-langdef Hungarian Magyar			{ -		. : ! ? .) ?) !) .' !' ?' }
-langdef	Italian Italiano			{ italian	. : ! ? .) ?) !) .' !' ?' }
-langdef Norwegian Norsk				{ norweg	. : ! ? .) ?) !) .' !' ?' }
-langdef Polish Polski				{ polish	. : ! ? .) ?) !) .' !' ?' }
-langdef Portuguese "Português"			{ portugal	. : ! ? .) ?) !) .' !' ?' }
-langdef Russian "\362\325\323\323\313\311\312"  { russian	. : ! ? .) ?) !) .' !' ?' }
-langdef Slovenian Slovenia Slovenija		{ slovenia	. : ! ? .) ?) !) .' !' ?' }
-langdef Spanish	"Espa\361ol"			{ spanish	. : ! ? .) ?) !) .' !' ?' }
-langdef Swedish	Svenska				{ swedish	. : ! ? .) ?) !) .' !' ?' }
+langdef Croatian Hrvatski hr			{ croatian	. : ! ? .) ?) !) .' !' ?' }
+langdef Czech Cesky Cestina cs			{ czech		. : ! ? .) ?) !) .' !' ?' }
+langdef Danish Dansk da				{ danish	. : ! ? .) ?) !) .' !' ?' }
+langdef Dutch Nederlands nl			{ dutch		. : ! ? .) ?) !) .' !' ?' }
+langdef English en				{ english	. : ! ? .) ?) !) .' !' ?' }
+langdef EnglishUK "en-GB"			{ engluk	. : ! ? .) ?) !) .' !' ?' }
+langdef Finnish Suomi fi			{ finnish				  }
+langdef French Francais "Fran\347ais" fr	{ french				  }
+langdef German Deutsch de			{ german				  }
+langdef Hungarian Magyar hu			{ magyar	. : ! ? .) ?) !) .' !' ?' }
+langdef	Italian Italiano it			{ italian				  }
+langdef Norwegian Norsk no			{ norweg	. : ! ? .) ?) !) .' !' ?' }
+langdef Polish Polski pl			{ polish	. : ! ? .) ?) !) .' !' ?' }
+langdef Portuguese "Português" pt		{ portugal	. : ! ? .) ?) !) .' !' ?' }
+langdef Russian "\362\325\323\323\313\311\312" ru { russian	. : ! ? .) ?) !) .' !' ?' }
+langdef Slovak Slovensky Slovencina sk		{ slovak	. : ! ? .) ?) !) .' !' ?' }
+langdef Slovenian Slovenia Slovenija sl		{ slovenia	. : ! ? .) ?) !) .' !' ?' }
+langdef Spanish	"Espa\361ol" es			{ spanish				  }
+langdef Swedish	Svenska sv			{ swedish	. : ! ? .) ?) !) .' !' ?' }
+langdef UpperSorbian hornjoserbsce serbsce wen	{ uppersorbian  . : ! ? .) ?) !) .' !' ?' }

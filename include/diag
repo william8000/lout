@@ -33,7 +33,7 @@
   # save		{ no			}
   # maxlabels		{ 200			}
   # title    		{ (none)		}
-  # titleformat 	{ Italic @Font @Title //0.7f ||0.35f @Body }
+  # titleformat 	{ Slope @Font @Title //0.7f ||0.35f @Body }
 
   #############################################################################
   #                                                                           #
@@ -383,6 +383,8 @@
   # bias		{ 2.0f			}
   # fbias		{ 2.0f			}
   # tbias		{ 2.0f			}
+  # hfrac		{ 0.5			}
+  # hbias		{ 0.0f			}
   # radius		{ 1.0f			}
   # xindent		{ 0.8f			}
   # zindent		{ 0.8f			}

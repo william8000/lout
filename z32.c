@@ -1,7 +1,7 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -63,6 +63,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
       word_colour(y) = word_colour(x);
       word_outline(y) = word_outline(x);
       word_language(y) = word_language(x);
+      word_baselinemark(y) = word_baselinemark(x);
       word_hyph(y) = word_hyph(x);
       underline(y) = underline(x);
       MergeNode(y, x);  x = y;
@@ -119,6 +120,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     
       Child(y, LastDown(x));
       y = Next(y, inc, done);

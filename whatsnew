@@ -285,10 +285,37 @@ Changes and new features introduced in Version 3.24 [8 October 2000]
 
     Bug fixes, including a new and better fix for table running headers bugs
 
+Changes and new features introduced in Version 3.25 [December 2001]
+
+    Bug fixes
+    Finnish additions
+    Croatian, Slovakian, Upper Sorbian
+    Outdent is now settable e.g. { setoutdent 0.3f } @Break object
+    @InitialOutdent options for initializing outdent value
+    Updated barcodes package to work with recent Lout versions (@FontDef)
+    "downifneeded @Scale" like "{} @Scale" but will only scale down, not up
+    @F symbol yields a settable font, no longer hardwired to Courier
+    @TitleOf symbol e.g. "@TitleOf azaleas" similar to "@NumberOf azaleas"
+    @IndexText option to @Book etc., allows text just below Index title
+    References may be printed in order of first citation
+    New @Diag link types: @HVHLine, @HVHCurve, @VHVLine, @VHVCurve
+    "baselinemark @Font" option (mark along baseline rather than half x height)
+    @IncludeGraphicRepeated symbol: less output when EPS included repeatedly
+    Arbitrary colours in @Colour, @Tbl, @Diag, and @Graph, done consistently
+    Size of small caps can be set now e.g. "{ setsmallcaps 0.8 } @Font ..."
+    Got rid of boxes around links when PostScript converted to PDF
+    Revised end of sentence handling for some languages
+    Symbols for embedding clickable URLs into PostScript output
+
+    I've decided not to maintain the PDF back end, but I will try to ensure
+    that Lout's PostScript output works with PostScript-to-PDF converters.
+
 Things that ought to be done but haven't been done yet
 
-    Various improvements/bug fixes for PDF output
-    Review Uwe's proposal for moving word row marks to the baseline
+    Fix bug in table running headers code
+    Fix bug in hyphenation across pages of some unusual kinds of list items
+    Fix bug in index header placement when there are multiple indexes
+    Column-width footnotes in full-width pages.
 
 Jeff Kingston
-8 October 2000
+21 October 2000

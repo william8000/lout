@@ -1,7 +1,7 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -302,6 +302,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     case VCAT:
     case HCAT:
     case ACAT:
@@ -452,6 +453,7 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     case ROTATE:
     case BACKGROUND:
     case SCALE:
@@ -576,14 +578,7 @@ OBJECT Meld(OBJECT x, OBJECT y)
   {
     for( yi = 1;  yi < ylen;  yi++ )
     {
-      if( is_word(type(xcomp[xi])) )
-      { is_equal = is_word(type(ycomp[yi])) &&
-	  StringEqual(string(xcomp[xi]), string(ycomp[yi]));
-      }
-      else
-      {
-	is_equal = (type(xcomp[xi]) == type(ycomp[yi]));
-      }
+      is_equal = EqualManifested(xcomp[xi], ycomp[yi]);
       if( is_equal )
       {
 	table[xi][yi] = 1 + table[xi - 1][yi - 1];
@@ -671,4 +666,154 @@ OBJECT Meld(OBJECT x, OBJECT y)
 
   debug1(DOS, D, "Meld returning %s", EchoObject(res));
   return res;
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  static BOOLEAN EqualChildren(x, y)                                       */
+/*                                                                           */
+/*  Return TRUE if manifested objects x and y have equal children.           */
+/*                                                                           */
+/*****************************************************************************/
+
+static BOOLEAN EqualChildren(OBJECT x, OBJECT y)
+{ OBJECT xl, yl, xc, yc;
+  xl = Down(x), yl = Down(y);
+  for( ; xl != x && yl != y;  xl = NextDown(xl), yl = NextDown(yl) )
+  {
+    Child(xc, xl);
+    Child(yc, yl);
+    if( !EqualManifested(xc, yc) )
+      return FALSE;
+  }
+  return xl == x && yl == y;
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  BOOLEAN EqualManifested(x, y)                                            */
+/*                                                                           */
+/*  Return TRUE if manifested objects x and y are equal.                     */
+/*                                                                           */
+/*****************************************************************************/
+
+BOOLEAN EqualManifested(OBJECT x, OBJECT y)
+{
+  if( is_word(type(x)) && is_word(type(y)) )
+  {
+    return StringEqual(string(x), string(y));
+  }
+  else if( type(x) != type(y) )
+  {
+    return FALSE;
+  }
+  else switch( type(x) )
+  {
+    case GAP_OBJ:
+
+      /* objects are equal if the two gaps are equal */
+      return GapEqual(gap(x), gap(y));
+      break;
+
+
+    case CLOSURE:
+
+      /* objects are equal if it's the same symbol and same parameters */
+      if( actual(x) != actual(y) )
+	return FALSE;
+      return EqualChildren(x, y);
+      break;
+
+
+    case PAGE_LABEL:
+    case NULL_CLOS:
+    case CROSS:
+    case FORCE_CROSS:
+    case HEAD:
+    case SPLIT:
+    case HSPANNER:
+    case VSPANNER:
+    case COL_THR:
+    case ROW_THR:
+    case ACAT:
+    case HCAT:
+    case VCAT:
+    case HSCALE:
+    case VSCALE:
+    case BEGIN_HEADER:
+    case SET_HEADER:
+    case END_HEADER:
+    case CLEAR_HEADER:
+    case ONE_COL:
+    case ONE_ROW:
+    case HCOVER:
+    case VCOVER:
+    case HCONTRACT:
+    case VCONTRACT:
+    case HEXPAND:
+    case VEXPAND:
+    case START_HSPAN:
+    case START_VSPAN:
+    case START_HVSPAN:
+    case HSPAN:
+    case VSPAN:
+    case KERN_SHRINK:
+    case BACKGROUND:
+    case GRAPHIC:
+    case PLAIN_GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
+    case LINK_URL:
+    case INCGRAPHIC:
+    case SINCGRAPHIC:
+    case PAR:
+
+      /* objects are equal if the children are equal */
+      return EqualChildren(x, y);
+      break;
+
+
+    case WIDE:
+    case HIGH:
+
+      /* objects are equal if constraints and children are equal */
+      return EqualConstraint(constraint(x), constraint(y)) &&
+	     EqualChildren(x, y);
+      break;
+
+
+    case HSHIFT:
+    case VSHIFT:
+
+      /* objects are equal if constraints and children are equal */
+      return shift_type(x) == shift_type(y) &&
+	     GapEqual(shift_gap(x), shift_gap(y)) && EqualChildren(x, y);
+      break;
+
+
+    case SCALE:
+
+      /* objects are equal if constraints and children are equal */
+      return bc(constraint(x)) == bc(constraint(y)) &&
+	     fc(constraint(x)) == fc(constraint(y)) &&
+	     EqualChildren(x, y);
+      break;
+
+
+    case ROTATE:
+
+      /* objects are equal if angle is equal and children are equal */
+      return sparec(constraint(x)) == sparec(constraint(y)) &&
+	     EqualChildren(x, y);
+      break;
+
+
+    default:
+
+      Error(7, 2, "EqualUnsized: type == %s", FATAL, &fpos(x), Image(type(x)));
+      return FALSE;
+      break;
+  }
 }

@@ -287,9 +287,12 @@ def @PythonSetup
 	}
 
 
+	export "'''"
 	def @PS		# for formatting strings
-	    right x
+	    body x
 	{
+	    def "'''" { "'''" }
+
 	    style @Case {
 		fixed @Yield fixedstringsformat {
 		    { strings @Else fixedstrings } @Font x

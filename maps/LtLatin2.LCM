@@ -251,7 +251,7 @@
 205	315	Iacute		LC iacute;	UA I;		AC acute;
 206	316	Icircumflex	LC icircumflex;	UA I;		AC circumflex;
 207	317	Dcaron		LC dcaron;	UA D;		AC caron;
-208	320	Eth 		LC eth;
+208	320	Dcroat 		LC dcroat;
 209	321	Nacute		LC nacute;	UA N;		AC acute;
 210	322	Ncaron		LC ncaron;	UA N;		AC caron;
 211	323	Oacute		LC oacute;	UA O;		AC acute;
@@ -283,7 +283,7 @@
 237	355	iacute		UC Iacute;	UA dotlessi;	AC acute;
 238	356	icircumflex	UC Icircumflex;	UA dotlessi;	AC circumflex;
 239	357	dcaron		UC Dcaron;	UA d;		AC caron;
-240	360	eth 		UC Eth;
+240	360	dcroat 		UC Dcroat;
 241	361	nacute		UC Nacute;	UA n;		AC acute;
 242	362	ncaron		UC Ncaron;	UA n;		AC caron;
 243	363	oacute		UC Oacute;	UA o;		AC acute;

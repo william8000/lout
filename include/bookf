@@ -322,6 +322,7 @@ def @BookSetup
         named @AtAfter { dft }
         named @InitialFont { @InitialFont }
         named @InitialBreak { @InitialBreak }
+        named @InitialOutdent { @InitialOutdent }
         named @InitialSpace { @InitialSpace }
         named @InitialLanguage { @InitialLanguage }
         named @PageOrientation { @PageOrientation }
@@ -330,6 +331,9 @@ def @BookSetup
         named @FirstPageNumber { @FirstPageNumber }
         named @IntroFirstPageNumber { @IntroFirstPageNumber }
 	named @OptimizePages { @OptimizePages }
+	named @IndexText { @IndexText }
+	named @IndexAText { @IndexAText }
+	named @IndexBText { @IndexBText }
     {
 	def @Before
 	{
@@ -469,6 +473,7 @@ def @BookSetup
 		headingfont { @ChapterHeadingFont }
 		headingbreak { @ChapterHeadingBreak }
 		headingformat { @Num @ChapterHeadingFormat @Body }
+		headingtext { @IndexText }
 		incontents { @IndexInContents }
 		pnprefix { @IndexPrefix }
 		inrunners { Yes }
@@ -501,6 +506,7 @@ def @BookSetup
 		headingfont { @ChapterHeadingFont }
 		headingbreak { @ChapterHeadingBreak }
 		headingformat { @Num @ChapterHeadingFormat @Body }
+		headingtext { @IndexAText }
 		incontents { @IndexAInContents }
 		pnprefix { @IndexAPrefix }
 		inrunners { Yes }
@@ -533,6 +539,7 @@ def @BookSetup
 		headingfont { @ChapterHeadingFont }
 		headingbreak { @ChapterHeadingBreak }
 		headingformat { @Num @ChapterHeadingFormat @Body }
+		headingtext { @IndexAText }
 		incontents { @IndexBInContents }
 		pnprefix { @IndexBPrefix }
 		inrunners { Yes }
@@ -651,8 +658,9 @@ def @BookSetup
 		}
 	}
 
-        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
-	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
+        @InitialFont @Font { @InitialBreak setoutdent @InitialOutdent } @Break
+	@InitialLanguage @Language @InitialSpace @Space
+	{ @ColourCommand @InitialColour } @SetColour
         {
 
 	    @SeparateIntroNumbering @Case {

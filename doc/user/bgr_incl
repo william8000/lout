@@ -44,4 +44,34 @@ page than would otherwise have been the case, and
 prints it half the current font size lower.  Any length (Section
 {@NumberOf objects}) is allowed, and the object following @Code "@VShift"
 may in fact be arbitrary as usual.
+@PP
+Sometimes you need to include the same EPS file many times, for
+example once per page.  If it is a large file it can make the
+output file very large to include it over and over again.  Lout
+offers a solution to this problem, in the form of the
+includegraphicrepeated. @Index @Code "@IncludeGraphicRepeated"
+@Code "@IncludeGraphicRepeated" symbol.  You place this at
+the start of your document, like this for example:
+@ID @Code {
+"@Include { doc }"
+"@IncludeGraphicRepeated { su_crest.eps }"
+}
+(note the braces around the following EPS file name).  Adding
+@Code "@IncludeGraphicRepeated" like this does not actually print the
+graphic anywhere on any page; on the contrary, it is guaranteed to not
+change the appearance of your document at all.  What it does do
+is give Lout a hint that the EPS file between the braces is likely
+to be included many times over in this document.  Lout then
+handles this EPS file in a different way that involves copying it
+into the PostScript output file just once, no matter how many
+times it is included by subsequent @Code "@IncludeGraphic" symbols.
+@PP
+When your EPS file would otherwise be included many times over, using
+@Code "@IncludeGraphicRepeated" definitely makes your PostScript
+output file a lot shorter, and it usually makes it print faster as
+well.  On the other hand, {@Code "@IncludeGraphicRepeated"} uses
+Level 2 PostScript features which some older printers may not have,
+and it consumes a lot of memory in the printer.  If memory runs out
+your job will not print properly, so @Code "@IncludeGraphicRepeated"
+must be used with caution.
 @End @Section

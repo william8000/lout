@@ -210,6 +210,7 @@ def @DocumentSetup
 	named @Address      {}
 	named @Annote       {}
 	named @Author       {}
+	named @CiteOrder    {}
 	named @Day          {}
 	named @Edition      {}
 	named @HowPublished {}
@@ -236,6 +237,7 @@ def @DocumentSetup
 				{  @Tag			} # sorting key
 
     named @MakeIndex		{  No			} # make index? Yes or No
+    named @IndexText		{  @Null		} # initial index text
     named @IndexFont		{			} # index entries font
     named @IndexBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index entries break
     named @IndexColumnNumber	{  2			} # index columns (1 to 10)
@@ -247,6 +249,7 @@ def @DocumentSetup
 	right @CtdWord
 				{  @Body @I (@CtdWord)	} # (ctd.) format
     named @MakeIndexA		{  No			} # make index A? Yes or No
+    named @IndexAText		{  @Null		} # initial index text
     named @IndexAFont		{			} # index A entries font
     named @IndexABreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index A entries break
     named @IndexAColumnNumber	{  2			} # index A columns (1 to 10)
@@ -258,6 +261,7 @@ def @DocumentSetup
 	right @CtdWord
 				{  @Body @I (@CtdWord)	} # (ctd.) format
     named @MakeIndexB		{  No			} # make index B? Yes or No
+    named @IndexBText		{  @Null		} # initial index text
     named @IndexBFont		{			} # index B entries font
     named @IndexBBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index B entries break
     named @IndexBColumnNumber	{  2			} # index B columns (1 to 10)
@@ -3160,6 +3164,13 @@ def @DocumentSetup
 	    @Address      { @Reference&&tag @Open { @Address }		}
 	    @Annote       { @Reference&&tag @Open { @Annote }		}
 	    @Author       { @Reference&&tag @Open { @Author }		}
+
+	    @CiteOrder    { {@NumberOf tag} @Case {
+			      "??" @Yield "??"
+			      else @Yield { "1000" @Plus @NumberOf tag }
+			    }
+			  }
+
 	    @Day          { @Reference&&tag @Open { @Day }		}
 	    @Edition      { @Reference&&tag @Open { @Edition }		}
 	    @HowPublished { @Reference&&tag @Open { @HowPublished }	}
@@ -3172,7 +3183,8 @@ def @DocumentSetup
 	    @Label        { label @Case {
 			      "" @Yield {@Reference&&tag @Open {@Label}}
 			      else @Yield label
-			    }						}
+			    }
+			  }
 
 	    @Month        { @Reference&&tag @Open { @Month }		}
 	    @Note         { @Reference&&tag @Open { @Note }		}
@@ -4136,8 +4148,8 @@ def @DocumentSetup
     def @IndexASection into { @IndexAPlace&&following }
 	right etc
     {
-	// @IndexAList // etc
-	// @BypassIndexAList // etc
+	// @IndexABreak @Break @IndexAList // etc
+	// @IndexABreak @Break @BypassIndexAList // etc
     }
 
     def @DoIndexA into { @IndexAList&&following }
@@ -4249,8 +4261,8 @@ def @DocumentSetup
     def @IndexBSection into { @IndexBPlace&&following }
 	right etc
     {
-	// @IndexBList // etc
-	// @BypassIndexBList // etc
+	// @IndexBBreak @Break @IndexBList // etc
+	// @IndexBBreak @Break @BypassIndexBList // etc
     }
 
     def @DoIndexB into { @IndexBList&&following }
@@ -4370,6 +4382,7 @@ def @DocumentSetup
 	named headingbreak {}		# its heading break
 	named headingformat		# its heading format
 	    left @Num right @Body {}
+	named headingtext { @Null }	# heading text
 	named incontents { No }         # entry in table of contents required
 	named contentsindent { 0f }	# only if type is Major
 	named word {}
@@ -4505,6 +4518,7 @@ def @DocumentSetup
 		    headingfont @Font
 		    headingbreak @Break @Protect {@LongNum headingformat title}
 		    // @PageMark tag
+		    @DP headingtext
 		}
 
 		{ Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield {
@@ -4513,6 +4527,7 @@ def @DocumentSetup
 		    headingfont @Font
 		    headingbreak @Break { @LongNum headingformat title }
 		    // @PageMark tag
+		    @DP headingtext
 		    }
 		}
 
@@ -4521,6 +4536,7 @@ def @DocumentSetup
 		    headingfont @Font
 		    headingbreak @Break { bypassnumber headingformat title }
 		    // @PageMark tag
+		    @DP headingtext
 		    }
 		}
 	    }
@@ -4553,6 +4569,7 @@ def @DocumentSetup
 	    //  @IfMajor { @FootNoteThrough @Do @BeginFootNoteCounter }
             //  @Run @StartIfMajor
             //  @ContentsStuff
+	    //  @TitleMarker @Tag { tag } @Value { title }
             //  intheorems @BeginAllCounters @ShortNum
             //  indisplays @BeginDisplayCounter @ShortNum
             //  infigures @BeginFigureCounter @ShortNum

@@ -1,7 +1,7 @@
 /*@z35.c:Time Keeper: MomentSym(), TimeString()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -105,6 +105,7 @@ void InitTime(void)
     Error(35, 1, "unable to obtain the current time", WARN, no_fpos);
   now = localtime(&raw_time);
   StringCopy(time_string, AsciiToFull(asctime(now)));
+  time_string[StringLength(time_string) - 1] = '\0';
 
   /* start of current_moment */
   New(current_moment, CLOSURE);

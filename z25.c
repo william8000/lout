@@ -1,7 +1,7 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -528,11 +528,9 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	aprint(" COLM:");
 	echo(y, FORCE_PREC, count);
 	newline();
-	/* ***
 	Child(y, DownDim(x, ROWM));
 	aprint(" ROWM:");
-	echo(y, FORCE_PREC);
-	*** */
+	echo(y, FORCE_PREC, count);
 	moveleft();
 	break;
 
@@ -726,6 +724,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     case ROTATE:
     case BACKGROUND:
     case SCALE:

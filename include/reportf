@@ -19,7 +19,7 @@ def @ReportSetup
     named @AboveTitleGap		{ 1i			}
     named @TitleFont			{ Bold			}
     named @TitleBreak			{ clines 1.4vx		}
-    named @AuthorFont			{ Italic		}
+    named @AuthorFont			{ Slope			}
     named @AuthorBreak			{ clines 		}
     named @InstitutionFont		{ 			}
     named @InstitutionBreak		{ clines 		}
@@ -259,6 +259,7 @@ def @ReportSetup
         named @AtEnd { dft }
         named @InitialFont { @InitialFont }
         named @InitialBreak { @InitialBreak }
+        named @InitialOutdent { @InitialOutdent }
         named @InitialSpace { @InitialSpace }
         named @InitialLanguage { @InitialLanguage }
 	named @PageOrientation { @PageOrientation }
@@ -269,6 +270,9 @@ def @ReportSetup
 	named @AbstractDisplay { @AbstractDisplay }
 	named @AbstractTitle { @AbstractTitle }
 	named @Abstract {}
+	named @IndexText { @IndexText }
+	named @IndexAText { @IndexAText }
+	named @IndexBText { @IndexBText }
     {
 
 	def @Cntr right x
@@ -379,6 +383,7 @@ def @ReportSetup
                 headingfont { @IndexHeadingFont }
                 headingbreak { @IndexHeadingBreak }
                 headingformat { @IndexHeadingFormat @Body }
+                headingtext { @IndexText }
                 incontents { @IndexInContents }
                 prefix { @IndexPrefix }
                 inrunners { Yes }
@@ -415,6 +420,7 @@ def @ReportSetup
                 headingfont { @IndexAHeadingFont }
                 headingbreak { @IndexAHeadingBreak }
                 headingformat { @IndexAHeadingFormat @Body }
+                headingtext { @IndexAText }
                 incontents { @IndexAInContents }
                 prefix { @IndexAPrefix }
                 inrunners { Yes }
@@ -451,6 +457,7 @@ def @ReportSetup
                 headingfont { @IndexBHeadingFont }
                 headingbreak { @IndexBHeadingBreak }
                 headingformat { @IndexBHeadingFormat @Body }
+                headingtext { @IndexBText }
                 incontents { @IndexBInContents }
                 prefix { @IndexBPrefix }
                 inrunners { Yes }
@@ -524,8 +531,9 @@ def @ReportSetup
 	    //			@MakeIndex  @Do @IndexPart
         }
 
-        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
-	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
+        @InitialFont @Font { @InitialBreak setoutdent @InitialOutdent } @Break
+	@InitialLanguage @Language @InitialSpace @Space
+	{ @ColourCommand @InitialColour } @SetColour
         {
 	    @CoverSheet @Case {
 

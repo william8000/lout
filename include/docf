@@ -217,6 +217,7 @@ def @OrdinarySetup
     def @Document
         named @InitialFont { @InitialFont }
         named @InitialBreak { @InitialBreak }
+        named @InitialOutdent { @InitialOutdent }
         named @InitialSpace { @InitialSpace }
         named @InitialLanguage { @InitialLanguage }
 	named @PageOrientation { @PageOrientation }
@@ -225,6 +226,9 @@ def @OrdinarySetup
         named @FirstPageNumber { @FirstPageNumber }
 	named @OptimizePages { @OptimizePages }
 	named @Unpaginated { No }
+	named @IndexText { @IndexText }
+	named @IndexAText { @IndexAText }
+	named @IndexBText { @IndexBText }
     {
 	def @ReferencesPart
 	    named @Tag {}
@@ -273,6 +277,7 @@ def @OrdinarySetup
 		headingfont { @IndexHeadingFont }
 		headingbreak { @IndexHeadingBreak }
 		headingformat { @IndexHeadingFormat @Body }
+		headingtext { @IndexText }
 		incontents { @IndexInContents }
 		pnprefix { @IndexPrefix }
 		inrunners { Yes }
@@ -309,6 +314,7 @@ def @OrdinarySetup
 		headingfont { @IndexAHeadingFont }
 		headingbreak { @IndexAHeadingBreak }
 		headingformat { @IndexAHeadingFormat @Body }
+		headingtext { @IndexAText }
 		incontents { @IndexAInContents }
 		pnprefix { @IndexAPrefix }
 		inrunners { Yes }
@@ -345,6 +351,7 @@ def @OrdinarySetup
 		headingfont { @IndexBHeadingFont }
 		headingbreak { @IndexBHeadingBreak }
 		headingformat { @IndexBHeadingFormat @Body }
+		headingtext { @IndexBText }
 		incontents { @IndexBInContents }
 		pnprefix { @IndexBPrefix }
 		inrunners { Yes }
@@ -380,8 +387,9 @@ def @OrdinarySetup
             //	NonStart @Runner
         }
 
-        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
-	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
+        @InitialFont @Font { @InitialBreak setoutdent @InitialOutdent } @Break
+	@InitialLanguage @Language @InitialSpace @Space
+	{ @ColourCommand @InitialColour } @SetColour
         {
 		Yes @BeginAllCounters {}
 		Yes @BeginDisplayCounter {}
@@ -770,6 +778,7 @@ def @OrdinarySetup
 
 	}
 
+	//1.1f
 	//  Start @Runner
 	//  @Body
 	//  NonStart @Runner

@@ -1,7 +1,7 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -276,7 +276,7 @@ BOOLEAN check)
   assert( tag[0] != '\0', "DbInsert: null tag!" );
   assert( seq[0] != '\0', "DbInsert: null seq!" );
   ifdebug(DPP, D, ProfileOn("DbInsert"));
-  debug6(DBS, D, "DbInsert(%s, %s, %s, %s, %s, %s, dlnum, dfpos)",
+  debug6(DBS, DD, "DbInsert(%s, %s, %s, %s, %s, %s, dlnum, dfpos)",
 	string(db), bool(gall), SymName(sym), tag, seq,
 	dfnum == NO_FILE ? AsciiToFull(".") : FileName(dfnum));
   assert(!reading(db), "DbInsert: insert into reading database");
@@ -626,7 +626,7 @@ static BOOLEAN SearchFile(FILE *fp, int left, int right,
 FULL_CHAR *str, FULL_CHAR *line)
 { int l, r, mid, mid_end;  FULL_CHAR buff[MAX_BUFF];  BOOLEAN res;
   ifdebug(DPP, D, ProfileOn("SearchFile"));
-  debug3(DBS, DD, "SearchFile(fp, %d, %d, %s, line)", left, right, str);
+  debug3(DBS, D, "SearchFile(fp, %d, %d, %s, line)", left, right, str);
 
   l = left;  r = right;
   while( l <= r )
@@ -651,9 +651,16 @@ FULL_CHAR *str, FULL_CHAR *line)
     assert( mid_end <= r,  "SearchFile: mid_end > r!"    );
 
     /* compare str with this line and prepare next step */
-    debug2(DBS, DD, "  comparing key %s with line %s", str, line);
-    if( TabbedStringLessEqual(str, line) )  r = mid - 1;
-    else l = mid_end + 1;
+    if( TabbedStringLessEqual(str, line) )
+    {
+      debug2(DBS, D, "  left after comparing key %s with line %s", str, line);
+      r = mid - 1;
+    }
+    else
+    {
+      debug2(DBS, D, "  right after comparing key %s with line %s", str, line);
+      l = mid_end + 1;
+    }
   } /* end while */
 
   /* now first key >= str lies in fp[l]; compare it with str */
@@ -664,7 +671,7 @@ FULL_CHAR *str, FULL_CHAR *line)
     res = StringEqual(str, buff);
   }
   else res = FALSE;
-  debug1(DBS, DD, "SearchFile returning %s", bool(res));
+  debug1(DBS, D, "SearchFile returning %s", bool(res));
   ifdebug(DPP, D, ProfileOff("SearchFile"));
   return res;
 } /* end SearchFile */

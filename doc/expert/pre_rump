@@ -38,4 +38,10 @@ well-suited to melding complex index entries.  Note that there must be
 a non-zero amount of space before each comma, otherwise each will become
 part of the preceding word, and, since @@Meld compares the two paragraphs
 word by word, the result will be different and less satisfactory.
+@PP
+Determining the values of all these symbols requires testing whether
+one component of the first paragraph is equal to one component of the
+second.  Since Version 3.25, the objects involved may be arbitrary
+and Lout will perform the necessary detailed checking for equality;
+previously, only simple words were guaranteed to be tested correctly.
 @End @Section

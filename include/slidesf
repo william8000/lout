@@ -77,17 +77,17 @@ def @OverheadSetup
     #######################################################################
 
     export num
-    def @LectureList named @Tag {} right num
+    def @LectureList named @Tag {} named num {}
     {
 		@Galley
-        //1.1b  @LectureList @Next num
+        //1.1b  @LectureList num { @Next num }
     }
 
     export num
-    def @OverheadsList named @Tag {} right num
+    def @OverheadsList named @Tag {} named num {}
     {
 		@Galley
-        //1.1b	@OverheadsList @Next num
+        //1.1b	@OverheadsList num { @Next num }
     }
 
     export num
@@ -121,6 +121,7 @@ def @OverheadSetup
         named @DateLine { @DateLine }
         named @InitialFont { @InitialFont }
         named @InitialBreak { @InitialBreak }
+        named @InitialOutdent { @InitialOutdent }
         named @InitialSpace { @InitialSpace }
         named @InitialLanguage { @InitialLanguage }
 	named @PageOrientation { @PageOrientation }
@@ -185,13 +186,14 @@ def @OverheadSetup
 			else		@Yield @Null
 		    }
 	    //      Start @Runner @MajorTitle { @GetTitle }
-	    //1.1b  @OverheadsList @FirstOverheadNumber
-	    //1.1b  @LectureList @FirstLectureNumber
+	    //1.1b  @OverheadsList num { @FirstOverheadNumber }
+	    //1.1b  @LectureList num { @FirstLectureNumber }
 	    //1.1b  @ReferencesPart
 	}
 
-        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
-	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
+        @InitialFont @Font { @InitialBreak setoutdent @InitialOutdent } @Break
+	@InitialLanguage @Language @InitialSpace @Space
+	{ @ColourCommand @InitialColour } @SetColour
         {
 		@SaveTitle {
 		    @InitialLanguage @Language { @RunningTitle @Dft @Title }
@@ -278,6 +280,8 @@ def @OverheadSetup
 	named @BypassNumber { dft }
         body @Body
     {
+	def @SaveTitle { @Title }
+
         def @EndOverheadsPlace { @Galley }
 
         def @EndOverheads force into { @EndOverheadsPlace&&preceding }
@@ -330,6 +334,7 @@ def @OverheadSetup
 		prefix { @LectureNum }
 		majornum { @LectureNum }
 		majortitle { @GetTitle }
+		minortitle { @SaveTitle }
 		intheorems { @OverheadNumInTheorems }
 		indisplays { OverheadNumInDisplays }
 		infigures { @OverheadNumInFigures }

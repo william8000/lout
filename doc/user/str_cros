@@ -80,6 +80,20 @@ produces
 For further information on this point, please consult
 Section @NumberOf cross (page @PageOf { cross }).
 }
+For symbols with a @Code "@Title" option (chapters, sections, etc.)
+there is also the @Code "@TitleOf" symbol:
+@ID @OneRow @Code {
+"For further information on this point, please consult"
+"the @TitleOf { cross } section."
+}
+produces
+@QD {
+"For further information on this point, please consult"
+"the @TitleOf { cross } section."
+}
+But this symbol won't work for footnotes, list items, and other
+things without a title.
+@PP
 Like all tags, the value of the @Code "@Tag" option should be a simple
 word (although Lout does accept multi-word tags).  Cross referencing of
 list items yields just the number of the item, in Arabic, Roman, or
@@ -115,11 +129,12 @@ version of cross references called {@I links}, which allow the user to
 click on, say, the entry for a section in a table of contents and be
 immediately transported to the page on which that section begins.  In
 principle, anything could happen when a link is clicked on, but Lout
-only offers the kind of link that transports the user to some page
-in the current document.
+only offers two kinds of links:  @I { internal links } that transport
+the user to some page in the current document, and @I { external
+links } that transports the user to a URL location on the World Wide Web.
 @PP
-Lout automatically makes a link out of every page number it prints
-in the table of contents and in the index, and every reference
+Lout automatically makes an internal link out of every page number it
+prints in the table of contents and in the index, and every reference
 citation.  You can also insert your own links, using the
 @Code "@CrossLink" symbol like this:
 @ID @Code "See cross @CrossLink { Section @NumberOf cross }"
@@ -169,11 +184,25 @@ to the right of @Code "@CrossLink" can be an arbitrary Lout object:
 However, in this form the @Code "@CrossLinkFormat" setup file option
 is still applied.
 @PP
-At present, the @Code "@CrossLink" symbol behaves as though a @Code "@OneCol"
-symbol encloses the object on its right.  This means that that object
-is kept together on one line of any enclosing paragraph, and inter-word
-spaces within it are not adjusted along with the inter-word spaces of
-any enclosing paragraph.  This deficiency might be corrected in the
-future, but meanwhile it means that it is best to keep your objects
-on the right short.
+External links are obtained in much the same way as internal ones,
+except that the symbol to use is @Code "@ExternalLink" and instead
+of supplying a tag, you need to supply a URL:
+@ID @Code {
+"\"http://snark.ptc.spbu.ru/~uwe/lout/lout.html\" @ExternalLink { Lout Home Page }"
+}
+Once again the result is the object to the right, modified by any
+@Code "@Format" option; and there is an {@Code "@ExternalLinkFormat"}
+setup file option that works in the same way as
+{@Code "@CrossLinkFormat"}.  This time, though, the effect is to
+jump right out of your document to the given place on the World
+Wide Web, assuming that the software you are using to display your
+document is capable of such a thing.
+@PP
+At present, the @Code "@CrossLink" and @Code "@ExternalLink" symbols
+behave as though a @Code "@OneCol" symbol encloses the object to their
+right.  This means that that object is kept together on one line of any
+enclosing paragraph, and inter-word spaces within it are not adjusted
+along with the inter-word spaces of any enclosing paragraph.  This
+deficiency might be corrected in the future, but meanwhile it means
+that it is best to keep your objects on the right short.
 @End @Section

@@ -1,7 +1,7 @@
-/*@z03.c:File Service:Declarations, no_fpos@******************************** */
+/*@503.c:File Service:Declarations, no_fpos@******************************** */
 /*                                                                           */
 /*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -37,13 +37,6 @@
 #endif
 
 #define	INIT_TAB 	  3			/* initial file table size   */
-
-#define	file_number(x)	word_font(x)		/* file number of file x     */
-#define	type_of_file(x) word_colour(x)		/* type of file x            */
-#define	used_suffix(x)	word_hyph(x)		/* file needs .lt suffix     */
-#define	updated(x)	fwd(x, COLM)		/* TRUE when x is updated    */
-#define	line_count(x)	fwd(x, ROWM)		/* number of lines written   */
-#define	path(x)		back(x, COLM)		/* search path for file x    */
 
 
 /*****************************************************************************/
@@ -182,7 +175,7 @@ static	FILE_TABLE	file_tab;		/* the file table            */
 static	OBJECT		file_type[MAX_TYPES];	/* files of each type        */
 static	OBJECT		file_path[MAX_PATHS];	/* the search paths          */
 static	char		*file_mode[MAX_TYPES] =
-{ READ_TEXT, READ_TEXT, READ_TEXT, READ_TEXT, READ_BINARY, READ_TEXT,
+{ READ_TEXT, READ_TEXT, READ_TEXT, READ_BINARY, READ_TEXT,
   READ_TEXT, READ_TEXT, READ_BINARY, READ_TEXT, READ_TEXT };
 
 
@@ -801,8 +794,10 @@ FILE *OpenFile(FILE_NUM fnum, BOOLEAN check_ld, BOOLEAN check_lt)
 /*  FILE *OpenIncGraphicFile(str, typ, full_name, xfpos, compressed)         */
 /*                                                                           */
 /*  Open for reading the @IncludeGraphic file str; typ is INCGRAPHIC or      */
-/*  SINCGRAPHIC.  Return the full name in full_name.  Set compressed to      */
-/*  TRUE if the file was a compressed file.                                  */
+/*  SINCGRAPHIC; xfpos is the file position of the file name.                */
+/*                                                                           */
+/*  Return the full name in full_name.  Set compressed to TRUE if the file   */
+/*  was a compressed file.                                                   */
 /*                                                                           */
 /*****************************************************************************/
 #define MAX_COMPRESSED 6

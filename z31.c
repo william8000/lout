@@ -1,7 +1,7 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -266,6 +266,7 @@ void MemInit(void)
   zz_lengths[ GRAPHIC      ] =
   zz_lengths[ LINK_SOURCE  ] =
   zz_lengths[ LINK_DEST    ] =
+  zz_lengths[ LINK_URL     ] =
 	ceiling(sizeof(struct closure_type), sizeof(ALIGN));
 
   zz_lengths[ HEAD         ] =
@@ -281,6 +282,8 @@ void MemInit(void)
   zz_lengths[ GSTUB_INT    ] =
   zz_lengths[ GSTUB_EXT    ] =
   zz_lengths[ UNEXPECTED_EOF] =
+  zz_lengths[ INCG_REPEATED ] =
+  zz_lengths[ SINCG_REPEATED] =
   zz_lengths[ PREPEND      ] =
   zz_lengths[ SYS_PREPEND  ] =
   zz_lengths[ DATABASE     ] =

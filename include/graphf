@@ -711,8 +711,7 @@ def @Graph
     named ylog     named none { "0" }               { none           }
     named points   named none { "none" }            { none           }
     named pairs    named none { "none" }            { none           }
-    named colour   named none { "none" }            { none           }
-    named color    named none { "none" }            { none           }
+    named colour color  named none { "none" }            { none           }
     named paint    named none { "none"  }           { none           }
     named xmin     named none { "false" }           { none           }
     named xmax     named none { "false" }           { none           }
@@ -818,8 +817,7 @@ def @Graph
     def @Data
 	named points   named none { "none" }            { points     }
 	named pairs    named none { "none" }            { pairs      }
-	named colour   named none { "none" }            { colour     }
-	named color    named none { "none" }            { color      }
+	named colour color   named none { "none" }            { colour     }
 	named paint    named none { "none" }            { paint      }
 	named dashlength                                { dashlength }
 	named linewidth                                 { linewidth  }
@@ -941,44 +939,14 @@ def @Graph
         {
 	    dataformat @Case {
 	        xandy     @Yield xandy
+	        swapxandy @Yield swapxandy
 	        yonly     @Yield yonly
 	        xonly     @Yield xonly
 	    }
         }
 
-	def @Col
-	{
-	    { colour @Case { "none" @Yield color else @Yield colour } } @Case {
-		none		@Yield	{                         }
-		nochange	@Yield	{                         }
-		darkblue	@Yield	{ 0.0 0.0 0.5 setrgbcolor }
-		blue		@Yield	{ 0.0 0.0 1.0 setrgbcolor }
-		lightblue	@Yield	{ 0.5 0.5 1.0 setrgbcolor }
-		darkgreen	@Yield	{ 0.0 0.5 0.0 setrgbcolor }
-		green		@Yield	{ 0.0 1.0 0.0 setrgbcolor }
-		lightgreen	@Yield	{ 0.5 1.0 0.5 setrgbcolor }
-		darkred		@Yield	{ 0.5 0.0 0.0 setrgbcolor }
-		red		@Yield	{ 1.0 0.0 0.0 setrgbcolor }
-		lightred	@Yield	{ 1.0 0.5 0.5 setrgbcolor }
-		darkcyan	@Yield	{ 0.0 0.5 0.5 setrgbcolor }
-		cyan		@Yield	{ 0.0 1.0 1.0 setrgbcolor }
-		lightcyan	@Yield	{ 0.5 1.0 1.0 setrgbcolor }
-		darkmagenta	@Yield	{ 0.5 0.0 0.5 setrgbcolor }
-		magenta		@Yield	{ 1.0 0.0 1.0 setrgbcolor }
-		lightmagenta	@Yield	{ 1.0 0.5 1.0 setrgbcolor }
-		darkyellow	@Yield	{ 0.5 0.5 0.0 setrgbcolor }
-		yellow		@Yield	{ 1.0 1.0 0.0 setrgbcolor }
-		lightyellow	@Yield	{ 1.0 1.0 0.5 setrgbcolor }
-		darkgray	@Yield	{ 0.2 0.2 0.2 setrgbcolor }
-		gray		@Yield	{ 0.5 0.5 0.5 setrgbcolor }
-		lightgray	@Yield	{ 0.7 0.7 0.7 setrgbcolor }
-		darkgrey	@Yield	{ 0.2 0.2 0.2 setrgbcolor }
-		grey		@Yield	{ 0.5 0.5 0.5 setrgbcolor }
-		lightgrey	@Yield	{ 0.7 0.7 0.7 setrgbcolor }
-		black		@Yield	{ 0.0 0.0 0.0 setrgbcolor }
-		white		@Yield	{ 1.0 1.0 1.0 setrgbcolor }
-	    }
-	}
+# include @ColourCommand symbol
+@SysInclude { ccommand }
 
 	def @Paint
 	{
@@ -992,7 +960,7 @@ def @Graph
 	  "{" @Points "}"
 	  "{" @Pairs "}"
 	  "{ /dashlength" dashlength "def"
-	  "  /linewidth"  linewidth  "def" @Col
+	  "  /linewidth"  linewidth  "def" @ColourCommand colour
 	  "  /symbolsize" symbolsize "def }"
 	  "{" @Paint "}"
        "]"

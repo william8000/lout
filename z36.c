@@ -1,7 +1,7 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -1082,6 +1082,7 @@ OBJECT Hyphenate(OBJECT x)
       word_colour(z) = word_colour(y);
       word_outline(z) = word_outline(y);
       word_language(z) = word_language(y);
+      word_baselinemark(z) = word_baselinemark(y);
       word_hyph(z) = word_hyph(y);
       underline(z) = underline(y);
       debug1(DHY, DD, "Hyphenate (hyph case) making fragment %s", string(z));
@@ -1197,6 +1198,7 @@ OBJECT Hyphenate(OBJECT x)
 	word_colour(z) = word_colour(y);
 	word_outline(z) = word_outline(y);
 	word_language(z) = word_language(y);
+	word_baselinemark(z) = word_baselinemark(y);
 	word_hyph(z) = word_hyph(y);
 	underline(z) = underline(y);
         debug1(DHY, D, "Hyphenate making fragment %s", string(z));

@@ -1,7 +1,7 @@
 /*@z09.c:Closure Expansion:SearchEnv()@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -185,7 +185,8 @@ OBJECT *crs, OBJECT *res_env)
 	    res = CopyObject(res, no_fpos);
 	  }
 	  else
-	  { debug2(DCE, DD, "link %s %s",
+	  {
+	    debug2(DCE, DD, "link %s %s",
 	      FullSymName(actual(par), AsciiToFull(".")), EchoObject(res));
 	    DeleteLink(Down(par));
 	    y = MakeWord(WORD, STR_NOCROSS, &fpos(res));
@@ -227,8 +228,9 @@ OBJECT *crs, OBJECT *res_env)
   /* case x is a user-defined symbol or default parameter */
   if( res == nilobj )
   { if( sym_body(actual(x)) == nilobj )
-      res = MakeWord(WORD,STR_NOCROSS,&fpos(x));
-    else res = CopyObject(sym_body(actual(x)), &fpos(x));
+      res = MakeWord(WORD, STR_NOCROSS, &fpos(x));
+    else
+      res = CopyObject(sym_body(actual(x)), &fpos(x));
     ReplaceNode(res, x);  AttachEnv(env, x);
     debug0(DCR, DDD, "  calling SetEnv from ClosureExpand (c)");
     *res_env = SetEnv(x, nilobj);

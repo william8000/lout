@@ -1,7 +1,7 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -613,7 +613,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
   sym = actual(x);
   StyleCopy(save_style(x), *style);
-  debugcond2(DOM, D, StringEqual(SymName(sym), "@Section"),
+  debugcond2(DOM, DD, StringEqual(SymName(sym), "@Section"),
      "manifesting %s at %s", SymName(sym), EchoFilePos(&fpos(x)));
   debug1(DOM, DD,  "  [ manifesting closure %s", SymName(sym));
 
@@ -1009,6 +1009,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	word_colour(x) = colour(*style);
 	word_outline(x) = outline(*style);
 	word_language(x) = language(*style);
+	word_baselinemark(x) = baselinemark(*style);
 	word_hyph(x) = hyph_style(*style) == HYPH_ON;
 	debug3(DOM, DDD, "  manfifest/WORD underline() := %s for %s %s",
 	  "UNDER_OFF", Image(type(x)), EchoObject(x));
@@ -1041,6 +1042,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	word_colour(y) = colour(*style);
 	word_outline(y) = outline(*style);
 	word_language(y) = language(*style);
+	word_baselinemark(y) = baselinemark(*style);
 	word_hyph(y) = hyph_style(*style) == HYPH_ON;
 	if( small_caps(*style) && ok )  y = MapSmallCaps(y, style);
       }
@@ -1078,6 +1080,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  word_colour(y) = colour(*style);
 	  word_outline(y) = outline(*style);
 	  word_language(y) = language(*style);
+	  word_baselinemark(y) = baselinemark(*style);
 	  word_hyph(y) = hyph_style(*style) == HYPH_ON;
 	  if( small_caps(*style) && ok )  y = MapSmallCaps(y, style);
 	}
@@ -1208,7 +1211,8 @@ OBJECT *enclose, BOOLEAN fcr)
 	    word_font(prev) == word_font(y) &&
 	    word_colour(prev) == word_colour(y) &&
 	    word_outline(prev) == word_outline(y) &&
-	    word_language(prev) == word_language(y) )
+	    word_language(prev) == word_language(y) &&
+	    word_baselinemark(prev) == word_baselinemark(y) )
 	    /* no need to compare underline() since both are false */
 	{ unsigned typ;
 	  assert( underline(prev) == UNDER_OFF, "Manifest/ACAT: underline(prev)!" );
@@ -1223,6 +1227,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  word_colour(y) = word_colour(prev);
 	  word_outline(y) = word_outline(prev);
 	  word_language(y) = word_language(prev);
+	  word_baselinemark(y) = word_baselinemark(prev);
 	  word_hyph(y) = word_hyph(prev);
 	  underline(y) = UNDER_OFF;
           debug3(DOM, DDD, "  manifest/ACAT4 underline() := %s for %s %s",
@@ -1291,6 +1296,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	        word_colour(z) = colour(*style);
 	        word_outline(z) = outline(*style);
 	        word_language(z) = language(*style);
+	        word_baselinemark(z) = baselinemark(*style);
 	        word_hyph(z) = hyph_style(*style) == HYPH_ON;
 		underline(z) = UNDER_OFF;
 	        Link(new_acat, z);
@@ -1495,6 +1501,13 @@ OBJECT *enclose, BOOLEAN fcr)
       {
 	/* missing scale factor, meaning to be inserted automatically */
         bc(constraint(x)) = fc(constraint(x)) = 0;  /* work out later */
+	bfc(constraint(x)) = 0;
+      }
+      else if( is_word(type(y)) && StringEqual(string(y), STR_SCALE_DOWN) )
+      {
+	/* scale factor "downifneeded", meaning to be inserted automatically */
+        bc(constraint(x)) = fc(constraint(x)) = 0;  /* work out later */
+	bfc(constraint(x)) = -1;
       }
       else if( type(y) != ACAT )
       {
@@ -1727,7 +1740,7 @@ OBJECT *enclose, BOOLEAN fcr)
     case RUMP:
 
       assert( Down(x) != x && NextDown(Down(x)) != x, "Manifest: COMMON!" );
-      debug2(DHY, DDD, "[Manifest %s %s", EchoObject(x), EchoObject(env));
+      debug2(DOM, D, "[Manifest %s %s", EchoObject(x), EchoObject(env));
 
       /* find the first child of x, make sure it is an ACAT, and manifest */
       Child(x1, Down(x));
@@ -1750,7 +1763,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	}
 	else link1 = NextDown(link1);
       }
-      debug1(DHY, DDD, "  manifested x1 = %s", EchoObject(x1));
+      debug1(DOM, D, "  manifested x1 = %s", EchoObject(x1));
  
       /* find the second child of x, make sure it is an ACAT, and manifest */
       Child(x2, NextDown(Down(x)));
@@ -1773,7 +1786,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	}
 	else link2 = NextDown(link2);
       }
-      debug1(DHY, DDD, "  manifested x2 = %s", EchoObject(x2));
+      debug1(DOM, D, "  manifested x2 = %s", EchoObject(x2));
      
       if( type(x) == MELD )
       {
@@ -1790,13 +1803,10 @@ OBJECT *enclose, BOOLEAN fcr)
         {
 	  Child(y1, link1);
 	  Child(y2, link2);
-	  debug1(DHY, DDD, "    y1 = %s", EchoObject(y1));
-	  debug1(DHY, DDD, "    y2 = %s", EchoObject(y2));
-	  if( is_word(type(y1)) && is_word(type(y2)) )
-	  {
-	    if( !StringEqual(string(y1), string(y2)) )  break;
-	  }
-	  else if( type(y1) != type(y2) )  break;
+	  debug1(DOM, D, "    y1 = %s", EchoObject(y1));
+	  debug1(DOM, D, "    y2 = %s", EchoObject(y2));
+	  if( !EqualManifested(y1, y2) )
+	    break;
 	  link1 = NextDown(link1);
 	  link2 = NextDown(link2);
         }
@@ -1842,7 +1852,7 @@ OBJECT *enclose, BOOLEAN fcr)
       DisposeObject(x);
       x = res;
       ReplaceWithSplit(x, bthr, fthr);
-      debug1(DHY, DDD, "]Manifest returning %s", EchoObject(x));
+      debug1(DOM, D, "]Manifest returning %s", EchoObject(x));
       break;
 
 
@@ -1937,7 +1947,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	res = MakeWord(WORD, buff, &fpos(x));
       }
       else
-      { res = MakeWord(WORD, STR_NOCROSS, &fpos(x));
+      { res = MakeWord(WORD, (FULL_CHAR *) "???", &fpos(x));
       }
       debug4(DOM, DD, "{ %s } %s { %s } = %s", EchoObject(y), Image(type(x)),
 	EchoObject(z), EchoObject(res));
@@ -2016,6 +2026,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
 
       Child(y, LastDown(x));
       y = Manifest(y, env, style, nbt, nft, target, crs, ok,FALSE,enclose,fcr);

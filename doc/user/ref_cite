@@ -48,14 +48,16 @@ references which are not cited anywhere in the body of their document.  For
 this there is {@Code "@NoCite"}:
 no.cite @Index @Code "@NoCite"
 @ID @Code {
-"... our scope @NoCite { $kingston1995lout.expert, $kingston1993lout.design }."
+"... our scope @NoCite { $kingston1995lout.expert $kingston1993lout.design }."
 }
 produces
 @ID {
-... our scope @NoCite { $kingston1995lout.expert, $kingston1993lout.design }.
+... our scope @NoCite { $kingston1995lout.expert $kingston1993lout.design }.
 }
 with the @Code "@NoCite" symbol and any preceding space removed.  The
-references will nevertheless appear in the reference list as usual.  There
+references will nevertheless appear in the reference list as usual.  Note
+that if you put commas between the references inside @Code "@NoCite" you
+will get commas in the output (so don't).  There
 is a @Code "@NoChapCite" symbol that combines @Code "@NoCite" and
 no.chap.cite @Index @Code "@NoChapCite"
 {@Code "@ChapCite"}.  For compatibility with previous versions of Lout,

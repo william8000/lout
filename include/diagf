@@ -27,7 +27,7 @@ def @DiagSetup
     named titleformat
 	left @Title
 	right @Body
-				{ Italic @Font @Title //0.7f ||0.35f @Body }
+				{ Slope @Font @Title //0.7f ||0.35f @Body }
 
     ###########################################################################
     #                                                                         #
@@ -489,6 +489,8 @@ def @DiagSetup
 	named bias {}
 	named fbias {}
 	named tbias {}
+	named hfrac {}
+	named hbias {}
 	named radius {}
 	named xindent {}
 	named zindent {}
@@ -502,6 +504,8 @@ def @DiagSetup
     import @Geometry named bias		{ 2.0f			}
     import @Geometry named fbias	{ 2.0f			}
     import @Geometry named tbias	{ 2.0f			}
+    import @Geometry named hfrac	{ 0.5			}
+    import @Geometry named hbias	{ 0.0f			}
     import @Geometry named radius	{ 1.0f			}
     import @Geometry named xindent	{ 0.8f			}
     import @Geometry named zindent	{ 0.8f			}
@@ -644,6 +648,8 @@ def @DiagSetup
 	   @HVCurve @HVCurveArrow @VHCurve @VHCurveArrow
 	   @LVRLine @LVRArrow @RVLLine @RVLArrow
 	   @LVRCurve @LVRCurveArrow @RVLCurve @RVLCurveArrow
+	   @HVHLine @HVHArrow @VHVLine @VHVArrow
+	   @HVHCurve @HVHCurveArrow @VHVCurve @VHVCurveArrow
 	   @DWrapLine @DWrapArrow @UWrapLine @UWrapArrow
 	   @DWrapCurve @DWrapCurveArrow @UWrapCurve @UWrapCurveArrow
 
@@ -920,6 +926,8 @@ def @DiagSetup
 	    named bias {}
 	    named fbias {}
 	    named tbias {}
+	    named hfrac {}
+	    named hbias {}
 	    named radius {}
 	    named xindent {}
 	    named zindent {}
@@ -933,6 +941,8 @@ def @DiagSetup
 						    bias	{ bias }
 						    fbias	{ fbias }
 						    tbias	{ tbias }
+						    hfrac	{ hfrac }
+						    hbias	{ hbias }
 						    radius	{ radius }
 						    xindent	{ xindent }
 						    zindent	{ zindent }
@@ -946,6 +956,8 @@ def @DiagSetup
 	import @Geometry named bias		{ bias			}
 	import @Geometry named fbias		{ fbias			}
 	import @Geometry named tbias		{ tbias			}
+	import @Geometry named hfrac		{ hfrac			}
+	import @Geometry named hbias		{ hbias			}
 	import @Geometry named radius		{ radius		}
 	import @Geometry named xindent		{ xindent		}
 	import @Geometry named zindent		{ zindent		}
@@ -1126,6 +1138,17 @@ def @DiagSetup
 	#                                                                     #
 	#######################################################################
 
+# include @ColourCommand symbol
+@SysInclude { ccommand }
+
+        def @PSAddPaint right col
+	{
+	  col @Case {
+	    { "none" "nopaint" } @Yield "{}"
+	    else             @Yield { "{" @ColourCommand col "fill }" }
+	  }
+	}
+
         # Like @Graphic, but affects the graphics state of right parameter
         def @InnerGraphic
             left ps
@@ -1223,14 +1246,27 @@ def @DiagSetup
             precedence 33
 	    associativity right
             left name
+	    named restrict {}
             right x
         {
-          @BackEnd @Case {
-            PostScript @Yield {
-            { "("name") ldiagpushtagdict"
-              // "ldiagpopuptagdict" } @Graphic x
-	      }
-	      PDF @Yield {}
+
+	    def @PushCommand
+	    {
+		"("name") ldiagpushtagdict"
+	    }
+
+	    def @PopCommand
+	    {
+		restrict @Case {
+		  "" @Yield "ldiagpopuptagdict"
+		  else @Yield { "[" restrict "] ldiagpopsometagdict" }
+		}
+		# "ldiagpopuptagdict"
+	    }
+
+            @BackEnd @Case {
+		PostScript @Yield { {@PushCommand // @PopCommand} @Graphic x }
+		PDF @Yield {}
 	    }
         }
 
@@ -2481,7 +2517,7 @@ def @DiagSetup
 		    {
 			"ldiagnodebegin [" @OutLine "]"
 			outlinedashlength "[" outlinestyle "]"
-			outlinewidth "/ldiag"paint "ldiagnodeend"
+			outlinewidth @PSAddPaint paint "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -2824,7 +2860,7 @@ def @DiagSetup
 		    {
 			"ldiagnodebegin [" @OutLine "]"
 			outlinedashlength "[" outlinestyle "]"
-			outlinewidth "/ldiag"paint "ldiagnodeend"
+			outlinewidth @PSAddPaint paint "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -3167,7 +3203,7 @@ def @DiagSetup
 		    {
 			"ldiagnodebegin [" @OutLine "]"
 			outlinedashlength "[" outlinestyle "]"
-			outlinewidth "/ldiag"paint "ldiagnodeend"
+			outlinewidth @PSAddPaint paint "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -3510,7 +3546,7 @@ def @DiagSetup
 		    {
 			"ldiagnodebegin [" @OutLine "]"
 			outlinedashlength "[" outlinestyle "]"
-			outlinewidth "/ldiag"paint "ldiagnodeend"
+			outlinewidth @PSAddPaint paint "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -3874,6 +3910,8 @@ def @DiagSetup
                 named bias {}
                 named fbias {}
                 named tbias {}
+                named hfrac {}
+                named hbias {}
                 named radius {}
                 named xindent {}
                 named zindent {}
@@ -3887,6 +3925,8 @@ def @DiagSetup
 						    bias { bias }
 						    fbias { fbias }
 						    tbias { tbias }
+						    hfrac { hfrac }
+						    hbias { hbias }
 						    radius { radius }
 						    xindent { xindent }
 						    zindent { zindent }
@@ -3900,6 +3940,8 @@ def @DiagSetup
             import @Geometry named bias		{ bias			}
             import @Geometry named fbias	{ fbias			}
             import @Geometry named tbias	{ tbias			}
+            import @Geometry named hfrac	{ hfrac			}
+            import @Geometry named hbias	{ hbias			}
             import @Geometry named radius	{ radius		}
             import @Geometry named xindent	{ xindent		}
             import @Geometry named zindent	{ zindent		}
@@ -4619,6 +4661,191 @@ def @DiagSetup
 		}
 	    }
 
+
+	    import @Geometry
+	    def @HVHLinePath  # still to do
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	      {arrow @FromArrowLength arrowlength}
+	      {arrow @ToArrowLength arrowlength}
+	      "{" from "}" "{" to "}"
+	      xindent zindent hfrac hbias "ldiaghvhlinepath"
+	      # FRDIRN  := {{from??CTR angleto to??CTR} quadcase
+	      #     0 { 0d } 0-90 { 0d } 90 { 0d } 90-180 { 180d }
+	      #	    180 { 180d } 180-270 { 180d } 270 { 180d } 270-360 { 0d }}
+	      # TODIRN  := {FRDIRN + 180d}
+	      # FROM    :: from boundaryatangle FRDIRN ++
+	      #     {arrow @FromArrowLength arrowlength} atangle FRDIRN
+	      # FROM    :< FRDIRN
+	      # TO      :: to boundaryatangle TODIRN ++
+	      #	    {arrow @ToArrowLength arrowlength} atangle TODIRN
+	      # TO      :< FRDIRN
+	      # BIAS    := abs { xcoord FROM - xcoord TO } * hfrac + hbias
+	      # P1      :: FROM ++ BIAS atangle FRDIRN
+	      # P2      :: { xcoord P1 ycoord TO }
+	      # LMID    :: { P1 ** 0.5 ++ P2 ** 0.5 }
+	      # LMID    :< P1 angleto P2
+	      # XINDENT := xindent min {FROM distance P1}
+	      # ZINDENT := zindent min {P2 distance TO}
+	      # LFROM   :: FROM ++ {XINDENT atangle FRDIRN}
+	      # LFROM   :< FRDIRN
+	      # LTO     :: TO ++ {ZINDENT atangle TODIRN}
+	      # LTO     :< FRDIRN
+	      # FROM LFROM P1 LMID P2 LTO TO
+
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    import @Geometry
+	    def @HVHCurvePath # still to do
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	      {arrow @FromArrowLength arrowlength}
+	      {arrow @ToArrowLength arrowlength}
+	      "{" from "}" "{" to "}"
+	      xindent zindent hfrac hbias radius "ldiaghvhcurvepath"
+	      # FRDIRN  := {{from??CTR angleto to??CTR} quadcase
+	      #     0 { 0d } 0-90 { 0d } 90 { 0d } 90-180 { 180d }
+	      #     180 { 180d } 180-270 { 180d } 270 { 180d } 270-360 { 0d }}
+	      # TODIRN  := {FRDIRN + 180d}
+	      # FROM    :: from boundaryatangle FRDIRN ++
+	      #     {arrow @FromArrowLength arrowlength} atangle FRDIRN
+	      # FROM    :< FRDIRN
+	      # TO      :: to boundaryatangle TODIRN ++
+	      #     {arrow @ToArrowLength arrowlength} atangle TODIRN
+	      # TO      :< FRDIRN
+	      # BIAS    := abs { xcoord FROM - xcoord TO } * hfrac + hbias
+	      # XP1     := FROM ++ BIAS atangle FRDIRN
+	      # XP2     := { xcoord XP1 ycoord TO }
+	      # LMID    :: { XP1 ** 0.5 ++ XP2 ** 0.5 }
+	      # VERT    := round { XP1 angleto XP2 }
+	      # LMID    :< VERT
+	      # XINDENT := xindent min {FROM distance XP1}
+	      # ZINDENT := zindent min {XP2 distance TO}
+	      # LFROM   :: FROM ++ {XINDENT atangle FRDIRN}
+	      # LFROM   :< FRDIRN
+	      # LTO     :: TO ++ {ZINDENT atangle TODIRN}
+	      # LTO     :< FRDIRN
+	      # RADIUS  := radius min { { XP1 distance XP2 } / 2 }
+	      # XP1PRE  := XP1 ++ { RADIUS atangle TODIRN }
+	      # XP1POST := XP1 ++ { RADIUS atangle VERT }
+	      # XP1CTR  := XP1PRE ++ { RADIUS atangle VERT }
+	      # P1      :: XP1CTR ++ { RADIUS atangle { XP1CTR angleto XP1 } }
+	      # P1      :< XP1PRE angleto XP1POST
+	      # XP2PRE  := XP2 -- { RADIUS atangle VERT }
+	      # XP2POST := XP2 ++ { RADIUS atangle FRDIRN }
+	      # XP2CTR  := XP2POST -- { RADIUS atangle VERT }
+	      # P2      :: XP2CTR ++ { RADIUS atangle { XP2CTR angleto XP2 } }
+	      # P2      :< XP2PRE angleto XP2POST
+	      # if cond { {VERT - FRDIRN} = 90 }
+	      # then { P1GO := "anticlockwise" P2GO := "clockwise" }
+	      # else { P1GO := "clockwise" P2GO := "anticlockwise" }
+	      # FROM LFROM
+	      # XP1PRE [XP1CTR P1GO] P1 [XP1CTR P1GO] XP1POST
+	      # LMID
+	      # XP2PRE [XP2CTR P2GO] P2 [XP2CTR P2GO] XP2POST
+	      # LTO TO
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    import @Geometry
+	    def @VHVLinePath  # still to do
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	      {arrow @FromArrowLength arrowlength}
+	      {arrow @ToArrowLength arrowlength}
+	      "{" from "}" "{" to "}"
+	      xindent zindent hfrac hbias "ldiagvhvlinepath"
+              # FROM    :: from boundaryatangle 0d
+              # ++ {arrow @FromArrowLength arrowlength} atangle 0d
+              # FROM    :< 0d
+              # TO      :: to boundaryatangle 0d
+              # ++ {arrow @ToArrowLength arrowlength} atangle 0d
+              # TO      :< 180d
+              # XRIGHT  := {{xcoord FROM} max {xcoord TO}} + bias
+              # P1      :: { XRIGHT ycoord FROM }
+              # P2      :: { XRIGHT ycoord TO   }
+              # VERT    := P1 angleto P2
+              # P1      :< P1 angleto {P1++{1f atangle 0d}  ++{1f atangle VERT}}
+              # P2      :< P2 angleto {P2++{1f atangle 180d}++{1f atangle VERT}}
+              # LMID    :: P1 ** 0.5 ++ P2 ** 0.5
+              # LMID    :< VERT
+              # XINDENT := xindent min {FROM distance P1}
+              # ZINDENT := zindent min {P2   distance TO}
+              # LFROM   :: FROM ++ { XINDENT 0 }
+              # LFROM   :< 0d
+              # LTO     :: TO ++ { ZINDENT 0 }
+              # LTO     :< 180d
+              # FROM LFROM P1 LMID P2 LTO TO
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    import @Geometry
+	    def @VHVCurvePath # still to do
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	      {arrow @FromArrowLength arrowlength}
+	      {arrow @ToArrowLength arrowlength}
+	      "{" from "}" "{" to "}"
+	      xindent zindent hfrac hbias radius "ldiagvhvcurvepath"
+	      # /FRDIRN [ { 0 dg } { 180 dg } { 180 dg } { 0 dg }
+	      #     { 0 dg } { 0 dg } { 180 dg } { 180 dg }
+	      #     from (CTR) ldiagdolabel to (CTR) ldiagdolabel
+	      #     ldiagangleto ldiagquadcase ] cvx def
+	      # /TODIRN [ FRDIRN 180 dg add ] cvx def
+	      #     from (CTR) ldiagdolabel FRDIRN from (CIRCUM) ldiagdolabel ldiagpadd
+	      #     0 0 fromarrowlength FRDIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+	      # FRDIRN /FROM@ANGLE ldiagangledef
+	      # to (CTR) ldiagdolabel TODIRN to (CIRCUM) ldiagdolabel ldiagpadd
+	      # 0 0 toarrowlength TODIRN ldiagatangle ldiagpadd /TO ldiagpointdef
+	      # FRDIRN /TO@ANGLE ldiagangledef
+	      # /BIAS [ FROM pop TO pop sub abs hfrac mul hbias add ] cvx def
+	      # /XP1 [ FROM 0 0 BIAS FRDIRN ldiagatangle ldiagpadd ] cvx def
+	      # /XP2 [ XP1 pop TO exch pop ] cvx def
+	      # XP1 0.5 ldiagpmul XP2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+	      # /VERT [ XP1 XP2 ldiagangleto round ] cvx def
+	      # VERT /LMID@ANGLE ldiagangledef
+	      # /XINDENT [ xindent FROM XP1 ldiagdistance ldiagmin ] cvx def
+	      # /ZINDENT [ zindent XP2 TO ldiagdistance ldiagmin ] cvx def
+	      # FROM 0 0 XINDENT FRDIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+	      # FRDIRN /LFROM@ANGLE ldiagangledef
+	      # TO 0 0 ZINDENT TODIRN ldiagatangle ldiagpadd /LTO ldiagpointdef
+	      # FRDIRN /LTO@ANGLE ldiagangledef
+	      # /RADIUS [ radius XP1 XP2 ldiagdistance 2 div ldiagmin ] cvx def
+	      # /XP1PRE [ XP1 0 0 RADIUS TODIRN ldiagatangle ldiagpadd ] cvx def
+	      # /XP1POST [ XP1 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+	      # /XP1CTR [ XP1PRE 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+	      # XP1CTR 0 0 RADIUS XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd /P1 ldiagpointdef
+	      # XP1PRE XP1POST ldiagangleto /P1@ANGLE ldiagangledef
+	      # /XP2PRE [ 0 0 RADIUS VERT ldiagatangle XP2 ldiagpsub ] cvx def
+	      # /XP2POST [ XP2 0 0 RADIUS FRDIRN ldiagatangle ldiagpadd ] cvx def
+	      # /XP2CTR [ 0 0 RADIUS VERT ldiagatangle XP2POST ldiagpsub ] cvx def
+	      # XP2CTR 0 0 RADIUS XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd /P2 ldiagpointdef
+	      # XP2PRE XP2POST ldiagangleto /P2@ANGLE ldiagangledef
+	      # VERT FRDIRN sub 90 eq
+	      # { /P1GO [ anticlockwise ] cvx def /P2GO [ clockwise ] cvx def }
+	      # { /P1GO [ clockwise ] cvx def /P2GO [ anticlockwise ] cvx def }
+	      # ifelse
+	      # FROM LFROM
+	      # XP1PRE [XP1CTR P1GO] P1 [XP1CTR P1GO] XP1POST
+	      # LMID
+	      # XP2PRE [XP2CTR P2GO] P2 [XP2CTR P2GO] XP2POST
+	      # LTO TO
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
 	    import @Geometry
 	    def @DWrapLinePath
 	    {
@@ -4886,6 +5113,10 @@ def @DiagSetup
 		    lvrcurve			@Yield @LVRCurvePath
 		    rvlline			@Yield @RVLLinePath
 		    rvlcurve			@Yield @RVLCurvePath
+		    hvhline			@Yield @HVHLinePath
+		    hvhcurve			@Yield @HVHCurvePath
+		    vhvline			@Yield @VHVLinePath
+		    vhvcurve			@Yield @VHVCurvePath
 		    dwrapline			@Yield @DWrapLinePath
 		    dwrapcurve			@Yield @DWrapCurvePath
 		    uwrapline			@Yield @UWrapLinePath
@@ -4897,6 +5128,8 @@ def @DiagSetup
 			    bias { bias }
 			    fbias { fbias }
 			    tbias { tbias }
+			    hfrac { hfrac }
+			    hbias { hbias }
 			    radius { radius }
 			    xindent { xindent }
 			    zindent { zindent }
@@ -4991,6 +5224,8 @@ def @DiagSetup
                 named bias {}
                 named fbias {}
                 named tbias {}
+                named hfrac {}
+                named hbias {}
                 named radius {}
                 named xindent {}
                 named zindent {}
@@ -5004,6 +5239,8 @@ def @DiagSetup
 						    bias { bias }
 						    fbias { fbias }
 						    tbias { tbias }
+						    hfrac { hfrac }
+						    hbias { hbias }
 						    radius { radius }
 						    xindent { xindent }
 						    zindent { zindent }
@@ -5019,6 +5256,8 @@ def @DiagSetup
             import @Geometry named bias		{ bias			}
             import @Geometry named fbias	{ fbias			}
             import @Geometry named tbias	{ tbias			}
+            import @Geometry named hfrac	{ hfrac			}
+            import @Geometry named hbias	{ hbias			}
             import @Geometry named radius	{ radius		}
             import @Geometry named xindent	{ xindent		}
             import @Geometry named zindent	{ zindent		}
@@ -5144,6 +5383,8 @@ def @DiagSetup
 			bias		{ bias			}
 			fbias		{ fbias			}
 			tbias		{ tbias			}
+			hfrac		{ hfrac			}
+			hbias		{ hbias			}
 			radius		{ radius		}
 			xindent		{ xindent		}
 			zindent		{ zindent		}
@@ -5155,6 +5396,8 @@ def @DiagSetup
 						bias { bias }
 						fbias { fbias }
 						tbias { tbias }
+						hfrac { hfrac }
+						hbias { hbias }
 						radius { radius }
 						xindent { xindent }
 						zindent { zindent }
@@ -5278,6 +5521,15 @@ def @DiagSetup
 	macro @LVRCurveArrow	{ @Link path { lvrcurve } arrow { yes }	}
 	macro @RVLCurve		{ @Link path { rvlcurve }		}
 	macro @RVLCurveArrow	{ @Link path { rvlcurve } arrow { yes }	}
+
+	macro @HVHLine		{ @Link path { hvhline  }		}
+	macro @HVHArrow		{ @Link path { hvhline  } arrow { yes }	}
+	macro @VHVLine		{ @Link path { vhvline  }		}
+	macro @VHVArrow		{ @Link path { vhvline  } arrow { yes }	}
+	macro @HVHCurve		{ @Link path { hvhcurve }		}
+	macro @HVHCurveArrow	{ @Link path { hvhcurve } arrow { yes }	}
+	macro @VHVCurve		{ @Link path { vhvcurve }		}
+	macro @VHVCurveArrow	{ @Link path { vhvcurve } arrow { yes }	}
 
 	macro @DWrapLine	{ @Link path { dwrapline}		}
 	macro @DWrapArrow	{ @Link path { dwrapline} arrow { yes }	}
@@ -5846,7 +6098,8 @@ def @DiagSetup
 		named ar { no }
 		right x
 	    {
-		{|i @HContract { |syntaxgap label:: @LabelMarks x |syntaxgap }}
+		{|i @HContract { |syntaxgap label:: restrict { "(WMK) (EMK)" }
+		    @LabelMarks x |syntaxgap }}
 		// @Line from { label"@WMK" } to { 0 ycoord label"@WMK" }
 		     arrow { al }
 		// @Line from { label"@EMK" } to { xsize ycoord label"@EMK" }
@@ -5860,7 +6113,8 @@ def @DiagSetup
 		named ad { no }
 		right x
 	    {
-		{/i @VContract { /syntaxgap label:: @LabelMarks x /syntaxgap }}
+		{/i @VContract { /syntaxgap label:: restrict { "(NMK) (SMK)" }
+		    @LabelMarks x /syntaxgap }}
 		|| @Line from { label"@NMK" } to { xcoord label"@NMK" ysize }
 		     arrow { au }
 		|| @Line from { label"@SMK" } to { xcoord label"@SMK" 0 }
@@ -5874,7 +6128,8 @@ def @DiagSetup
 		named ar { no }
 		right x
 	    {
-		{|i @HContract { |syntaxgap label:: @LabelMarks x |syntaxgap }}
+		{|i @HContract { |syntaxgap label:: restrict { "(WMK) (EMK)" }
+		   @LabelMarks x |syntaxgap }}
 		// @HVCurve from { label"@WMK" } to { 0 ycoord "AX@WMK" }
 		     arrow { al } bias { pssyntaxbias } radius { pssyntaxradius }
 		// @HVCurve from { label"@EMK" } to { xsize ycoord "AX@WMK" }
@@ -5888,7 +6143,8 @@ def @DiagSetup
 		named ad { no }
 		right x
 	    {
-		{/i @VContract { /syntaxgap label:: @LabelMarks x /syntaxgap }}
+		{/i @VContract { /syntaxgap label:: restrict { "(NMK) (SMK)" }
+		   @LabelMarks x /syntaxgap }}
 		|| @VHCurve from { label"@NMK" } to { xcoord "AX@NMK" ysize }
 		     arrow { au } bias { pssyntaxbias } radius { pssyntaxradius }
 		|| @VHCurve from { label"@SMK" } to { xcoord "AX@SMK" 0 }
@@ -6349,6 +6605,7 @@ def @DiagSetup
 		@LRLine {
 		    @HContract @VContract { OX:: @LabelMarks {
 		    	{ |0.5rt BX:: @LabelMarks @GoReverse B |syntaxgap }
+		    	 //syntaxgap
 		    	^//syntaxgap
 		    	{ |syntaxgap AX:: @LabelMarks A |syntaxgap }
 		    } }
@@ -6440,7 +6697,7 @@ def @DiagSetup
 	    avstrut { yes }
 	    amargin { 0.2f }
 	    aoutline { box }
-	    afont { Italic }
+	    afont { Slope }
 
 	    bvalign { mark }
 	    bvstrut { yes }

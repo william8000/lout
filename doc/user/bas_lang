@@ -33,29 +33,32 @@ knowing that non-English parts will appear as they should.
 @PP
 At the time of writing, the following languages were available:
 @ID @OneRow @Code {
-Czech Cesky Cestina
-Danish Dansk
-Dutch Nederlands
-English
-EnglishUK
-Finnish Suomi
-French Francais Fran{@Char ccedilla}ais
-German Deutsch
-Hungarian Magyar
-Italian Italiano
-Norwegian Norsk
-Polish Polski
-Portuguese Português
-Russian
-Slovenian Slovenia Slovenija
-Spanish Espa{@Char ntilde}ol
-Swedish Svenska
+Croatian Hrvatski
+Czech Cesky Cestina cs
+Danish Dansk da
+Dutch Nederlands nl
+English en
+EnglishUK en-GB
+Finnish Suomi fi
+French Francais Fran{@Char ccedilla}ais fr
+German Deutsch de
+Hungarian Magyar hu
+Italian Italiano it
+Norwegian Norsk no
+Polish Polski pl
+Portuguese Português pt
+Russian ru
+Slovak Slovensky Slovencina
+Slovenian Slovenia Slovenija sl
+Spanish Espa{@Char ntilde}ol es
+Swedish Svenska sv
+UpperSorbian hornjoserbsce serbsce
 }
-As shown, most languages have alternative names, all equally acceptable
-to the @Code "@Language" symbol.  @Code "EnglishUK" differs from
-@Code "English" only by applying hyphenation rules said to be more
-appropriate for British English.  Hungarian does not yet allow
-hyphenation.
+File @Code "include/langdefs" in the distribution always has the exact
+list of known languages.  As shown, most languages have alternative
+names, all equally acceptable to the @Code "@Language"
+symbol.  @Code "EnglishUK" differs from @Code "English" only by applying
+hyphenation rules said to be more appropriate for British English.
 @PP
 If your entire document is in a language other than English, you need
 to change the @Code "@InitialLanguage" option:
@@ -65,8 +68,8 @@ If you are using your own setup file (Section {@NumberOf setup}), you
 can change it there.  If not, you can change it at the start of your
 document, as explained in Section {@NumberOf ordinary}.
 @PP
-Czech, Polish, and Slovenian use the Latin2 character set, and
-users of these languages have to place
+Czech, Polish, and Slovenian (at least) use the Latin2 character set,
+and users of these languages have to place
 @ID @Code "@SysInclude { latin2 }"
 at the start of their documents in order to get access to the
 Latin2 versions of the fonts.
@@ -76,9 +79,24 @@ been corrected by getting Lout to generate output for these characters
 which prints their base letter and accent separately. }  These have
 family names such as TimesCE, CourierCE, HelveticaCE, and so on (CE
 standing for Central European), to distinguish them from the same
-fonts encoded in Latin1.  The face names are unchanged.  Consult
-database file @Code "latin2.ld" in the standard database directory
-for a complete list of these fonts.
+fonts encoded in Latin1.  The face names are unchanged.  A typical
+Latin2 document would therefore start off like this:
+@ID @OneRow @Code {
+"@SysInclude { latin2 }"
+"@SysInclude { doc }"
+"@Document"
+"    @InitialLanguage { Polish }"
+"    @InitialFont { TimesCE Base 12p }"
+"//"
+}
+Depending on the document type there may be a few other font-setting
+options in the setup file that need to be changed; in fact, it might be
+best to produce your own setup file in this case, replacing {@Code "doc"},
+with the changed options in it.  See Section {@NumberOf setup} for how
+to do this.  You could even start your setup file off with
+@Code "@SysInclude { latin2 }" to avoid the trouble of typing it at
+the top of every document.  Consult database file @Code "latin2.ld"
+in the standard database directory for a complete list of Latin2 fonts.
 @PP
 Russian uses Cyrillic characters.  In principle, users of Russian
 have to place

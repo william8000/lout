@@ -47,6 +47,7 @@
    def @@HSpan                { @Code "@HSpan"                }
    def @@Include              { @Code "@Include"              }
    def @@IncludeGraphic       { @Code "@IncludeGraphic"       }
+   def @@IncludeGraphicRepeated { @Code "@IncludeGraphicRepeated" }
    def @@KernShrink           { @Code "@KernShrink"           }
    def @@Key                  { @Code "@Key"                  }
    def @@Language             { @Code "@Language"             }
@@ -87,10 +88,12 @@
    def @@SysDatabase          { @Code "@SysDatabase"          }
    def @@SysInclude           { @Code "@SysInclude"           }
    def @@SysIncludeGraphic    { @Code "@SysIncludeGraphic"    }
+   def @@SysIncludeGraphicRepeated { @Code "@SysIncludeGraphicRepeated" }
    def @@SysPrependGraphic    { @Code "@SysPrependGraphic"    }
    def @@Tag                  { @Code "@Tag"                  }
    def @@Tagged               { @Code "@Tagged"               }
    def @@Underline            { @Code "@Underline"            }
+   def @@URLLink              { @Code "@URLLink"              }
    def @@Use                  { @Code "@Use"                  }
    def @@VAdjust              { @Code "@VAdjust"              }
    def @@VContract            { @Code "@VContract"            }

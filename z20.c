@@ -1,7 +1,7 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -532,6 +532,7 @@ void FlushGalley(OBJECT hd)
       case GRAPHIC:
       case LINK_SOURCE:
       case LINK_DEST:
+      case LINK_URL:
       case ACAT:
       case HCAT:
       case VCAT:
@@ -930,7 +931,7 @@ void FlushGalley(OBJECT hd)
 			StringEqual(newtag, string(tag));
 
 	/* merge galleys whose seq strings are equal */
-	if( found && StringEqual(newseq, string(seq)) )
+	if( found && StringEqual(newseq, string(seq)) && !StringEqual(newseq, STR_NOCROSS) )
 	{
 	  SwitchScope(nilobj);
 	  val = ReadFromFile(eg_fnum(eg), eg_fpos(eg), eg_lnum(eg));
@@ -951,7 +952,7 @@ void FlushGalley(OBJECT hd)
 	  }
 	}
 
-      } while( found && StringEqual(newseq, string(seq)) );
+      } while( found && StringEqual(newseq, string(seq)) && !StringEqual(newseq, STR_NOCROSS) );
       if( found )
       {	DisposeChild(Up(tag));
 	DisposeChild(Up(seq));

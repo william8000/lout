@@ -42,4 +42,40 @@ If you see @Code "dictfull" in an error message, it means that you are
 dictfull. @Index { @Code dictfull PostScript error }
 using an old version of PostScript.  Increasing the @Code "maxlabels"
 option of @@Diag (Section {@NumberOf dia_summ}) might fix the problem.
+@PP
+On other occasions your document might print without problems but you
+see things that should not be there.  Here is a typical example,
+reported by a user:
+@CD @Diag
+    margin { 0.3f }
+    outline { shadowbox }
+    shadow { 0.2f }
+    paint { lightyellow }
+    zindent { 0.4f }
+{
+    @Tbl
+        marginhorizontal { 0.55f }
+        aformat { @Cell A }
+    {
+        @Rowa
+            A { QEVENT:: @Node paint { lightblue } { QEvent } }
+        @Rowa
+            A { QIMEVENT:: @Node paint { lightblue } halign { right } { QIMEvent } }
+        @Rowa
+            A { QKEYEVENT:: @Node paint { lightblue } { QKeyEvent } }
+    }
+    //
+    @RVLCurveArrow from { QEVENT } to { QIMEVENT } bias { 1.5f }
+    @RVLCurveArrow from { QEVENT } to { QKEYEVENT } bias { 1.5f }
+}
+The problem here is the two short lengths of straight line protruding
+backwards beyond the point where the arrow starts to curve.  This has
+occurred because the @Code TO labels are to the right of the point
+where the curving begins; it can be corrected either by reducing the
+@Code radius option, or else by decreasing @Code { zindent }.  Ideally
+@Code "@Diag" would adjust options for you so as to ensure that the
+diagram always look good; but this is quite difficult to do, especially
+when space to turn in is tight or there is a choice of which option to
+adjust, as in the example above.  So @Code "@Diag" just does a few
+basic things and leaves the rest to you.
 @End @Section

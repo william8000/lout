@@ -479,7 +479,9 @@ different font; they are
 small.caps @Index { small capitals }
 made on demand from the current font.  So you can write, for example,
 @ID @Code "@I @S { Hello World }"
-and get @I @S { Hello World }.
+and get @I @S { Hello World }.  You can change the size of small
+capitals using the @Code "@Font" or @Code "@InitialFont" symbols,
+as described below.
 @PP
 The @Code "@R" symbol is almost unnecessary, since the document as a
 whole is set in a Roman face; but it is occasionally useful:
@@ -596,6 +598,29 @@ size:  @Code "+2p" means two points larger, @Code "-2p" means two
 points smaller, and @Code "1.5f" means 1.5 times the current font
 size.
 @PP
+If you switch font sizes in the middle of a line, as in
+@ID @Code "Here's a 20p @Font big word"
+you will discover one of Lout's obscure secrets:
+@ID { Here's a 20p @Font big word }
+Adjacent letters are aligned vertically through their middles, not
+through the baseline, causing this awkward alignment.  This was done
+because it makes equation formatting easy, and examples like the above
+look poor anyway.  However, if you want to do this and so require
+alignment through the baseline, you can get it, with the @Code baselinemark
+option to the @Code "@Font" symbol like this:
+@ID @Code "baselinemark @Font { Here's a 20p @Font big word }"
+which produces
+@ID @Code { baselinemark @Font { Here's a 20p @Font big word } }
+If you want it this way throughout your document, you can put
+@Code { baselinemark } in your initial font (see below).  Lout's
+equation formatter contains the opposite option, which is
+@Code "xheight2mark @Font { ... }"
+(meaning that the alignment goes through a point half the height of
+an x character) so you won't disrupt equation formatting if you do
+this, although you will have a problem if you put an equation inside
+a paragraph, since its axis will be aligned with the baseline of
+the adjacent words.
+@PP
 For the convenience of people who use fixed width fonts such as
 Courier, there is an @Code "@F" symbol which switches to a
 fixed width font family:
@@ -616,6 +641,21 @@ to get Helvetica 10 point.  You must give all three parts in
 setup file, as explained in Section {@NumberOf setup}, you can find the
 @Code "@InitialFont" option there.  If not, you can set it at the
 beginning of your document as explained in Section {@NumberOf ordinary}.
+@PP
+The @Code "@InitialFont" option is also a good place to set the size
+of small capitals if you don't like the default size that Lout gives
+you:
+@ID @Code "@InitialFont { Helvetica Base 10p setsmallcaps 0.9 }"
+In this example we're asking for small capitals to have size 0.9
+times the height of ordinary capitals.  The number following
+@Code "setsmallcaps" is a ratio, not a length, so it carries no
+unit of measurement.  You can put @Code "setsmallcaps" in an ordinary
+@Code "@Font" symbol too, if you like.  For example,
+@ID @Code "{ setsmallcaps 0.9 } @Font @S { Hello, world }"
+has result
+@ID { { setsmallcaps 0.9 } @Font @S { Hello, world } }
+However for consistency most people would use @Code "setsmallcaps" only in
+{@Code "@InitialFont"}, if at all.
 @PP
 There are two features that make fonts look better on the
 page.  @I Ligatures are pairs of letters run together; the most

@@ -1,7 +1,7 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -350,6 +350,7 @@ static OBJECT FindSplitInGalley(OBJECT hd)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
 
       debug0(DGF, D, "FindSplitInGalley(hd) failing, hd =");
       ifdebug(DGF, D, DebugObject(hd));
@@ -621,6 +622,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	word_colour(last) = word_colour(y);
 	word_outline(last) = word_outline(y);
 	word_language(last) = word_language(y);
+	word_baselinemark(last) = word_baselinemark(y);
 	word_hyph(last) = word_hyph(y);
 	Link(opt_components(hd), last);
 	debug2(DOG, DD, "  adding %s \"%s\"", Image(type(last)), string(last));
@@ -824,6 +826,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	case GRAPHIC:
 	case LINK_SOURCE:
 	case LINK_DEST:
+	case LINK_URL:
 	case ACAT:
 	case HCAT:
 	case ROW_THR:

@@ -1,7 +1,7 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -39,12 +39,14 @@
 #define NO_FONT		0		/* actually stolen from z37.c        */
 #define NO_COLOUR	0
 #define MAX_GS		50		/* maximum depth of graphics states  */
+#define	STRING_SIZE	16000		/* used by forms code                */
 
 BOOLEAN	Encapsulated;			/* TRUE if EPS file is wanted	     */
 
 typedef struct
 {
   FONT_NUM	gs_font;		/* font number of this state         */
+  BOOLEAN	gs_baselinemark;	/* baseline mark in use              */
   COLOUR_NUM	gs_colour;		/* colour number of this state       */
   BOOLEAN	gs_cpexists;		/* TRUE if a current point exists    */
   FULL_LENGTH	gs_currenty;		/* if cpexists, its y coordinate     */
@@ -55,6 +57,7 @@ static GRAPHICS_STATE	gs_stack[MAX_GS];/* graphics state stack             */
 static int		gs_stack_top;	/* top of graphics state stack       */
 
 static FONT_NUM		currentfont;	/* font of most recent atom          */
+static BOOLEAN		currentbaselinemark;	/* current baselinemark      */
 static COLOUR_NUM	currentcolour;	/* colour of most recent atom        */
 static short		currentxheight2;/* half xheight in current font      */
 static BOOLEAN		cpexists;	/* true if a current point exists    */
@@ -65,6 +68,7 @@ static int		pagecount;	/* total number of pages printed     */
 static BOOLEAN		prologue_done;	/* TRUE after prologue is printed    */
 static OBJECT		needs;		/* Resource needs of included EPSFs  */
 static OBJECT		supplied;	/* Resources supplied by this file   */
+static OBJECT		incg_files = nilobj; /* IncludeGraphicRepeated files */
 static FILE		*out_fp;	/* file to print PostScript on       */
 
 
@@ -225,6 +229,7 @@ static void PS_PrintInitialize(FILE *fp)
   prologue_done = FALSE;
   gs_stack_top = -1;
   currentfont = NO_FONT;
+  currentbaselinemark = FALSE;
   currentcolour = NO_COLOUR;
   cpexists = FALSE;
   wordcount = pagecount = 0;
@@ -247,6 +252,64 @@ static void PS_PrintInitialize(FILE *fp)
 static void PS_PrintLength(FULL_CHAR *buff, int length, int length_dim)
 {
   sprintf( (char *) buff, "%.3fc", (float) length/CM);
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void PS_IncGRepeated(OBJECT x)                                           */
+/*                                                                           */
+/*  Declare x to be an @IncludeGraphicRepeated file of the given type        */
+/*  (either @IncludeGraphicRepeated or @SysIncludeGraphicRepeated).          */
+/*                                                                           */
+/*****************************************************************************/
+
+void PS_IncGRepeated(OBJECT x)
+{
+  if( incg_files == nilobj )
+    New(incg_files, ACAT);
+  Link(incg_files, x);
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  int PS_FindIncGRepeated(OBJECT x, int typ)                               */
+/*                                                                           */
+/*  Find the number of @IncludeGraphicRepeated file string(x), or else       */
+/*  return 0 if not known.                                                   */
+/*                                                                           */
+/*  Check that the type conforms with typ, if not then warn user.            */
+/*                                                                           */
+/*****************************************************************************/
+
+int PS_FindIncGRepeated(OBJECT x, int typ)
+{ OBJECT link, y;  int i;
+  if( incg_files != nilobj )
+  {
+    for( i=1, link=Down(incg_files); link!=incg_files; i++, link=NextDown(link))
+    {
+      Child(y, link);
+      if( StringEqual(string(x), string(y)) )
+      {
+	if( typ == INCGRAPHIC && incg_type(y) == SINCGRAPHIC )
+	{
+          Error(49, 15, "use of %s rather than %s contradicts prior %s at %s",
+	    WARN, &fpos(x), KW_INCGRAPHIC, KW_SINCGRAPHIC,
+	    KW_SINCG_REPEATED, EchoFilePos(&fpos(y)));
+	}
+	else if( typ == SINCGRAPHIC && incg_type(y) == INCGRAPHIC )
+	{
+          Error(49, 16, "use of %s rather than %s contradicts prior %s at %s",
+	    WARN, &fpos(x), KW_SINCGRAPHIC, KW_INCGRAPHIC,
+	    KW_INCG_REPEATED, EchoFilePos(&fpos(y)));
+	}
+	else
+	  return i;
+      }
+    }
+  }
+  return 0;
 }
 
 
@@ -313,6 +376,69 @@ static void PS_PrintMapping(MAPPING m)
   fprintf(out_fp, "] def\n");
   fprintf(out_fp, "%%%%EndResource\n\n");
 } /* end PrintMapping */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PS_PrintEPSFile(FILE *fp, FILE_POS *pos)                                 */
+/*                                                                           */
+/*  Print EPS file fp to out_fp.                                             */
+/*                                                                           */
+/*****************************************************************************/
+#define	SKIPPING	0
+#define	READING_DNR	1
+#define FINISHED	2
+
+static BOOLEAN strip_out(FULL_CHAR *buff)
+{ if( StringBeginsWith(buff, AsciiToFull("%%EOF"))     )  return TRUE;
+  if( StringBeginsWith(buff, AsciiToFull("%%Trailer")) )  return TRUE;
+  return FALSE;
+} /* end strip_out */
+
+void PS_PrintEPSFile(FILE *fp, FILE_POS *pos)
+{ int state;  OBJECT y;
+  FULL_CHAR buff[MAX_BUFF];
+  debug0(DPO, D, "[ PS_PrintEPSFile");
+
+  assert( fp != NULL, "PS_PrintEPSFile: fp!" );
+  state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
+  while( state != FINISHED ) switch(state)
+  {
+    case SKIPPING:
+
+      if( StringBeginsWith(buff, AsciiToFull("%%DocumentNeededResources:")) &&
+	  !StringContains(buff, AsciiToFull("(atend)")) )
+      { y = MakeWord(WORD, &buff[StringLength("%%DocumentNeededResources:")],
+	      no_fpos);
+        Link(needs, y);
+	state = (StringFGets(buff,MAX_BUFF,fp)==NULL) ? FINISHED : READING_DNR;
+      }
+      else
+      { if( StringBeginsWith(buff, AsciiToFull("%%LanguageLevel:")) )
+	  Error(49, 10, "ignoring LanguageLevel comment in EPS file", WARN, pos);
+	if( StringBeginsWith(buff, AsciiToFull("%%Extensions:")) )
+	  Error(49, 11, "ignoring Extensions comment in EPS file", WARN, pos);
+	if( !strip_out(buff) )  StringFPuts(buff, out_fp);
+	state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
+      }
+      break;
+
+    case READING_DNR:
+
+      if( StringBeginsWith(buff, AsciiToFull("%%+")) )
+      {	y = MakeWord(WORD, &buff[StringLength(AsciiToFull("%%+"))], no_fpos);
+	Link(needs, y);
+	state = (StringFGets(buff,MAX_BUFF,fp)==NULL) ? FINISHED : READING_DNR;
+      }
+      else
+      { if( !strip_out(buff) )  StringFPuts(buff, out_fp);
+	state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
+      }
+      break;
+  }
+  fclose(fp);
+  debug0(DPO, D, "] PS_PrintEPSFile returning.");
+} /* end PS_PrintEPSFile */
 
 
 /*****************************************************************************/
@@ -405,6 +531,7 @@ static const char *MediaName(int h, int v)
 #define p1(str, arg1) fprintf(out_fp, str, arg1)
 #define p2(str, arg1, arg2) fprintf(out_fp, str, arg1, arg2)
 #define p3(str, arg1, arg2, arg3) fprintf(out_fp, str, arg1, arg2, arg3)
+#define p4(str, ar1, ar2, ar3, ar4) fprintf(out_fp, str, ar1, ar2, ar3, ar4)
 
 static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   FULL_CHAR *label)
@@ -417,12 +544,13 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   else
     p0("%!PS-Adobe-3.0\n");
   p1("%%%%Creator: %s\n", LOUT_VERSION);
-  p1("%%%%CreationDate: %s", TimeString());
+  p1("%%%%CreationDate: %s\n", TimeString());
   p0("%%DocumentData: Binary\n");
   p0("%%DocumentNeededResources: (atend)\n");
   p0("%%DocumentSuppliedResources: (atend)\n");
   p3("%%%%DocumentMedia: %s %d %d 0 white ()\n", MediaName(h, v), h/PT, v/PT);
   p0("%%PageOrder: Ascend\n");
+  p0("%%LanguageLevel: 2\n");
   p0("%%Pages: (atend)\n");
   p2("%%%%BoundingBox: 0 0 %d %d\n", h/PT, v/PT);
   p0("%%EndComments\n\n");
@@ -485,33 +613,48 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
 
   /* print definitions used by Lout output when including EPSF files     */
   /* copied from PostScript Language Reference Manual (2nd Ed.), p. 726  */
+  /* but then revised to follow Adobe's Technical Note #5144             */
 
-  p0("/BeginEPSF {\n");
-  p0("  /LoutEPSFState save def\n");
-  p0("  /dict_count countdictstack def\n");
-  p0("  /op_count count 1 sub def\n");
+  p0("/LoutStartEPSF { % prepare for EPSF inclusion\n");
   p0("  userdict begin\n");
-  p0("  /showpage { } def\n");
-  p0("  0 setgray 0 setlinecap\n");
-  p0("  1 setlinewidth 0 setlinejoin\n");
-  p0("  10 setmiterlimit [] 0 setdash newpath\n");
-  p0("  /languagelevel where\n");
-  p0("  { pop languagelevel\n");
-  p0("    1 ne\n");
-  p0("    { false setstrokeadjust false setoverprint\n");
+  p0("    /PreEPSF_state save def\n");
+  p0("    /dict_stack countdictstack def\n");
+  p0("    /ops_count count 1 sub def\n");
+  p0("    /showpage {} def\n");
+  p0("    0 setgray 0 setlinecap\n");
+  p0("    1 setlinewidth 0 setlinejoin\n");
+  p0("    10 setmiterlimit [] 0 setdash newpath\n");
+  p0("    /languagelevel where\n");
+  p0("    { pop languagelevel\n");
+  p0("      1 ne\n");
+  p0("      { false setstrokeadjust false setoverprint\n");
+  p0("      } if\n");
   p0("    } if\n");
-  p0("  } if\n");
   p0("} bind def\n\n");
 
-  p0("/EndEPSF {\n");
-  p0("  count op_count sub { pop } repeat\n");
-  p0("  countdictstack dict_count sub { end } repeat\n");
-  p0("  LoutEPSFState restore\n");
+  p0("/LoutEPSFCleanUp { % clean up after EPSF inclusion\n");
+  p0("    count ops_count sub { pop } repeat\n");
+  p0("    countdictstack dict_stack sub { end } repeat\n");
+  p0("    PreEPSF_state restore\n");
+  p0("  end % userdict\n");
   p0("} bind def\n");
+
+  if( incg_files != nilobj )
+  {
+    p0("\n/LoutReadFormEPS {\n");
+    p1("  currentfile 0 (Lout_Marker_%s)\n", (char *) TimeString());
+    p0("  /SubFileDecode filter exch 1\n");
+    p1("  { 2 copy 4 index %d string readstring 4 1 roll\n", STRING_SIZE);
+    p0("    put not { exit } if 1 add\n");
+    p0("  } loop\n");
+    p0("  1 add 2 copy () put pop currentglobal true setglobal exch\n");
+    p0("  0 1 array put setglobal pop\n");
+    p0("} bind def\n");
+  }
 
   p0("%%EndResource\n\n");
 
-  /* print prepend files (assumed to be organized as DSC 3.0 Resources) */
+  /* prepend files (assumed to be organized as DSC 3.0 Resources) */
   for( fnum = FirstFile(PREPEND_FILE);  fnum != NO_FILE;  fnum=NextFile(fnum) )
   { FULL_CHAR buff[MAX_BUFF];  FILE *fp;
     if( (fp = OpenFile(fnum, FALSE, FALSE)) == null )
@@ -541,6 +684,70 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
 
   fputs("%%EndProlog\n\n", out_fp);
   fputs("%%BeginSetup\n", out_fp);
+
+  /* print one PostScript form for each @IncludeGraphicRepeated entry */
+  if( incg_files != nilobj )
+  { int fnum;  FILE *fp;  BOOLEAN junk, cp;  OBJECT link, x, full_name;
+    p0("<< /MaxFormItem currentsystemparams /MaxFormCache get >> setuserparams\n\n");
+    fnum = 1;
+    for( link = Down(incg_files);  link != incg_files;  link = NextDown(link) )
+    {
+      int file_size = 0;
+      int llx = 0, lly = 0, urx = 0, ury = 0;
+
+      /* open graphic file string(x) */
+      Child(x, link);
+      fp = OpenIncGraphicFile(string(x), incg_type(x), &full_name,&fpos(x),&cp);
+      if( fp == null )
+	Error(49, 21, "cannot open %s file %s", FATAL, &fpos(x),
+	  KW_INCG_REPEATED, string(x));
+
+      /* find its bounding box and file size */
+      junk = PS_FindBoundingBox(fp, &fpos(x), &llx, &lly, &urx, &ury);
+      fseek(fp, 0L, SEEK_END);
+      file_size = ftell(fp);
+      rewind(fp);
+
+      /* print the form resource for this file                           */
+      /* NB tech note says file_size / STRING_SIZE + 2 but really means  */
+      /* ceiling(file_size / STRING_SIZE) + 2 so we use + 3              */
+      p1("%%%%BeginResource: form Form%d\n", fnum);
+      p1("/Form%d\n", fnum);
+      p0("10 dict begin\n");
+      p0("  /FormType 1 def\n");
+      p1("  /EPSArray %d array def\n", file_size / STRING_SIZE + 3);
+      p0("  /AcquisitionProc {\n");
+      p0("    EPSArray dup 0 get dup 0 get\n");
+      p0("    dup 3 1 roll 1 add 0 exch put get\n");
+      p0("  } bind def\n");
+      p0("\n");
+      p0("  /PaintProc {\n");
+      p0("    begin\n");
+      p0("      LoutStartEPSF\n");
+      p0("        EPSArray 0 get 0 1 put\n");
+      p0("        //AcquisitionProc 0 () /SubFileDecode filter\n");
+      p0("        cvx exec\n");
+      p0("      LoutEPSFCleanUp\n");
+      p0("    end\n");
+      p0("  } bind def\n");
+      p0("\n");
+      p4("  /BBox [ %d %d %d %d ] def\n", llx, lly, urx, ury);
+      p0("  /Matrix [1 0 0 1 0 0] def\n");
+      p1("currentdict end def %% Form%d", fnum);
+      p0("\n");
+      p1("Form%d /EPSArray get\n", fnum);
+      p0("LoutReadFormEPS\n");
+      PS_PrintEPSFile(fp, &fpos(x));
+      p1("Lout_Marker_%s\n", (char *) TimeString());
+      p0("%%EndResource\n\n");
+
+      /* remove any unpacked version and go to next file */
+      if( cp ) StringRemove(AsciiToFull(LOUT_EPS));
+      fnum++;
+    }
+  }
+
+  /* encodings */
   MapPrintEncodings();
 
   /* pdfmark compatibility code, as in the pdfmark Reference Manual p10 */
@@ -622,6 +829,7 @@ static void PS_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
   gs_stack_top = 0;
   cpexists = FALSE;
   currentfont = NO_FONT;
+  currentbaselinemark = FALSE;
   currentcolour = NO_COLOUR;
   if( Encapsulated )
   { PS_PrintAfterLastPage();
@@ -707,10 +915,16 @@ static void PS_PrintWord(OBJECT x, int hpos, int vpos)
     hpos, vpos, word_font(x), word_colour(x), word_outline(x) ? " outline":"");
   TotalWordCount++;
 
+  /* if baselinemark is different to previous then record change */
+  if( word_baselinemark(x) != currentbaselinemark )
+  { currentbaselinemark = word_baselinemark(x);
+    currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
+  }
+
   /* if font is different to previous word then print change */
   if( word_font(x) != currentfont )
   { currentfont = word_font(x);
-    currentxheight2 = FontHalfXHeight(currentfont);
+    currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
     fprintf(out_fp, "%hd %s", FontSize(currentfont, x), FontName(currentfont));
     if( ++wordcount >= 5 )
     { putc('\n', out_fp);
@@ -902,7 +1116,7 @@ static void PS_CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
 
 static void PS_CoordRotate(FULL_LENGTH amount)
 { debug1(DPO, D, "PS_CoordRotate(%.1f degrees)", (float) amount / DG);
-    fprintf(out_fp, "%.4f rotate\n", (float) amount / DG);
+  fprintf(out_fp, "%.4f rotate\n", (float) amount / DG);
   cpexists = FALSE;
   debug0(DPO, D, "CoordRotate returning.");
 } /* end PS_CoordRotate */
@@ -923,7 +1137,7 @@ static void PS_CoordScale(float hfactor, float vfactor)
 #endif
   ifdebug(DPO, D, sprintf(buff, "%.3f, %.3f", hfactor, vfactor));
   debug1(DPO, D, "CoordScale(%s)", buff);
-    fprintf(out_fp, "%.4f %.4f scale\n", hfactor, vfactor);
+  fprintf(out_fp, "%.4f %.4f scale\n", hfactor, vfactor);
   cpexists = FALSE;
   debug0(DPO, D, "CoordScale returning.");
 } /* end PS_CoordScale */
@@ -946,6 +1160,7 @@ static void PS_SaveGraphicState(OBJECT x)
     Error(49, 7, "rotations, graphics etc. too deeply nested (max is %d)",
       FATAL, &fpos(x), MAX_GS);
   gs_stack[gs_stack_top].gs_font	= currentfont;
+  gs_stack[gs_stack_top].gs_baselinemark= currentbaselinemark;
   gs_stack[gs_stack_top].gs_colour	= currentcolour;
   gs_stack[gs_stack_top].gs_cpexists	= cpexists;
   gs_stack[gs_stack_top].gs_currenty	= currenty;
@@ -969,6 +1184,7 @@ void PS_RestoreGraphicState(void)
 { debug0(DPO, D, "PS_RestoreGraphicState()");
   fprintf(out_fp, "\ngrestore\n");
   currentfont	  = gs_stack[gs_stack_top].gs_font;
+  currentbaselinemark	  = gs_stack[gs_stack_top].gs_baselinemark;
   currentcolour	  = gs_stack[gs_stack_top].gs_colour;
   cpexists	  = gs_stack[gs_stack_top].gs_cpexists;
   currenty	  = gs_stack[gs_stack_top].gs_currenty;
@@ -1049,11 +1265,19 @@ void PS_DefineGraphicNames(OBJECT x)
   debug1(DPO, D, "DefineGraphicNames( %s )", EchoObject(x));
   debug1(DPO, DD, "  style = %s", EchoStyle(&save_style(x)));
 
+  /* if baselinemark is different to prevsiou then record change */
+  if( baselinemark(save_style(x)) != currentbaselinemark )
+  {
+    currentbaselinemark = baselinemark(save_style(x));
+    if( currentfont > 0 )
+      currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
+  }
+
   /* if font is different to previous word then print change */
   if( font(save_style(x)) != currentfont )
   { currentfont = font(save_style(x));
     if( currentfont > 0 )
-    { currentxheight2 = FontHalfXHeight(currentfont);
+    { currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
       fprintf(out_fp, "%hd %s ", FontSize(currentfont, x),
 	FontName(currentfont));
     }
@@ -1108,6 +1332,7 @@ void PS_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
     /* from Save */
     gs_stack_top++;
     gs_stack[gs_stack_top].gs_font	= currentfont;
+    gs_stack[gs_stack_top].gs_baselinemark	= currentbaselinemark;
     gs_stack[gs_stack_top].gs_colour	= currentcolour;
     gs_stack[gs_stack_top].gs_cpexists	= cpexists;
     gs_stack[gs_stack_top].gs_currenty	= currenty;
@@ -1119,6 +1344,7 @@ void PS_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
     /* from Save */
     gs_stack_top++;
     gs_stack[gs_stack_top].gs_font	= currentfont;
+    gs_stack[gs_stack_top].gs_baselinemark	= currentbaselinemark;
     gs_stack[gs_stack_top].gs_colour	= currentcolour;
     gs_stack[gs_stack_top].gs_cpexists	= cpexists;
     gs_stack[gs_stack_top].gs_currenty	= currenty;
@@ -1133,6 +1359,101 @@ void PS_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
       
   }
 } /* end PS_SaveTranslateDefineSave */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PS_FindBoundingBox(FILE *fp, FILE_POS *fpos, FULL_LENGTH *llx,           */
+/*    FULL_LENGTH *lly, FULL_LENGTH *urx, FULL_LENGTH *ury)                  */
+/*                                                                           */
+/*  Find bounding box line in EPS file fp.  fpos is used for errors only.    */
+/*                                                                           */
+/*****************************************************************************/
+#define IG_LOOKING      0
+#define IG_NOFILE       1
+#define IG_BADFILE      2
+#define IG_BADSIZE      3
+#define IG_OK           4
+
+BOOLEAN PS_FindBoundingBox(FILE *fp, FILE_POS *pos, FULL_LENGTH *llx,
+  FULL_LENGTH *lly, FULL_LENGTH *urx, FULL_LENGTH *ury)
+{ BOOLEAN first_line = TRUE;  FULL_CHAR buff[MAX_BUFF];
+  int status = (fp == NULL ? IG_NOFILE : IG_LOOKING);
+  int read_status;
+  BOOLEAN res;
+  float fllx, flly, furx, fury;
+  *llx = *lly = *urx = *ury = 0;
+
+  /* search for BoundingBox line */
+  while( status == IG_LOOKING )
+  {
+    read_status = fscanf(fp, "%[^\n\r]%*c", (char *) buff);
+    if( read_status == 0 || read_status == EOF )
+    {
+      /* end of input and no luck */
+      break;
+    }
+    if( first_line && !StringBeginsWith(buff, AsciiToFull("%!")) )
+      status = IG_BADFILE;
+    else
+    { first_line = FALSE;
+      if( buff[0] == '%'
+	  && StringBeginsWith(buff, AsciiToFull("%%BoundingBox:"))
+	  && !StringContains(buff, AsciiToFull("(atend)")) )
+      {
+	if( sscanf( (char *) buff, "%%%%BoundingBox: %f %f %f %f",
+	  &fllx, &flly, &furx, &fury) == 4 )
+	{
+	  status = IG_OK;
+	  *llx = fllx;
+	  *lly = flly;
+	  *urx = furx;
+	  *ury = fury;
+	}
+	else status = IG_BADSIZE;
+      }
+    }
+  }
+
+  /* report error depending on status */
+  res = TRUE;
+  switch( status )
+  {
+    case IG_NOFILE:
+
+      Error(49, 17, "EPS file ignored (cannot open file)", WARN, pos);
+      res = FALSE;
+      break;
+
+
+    case IG_LOOKING:
+
+      Error(49, 18, "EPS given zero size (no BoundingBox line in file)",
+	WARN, pos);
+      break;
+
+
+    case IG_BADFILE:
+
+      Error(49, 19, "EPS file ignored (bad first line in file)", WARN, pos);
+      res = FALSE;
+      break;
+
+
+    case IG_BADSIZE:
+
+      Error(49, 20, "EPS given zero size (bad BoundingBox line in file)",
+	WARN, pos);
+      break;
+
+
+    case IG_OK:
+
+      break;
+
+  }
+  return res;
+} /* end PS_FindBoundingBox */
 
 
 /*****************************************************************************/
@@ -1154,19 +1475,9 @@ void PS_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
 /*  the mpage Unix utility, so now I'm stripping it out as well.             */
 /*                                                                           */
 /*****************************************************************************/
-#define	SKIPPING	0
-#define	READING_DNR	1
-#define FINISHED	2
-
-static BOOLEAN strip_out(FULL_CHAR *buff)
-{ if( StringBeginsWith(buff, AsciiToFull("%%EOF"))     )  return TRUE;
-  if( StringBeginsWith(buff, AsciiToFull("%%Trailer")) )  return TRUE;
-  return FALSE;
-} /* end strip_out */
 
 void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
-{ OBJECT y, full_name;  FULL_CHAR buff[MAX_BUFF];
-  FILE *fp;  int state;  BOOLEAN compressed;
+{ OBJECT y, full_name;  FILE *fp;  BOOLEAN compressed;  int fnum;
   debug0(DPO, D, "PS_PrintGraphicInclude(x)");
 
   assert(type(x)==INCGRAPHIC || type(x)==SINCGRAPHIC, "PrintGraphicInclude!");
@@ -1174,13 +1485,18 @@ void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
 
   /* open the include file and get its full path name */
   Child(y, Down(x));
-  fp = OpenIncGraphicFile(string(y), type(x), &full_name,&fpos(y),&compressed);
-  assert( fp != NULL, "PrintGraphicInclude: fp!" );
+
+  /* if currentbaselinemark is different to previous word then record change */
+  if( baselinemark(save_style(x)) != currentbaselinemark )
+  {
+    currentbaselinemark = baselinemark(save_style(x));
+    currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
+  }
 
   /* if font is different to previous word then print change */
   if( font(save_style(x)) != currentfont )
   { currentfont = font(save_style(x));
-    currentxheight2 = FontHalfXHeight(currentfont);
+    currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
     fprintf(out_fp, "%hd %s\n", FontSize(currentfont,x), FontName(currentfont));
   }
 
@@ -1188,66 +1504,49 @@ void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
   if( colour(save_style(x)) != currentcolour )
   { currentcolour = colour(save_style(x));
     if( currentcolour > 0 )
-    {
       fprintf(out_fp, "%s\n", ColourCommand(currentcolour));
-    }
   }
 
-  /* generate appropriate header code */
-  fprintf(out_fp, "BeginEPSF\n");
-  PS_CoordTranslate(colmark - back(x, COLM), rowmark - fwd(x, ROWM));
-  PS_CoordScale( (float) PT, (float) PT );
-  PS_CoordTranslate(-back(y, COLM), -back(y, ROWM));
-  fprintf(out_fp, "%%%%BeginDocument: %s\n", string(full_name));
-
-  /* copy through the include file, except divert resources lines to needs */
-  /* and strip out some comment lines that cause problems                  */
-  state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
-  while( state != FINISHED ) switch(state)
+  fnum = PS_FindIncGRepeated(y, type(x));
+  if( fnum != 0 )
   {
-    case SKIPPING:
+    /* print form */
+    PS_SaveGraphicState(x);
+    PS_CoordTranslate(colmark - back(x, COLM), rowmark - fwd(x, ROWM));
+    PS_CoordScale( (float) PT, (float) PT );
+    PS_CoordTranslate(-back(y, COLM), -back(y, ROWM));
+    fprintf(out_fp, "Form%d execform\n", fnum);
+    PS_RestoreGraphicState();
+  }
+  else
+  {
+    /* open the include file and get its full name etc. */
+    fp = OpenIncGraphicFile(string(y), type(x),&full_name,&fpos(y),&compressed);
+    assert( fp != NULL, "PS_PrintGraphicInclude: fp!" );
 
-      if( StringBeginsWith(buff, AsciiToFull("%%DocumentNeededResources:")) &&
-	  !StringContains(buff, AsciiToFull("(atend)")) )
-      { y = MakeWord(WORD, &buff[StringLength("%%DocumentNeededResources:")],
-	      no_fpos);
-        Link(needs, y);
-	state = (StringFGets(buff,MAX_BUFF,fp)==NULL) ? FINISHED : READING_DNR;
-      }
-      else
-      { if( StringBeginsWith(buff, AsciiToFull("%%LanguageLevel:")) )
-	  Error(49, 10, "ignoring LanguageLevel comment in %s file %s",
-	    WARN, &fpos(x), KW_INCGRAPHIC, string(full_name));
-	if( StringBeginsWith(buff, AsciiToFull("%%Extensions:")) )
-	  Error(49, 11, "ignoring Extensions comment in %s file %s",
-	    WARN, &fpos(x), KW_INCGRAPHIC, string(full_name));
-	if( !strip_out(buff) )  StringFPuts(buff, out_fp);
-	state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
-      }
-      break;
+    /* print appropriate header code for EPS file inclusion */
+    fprintf(out_fp, "LoutStartEPSF\n");
+    PS_CoordTranslate(colmark - back(x, COLM), rowmark - fwd(x, ROWM));
+    PS_CoordScale( (float) PT, (float) PT );
+    PS_CoordTranslate(-back(y, COLM), -back(y, ROWM));
+    fprintf(out_fp, "%%%%BeginDocument: %s\n", string(full_name));
 
-    case READING_DNR:
+    /* copy through the include file, except divert resources lines to needs */
+    /* and strip out some comment lines that cause problems                  */
+    PS_PrintEPSFile(fp, &fpos(y));
 
-      if( StringBeginsWith(buff, AsciiToFull("%%+")) )
-      {	x = MakeWord(WORD, &buff[StringLength(AsciiToFull("%%+"))], no_fpos);
-	Link(needs, x);
-	state = (StringFGets(buff,MAX_BUFF,fp)==NULL) ? FINISHED : READING_DNR;
-      }
-      else
-      { if( !strip_out(buff) )  StringFPuts(buff, out_fp);
-	state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
-      }
-      break;
+    /* wrapup */
+    DisposeObject(full_name);
+    if( compressed )  StringRemove(AsciiToFull(LOUT_EPS));
+    fprintf(out_fp, "\n%%%%EndDocument\nLoutEPSFCleanUp\n");
   }
 
-  /* wrapup */
-  DisposeObject(full_name);
-  fclose(fp);
-  if( compressed )  StringRemove(AsciiToFull(LOUT_EPS));
-  fprintf(out_fp, "\n%%%%EndDocument\nEndEPSF\n");
+  cpexists = FALSE;
   wordcount = 0;
   debug0(DPO, D, "PS_PrintGraphicInclude returning.");
 } /* end PS_PrintGraphicInclude */
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  char *ConvertToPDFName(name)                                             */
@@ -1300,8 +1599,9 @@ static void PS_LinkSource(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
 
   /* print the link source point */
   fprintf(out_fp,
-    "\n[ /Rect [%d %d %d %d] /Subtype /Link /Dest /%s /ANN pdfmark\n",
-    llx, lly, urx, ury, ConvertToPDFName(name));
+    "\n[ /Rect [%d %d %d %d] %s %s /Subtype /Link /Dest /%s /ANN pdfmark\n",
+    llx, lly, urx, ury, "/Border [0 0 0]", "/View [ /XYZ null null null ]",
+    ConvertToPDFName(name));
 
   /* remember it so that at end of run can check if it has an dest point */
   Link(link_source_list, name);
@@ -1339,6 +1639,34 @@ static void PS_LinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
   }
   debug0(DPO, D, "PS_LinkDest returning.");
 } /* end PS_LinkDest */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PS_LinkURL(url, llx, lly, urx, ury)                                      */
+/*                                                                           */
+/*  Print a URL link.                                                        */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PS_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{ debug5(DPO, D, "PS_LinkURL(%s, %d, %d, %d, %d)", EchoObject(url),
+    llx, lly, urx, ury);
+
+  if( is_word(type(url)) )
+  {
+    fprintf(out_fp,
+      "\n[ /Rect [%d %d %d %d] %s /Action << %s /URI (%s) >> %s /ANN pdfmark\n",
+      llx, lly, urx, ury, "/Border [0 0 0]", "/Subtype /URI", string(url),
+      "/Subtype /Link");
+  }
+  else
+    Error(49, 22, "%s ignored; left parameter not a simple word",
+      WARN, &fpos(url), KW_LINK_URL);
+
+  debug0(DPO, D, "PS_LinkURL returning.");
+} /* end PS_LinkSource */
 
 
 /*****************************************************************************/
@@ -1407,6 +1735,7 @@ static struct back_end_rec ps_back = {
   PS_PrintGraphicInclude,
   PS_LinkSource,
   PS_LinkDest,
+  PS_LinkURL,
   PS_LinkCheck,
 };
 

@@ -1,7 +1,7 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -462,6 +462,7 @@ static BOOLEAN Reduce(void)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     case OPEN:
     case RAW_VERBATIM:
     case VERBATIM:
@@ -871,6 +872,11 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 	  Dispose(t);
 	  t = LexGetToken();
 	}
+	else if( type(t) == INCG_REPEATED || type(t) == SINCG_REPEATED )
+	{ ReadIncGRepeatedDef(type(t), encl);
+	  Dispose(t);
+	  t = LexGetToken();
+	}
 	else if( type(t) == DATABASE || type(t) == SYS_DATABASE )
 	{ ReadDatabaseDef(type(t), encl);
 	  Dispose(t);
@@ -1046,6 +1052,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case GRAPHIC:
       case LINK_SOURCE:
       case LINK_DEST:
+      case LINK_URL:
 
 	/* clean up left context of t (these ops are all right associative) */
 	Shift(t, precedence(t), RIGHT_ASSOC,
@@ -1160,11 +1167,13 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case NOT_REVEALED:
       case PREPEND:
       case SYS_PREPEND:
+      case INCG_REPEATED:
+      case SINCG_REPEATED:
       case DATABASE:
       case SYS_DATABASE:
       
 	Error(6, 26, "%s symbol out of place",
-	  FATAL, &fpos(t), SymName(actual(t)));
+	  INTERN, &fpos(t), SymName(actual(t)));
 	break;
 
 

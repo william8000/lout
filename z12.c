@@ -1,7 +1,7 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -328,10 +328,9 @@ void SpannerAvailableSpace(OBJECT y, int dim, FULL_LENGTH *resb,
 
 OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 { OBJECT y, z, link, prev, t, g, full_name;
-  FULL_LENGTH b, f, dble_fwd, llx, lly, urx, ury; int status, read_status;
-  float fllx, flly, furx, fury;
-  BOOLEAN dble_found, found, will_expand, first_line, cp;
-  FILE *fp;  FULL_CHAR buff[MAX_BUFF];
+  FULL_LENGTH b, f, dble_fwd;
+  BOOLEAN dble_found, found, will_expand, cp;
+  FILE *fp;
 
   debug2(DSF, DD, "[ MinSize( %s, %s, extras )", EchoObject(x), dimen(dim));
   debugcond4(DSF, D, dim == COLM && debug_depth++ < debug_depth_max,
@@ -620,6 +619,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     
       Child(y, LastDown(x));
       y = MinSize(y, dim, extras);
@@ -878,6 +878,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		word_colour(z) = colour(save_style(x));
 		word_outline(z) = outline(save_style(x));
 		word_language(z) = language(save_style(x));
+		word_baselinemark(z) = baselinemark(save_style(x));
 		word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
 		underline(z) = UNDER_OFF;
 		back(z, COLM) = fwd(z, COLM) = 0;
@@ -967,6 +968,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		    word_colour(prev) == word_colour(y) &&
 		    word_outline(prev) == word_outline(y) &&
 		    word_language(prev) == word_language(y) &&
+		    word_baselinemark(prev) == word_baselinemark(y) &&
 		    underline(prev) == underline(y) &&
 		    NextDown(NextDown(Up(prev))) == link
 		    )
@@ -984,6 +986,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		  word_colour(y) = word_colour(prev);
 		  word_outline(y) = word_outline(prev);
 		  word_language(y) = word_language(prev);
+		  word_baselinemark(y) = word_baselinemark(prev);
 		  word_hyph(y) = word_hyph(prev);
 		  underline(y) = underline(prev);
 		  FontWordSize(y);
@@ -1238,113 +1241,22 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case INCGRAPHIC:
     case SINCGRAPHIC:
 
-      /* open file, check for initial %!, and hunt for %%BoundingBox line */
-      /* according to DSC Version 3.0, the BoundingBox parameters must be */
-      /* integers; but we read them as floats and truncate since files    */
-      /* with fractional values seem to be common in the real world       */
+      /* open file and hunt for %%BoundingBox line */
       if( dim == ROWM )  break;
-      status = IG_LOOKING;
       Child(y, Down(x));
       fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y), &cp);
-      if( fp == NULL )  status = IG_NOFILE;
-      first_line = TRUE;
-      /* ***
-      while( status == IG_LOOKING && StringFGets(buff, MAX_BUFF, fp) != NULL )
-      *** */
-      while( status == IG_LOOKING )
+      incgraphic_ok(x) = PS_FindBoundingBox(fp, &fpos(y),
+	  &back(y, COLM), &back(y, ROWM), &fwd(y, COLM), &fwd(y, ROWM));
+      b = (fwd(y, COLM) - back(y, COLM)) * PT;
+      b = find_min(MAX_FULL_LENGTH, find_max(0, b));
+      back(x, COLM) = fwd(x, COLM) = b / 2;
+      b = (fwd(y, ROWM) - back(y, ROWM)) * PT;
+      b = find_min(MAX_FULL_LENGTH, find_max(0, b));
+      back(x, ROWM) = fwd(x, ROWM) = b / 2;
+      if( fp != NULL )
       {
-	read_status = fscanf(fp, "%[^\n\r]%*c", (char *) buff);
-	if( read_status == 0 || read_status == EOF )
-	{
-	  /* end of input and no luck */
-	  break;
-	}
-	if( first_line && !StringBeginsWith(buff, AsciiToFull("%!")) )
-	  status = IG_BADFILE;
-	else
-	{ first_line = FALSE;
-	  if( buff[0] == '%'
-	      && StringBeginsWith(buff, AsciiToFull("%%BoundingBox:"))
-	      && !StringContains(buff, AsciiToFull("(atend)")) )
-	  { if( sscanf( (char *) buff, "%%%%BoundingBox: %f %f %f %f",
-		&fllx, &flly, &furx, &fury) == 4 )
-	    {
-	      status = IG_OK;
-	      llx = fllx;
-	      lly = flly;
-	      urx = furx;
-	      ury = fury;
-	    }
-	    else status = IG_BADSIZE;
-	  }
-	}
-      }
-
-      /* report error or calculate true size, depending on status */
-      switch( status )
-      {
-	case IG_NOFILE:
-
-	  Error(12, 5, "%s deleted (cannot open file %s)", WARN, &fpos(x),
-	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
-	    string(full_name));
-	  incgraphic_ok(x) = FALSE;
-	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
-	  break;
-
-	case IG_LOOKING:
-
-	  Error(12, 6, "%s given zero size (no BoundingBox line in file %s)",
-	    WARN, &fpos(x),
-	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
-	    string(full_name));
-	  back(y, COLM) = fwd(y, COLM) = back(y, ROWM) = fwd(y, ROWM) = 0;
-	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
-	  incgraphic_ok(x) = TRUE;
-	  fclose(fp);
-	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
-	  break;
-
-	case IG_BADFILE:
-
-	  Error(12, 7, "%s deleted (bad first line in file %s)", WARN,
-	    &fpos(x), type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
-	    string(full_name));
-	  incgraphic_ok(x) = FALSE;
-	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
-	  fclose(fp);
-	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
-	  break;
-	
-	case IG_BADSIZE:
-
-	  Error(12, 8, "%s given zero size (bad BoundingBox line in file %s)",
-	    WARN, &fpos(x),
-	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
-	    string(full_name));
-	  back(y, COLM) = fwd(y, COLM) = back(y, ROWM) = fwd(y, ROWM) = 0;
-	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
-	  incgraphic_ok(x) = TRUE;
-	  fclose(fp);
-	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
-	  break;
-
-	case IG_OK:
-
-	  Child(y, Down(x));
-	  back(y, COLM) = llx;  fwd(y, COLM) = urx;
-	  back(y, ROWM) = lly;  fwd(y, ROWM) = ury;
-	  b = (urx - llx) * PT;
-	  b = find_min(MAX_FULL_LENGTH, find_max(0, b));
-	  back(x, COLM) = fwd(x, COLM) = b / 2;
-	  b = (ury - lly) * PT;
-	  b = find_min(MAX_FULL_LENGTH, find_max(0, b));
-	  back(x, ROWM) = fwd(x, ROWM) = b / 2;
-	  incgraphic_ok(x) = TRUE;
-	  fclose(fp);
-	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
-	  break;
-
+	fclose(fp);
+        if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
       }
       DisposeObject(full_name);
       break;

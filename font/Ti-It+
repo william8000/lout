@@ -1,4 +1,16 @@
 StartExtraCharMetrics
+C -1 ; WX 722 ; N Aogonek ; B 15 0 706 674 ;
+C -1 ; WX 444 ; N aogonek ; B 37 -10 442 460 ;
+C -1 ; WX 611 ; N Eogonek ; B 12 0 597 662 ;
+C -1 ; WX 444 ; N eogonek ; B 25 -10 424 460 ;
+C -1 ; WX 667 ; N Cacute ; B 28 -14 633 890 ;
+C -1 ; WX 444 ; N cacute ; B 25 -10 412 674 ;
+C -1 ; WX 556 ; N Sacute ; B 42 -14 491 676 ;
+C -1 ; WX 389 ; N sacute ; B 51 -10 348 460 ;
+C -1 ; WX 611 ; N Zacute ; B 9 0 597 662 ;
+C -1 ; WX 444 ; N zacute ; B 27 0 418 450 ;
+C -1 ; WX 611 ; N Zdotaccent ; B 9 0 597 662 ;
+C -1 ; WX 444 ; N zdotaccent ; B 27 0 418 450 ;
 C -1 ; WX 667 ; N Ccaron ; B 66 -18 714 882 ;
 C -1 ; WX 444 ; N ccaron ; B 30 -11 501 661 ;
 C -1 ; WX 722 ; N Dcaron ; B -8 0 700 882 ;
@@ -21,6 +33,22 @@ C -1 ; WX 722 ; N Uring ; B 102 -18 765 882 ;
 C -1 ; WX 500 ; N uring ; B 42 -11 475 691 ;
 EndExtraCharMetrics
 StartBuildComposites
+CC Aogonek 2 ; PCC A 0 0 ; PCC ogonek 300 0 ;
+CC aogonek 2 ; PCC a 0 0 ; PCC ogonek 155 0 ;
+CC Eogonek 2 ; PCC E 0 0 ; PCC ogonek 250 0 ;
+CC eogonek 2 ; PCC e 0 0 ; PCC ogonek 105 0 ;
+CC Cacute 2 ; PCC C 0 0 ; PCC acute 228 216 ;
+CC cacute 2 ; PCC c 0 0 ; PCC acute 74 0 ;
+CC Lslash 2 ; PCC L 0 0 ; PCC acute -80 -220;
+CC lslash 2 ; PCC l 0 0 ; PCC acute -80 -220 ;
+CC Nacute 2 ; PCC N 0 0 ; PCC acute 194 216 ;
+CC nacute 2 ; PCC n 0 0 ; PCC acute 83 0 ;
+CC Sacute 2 ; PCC S 0 0 ; PCC acute 194 216 ;
+CC sacute 2 ; PCC s 0 0 ; PCC acute 83 0 ;
+CC Zacute 2 ; PCC Z 0 0 ; PCC acute 194 216 ;
+CC zacute 2 ; PCC z 0 0 ; PCC acute 83 0 ;
+CC Zdotaccent 2 ; PCC Z 0 0 ; PCC dotaccent 194 216 ;
+CC zdotaccent 2 ; PCC z 0 0 ; PCC dotaccent 83 0;
 CC Ccaron 2 ; PCC C 0 0 ; PCC caron 288 221 ;
 CC ccaron 2 ; PCC c 0 0 ; PCC caron 75 0 ;
 CC Dcaron 2 ; PCC D 0 0 ; PCC caron 253 221 ;

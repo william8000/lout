@@ -1,7 +1,7 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -912,9 +912,10 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
 	  if( end_stop && StringBeginsWith(p, KW_END) )
 	  { finished = TRUE;
 	  }
-	  else if( StringBeginsWith(p, KW_INCLUDE) ||
-		   StringBeginsWith(p, KW_SYSINCLUDE) )
-	  { OBJECT incl_fname, t;  FILE *incl_fp;  int ch;  FILE_NUM fnum;
+	  else if( StringBeginsWithWord(p, KW_INCLUDE) ||
+		   StringBeginsWithWord(p, KW_SYSINCLUDE) )
+	  {
+	    OBJECT incl_fname, t;  FILE *incl_fp;  int ch;  FILE_NUM fnum;
 	    BOOLEAN sysinc = StringBeginsWith(p, KW_SYSINCLUDE);
 	    clear();
 	    p += sysinc ? StringLength(KW_SYSINCLUDE):StringLength(KW_INCLUDE);

@@ -1,7 +1,7 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -590,20 +590,33 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     
       CountChild(y, LastDown(x), count);
       if( dim == COLM )
 	save_mark(x) = xmk;
       else
       {	Child(z, Down(x));
-	if( type(x) == LINK_SOURCE )
-	  BackEnd->LinkSource(z, save_mark(x) - back(x, COLM),
-	    (pg - xmk) - xf, save_mark(x) + fwd(x, COLM),
-	    (pg - xmk) + xb);
-	else
-	  BackEnd->LinkDest(z, save_mark(x) - back(x, COLM),
-	    (pg - xmk) - xf, save_mark(x) + fwd(x, COLM),
-	    (pg - xmk) + xb);
+	switch( type(x) )
+	{
+	  case LINK_SOURCE:
+
+	    BackEnd->LinkSource(z, save_mark(x) - back(x, COLM),
+	      (pg - xmk) - xf, save_mark(x) + fwd(x, COLM), (pg - xmk) + xb);
+	    break;
+
+	  case LINK_DEST:
+
+	    BackEnd->LinkDest(z, save_mark(x) - back(x, COLM),
+	      (pg - xmk) - xf, save_mark(x) + fwd(x, COLM), (pg - xmk) + xb);
+	    break;
+
+	  case LINK_URL:
+
+	    BackEnd->LinkURL(z, save_mark(x) - back(x, COLM),
+	      (pg - xmk) - xf, save_mark(x) + fwd(x, COLM), (pg - xmk) + xb);
+	    break;
+	}
       }
       y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
 	    &aback, &afwd);

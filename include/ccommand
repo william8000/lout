@@ -1,0 +1,113 @@
+
+###########################################################################
+#                                                                         #
+#   @ColourCommand                                                        #
+#                                                                         #
+#   Jeff Kingston                                                         #
+#   19 October 2001                                                       #
+#                                                                         #
+#   @ColourCommand converts a colour expressed in a manner that the       #
+#   ordinary user can comprehend into the PostScript or PDF command       #
+#   needed to obtain that colour, suitable for passing to @SetColour      #
+#   or including in the left parameter of @Graphic.                       #
+#                                                                         #
+#   This symbol is needed in various places so I've taken the coward's    #
+#   way out and @SysIncluded it at those places.                          #
+#                                                                         #
+#   Examples of behaviour for the PostScript back end:                    #
+#                                                                         #
+#       Parameter                 Result                                  #
+#       ------------------------------------------------------------      #
+#       black                     "0.0 0.0 0.0 setrgbcolor"               #
+#       darkblue                  "0.0 0.0 0.5 setrgbcolor"               #
+#       white                     "1.0 1.0 1.0 setrgbcolor"               #
+#       none                      ""                                      #
+#       nochange                  ""                                      #
+#       ""                        ""                                      #
+#       rgb <red> <blue> <green>  "<red> <blue> <green> setrgbcolor"      #
+#       cymk <c> <y> <m> <k>      "<c> <y> <m> <k> setcymkcolor"          #
+#       ------------------------------------------------------------      #
+#                                                                         #
+#   @ColourCommand also does the right thing for the PDF back end;        #
+#   its result is always empty for the PlainText back end.                #
+#                                                                         #
+###########################################################################
+
+def @ColourCommand right @Body
+{
+    def @RGB right coords
+    {
+	@BackEnd @Case {
+	    PostScript @Yield { coords "setrgbcolor" }
+	    PDF        @Yield { coords "rg" coords "RG" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def @CMYK right coords
+    {
+	@BackEnd @Case {
+	    PostScript @Yield { coords "setcmykcolor" }
+	    PDF        @Yield { coords "k" coords "K" }
+	    PlainText  @Yield ""
+	}
+    }
+
+    def @RGBElse right alt
+    {
+	{ "rgb" @Common @Body } @Case {
+	    "rgb" @Yield @RGB { "rgb" @Rump @Body }
+	    else  @Yield alt
+	}
+    }
+
+    def @CMYKElse right alt
+    {
+	{ "cmyk" @Common @Body } @Case {
+	    "cmyk" @Yield @CMYK { "cmyk" @Rump @Body }
+	    else  @Yield alt
+	}
+    }
+
+    def @NoChangeElse right alt
+    {
+	@Body @Case {
+	    { "nochange" "none" "" } @Yield ""
+	    else              @Yield alt
+	}
+    }
+
+    def @RGBCoords
+    {
+	@Body @Case {
+	    black	@Yield	{ 0.0 0.0 0.0 }
+	    darkblue	@Yield	{ 0.0 0.0 0.5 }
+	    blue	@Yield	{ 0.0 0.0 1.0 }
+	    lightblue	@Yield	{ 0.5 0.5 1.0 }
+	    darkgreen	@Yield	{ 0.0 0.5 0.0 }
+	    green	@Yield	{ 0.0 1.0 0.0 }
+	    lightgreen	@Yield	{ 0.5 1.0 0.5 }
+	    darkred	@Yield	{ 0.5 0.0 0.0 }
+	    red		@Yield	{ 1.0 0.0 0.0 }
+	    lightred	@Yield	{ 1.0 0.5 0.5 }
+	    darkcyan	@Yield	{ 0.0 0.5 0.5 }
+	    cyan	@Yield	{ 0.0 1.0 1.0 }
+	    lightcyan	@Yield	{ 0.5 1.0 1.0 }
+	    darkmagenta	@Yield	{ 0.5 0.0 0.5 }
+	    magenta	@Yield	{ 1.0 0.0 1.0 }
+	    lightmagenta @Yield	{ 1.0 0.5 1.0 }
+	    darkyellow	@Yield	{ 0.5 0.5 0.0 }
+	    yellow	@Yield	{ 1.0 1.0 0.0 }
+	    lightyellow	@Yield	{ 1.0 1.0 0.5 }
+	    darkgray	@Yield	{ 0.2 0.2 0.2 }
+	    gray	@Yield	{ 0.5 0.5 0.5 }
+	    lightgray	@Yield	{ 0.8 0.8 0.8 }
+	    darkgrey	@Yield	{ 0.2 0.2 0.2 }
+	    grey	@Yield	{ 0.5 0.5 0.5 }
+	    lightgrey	@Yield	{ 0.8 0.8 0.8 }
+	    white	@Yield	{ 1.0 1.0 1.0 }
+	}
+    }
+
+    @RGBElse @CMYKElse @NoChangeElse @RGB @RGBCoords
+}

@@ -84,6 +84,29 @@ precise effect depends on the font (see below).  There is a default
 value (@Code {"nosmallcaps"}), so it is not necessary to mention this
 attribute when giving an initial font.
 @PP
+By default, the size of the small capitals is 0.7 times the size
+of full-size capitals.  You can change this ratio, for example to
+0.8, using
+@ID @Code "{ setsmallcaps 0.8 } @Font ..."
+This does not itself cause a change to small capitals, but wherever
+they are used in the right parameter of @Code "@Font" they will have
+size 0.8 times the size that ordinary capitals would have had at
+that point.  Note that the number following @Code "setsmallcaps" is
+a ratio, not a length, so there is no unit of measurement.
+@PP
+The @@Font symbol also controls a feature added in Version 3.25
+which determines where the row mark is placed in a word.  Usually,
+as described elsewhere in this document, the row mark passes through
+the word at a height of half the height of the letter `x' above the
+baseline of the word.  However this can be changed so that it passes
+through the baseline, or not, like this:
+@ID @Code {
+"baselinemark @Font ..."
+"xheight2mark @Font ..."
+}
+The default value is {@Code xheight2mark}.  It's useful when
+words in different font sizes appear side by side on a line.
+@PP
 There are two predefined symbols, @@CurrFamily and @@CurrFace, which
 respectively return the family and face names of the current font.  For
 example, right now @@CurrFamily is @CurrFamily and @@CurrFace is

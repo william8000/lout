@@ -168,7 +168,7 @@ automatic }
 @Rowa
     A { "colour/color" }
     B { none }
-    C { {@Code none} or any colour name from Section {@NumberOf colour}}
+    C { {@Code none} or any colour from Section {@NumberOf colour}}
 @Rowa
     A { paint }
     B { no }
@@ -176,7 +176,7 @@ automatic }
 @Rowa
     A { dataformat }
     B { xandy }
-    C { {@Code xandy}, {@Code yonly}, {@Code xonly} }
+    C { {@Code xandy}, {@Code yonly}, {@Code xonly}, {@Code swapxandy} }
 @Rowa
     A { dashlength }
     B { 0.2 ft }

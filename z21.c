@@ -1,7 +1,7 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -302,11 +302,20 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 	back(tmp, COLM) = fwd(tmp, COLM) = 0;
 	back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
 	word_font(tmp) = word_colour(tmp) = word_language(tmp) = 0;
+	word_baselinemark(tmp) = FALSE;
 	word_outline(tmp) = FALSE;
 	word_hyph(tmp) = FALSE;
 	ReplaceNode(tmp, t);
 	DisposeObject(t);
 	t = tmp;
+      }
+      else if( bfc(constraint(z)) == -1 )
+      {
+	/* we want to scale down but not up */
+	if( size(t, COLM) > bfc(zc) )
+	  bc(constraint(z)) = fc(constraint(z)) = (bfc(zc) * SF)/size(t, COLM);
+	else
+	  bc(constraint(z)) = fc(constraint(z)) = 1 * SF;
       }
       else bc(constraint(z)) = fc(constraint(z)) = (bfc(zc) * SF)/size(t, COLM);
 

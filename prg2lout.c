@@ -4,7 +4,7 @@
 /*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
 /*  COPYRIGHT (C) 2000 Jeffrey H. Kingston                                   */
 /*                                                                           */
-/*  Version 2.1, 24 June 2000                                                */
+/*  Version 2.2, 17 September 2001                                           */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -620,7 +620,7 @@ TOKEN PythonDblStringToken = {
 TOKEN PythonSnglStringToken = {
   "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",			/* Lout command for formatting strings              */
+  "@PS",		/* Lout command for formatting strings              */
   "",			/* no alternate command                             */
   "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
@@ -642,7 +642,7 @@ TOKEN PythonSnglStringToken = {
 TOKEN PythonTriSnglStringToken = {
   "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  "@PS",			/* Lout command for formatting strings              */
+  "@PS",		/* Lout command for formatting strings              */
   "",			/* no alternate command                             */
   "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
@@ -650,13 +650,13 @@ TOKEN PythonTriSnglStringToken = {
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
-  AllPrintableTabNL,		/* inside, any printable is OK		            */
+  AllPrintableTabNL,	/* inside, any printable is OK		            */
   "\\",			/* within strings, \\ is the escape character       */
   AllPrintableTabNL,	/* after escape char, any printable char or nl OK   */
   "",			/* strings do not permit "inner escapes"            */
   "",			/* and so there is no end innner escape either      */
   "",			/* no bracketing delimiter			    */
-  "'''",			/* strings end with '''                   */
+  "'''",		/* strings end with '''                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -2567,6 +2567,40 @@ LANGUAGE BlueLanguage = {
 };
 
 
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Java                                                                     */
+/*                                                                           */
+/*****************************************************************************/
+
+LANGUAGE JavaLanguage = {
+  { "Java", "java"  },
+  "java", "@Java",
+  NO_MATCH_ERROR,
+  {
+    &CStringToken, &CCharacterToken, &IdentifierToken, &NumberToken,
+    &CCommentToken, &CCommentEscapeToken,
+    &CPPCommentToken, &CPPCommentEscapeToken,
+    &HashToken, &ExclamationToken, &PercentToken, &HatToken,
+    &AmpersandToken, &StarToken, &LeftParenToken, &RightParenToken,
+    &MinusToken, &PlusToken, &EqualToken, &LeftBraceToken, &RightBraceToken,
+    &BarToken, &CircumToken, &LeftBracketToken, &RightBracketToken,
+    &SemicolonToken, &ColonToken, &LessToken, &GreaterToken,
+    &QuestionToken, &CommaToken, &DotToken, &SlashToken, &BackSlashToken,
+    &LessEqualToken, &GreaterEqualToken, &CNotEqualToken
+  },
+
+  { "abstract", "boolean", "break", "byte", "case", "catch", "char", "class",
+    "const", "continue", "default", "do", "double", "else", "extends", "final",
+    "finally", "float", "for", "goto", "if", "implements", "import", "instanceof",
+    "int", "interface", "long", "native", "new", "package", "private", "protected",
+    "public", "return", "short", "static", "strictfp", "super", "switch",
+    "synchronized", "this", "throw", "throws", "transient", "try", "void",
+    "volatile", "while",
+  }
+};
+
 /*****************************************************************************/
 /*                                                                           */
 /*  Perl and Pod                                                             */
@@ -2749,6 +2783,7 @@ LANGUAGE PodLanguage = {
 /*****************************************************************************/
 /*                                                                           */
 /*  The "languages" variable - add your language to this list                */
+/*  in alphabetical order and before the concluding NO_LANGUAGE              */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -2756,9 +2791,11 @@ LANGUAGE *languages[] = {
   & BlueLanguage,
   & CLanguage,
   & EiffelLanguage,
+  & JavaLanguage,
   & PerlLanguage,
   & PodLanguage,
   & PythonLanguage,
+  NO_LANGUAGE
 };
 
 
@@ -2790,7 +2827,7 @@ LANGUAGE *languages[] = {
 #define DEBUG_EMIT	0
 #define DEBUG_MAIN	0
 
-#define PRG2LOUT_VERSION "prg2lout Version 2.0 (April 2000)"
+#define PRG2LOUT_VERSION "prg2lout Version 2.1 (April 2001)"
 #define	MAX_LINE	1024
 
 static char	file_name[MAX_LINE];	/* current input file name           */
@@ -4306,7 +4343,7 @@ void PrintUsage()
 { int i;
   fprintf(err_fp, "\n");
   fprintf(err_fp, "usage: prg2lout <options> <files>\n\n");
-  fprintf(err_fp, "    where <options> can be\n");
+  fprintf(err_fp, "where <options> can be\n");
   fprintf(err_fp, "\n");
   fprintf(err_fp, "    -r           raw mode (used within Lout only)\n");
   fprintf(err_fp, "    -i<file>     take input from <file>\n");
@@ -4325,9 +4362,9 @@ void PrintUsage()
   fprintf(err_fp, "    -V           print version information and exit\n");
   fprintf(err_fp, "    -u           print this usage message and exit\n");
   fprintf(err_fp, "\n");
-  fprintf(err_fp, "    <language> (which is compulsory) can be any one of:\n");
+  fprintf(err_fp, "and <language> (which is compulsory) can be any one of:\n\n");
   for( i = 0;  languages[i] != (LANGUAGE *) NULL;  i++ )
-    fprintf(err_fp, "        %s\n", languages[i]->names[0]);
+    fprintf(err_fp, "    %s\n", languages[i]->names[0]);
   fprintf(err_fp, "\n");
   fprintf(err_fp, "The values of all formatting options not given are\n");
   fprintf(err_fp, "taken from the setup file: either the file given after\n");
@@ -4633,7 +4670,7 @@ int main(int argc, char *argv[])
       default:
      
 	fprintf(err_fp, "%s: unknown command line flag %s\n", ErrorHeader(),
-	  argv[i]);
+	  argv[arg_pos]);
 	exit(1);
 	break;
 

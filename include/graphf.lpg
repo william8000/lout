@@ -4,6 +4,7 @@
 %  PostScript @SysPrependGraphic file for @Graph (Version 1.0)       %
 %                                                                    %
 %  Version 1.0 by Jeffrey H. Kingston, December 1993.                %
+%  swapxandy added September 2001 by JHK.                            %
 %                                                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -356,6 +357,16 @@ lgraphdict begin
 % xandy: no interpolation of x or y values
 % [ data ] xandy [ data ]
 /xandy {} def
+
+% swapxandy: no interpolation of x or y values
+% [ data ] swapxandy [ data ]
+/swapxandy
+{ dup /tmp exch def
+  length [ exch 2 exch 2 exch
+  { dup tmp exch 1 sub get exch 2 sub tmp exch get
+  } for
+  ]
+} def
 
 
 % expstringwidth: calculate width of string containing optional exponent

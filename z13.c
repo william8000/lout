@@ -1,7 +1,7 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -546,6 +546,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	colour(save_style(y)) = word_colour(x);
 	outline(save_style(y)) = word_outline(x);
 	language(save_style(y)) = word_language(x);
+	baselinemark(save_style(y)) = word_baselinemark(x);
 	debug3(DOF, DD, "  in BreakObject y %s %s %s",
 	  EchoStyle(&save_style(y)), Image(type(y)), EchoObject(y));
 
@@ -706,6 +707,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
     case GRAPHIC:
     case LINK_SOURCE:
     case LINK_DEST:
+    case LINK_URL:
     
       Child(y, LastDown(x));
       y = BreakObject(y, c);

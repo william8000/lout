@@ -24,6 +24,7 @@
 ######################################################
 
 { contents @Word @CurrLang @Case {
+    Croatian	@Yield { Sadr{@Char zcaron}aj }
     Czech	@Yield { Obsah }
     Danish	@Yield { Indhold }
     Dutch       @Yield { Inhoudsopgave }
@@ -33,18 +34,21 @@
     French	@Yield { Table des Mati{@Char egrave}res }
     German	@Yield { Inhalt }
     Hungarian	@Yield { Tartalom }
-    Italian	@Yield { Contenuto }
+    Italian	@Yield { Indice }
     Norwegian   @Yield { Innhold }
     Polish	@Yield { Spis tre{@Char sacute}ci }
     Portuguese  @Yield { Conte{@Char uacute}do }
     Russian	@Yield { "\363\317\304\305\322\326\301\316\311\305" }
+    Slovak	@Yield { Obsah }
     Slovenian   @Yield { Vsebina }
     Spanish	@Yield { Contenidos }
     Swedish	@Yield { Inneh{@Char aring}ll }
+    UpperSorbian @Yield { Wobsah }
   }
 }
 
 { references @Word @CurrLang @Case {
+    Croatian	@Yield { Reference }
     Czech	@Yield { Odkazy na literaturu }
     Danish	@Yield { Referencer }
     Dutch       @Yield { Referenties }
@@ -59,13 +63,16 @@
     Polish	@Yield { Odno{@Char sacute}niki }
     Portuguese  @Yield { Refer{@Char ecircumflex}ncias }
     Russian	@Yield { "\354\311\324\305\322\301\324\325\322\301" }
+    Slovak	@Yield { Odkazy na literat{@Char uacute}uru }
     Slovenian   @Yield { Reference }
     Spanish	@Yield { Referencias }
     Swedish	@Yield { Referenser }
+    UpperSorbian @Yield { Literatura }
   }
 }
 
 { bibliography @Word @CurrLang @Case {
+    Croatian	@Yield { Bibliografija }
     Czech	@Yield { Seznam literatury }
     Danish	@Yield { Bibliografi }
     Dutch       @Yield { Bibliografie } 
@@ -80,13 +87,16 @@
     Polish	@Yield { Literatura }
     Portuguese  @Yield { Bibliografia }
     Russian	@Yield { "\354\311\324\305\322\301\324\325\322\301" }
+    Slovak	@Yield { Zoznam literat{@Char uacute}ry }
     Slovenian   @Yield { Literatura }
     Spanish	@Yield { Bibliograf{@Char iacute}a }
     Swedish	@Yield { Bibliografi }
+    UpperSorbian @Yield { Bibliografija }
   }
 }
 
 { figure @Word @CurrLang @Case {
+    Croatian	@Yield { Slika }
     Czech	@Yield { Obr{@Char aacute}zek }
     Danish	@Yield { Figur }
     Dutch       @Yield { Figuur }
@@ -101,34 +111,40 @@
     Polish	@Yield { Rysunek }
     Portuguese  @Yield { Figura }
     Russian	@Yield { "\362\311\323\325\316\317\313" }
+    Slovak	@Yield { Obr{@Char aacute}zok }
     Slovenian   @Yield { Slika }
     Spanish	@Yield { Figura }
     Swedish	@Yield { Figur }
+    UpperSorbian @Yield { Wobraz }
   }
 }
 
 { figurelist @Word @CurrLang @Case {
+    Croatian	@Yield { Popis slika }
     Czech	@Yield { Seznam obr{@Char aacute}zk{@Char uring} }
     Danish	@Yield { Figurliste }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Lijst van figuren } # Figuren, Figurenlijst
     English	@Yield { List of Figures }
     EnglishUK	@Yield { List of Figures }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { Kuvat }
     French	@Yield { Liste des figures }
     German	@Yield { Abbildungsverzeichnis }
     Hungarian	@Yield { {@Char Aacute}br{@Char aacute}k jegyz{@Char eacute}ke }
-    Italian	@Yield { Elenco delle Figure }
+    Italian	@Yield { Elenco delle figure }
     Norwegian   @Yield { ??  }
     Polish	@Yield { Spis rysunk{@Char oacute}w }
     Portuguese  @Yield { Lista de Figuras }
     Russian	@Yield { "\363\320\311\323\317\313 \311\314\314\300\323\324\322\301\303\311\312" }
+    Slovak	@Yield { Zoznam obr{@Char aacute}zkov }
     Slovenian   @Yield { Seznam slik }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Lista de figuras }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Zapisk wobrazow }
   }
 }
 
 { table @Word @CurrLang @Case {
+    Croatian	@Yield { Tablica }
     Czech	@Yield { Tabulka }
     Danish	@Yield { Tabel }
     Dutch       @Yield { Tabel }
@@ -143,40 +159,46 @@
     Polish	@Yield { Tabela }
     Portuguese  @Yield { Tabela }
     Russian	@Yield { "\364\301\302\314\311\303\301" }
+    Slovak	@Yield { Tabu{@Char lcaron}ka }
     Slovenian   @Yield { Tabela }
     Spanish	@Yield { Tabla }
     Swedish	@Yield { Tabell }
+    UpperSorbian @Yield { Tabulka }
   }
 }
 
 { tablelist @Word @CurrLang @Case {
+    Croatian	@Yield { Popis tablica }
     Czech	@Yield { Seznam tabulek }
     Danish	@Yield { Tabelliste }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Lijst van tabellen }  # Tabellen, Tabellenlijst
     English	@Yield { List of Tables }
     EnglishUK	@Yield { List of Tables }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { Taulukot }
     French	@Yield { Liste des tables }
     German	@Yield { Tabellenverzeichnis }
     Hungarian	@Yield { T{@Char aacute}bl{@Char aacute}zatok jegyz{@Char eacute}ke }
-    Italian	@Yield { Elenco delle Tabelle }
+    Italian	@Yield { Elenco delle tabelle }
     Norwegian   @Yield { ?? }
     Polish	@Yield { Spis tabel }
     Portuguese  @Yield { Lista de Tabelas }
     Russian	@Yield { "\363\320\311\323\317\313 \324\301\302\314\311\303" }
+    Slovak	@Yield { Zoznam tabuliek }
     Slovenian   @Yield { Seznam tabel }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Lista de tablas  }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Zapisk tabulkow }
   }
 }
 
 { definition @Word @CurrLang @Case {
+    Croatian	@Yield { Definicija }
     Czech	@Yield { Definice }
     Danish	@Yield { Definition }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Definitie }
     English	@Yield { Definition }
     EnglishUK	@Yield { Definition }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { M{@Char adieresis}{@Char adieresis}ritelm{@Char adieresis} }
     French	@Yield { D{@Char eacute}finition }
     German	@Yield { Definition }
     Hungarian	@Yield { defin{@Char iacute}ci{@Char oacute} }
@@ -185,19 +207,22 @@
     Polish	@Yield { Definicja }
     Portuguese  @Yield { Defini{@Char ccedila}{@Char atilde}o }
     Russian	@Yield { "\357\320\322\305\304\305\314\305\316\311\305" }
+    Slovak	@Yield { Defin{@Char iacute}ce }
     Slovenian   @Yield { Definicija }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Definici{@Char oacute}n }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Definicija }
   }
 }
 
 { lemma @Word @CurrLang @Case {
+    Croatian	@Yield { Lema }
     Czech	@Yield { Lemma }
     Danish	@Yield { Lemma }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Lemma }
     English	@Yield { Lemma }
     EnglishUK	@Yield { Lemma }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { Lemma }
     French	@Yield { Lemme }
     German	@Yield { Lemma }
     Hungarian	@Yield { lemma }
@@ -206,19 +231,22 @@
     Polish	@Yield { Lemat }
     Portuguese  @Yield { Lema }
     Russian	@Yield { "\354\305\315\315\301" }
+    Slovak	@Yield { Lemma }
     Slovenian   @Yield { Lema }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Lema }
   }
 }
 
 { theorem @Word @CurrLang @Case {
+    Croatian	@Yield { Teorem }
     Czech	@Yield { Teor{@Char eacute}m }
     Danish	@Yield { S{@Char ae}tning }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Theorema }
     English	@Yield { Theorem }
     EnglishUK	@Yield { Theorem }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { Lause }
     French	@Yield { Th{@Char eacute}or{@Char egrave}me }
     German	@Yield { Theorem }
     Hungarian	@Yield { t{@Char eacute}tel }
@@ -227,19 +255,22 @@
     Polish	@Yield { Twierdzenie }
     Portuguese  @Yield { Teorema }
     Russian	@Yield { "\364\305\317\322\305\315\301" }
+    Slovak	@Yield { Teor{@Char eacute}ma }
     Slovenian   @Yield { Teorem }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Teorema }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Teorem }
   }
 }
 
 { proposition @Word @CurrLang @Case {
+    Croatian	@Yield { Propozicija }
     Czech	@Yield { P{@Char rcaron}edpoklad }
     Danish	@Yield { Proposition }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Propositie } # Bewering
     English	@Yield { Proposition }
     EnglishUK	@Yield { Proposition }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { Propositio }
     French	@Yield { Proposition }
     German	@Yield { Satz }
     Hungarian	@Yield { {@Char aacute}ll{@Char iacute}t{@Char aacute}s }
@@ -248,19 +279,22 @@
     Polish	@Yield { Za{@Char lslash}o{@Char zdotabove}enie }
     Portuguese  @Yield { Proposi{@Char ccedilla}{@Char atilde}o }
     Russian	@Yield { "\360\322\305\304\314\317\326\305\316\311\305" }
+    Slovak	@Yield { Predpoklad }
     Slovenian   @Yield { Predpostavka }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Proposici{@Char oacute}n }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Postajenje }
   }
 }
 
 { corollary @Word @CurrLang @Case {
+    Croatian	@Yield { Korolar }
     Czech	@Yield { D{@Char uring}sledek }
     Danish	@Yield { Korollar }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Corollaar }
     English	@Yield { Corollary }
     EnglishUK	@Yield { Corollary }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { Seuraus }
     French	@Yield { Corollaire }
     German	@Yield { Korollar }
     Hungarian	@Yield { ?? }
@@ -269,19 +303,22 @@
     Polish	@Yield { Wniosek }
     Portuguese  @Yield { Corol{@Char aacute}rio }
     Russian	@Yield { "\363\314\305\304\323\324\327\311\305" }
+    Slovak	@Yield { D{@Char ocircumflex}sledok }
     Slovenian   @Yield { Sklep }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Corolario }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Korolar }
   }
 }
 
 { example @Word @CurrLang @Case {
+    Croatian	@Yield { Primjer }
     Czech	@Yield { P{@Char rcaron}{@Char iacute}klad }
     Danish	@Yield { Eksempel }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Voorbeeld }
     English	@Yield { Example }
     EnglishUK	@Yield { Example }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { Esimerkki }
     French	@Yield { Exemple }
     German	@Yield { Beispiel }
     Hungarian	@Yield { p{@Char eacute}lda }
@@ -290,19 +327,22 @@
     Polish	@Yield { Przyk{@Char lslash}ad }
     Portuguese  @Yield { Exemplo }
     Russian	@Yield { "\360\322\311\315\305\322" }
+    Slovak	@Yield { Pr{@Char iacute}klad }
     Slovenian   @Yield { Primer }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Ejemplo }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { p{@Char rcaron}ik{@Char lslash}ad }
   }
 }
 
 { claim @Word @CurrLang @Case {
+    Croatian	@Yield { Tvrdnja }
     Czech	@Yield { Tvrzen{@Char iacute} }
     Danish	@Yield { P{@Char aa}stand }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Stelling }
     English	@Yield { Claim }
     EnglishUK	@Yield { Claim }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { V{@Char adieresis}ite }
     French	@Yield { Affirmation }
     German	@Yield { Behauptung }
     Hungarian	@Yield { kijelent{@Char eacute}s }
@@ -311,19 +351,22 @@
     Polish	@Yield { Stwierdzenie }
     Portuguese  @Yield { Crédito }
     Russian	@Yield { "\365\324\327\305\322\326\304\305\316\311\305" }
+    Slovak	@Yield { Tvrdenie }
     Slovenian   @Yield { Trditev }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Hip{@Char oacute}tesis }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Twjerd{@Char zacute}enje }
   }
 }
 
 { proof @Word @CurrLang @Case {
+    Croatian	@Yield { Dokaz }
     Czech	@Yield { D{@Char uring}kaz }
     Danish	@Yield { Bevis }
-    Dutch       @Yield { ?? }
+    Dutch       @Yield { Bewijs }
     English	@Yield { Proof }
     EnglishUK	@Yield { Proof }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { Todistus }
     French	@Yield { Preuve }
     German	@Yield { Beweis }
     Hungarian	@Yield { Bizony{@Char iacute}t{@Char aacute}s }
@@ -332,13 +375,16 @@
     Polish	@Yield { Dow{@Char oacute}d }
     Portuguese  @Yield { Prova }
     Russian	@Yield { "\344\317\313\301\332\301\324\305\314\330\323\324\327\317" }
+    Slovak	@Yield { D{@Char ocircumflex}kaz }
     Slovenian   @Yield { Dokaz }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Demostraci{@Char oacute}n }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Dopokaz }
   }
 }
 
 { abstract @Word @CurrLang @Case {
+    Croatian	@Yield { Sa{@Char zcaron}etak }
     Czech	@Yield { Abstrakt }
     Danish	@Yield { Synopsis }
     Dutch       @Yield { Samenvatting }
@@ -353,13 +399,16 @@
     Polish	@Yield { Abstrakt }
     Portuguese  @Yield { Resumo }
     Russian	@Yield { "\341\302\323\324\322\301\313\324" } #correct!
+    Slovak	@Yield { Abstrakt }
     Slovenian   @Yield { Povzetek }
     Spanish	@Yield { Sinopsis }
     Swedish	@Yield { {@Char Odieresis}versikt }
+    UpperSorbian @Yield { Zje{@Char cacute}e }
   }
 }
 
 { preface @Word @CurrLang @Case {
+    Croatian	@Yield { Predgovor }
     Czech	@Yield { P{@Char rcaron}edmluva }
     Danish	@Yield { Forord }
     Dutch       @Yield { Voorwoord } # or { Woord vooraf }
@@ -374,37 +423,43 @@
     Polish	@Yield { Przedmowa }
     Portuguese  @Yield { Pref{@Char aacute}cio }
     Russian	@Yield { "\360\322\305\304\311\323\314\317\327\311\305" }
+    Slovak	@Yield { Predhovor }
     Slovenian   @Yield { Predgovor }
     Spanish	@Yield { Prefacio }
     Swedish	@Yield { F{@Char odieresis}rord }
+    UpperSorbian @Yield { P{@Char rcaron}eds{@Char lslash}owo }
   }
 }
 
 { abbreviations @Word @CurrLang @Case {
+    Croatian	@Yield { Skra{@Char cacute}enice }
     Czech	@Yield { Zkratky }
     Danish	@Yield { ?? }
     Dutch       @Yield { ?? }
     English	@Yield { Abbreviations }
     EnglishUK	@Yield { Abbreviations }
-    Finnish	@Yield { ?? }
-    French	@Yield { ?? }
-    German	@Yield { ?? }
+    Finnish	@Yield { Lyhenteet }
+    French	@Yield { Abr{@Char eacute}viation }
+    German	@Yield { Abk{@Char udiaresis}rzungsverzeichnis }
     Hungarian	@Yield { ?? }
-    Italian	@Yield { ?? }
+    Italian	@Yield { Abbreviazioni }
     Norwegian   @Yield { ?? }
     Polish	@Yield { ?? }
     Portuguese  @Yield { Abrevia{@Char ccedilla}{@Char otilde}es }
     Russian	@Yield { ?? }
+    Slovak	@Yield { Skratky }
     Slovenian   @Yield { ?? }
     Spanish	@Yield { ?? }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Skr{@Char oacute}t{@Char scaron}enki }
   }
 }
 
 { introduction @Word @CurrLang @Case {
+    Croatian	@Yield { Uvod }
     Czech	@Yield { {@Char Uacute}vod }
     Danish	@Yield { Indledning }
-    Dutch       @Yield { Inleiding }
+    Dutch       @Yield { Afkortingen }
     English	@Yield { Introduction }
     EnglishUK	@Yield { Introduction }
     Finnish	@Yield { Johdanto }
@@ -416,13 +471,16 @@
     Polish	@Yield { Wst{@Char eogonek}p }
     Portuguese  @Yield { Introdu{@Char ccedilla}{@Char atilde}o }
     Russian	@Yield { "\367\327\305\304\305\316\311\305" }
+    Slovak	@Yield { {@Char Uacute}vod }
     Slovenian   @Yield { Uvod }
     Spanish	@Yield { Introducci{@Char oacute}n }
     Swedish	@Yield { Inledning }
+    UpperSorbian @Yield { Zawod }
   }
 }
 
 { chapter @Word @CurrLang @Case {
+    Croatian	@Yield { Poglavlje }
     Czech	@Yield { Kapitola }
     Danish	@Yield { Kapitel }
     Dutch       @Yield { Hoofdstuk }
@@ -437,13 +495,16 @@
     Polish	@Yield { Rozdzia{@Char lslash} }
     Portuguese  @Yield { Cap{@Char iacute}tolo }
     Russian	@Yield { "\347\314\301\327\301" }
+    Slovak	@Yield { Kapitola }
     Slovenian   @Yield { Poglavje }
     Spanish	@Yield { Cap{@Char iacute}tulo }
     Swedish	@Yield { Kapitel }
+    UpperSorbian @Yield { Staw }
   }
 }
 
 { appendix @Word @CurrLang @Case {
+    Croatian	@Yield { Dodatak }
     Czech	@Yield { P{@Char rcaron}{@Char iacute}loha }
     Danish	@Yield { Appendiks }
     Dutch       @Yield { Appendix }
@@ -458,34 +519,40 @@
     Polish	@Yield { Dodatek }
     Portuguese  @Yield { Apêndice }
     Russian	@Yield { "\360\322\311\314\317\326\305\316\311\305" }
+    Slovak	@Yield { Pr{@Char iacute}loha }
     Slovenian   @Yield { Dodatek }
     Spanish	@Yield { Ap{@Char eacute}ndice }
     Swedish	@Yield { Appendix }
+    UpperSorbian @Yield { Dodawki }
   }
 }
 
 { lecture @Word @CurrLang @Case {
+    Croatian	@Yield { Predavanje }
     Czech	@Yield { P{@Char rcaron}edn{@Char aacute}{@Char scaron}ka }
     Danish	@Yield { Lecture }
     Dutch       @Yield { Lecture }
     English	@Yield { Lecture }
     EnglishUK	@Yield { Lecture }
-    Finnish	@Yield { Lecture }
-    French	@Yield { Lecture }
+    Finnish	@Yield { Luento }
+    French	@Yield { Conf{@Char eacute}rence }
     German	@Yield { Lecture }
     Hungarian	@Yield { Lecture }
-    Italian	@Yield { Lecture }
+    Italian	@Yield { Conferenza }
     Norwegian   @Yield { Lecture }
     Polish	@Yield { Lecture }
     Portuguese  @Yield { Conferência }
     Russian	@Yield { Lecture }
+    Slovak	@Yield { Predn{@Char aacute}{@Char scaron}ka }
     Slovenian   @Yield { Lecture }
-    Spanish	@Yield { Lecture }
+    Spanish	@Yield { Conferencia }
     Swedish	@Yield { Lecture }
+    UpperSorbian @Yield { P{@Char rcaron}edno{@Char scaron}k }
   }
 }
 
 { index @Word @CurrLang @Case {
+    Croatian	@Yield { Indeks }
     Czech	@Yield { Rejst{@Char rcaron}{@Char iacute}k }
     Danish	@Yield { Indeks }
     Dutch       @Yield { Index }
@@ -500,13 +567,16 @@
     Polish	@Yield { Skorowidz }
     Portuguese  @Yield { {@Char Iacute}ndice Remissivo }
     Russian	@Yield { "\351\316\304\305\313\323" }
+    Slovak	@Yield { Index }
     Slovenian   @Yield { Indeks }
     Spanish	@Yield { Indice }
     Swedish	@Yield { Index }
+    UpperSorbian @Yield { Indeks }
   }
 }
 
 { notitle @Word @CurrLang @Case {
+    Croatian	@Yield { Bez naslova }
     Czech	@Yield { Bez n{@Char aacute}zvu }
     Danish	@Yield { Ingen titel }
     Dutch       @Yield { Zonder titel }
@@ -521,13 +591,16 @@
     Italian	@Yield { Senza titolo }
     Norwegian   @Yield { Utel tittel }
     Russian	@Yield { "\342\305\332 \316\301\332\327\301\316\311\321" }
+    Slovak	@Yield { Bez n{@Char aacute}zvu }
     Slovenian   @Yield { Brez naslova }
     Spanish	@Yield { Sin t{@Char iacute}tulo }
     Swedish	@Yield { Ingen titel }
+    UpperSorbian @Yield { Bjez titla }
   }
 }
 
 { pages @Word @CurrLang @Case {
+    Croatian	@Yield { stranica }
     Czech	@Yield { stranky }
     Danish	@Yield { sider }
     Dutch       @Yield { pagina's } # or {bladzijden}, {pag.}, {blz.}
@@ -542,13 +615,16 @@
     Polish	@Yield { strony }
     Portuguese  @Yield { p{@Char aacute}ginas }
     Russian	@Yield { "\323\324\322\301\316\311\303\331" }
+    Slovak	@Yield { str{@Char aacute}n }
     Slovenian   @Yield { strani }
     Spanish	@Yield { p{@Char aacute}ginas }
     Swedish	@Yield { sidor }
+    UpperSorbian @Yield { strony }
   }
 }
 
 { page @Word @CurrLang @Case {
+    Croatian	@Yield { strana }
     Czech	@Yield { strana }
     Danish	@Yield { side }
     Dutch       @Yield { pagina } # or {bladzijde}, {pag.}, {blz.}
@@ -563,19 +639,22 @@
     Polish	@Yield { strona }
     Portuguese  @Yield { p{@Char aacute}gina }
     Russian	@Yield { "\323\324\322\301\316\311\303\301" }
+    Slovak	@Yield { strana }
     Slovenian   @Yield { stran }
     Spanish	@Yield { p{@Char aacute}gina }
     Swedish	@Yield { sida }
+    UpperSorbian @Yield { strona }
   }
 }
 
 { nopublisher @Word @CurrLang @Case {
+    Croatian	@Yield { Bez izdava{@Char ccaron}a }
     Czech	@Yield { Vydavatel neuveden }
     Danish	@Yield { Intet forlag }
     Dutch       @Yield { Ongepubliceerd } # or {Zonder uitgever}
     English	@Yield { No publisher }
     EnglishUK	@Yield { No publisher }
-    Finnish	@Yield { Ei kustantamo }
+    Finnish	@Yield { Ei kustantajaa }
     French	@Yield { Sans {@Char eacute}diteur }
     German	@Yield { Ohne Verleger }
     Hungarian	@Yield { Kiad{@Char oacute} n{@Char eacute}lk{@Char udieresis}l }
@@ -584,13 +663,16 @@
     Polish	@Yield { Bez wydawcy }
     Portuguese  @Yield { Sem editora }
     Russian	@Yield { "\302\305\332 \311\332\304\301\324\305\314\321" }
+    Slovak	@Yield { Vydavate{@Char lcaron} neuveden{@Char eacute} }
     Slovenian   @Yield { Brez zalo{@Char zcaron}nika }
     Spanish	@Yield { Sin editor }
     Swedish	@Yield { Inget f{@Char odieresis}rlag }
+    UpperSorbian @Yield { Wudawa{@Char cacute}el njeznaty }
   }
 }
 
 { techrep @Word @CurrLang @Case {
+    Croatian	@Yield { Tehni{@Char ccaron}ko izvje{@Char scaron}{@Char cacute}e }
     Czech	@Yield { Technick{@Char aacute} zpr{@Char aacute}va }
     Danish	@Yield { Teknisk rapport }
     Dutch       @Yield { Technisch rapport }
@@ -603,15 +685,18 @@
     Italian	@Yield { Rapporto tecnico }
     Norwegian   @Yield { Tekn. Rapp. }
     Russian	@Yield { "\324\305\310. \304\317\313\314\301\304" }
+    Slovak	@Yield { Technick{@Char aacute} spr{@Char aacute}va }
     Polish	@Yield { Sprawozdanie techniczne }
     Portuguese  @Yield { Relat{@Char oacute}rio t{@Char eacute}cnico }
     Slovenian   @Yield { Tehn. por. }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Informe t{@Char eacute}cnico }
     Swedish	@Yield { Tekn. rap. }
+    UpperSorbian @Yield { Techn. rozp. }
   }
 }
 
 { phdthesis @Word @CurrLang @Case {
+    Croatian	@Yield { Doktorska disertacija }
     Czech	@Yield { Doktorsk{@Char aacute} disertace }
     Danish	@Yield { Ph.D.-afhandling }
     Dutch       @Yield { Proefschrift } # or {Dissertatie}
@@ -627,13 +712,16 @@
     Portuguese  @Yield { Tese de doutoramento }
     Russian	@Yield { "\313\301\316\304\311\304\301\324\323\313\301\321"
 "\304\311\323\323\305\322\324\301\303\311\321" }
+    Slovak	@Yield { Doktorsk{@Char aacute} dizert{@Char aacute}cia }
     Slovenian   @Yield { Doktorska disertacija }
     Spanish	@Yield { Tesis Doctoral }
     Swedish	@Yield { doktorsavhandling }
+    UpperSorbian @Yield { Disertacija }
   }
 }
 
 { mastersthesis @Word @CurrLang @Case {
+    Croatian	@Yield { Magistarski rad }
     Czech	@Yield { Diplomov{@Char aacute} pr{@Char aacute}ce }
     Danish	@Yield { Specialeafhandling }
     Dutch       @Yield { Doctoraalscriptie } 
@@ -649,13 +737,16 @@
     Portuguese  @Yield { Disserta{@Char ccedilla}{@Char atilde}o de mestrado }
     Russian	@Yield { "\304\311\320\314\317\315\316\301\321"
 "\322\301\302\317\324\301" }
+    Slovak	@Yield { Diplomov{@Char aacute} pr{@Char aacute}ca }
     Slovenian   @Yield { Diploma }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { Tesis Magistral }
     Swedish	@Yield { diplomarbete }
+    UpperSorbian @Yield { Diplomowe d{@Char zacute}{@Char ecaron}{@Char lslash}o }
   }
 }
 
 { in @Word @CurrLang @Case {
+    Croatian	@Yield { U }
     Czech	@Yield { In }
     Danish	@Yield { I }
     Dutch       @Yield { In }
@@ -670,19 +761,22 @@
     Polish	@Yield { W }
     Portuguese  @Yield { Em }
     Russian	@Yield { "\327" }
+    Slovak	@Yield { In }
     Slovenian   @Yield { V }
     Spanish	@Yield { En }
     Swedish	@Yield { I }
+    UpperSorbian @Yield { W }
   }
 }
 
 { continued @Word @CurrLang @Case {
+    Croatian	@Yield { nast. }
     Czech	@Yield { pokra{@Char ccaron}ov{@Char aacute}n{@Char iacute} }
     Danish	@Yield { ?? }
     Dutch       @Yield { ?? }
     English	@Yield { ctd. }
     EnglishUK	@Yield { ctd. }
-    Finnish	@Yield { ?? }
+    Finnish	@Yield { jatk. }
     French	@Yield { suite }
     German	@Yield { Fortsetzung }
     Hungarian	@Yield { folyt. }
@@ -691,13 +785,16 @@
     Polish	@Yield { ?? }
     Portuguese  @Yield { cont. }
     Russian	@Yield { ?? }
+    Slovak	@Yield { pokra{@Char ccaron}ovanie }
     Slovenian   @Yield { ?? }
-    Spanish	@Yield { ?? }
+    Spanish	@Yield { continuaci{@Char oacute}n }
     Swedish	@Yield { ?? }
+    UpperSorbian @Yield { Pokro{@Char zcaron}owanje }
   }
 }
 
 { am @Word @CurrLang @Case {
+    Croatian	@Yield { a.m. }
     Czech	@Yield { a.m. }
     Danish	@Yield { a.m. }
     Dutch       @Yield { a.m. }
@@ -712,13 +809,16 @@
     Polish	@Yield { a.m. }
     Portuguese  @Yield { a.m. }
     Russian	@Yield { a.m. }
+    Slovak	@Yield { a.m. }
     Slovenian   @Yield { a.m. }
     Spanish	@Yield { a.m. }
     Swedish	@Yield { a.m. }
+    UpperSorbian @Yield { dopo{@Char lslash}dnja }
   }
 }
 
 { pm @Word @CurrLang @Case {
+    Croatian	@Yield { p.m. }
     Czech	@Yield { p.m. }
     Danish	@Yield { p.m. }
     Dutch       @Yield { p.m. }
@@ -733,13 +833,16 @@
     Polish	@Yield { p.m. }
     Portuguese  @Yield { p.m. }
     Russian	@Yield { p.m. }
+    Slovak	@Yield { p.m. }
     Slovenian   @Yield { p.m. }
     Spanish	@Yield { p.m. }
     Swedish	@Yield { p.m. }
+    UpperSorbian @Yield { popo{@Char lslash}dnju }
   }
 }
 
 { shortam @Word @CurrLang @Case {
+    Croatian	@Yield { am }
     Czech	@Yield { am }
     Danish	@Yield { am }
     Dutch       @Yield { am }
@@ -754,13 +857,16 @@
     Polish	@Yield { am }
     Portuguese  @Yield { am }
     Russian	@Yield { am }
+    Slovak	@Yield { am }
     Slovenian   @Yield { am }
     Spanish	@Yield { am }
     Swedish	@Yield { am }
+    UpperSorbian @Yield { dopo{@Char lslash}. }
   }
 }
 
 { shortpm @Word @CurrLang @Case {
+    Croatian	@Yield { pm }
     Czech	@Yield { pm }
     Danish	@Yield { pm }
     Dutch       @Yield { pm }
@@ -775,9 +881,11 @@
     Polish	@Yield { pm }
     Portuguese  @Yield { pm }
     Russian	@Yield { pm }
+    Slovak	@Yield { pm }
     Slovenian   @Yield { pm }
     Spanish	@Yield { pm }
     Swedish	@Yield { pm }
+    UpperSorbian @Yield { popo{@Char lslash}. }
   }
 }
 
@@ -1216,6 +1324,7 @@
 {  26 @Alpha z		}
 
 { 27 @Alpha @CurrLang @Case {
+    Croatian	@Yield { ?? }
     Czech	@Yield { ?? }
     Danish	@Yield { @Char ae }
     English	@Yield { ?? }
@@ -1225,17 +1334,20 @@
     French	@Yield { @Char ae }
     German	@Yield { ?? }
     Hungarian	@Yield { ?? }
-    Italian	@Yield { @Char ae }
+    Italian	@Yield { ?? }
     Norwegian	@Yield { @Char ae }
     Polish	@Yield { ?? }
     Portuguese  @Yield { ?? }
     Russian	@Yield { ?? }
+    Slovak	@Yield { ?? }
     Slovenian   @Yield { ?? }
     Spanish	@Yield { ?? }
     Swedish	@Yield { @Char aring }
+    UpperSorbian @Yield { ?? }
 } }
 
 { 28 @Alpha @CurrLang @Case {
+    Croatian	@Yield { ?? }
     Czech	@Yield { ?? }
     Danish	@Yield { @Char oslash }
     Dutch	@Yield { ?? }
@@ -1250,12 +1362,15 @@
     Polish	@Yield { ?? }
     Portuguese  @Yield { ?? }
     Russian	@Yield { ?? }
+    Slovak	@Yield { ?? }
     Slovenian   @Yield { ?? }
     Spanish	@Yield { ?? }
     Swedish	@Yield { @Char adieresis }
+    UpperSorbian @Yield { ?? }
 } }
 
 { 29 @Alpha @CurrLang @Case {
+    Croatian	@Yield { ?? }
     Czech	@Yield { ?? }
     Danish	@Yield { @Char aring }
     Dutch	@Yield { ?? }
@@ -1270,9 +1385,11 @@
     Polish	@Yield { ?? }
     Portuguese  @Yield { ?? }
     Russian	@Yield { ?? }
+    Slovak	@Yield { ?? }
     Slovenian   @Yield { ?? }
     Spanish	@Yield { ?? }
     Swedish	@Yield { @Char odieresis }
+    UpperSorbian @Yield { ?? }
 } }
 
 {  ?? @UCAlpha ??	}
@@ -1304,6 +1421,7 @@
 {  26 @UCAlpha Z	}
 
 { 27 @UCAlpha @CurrLang @Case {
+    Croatian	@Yield { ?? }
     Czech	@Yield { ?? }
     Danish	@Yield { @Char AE }
     Dutch	@Yield { ?? }
@@ -1313,17 +1431,20 @@
     French	@Yield { @Char AE }
     German	@Yield { ?? }
     Hungarian	@Yield { ?? }
-    Italian	@Yield { @Char AE }
+    Italian	@Yield { ?? }
     Norwegian	@Yield { @Char AE }
     Polish	@Yield { ?? }
     Portuguese  @Yield { ?? }
     Russian	@Yield { ?? }
+    Slovak	@Yield { ?? }
     Slovenian   @Yield { ?? }
     Spanish	@Yield { ?? }
     Swedish	@Yield { @Char Aring }
+    UpperSorbian @Yield { ?? }
 } }
 
 { 28 @UCAlpha @CurrLang @Case {
+    Croatian	@Yield { ?? }
     Czech	@Yield { ?? }
     Danish	@Yield { @Char Oslash }
     Dutch	@Yield { ?? }
@@ -1338,12 +1459,15 @@
     Polish	@Yield { ?? }
     Portuguese  @Yield { ?? }
     Russian	@Yield { ?? }
+    Slovak	@Yield { ?? }
     Slovenian   @Yield { ?? }
     Spanish	@Yield { ?? }
     Swedish	@Yield { @Char Adieresis }
+    UpperSorbian @Yield { ?? }
 } }
 
 { 29 @UCAlpha @CurrLang @Case {
+    Croatian	@Yield { ?? }
     Czech	@Yield { ?? }
     Danish	@Yield { @Char Aring }
     Dutch	@Yield { ?? }
@@ -1358,13 +1482,16 @@
     Polish	@Yield { ?? }
     Portuguese  @Yield { ?? }
     Russian	@Yield { ?? }
+    Slovak	@Yield { ?? }
     Slovenian   @Yield { ?? }
     Spanish	@Yield { ?? }
     Swedish	@Yield { @Char Odieresis }
+    UpperSorbian @Yield { ?? }
 } }
 
 
 { 1 @Months @CurrLang @Case {
+    Croatian	@Yield { sije{@Char ccaron}anj }
     Czech	@Yield { ledna }
     Danish	@Yield { januar }
     Dutch       @Yield { januari }
@@ -1379,12 +1506,15 @@
     Polish	@Yield { stycze{@Char nacute} }
     Portuguese  @Yield { janeiro }
     Russian	@Yield { "\321\316\327\301\322\321" }
+    Slovak	@Yield { janu{@Char aacute}r }
     Slovenian   @Yield { januar }
     Spanish	@Yield { Enero }
     Swedish	@Yield { januari }
+    UpperSorbian @Yield { wulkeho r{@Char oacute}{@Char zcaron}ka }
 } }
 
 { 2 @Months @CurrLang @Case {
+    Croatian	@Yield { velja{@Char ccaron}a }
     Czech	@Yield { {@Char uacute}nora }
     Danish	@Yield { februar }
     Dutch       @Yield { februari }
@@ -1399,12 +1529,15 @@
     Polish	@Yield { luty }
     Portuguese  @Yield { fevereiro }
     Russian	@Yield { "\306\305\327\322\301\314\321" }
+    Slovak	@Yield { febru{@Char aacute}r }
     Slovenian   @Yield { februar }
     Spanish	@Yield { Febrero }
     Swedish	@Yield { februari }
+    UpperSorbian @Yield { ma{@Char lslash}eho r{@Char oacute}{@Char zcaron}ka }
 } }
 
 { 3 @Months @CurrLang @Case {
+    Croatian	@Yield { o{@Char zcaron}ujak }
     Czech	@Yield { b{@Char rcaron}ezna }
     Danish	@Yield { marts }
     Dutch       @Yield { maart }
@@ -1419,12 +1552,15 @@
     Polish	@Yield { marzec }
     Portuguese  @Yield { mar{@Char ccedilla}o }
     Russian	@Yield { "\315\301\322\324\301" }
+    Slovak	@Yield { marec }
     Slovenian   @Yield { marec }
     Spanish	@Yield { Marzo }
     Swedish	@Yield { mars }
+    UpperSorbian @Yield { nal{@Char ecaron}tnika }
 } }
 
 { 4 @Months @CurrLang @Case {
+    Croatian	@Yield { travanj }
     Czech	@Yield { dubna }
     Danish	@Yield { april }
     Dutch       @Yield { april }
@@ -1439,12 +1575,15 @@
     Polish	@Yield { kwiecie{@Char nacute} }
     Portuguese  @Yield { abril }
     Russian	@Yield { "\301\320\322\305\314\321" }
+    Slovak	@Yield { april }
     Slovenian   @Yield { april }
     Spanish	@Yield { Abril }
     Swedish	@Yield { april }
+    UpperSorbian @Yield { jutrownika }
 } }
 
 { 5 @Months @CurrLang @Case {
+    Croatian	@Yield { svibanj }
     Czech	@Yield { kv{@Char ecaron}tna }
     Danish	@Yield { maj }
     Dutch       @Yield { mei }
@@ -1459,12 +1598,15 @@
     Polish	@Yield { maj }
     Portuguese  @Yield { maio }
     Russian	@Yield { "\315\301\321" }
+    Slovak	@Yield { m{@Char aacute}j }
     Slovenian   @Yield { maj }
     Spanish	@Yield { Mayo }
     Swedish	@Yield { maj }
+    UpperSorbian @Yield { ma{@Char lslash}eho r{@Char oacute}{@Char zcaron}ka }
 } }
 
 { 6 @Months @CurrLang @Case {
+    Croatian	@Yield { lipanj }
     Czech	@Yield { {@Char ccaron}ervna }
     Danish	@Yield { juni }
     Dutch       @Yield { juni }
@@ -1479,13 +1621,16 @@
     Polish	@Yield { czerwiec }
     Portuguese  @Yield { junho }
     Russian	@Yield { "\311\300\316\321" }
+    Slovak	@Yield { j{@Char uacute}n }
     Slovenian   @Yield { junij }
     Spanish	@Yield { Junio }
     Swedish	@Yield { juni }
+    UpperSorbian @Yield { sma{@Char zcaron}nika }
 } }
 
 
 { 7 @Months @CurrLang @Case {
+    Croatian	@Yield { srpanj }
     Czech	@Yield { {@Char ccaron}ervence }
     Danish	@Yield { juli }
     Dutch       @Yield { juli }
@@ -1500,12 +1645,15 @@
     Polish	@Yield { lipiec }
     Portuguese  @Yield { julho }
     Russian	@Yield { "\311\300\314\321" }
+    Slovak	@Yield { j{@Char uacute}l }
     Slovenian   @Yield { julij }
     Spanish	@Yield { Julio }
     Swedish	@Yield { juli }
+    UpperSorbian @Yield { pra{@Char zcaron}nika }
 } }
 
 { 8 @Months @CurrLang @Case {
+    Croatian	@Yield { kolovoz }
     Czech	@Yield { srpna }
     Danish	@Yield { august }
     Dutch       @Yield { augustus }
@@ -1520,12 +1668,15 @@
     Polish	@Yield { sierpie{@Char nacute} }
     Portuguese  @Yield { agosto }
     Russian	@Yield { "\301\327\307\325\323\324\301" }
+    Slovak	@Yield { august }
     Slovenian   @Yield { avgust }
     Spanish	@Yield { Agosto }
     Swedish	@Yield { augusti }
+    UpperSorbian @Yield { {@Char zcaron}njenca }
 } }
 
 { 9 @Months @CurrLang @Case {
+    Croatian	@Yield { rujan }
     Czech	@Yield { z{@Char aacute}{@Char rcaron}{@Char iacute} }
     Danish	@Yield { september }
     Dutch       @Yield { september }
@@ -1540,12 +1691,15 @@
     Polish	@Yield { wrzesie{@Char nacute} }
     Portuguese  @Yield { setembro }
     Russian	@Yield { "\323\305\316\324\321\302\322\321" }
+    Slovak	@Yield { september }
     Slovenian   @Yield { september }
     Spanish	@Yield { Septiembre }
     Swedish	@Yield { september }
+    UpperSorbian @Yield { po{@Char zcaron}njenca }
 } }
 
 { 10 @Months @CurrLang @Case {
+    Croatian	@Yield { listopad }
     Czech	@Yield { {@Char rcaron}{@Char iacute}jna }
     Danish	@Yield { oktober }
     Dutch       @Yield { oktober }
@@ -1560,12 +1714,15 @@
     Polish	@Yield { pa{@Char zacute}dziernik }
     Portuguese  @Yield { outubro }
     Russian	@Yield { "\317\313\324\321\302\322\321" }
+    Slovak	@Yield { okt{@Char oacute}ber }
     Slovenian   @Yield { oktober }
     Spanish	@Yield { Octubre }
     Swedish	@Yield { oktober }
+    UpperSorbian @Yield { winowca }
 } }
 
 { 11 @Months @CurrLang @Case {
+    Croatian	@Yield { studeni }
     Czech	@Yield { listopadu }
     Danish	@Yield { november }
     Dutch       @Yield { november }
@@ -1580,12 +1737,15 @@
     Polish	@Yield { listopad }
     Portuguese  @Yield { novembro }
     Russian	@Yield { "\316\317\321\302\322\321" }
+    Slovak	@Yield { november }
     Slovenian   @Yield { november }
     Spanish	@Yield { Noviembre }
     Swedish	@Yield { november }
+    UpperSorbian @Yield { nazymnika }
 } }
 
 { 12 @Months @CurrLang @Case {
+    Croatian	@Yield { prosinac }
     Czech	@Yield { prosince }
     Danish	@Yield { december }
     Dutch       @Yield { december }
@@ -1600,13 +1760,16 @@
     Polish	@Yield { grudzie{@Char nacute} }
     Portuguese  @Yield { dezembro }
     Russian	@Yield { "\304\305\313\301\302\322\321" }
+    Slovak	@Yield { december }
     Slovenian   @Yield { december }
     Spanish	@Yield { Diciembre }
     Swedish	@Yield { december }
+    UpperSorbian @Yield { hodownika }
 } }
 
 
 { 1 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { sij }
     Czech	@Yield { ledna }
     Danish	@Yield { jan }
     Dutch       @Yield { jan }
@@ -1621,12 +1784,15 @@
     Polish	@Yield { sty }
     Portuguese  @Yield { jan }
     Russian	@Yield { "\321\316\327" }
+    Slovak	@Yield { jan }
     Slovenian   @Yield { jan }
     Spanish	@Yield { Ene }
     Swedish	@Yield { jan }
+    UpperSorbian @Yield { jan }
 } }
 
 { 2 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { velj }
     Czech	@Yield { {@Char uacute}nora }
     Danish	@Yield { feb }
     Dutch       @Yield { feb }
@@ -1641,12 +1807,15 @@
     Polish	@Yield { luty }
     Portuguese  @Yield { fev }
     Russian	@Yield { "\306\305\327" }
+    Slovak	@Yield { feb }
     Slovenian   @Yield { feb }
     Spanish	@Yield { Feb }
     Swedish	@Yield { feb }
+    UpperSorbian @Yield { feb }
 } }
 
 { 3 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { o{@Char zcaron}u }
     Czech	@Yield { b{@Char rcaron}ezna }
     Danish	@Yield { mar }
     Dutch       @Yield { mrt }
@@ -1661,13 +1830,16 @@
     Polish	@Yield { marz }
     Portuguese  @Yield { mar }
     Russian	@Yield { "\315\301\322" }
+    Slovak	@Yield { mar }
     Slovenian   @Yield { mar }
     Spanish	@Yield { Mar }
     Swedish	@Yield { mar }
+    UpperSorbian @Yield { m{@Char ecaron}r }
 } }
 
 { 4 @ShortMonths @CurrLang @Case {
-    Czech	@Yield @Yield { dubna }
+    Croatian	@Yield { tra }
+    Czech	@Yield { dubna }
     Danish	@Yield { apr }
     Dutch       @Yield { apr }
     English	@Yield { Apr }
@@ -1681,12 +1853,15 @@
     Polish	@Yield { kwie }
     Portuguese  @Yield { abr }
     Russian	@Yield { "\301\320\322" }
+    Slovak	@Yield { apr }
     Slovenian   @Yield { apr }
     Spanish	@Yield { Abr }
     Swedish	@Yield { apr }
+    UpperSorbian @Yield { apr }
 } }
 
 { 5 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { svi }
     Czech	@Yield { kv{@Char ecaron}tna }
     Danish	@Yield { maj }
     Dutch       @Yield { mei }
@@ -1701,12 +1876,15 @@
     Polish	@Yield { maj }
     Portuguese  @Yield { mai }
     Russian	@Yield { "\315\301\321" }
+    Slovak	@Yield { m{@Char aacute}j }
     Slovenian   @Yield { maj }
     Spanish	@Yield { May }
     Swedish	@Yield { maj }
+    UpperSorbian @Yield { meje }
 } }
 
 { 6 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { lip }
     Czech	@Yield { {@Char ccaron}ervna }
     Danish	@Yield { jun }
     Dutch       @Yield { jun }
@@ -1721,12 +1899,15 @@
     Polish	@Yield { czer }
     Portuguese  @Yield { jun }
     Russian	@Yield { "\311\300\316\321" }
+    Slovak	@Yield { j{@Char uacute}n }
     Slovenian   @Yield { jun }
     Spanish	@Yield { Jun }
     Swedish	@Yield { jun }
+    UpperSorbian @Yield { jun }
 } }
 
 { 7 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { srp }
     Czech	@Yield { {@Char ccaron}ervence }
     Danish	@Yield { jul }
     Dutch       @Yield { jul }
@@ -1741,12 +1922,15 @@
     Polish	@Yield { lip }
     Portuguese  @Yield { jul }
     Russian	@Yield { "\311\300\314\321" }
+    Slovak	@Yield { j{@Char uacute}l }
     Slovenian   @Yield { jul }
     Spanish	@Yield { Jul }
     Swedish	@Yield { jul }
+    UpperSorbian @Yield { jul }
 } }
 
 { 8 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { kol }
     Czech	@Yield { srpna }
     Danish	@Yield { aug }
     Dutch       @Yield { aug }
@@ -1761,12 +1945,15 @@
     Polish	@Yield { sier }
     Portuguese  @Yield { ago }
     Russian	@Yield { "\301\327\307" }
+    Slovak	@Yield { aug }
     Slovenian   @Yield { avg }
     Spanish	@Yield { Ago }
     Swedish	@Yield { aug }
+    UpperSorbian @Yield { awg }
 } }
 
 { 9 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { ruj }
     Czech	@Yield { z{@Char aacute}{@Char rcaron}{@Char iacute} }
     Danish	@Yield { sep }
     Dutch       @Yield { sep }
@@ -1781,12 +1968,15 @@
     Polish	@Yield { wrze }
     Portuguese  @Yield { set }
     Russian	@Yield { "\323\305\316" }
+    Slovak	@Yield { sep }
     Slovenian   @Yield { sep }
     Spanish	@Yield { Sep }
     Swedish	@Yield { sep }
+    UpperSorbian @Yield { sep }
 } }
 
 { 10 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { lis }
     Czech	@Yield { {@Char rcaron}{@Char iacute}jna }
     Danish	@Yield { okt }
     Dutch       @Yield { okt }
@@ -1801,12 +1991,15 @@
     Polish	@Yield { pa{@Char zacute} }
     Portuguese  @Yield { out }
     Russian	@Yield { "\317\313\324" }
+    Slovak	@Yield { okt }
     Slovenian   @Yield { okt }
     Spanish	@Yield { Oct }
     Swedish	@Yield { okt }
+    UpperSorbian @Yield { okt }
 } }
 
 { 11 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { stu }
     Czech	@Yield { listopadu }
     Danish	@Yield { nov }
     Dutch       @Yield { nov }
@@ -1821,12 +2014,15 @@
     Polish	@Yield { list }
     Portuguese  @Yield { nov }
     Russian	@Yield { "\316\317\321" }
+    Slovak	@Yield { nov }
     Slovenian   @Yield { nov }
     Spanish	@Yield { Nov }
     Swedish	@Yield { nov }
+    UpperSorbian @Yield { now }
 } }
 
 { 12 @ShortMonths @CurrLang @Case {
+    Croatian	@Yield { pro }
     Czech	@Yield { prosince }
     Danish	@Yield { dec }
     Dutch       @Yield { dec }
@@ -1841,13 +2037,16 @@
     Polish	@Yield { gru }
     Portuguese  @Yield { dez }
     Russian	@Yield { "\304\305\313" }
+    Slovak	@Yield { dec }
     Slovenian   @Yield { dec }
     Spanish	@Yield { Dic }
     Swedish	@Yield { dec }
+    UpperSorbian @Yield { dec }
 } }
 
 
 { 1 @WeekDays @CurrLang @Case {
+    Croatian	@Yield { nedjelja }
     Czech	@Yield { ned{@Char ecaron}le }
     Danish	@Yield { s{@Char oslash}ndag }
     Dutch       @Yield { zondag }
@@ -1862,12 +2061,15 @@
     Polish	@Yield { niedziela }
     Portuguese  @Yield { Domingo }
     Russian	@Yield { "\327\317\323\313\322\305\323\305\316\330\305" }
+    Slovak	@Yield { nede{@Char lcaron}a }
     Slovenian   @Yield { nedelja }
     Spanish	@Yield { Domingo }
     Swedish	@Yield { s{@Char odieresis}ndag }
+    UpperSorbian @Yield { njed{@Char zacute}ela }
 } }
 
 { 2 @WeekDays @CurrLang @Case {
+    Croatian	@Yield { ponedjeljak }
     Czech	@Yield { pond{@Char ecaron}l{@Char iacute} }
     Danish	@Yield { mandag }
     Dutch       @Yield { maandag }
@@ -1882,12 +2084,15 @@
     Polish	@Yield { poniedzia{@Char lslash}ek }
     Portuguese  @Yield { Segunda }
     Russian	@Yield { "\320\317\316\305\304\305\314\330\316\311\313" }
+    Slovak	@Yield { pondelok }
     Slovenian   @Yield { ponedeljek }
     Spanish	@Yield { Lunes }
     Swedish	@Yield { m{@Char aring}ndag }
+    UpperSorbian @Yield { p{@Char oacute}nd{@Char zacute}ela }
 } }
 
 { 3 @WeekDays @CurrLang @Case {
+    Croatian	@Yield { utorak }
     Czech	@Yield { {@Char uacute}ter{@Char yacute} }
     Danish	@Yield { tirsdag }
     Dutch       @Yield { dinsdag }
@@ -1902,12 +2107,15 @@
     Polish	@Yield { wtorek }
     Portuguese  @Yield { Ter{@Char ccedilla}a }
     Russian	@Yield { "\327\324\317\322\316\311\313" }
+    Slovak	@Yield { utorok }
     Slovenian   @Yield { torek }
     Spanish	@Yield { Martes }
     Swedish	@Yield { tisdag }
+    UpperSorbian @Yield { wutora }
 } }
 
 { 4 @WeekDays @CurrLang @Case {
+    Croatian	@Yield { srijeda }
     Czech	@Yield { st{@Char rcaron}eda }
     Danish	@Yield { onsdag }
     Dutch       @Yield { woensdag }
@@ -1922,12 +2130,15 @@
     Polish	@Yield { {@Char sacute}roda }
     Portuguese  @Yield { Quarta }
     Russian	@Yield { "\323\322\305\304\301" }
+    Slovak	@Yield { streda }
     Slovenian   @Yield { sreda }
     Spanish	@Yield { Mi{@Char eacute}rcoles }
     Swedish	@Yield { onsdag }
+    UpperSorbian @Yield { srjeda }
 } }
 
 { 5 @WeekDays @CurrLang @Case {
+    Croatian	@Yield { {@Char ccaron}etvrtak }
     Czech	@Yield { {@Char ccaron}tvrtek }
     Danish	@Yield { torsdag }
     Dutch       @Yield { donderdag }
@@ -1942,12 +2153,15 @@
     Polish	@Yield { czwartek }
     Portuguese  @Yield { Quinta }
     Russian	@Yield { "\336\305\324\327\305\322\307" }
+    Slovak	@Yield { {@Char scaron}tvrtok }
     Slovenian   @Yield { {@Char ccaron}etrtek }
     Spanish	@Yield { Jueves }
     Swedish	@Yield { torsdag }
+    UpperSorbian @Yield { {@Char scaron}tw{@Char oacute}rtk }
 } }
 
 { 6 @WeekDays @CurrLang @Case {
+    Croatian	@Yield { petak }
     Czech	@Yield { p{@Char aacute}tek }
     Danish	@Yield { fredag }
     Dutch       @Yield { vrijdag }
@@ -1962,12 +2176,15 @@
     Polish	@Yield { pi{@Char aogonek}tek }
     Portuguese  @Yield { Sexta }
     Russian	@Yield { "\320\321\324\316\311\303\301" }
+    Slovak	@Yield { piatok }
     Slovenian   @Yield { petek }
     Spanish	@Yield { Viernes }
     Swedish	@Yield { fredag }
+    UpperSorbian @Yield { pjatk }
 } }
 
 { 7 @WeekDays @CurrLang @Case {
+    Croatian	@Yield { subota }
     Czech	@Yield { sobota }
     Danish	@Yield { l{@Char oslash}rdag }
     Dutch       @Yield { zaterdag }
@@ -1982,13 +2199,16 @@
     Polish	@Yield { sobota }
     Portuguese  @Yield { S{@Char aacute}bado }
     Russian	@Yield { "\323\325\302\302\317\324\301" }
+    Slovak	@Yield { sobota }
     Slovenian   @Yield { sobota }
     Spanish	@Yield { S{@Char aacute}bado }
     Swedish	@Yield { l{@Char odieresis}rdag }
+    UpperSorbian @Yield { sobota }
 } }
 
 
 { 1 @ShortWeekDays @CurrLang @Case {
+    Croatian	@Yield { ned }
     Czech	@Yield { ne }
     Danish	@Yield { s{@Char oslash}n }
     Dutch       @Yield { zo }
@@ -2003,12 +2223,15 @@
     Polish	@Yield { niedz }
     Portuguese  @Yield { Dom }
     Russian	@Yield { "\327\323" }
+    Slovak	@Yield { ne }
     Slovenian   @Yield { ned }
     Spanish	@Yield { Dom }
     Swedish	@Yield { s{@Char odieresis} }
+    UpperSorbian @Yield { nje }
 } }
 
 { 2 @ShortWeekDays @CurrLang @Case {
+    Croatian	@Yield { pon }
     Czech	@Yield { po }
     Danish	@Yield { man }
     Dutch       @Yield { ma }
@@ -2023,12 +2246,15 @@
     Polish	@Yield { pon }
     Portuguese  @Yield { Seg }
     Russian	@Yield { "\320\316" }
+    Slovak	@Yield { po }
     Slovenian   @Yield { pon }
     Spanish	@Yield { Lun }
     Swedish	@Yield { m{@Char aring} }
+    UpperSorbian @Yield { p{@Char oacute} }
 } }
 
 { 3 @ShortWeekDays @CurrLang @Case {
+    Croatian	@Yield { uto }
     Czech	@Yield { {@Char uacute}t }
     Danish	@Yield { tir }
     Dutch       @Yield { di }
@@ -2043,12 +2269,15 @@
     Polish	@Yield { wto }
     Portuguese  @Yield { Ter }
     Russian	@Yield { "\327\324" }
+    Slovak	@Yield { ut }
     Slovenian   @Yield { tor }
     Spanish	@Yield { Mar }
     Swedish	@Yield { ti }
+    UpperSorbian @Yield { wu }
 } }
 
 { 4 @ShortWeekDays @CurrLang @Case {
+    Croatian	@Yield { sri }
     Czech	@Yield { st }
     Danish	@Yield { ons }
     Dutch       @Yield { wo }
@@ -2063,12 +2292,15 @@
     Polish	@Yield { {@Char sacute}ro }
     Portuguese  @Yield { Qua }
     Russian	@Yield { "\323\322" }
+    Slovak	@Yield { st }
     Slovenian   @Yield { sre }
     Spanish	@Yield { Mie }
     Swedish	@Yield { on }
+    UpperSorbian @Yield { srj }
 } }
 
 { 5 @ShortWeekDays @CurrLang @Case {
+    Croatian	@Yield { {@Char ccaron}et }
     Czech	@Yield { {@Char ccaron}t }
     Danish	@Yield { tor }
     Dutch       @Yield { do }
@@ -2083,12 +2315,15 @@
     Polish	@Yield { czw }
     Portuguese  @Yield { Qui }
     Russian	@Yield { "\336\324" }
+    Slovak	@Yield { {@Char scaron}t }
     Slovenian   @Yield { cet }
     Spanish	@Yield { Jue }
     Swedish	@Yield { to }
+    UpperSorbian @Yield { {@Char scaron}tw }
 } }
 
 { 6 @ShortWeekDays @CurrLang @Case {
+    Croatian	@Yield { pet }
     Czech	@Yield { p{@Char aacute} }
     Danish	@Yield { fre }
     Dutch       @Yield { vr }
@@ -2103,12 +2338,15 @@
     Polish	@Yield { pi{@Char aogonek}t }
     Portuguese  @Yield { Sex }
     Russian	@Yield { "\320\324" }
+    Slovak	@Yield { pi }
     Slovenian   @Yield { pet }
     Spanish	@Yield { Vie }
     Swedish	@Yield { fr }
+    UpperSorbian @Yield { pj }
 } }
 
 { 7 @ShortWeekDays @CurrLang @Case {
+    Croatian	@Yield { sub }
     Czech	@Yield { so }
     Danish	@Yield { l{@Char oslash}r }
     Dutch       @Yield { za }
@@ -2123,9 +2361,11 @@
     Polish	@Yield { sob }
     Portuguese  @Yield { S{@Char aacute}b }
     Russian	@Yield { "\323\302" }
+    Slovak	@Yield { so }
     Slovenian   @Yield { sob }
     Spanish	@Yield { Sab }
     Swedish	@Yield { l{@Char odieresis} }
+    UpperSorbian @Yield { so }
 } }
 
 
@@ -2234,6 +2474,7 @@
 
 
 { date @DateTimeFormat @Value { @CurrLang @Case {
+    Croatian	@Yield { @DayNum. @Month @Year                  }
     Czech	@Yield { @DayNum. @Month @Year			}
     Danish	@Yield { @DayNum. @Month, @Year			}
     Dutch	@Yield { @DayNum @Month @Year			}
@@ -2248,13 +2489,16 @@
     Polish	@Yield { @DayNum @Month @Year			}
     Portuguese  @Yield { @DayNum "de" @Month "de" @Year		}
     Russian	@Yield { @DayNum @Month @Year			}
+    Slovak	@Yield { @DayNum. @Month @Year			}
     Slovenian   @Yield { @DayNum @Month @Year			}
     Spanish	@Yield { @DayNum "de" @Month, @Year		}
     Swedish	@Yield { @DayNum @Month @Year			}
+    UpperSorbian @Yield { @DayNum @Month @Year			}
   } }
 }
 
 { time @DateTimeFormat @Value { @CurrLang @Case {
+    Croatian	@Yield { @ShortHour:@Minute                     }
     Czech	@Yield { @ShortHour:@Minute			}
     Danish	@Yield { @ShortHour.@Minute			}
     Dutch	@Yield { @ShortHour.@Minute			}
@@ -2264,13 +2508,15 @@
     French	@Yield { @ShortHour"h"@Minute			}
     German	@Yield { @ShortHour.@Minute			}
     Hungarian	@Yield { @ShortHour {@Char oacute}ra @Minute perc }
-    Italian	@Yield { @ShortHour.@Minute			}
+    Italian	@Yield { @ShortHour:@Minute			}
     Norwegian   @Yield { @ShortHour.@Minute 			}
     Polish	@Yield { @ShortHour.@Minute			}
     Portuguese  @Yield { @ShortHour:@Minute			}
     Russian	@Yield { @ShortHour.@Minute			}
+    Slovak	@Yield { @ShortHour:@Minute			}
     Slovenian   @Yield { @ShortHour.@Minute			}
     Spanish	@Yield { @ShortHour:@Minute 			}
     Swedish	@Yield { @ShortHour.@Minute			}
+    UpperSorbian @Yield { @ShortHour.@Minute			}
   } }
 }

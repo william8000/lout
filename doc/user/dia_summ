@@ -586,6 +586,11 @@ A:: @Circle /0.8c |1.5c B:: @Circle
 }
 }
 
+@LII {
+In the following links, the @Code radius option determines the
+radius of the curved corners of the link.
+}
+
 @LI {
 @Code {
 "@Link"
@@ -636,6 +641,12 @@ A:: @Circle /0.8c |1.5c B:: @Circle
     pathstyle { solid dashed }
     path { hvcurve } from { A } to { B }
 }
+}
+
+@LII {
+In the following links, the @Code bias option determines how far
+the link extends to the left of the leftmost node, or to the
+right of the rightmost node.
 }
 
 @LI {
@@ -742,6 +753,135 @@ A:: @Circle /0.8c |1.5c B:: @Circle
     pathstyle { solid dashed }
     path { rvlcurve } from { A } to { B }
 }
+}
+
+@LII {
+In the following links, the @Code "hfrac" and @Code "hbias" options
+determine how far across from @Code "FROM" to @Code "TO" the path turns
+vertical:  a fraction @Code "hfrac" of the way across, plus a distance
+{@Code "hbias"}.  The default settings shown make this point halfway; by
+changing @Code "hfrac" to 0 and giving a length to {@Code "hbias"}, one can
+select a particular distance, rather than a fraction of the total distance.
+}
+
+@LI {
+@Code {
+"@Link"
+"    path { hvhline }"
+"    hfrac { 0.5 }"
+"    hbias { 0f }"
+"    radius { 1.0f }"
+}
+||6ct
+@Diag {
+//0.5f
+A:: @Circle /0.8c |1.5c B:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { hvhline } from { A } to { B }
+}
+&2.5c
+@Diag {
+//0.5f
+|1.5c B:: @Circle /0.8c A:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { hvhline } from { A } to { B }
+}
+}
+
+@LI {
+@Code {
+"@Link"
+"    path { hvhcurve }"
+"    hfrac { 0.5 }"
+"    hbias { 0f }"
+"    radius { 1.0f }"
+}
+||6ct
+@Diag {
+//0.5f
+A:: @Circle /0.8c |1.5c B:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { hvhcurve } from { A } to { B }
+}
+&2.5c
+@Diag {
+//0.5f
+|1.5c B:: @Circle /0.8c A:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { hvhcurve } from { A } to { B }
+}
+}
+
+@LI {
+@Code {
+"@Link"
+"    path { vhvline }"
+"    hfrac { 0.5 }"
+"    hbias { 0f }"
+"    radius { 1.0f }"
+}
+||6ct
+@Diag {
+//0.5f
+A:: @Circle /1.8c |1.5c B:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { vhvline } from { A } to { B }
+}
+&2.5c
+@Diag {
+//0.5f
+|1.5c B:: @Circle /1.8c A:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { vhvline } from { A } to { B }
+}
+}
+
+@LI {
+@Code {
+"@Link"
+"    path { vhvcurve }"
+"    hfrac { 0.5 }"
+"    hbias { 0f }"
+"    radius { 1.0f }"
+}
+||6ct
+@Diag {
+//0.5f
+A:: @Circle /1.8c |1.5c B:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { vhvcurve } from { A } to { B }
+}
+&2.5c
+@Diag {
+//0.5f
+|1.5c B:: @Circle /1.8c A:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { vhvcurve } from { A } to { B }
+}
+}
+
+@LII {
+In the following links, the @Code "fbias" option determines
+how far the curve extends away from the FROM node; the
+@Code "tbias" option determines how far it extends away from
+the TO node; and the @Code "bias" option determines how far
+it extends above the higher or below the lower node.
 }
 
 @LI {
@@ -928,6 +1068,23 @@ path also has an abbreviation which adds a forward arrow:
     C { RVLCurveArrow }
 
 @Rowa
+    A { hvhline }
+    B { HVHLine }
+    C { HVHArrow }
+@Rowa
+    A { vhvline }
+    B { VHVLine }
+    C { VHVArrow }
+@Rowa
+    A { hvhcurve }
+    B { HVHCurve }
+    C { HVHCurveArrow }
+@Rowa
+    A { vhvcurve }
+    B { VHVCurve }
+    C { VHVCurveArrow }
+
+@Rowa
     A { dwrapline }
     B { DWrapLine }
     C { DWrapArrow }
@@ -966,6 +1123,7 @@ have been omitted where they are the same as the {@Code linklabel} options.
 {@Code "ccurve"}, {@Code "bezier"},
 {@Code "vhline"}, {@Code "hvline"}, {@Code "vhcurve"}, {@Code "hvcurve"},
 {@Code "lvrline"}, {@Code "rvlline"}, {@Code "lvrcurve"}, {@Code "rvlcurve"},
+{@Code "hvhline"}, {@Code "vhvline"}, {@Code "hvhcurve"}, {@Code "vhvcurve"},
 {@Code "dwrapline"}, {@Code "uwrapline"}, {@Code "dwrapcurve"},
 {@Code "uwrapcurve"}, or any path }
 @Rowa
@@ -987,6 +1145,14 @@ have been omitted where they are the same as the {@Code linklabel} options.
 @Rowa
   A { "   tbias"}
   B { 2.0f }
+  C { any @I length }
+@Rowa
+  A { "   hfrac"}
+  B { 0.5 }
+  C { any fractional @I number }
+@Rowa
+  A { "   hbias"}
+  B { 0.0f }
   C { any @I length }
 @Rowa
   A { "   radius"}

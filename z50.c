@@ -1,7 +1,7 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -22,8 +22,8 @@
 /*  along with this program; if not, write to the Free Software              */
 /*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
-/*  FILE:         z49.c                                                      */
-/*  MODULE:       PDF Back End                                               */
+/*  FILE:         z50.c                                                      */
+/*  MODULE:       PDF Back End (in addition to z48.c)                        */
 /*  EXTERNS:      PDF_BackEnd                                                */
 /*                                                                           */
 /*****************************************************************************/
@@ -45,6 +45,7 @@ static FILE		*out_fp;	/* file to print PDF on              */
 typedef struct
 {
   FONT_NUM	gs_font;		/* font number of this state         */
+  BOOLEAN	gs_baselinemark;	/* TRUE if baseline mark             */
   COLOUR_NUM	gs_colour;		/* colour number of this state       */
   BOOLEAN	gs_cpexists;		/* TRUE if a current point exists    */
   FULL_LENGTH	gs_currenty;		/* if cpexists, its y coordinate     */
@@ -55,6 +56,7 @@ static GRAPHICS_STATE	gs_stack[MAX_GS];/* graphics state stack             */
 static int		gs_stack_top;	/* top of graphics state stack       */
 
 static FONT_NUM		currentfont;	/* font of most recent atom          */
+static BOOLEAN		currentbaselinemark;	/* baseline mark in use      */
 static COLOUR_NUM	currentcolour;	/* colour of most recent atom        */
 static short		currentxheight2;/* half xheight in current font      */
 static BOOLEAN		cpexists;	/* true if a current point exists    */
@@ -100,6 +102,7 @@ static void PDF_PrintInitialize(FILE *fp)
   prologue_done = FALSE;
   gs_stack_top = -1;
   currentfont = NO_FONT;
+  currentbaselinemark = FALSE;
   currentcolour = NO_COLOUR;
   cpexists = FALSE;
   wordcount = pagecount = 0;
@@ -313,10 +316,17 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
     word_outline(x) ? " outline" : "");
   TotalWordCount++;
 
+  /* if baselinemark is different to previous word then record change */
+  if( word_baselinemark(x) != currentbaselinemark )
+  {
+    currentbaselinemark = word_baselinemark(x);
+    currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
+  }
+
   /* if font is different to previous word then print change */
   if( word_font(x) != currentfont )
   { currentfont = word_font(x);
-    currentxheight2 = FontHalfXHeight(currentfont);
+    currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
     PDFFont_Set(out_fp, FontSize(currentfont, x), FontName(currentfont));
   }
 
@@ -595,6 +605,7 @@ void PDF_SaveGraphicState(OBJECT x)
     Error(50, 1, "rotations, graphics etc. too deeply nested (max is %d)",
       FATAL, &fpos(x), MAX_GS);
   gs_stack[gs_stack_top].gs_font	= currentfont;
+  gs_stack[gs_stack_top].gs_baselinemark	= currentbaselinemark;
   gs_stack[gs_stack_top].gs_colour	= currentcolour;
   gs_stack[gs_stack_top].gs_cpexists	= cpexists;
   gs_stack[gs_stack_top].gs_currenty	= currenty;
@@ -623,6 +634,7 @@ void PDF_RestoreGraphicState(void)
 { debug0(DPF, D, "PDF_RestoreGraphicState()");
   PDFPage_Pop(out_fp);
   currentfont	  = gs_stack[gs_stack_top].gs_font;
+  currentbaselinemark	  = gs_stack[gs_stack_top].gs_baselinemark;
   currentcolour	  = gs_stack[gs_stack_top].gs_colour;
   cpexists	  = gs_stack[gs_stack_top].gs_cpexists;
   currenty	  = gs_stack[gs_stack_top].gs_currenty;
@@ -703,11 +715,18 @@ void PDF_DefineGraphicNames(OBJECT x)
   debug1(DPF, D, "DefineGraphicNames( %s )", EchoObject(x));
   debug1(DPF, DD, "  style = %s", EchoStyle(&save_style(x)));
 
+  /* if baselinemark is different to previous word then record change */
+  if( baselinemark(save_style(x)) != currentbaselinemark )
+  {
+    currentbaselinemark = baselinemark(save_style(x));
+    currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
+  }
   /* if font is different to previous word then print change */
   if( font(save_style(x)) != currentfont )
   { currentfont = font(save_style(x));
     if( currentfont > 0 )
-    { currentxheight2 = FontHalfXHeight(currentfont);
+    {
+      currentxheight2 = currentbaselinemark ? 0 : FontHalfXHeight(currentfont);
       PDFFont_Set(out_fp, FontSize(currentfont, x), FontName(currentfont));
     }
   }
@@ -817,6 +836,26 @@ static void PDF_LinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
 
 /*****************************************************************************/
 /*                                                                           */
+/*  PDF_LinkURL(url, llx, lly, urx, ury)                                     */
+/*                                                                           */
+/*  Print a URL link.                                                        */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PDF_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{
+  debug5(DPF, D, "PDF_LinkURL(%s, %d, %d, %d, %d)", EchoObject(url),
+    llx, lly, urx, ury);
+
+  /* still to do */
+
+  debug0(DPF, D, "PDF_LinkURL returning.");
+} /* end PDF_LinkURL */
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  PDF_LinkCheck()                                                          */
 /*                                                                           */
 /*  Called at end of run; will check that for every link source point there  */
@@ -875,6 +914,7 @@ static struct back_end_rec pdf_back = {
   PDF_PrintGraphicInclude,
   PDF_LinkSource,
   PDF_LinkDest,
+  PDF_LinkURL,
   PDF_LinkCheck,
 };
 

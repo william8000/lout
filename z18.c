@@ -1,7 +1,7 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -84,8 +84,11 @@ void TransferInit(OBJECT InitEnv)
   language(InitialStyle)        = 0;			/* i.e. undefined    */
   yunit(InitialStyle)           = 0;			/* i.e. zero         */
   zunit(InitialStyle)           = 0;			/* i.e. zero         */
+  outdent_len(InitialStyle)     = 0;			/* i.e. zero         */
+  smallcaps_len(InitialStyle)   = 0.7 * FR;		/* i.e. 0.7 scale    */
   nobreakfirst(InitialStyle)	= FALSE;
   nobreaklast(InitialStyle)	= FALSE;
+  baselinemark(InitialStyle)	= FALSE;                /* i.e. not baseline */
 
   /* construct destination for root galley */
   New(up_hd, HEAD);

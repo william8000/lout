@@ -1,0 +1,43 @@
+@Section
+   @Title { "@IncludeGraphicRepeated" and "@SysIncludeGraphicRepeated" }
+   @Tag { includegraphicrepeated }
+@Begin
+@PP
+includegraphicrepeated.sym @Index { @@IncludeGraphicRepeated symbol }
+sysincludegraphicrepeated.sym @Index { @@SysIncludeGraphicRepeated symbol }
+postscript.includegraphicrepeated @SubIndex { used by @@IncludeGraphicRepeated }
+These symbols, which are allowed only at the start of a document, tell
+Lout that the EPS file named is likely to be included repeatedly:
+@ID @Code "@IncludeGraphicRepeated { myportrait.eps }"
+To actually see the graphic you use @@IncludeGraphic as usual.  The
+purpose of @@IncludeGraphicRepeated is not to display the graphic but
+rather to instruct Lout to include its EPS file in the output file just
+once, at the start, rather than over and over again for every time it
+appears in an @@IncludeGraphic, as would otherwise occur.
+@PP
+Any number of @@IncludeGraphicRepeated and @@SysIncludeGraphicRepeated
+directives may ppear at the start of the document.  The files involved
+may be compressed as for @@IncludeGraphic.  The file names given within
+@@IncludeGraphicRepeated must be identical to the name used within the
+corresponding @@IncludeGraphic symbols, or else the @@IncludeGraphicRepeated
+will be ineffective.  If @@SysIncludeGraphicRepeated is used (as opposed
+to @@IncludeGraphicRepeated) then all corresponding includes must use
+@@SysIncludeGraphic rather than @@IncludeGraphic.
+@PP
+Use of @@IncludeGraphicRepeated does not change the appearance of
+the output at all, but, if the EPS file would otherwise be included
+many times over, the result will be a much shorter PostScript file
+which will usually print significantly faster as well.  However, Lout
+uses Level 2 PostScript features to implement @@IncludeGraphicRepeated,
+which may not be available in some old printers, and the contents of the
+EPS file have to be stored in the printer for the entire duration of the
+print job, so there is a risk that memory will run out if
+@@IncludeGraphicRepeated is used.
+@PP
+The implementation of @@IncludeGraphicRepeated uses code given by
+the authors of PostScript which employs PostScript forms to save
+the EPS files @Cite { adobe1996epsforms }.  Lout's version of this code
+is somewhat modified, partly for simplicity and partly to correct a
+possible bug caused by their use of a single filter to read all the
+EPS files, rather than a separate filter for each one.
+@End @Section

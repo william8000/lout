@@ -1,4 +1,4 @@
-%%BeginResource: procset LoutFigPrependGraphic
+%%BeginResource: procset LoutDiagPrependGraphic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                    %
 %  PostScript @SysPrependGraphic file for @Diag Jeffrey H. Kingston  %
@@ -23,10 +23,10 @@ errordict begin
 	 $error /errorname get
 	 dup ldiagdict exch known
 	 { ldiagdict exch get }
-	 { 50 string cvs } ifelse
+	 { 100 string cvs } ifelse
 	 show
 	 (  Command: ) show
-	 $error /command get 50 string cvs show
+	 $error /command get 100 string cvs show
       } stopped {} if
       showpage stop
    } def
@@ -55,12 +55,33 @@ end
   3 1 roll pop pop
 } def
 
+% mconcat strings: <string> <string> ldiagmconcat <string>
+% returns concatenation, separated by @ if first is non-empty
+% must be defined outside ldiagdict since used in ldiagpromotelabels
+/ldiagmconcat
+{
+  2 copy length exch length add 1 add string
+  dup 0 4 index putinterval
+  dup 3 index length (@) putinterval
+  dup 3 index length 1 add 3 index putinterval
+  3 1 roll pop pop
+} def
+
+% show string in format start ... end: <string> ldiagsends <string>
+/ldiagsends
+{
+  dup length 20 string cvs (: ) ldiagconcat exch
+  dup 0 20 getinterval ( ... ) ldiagconcat
+  3 -1 roll exch ldiagconcat
+  exch dup length 20 sub 20 getinterval ldiagconcat
+} def
+
 /ldiagdebugposy 432 def
 /ldiagdebugposx 72 def
 
 % <string> <int> ldiagdebugprint -
 % must be defined outside ldiagdict since used in arbitrary places
-% print count or <int> stack entries, which ever is the smaller
+% print <string> plus count or <int> stack entries, whichever is the smaller
 /ldiagdebugprint
 {
   exch
@@ -81,7 +102,22 @@ end
   {
     /ldiagdebugposy ldiagdebugposy 12 sub store
     ldiagdebugposx 12 add ldiagdebugposy moveto
-    index 50 string cvs show
+    index
+    dup type (dicttype) eq
+    {
+      (begin dict) show
+      {
+        /ldiagdebugposy ldiagdebugposy 12 sub store
+        ldiagdebugposx 12 add ldiagdebugposy moveto
+	pop 100 string cvs show
+      } forall
+      /ldiagdebugposy ldiagdebugposy 12 sub store
+      ldiagdebugposx 12 add ldiagdebugposy moveto
+      (end dict) show
+    }
+    {
+      100 string cvs show
+    } ifelse
   } for
   grestore
 } def
@@ -191,37 +227,6 @@ ldiagdict begin
 { pop pop
 } def
 
-% painting (i.e. filling): - ldiagwhite - (etc.)
-/ldiagnopaint		{			       } def
-/ldiagnochange		{ 			  fill } def
-/ldiagdarkblue		{ 0.0 0.0 0.5 setrgbcolor fill } def
-/ldiagblue		{ 0.0 0.0 1.0 setrgbcolor fill } def
-/ldiaglightblue		{ 0.5 0.5 1.0 setrgbcolor fill } def
-/ldiagdarkgreen		{ 0.0 0.5 0.0 setrgbcolor fill } def
-/ldiaggreen		{ 0.0 1.0 0.0 setrgbcolor fill } def
-/ldiaglightgreen	{ 0.5 1.0 0.5 setrgbcolor fill } def
-/ldiagdarkred		{ 0.5 0.0 0.0 setrgbcolor fill } def
-/ldiagred		{ 1.0 0.0 0.0 setrgbcolor fill } def
-/ldiaglightred		{ 1.0 0.5 0.5 setrgbcolor fill } def
-/ldiagdarkcyan		{ 0.0 0.5 0.5 setrgbcolor fill } def
-/ldiagcyan		{ 0.0 1.0 1.0 setrgbcolor fill } def
-/ldiaglightcyan		{ 0.5 1.0 1.0 setrgbcolor fill } def
-/ldiagdarkmagenta	{ 0.5 0.0 0.5 setrgbcolor fill } def
-/ldiagmagenta		{ 1.0 0.0 1.0 setrgbcolor fill } def
-/ldiaglightmagenta	{ 1.0 0.5 1.0 setrgbcolor fill } def
-/ldiagdarkyellow	{ 0.5 0.5 0.0 setrgbcolor fill } def
-/ldiagyellow		{ 1.0 1.0 0.0 setrgbcolor fill } def
-/ldiaglightyellow	{ 1.0 1.0 0.5 setrgbcolor fill } def
-/ldiagdarkgray		{ 0.2 0.2 0.2 setrgbcolor fill } def
-/ldiaggray		{ 0.5 0.5 0.5 setrgbcolor fill } def
-/ldiaglightgray		{ 0.8 0.8 0.8 setrgbcolor fill } def
-/ldiagdarkgrey		{ 0.2 0.2 0.2 setrgbcolor fill } def
-/ldiaggrey		{ 0.5 0.5 0.5 setrgbcolor fill } def
-/ldiaglightgrey		{ 0.8 0.8 0.8 setrgbcolor fill } def
-/ldiagblack		{ 0.0 0.0 0.0 setrgbcolor fill } def
-/ldiagwhite		{ 1.0 1.0 1.0 setrgbcolor fill } def
-
-% shape and labels of the @Box symbol
 /ldiagbox
 {
    0     0         /SW  ldiagpointdef
@@ -893,6 +898,8 @@ ldiagdict begin
 %         ldiagtoptagdict   dict   Find the top tag dictionary
 %         ldiagpoptagdict   -      Pop and destroy the top tag dictionary
 %         ldiagpopuptagdict -      Pop top tag dict and promote its entries
+% <array> ldiagpopsometagdict -    Like popuptagdict but only those promote
+%                                  those labels listed in <array>
 %         ldiagdebugtagdict -      Debug print of dictionary stack
 %
 % They are distinguished from other dictionaries by containing /ldiagtagdict,
@@ -940,13 +947,35 @@ ldiagdict begin
   % (Entering ldiagpopuptagdict) 1 ldiagdebugprint
   % ldiagdebugtagdict
   ldiagtoptagdict ldiagpoptagdict ldiagtoptagdict exch
-  { exch 50 string cvs 3 index
-    dup length 0 ne
-    { (@) ldiagconcat
-    } if
-    exch ldiagconcat cvn exch 2 index 3 1 roll put
+  { exch dup length string cvs
+    3 index exch ldiagmconcat
+    cvn exch 2 index 3 1 roll put
   } forall
   pop pop
+  % (Leaving ldiagpopuptagdict) 0 ldiagdebugprint
+  % ldiagdebugtagdict
+} def
+
+% similar to ldiagpopuptagdict but only those inner labels that are
+% present in <array> will be promoted
+% <array> ldiagpopsometagdict -
+/ldiagpopsometagdict
+{
+  ldiagtagdict
+  % (Entering ldiagpopsometagdict) 1 ldiagdebugprint
+  % ldiagdebugtagdict
+  ldiagtoptagdict
+  ldiagpoptagdict
+  ldiagtoptagdict
+  4 -1 roll
+  { dup 3 index exch
+    get
+    exch 4 index
+    exch ldiagmconcat exch
+    3 copy put
+    pop pop
+  } forall
+  pop pop pop
   % (Leaving ldiagpopuptagdict) 0 ldiagdebugprint
   % ldiagdebugtagdict
 } def
@@ -957,7 +986,7 @@ ldiagdict begin
   30 array dictstack
   { dup /ldiagtagdict known
     { dup /ldiagtagdict get 0 ldiagdebugprint
-      { pop 50 string cvs (   ) exch ldiagconcat
+      { pop 100 string cvs (   ) exch ldiagconcat
 	dup 0 ldiagdebugprint
 	pop
       }
@@ -1003,7 +1032,7 @@ ldiagdict begin
 {
   % (Entering ldiagshowpoints) 0 ldiagdebugprint
   ldiagtoptagdict
-  { 1 index 50 string cvs
+  { 1 index 100 string cvs
     (ldiagdebugpos) search
     { pop pop pop pop pop }
     {
@@ -1035,7 +1064,7 @@ ldiagdict begin
 {
   % (Entering ldiagshowtags) 0 ldiagdebugprint
   ldiagtoptagdict
-  { 1 index 50 string cvs
+  { 1 index 100 string cvs
     % dup 0 ldiagdebugprint
     (ldiagdebugpos) search
     { pop pop pop pop pop }
@@ -1057,7 +1086,7 @@ ldiagdict begin
 	    gsave
 	    newpath 2.0 pt 0 360 arc 0 setgray fill
             /Times-Roman findfont 8 pt scalefont setfont
-            translate 40 rotate 0.2 cm 0.1 cm moveto 20 string cvs show
+            translate 40 rotate 0.2 cm 0.1 cm moveto 100 string cvs show
 	    grestore
           } ifelse
         } ifelse
@@ -1073,7 +1102,7 @@ ldiagdict begin
 {
   % (Entering ldiagshowangles) 0 ldiagdebugprint
   ldiagtoptagdict
-  { 1 index 20 string cvs
+  { 1 index 100 string cvs
     % dup 0 ldiagdebugprint
     (ldiagdebugpos) search
     { pop pop pop pop pop }
@@ -1485,7 +1514,8 @@ ldiagdict begin
     { exch false
       % (Leaving ldiagfindabel (not a name)) 3 ldiagdebugprint
     }
-    { dup 0 get 50 string cvs (@) ldiagconcat 2 index ldiagconcat dup where
+    { dup 0 get dup length string cvs (@) ldiagconcat
+      2 index ldiagconcat dup where
       { exch get exch pop exch pop cvx exec true
 	% (Leaving ldiagfindlabel with success) 100 ldiagdebugprint
       }
@@ -2322,6 +2352,221 @@ ldiagdict begin
   XP2POST LTO TO
 
   % (leaving ldiagrvlcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent hfrac hbias ldiaghvhlinepath -
+/ldiaghvhlinepath % still to do
+{
+  % (entering ldiaghvhlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /hbias exch def
+  /hfrac exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /FRDIRN [ { 0 dg } { 180 dg } { 180 dg } { 0 dg }
+  { 0 dg } { 0 dg } { 180 dg } { 180 dg }
+  from (CTR) ldiagdolabel to (CTR) ldiagdolabel
+  ldiagangleto ldiagquadcase ] cvx def
+  /TODIRN [ FRDIRN 180 dg add ] cvx def
+  from (CTR) ldiagdolabel FRDIRN from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FRDIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+  FRDIRN /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel TODIRN to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TODIRN ldiagatangle ldiagpadd /TO ldiagpointdef
+  FRDIRN /TO@ANGLE ldiagangledef
+  /BIAS [ FROM pop TO pop sub abs hfrac mul hbias add ] cvx def
+  FROM 0 0 BIAS FRDIRN ldiagatangle ldiagpadd /P1 ldiagpointdef
+  P1 pop TO exch pop /P2 ldiagpointdef
+  P1 0.5 ldiagpmul P2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  P1 P2 ldiagangleto /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM P1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent P2 TO ldiagdistance ldiagmin ] cvx def
+  FROM 0 0 XINDENT FRDIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FRDIRN /LFROM@ANGLE ldiagangledef
+  TO 0 0 ZINDENT TODIRN ldiagatangle ldiagpadd /LTO ldiagpointdef
+  FRDIRN /LTO@ANGLE ldiagangledef
+  FROM LFROM P1 LMID P2 LTO TO
+
+  % (leaving ldiaghvhlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+
+% farr tarr { from } { to } xindent zindent hfrac hbias radius ldiaghvhcurvepath -
+/ldiaghvhcurvepath % still to do
+{
+  % (entering ldiaghvhcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /hbias exch def
+  /hfrac exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /FRDIRN [ { 0 dg } { 180 dg } { 180 dg } { 0 dg }
+  { 0 dg } { 0 dg } { 180 dg } { 180 dg }
+  from (CTR) ldiagdolabel to (CTR) ldiagdolabel
+  ldiagangleto ldiagquadcase ] cvx def
+  /TODIRN [ FRDIRN 180 dg add ] cvx def
+
+  from (CTR) ldiagdolabel FRDIRN from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FRDIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+  FRDIRN /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel TODIRN to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TODIRN ldiagatangle ldiagpadd /TO ldiagpointdef
+
+  FRDIRN /TO@ANGLE ldiagangledef
+  /BIAS [ FROM pop TO pop sub abs hfrac mul hbias add ] cvx def
+  /XP1 [ FROM 0 0 BIAS FRDIRN ldiagatangle ldiagpadd ] cvx def
+  /XP2 [ XP1 pop TO exch pop ] cvx def
+  XP1 0.5 ldiagpmul XP2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  /VERT [ XP1 XP2 ldiagangleto round ] cvx def
+  VERT /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM XP1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent XP2 TO ldiagdistance ldiagmin ] cvx def
+  FROM 0 0 XINDENT FRDIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FRDIRN /LFROM@ANGLE ldiagangledef
+  TO 0 0 ZINDENT TODIRN ldiagatangle ldiagpadd /LTO ldiagpointdef
+  FRDIRN /LTO@ANGLE ldiagangledef
+  /RADIUS [ radius XP1 XP2 ldiagdistance 2 div ldiagmin ] cvx def
+  /XP1PRE [ XP1 0 0 RADIUS TODIRN ldiagatangle ldiagpadd ] cvx def
+  /XP1POST [ XP1 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+  /XP1CTR [ XP1PRE 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+  XP1CTR 0 0 RADIUS XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd /P1 ldiagpointdef
+  XP1PRE XP1POST ldiagangleto /P1@ANGLE ldiagangledef
+  /XP2PRE [ 0 0 RADIUS VERT ldiagatangle XP2 ldiagpsub ] cvx def
+  /XP2POST [ XP2 0 0 RADIUS FRDIRN ldiagatangle ldiagpadd ] cvx def
+  /XP2CTR [ 0 0 RADIUS VERT ldiagatangle XP2POST ldiagpsub ] cvx def
+  XP2CTR 0 0 RADIUS XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd /P2 ldiagpointdef
+  XP2PRE XP2POST ldiagangleto /P2@ANGLE ldiagangledef
+  VERT FRDIRN sub 90 eq
+  { /P1GO [ anticlockwise ] cvx def /P2GO [ clockwise ] cvx def }
+  { /P1GO [ clockwise ] cvx def /P2GO [ anticlockwise ] cvx def }
+  ifelse
+  FROM LFROM
+  XP1PRE [XP1CTR P1GO] P1 [XP1CTR P1GO] XP1POST
+  LMID
+  XP2PRE [XP2CTR P2GO] P2 [XP2CTR P2GO] XP2POST
+  LTO TO
+
+  % (leaving ldiaghvhcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent hfrac hbias ldiagvhvlinepath -
+/ldiagvhvlinepath % still to do
+{
+  % (entering ldiagvhvlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /hbias exch def
+  /hfrac exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /FRDIRN [ { 90 dg } { 270 dg } { 270 dg } { 0 dg }
+  { 90 dg } { 270 dg } { 270 dg } { 90 dg }
+  from (CTR) ldiagdolabel to (CTR) ldiagdolabel
+  ldiagangleto ldiagquadcase ] cvx def
+  /TODIRN [ FRDIRN 180 dg sub ] cvx def
+  from (CTR) ldiagdolabel FRDIRN from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FRDIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+  FRDIRN /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel TODIRN to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TODIRN ldiagatangle ldiagpadd /TO ldiagpointdef
+  FRDIRN /TO@ANGLE ldiagangledef
+  /BIAS [ FROM exch pop TO exch pop sub abs hfrac mul hbias ft add ] cvx def
+  FROM 0 0 BIAS FRDIRN ldiagatangle ldiagpadd /P1 ldiagpointdef
+  TO pop P1 exch pop /P2 ldiagpointdef
+  P1 0.5 ldiagpmul P2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  P1 P2 ldiagangleto /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM P1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent P2 TO ldiagdistance ldiagmin ] cvx def
+  FROM 0 0 XINDENT FRDIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FRDIRN /LFROM@ANGLE ldiagangledef
+  TO 0 0 ZINDENT TODIRN ldiagatangle ldiagpadd /LTO ldiagpointdef
+  FRDIRN /LTO@ANGLE ldiagangledef
+  FROM LFROM P1 LMID P2 LTO TO
+
+  % (leaving ldiagvhvlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+
+% farr tarr { from } { to } xindent zindent hfrac hbias radius ldiagvhvcurvepath -
+/ldiagvhvcurvepath % still to do
+{
+  % (entering ldiagvhvcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /hbias exch def
+  /hfrac exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /FRDIRN [ { 90 dg } { 270 dg } { 270 dg } { 0 dg }
+  { 90 dg } { 270 dg } { 270 dg } { 90 dg }
+  from (CTR) ldiagdolabel to (CTR) ldiagdolabel
+  ldiagangleto ldiagquadcase ] cvx def
+  /TODIRN [ FRDIRN 180 dg sub ] cvx def
+  from (CTR) ldiagdolabel FRDIRN from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FRDIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+  FRDIRN /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel TODIRN to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TODIRN ldiagatangle ldiagpadd /TO ldiagpointdef
+  FRDIRN /TO@ANGLE ldiagangledef
+  /BIAS [ FROM exch pop TO exch pop sub abs hfrac mul hbias add ] cvx def
+  /XP1 [ FROM 0 0 BIAS FRDIRN ldiagatangle ldiagpadd ] cvx def
+  /XP2 [ TO pop XP1 exch pop ] cvx def
+  XP1 0.5 ldiagpmul XP2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  /VERT [ XP1 XP2 ldiagangleto round ] cvx def
+  VERT /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM XP1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent XP2 TO ldiagdistance ldiagmin ] cvx def
+  FROM 0 0 XINDENT FRDIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FRDIRN /LFROM@ANGLE ldiagangledef
+  TO 0 0 ZINDENT TODIRN ldiagatangle ldiagpadd /LTO ldiagpointdef
+  FRDIRN /LTO@ANGLE ldiagangledef
+  /RADIUS [ radius XP1 XP2 ldiagdistance 2 div ldiagmin ] cvx def
+  /XP1PRE [ XP1 0 0 RADIUS TODIRN ldiagatangle ldiagpadd ] cvx def
+  /XP1POST [ XP1 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+  /XP1CTR [ XP1PRE 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+  XP1CTR 0 0 RADIUS XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd /P1 ldiagpointdef
+  XP1PRE XP1POST ldiagangleto /P1@ANGLE ldiagangledef
+  /XP2PRE [ 0 0 RADIUS VERT ldiagatangle XP2 ldiagpsub ] cvx def
+  /XP2POST [ XP2 0 0 RADIUS FRDIRN ldiagatangle ldiagpadd ] cvx def
+  /XP2CTR [ 0 0 RADIUS VERT ldiagatangle XP2POST ldiagpsub ] cvx def
+  XP2CTR 0 0 RADIUS XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd /P2 ldiagpointdef
+  XP2PRE XP2POST ldiagangleto /P2@ANGLE ldiagangledef
+  FRDIRN VERT sub 90 eq
+  { /P1GO [ clockwise ] cvx def /P2GO [ anticlockwise ] cvx def }
+  { /P1GO [ anticlockwise ] cvx def /P2GO [ clockwise ] cvx def }
+  ifelse
+  FROM LFROM
+  XP1PRE [XP1CTR P1GO] P1 [XP1CTR P1GO] XP1POST
+  LMID
+  XP2PRE [XP2CTR P2GO] P2 [XP2CTR P2GO] XP2POST
+  LTO TO
+
+
+  % (leaving ldiagvhvcurvepath) 0 ldiagdebugprint
   % count (  stack size is) 1 ldiagdebugprint pop
 } def
 

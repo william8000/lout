@@ -273,7 +273,7 @@ However, if either object is empty, the dot and two spaces are
 omitted.  It's a fine point, needed mainly for unnumbered chapters
 and sections.  @Code "@DotJoin" is the same as @Code "@DotSep" but
 dot.join @Index @Code "@DotJoin"
-without the two spaces.  @Code "NoDotSep" is the same as
+without the two spaces.  @Code "@NoDotSep" is the same as
 nodot.sep @Index @Code "@NoDotSep"
 @Code "@DotSep" but leaving out the dot, @Code "@NoDotJoin" is the same
 nodot.join @Index @Code "@NoDotJoin"

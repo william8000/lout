@@ -1,7 +1,7 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -418,7 +418,8 @@ static void ReadCompositeMetrics(OBJECT face, OBJECT Extrafilename,
     composite_code = MapCharEncoding(composite_name,font_mapping(face));
     if( composite_code == (FULL_CHAR) '\0' )
       Error(37, 6, "unknown character name %s in font file %s (line %d)",
-	FATAL, &fpos(Extrafilename), FileName(extra_fnum), *lnum);
+	FATAL, &fpos(Extrafilename), composite_name, FileName(extra_fnum),
+	*lnum);
     composite[composite_code] = *cmptop;
 
     for( count = 0; count < composite_num; count++ )
@@ -763,8 +764,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
     !(buff[0] == 'E' && StringEqual(buff, AsciiToFull("EndFontMetrics\n"))) )
   {
     lnum++;
-    sscanf( (char *) buff, "%s", command);
-    switch( command[0] )
+    if( sscanf( (char *) buff, "%s", command) != EOF ) switch( command[0] )
     {
 
       case 'U':
@@ -1067,58 +1067,106 @@ void FontChange(STYLE *style, OBJECT x)
 
   /***************************************************************************/
   /*                                                                         */
-  /*  Analyse x, doing any small-caps style changes immediately, and putting */
-  /*  all the other words of x into par[0 .. num-1] for further analysis.    */
+  /*  Analyse x, doing any small-caps and baselinemark changes immediately,  */
+  /*  and putting all the other words of x into par[0 .. num-1] for further  */
+  /*  analysis.                                                              */
   /*                                                                         */
   /***************************************************************************/
 
   num = 0;
-  if( type(x) == NULL_CLOS )
-  { /* acceptable, but do nothing */
-  }
-  else if( is_word(type(x)) )
+  switch( type(x) )
   {
-    if( StringEqual(string(x), STR_SMALL_CAPS_ON) )
-      small_caps(*style) = SMALL_CAPS_ON;
-    else if( StringEqual(string(x), STR_SMALL_CAPS_OFF) )
-      small_caps(*style) = SMALL_CAPS_OFF;
-    else if( !StringEqual(string(x), STR_EMPTY) )
-      par[num++] = x; 
-  }
-  else if( type(x) == ACAT )
-  { for( link = Down(x);  link != x;  link = NextDown(link) )
-    { Child(y, link);
-      debug1(DFT, DDD, "  pars examining y = %s", EchoObject(y));
-      if( type(y) == GAP_OBJ || type(y)  == NULL_CLOS )  continue;
-      if( is_word(type(y)) ) 
-      {
-	if( StringEqual(string(y), STR_SMALL_CAPS_ON) )
-	  small_caps(*style) = SMALL_CAPS_ON;
-	else if( StringEqual(string(y), STR_SMALL_CAPS_OFF) )
-	  small_caps(*style) = SMALL_CAPS_OFF;
-	else if( !StringEqual(string(y), STR_EMPTY) )
-	{
-	  if( num >= 3 )
-	  { Error(37, 40, "error in left parameter of %s",
-	      WARN, &fpos(x), KW_FONT);
-	    debug0(DFT, D, "FontChange returning: ACAT children");
-	    return;
+    case NULL_CLOS:
+
+      /* acceptable, but do nothing */
+      break;
+
+
+    case WORD:
+    case QWORD:
+
+      if( StringEqual(string(x), STR_SMALL_CAPS_ON) )
+        small_caps(*style) = SMALL_CAPS_ON;
+      else if( StringEqual(string(x), STR_SMALL_CAPS_OFF) )
+        small_caps(*style) = SMALL_CAPS_OFF;
+      else if( StringEqual(string(x), STR_BASELINE_MARK) )
+        baselinemark(*style) = TRUE;
+      else if( StringEqual(string(x), STR_XHEIGHT2_MARK) )
+        baselinemark(*style) = FALSE;
+      else if( StringEqual(string(x), STR_SMALL_CAPS_SET) )
+        Error(37, 65, "%s in left parameter of %s must be followed by a value",
+          WARN, &fpos(x), STR_SMALL_CAPS_SET, KW_FONT);
+      else if( !StringEqual(string(x), STR_EMPTY) )
+        par[num++] = x; 
+      break;
+
+
+    case ACAT:
+
+      for( link = Down(x);  link != x;  link = NextDown(link) )
+      { Child(y, link);
+        debug1(DFT, DDD, "  pars examining y = %s", EchoObject(y));
+        if( type(y) == GAP_OBJ || type(y)  == NULL_CLOS )  continue;
+        if( is_word(type(y)) ) 
+        {
+	  if( StringEqual(string(y), STR_SMALL_CAPS_ON) )
+	    small_caps(*style) = SMALL_CAPS_ON;
+	  else if( StringEqual(string(y), STR_SMALL_CAPS_OFF) )
+	    small_caps(*style) = SMALL_CAPS_OFF;
+	  else if( StringEqual(string(y), STR_BASELINE_MARK) )
+	    baselinemark(*style) = TRUE;
+	  else if( StringEqual(string(y), STR_XHEIGHT2_MARK) )
+	    baselinemark(*style) = FALSE;
+	  else if( StringEqual(string(y), STR_SMALL_CAPS_SET) )
+	  {
+	    if( NextDown(link) == x || NextDown(NextDown(link)) == x )
+	      Error(37, 65, "%s in %s must be followed by a value",
+	        WARN, &fpos(x), STR_SMALL_CAPS_SET, KW_FONT);
+	    else
+	    { float tmpf;
+	      Child(y, NextDown(NextDown(link)));
+	      if( !is_word(type(y)) )
+	        Error(37, 66, "%s in %s must be followed by a word",
+		  WARN, &fpos(x), STR_SMALL_CAPS_SET, KW_FONT);
+	      else if( sscanf( (char *) string(y), "%f", &tmpf) != 1 )
+	        Error(37, 67, "%s in %s followed by \"%s\" (should be number)",
+		  WARN, &fpos(x), STR_SMALL_CAPS_SET, KW_FONT, string(y));
+	      else if( tmpf <= 0 || tmpf >= 10 )
+	        Error(37, 68, "%s in %s followed by unreasonable number \"%s\"",
+		  WARN, &fpos(x), STR_SMALL_CAPS_SET, KW_FONT, string(y));
+	      else
+	        smallcaps_len(*style) = tmpf * FR;
+	      link = NextDown(NextDown(link));
+	    }
 	  }
-	  par[num++] = y; 
-	}
+	  else if( !StringEqual(string(y), STR_EMPTY) )
+	  {
+	    if( num >= 3 )
+	    { Error(37, 40, "error in left parameter of %s",
+	        WARN, &fpos(x), KW_FONT);
+	      debug0(DFT, D, "FontChange returning: ACAT children");
+	      return;
+	    }
+	    debug2(DFT, D, "  par[%d]++ = %s", num, string(y));
+	    par[num++] = y; 
+	  }
+        }
+        else
+        { Error(37, 41, "error in left parameter of %s",
+	    WARN, &fpos(x), KW_FONT);
+	  debug0(DFT, D, "FontChange returning: ACAT children");
+	  return;
+        }
       }
-      else
-      {	Error(37, 41, "error in left parameter of %s",
-	  WARN, &fpos(x), KW_FONT);
-	debug0(DFT, D, "FontChange returning: ACAT children");
-	return;
-      }
-    }
-  }
-  else
-  { Error(37, 42, "error in left parameter of %s", WARN, &fpos(x), KW_FONT);
-    debug0(DFT, D, "FontChange returning: wrong type");
-    return;
+      break;
+
+
+    default:
+
+      Error(37, 42, "error in left parameter of %s", WARN, &fpos(x), KW_FONT);
+      debug0(DFT, D, "FontChange returning: wrong type");
+      return;
+
   }
   debug1(DFT, DDD, " found pars, num = %d", num);
   if( num == 0 )
@@ -1497,12 +1545,6 @@ void FontWordSize(OBJECT x)
 	  /* bug fix: unaccented version exists if unacc differs from self */
 	  if( unacc[*q] != *q )
 	  {
-	    /* *** this is acceptable now, let this char through
-	    Error(37, 59, "accent dropped from character %s (it has no glyph in font %s)",
-	      WARN, &fpos(x),
-	      StringQuotedWord(tmp), FontFamilyAndFace(word_font(x)));
-	    *(p-1) = *q = unacc[*q];
-	    *** */
 	    debug2(DFT, D, "  unacc[%c] = `%c'", *q, unacc[*q]);
 	    fnt[*q].up = fnt[unacc[*q]].up;
 	    fnt[*q].down = fnt[unacc[*q]].down;
@@ -1558,11 +1600,20 @@ void FontWordSize(OBJECT x)
 	*p, *q, ksize);
       r += ksize;
     }
+
     /* set sizes of x */
     back(x, COLM) = 0;
     fwd(x, COLM)  = r;
-    back(x, ROWM) = u;
-    fwd(x, ROWM)  = -d;
+    if( word_baselinemark(x) )
+    { int vadjust = font_xheight2(finfo[word_font(x)].font_table);
+      back(x, ROWM) = u + vadjust;
+      fwd(x, ROWM)  = -d - vadjust;
+    }
+    else
+    {
+      back(x, ROWM) = u;
+      fwd(x, ROWM)  = -d;
+    }
   } 
   else back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
   debug4(DFT, D, "FontWordSize returning %hd %hd %hd %hd",

@@ -1,7 +1,7 @@
 /*@z39.c:String Handler:AsciiToFull(), StringEqual(), etc.@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -79,23 +79,36 @@ int strcollcmp(char *a, char *b)
 *** */
 
 int strcollcmp(char *a, char *b)
-{ char a1[100], b1[100];
+{ char a1[100], a2[100], a3[100], b1[100], b2[100], b3[100];
   int order;
-  sscanf(a, "%[^\t]", a1);
-  sscanf(b, "%[^\t]", b1);
+  a1[0] = a2[0] = a3[0] = '\0';
+  sscanf(a, "%[^\t]\t%[^\t]\t%[^\t]", a1, a2, a3);
+  b1[0] = b2[0] = b3[0] = '\0';
+  sscanf(b, "%[^\t]\t%[^\t]\t%[^\t]", b1, b2, b3);
   order = strcoll(a1, b1);
   if( order == 0 )
-    order = strcmp(a, b);  /* disambiguate with strcmp */
-  debug3(DBS, D, "strcollcmp(\"%s<tab>\", \"%s<tab>\") = %d", a1, b1, order)
+  {
+    order = strcoll(a2, b2);
+    if( order == 0 )
+    {
+      order = strcoll(a3, b3);
+      if( order == 0 )
+        order = strcmp(a, b);  /* disambiguate with strcmp */
+    }
+  }
+  debug7(DBS, D, "strcollcmp(\"%s<tab>%s<tab>%s\", \"%s<tab>%s<tab>%s\") = %d",
+    a1, a2, a3, b1, b2, b3, order);
   return order;
 }
 
 /*@::StringBeginsWith(), StringContains(), StringInt(), StringFiveInt()@******/
 /*                                                                           */
 /*  BOOLEAN StringBeginsWith(str, pattern)                                   */
+/*  BOOLEAN StringBeginsWithWord(str, pattern)                               */
 /*  BOOLEAN StringEndsWith(str, pattern)                                     */
 /*                                                                           */
-/*  Check whether str begins with or ends with pattern.                      */
+/*  Check whether str begins with or ends with pattern; in the case of       */
+/*  StringBeginsWithWord there may not be a letter after the pattern.        */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -107,6 +120,17 @@ BOOLEAN StringBeginsWith(FULL_CHAR *str, FULL_CHAR *pattern)
   }
   return (*pp == '\0');
 } /* end StringBeginsWith */
+
+#define is_letter(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
+
+BOOLEAN StringBeginsWithWord(FULL_CHAR *str, FULL_CHAR *pattern)
+{ FULL_CHAR *sp, *pp;
+  sp = str;  pp = pattern;
+  while( *sp != '\0' && *pp != '\0' )
+  { if( *sp++ != *pp++ )  return FALSE;
+  }
+  return (*pp == '\0' && !is_letter(*sp));
+} /* end StringBeginsWithWord */
 
 
 BOOLEAN StringEndsWith(FULL_CHAR *str, FULL_CHAR *pattern)

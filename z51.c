@@ -1,7 +1,7 @@
 /*@z51.c:Plain Text Back End:Plain_BackEnd@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -22,9 +22,10 @@
 /*  along with this program; if not, write to the Free Software              */
 /*  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA   */
 /*                                                                           */
-/*  FILE:         z49.c                                                      */
-/*  MODULE:       PostScript Back End                                        */
-/*  EXTERNS:      PS_BackEnd                                                 */
+/*  FILE:         z51.c                                                      */
+/*  MODULE:       Plain Text Back End                                        */
+/*  EXTERNS:      Plain_BackEnd, PlainCharWidth, PlainCharHeight,            */
+/*                PlainFormFeed                                              */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs.h"
@@ -583,6 +584,24 @@ static void Plain_LinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
 
 /*****************************************************************************/
 /*                                                                           */
+/*  Plain_LinkURL(url, llx, lly, urx, ury)                                   */
+/*                                                                           */
+/*  Print an external link.                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+static void Plain_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{
+  debug5(DPT, D, "Plain_LinkURL(%s, %d, %d, %d, %d)", EchoObject(url),
+    llx, lly, urx, ury);
+  /* do nothing; no links in plain text output */
+  debug0(DPT, D, "Plain_LinkURL returning.");
+} /* end Plain_LinkDest */
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  Plain_LinkCheck()                                                        */
 /*                                                                           */
 /*  Called at end of run; will check that for every link source point there  */
@@ -639,6 +658,7 @@ static struct back_end_rec plain_back = {
   Plain_PrintGraphicInclude,
   Plain_LinkSource,
   Plain_LinkDest,
+  Plain_LinkURL,
   Plain_LinkCheck,
 };
 

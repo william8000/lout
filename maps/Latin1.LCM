@@ -239,7 +239,7 @@
 221	335	Yacute		LC yacute;	UA Y;		AC acute;
 222	336	Thorn		LC thorn;
 223	337	germandbls
-224	340	agrave		UC Agrave	UA a;		AC grave;
+224	340	agrave		UC Agrave;	UA a;		AC grave;
 225	341	aacute		UC Aacute;	UA a;		AC acute;
 226	342	acircumflex	UC Acircumflex;	UA a;		AC circumflex;
 227	343	atilde		UC Atilde;	UA a;		AC tilde;

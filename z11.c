@@ -1,7 +1,7 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -90,7 +90,7 @@ FULL_CHAR *EchoStyle(STYLE *style)
 /*                                                                           */
 /*  SpaceChange(style, x)                                                    */
 /*                                                                           */
-/*  Change the current break style as indicated by object x.                 */
+/*  Change the current space style as indicated by object x.                 */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -175,6 +175,7 @@ void SpaceChange(STYLE *style, OBJECT x)
 
 static void changebreak(STYLE *style, OBJECT x)
 { GAP res_gap;  unsigned gap_inc;
+  debug0(DSS, D, "[ changebreak");
   if( beginsbreakstyle(string(x)[0]) )
   {
     /* should be a new break style option */
@@ -208,7 +209,7 @@ static void changebreak(STYLE *style, OBJECT x)
 	nobreaklast(*style) = TRUE;
     else if( StringEqual(string(x), STR_BREAK_LAST) )
 	nobreaklast(*style) = FALSE;
-    else Error(11, 5, "unknown option to %s symbol (%s)",
+    else Error(11, 5, "found unknown option to %s symbol (%s)",
 	   WARN, &fpos(x), KW_BREAK, string(x));
   }
   else /* should be a new inter-line gap */
@@ -224,10 +225,12 @@ static void changebreak(STYLE *style, OBJECT x)
 	find_max(width(line_gap(*style)) - width(res_gap), 0);
     }
   }
+  debug0(DSS, D, "] changebreak");
 } /* end changebreak */
 
 void BreakChange(STYLE *style, OBJECT x)
 { OBJECT link, y;
+  GAP res_gap;  unsigned gap_inc;
   debug3(DSS, D, "BreakChange(%s, %s at %s)", EchoStyle(style),
     EchoObject(x), EchoFilePos(&fpos(x)));
   switch( type(x) )
@@ -236,7 +239,20 @@ void BreakChange(STYLE *style, OBJECT x)
 
     case WORD:
     case QWORD:	if( !StringEqual(string(x), STR_EMPTY) )
-		  changebreak(style, x);
+		{
+		  debug1(DSS, D, "BreakChange WORD examining %s", (string(x)));
+		  if( StringEqual(string(x), STR_BREAK_SETOUTDENT) )
+		  {
+		    debug1(DSS, D, " found %s", STR_BREAK_SETOUTDENT);
+		    Error(11, 11, "width missing after %s in %s",
+		      WARN, &fpos(x), STR_BREAK_SETOUTDENT, KW_BREAK);
+		  }
+		  else
+		  {
+		    debug1(DSS, D, " not found %s", STR_BREAK_SETOUTDENT);
+		    changebreak(style, x);
+		  }
+		}
 		break;
 
 
@@ -245,7 +261,33 @@ void BreakChange(STYLE *style, OBJECT x)
 		  if( type(y) == GAP_OBJ || type(y) == NULL_CLOS )  continue;
 		  else if( is_word(type(y)) )
 		  { if( !StringEqual(string(y), STR_EMPTY) )
-		      changebreak(style, y);
+		    {
+		      debug1(DSS, D, "BreakChange examining %s", (string(y)));
+		      if( StringEqual(string(y), STR_BREAK_SETOUTDENT) )
+		      {
+			debug1(DSS, D, "  found %s", STR_BREAK_SETOUTDENT);
+			if( NextDown(link)==x || NextDown(NextDown(link))==x )
+			{
+			  Error(11, 11, "width missing after %s in %s",
+			    WARN, &fpos(x), STR_BREAK_SETOUTDENT, KW_BREAK);
+			}
+			else
+			{
+			  link = NextDown(NextDown(link));
+			  Child(y, link);
+			  GetGap(y, style, &res_gap, &gap_inc);
+			  outdent_len(*style) = gap_inc == GAP_ABS ?
+			    width(res_gap) : gap_inc == GAP_INC ?
+			    outdent_len(*style) + width(res_gap) :
+			    find_max(outdent_len(*style) - width(res_gap), 0);
+			}
+		      }
+		      else
+		      {
+			debug1(DSS, D, "  not found %s", STR_BREAK_SETOUTDENT);
+			changebreak(style, y);
+		      }
+		    }
 		  }
 		  else Error(11, 7, "invalid left parameter of %s",
 			 WARN, &fpos(x), KW_BREAK);

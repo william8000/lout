@@ -8,8 +8,8 @@
 @SysInclude { cprint }
 @SysInclude { eiffel }
 @SysInclude { perl }
-# @SysInclude { book }
-@Include { letterbook } # for testing Letter size formatting
+@SysInclude { book }
+# @Include { letterbook } # for testing Letter size formatting
 
 @SysDatabase @Reference { loutrefs }
 
@@ -21,8 +21,8 @@ Lout
 Document Formatting System
 }
     @Author { Jeffrey H. Kingston }
-    @Edition { Version 3.24
-October, 2000 }
+    @Edition { Version 3.25
+September, 2001 }
     @Publisher {
 Copyright @CopyRight 1991, 2000 Jeffrey H. Kingston,
 Basser Department of Computer Science,

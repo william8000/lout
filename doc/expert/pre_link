@@ -1,13 +1,13 @@
 @Section
-   @Title { "@LinkSource and @LinkDest" }
+   @Title { "@LinkSource", "@LinkDest", and "@URLLink" }
    @Tag { link_source }
 @Begin
 @PP
-These two symbols
+The two symbols @@LinkSource and @@LinkDest
 link.source.sym @Index { @@LinkSource symbol }
 link.dest.sym @Index { @@LinkDest symbol }
-work together to create @I links in a document, that is, points where
-a user viewing the document on screen can click and be transported to
+work together to create @I { cross links } in a document, that is, points
+where a user viewing the document on screen can click and be transported to
 another point in the document.  We call the point where the user
 clicks the @I source of the link, and the point where the user
 arrives the @I destination of the link.
@@ -35,6 +35,21 @@ destination point with the same name as a previous one, but it is not
 able to refrain from inserting a source point with no corresponding
 destination point, and such points must cause errors of some kind when
 viewed (exactly what error will depend on the viewer).
+@PP
+The @@URLLink symbol is similar to @@LinkSource in being the
+source point of a link, but instead of a tag you supply a URL
+to some other document altogether:
+@ID @Code {
+"\"http://snark.ptc.spbu.ru/~uwe/lout/lout.html\" @URLLink { Lout Home Page }"
+}
+The URL will need to be enclosed in quotes, because of the "/"
+characters which are otherwise taken to be concatenation operations.  As
+for @@LinkSource, the result is just the object to the right, like this:
+@ID { "http://snark.ptc.spbu.ru/~uwe/lout/lout.html" @URLLink { Lout Home Page } }
+but if the user clicks on this object on the screen they enter a
+link that takes them to the given URL location, assuming that
+the software which they are using to display the document is
+clever enough to do this.
 @PP
 At present, @I object above is treated as though it were enclosed
 in @@OneCol, which means that a long link source or destination point

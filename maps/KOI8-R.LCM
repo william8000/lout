@@ -1,0 +1,285 @@
+###############################################################
+#                                                             #
+#  KOI8-R.LCM                                                 #
+#                                                             #
+#  LCM (Lout Character Mapping) file for RFC1489 KOI8-R.      #
+#                                                             #
+#  This is verbatim KOI8-R mapping primary useful for         #
+#  monospaced fonts like Courier intended for screenshots.    #
+#  All the line-drawing characters are mapped; additional     #
+#  typographic niceties (e.g. guillemot) are stuffed into C0. #
+#                                                             #
+#  RFC1489 encodes U+2219 BULLET OPERATOR at 149 and that     #
+#  maps to "periodcentered" glyph, but "periodcentered" is    #
+#  also a glyph for U+00B7 MIDDLE DOT that RFC1489 has        #
+#  encoded at 158.  I think this is a bug in RFC1489.  So I   #
+#  map "bullet" glyph (for U+2022 BULLET) at 149 instead.     #
+#                                                             #
+#  Valeriy Ushakov <uwe@ptc.spb.ru>                           #
+#  24 December 2000                                           #
+#                                                             #
+#  Dec- Octal   Character       Functions ...                 #
+#  imal code    name                                          #
+#  code                                                       #
+#                                                             #
+###############################################################
+
+000	000	-none-
+001	001	ellipsis
+002	002	quotesinglbase
+003	003	quoteleft
+004	004	quoteright
+005	005	quotedblbase
+006	006	quotedblleft
+007	007	quotedblright
+008	010	guilsinglleft
+009	011	guilsinglright
+010	012	-none-
+011	013	guillemotleft
+012	014	guillemotright
+013	015	-none-
+014	016	endash
+015	017	emdash
+016	020	dagger
+017	021	daggerdbl
+018	022	perthousand
+019	023	registered
+020	024	trademark
+021	025	paragraph
+022	026	section
+023	027	afii61352
+024	030	florin
+025	031	currency
+026	032	logicalnot
+027	033	minus
+028	034	plusminus
+029	035	notequal
+030	036	brokenbar
+031	037	infinity
+
+032	040	space
+033	041	exclam
+034	042	quotedbl
+035	043	numbersign
+036	044	dollar
+037	045	percent
+038	046	ampersand
+039	047	quotesingle
+040	050	parenleft
+041	051	parenright
+042	052	asterisk
+043	053	plus
+044	054	comma
+045	055	hyphen
+046	056	period
+047	057	slash
+048	060	zero
+049	061	one
+050	062	two
+051	063	three
+052	064	four
+053	065	five
+054	066	six
+055	067	seven
+056	070	eight
+057	071	nine
+058	072	colon
+059	073	semicolon
+060	074	less
+061	075	equal
+062	076	greater
+063	077	question
+064	100	at
+065	101	A		LC a;
+066	102	B		LC b;
+067	103	C		LC c;
+068	104	D		LC d;
+069	105	E		LC e;
+070	106	F		LC f;
+071	107	G		LC g;
+072	110	H		LC h;
+073	111	I		LC i;
+074	112	J		LC j;
+075	113	K		LC k;
+076	114	L		LC l;
+077	115	M		LC m;
+078	116	N		LC n;
+079	117	O		LC o;
+080	120	P		LC p;
+081	121	Q		LC q;
+082	122	R		LC r;
+083	123	S		LC s;
+084	124	T		LC t;
+085	125	U		LC u;
+086	126	V		LC v;
+087	127	W		LC w;
+088	130	X		LC x;
+089	131	Y		LC y;
+090	132	Z		LC z;
+091	133	bracketleft
+092	134	backslash
+093	135	bracketright
+094	136	asciicircum
+095	137	underscore
+096	140	grave
+097	141	a		UC A;
+098	142	b		UC B;
+099	143	c		UC C;
+100	144	d		UC D;
+101	145	e		UC E;
+102	146	f		UC F;
+103	147	g		UC G;
+104	150	h		UC H;
+105	151	i		UC I;
+106	152	j		UC J;
+107	153	k		UC K;
+108	154	l		UC L;
+109	155	m		UC M;
+110	156	n		UC N;
+111	157	o		UC O;
+112	160	p		UC P;
+113	161	q		UC Q;
+114	162	r		UC R;
+115	163	s		UC S;
+116	164	t		UC T;
+117	165	u		UC U;
+118	166	v		UC V;
+119	167	w		UC W;
+120	170	x		UC X;
+121	171	y		UC Y;
+122	172	z		UC Z;
+123	173	braceleft
+124	174	bar
+125	175	braceright
+126	176	asciitilde
+127	177	-none-
+
+128	200	SF100000
+129	201	SF110000
+130	202	SF010000
+131	203	SF030000
+132	204	SF020000
+133	205	SF040000
+134	206	SF080000
+135	207	SF090000
+136	210	SF060000
+137	211	SF070000
+138	212	SF050000
+139	213	upblock
+140	214	dnblock
+141	215	block
+142	216	lfblock
+143	217	rtblock
+144	220	ltshade
+145	221	shade
+146	222	dkshade
+147	223	integraltp
+148	224	filledbox
+149	225	bullet
+150	226	radical
+151	227	approxequal
+152	230	lessequal
+153	231	greaterequal
+154	232	space
+155	233	integralbt
+156	234	degree
+157	235	twosuperior
+158	236	periodcentered
+159	237	divide
+
+160	240	SF430000
+161	241	SF240000
+162	242	SF510000
+163	243	afii10071	UC afii10023;
+164	244	SF520000
+165	245	SF390000
+166	246	SF220000
+167	247	SF210000
+168	250	SF250000
+169	251	SF500000
+170	252	SF490000
+171	253	SF380000
+172	254	SF280000
+173	255	SF270000
+174	256	SF260000
+175	257	SF360000
+176	260	SF370000
+177	261	SF420000
+178	262	SF190000
+179	263	afii10023	LC afii10071;
+180	264	SF200000
+181	265	SF230000
+182	266	SF470000
+183	267	SF480000
+184	270	SF410000
+185	271	SF450000
+186	272	SF460000
+187	273	SF400000
+188	274	SF540000
+189	275	SF530000
+190	276	SF440000
+191	277	copyright
+192	300	afii10096	UC afii10048;
+193	301	afii10065	UC afii10017;
+194	302	afii10066	UC afii10018;
+195	303	afii10088	UC afii10040;
+196	304	afii10069	UC afii10021;
+197	305	afii10070	UC afii10022;
+198	306	afii10086	UC afii10038;
+199	307	afii10068	UC afii10020;
+200	310	afii10087	UC afii10039;
+201	311	afii10074	UC afii10026;
+202	312	afii10075	UC afii10027;
+203	313	afii10076	UC afii10028;
+204	314	afii10077	UC afii10029;
+205	315	afii10078	UC afii10030;
+206	316	afii10079	UC afii10031;
+207	317	afii10080	UC afii10032;
+208	320	afii10081	UC afii10033;
+209	321	afii10097	UC afii10049;
+210	322	afii10082	UC afii10034;
+211	323	afii10083	UC afii10035;
+212	324	afii10084	UC afii10036;
+213	325	afii10085	UC afii10037;
+214	326	afii10072	UC afii10024;
+215	327	afii10067	UC afii10019;
+216	330	afii10094	UC afii10046;
+217	331	afii10093	UC afii10045;
+218	332	afii10073	UC afii10025;
+219	333	afii10090	UC afii10042;
+220	334	afii10095	UC afii10047;
+221	335	afii10091	UC afii10043;
+222	336	afii10089	UC afii10041;
+223	337	afii10092	UC afii10044;
+224	340	afii10048	LC afii10096;
+225	341	afii10017	LC afii10065;
+226	342	afii10018	LC afii10066;
+227	343	afii10040	LC afii10088;
+228	344	afii10021	LC afii10069;
+229	345	afii10022	LC afii10070;
+230	346	afii10038	LC afii10086;
+231	347	afii10020	LC afii10068;
+232	350	afii10039	LC afii10087;
+233	351	afii10026	LC afii10074;
+234	352	afii10027	LC afii10075;
+235	353	afii10028	LC afii10076;
+236	354	afii10029	LC afii10077;
+237	355	afii10030	LC afii10078;
+238	356	afii10031	LC afii10079;
+239	357	afii10032	LC afii10080;
+240	360	afii10033	LC afii10081;
+241	361	afii10049	LC afii10097;
+242	362	afii10034	LC afii10082;
+243	363	afii10035	LC afii10083;
+244	364	afii10036	LC afii10084;
+245	365	afii10037	LC afii10085;
+246	366	afii10024	LC afii10072;
+247	367	afii10019	LC afii10067;
+248	370	afii10046	LC afii10094;
+249	371	afii10045	LC afii10093;
+250	372	afii10025	LC afii10073;
+251	373	afii10042	LC afii10090;
+252	374	afii10047	LC afii10095;
+253	375	afii10043	LC afii10091;
+254	376	afii10041	LC afii10089;
+255	377	afii10044	LC afii10092;

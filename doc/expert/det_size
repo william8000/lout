@@ -10,25 +10,32 @@ style @Index { Style of an object }
 @PP
 The style of an object comprises the following:
 @BulletList
-@ListItem { Which font family, face and size to use (also defining the
+@LI { Which font family, face and size to use (also defining the
 @Code f unit); }
-@ListItem { Whether small capitals are in effect or not; }
-@ListItem { What gap to replace a single space between two objects by (also
+@LI { Whether small capitals are in effect or not, and also what fraction
+of the height of full capitals the small capitals are to have; }
+@LI { What gap to replace a single space between two objects by (also
 defining the @Code s unit); }
-@ListItem { The interpretation to place on white space separating
+@LI { The interpretation to place on white space separating
 two objects ({@Code lout}, {@Code compress}, {@Code separate}, {@Code troff},
 or {@Code tex} as in Section {@NumberOf space}); }
-@ListItem { The current value of the @Code y and @Code z units of
+@LI { The current value of the @Code y and @Code z units of
 measurement (Section {@NumberOf yunit}); }
-@ListItem { The kind of paragraph breaking to employ ({@Code adjust},
+@LI { The kind of paragraph breaking to employ ({@Code adjust},
 {@Code ragged}, etc.) }
-@ListItem { What gap to insert between the lines of paragraphs
+@LI { What gap to insert between the lines of paragraphs
 (also defining the @Code v unit); }
-@ListItem { Whether to permit hyphenation or not; }
-@ListItem { What colour the object is to appear in; }
-@ListItem { Whether @@Outline is in effect; }
-@ListItem { The language of the object; }
-@ListItem { Whether @@VAdjust, @@HAdjust and @@PAdjust are in effect. }
+@LI { The size of the outdent to use in the @Code outdent paragraph
+breaking style; }
+@LI { Whether the @Code "unbreakablefirst" and @Code "unbreakablelast"
+paragraph breaking options are in effect; }
+@LI { Whether the row marks of words are to pass along the baseline
+or half the height of an `x' above the baseline; }
+@LI { Whether to permit hyphenation or not; }
+@LI { What colour the object is to appear in; }
+@LI { Whether @@Outline is in effect; }
+@LI { The language of the object; }
+@LI { Whether @@VAdjust, @@HAdjust and @@PAdjust are in effect. }
 @EndList
 The style of an object depends on where it appears in the final
 document.  For example, the style of a parameter depends on where it is
@@ -37,8 +44,10 @@ attempts to attach itself to.  Of course, the style of any object can be
 changed by using the @@Font, @@Break, @@Space, @@SetColour or
 @@SetColor, @@Outline, and @@Language symbols.
 @PP
-There are no standard default values for style, except that small capitals
-and outlining are initially off, the interpretation of white space is
+There are no standard default values for style, except that row marks
+of words initially pass half the height of an `x' above the baseline,
+small capitals are initially off and will be 0.7 times the size of full
+capitals, outlining is initially off, the interpretation of white space is
 initially {@Code lout}, and the values of the @Code y and @Code z units
 are zero.  Therefore one must ensure that the root galley or each of its
 components is enclosed in @@Font, @@Break, @@SetColour or @@SetColor, and

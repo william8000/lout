@@ -94,7 +94,9 @@ The particular LCM files in this directory are:
 
     LtLatin2.LCM  Similar to LtLatin1.LCM but uses the Latin2 character set.
 
-    koi8r.LCM     For Russian
+    koi8r.LCM     For Russian (obsolete)
+    KOI8-R.LCM    For Russian
+    LtKOI8.LCM    For Russian
 
     Symb.LCM      The Symbol encoding vector, exactly as on page 606 of the
 		  PostScript LRM 2nd Ed., plus mappings.

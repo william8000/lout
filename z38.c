@@ -1,7 +1,7 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.24)                       */
-/*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.25)                       */
+/*  COPYRIGHT (C) 1991, 2001 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
@@ -365,6 +365,7 @@ static OBJECT DoWord(FULL_CHAR *buff, FULL_CHAR *q, OBJECT x, FONT_NUM fnum)
   word_colour(res) = word_colour(x);
   word_outline(res) = word_outline(x);
   word_language(res) = word_language(x);
+  word_baselinemark(res) = word_baselinemark(x);
   word_hyph(res) = word_hyph(x);
   underline(res) = UNDER_OFF;
   return res;
@@ -424,16 +425,19 @@ static void DoAddGap(OBJECT new_acat)
 #define	MIXED_TRANS	4
 #define transformable(ch)	(uc[ch] != '\0')
 
+/* basically temporaries but remembered from call to call for recycling */
+static OBJECT		font_change_word = nilobj;
+static FULL_LENGTH	font_change_length = 0;
+
 OBJECT MapSmallCaps(OBJECT x, STYLE *style)
 { MAPPING m;  int i;  OBJECT new_y, new_x, new_acat, tmp;
   FULL_CHAR buff[MAX_BUFF], *uc, *p, *q;
   FONT_NUM small_font;  FULL_LENGTH vshift;  int state;  STYLE new_style;
-  static OBJECT font_change_word = nilobj;
   assert( is_word(type(x)), "MapSmallCaps: !is_word(type(x))" );
   debug2(DCM, D, "MapSmallCaps(%s %s)", Image(type(x)), string(x));
 
   /* get the mapping and return if there isn't one for this font */
-  m = FontMapping(font_num(x), &fpos(x));
+  m = FontMapping(word_font(x), &fpos(x));
   if( m == 0 )
   { debug0(DCM, D, "MapSmallCaps returning unchanged (mapping is 0)");
     return x;
@@ -451,9 +455,16 @@ OBJECT MapSmallCaps(OBJECT x, STYLE *style)
     return x;
   }
 
+  /* make sure the small caps size is a reasonable one */
+  if( smallcaps_len(*style) <= 0 )
+    Error(38, 12, "small caps size is zero or negative", FATAL, &fpos(x));
+
   /* set up the font change word if not already done */
-  if( font_change_word == nilobj )
-  { font_change_word = MakeWord(WORD, AsciiToFull("0.7f"), no_fpos);
+  if( font_change_length != smallcaps_len(*style) )
+  { char tmp[100];
+    font_change_length = smallcaps_len(*style);
+    sprintf(tmp, "%.2ff", (float) font_change_length / FR);
+    font_change_word = MakeWord(WORD, AsciiToFull(tmp), no_fpos);
   }
 
   state = INIT;  q = buff;
@@ -473,7 +484,8 @@ OBJECT MapSmallCaps(OBJECT x, STYLE *style)
 	  StyleCopy(new_style, *style);
 	  FontChange(&new_style, font_change_word);
 	  small_font = font(new_style);
-	  vshift = FontHalfXHeight(word_font(x)) - FontHalfXHeight(small_font);
+	  vshift = word_baselinemark(x) ? 0 :
+	    (FontHalfXHeight(word_font(x)) - FontHalfXHeight(small_font));
 
           state = ALL_TRANS;
         }
@@ -493,7 +505,8 @@ OBJECT MapSmallCaps(OBJECT x, STYLE *style)
 	  StyleCopy(new_style, *style);
 	  FontChange(&new_style, font_change_word);
 	  small_font = font(new_style);
-	  vshift = FontHalfXHeight(word_font(x)) - FontHalfXHeight(small_font);
+	  vshift = word_baselinemark(x) ? 0 :
+	    (FontHalfXHeight(word_font(x)) - FontHalfXHeight(small_font));
 
 	  /* make a new WORD out of the current contents of buff */
 	  new_y = DoWord(buff, q, x, word_font(x));

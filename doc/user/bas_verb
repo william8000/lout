@@ -37,13 +37,14 @@ so that there is no doubt about where the verbatim text ends.  Although
 we have said that there are no special meanings, there is one exception
 to this rule:  @Code "@Include" and @Code "@SysInclude" commands are
 recognized, allowing all or part of the verbatim text to come from some
-other file.
+other file.  Braces do not have to be balanced in that file.
 @PP
 Occasionally the first line of some verbatim text begins with some
 spaces that have to be preserved.  This is a problem for @Code "@Verbatim"
 because it ignores all white spaces following the opening brace and
 all white spaces preceding the closing brace.  However, the alternative
 @Code "@RawVerbatim" symbol stops ignoring white spaces at the opening
+raw.verbatim.sym @Index @Code "@RawVerbatim"
 as soon as a newline character is reached; in other words, it will
 preserve all white spaces following the first newline.
 @End @Section

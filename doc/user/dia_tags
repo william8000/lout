@@ -165,4 +165,26 @@ This will select a point on the outline of the named node, appropriate
 to the type of link being drawn.  It is extremely useful, of course, but
 potentially confusing:  @Code A and @Code B do not denote points and are
 not tags, strictly speaking, at all.
+@PP
+The @Code "::" symbol has a @Code restrict option which can be
+used to save printer memory in deeply nested structures (such as
+the syntax diagrams of Section {@NumberOf dia_synt}) by restricting
+the tags promoted by @Code "::" to a limited set:
+@ID {
+@Code {
+"A:: restrict { (E) (W) } @Ellipse"
+}
+||7ct
+@Diag {
+@ShowTags {
+  A:: restrict { (E) (W) } @Ellipse
+    vsize { 1.5c }
+    hsize { 3.0c }
+  }
+}
+}
+The tags to be preserved appear within the @Code restrict option, each
+enclosed in parentheses.  Care is needed with this option:  all of
+the listed tags must actually exist in the following object.  If not, the
+result will be a PostScript error mentioning the @Code get command.
 @End @Section

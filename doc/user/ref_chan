@@ -173,12 +173,22 @@ sort.ref @Index { sorting of reference lists }
 reflistsortkey.sym @Index { @Code "@RefListSortKey" }
 ordering the reference list.  The default value,
 @ID @Code "@RefListSortKey { @Tag }"
-sorts by tag; the other popular possibility is to sort by the
+sorts by tag.  Another popular possibility is to sort by the
 @Code "@Label" option:
 @ID @Code "@RefListSortKey { @Label }"
 As usual @Code "@Label" will use the value of a @Code "label" option
-to the citation if there is one.  There is no way to sort by order of
-first appearance in the document.
+to the citation if there is one.  To sort by order of first citation, use
+@ID @Code "@RefListSortKey { @CiteOrder }"
+@Code "@CiteOrder" is implemented in a quick and dirty way, and there
+are a couple of problems to watch out for if you use it.  First,
+when you cite references more than once you get some strange
+intermediate error messages and results.  All such problems will
+be gone by the end of the fifth run.  Second, if you insert
+more citations later on, you will need to restart the whole process,
+by deleting the cross reference index file {@I lout.li}, since any
+late insertions get erroneously stuck on the end instead of inserted
+in the correct order.  If things go haywire, delete {@I lout.li} then
+do five runs and they should be right again.
 @PP
 @Code "@RefListSortKey" may be any sequence of words
 and options from the @Code "@Reference" symbol, but not @Code "@RefNum"
@@ -189,7 +199,8 @@ by tag.  However you
 are supposed to choose tags which have this effect, and that is more
 reliable since the modern practice is to put the authors' surnames
 after their given names.  There seems to be little practical use for
-sorting keys other than {@Code "@Tag"} and {@Code "@Label"}.
+sorting keys other than {@Code "@Tag"}, {@Code "@Label"}, and
+{@Code "@CiteOrder"}.
 @PP
 A colon within the @Code "@RefListSortKey" option is converted by Lout
 into a character smaller than any printable character, which ensures that
