@@ -66,8 +66,7 @@ equivalent for other languages), so that Lout does not confuse program
 braces with Lout braces.  In that case the program text must not
 contain {@Code "@End"}; and in either case the program text must not
 include @Code "@Include" or @Code "@SysInclude" unless you are really
-including a file at that point (which is allowed, and follows the
-rules given for @Code "@Verbatim" in Section {@NumberOf verbatim}).
+including a file at that point (Section {@NumberOf pipes}).
 @PP
 If your Lout document contains program texts in several languages,
 simply add one @Code "@SysInclude" line for each of them and proceed
@@ -77,6 +76,6 @@ a viable alternative is
 These symbols cause the text between braces to be set verbatim in
 a fixed-width font, as explained elsewhere in this guide.  This fallback
 method will not handle tab and formfeed characters very well.  Again,
-use @Code "@Begin" and @Code "@End @Verbatim" instead of braces if
-your program text contains unbalanced braces.
+use @Code "@Verbatim @Begin ... @End @Verbatim" if your program text
+contains unbalanced braces.
 @End @Section

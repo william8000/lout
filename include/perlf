@@ -1,7 +1,7 @@
 
 ###############################################################################
 #                                                                             #
-#  Lout @EiffelSetup package for formatting Eiffel programs                   #
+#  Lout @PerlSetup package for formatting Perl programs                       #
 #                                                                             #
 #  Version 3.0                                                                #
 #  Jeffrey H. Kingston                                                        #
@@ -14,13 +14,13 @@
 #                                                                             #
 ###############################################################################
 
-export @Eiffel
-def @EiffelSetup
+export @Perl
+def @PerlSetup
     named pipe			{	}  # pipe through this first
     named style
 	named @OrIfPlain left x right y
 	{ @BackEnd @Case { PlainText @Yield y else @Yield x } }
-				{ varying @OrIfPlain fixed }  # print style
+						{ fixed }  # print style
 
     # the following options apply when style is "fixed"
     named fixedfont				{ Courier }# font family
@@ -92,7 +92,7 @@ def @EiffelSetup
 	@PI @PK @PO @PN @PS @PC @PA @PM @PD
 	@A "$>"
 
-    def @Eiffel
+    def @Perl
 	named style        { style         }  # style
 	named pipe         { pipe          }  # pipe through this first
 	named font         { dft           }  # font family
@@ -161,12 +161,12 @@ def @EiffelSetup
 	{
 	    pipe @Case {
 		"" @Yield {
-	    	    "prg2lout -r -lEiffel" -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
+	    	    "prg2lout -r -lPerl" -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
 			-t{@InitTab} -T{@InitTabWidth}
 		}
 		else @Yield {
 	    	    "cat" @FilterIn "|" pipe "|"
-		    "prg2lout -r -lEiffel" -o{@FilterOut}
+		    "prg2lout -r -lPerl" -o{@FilterOut}
 		    -e{@FilterErr} -t{@InitTab} -T{@InitTabWidth}
 		}
 	    }
@@ -349,6 +349,6 @@ def @EiffelSetup
 	{ @InitFontFamily Base @InitSize } @Font
 	{ @InitLine lines } @Break @Body
 
-    @End @Eiffel
+    @End @Perl
 
-@End @EiffelSetup
+@End @PerlSetup

@@ -1,0 +1,108 @@
+@Section
+   @Title { Notes on Perl and Pod }
+   @Tag { prg_perl }
+@Begin
+@PP
+The Perl programming language
+@FootNote { My thanks to Mark Summerfield for help with Perl and Pod. }
+is quite a difficult one for the @Code { prg2lout } program to deal with,
+and our boast that programs can be included with `absolutely no
+modifications' is not quite true for Perl.
+@PP
+Here is the complete list of problem areas.  In most cases their
+effect is to get the formatting wrong over a short region, which is not
+perhaps so disastrous; and it should be easy to modify your Perl program
+without changing its meaning, to work around these problems.  After all,
+in Perl there is always more than one way to do it.
+@NumberedList
+
+@LI {
+@I Here-documents such as
+@ID @Verbatim {
+<<"EOF"
+These lines will be read as though
+enclosed in double quotes
+EOF
+}
+will be handled correctly only if the string appearing immediately after
+the @Perl { << } operator (that is, the string used to terminate the
+here-document) is one of @Perl { EOF }, @Perl { EOT }, @Perl { END },
+and the empty string, all optionally enclosed in quotes of any of the
+three kinds.  If this condition is not met, then the here-document will
+be treated as Perl program text.  If the condition is met, there is still
+another problem:  everything after the @Perl { << } symbol on the same
+line will be treated (incorrectly) as a string; the worst consequence
+of this is that stacked here-documents will not be printed properly.
+}
+
+@LI {
+When @Code { prg2lout } is scanning the program text looking for the
+beginning of a lexical unit, it may come upon a @Code "/" character,
+and this @I initial @Code "/" (not subsequent ones in the same lexical
+unit) it finds difficult to interpret, since it may be the beginning
+of a regular expression, to be formatted like a string, or it may be a
+complete lexical unit denoting division.  The program chooses the regular
+expression (or equivalently, string) interpretation if the @Code "/"
+character is immediately preceded by @Code { "q" }, @Code { "qq" },
+@Code { "qx" }, @Code { "qw" }, @Code { "qr" }, @Code { "m" },
+@Code { "s" }, @Code { "y" }, or @Code { "tr" }.  It also chooses the
+regular expression interpretation if the @Code "/" character appears
+at the start of a line, or if it is
+immediately preceded by zero, one, or two space or tab characters, which
+are themselves immediately preceded by a complete lexical unit which is
+one of @Code { "(" }, @Code { "=" }, @Code { "=~" }, @Code { "!~" },
+@Code { "split" }, @Code { "if" }, @Code { "not" }, @Code { "unless" },
+@Code { "for" }, @Code { "foreach" }, and @Code { "while" }.  Otherwise
+it chooses the division interpretation.  In the rare cases where this
+rule fails, you can force @Code { prg2lout } to choose the regular expression
+interpretation by placing an @Code { m } in front of the initial @Code "/"
+(this does not change the meaning of the program), and you can force the
+division interpretation by placing at least three spaces before the
+@Code "/" character.
+}
+
+@LI {
+The @Code { prg2lout } program recognises complete substitution operators,
+such as @Code "s/abc/ABC/" and {@Code "s{abc}{ABC}"}, as individual lexical
+units, and it formats them as it does strings.  However, its rule for
+deciding where these units end is rather simple-minded:  at the start,
+it works out what character finishes the unit (in the examples above,
+@Code "/" and @Code "}" respectively), and scans along until it reaches
+the second occurrence of this character not preceded by the @Code "\\"
+escape character.  This is inadequate in two respects.  Firstly,
+@ID @Code "s{{}}{}"
+is a complete legal substitution expression in Perl, but @Code { prg2lout }
+will think it ends after the second {@Code "}"}, and so format the rest
+of it wrongly.  Secondly, and more seriously,
+@ID @Code "s{abc}<ABC>"
+is also allowed in Perl, but @Code { prg2lout } does not understand that
+the finishing character can change in this way, so in this example it will
+keep scanning forever, looking for the second @Code "}" character, which is
+disastrous.
+}
+
+@EndList
+Further work may eliminate some of these problems.
+@PP
+The Pod language is used by Perl programmers for creating documentation,
+and may be found within Perl programs or standing alone.  Lout supports
+both arrangements without any special action by the user.  At the
+beginning of the @Code perl setup line, the following line has been placed:
+@ID @Code "@SysInclude { pod }"
+Thus, asking for Perl always gives you Pod as well.  If you are using
+your own setup files for both languages, it is probably better to
+break this connection by deleting this line from your copy of the
+@Code perl setup file and placing
+@ID @Code {
+"@Include { mypod }"
+"@Include { myperl }"
+}
+at the start of your document in the usual way.
+@PP
+Because Pod is a documentation language rather than a programming
+language, the setup file options listed in Section {@NumberOf cpsetup}
+do not really apply.  So for Pod only these have been discarded and replaced
+by a completely different set of options, controlling such things as
+the size of headings and the gaps between list items, which you can
+find documented in the @Code { pod } setup file.
+@End @Section

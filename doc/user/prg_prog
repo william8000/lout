@@ -7,7 +7,7 @@ The standard reference for the Eiffel language @Cite { $meyer1992eiffel }
 specifies that identifiers within comments may or should be enclosed
 in ` and ' so that they may be noticed and printed in an italic
 font:
-@ID lines @Break @F @Verbatim {
+@ID @Code @Verbatim {
 @ID @Eiffel {
 deposit(amount: REAL) is
         -- deposit `amount' dollars

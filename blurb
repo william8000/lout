@@ -1,7 +1,7 @@
 
-         THE LOUT DOCUMENT FORMATTING SYSTEM, VERSION 3.19
+         THE LOUT DOCUMENT FORMATTING SYSTEM, VERSION 3.20
 
-Version 3.19 of the Lout document formatting system is now available
+Version 3.20 of the Lout document formatting system is now available
 (free of charge).  The system reads a high-level description of a
 document similar in style to LaTeX and produces a PostScript, PDF or
 plain text output file.
@@ -12,7 +12,7 @@ EPS file inclusion and generation, equation formatting, tables, diagrams,
 rotation and scaling, sorted indexes, bibliographic databases, running
 headers and odd-even pages, automatic cross referencing, multilingual
 documents including hyphenation (most European languages are supported,
-including Russian), formatting of C/C++ programs, and much more, all
+including Russian), formatting of computer programs, and much more, all
 ready to use.  Furthermore, Lout is easily extended with definitions
 which are very much easier to write than troff of TeX macros because
 Lout is a high-level language, the outcome of an eight-year research
@@ -21,9 +21,9 @@ project that went back to the beginning.
 Lout is written in highly portable ANSI C.  It is distributed under the
 GNU public license as follows:
 
-   ftp://ftp.cs.usyd.edu.au/jeff/lout/lout-3.19.tar.gz
+   ftp://ftp.cs.usyd.edu.au/jeff/lout/lout-3.20.tar.gz
 
-In other words, in a gzipped tar file called "lout-3.19.tar.gz" in the
+In other words, in a gzipped tar file called "lout-3.20.tar.gz" in the
 "jeff/lout" subdirectory of the home directory of "ftp ftp.cs.usyd.edu.au"
 with login name "ftp" or "anonymous" using any non-empty password.  The
 distribution contains
@@ -43,7 +43,7 @@ distribution contains
 For those who want to browse first, a PostScript version of the User's
 Guide may be found in the same ftp directory:
 
-   ftp://ftp.cs.usyd.edu.au/jeff/lout/lout-3.19.user.ps.gz
+   ftp://ftp.cs.usyd.edu.au/jeff/lout/lout-3.20.user.ps.gz
 
 Lout was designed and implemented by Jeffrey H. Kingston (jeff@cs.usyd.edu.au)
 of the Basser Department of Computer Science at the University of Sydney.

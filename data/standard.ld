@@ -684,7 +684,7 @@
     EnglishUK	@Yield { ctd. }
     Finnish	@Yield { ?? }
     French	@Yield { suite }
-    German	@Yield { ?? }
+    German	@Yield { Fortsetzung }
     Hungarian	@Yield { folyt. }
     Italian	@Yield { cont. }
     Norwegian   @Yield { ?? }

@@ -1,6 +1,6 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -58,7 +58,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 { int w;  float num; 
   FULL_CHAR *str;
 
-  debug2(DGW, DD, "GetGap( %s, %s, res_gap, res_inc )",
+  debug2(DGW, D, "GetGap( %s, %s, res_gap, res_inc )",
 	EchoObject(x), EchoStyle(style));
 
   nobreak(*res_gap) = FALSE;
@@ -68,14 +68,14 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   /* make sure we have a WORD or QWORD argument */
   if( !is_word(type(x)) )
   { Error(17, 1, "gap is not a simple word", WARN, &fpos(x));
-    debug1(DGW, DD, "GetGap failing (x = %s)", EchoObject(x));
+    debug1(DGW, D, "GetGap failing (x = %s)", EchoObject(x));
     return;
   }
   str = string(x);
 
   /* if word is empty, return 0ie */
   if( *str == '\0' )
-  { debug0(DGW, DD, "GetGap returning (null word)");
+  { debug0(DGW, D, "GetGap returning (null word)");
     return;
   }
 
@@ -88,7 +88,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   { Error(17, 2, "width missing from %s", WARN, &fpos(x), string(x));
     Error(17, 3, "%s, %s and %s must be enclosed in double quotes",
       WARN, &fpos(x), KW_VCAT_NJ, KW_HCAT_NJ, KW_ACAT_NJ);
-    debug0(DGW, DD, "GetGap failing (width missing)");
+    debug0(DGW, D, "GetGap failing (width missing)");
     return;
   }
   while( numericchar(*str) )  str++;
@@ -118,7 +118,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 
     default:	Error(17, 4, "units letter missing from %s",
 		  WARN, &fpos(x), string(x));
-		debug0(DGW, DD, "GetGap failing (units letter missing)");
+		debug0(DGW, D, "GetGap failing (units letter missing)");
 		return;
   }
 
@@ -142,7 +142,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 
     default:	Error(17, 7, "unknown gap mode in %s",
 		  WARN, &fpos(x), string(x));
-		debug0(DGW, DD, "GetGap failing (spacing mode)");
+		debug0(DGW, D, "GetGap failing (spacing mode)");
 		return;
   }
 
@@ -160,7 +160,7 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   if( *str != '\0' )
     Error(17, 8, "invalid width or gap %s", WARN, &fpos(x), string(x));
 
-  debug2(DGW, DD, "GetGap returning (res_gap = %s, res_inc = %s)",
+  debug2(DGW, D, "GetGap returning (res_gap = %s, res_inc = %s)",
     EchoGap(res_gap), Image( (int) *res_inc) );
 } /* end GetGap */
 
@@ -352,7 +352,7 @@ FULL_LENGTH ActualGap(FULL_LENGTH prevf, FULL_LENGTH b, FULL_LENGTH f,
 			break;
   }
   res = find_min(MAX_FULL_LENGTH, w2);
-  debug7(DGW, D, "ActualGap( _,%s %s %s,%s; frame_size %s, mk %s ) = %s",
+  debug7(DGW, DD, "ActualGap( _,%s %s %s,%s; frame_size %s, mk %s ) = %s",
 	EchoLength(prevf), EchoGap(xgap), EchoLength(b), EchoLength(f),
 	EchoLength(frame_size), EchoLength(mk), EchoLength(res));
   return res;

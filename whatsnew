@@ -237,6 +237,12 @@ Changes and new features introduced in Version 3.19 [9 March 2000]
     Running headers in indexes
     Two extra @Eq symbols:  triangleup, triangledown
 
+Changes and new features introduced in Version 3.20 [8 April 2000]
+
+    Bug fixes (including the internal error that was dumping core recently)
+    Multi-line style changes (@I, @Colour etc.) now work in lines @Break mode
+    @Perl symbol for Perl programming language formatting (includes Pod)
+
 Things that ought to be done but haven't been done yet
 
     PDF-like features in PostScript output
@@ -244,4 +250,4 @@ Things that ought to be done but haven't been done yet
     Review Uwe's proposal for moving word row marks to the baseline
 
 Jeff Kingston
-9 March 2000
+8 April 2000

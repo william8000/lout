@@ -1,6 +1,6 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -44,8 +44,8 @@ FULL_CHAR *EchoStyle(STYLE *style)
   static char *hyphwords[] = { "hyph_undef", "hyph_off", "hyph_on" };
   static char *fillwords[] = { "fill_undef", "fill_off", "fill_on" };
   static char *spacewords[] = { "lout", "comp", "troff", "tex" };
-  static char *displaywords[] = { "undef", "adjust", "outdent", "left",
-			     "centre", "right", "do" };
+  static char *displaywords[] = { "undef", "adjust", "outdent", "oragged",
+				  "left", "centre", "right", "do" };
 
   StringCopy(res, AsciiToFull("["));
   StringCat(res, EchoCatOp(VCAT,mark(line_gap(*style)),join(line_gap(*style))));
@@ -228,7 +228,8 @@ static void changebreak(STYLE *style, OBJECT x)
 
 void BreakChange(STYLE *style, OBJECT x)
 { OBJECT link, y;
-  debug2(DSS, D, "BreakChange(%s, %s)", EchoStyle(style), EchoObject(x));
+  debug3(DSS, D, "BreakChange(%s, %s at %s)", EchoStyle(style),
+    EchoObject(x), EchoFilePos(&fpos(x)));
   switch( type(x) )
   {
     case NULL_CLOS: break;

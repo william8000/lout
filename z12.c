@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -28,6 +28,8 @@
 /*                                                                           */
 /*****************************************************************************/
 #include "externs.h"
+#define line_breaker(g)							\
+  (vspace(g) > 0 || (units(gap(g)) == FRAME_UNIT && width(gap(g)) > FR))
 #define IG_LOOKING	0
 #define IG_NOFILE	1
 #define IG_BADFILE	2
@@ -802,6 +804,90 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
 
     case ACAT:
+
+      if( fill_style(save_style(x)) == FILL_OFF )
+      { OBJECT new_line, g, z, res;  BOOLEAN jn;
+
+	/* convert ACAT to VCAT of lines if more than one line */
+	/* first, compress all ACAT children                   */
+	for( link = x;  NextDown(link) != x;  link = NextDown(link) )
+	{ Child(y, NextDown(link));
+	  if( type(y) == ACAT )
+	  {
+	    TransferLinks(Down(y), y, NextDown(link));
+	    DisposeChild(Up(y));
+	    link = PrevDown(link);
+	  }
+	}
+
+	/* check each definite subobject in turn for a linebreak preceding */
+	FirstDefinite(x, link, y, jn);
+	if( link != x )
+	{
+	  res = nilobj;
+	  NextDefiniteWithGap(x,  link, y, g, jn);
+	  while( link != x )
+	  {
+	    /* check whether we need to break the paragraph here at g */
+	    if( mode(gap(g)) != NO_MODE && line_breaker(g) )
+	    {
+	      /* if this is our first break, build res */
+	      if( res == nilobj )
+	      {
+		New(res, VCAT);
+		adjust_cat(res) = FALSE;
+		ReplaceNode(res, x);
+	      }
+
+	      /* make new line of stuff up to g and append it to res */
+	      New(new_line, ACAT);
+	      TransferLinks(NextDown(x), Up(g), new_line);
+	      StyleCopy(save_style(new_line), save_style(x));
+	      Link(res, new_line);
+
+	      /* may need to insert space at start of remainder */
+	      if( hspace(g) > 0 )
+	      {
+		/* make an empty word to occupy the first spot */
+		z = MakeWord(WORD, STR_EMPTY, &fpos(g));
+		word_font(z) = font(save_style(x));
+		word_colour(z) = colour(save_style(x));
+		word_outline(z) = outline(save_style(x));
+		word_language(z) = language(save_style(x));
+		word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
+		underline(z) = UNDER_OFF;
+		Link(Down(x), z);
+
+		/* follow the empty word with a gap of the right width */
+		New(z, GAP_OBJ);
+		hspace(z) = hspace(g);
+		vspace(z) = 0;
+		underline(z) = UNDER_OFF;
+		GapCopy(gap(z), space_gap(save_style(x)));
+		width(gap(z)) *= hspace(z);
+		Link(NextDown(Down(x)), z);
+	      }
+
+	      /* append a gap to res (recycle g) */
+	      MoveLink(Up(g), res, PARENT);
+	      GapCopy(gap(g), line_gap(save_style(x)));
+	      width(gap(g)) *= find_max(1, vspace(g));
+
+	    }
+	    NextDefiniteWithGap(x, link, y, g, jn);
+	  }
+
+	  /* at end of loop, if we have a res, leftover last line is linked */
+	  if( res != nilobj )
+	  {
+	    Link(res, x);
+	    x = res;
+	  }
+	}
+      }
+      /* *** NB NO BREAK *** */
+
+
     case HCAT:
     case VCAT:
     

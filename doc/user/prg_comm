@@ -16,7 +16,7 @@ formfeed. @Index { formfeed in program texts }
 character, control-L, without any comment; whatever the language, a formfeed
 in program text is taken to be a request to start a new page.)  Or, to
 make a heading in an Eiffel program, do this:
-@ID @Code "--@ @Display @Heading { treeprint() }"
+@ID @Code "--@ @Display @Heading { treeprint }"
 (Eiffel comments begin with @Code "--" and end at the end of the
 line.)  Other possible uses for this feature include index entries and
 margin notes.  Incredible as it may seem, you can even write

@@ -500,7 +500,7 @@ begin
         DoPriAbstract(root^.rightchild);
     end;
 end;
-} &0io
+} |0io
 }
 @End @Overhead
 

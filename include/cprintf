@@ -1,11 +1,13 @@
 
 ###############################################################################
 #                                                                             #
-#  Lout @CPSetup package for formatting C programs                            #
+#  Lout @CPSetup package for formatting C and C++ programs                    #
 #                                                                             #
-#  Version 2.0 by Jeffrey H. Kingston, February 2000.                         #
+#  Version 3.0                                                                #
+#  Jeffrey H. Kingston                                                        #
+#  5 April 2000                                                               #
 #                                                                             #
-#  This package uses a filtered body parameter to convert C source            #
+#  This package uses a filtered body parameter to convert program source      #
 #  code into Lout source.  The filter program is prg2lout, which is           #
 #  distributed with Lout and should be compiled and installed wherever        #
 #  Lout itself is.                                                            #
@@ -14,69 +16,96 @@
 
 export @CP
 def @CPSetup
+    named pipe			{	}  # pipe through this first
     named style
-    named @OrIfPlain left x right y
-    { @BackEnd @Case { PlainText @Yield y else @Yield x } }
-                             { fixed	 }  # print style
+	named @OrIfPlain left x right y
+	{ @BackEnd @Case { PlainText @Yield y else @Yield x } }
+						{ fixed }  # print style
 
-    named pipe               {           }  # pipe through this first
+    # the following options apply when style is "fixed"
+    named fixedfont				{ Courier }# font family
+    named fixedsize				{ -1.0p	}  # font size
+    named fixedline				{ 1.0vx	}  # line-space
+    named fixedtabin				{ 8	}  # tab interval
+    named fixedtabout				{ 8s	}  # tab width
 
-    named fixedfont          { Courier   }  # font family if fixed
-    named fixedstrings       { Base      }  # string face if fixed
-    named fixedidentifiers   { Base      }  # identifier face if fixed
-    named fixedcomments      { Base      }  # comment face if fixed
-    named fixedkeywords      { Base      }  # keyword face if fixed
-    named fixednumbers       { Base      }  # number face if fixed
-    named fixedoperators     { Base      }  # operator face if fixed
-    named fixedsize          { -1.0p     }  # font size if fixed
-    named fixedline          { 1.0vx     }  # line-space if fixed
-    named fixedtabin	     { 8	 }  # tab interval if fixed
-    named fixedtabout	     { 8s	 }  # tab width if fixed
+    named fixedidentifiers			{ Base	}  # identifier face
+    named fixedkeywords				{ Base	}  # keyword face
+    named fixedoperators			{ Base	}  # operator face
+    named fixednumbers				{ Base	}  # number face
+    named fixedstrings				{ Base	}  # string face
+    named fixedcomments				{ Base	}  # comment face
 
-    named varyingfont        {           }  # font family if varying
-    named varyingstrings     { Slope     }  # string face if varying
-    named varyingidentifiers { Slope     }  # identifier face if varying
-    named varyingcomments    { Base      }  # comment face if varying
-    named varyingkeywords    { Bold      }  # keyword face if varying
-    named varyingnumbers     { Base      }  # number face if varying
-    named varyingoperators   { Base      }  # operator face if varying
-    named varyingsize        { 1.0f      }  # font size if varying
-    named varyingline        { 1.0vx     }  # line-space if varying
-    named varyingtabin       { 8	 }  # tab interval if varying
-    named varyingtabout      { 3f	 }  # tab width if varying
+    named fixedidentifiersformat right @Body	{ @Body	}  # identifier format
+    named fixedkeywordsformat right @Body	{ @Body	}  # keyword format
+    named fixedoperatorsformat right @Body	{ @Body	}  # operators format
+    named fixednumbersformat right @Body	{ @Body	}  # number format
+    named fixedstringsformat right @Body	{ @Body	}  # string format
+    named fixedcommentsformat right @Body	{ @Body	}  # comment format
 
-    named symbolfont         {           }  # font family if symbol
-    named symbolstrings      { Slope     }  # string face if symbol
-    named symbolidentifiers  { Slope     }  # identifier face if symbol
-    named symbolcomments     { Base      }  # comment face if symbol
-    named symbolkeywords     { Bold      }  # keyword face if symbol
-    named symbolnumbers      { Base      }  # number face if symbol
-    named symboloperators    { Base      }  # operator face if symbol
-    named symbolsize         { 1.0f      }  # font size if symbol
-    named symbolline         { 1.0vx     }  # line-space if symbol
-    named symboltabin        { 8	 }  # tab interval if symbol
-    named symboltabout       { 3f	 }  # tab width if symbol
+    # the following options apply when style is "varying"
+    named varyingfont				{	}  # font family
+    named varyingsize				{ 1.0f	}  # font size
+    named varyingline				{ 1.0vx	}  # line-space
+    named varyingtabin				{ 8	}  # tab interval
+    named varyingtabout				{ 3f	}  # tab width
+
+    named varyingidentifiers			{ Slope	}  # identifier face
+    named varyingkeywords			{ Bold	}  # keyword face
+    named varyingoperators			{ Base	}  # operator face
+    named varyingnumbers			{ Base	}  # number face
+    named varyingstrings			{ Slope	}  # string face
+    named varyingcomments			{ Base	}  # comment face
+
+    named varyingidentifiersformat right @Body	{ @Body	}  # identifier format
+    named varyingkeywordsformat right @Body	{ @Body	}  # keyword format
+    named varyingoperatorsformat right @Body	{ @Body	}  # operators format
+    named varyingnumbersformat right @Body	{ @Body	}  # number format
+    named varyingstringsformat right @Body	{ @Body	}  # string format
+    named varyingcommentsformat right @Body	{ @Body	}  # comment format
+
+    # the following options apply when style is "symbol"
+    named symbolfont				{	}  # font family
+    named symbolsize				{ 1.0f	}  # font size
+    named symbolline				{ 1.0vx	}  # line-space
+    named symboltabin				{ 8	}  # tab interval
+    named symboltabout				{ 3f	}  # tab width
+
+    named symbolidentifiers			{ Slope	}  # identifier face
+    named symbolkeywords			{ Bold	}  # keyword face
+    named symboloperators			{ Base	}  # operator face
+    named symbolnumbers				{ Base	}  # number face
+    named symbolstrings				{ Slope	}  # string face
+    named symbolcomments			{ Base	}  # comment face
+
+    named symbolidentifiersformat right @Body	{ @Body	}  # identifier format
+    named symbolkeywordsformat right @Body	{ @Body	}  # keyword format
+    named symboloperatorsformat right @Body	{ @Body	}  # operators format
+    named symbolnumbersformat right @Body	{ @Body	}  # number format
+    named symbolstringsformat right @Body	{ @Body	}  # string format
+    named symbolcommentsformat right @Body	{ @Body	}  # comment format
 
 @Begin
 
     export
     
-	"$>" @S @D @C @K @N @O @A @ST @ED @M
+	@PI @PK @PO @PN @PS @PC @PA @PM @PD
+	@A "$>"
 
     def @CP
 	named style        { style         }  # style
 	named pipe         { pipe          }  # pipe through this first
 	named font         { dft           }  # font family
-	named strings      { dft           }  # string font
-	named identifiers  { dft           }  # ident. font
-	named comments     { dft           }  # comment font
-	named keywords     { dft           }  # keyword font
-	named numbers      { dft           }  # number font
-	named operators    { dft           }  # operator font
 	named size         { dft           }  # font size
 	named line         { dft           }  # line-space
 	named tabin        { dft           }  # tab interval
 	named tabout       { dft           }  # tab width
+	named identifiers  { dft           }  # ident. font
+	named keywords     { dft           }  # keyword font
+	named operators    { dft           }  # operator font
+	named numbers      { dft           }  # number font
+	named strings      { dft           }  # string font
+	named comments     { dft           }  # comment font
 	body @Body			      # filtered, see below
     @Begin
 
@@ -98,6 +127,18 @@ def @CPSetup
 	    }
 	}
 
+
+	def @Else	# returns x, or y if x is dft
+	    left x
+	    right y
+	{
+	    x @Case {
+		dft  @Yield y
+		else @Yield x
+	    }
+	}
+
+
 	def @InitTab
 	{
 	  tabin @Test
@@ -106,6 +147,7 @@ def @CPSetup
 	      ifsymbol  { symboltabin  }
 	}
 
+
 	def @InitTabWidth
 	{
 	  tabout @Test
@@ -113,6 +155,7 @@ def @CPSetup
 	      ifvarying { varyingtabout }
 	      ifsymbol  { symboltabout  }
 	}
+
 
 	def @Filter
 	{
@@ -129,6 +172,7 @@ def @CPSetup
 	    }
 	}
 
+
 	def @InitFontFamily
 	{
 	  font @Test
@@ -136,6 +180,7 @@ def @CPSetup
 	      ifvarying { varyingfont }
 	      ifsymbol  { symbolfont  }
 	}
+
 
 	def @InitSize
 	{
@@ -145,6 +190,7 @@ def @CPSetup
 	      ifsymbol  { symbolsize  }
 	}
 
+
 	def @InitLine
 	{
 	  line @Test
@@ -153,75 +199,138 @@ def @CPSetup
 	      ifsymbol  { symbolline  }
 	}
 
-	def @S		# for formatting strings
+
+	def @PI		# for formatting identifiers
 	    right x
 	{
-	    # "\"" &
-	    strings @Test
-	      iffixed   { fixedstrings   }
-	      ifvarying { varyingstrings }
-	      ifsymbol  { symbolstrings  }
-	    @Font x
-	    # & "\""
+	    style @Case {
+		fixed @Yield fixedidentifiersformat {
+		    { identifiers @Else fixedidentifiers } @Font x
+		}
+		varying @Yield varyingidentifiersformat {
+		    { identifiers @Else varyingidentifiers } @Font x
+		}
+		symbol @Yield symbolidentifiersformat {
+		    { identifiers @Else symbolidentifiers } @Font x
+		}
+	    }
 	}
 
-#	def "`"
-#	{
-#	    style @Case {
-#		symbol	@Yield { "`" }
-#		else	@Yield { "'" }
-#	    }
-#	}
 
-	def @D	# for formatting identifiers
+	def @PK		# for formatting keywords
 	    right x
 	{
-	    identifiers @Test
-	      iffixed   { fixedidentifiers   }
-	      ifvarying { varyingidentifiers }
-	      ifsymbol  { symbolidentifiers  }
-	    @Font x
+	    style @Case {
+		fixed @Yield fixedkeywordsformat {
+		    { keywords @Else fixedkeywords } @Font x
+		}
+		varying @Yield varyingkeywordsformat {
+		    { keywords @Else varyingkeywords } @Font x
+		}
+		symbol @Yield symbolkeywordsformat {
+		    { keywords @Else symbolkeywords } @Font x
+		}
+	    }
 	}
 
-	def @C		# for formatting comments
+
+	def @PO		# for formatting operators
 	    right x
 	{
-	    comments @Test
-	      iffixed   { fixedcomments   }
-	      ifvarying { varyingcomments }
-	      ifsymbol  { symbolcomments  }
-	    @Font x
+	    style @Case {
+		fixed @Yield fixedoperatorsformat {
+		    { operators @Else fixedoperators } @Font x
+		}
+		varying @Yield varyingoperatorsformat {
+		    { operators @Else varyingoperators } @Font x
+		}
+		symbol @Yield symboloperatorsformat {
+		    { operators @Else symboloperators } @Font x
+		}
+	    }
 	}
 
-	def @K		# for formatting keywords
+
+	def @PN		# for formatting numbers
 	    right x
 	{
-	    keywords @Test
-	      iffixed   { fixedkeywords   }
-	      ifvarying { varyingkeywords }
-	      ifsymbol  { symbolkeywords  }
-	    @Font x
+	    style @Case {
+		fixed @Yield fixednumbersformat {
+		    { numbers @Else fixednumbers } @Font x
+		}
+		varying @Yield varyingnumbersformat {
+		    { numbers @Else varyingnumbers } @Font x
+		}
+		symbol @Yield symbolnumbersformat {
+		    { numbers @Else symbolnumbers } @Font x
+		}
+	    }
 	}
 
-	def @N		# for formatting numbers
+
+	def @PS		# for formatting strings
 	    right x
 	{
-	    numbers @Test
-	      iffixed   { fixednumbers   }
-	      ifvarying { varyingnumbers }
-	      ifsymbol  { symbolnumbers  }
-	    @Font x
+	    style @Case {
+		fixed @Yield fixedstringsformat {
+		    { strings @Else fixedstrings } @Font x
+		}
+		varying @Yield varyingstringsformat {
+		    { strings @Else varyingstrings } @Font x
+		}
+		symbol @Yield symbolstringsformat {
+		    { strings @Else symbolstrings } @Font x
+		}
+	    }
 	}
 
-	def @O		# for formatting operators
+
+	def @PC		# for formatting comments
 	    right x
 	{
-	    operators @Test
-	      iffixed   { fixedoperators   }
-	      ifvarying { varyingoperators }
-	      ifsymbol  { symboloperators  }
-	    @Font x
+	    style @Case {
+		fixed @Yield fixedcommentsformat {
+		    { comments @Else fixedcomments } @Font x
+		}
+		varying @Yield varyingcommentsformat {
+		    { comments @Else varyingcomments } @Font x
+		}
+		symbol @Yield symbolcommentsformat {
+		    { comments @Else symbolcomments } @Font x
+		}
+	    }
 	}
+
+
+	def @PA		# for formatting asterisks
+	{
+	    @PO @BackEnd @Case {
+		PlainText @Yield "*"
+		else @Yield { "0.5w" @VShift "*" }
+	    }
+	}
+
+
+	def @PM		# for formatting minus signs
+	{
+	    @PO @BackEnd @Case {
+		PlainText @Yield "-"
+		else @Yield style @Case {
+		    fixed   @Yield "-"
+		    else    @Yield { { Symbol Base } @Font @Char "minus" }
+		}
+	    }
+	}
+
+
+	def @PD		# for formatting dots, if wanted larger
+	{
+	    @PO @BackEnd @Case {
+		PlainText @Yield "."
+		else @Yield { "1.4f" @Font "+0.04f" @VShift "." &"0.05f" }
+	    }
+	}
+
 
 	def @A		# get characters from the Adobe Symbol font
 	    left sym
@@ -233,39 +342,9 @@ def @CPSetup
 	    }
 	}
 
-	def @ST		# for formatting asterisks
-	    right x
-	{
-	    operators @Test
-	      iffixed   { fixedoperators   }
-	      ifvarying { varyingoperators }
-	      ifsymbol  { symboloperators  }
-	    @Font "0.5w" @VShift x
-	}
- 
-	def @ED		# for formatting larger dots (not used in C)
-	    right x
-	{
-	    operators @Test
-	      iffixed   { fixedoperators   }
-	      ifvarying { varyingoperators }
-	      ifsymbol  { symboloperators  }
-	    @Font @BackEnd @Case {
-		PlainText @Yield x
-		else @Yield { "1.2f" @Font "+0.05f" @VShift @O x &"0.05f" }
-	    }
-	}
 
 	macro "$>" { {} & }
 
-	def @M right x
-	{
-	    style @Case {
-		fixed	@Yield "-"
-		varying @Yield { { Symbol Base } @Font @Char minus }
-		symbol  @Yield { { Symbol Base } @Font @Char minus }
-	    }
-	}
 
 	{ @InitFontFamily Base @InitSize } @Font
 	{ @InitLine lines } @Break @Body

@@ -68,6 +68,12 @@ OPTIONS
           is sufficiently large.  For  example,  -T0.5i  produces
           half-inch tab intervals.
 
+     -S filename
+          Use  filename  as  the setup file instead of the system
+          default  setup  file.  The  setup  file  determines the
+          value  of  all formatting options not given to prg2lout
+          as command line arguments.
+
      -u   Print usage information on stderr, including  available
           languages, and exit.
 

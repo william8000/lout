@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -789,6 +789,8 @@ OBJECT *enclose, BOOLEAN fcr)
 	Error(8, 19, "filter parameter of %s symbol is not simple",
 	  FATAL, &fpos(command), SymName(enclosing(sym)));
       y = FilterExecute(x, string(command), res_env);
+      debug2(DFH, D, "after \"%s\", will manifest result with style %s",
+	string(command), EchoStyle(style));
       DisposeObject(command);
       ReplaceNode(y, x);
       DisposeObject(x);
@@ -1241,12 +1243,15 @@ OBJECT *enclose, BOOLEAN fcr)
       }
 
       /* implement FILL_OFF break option if required */
+      /* *** this has been moved now to MinSize, z12.c *** */
+
+      /* ***
       if( ok && multiline && fill_style(*style) == FILL_UNDEF )
 	Error(8, 25, "missing %s symbol or option", FATAL, &fpos(x), KW_BREAK);
       if( ok && multiline && fill_style(*style) == FILL_OFF )
       {	OBJECT prev_acat, new_acat;  BOOLEAN jn;
 
-	/* compress any ACAT children of ACAT x */
+	%* compress any ACAT children of ACAT x *%
 	for( link = x;  NextDown(link) != x;  link = NextDown(link) )
 	{ Child(y, NextDown(link));
 	  if( type(y) == ACAT )
@@ -1256,7 +1261,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  }
 	}
 
-	/* do line breaks now */
+	%* do line breaks now *%
 	prev_acat = x;
 	New(x, VCAT);
 	adjust_cat(x) = FALSE;
@@ -1305,7 +1310,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  }
 	}
 
-	/* remove any singleton ACAT objects under x, if they are VCATs */
+	%* remove any singleton ACAT objects under x, if they are VCATs *%
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  if( type(y) == ACAT && Down(y) == LastDown(y) )
@@ -1317,6 +1322,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  }
 	}
       }
+      *** */
 
       ReplaceWithSplit(x, bthr, fthr);
       break;
@@ -1404,7 +1410,7 @@ OBJECT *enclose, BOOLEAN fcr)
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
 	&nenclose, fcr);
       y = ReplaceWithTidy(y, FALSE);
-      GetGap(y, style, &line_gap(save_style(x)), &res_gap);
+      GetGap(y, style, &line_gap(save_style(x)), &res_inc);
 
       /* now the right parameter */
       Child(y, LastDown(x));

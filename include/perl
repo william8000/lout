@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-#   Lout setup file for Blue program printing                                 #
+#   Lout setup file for Perl program printing                                 #
 #                                                                             #
 #   Version 3.0                                                               #
 #   Jeffrey H. Kingston                                                       #
@@ -18,7 +18,7 @@
 #                                                                             #
 ###############################################################################
 
-@SysInclude { bluef }
+@SysInclude { perlf }
 
 
 ###############################################################################
@@ -30,9 +30,9 @@
 #                                                                             #
 ###############################################################################
 
-@Use { @BlueSetup
+@Use { @PerlSetup
   # pipe			{		} # pipe source through this
-  # style	     { varying @OrIfPlain fixed	} # fixed, varying, or symbol
+  # style			{ fixed		} # fixed, varying, or symbol
 
   # the following options apply when style is "fixed"
 

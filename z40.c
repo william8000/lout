@@ -1,6 +1,6 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.19)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.20)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -241,6 +241,7 @@ void FilterWrite(OBJECT x, FILE *fp, int *linecount)
 
 void FilterScavenge(BOOLEAN all)
 { OBJECT y, link, nextlink;
+  ifdebug(DFH, D, return);
   debug1(DFH, D, "FilterScavenge(%s)", bool(all));
   for( link = Down(filter_active);  link != filter_active;  link = nextlink )
   { Child(y, link);

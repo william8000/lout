@@ -2,18 +2,19 @@
 #                                                                             #
 #   Lout setup file for Eiffel program printing                               #
 #                                                                             #
+#   Version 3.0                                                               #
 #   Jeffrey H. Kingston                                                       #
-#   23 February 2000                                                          #
+#   5 April 2000                                                              #
 #                                                                             #
 ###############################################################################
 
 
 ###############################################################################
 #                                                                             #
-#  The @SysInclude { eiffelf } line                                           #
+#  @SysInclude line                                                           #
 #                                                                             #
-#  This line causes Lout to read the definitions for Eiffel, and should       #
-#  not be touched.                                                            #
+#  This line causes Lout to read the definitions for this programming         #
+#  language, and should not be touched.                                       #
 #                                                                             #
 ###############################################################################
 
@@ -22,7 +23,7 @@
 
 ###############################################################################
 #                                                                             #
-#  The @EiffelSetup @Use clause                                               #
+#  @Use clause                                                                #
 #                                                                             #
 #  To change the default value of any option, delete the # at the start of    #
 #  its line and change the value between braces.                              #
@@ -30,42 +31,72 @@
 ###############################################################################
 
 @Use { @EiffelSetup
-  # style		{ varying @OrIfPlain fixed } # fixed, varying, or symbol
-  # pipe                {                       } # pipe source through this
+  # pipe			{		} # pipe source through this
+  # style	     { varying @OrIfPlain fixed	} # fixed, varying, or symbol
 
-  # fixedfont		{ Courier		} # font family if fixed
-  # fixedstrings	{ Base			} # string face if fixed
-  # fixedidentifiers	{ Base			} # identifier face if fixed
-  # fixedcomments	{ Base			} # comment face if fixed
-  # fixedkeywords	{ Base			} # keyword face if fixed
-  # fixednumbers	{ Base			} # number face if fixed
-  # fixedoperators	{ Base			} # operator face if fixed
-  # fixedsize		{ -1.0p			} # font size if fixed
-  # fixedline		{ 1.0vx			} # line-space if fixed
-  # fixedtabin		{ 8			} # tab interval if fixed
-  # fixedtabout		{ 8s			} # tab width if fixed
+  # the following options apply when style is "fixed"
 
-  # varyingfont		{			} # font family if varying
-  # varyingstrings	{ Slope			} # string face if varying
-  # varyingidentifiers	{ Slope			} # identifier face if varying
-  # varyingcomments	{ Base			} # comment face if varying
-  # varyingkeywords	{ Bold			} # keyword face if varying
-  # varyingnumbers	{ Base			} # number face if varying
-  # varyingoperators	{ Base			} # operator face if varying
-  # varyingsize		{ 1.0f			} # font size if varying
-  # varyingline		{ 1.0vx			} # line-space if varying
-  # varyingtabin	{ 8			} # tab interval if varying
-  # varyingtabout	{ 3f			} # tab width if varying
+  # fixedfont			{ Courier	} # font family
+  # fixedsize			{ -1.0p		} # font size
+  # fixedline			{ 1.0vx		} # line-space
+  # fixedtabin			{ 8		} # tab interval
+  # fixedtabout			{ 8s		} # tab width
 
-  # symbolfont		{			} # font family if symbol
-  # symbolstrings	{ Slope			} # string face if symbol
-  # symbolidentifiers	{ Slope			} # identifier face if symbol
-  # symbolcomments	{ Base			} # comment face if symbol
-  # symbolkeywords	{ Bold			} # keyword face if symbol
-  # symbolnumbers	{ Base			} # number face if symbol
-  # symboloperators	{ Base			} # operator face if symbol
-  # symbolsize		{ 1.0f			} # font size if symbol
-  # symbolline		{ 1.0vx			} # line-space if symbol
-  # symboltabin		{ 8			} # tab interval if symbol
-  # symboltabout	{ 3f			} # tab width if symbol
+  # fixedidentifiers		{ Base		} # identifier face
+  # fixedkeywords		{ Base		} # keyword face
+  # fixedoperators		{ Base		} # operator face
+  # fixednumbers		{ Base		} # number face
+  # fixedstrings		{ Base		} # string face
+  # fixedcomments		{ Base		} # comment face
+
+  # fixedidentifiersformat	{ @Body		} # identifiers format
+  # fixedkeywordsformat		{ @Body		} # keywords format
+  # fixedoperatorsformat	{ @Body		} # operators format
+  # fixednumbersformat		{ @Body		} # numbers format
+  # fixedstringsformat		{ @Body		} # strings format
+  # fixedcommentsformat		{ @Body		} # comments format
+
+  # the following options apply when style is "varying"
+
+  # varyingfont			{		} # font family
+  # varyingsize			{ 1.0f		} # font size
+  # varyingline			{ 1.0vx		} # line-space
+  # varyingtabin		{ 8		} # tab interval
+  # varyingtabout		{ 3f		} # tab width
+
+  # varyingidentifiers		{ Slope		} # identifier face
+  # varyingkeywords		{ Bold		} # keyword face
+  # varyingoperators		{ Base		} # operator face
+  # varyingnumbers		{ Base		} # number face
+  # varyingstrings		{ Slope		} # string face
+  # varyingcomments		{ Base		} # comment face
+
+  # varyingidentifiersformat	{ @Body		} # identifiers format
+  # varyingkeywordsformat	{ @Body		} # keywords format
+  # varyingoperatorsformat	{ @Body		} # operators format
+  # varyingnumbersformat	{ @Body		} # numbers format
+  # varyingstringsformat	{ @Body		} # strings format
+  # varyingcommentsformat	{ @Body		} # comments format
+
+  # the following options apply when style is "symbol"
+
+  # symbolfont			{		} # font family
+  # symbolsize			{ 1.0f		} # font size
+  # symbolline			{ 1.0vx		} # line-space
+  # symboltabin			{ 8		} # tab interval
+  # symboltabout		{ 3f		} # tab width
+
+  # symbolidentifiers		{ Slope		} # identifier face
+  # symbolkeywords		{ Bold		} # keyword face
+  # symboloperators		{ Base		} # operator face
+  # symbolnumbers		{ Base		} # number face
+  # symbolstrings		{ Slope		} # string face
+  # symbolcomments		{ Base		} # comment face
+
+  # symbolidentifiersformat	{ @Body		} # identifiers format
+  # symbolkeywordsformat	{ @Body		} # keywords format
+  # symboloperatorsformat	{ @Body		} # operators format
+  # symbolnumbersformat		{ @Body		} # numbers format
+  # symbolstringsformat		{ @Body		} # strings format
+  # symbolcommentsformat	{ @Body		} # comments format
 }

@@ -30,6 +30,8 @@ At the time of writing, the available programming languages are:
 eiffel. @Index { Eiffel program printing }
 c. @Index { C and C++ program printing }
 blue. @Index { Blue program printing }
+perl. @Index { Perl program printing }
+pod. @Index { Pod (for Perl) printing }
 @CD @Tbl
     mv { 0.5vx }
     af { Italic }
@@ -61,26 +63,41 @@ blue. @Index { Blue program printing }
     C { "@Blue" }
     D { varying }
     E { Yes }
+@Rowb
+    A { Perl }
+    B { perl }
+    C { "@Perl" }
+    D { fixed }
+    E { No }
+@Rowb
+    A { Pod }
+    B { pod }
+    C { "@Pod" }
+    D { varying }
+    E { No }
 }
 C and C++ are handled together since, for formatting purposes, they
 differ only in that C++ has some additional keywords plus an extra
 way to make comments.  Whenever we mention C from now on, we mean
-both C and C++.  The second to fifth columns of this table will be
+both C and C++.  See Section {@NumberOf prg_perl} for more on Perl
+and its handmaiden Pod.  The second to fifth columns of this table will be
 explained at various points later in this chapter.
 @PP
 The list of languages is likely to expand, because the @Code "prg2lout"
-program has been designed to make it easy to add new languages.  Consult
-the instructions at the top of the source file of that program if you
-want to try it yourself.
+program has been designed to make it relatively easy to add new languages
+(you don't have to write executable code, just declare a lot of records
+describing your language).  Consult the instructions at the top of the
+source file of that program ({@I prg2lout.c}) if you want to try it yourself.
 @BeginSections
-@Include { cpp_lone }
-@Include { cpp_embe }
-@Include { cpp_opti }
-@Include { cpp_chan }
-@Include { cpp_tabs }
-@Include { cpp_comm }
-@Include { cpp_prog }
-@Include { cpp_pipe }
-@Include { cpp_erro }
+@Include { prg_lone }
+@Include { prg_embe }
+@Include { prg_opti }
+@Include { prg_chan }
+@Include { prg_tabs }
+@Include { prg_comm }
+@Include { prg_prog }
+@Include { prg_pipe }
+@Include { prg_erro }
+@Include { prg_perl }
 @EndSections
 @End @Chapter

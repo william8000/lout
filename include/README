@@ -32,6 +32,8 @@ Setup files (containing mainly lists of options settable by the user)
        cprint           C and C++
        eiffel           Eiffel
        blue             Blue
+       perl             Perl + Pod
+       pod              Pod
 
 Source files (containing Lout and PostScript source code for the packages)
 --------------------------------------------------------------------------
@@ -58,24 +60,26 @@ Source files (containing Lout and PostScript source code for the packages)
        graphf           The Graph graph drawing package
        graphf.etc       A file included by graphf
        graphf.lpg       A PostScript prepend file needed by graphf
-       progf            Programming language formatting (for use by prg2lout)
-       cprintf          C and C++
-       eiffelf          Eiffel
-       bluef            Blue
        pasf             Pascal
        modulaf          Modula-2
        latin2.fd        Latin2 font definitions file (placeholder file)
        russian.fd       Russian font definitions file (placeholder file)
+
+       cprintf          C and C++
+       eiffelf          Eiffel
+       bluef            Blue
+       perlf            Perl
+       podf             Pod
 
 Miscellaneous
 -------------
 
        fontdefs         Standard font definitions file
        langdefs         Standard language definitions file
-       mydefs           Empty file for if the user doesn't have one
+       mydefs           Empty file for if the user doesn't have a mydefs
        ts               The ToySetup package (an expert users' intro. example)
        init             A Lout source file used during installation (lout -x)
 
 
 Jeffrey H. Kingston
-9 March 2000
+8 April 2000

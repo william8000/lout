@@ -65,7 +65,7 @@ The right parameter of @@Open may use the exported parameters of the
 left, and so the result is
 @ID {
 @Reference&&strunk1979style @Open
-{  @Author,  {Slope @Font @Title}.  @Publisher, @Year.  } &0io
+{  @Author,  {Slope @Font @Title}.  @Publisher, @Year.  } |0io
 }
 Incidentally, we are not limited to just one database of references;
 several @@Database symbols can nominate the same symbol, and invocations of
@@ -105,7 +105,7 @@ and so on.  The following prints the reference whose tag is
 }
 It has result
 @ID {
-@RefStyle&&Book @Open { @Style strunk1979style } &0io
+@RefStyle&&Book @Open { @Style strunk1979style } |0io
 }
 Notice how the @Code "@Style" parameter of @Code "@RefStyle" is given the
 parameter {@Code strunk1979style}, which it uses to open the appropriate

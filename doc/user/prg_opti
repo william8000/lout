@@ -1,6 +1,6 @@
 @Section
    @Title { Changing the appearance of a program }
-   @Tag { cpp_opti }
+   @Tag { prg_opti }
 @Begin
 @PP
 The {@Code "@CP"}, {@Code "@Eiffel"} etc. symbols have a number of
@@ -69,37 +69,33 @@ default values:
 "@CP         [ or @Eiffel, @Blue, etc. ]"
 "    style { fixed }"
 "    font { Courier }"
-"    strings { Base }"
-"    identifiers { Base }"
-"    comments { Base }"
-"    keywords { Base }"
-"    numbers { Base }"
-"    operators { Base }"
 "    size { -1.0p }"
 "    line { 1.0vx }"
 "    tabin { 8 }"
 "    tabout { 8s }"
+"    identifiers { Base }"
+"    keywords { Base }"
+"    operators { Base }"
+"    numbers { Base }"
+"    strings { Base }"
+"    comments { Base }"
 "{"
 "    ..."
 "}"
 }
 We are already familiar with {@Code "style"}.  After that comes
-{@Code "font"}, which determines the font family to use, followed
-by six options giving the particular faces within that family in which to
-print strings, identifiers, comments, keywords, numbers, and
-operators.  {@Code "Base"} means the basic face; other commonly available
-choices are {@Code "Slope"} and {@Code "Bold"}.  These options may all be
-set to different faces if desired.  The default values shown are correct
-for @Code "style { fixed }" only; the other styles have other defaults
-(Section {@NumberOf cpsetup}).
-@PP
-The @Code "size" option is the font size to use, and @Code "line" is the
-inter-line spacing.  The default values specify that @Code "size" is
-to be one point smaller than in the surrounding document; this was done
-to compensate for Courier's relatively large appearance compared
-to other fonts of the same nominal size.  Again, these defaults are
-different for different values of {@Code "style"}.
+{@Code "font"}, which determines the font family to use, {@Code "size"},
+the font size to use, and {@Code "line"}, the inter-line spacing.  The
+default value for @Code "size" asks for one point smaller than in the
+surrounding document; this was done to compensate for Courier's relatively
+large appearance compared to other fonts of the same nominal size.
 @PP
 The @Code "tabin" and @Code "tabout" options are the subject of
-Section {@NumberOf tabs}.
+Section {@NumberOf tabs}.  After them come six options giving the
+particular font faces in which to print identifiers, keywords, operators,
+numbers, strings, and comments.  {@Code "Base"} means the basic face; other
+commonly available choices are {@Code "Slope"} and {@Code "Bold"}.  These
+options may all be set to different faces if desired.  The default values
+shown are correct for @Code "style { fixed }" only; the other styles
+have other defaults (Section {@NumberOf cpsetup}).
 @End @Section
