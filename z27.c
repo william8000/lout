@@ -1,9 +1,9 @@
 /*@z27.c:Debug Service:Debug flags@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -70,15 +70,15 @@ struct dbs  dbg[] = {
     {"tk",    {0, 0, 0}},		/* Time Keeper               */
     {"hy",    {0, 0, 0}},		/* Hyphenation               */
     {"ft",    {0, 0, 0}},		/* Font Tables               */
-    {"ev",    {0, 0, 0}},		/* Encoding Vextors          */
+    {"cm",    {0, 0, 0}},		/* Character Mappings        */
     {"sh",    {0, 0, 0}},		/* String Handler            */
     {"fh",    {0, 0, 0}},		/* Filter Handler            */
     {"io",    {0, 0, 0}},		/* Object Input-Output       */
     {"co",    {0, 0, 0}},		/* Colour Service            */
     {"ls",    {0, 0, 0}},		/* Language Service          */
     {"vh",    {0, 0, 0}},		/* Vertical Hyphenation      */
-    {"cm",    {0, 0, 0}},		/* Character Mapping         */
     {"ex",    {0, 0, 0}},		/* External Sort             */
+    {"og",    {0, 0, 0}},		/* Optimal Galleys           */
     {"pp",    {0, 0, 0}},		/* Profiling                 */
     {"",      {0, 0, 0}},		/* any                       */
 };
@@ -154,10 +154,10 @@ void ProfileOn(char *str)
   { if( strcmp(profstack[i].label, str) == 0 )
     { for( i = 0;  i < proftop;  i++ )
 	fprintf(stderr, "profstack[%d] = %s\n", i, profstack[i].label);
-      Error(27, 2, "ProfileOn: %s restarted", INTERN, no_fpos, str);
+      assert1(FALSE, "ProfileOn: restarted", str);
     }
   }
-  if( proftop==MAXPROF )  Error(27, 3, "ProfileOn: overflow", INTERN, no_fpos);
+  assert(proftop < MAXPROF, "ProfileOn: overflow");
   time(&raw_time);  profstack[proftop].label = str;
   profstack[proftop++].time  = raw_time;
 } /* end ProfileOn */
@@ -173,12 +173,12 @@ void ProfileOn(char *str)
 
 void ProfileOff(char *str)
 { int i;  time_t raw_time;
-  if( proftop == 0 || strcmp(profstack[proftop-1].label, str) != 0 )
-    Error(27, 4, "ProfileOff: %s is not current", INTERN, no_fpos, str);
+  assert1(proftop > 0 && strcmp(profstack[proftop-1].label, str) == 0,
+    "ProfileOff: not current", str);
   for( i = 0;  i < profsize && strcmp(profstore[i].label, str) != 0; i++ );
   if( i >= profsize )
-  { if( profsize++ == MAXPROF )
-      Error(27, 5, "ProfileOff: overflow", INTERN, no_fpos);
+  { profsize++;
+    assert(profsize < MAXPROF, "ProfileOff: overflow");
     profstore[i].label = str;
     profstore[i].calls = 0;
     profstore[i].time  = 0;

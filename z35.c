@@ -1,9 +1,9 @@
 /*@z35.c:Time Keeper: MomentSym(), TimeString()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -37,7 +37,7 @@
 
 #define add_par(format, val, sym)					\
   sprintf( (char *) buff, format, val);					\
-  par = New(PAR);  actual(par) = sym;					\
+  New(par, PAR);  actual(par) = sym;					\
   Link(current_moment, par);						\
   tmp = MakeWord(WORD, buff, no_fpos);					\
   Link(par, tmp);
@@ -107,7 +107,7 @@ void InitTime(void)
   StringCopy(time_string, AsciiToFull(asctime(now)));
 
   /* start of current_moment */
-  current_moment = New(CLOSURE);
+  New(current_moment, CLOSURE);
   actual(current_moment) = MomentSym;
 
   /* attach its many parameters */
@@ -124,7 +124,7 @@ void InitTime(void)
   add_par("%d",   now->tm_isdst,               dst);
 
   /* add a null environment */
-  env = New(ENV);
+  New(env, ENV);
   AttachEnv(env, current_moment);
   debug0(DTK, D, "InitTime() returning.");
   debug0(DTK, DD, "current_moment =");

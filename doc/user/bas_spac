@@ -52,6 +52,12 @@ they are separated by no spaces, they will appear immediately adjacent
 in the result; if separated by two spaces, they will appear two spaces
 apart; and so on.  In English it is correct to leave two spaces between
 the end of one sentence and the beginning of the next, for example.
+@FootNote {
+Lout offers two alternative ways to interpret white space between two
+objects, reminiscent of those used by the troff @Cite { $ossanna1976troff }
+and @LaTeX @Cite { $lamport1986latex } document formatting systems.  Section
+{@NumberOf white} explains these alternatives and how to obtain them.
+}
 @PP
 Occasionally the two uses for spaces conflict.  For example, to produce
 @ID { { @CurveBox Hello }{ @CurveBox world } }

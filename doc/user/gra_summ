@@ -161,6 +161,10 @@ inserted automatically }
     B { 0.2 ft }
     C { any @I distance }
 @Rowa
+    A { linewidth }
+    B { 0.5 pt }
+    C { any @I distance }
+@Rowa
     A { symbolsize }
     B { 0.15 ft }
     C { any @I distance }
@@ -257,6 +261,9 @@ their possible values are:
     C { {@Code xandy}, {@Code yonly}, {@Code xonly} }
 @Rowa
     A { dashlength }
+    C { any @I distance }
+@Rowa
+    A { linewidth }
     C { any @I distance }
 @Rowa
     A { symbolsize }

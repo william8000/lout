@@ -1,5 +1,6 @@
 @Section
    @Title { Lengths, angles, and points }
+   @Tag { figlengths }
 @Begin
 @PP
 We already know that two lengths placed side by side define a point.  This is 
@@ -60,6 +61,9 @@ For example, @Code "{ 5 cm << 45 dg }" is the point 5 cm
 from @Eq { (0, 0) } at 45 degrees.
 @PP
 Points may be added, subtracted, and multiplied by a number:
+"++" @Index { @Code "++" symbol (in Fig) }
+"--" @Index { @Code "--" symbol (in Fig) }
+"**" @Index { @Code "**" symbol (in Fig) }
 @ID @Tab
      vmargin { 0.5vx }
      @Fmta { @Col A ! @Col is ! @Col B }
@@ -164,9 +168,10 @@ relative to the previous one:
 }
 }
 @PP
-@Code "@Fig" provides a @Code "@Label" symbol for attaching a label to
+There is a @Code "@Label" symbol, available only within the
+@Code "shape" option of {@Code "@Figure"}, for attaching a label to
 label. @Index { @Code "@Label" in figures }
-a point in a shape, like this:
+a point in the shape, like this:
 @ID @Code "{xsize ysize} ** 0.5 @Label CTR"
 The point may then be referred to more concisely by its label,
 {@Code CTR}.  For example, the large arrow appearing in Section

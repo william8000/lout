@@ -108,14 +108,12 @@ but the resulting lines are left-justified, centred, or right-justified
 with respect to each other, rather than adjusted.
 @PP
 If you have a few words that must be kept together on one line, the
-onecol. @Index { @Code "@OneCol" symbol }
 preventing. @Index { preventing line breaks }
 keeping. @Index { keeping things on one line }
-recommended way is to enclose them in a {@Code "@OneCol"} symbol:
-@ID @Code "According to @OneCol { Prof. Jones }, the effect of ..."
-It's probably best not to bother about this until you actually get a
-bad line break, since chances are good that the words will fall on
-one line anyway.
+recommended way is to separate them by an @Code "~" symbol:
+@ID @Code "According to Prof.~Jones, the effect of ..."
+It's best not to bother about this until you actually get a bad line
+break, since chances are good that the words will fall on one line anyway.
 @PP
 The last three styles differ from the first five in breaking the
 paragraph at the points where it is broken in the original input:

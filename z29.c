@@ -1,9 +1,9 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -250,7 +250,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   if( !LexLegalName(str) )
     Error(29, 3, "invalid symbol name %s", WARN, xfpos, str);
 
-  s = New(xtype);
+  New(s, xtype);
   FposCopy(fpos(s), *xfpos);
   has_body(s)          = FALSE;
   filter(s)            = nilobj;
@@ -270,6 +270,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   uses_extern_target(s)= FALSE;
   visible(s)           = FALSE;
   uses_galley(s)       = FALSE;
+  horiz_galley(s)      = ROWM;
 
   uses_count(s)  = 0;
   dirty(s)       = FALSE;
@@ -304,11 +305,15 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
 
   has_tag(s) = is_tag(s) = FALSE;
   has_key(s) = is_key(s) = FALSE;
+  has_optimize(s) = is_optimize(s) = FALSE;
   has_merge(s) = is_merge(s) = FALSE;
   if( enclosing(s) != nilobj && type(enclosing(s)) == LOCAL )
   {
     if( StringEqual(str, KW_TAG) )
       is_tag(s) = has_tag(enclosing(s)) = dirty(enclosing(s)) = TRUE;
+
+    if( StringEqual(str, KW_OPTIMIZE) )
+      is_optimize(s) = has_optimize(enclosing(s)) = TRUE;
 
     if( StringEqual(str, KW_KEY) )
     { is_key(s) = has_key(enclosing(s)) = dirty(enclosing(s)) = TRUE;
@@ -337,10 +342,12 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
     else filter(enclosing(s)) = s;
   }
 
-  if( type(s) == RPAR && has_body(enclosing(s)) && (is_tag(s) || is_key(s)) )
+  if( type(s) == RPAR && has_body(enclosing(s)) &&
+    (is_tag(s) || is_key(s) || is_optimize(s)) )
     Error(29, 5, "a body parameter may not be named %s", WARN, &fpos(s), str);
 
-  if( type(s) == RPAR && has_target(enclosing(s)) && (is_tag(s) || is_key(s)) )
+  if( type(s) == RPAR && has_target(enclosing(s)) &&
+    (is_tag(s) || is_key(s) || is_optimize(s)) )
     Error(29, 6, "the right parameter of a galley may not be called %s",
       WARN, &fpos(s), str);
 
@@ -365,7 +372,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   }
 
   /* need a new OBJECT as well as s */
-  p = NewWord(WORD, len, xfpos);
+  NewWord(p, WORD, len, xfpos);
   length(p) = len;
   StringCopy(string(p), str);
   Link(entry, p);
@@ -542,11 +549,15 @@ void CheckSymSpread(void)
 /*****************************************************************************/
 
 static void DeleteSymBody(OBJECT s)
-{ debug1(DST, DDD, "DeleteSymBody( %s )", SymName(s));
+{ OBJECT t;
+  debug1(DST, DDD, "DeleteSymBody( %s )", SymName(s));
   switch( type(s) )
   {
     case MACRO:	while( sym_body(s) != nilobj )
-		  sym_body(s) = DeleteAndDispose(sym_body(s), PARENT);
+		{ t = sym_body(s);
+		  sym_body(s) = Delete(sym_body(s), PARENT);
+		  Dispose(t);
+		}
 		break;
 	
     case LPAR:
@@ -555,7 +566,7 @@ static void DeleteSymBody(OBJECT s)
     case LOCAL:	if( sym_body(s) != nilobj ) DisposeObject(sym_body(s));
 		break;
 
-    default:	Error(29, 11, "DeleteSymBody: %s", INTERN,no_fpos,Image(type(s)));
+    default:	assert1(FALSE, "DeleteSymBody:", Image(type(s)));
 		break;
   }
   debug0(DST, DDD, "DeleteSymBody returning.");

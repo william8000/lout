@@ -1,31 +1,22 @@
 Directory lout/doc/expert
 
-This directory contains the Lout source files for the
-Expert's Guide to the Lout Document Formatting System,
-formerly known as `Document Formatting with Lout'.
-To produce the Guide, type the command
+This directory contains the Lout source files
+for the Expert's Guide to the Lout Document
+Formatting System.  To produce the Guide, type
+the command
 
 	lout all > outfile.ps
 
-in this directory.  This must be done four times to
-completely resolve all cross references, although
-the PostScript file outfile.ps is printable after
+in this directory.  This must be done four times
+to completely resolve all cross references (five
+times if Letter page size is used), although the
+PostScript file outfile.ps is printable after
 the first run.  Auxiliary files with .li and .ld
-suffixes will be created in this directory.  A copy
-of the final outfile.ps is included.
+suffixes will be created in this directory.  A
+copy of the final outfile.ps is included.  There
+should be no warning messages on the fourth run.
 
 Jeffrey H. Kingston
 23 December 1992
 8 May 1995
-
-ps The first few runs will generate a large number
-of benign error messages, mostly beginning with
-"unresolved cross reference".  The error message
-output of the fourth run should look like this:
-
-lout file "ch3.02" (from "all" line 39):
-     147,1: this component of @BeginFigures did not fit into its nearest target
-
-This just says that a figure within Chapter 3 could
-not be placed on the first available page, which is
-not a problem here since it can go on a later page.
+8 May 1996

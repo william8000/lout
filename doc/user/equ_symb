@@ -166,30 +166,28 @@ symbols to associate towards the left or right, @Code "@Eq" chooses
 to have only left associative symbols.  The summary at the end of this
 chapter gives the precedence of every symbol.
 @PP
-The @I matrix symbol {@PageMark matrix} builds an array of objects:
+The @Code matrix symbol {@PageMark matrix} builds an array of objects:
 matrix. @Index { @Code "matrix" in equations }
 @ID {
 @Code {
 "matrix"
 "   atleft { blpar }"
 "   atright { brpar }"
-"{ x sup 2 above x above 1"
-"  nextcol"
-"  y sup 2 above y above 1"
-"  nextcol"
-"  z sup 2 above z above 1"
+"{"
+"  row col x sup 2 col y sup 2 col z sup 2"
+"  row col x col y col z"
+"  row col 1 col 1 col 1"
 "}"
 }
-||7ct
+||9ct
 @Eq {
 matrix
    atleft { blpar }
    atright { brpar }
-{ x sup 2 above x above 1
-  nextcol
-  y sup 2 above y above 1
-  nextcol
-  z sup 2 above z above 1
+{
+  row col x sup 2 col y sup 2 col z sup 2
+  row col x col y col z
+  row col 1 col 1 col 1
 }
 }
 }
@@ -203,42 +201,26 @@ vertically scaled to the correct size some people prefer simply
 "   atleft { ( }"
 "   atright { ) }"
 }
-The right parameter of @Code matrix is the array itself.  It is a
-sequence of columns separated by @Code nextcol symbols; each column is
-a sequence of objects separated by @Code above symbols.
-@PP
-The @Code nextcol and @Code above symbols have low precedence, but not
+The right parameter of @Code matrix is the array itself.  It must be
+enclosed in braces, and it is a sequence of rows introduced by
+@Code row symbols; each row is a sequence of objects introduced by
+@Code col symbols.
+@FootNote {
+Older versions of Lout use different symbols, {@Code "above"} and
+{@Code "nextcol"}, at this point.  For backward compatibility these
+symbols are still available, but they are obsolete and no longer documented.
+}
+The @Code row and @Code col symbols have low precedence, but not
 as low as white space between two objects.  Therefore, unless the
 entries in the array are very simple, it is safest to enclose each of
 them in braces.
 @PP
-Columns built with the @Code above symbol have their objects centred in
-the column.  Also available are @Code labove for left-justified columns,
-@Code cabove meaning the same as {@Code above}, @Code rabove for
-right-justified columns, and @Code mabove for alignment along column
-marks.  Each column should contain only one kind of @Code above symbol
-(although adventurous users might be able to get some mixtures to work),
-but different columns may differ.  For example,
-@ID @OneRow @Code {
-"@R \"Chain rule:\"  labove  @R \"Product rule:\""
-"nextcol"
-"{df over dx ^= df over dy cdot dy over dx}"
-"mabove"
-"{dfg over dy ^= f ` dg over dx + g df over dx}"
-}
-has result
-@ID @Eq {
-   @R "Chain rule:" labove @R "Product rule:"
-   nextcol
-   {df over dx ^= df over dy cdot dy over dx}
-   mabove
-   {dfg over dy ^= f ` dg over dx + g df over dx}
-}
-As this last example shows, it is @Code nextcol and the various @Code
-above symbols that lay out the array; @Code matrix attaches the @Code
-atleft and @Code atright options and makes sure the result appears in
-the correct vertical position relative to the rest of the equation.  So
-the right parameter of {@Code matrix} may be any object.
+Entries built with the @Code col symbol have their objects centred in
+the column.  Also available are @Code lcol for left-justified entries,
+@Code ccol meaning the same as {@Code col}, @Code rcol for
+right-justified entries, and @Code mcol for alignment along column
+marks.  Each column may contain entries of different kinds, except
+that @Code mcol does not work well with any other sort.
 @PP
 Some symbols have been added which produce `matrices' with commonly needed
 @Code atleft and @Code atright options already set for you.  Here are
@@ -249,35 +231,35 @@ and, on the right, the result produced:
 {
 @Rowa
     A { "pmatrix" }
-    B { "matrix atleft { ( } atright { ) } M" }
-    C { @Eq { pmatrix M } }
+    B { "matrix atleft { ( } atright { ) } { M }" }
+    C { @Eq { pmatrix { M } } }
 @Rowa
     A { "bmatrix" }
-    B { "matrix atleft { blbrack } atright { brbrack } M" }
-    C { @Eq { bmatrix M } }
+    B { "matrix atleft { blbrack } atright { brbrack } { M }" }
+    C { @Eq { bmatrix { M } } }
 @Rowa
     A { "brmatrix" }
-    B { "matrix atleft { blbrace } atright { brbrace } M" }
-    C { @Eq { brmatrix M } }
+    B { "matrix atleft { blbrace } atright { brbrace } { M }" }
+    C { @Eq { brmatrix { M } } }
 @Rowa
     A { "fmatrix" }
-    B { "matrix atleft { blfloor } atright { brfloor } M" }
-    C { @Eq { fmatrix M } }
+    B { "matrix atleft { blfloor } atright { brfloor } { M }" }
+    C { @Eq { fmatrix { M } } }
 @Rowa
     A { "cmatrix" }
-    B { "matrix atleft { blceil } atright { brceil } M" }
-    C { @Eq { cmatrix M } }
+    B { "matrix atleft { blceil } atright { brceil } { M }" }
+    C { @Eq { cmatrix { M } } }
 @Rowa
     A { "amatrix" }
-    B { "matrix atleft { blangle } atright { brangle } M" }
-    C { @Eq { amatrix M } }
+    B { "matrix atleft { blangle } atright { brangle } { M }" }
+    C { @Eq { amatrix { M } } }
 }
 For example:
 @ID {
 @Code {
 "fmatrix { (n+1) over 2 }"
 }
-||7ct
+|7ct
 @Eq {
 fmatrix { (n+1) over 2 }
 }

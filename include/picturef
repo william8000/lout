@@ -24,12 +24,14 @@ def @IllustrationLayout
     def @Illustration
 	named @InitialFont { @InitialFont }
 	named @InitialBreak { @InitialBreak }
+	named @InitialSpace { @InitialSpace }
 	named @InitialLanguage { @InitialLanguage }
 	named @InitialColour { @InitialColour }
 	right x
     {
         @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
-	{ @ColourCommand @InitialColour } @SetColour @OneCol @OneRow x
+	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
+	@OneCol @OneRow x
     }
 
 @End @IllustrationLayout

@@ -28,19 +28,24 @@ reference list only once.  The references will ordinarily be sorted by
 tag and labelled with Arabic numbers, although this can be changed by
 setting options in the setup file (Section {@NumberOf changeref}).
 @PP
-It is quite all right to cite a reference from within a footnote or
-figure.  However, if the point of citation appears in the final printed
-document past the beginning of the reference list (as can happen when a
-footnote drops to the bottom of the page, for example), it won't
-work.  For the same reason, citations in index entries never work.
-@PP
 If you are making a book, there is a @Code "@ChapCite" symbol which is
 chap.cite @Index @Code "@ChapCite"
 the same as @Code "@Cite" except that its references come out at the
 end of the current preface, introduction, chapter, or appendix, rather
-than at the end of the document.  Although it is frowned upon by the
-authorities, some people include references which are not cited anywhere
-in the body of their document.  For this there is {@Code "@NoCite"}:
+than at the end of the document.
+@PP
+It is quite all right to cite a reference from within a footnote, figure,
+table, or index entry.  The reference will appear in the closest
+reference list following the citation point in the final printed document,
+or if there is no such list, the closest preceding reference list.  This
+is fine in documents with just one reference list; but when using
+@Code "@ChapCite" in books, if the citation point appears after the intended
+reference list (because the footnote or figure has floated past the reference
+list at the end of the chapter), the reference will come out in the wrong list.
+@PP
+Although it is frowned upon by the authorities, some people include
+references which are not cited anywhere in the body of their document.  For
+this there is {@Code "@NoCite"}:
 no.cite @Index @Code "@NoCite"
 @ID @Code {
 "... our scope @NoCite { $kingston1995lout.expert, $kingston1993lout.design }."
@@ -78,11 +83,8 @@ unrelated to any reference list.  For example,
 "@Heading { Journal Articles }"
 "@NumberedList"
 "@LI @RefPrint kingston1985tree"
-"@LI @RefPrint kingston1986hen"
-"@LI @RefPrint kingston1986amort"
-"@LI @RefPrint kingston1988"
+"..."
 "@LI @RefPrint kingston1993lout.design"
-"@LI @RefPrint kingston1993time"
 "@EndList"
 }
 might appear in someone's resume.

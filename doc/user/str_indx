@@ -278,4 +278,25 @@ indexcolumngap. @Index @Code "@IndexColumnGap"
 number of index columns per page, and the gap between them, and are
 exactly analogous to the @Code "@ColumnNumber" and @Code "@ColumnGap"
 options described in Section {@NumberOf columns}.
+@PP
+Lout offers the possibility of having up to three independent indexes
+(useful for glossaries, author indexes, etc.).  The other two are called
+index A and index B, and they precede the main index in the
+output.  Just replace @Code Index by @Code IndexA to refer to index A,
+and by @Code IndexB to refer to index B.  For example,
+@ID @Code "smith.j @IndexA { Smith, John }"
+will insert an index entry to index A, and @Code "@IndexBBlanks"
+will insert the usual 25 blank entries into index B.
+@PP
+In large projects it might help to rename the @Code "@IndexA" symbol
+to something else, such as {@Code "@AuthorIndex"}.  This can
+be done by placing
+@ID @Code {
+"import @DocumentLayout"
+"macro @AuthorIndex { @IndexA }"
+}
+in the @Code mydefs file.  See Section {@NumberOf definitions} for
+an introduction to the @Code "mydefs" file; the word @Code macro
+is needed here instead of @Code "def" because we are introducing
+a new name for an existing symbol, not defining a new symbol.
 @End @Section

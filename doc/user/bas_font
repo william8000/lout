@@ -583,6 +583,16 @@ size:  @Code "+2p" means two points larger, @Code "-2p" means two
 points smaller, and @Code "1.5f" means 1.5 times the current font
 size.
 @PP
+For the convenience of people who use fixed width fonts such as
+Courier, there is an @Code "@F" symbol which switches to a
+fixed width font family:
+@ID @Code "@F { Hello world }"
+produces
+@ID @F { Hello world }
+It is the same as writing @Code "{ Courier Base -1p } @Font ..."
+with the @Code "-1p" included to compensate for the relatively
+large appearance of the Courier font.
+@PP
 The document as a whole will be set in @Code { Times Base 12p }.  To
 change this you need to change the @Code "@InitialFont" option, for
 initialfont. @Index @Code "@InitialFont"

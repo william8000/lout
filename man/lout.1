@@ -31,6 +31,10 @@ Produce plain text output instead of PostScript.
 -P
 Like -p but with a form-feed character between pages.
 .TP
+-S
+Safe execution:  disable all calls to system(3), instead echoing
+the commands that would have been executed.
+.TP
 -e<filename>
 Direct error messages to <filename> instead of to stderr.
 .TP
@@ -51,10 +55,10 @@ order given, and finally searches the default include file directory
 current directory.
 .TP
 -C<dirname>
-Add <dirname> to the list of directories searched for character
-encoding (.CEV) and character mapping (.CMA) files.  There may be
-multiple -C options; the directories are searched in the order given,
-and finally the default encoding vectors directory is searched (see below).
+Add <dirname> to the list of directories searched for Lout character
+mapping (.LCM) files.  There may be multiple -C options; the directories
+are searched in the order given, and finally the default character
+mappings directory is searched (see below).
 .TP
 -F<dirname>
 Add <dirname> to the list of directories searched for font metrics
@@ -75,6 +79,14 @@ current directory, then the -D directories in the order given, and
 finally searches the default databases directory (see below).
 @SysDatabase omits the search of the current directory.
 .TP
+--<opt>{<val>}
+Set setup file <opt> to <val>, overriding any value assigned to
+<opt> in the setup file.  For example, --@PageType{Letter} will
+set the @PageType setup file option to Letter.  The value may be
+a sequence of words but not an arbitrary Lout object.  If there
+are spaces you must ensure that it is passed to Lout as a single
+option; the usual way to do this is to enclose it in quotes.
+.TP
 -x
 Initializing run, not for ordinary use: read and check all font files
 mentioned in font definitions, read and check all hyphenation files
@@ -89,13 +101,13 @@ Print usage information on stderr.
 Print version information on stderr.
 .SH FILES
 .nf
-Binary file:                    <BINDIR>/lout
-Default include file directory: <LIBDIR>/include
-Default databases directory:    <LIBDIR>/data
-Default font metrics directory: <LIBDIR>/font
-Default hyphenation directory:  <LIBDIR>/hyph
-Default encoding vectors dir.:  <LIBDIR>/evec
-Lout documentation directory:   <DOCDIR>
+Binary file:                     <BINDIR>/lout
+Default include file directory:  <LIBDIR>/include
+Default databases directory:     <LIBDIR>/data
+Default font metrics directory:  <LIBDIR>/font
+Default hyphenation directory:   <LIBDIR>/hyph
+Default character mappings dir.: <LIBDIR>/maps
+Lout documentation directory:    <DOCDIR>
 .fi
 .SH SEE ALSO
 .P

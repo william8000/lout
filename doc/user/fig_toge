@@ -140,8 +140,8 @@ joinfigures. @Index @Code "@JoinFigures"
 "}"
 }
 Definitions are the subject of Section {@NumberOf definitions},
-although to read about @Code named parameters, which define
-options, you will have to consult the Lout expert's guide
+although for @Code named parameters, which define
+options, you have to consult the Lout expert's guide
 @Cite { $kingston1995lout.expert }.  Now, to the figure above we can add
 @ID @OneRow @Code {
 "// A @JoinFigures arrow { forward } B"

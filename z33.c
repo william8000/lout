@@ -1,9 +1,9 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -29,7 +29,7 @@
 /*                DbRetrieveNext()                                           */
 /*                                                                           */
 /*****************************************************************************/
-#define INIT_DBCHECK_NUM	5
+#define INIT_DBCHECK_NUM	107
 #include "externs"
 
 
@@ -81,11 +81,18 @@ static DBCHECK_TABLE dtab_new(int newsize)
 static void dtab_insert(OBJECT x, DBCHECK_TABLE *S);
 
 static DBCHECK_TABLE dtab_rehash(DBCHECK_TABLE S, int newsize)
-{ DBCHECK_TABLE NewS;  int i;
+{ DBCHECK_TABLE NewS;  int i;  OBJECT link, z;
   NewS = dtab_new(newsize);
-  for( i = 1;  i <= dtab_size(S);  i++ )
+  for( i = 0;  i < dtab_size(S);  i++ )
   { if( dtab_item(S, i) != nilobj )
-      dtab_insert(dtab_item(S, i), &NewS);
+    { OBJECT ent = dtab_item(S, i);
+      assert( type(ent) == ACAT, "dtab_rehash: ACAT!" );
+      for( link = Down(ent);  link != ent;  link = NextDown(link) )
+      { Child(z, link);
+	dtab_insert(z, &NewS);
+      }
+      DisposeObject(ent);
+    }
   }
   ifdebug(DMA, D, DebugRegisterUsage(MEM_DBCHECK, -1,
     -(2*sizeof(int) + dtab_size(S) * sizeof(OBJECT))));
@@ -97,13 +104,14 @@ static void dtab_insert(OBJECT x, DBCHECK_TABLE *S)
 { long pos;  OBJECT z, link, y;
   if( dtab_count(*S) == dtab_size(*S) - 1 )	/* one less since 0 unused */
     *S = dtab_rehash(*S, 2*dtab_size(*S));
+  dtab_count(*S)++;
   hash(pos, db_checksym(x), string(x), *S);
-  if( dtab_item(*S, pos) == nilobj )  dtab_item(*S, pos) = New(ACAT);
+  if( dtab_item(*S, pos) == nilobj )  New(dtab_item(*S, pos), ACAT);
   z = dtab_item(*S, pos);
   for( link = Down(z);  link != z;  link = NextDown(link) )
   { Child(y, link);
     if( db_checksym(x) == db_checksym(y) && StringEqual(string(x), string(y)) )
-    { Error(33, 2, "Dbcheck: entry inserted twice", INTERN, &fpos(x));
+    { assert(FALSE, "Dbcheck: entry inserted twice");
     }
   }
   Link(dtab_item(*S, pos), x);
@@ -182,7 +190,8 @@ OBJECT OldCrossDb, NewCrossDb;
   }									\
   if( link == db )							\
   { if( cross_sym(sym) == nilobj )  CrossInit(sym);			\
-    link = Link(db, cross_sym(sym));					\
+    Link(db, cross_sym(sym));						\
+    link = LastDown(db);						\
     number(link) = count + 1;						\
     db_targ(link) = FALSE;						\
   }									\
@@ -206,8 +215,7 @@ OBJECT OldCrossDb, NewCrossDb;
   { Child(y, link);							\
     if( type(y) == CROSS_SYM && number(link) == num )  break;		\
   }									\
-  if( link == db )							\
-    Error(33, 3, "NumToSym: no sym", INTERN, &fpos(db));		\
+  assert( link != db, "NumToSym: no sym");				\
   assert( type(y) == CROSS_SYM, "NumToSym: y!" );			\
   sym = symb(y);							\
 } /* end NumToSym */
@@ -269,30 +277,29 @@ FILE_POS *tagfpos, FULL_CHAR *seq, FILE_NUM dfnum, long dfpos, BOOLEAN check)
   debug6(DBS, D, "DbInsert(%s, %s, %s, %s, %s, %s, dfpos)",
 	string(db), bool(gall), SymName(sym), tag, seq,
 	dfnum == NO_FILE ? AsciiToFull(".") : FileName(dfnum));
-  if( reading(db) )
-    Error(33, 4, "insert into reading database", INTERN, &fpos(db));
+  assert(!reading(db), "DbInsert: insert into reading database");
 
   /* open database index file if not already done */
   if( filep(db) == null )
   { if( StringLength(string(db)) + StringLength(NEW_INDEX_SUFFIX) >= MAX_BUFF )
-      Error(33, 5, "database file name %s%s is too long",
+      Error(33, 2, "database file name %s%s is too long",
 	FATAL, no_fpos, string(db), NEW_INDEX_SUFFIX);
     StringCopy(buff, string(db));
     StringCat(buff, NEW_INDEX_SUFFIX);
     filep(db) = StringFOpen(buff, WRITE_BINARY);
     if( filep(db) == null )
-      Error(33, 6, "cannot write to database file %s", FATAL, &fpos(db), buff);
+      Error(33, 3, "cannot write to database file %s", FATAL, &fpos(db), buff);
   }
 
   /* if required, check that (sym, tag) not already inserted */
   if( check )
   { 
-    debug2(DBS, D, "  checking %s&&%s, DbCheckTable =", SymName(sym), tag);
+    debug2(DBS, DD, "  checking %s&&%s, DbCheckTable =", SymName(sym), tag);
     if( !DbCheckTableInit )
     { DbCheckTable = dtab_new(INIT_DBCHECK_NUM);
       DbCheckTableInit = TRUE;
     }
-    ifdebug(DBS, D, dtab_debug(DbCheckTable, stderr));
+    ifdebug(DBS, DD, dtab_debug(DbCheckTable, stderr));
     chk = dtab_retrieve(sym, tag, DbCheckTable);
     if( chk == nilobj )
     { chk = MakeWord(WORD, tag, tagfpos);
@@ -301,9 +308,9 @@ FILE_POS *tagfpos, FULL_CHAR *seq, FILE_NUM dfnum, long dfpos, BOOLEAN check)
     }
     else
     { if( file_num(fpos(chk)) > 0 )
-        Error(33, 7, "cross reference %s&&%s used previously, at%s",
+        Error(33, 4, "cross reference %s&&%s used previously, at%s",
           WARN, tagfpos, SymName(sym), tag, EchoFilePos(&fpos(chk)));
-      else Error(33, 8, "cross reference %s&&%s used previously",
+      else Error(33, 5, "cross reference %s&&%s used previously",
 	  WARN, tagfpos, SymName(sym), tag);
     }
   }
@@ -340,8 +347,7 @@ void DbConvert(OBJECT db, BOOLEAN full_name)
   OBJECT link, y;
   ifdebug(DPP, D, ProfileOn("DbConvert"));
   debug2(DBS, D, "DbConvert( %ld %s )", (long) db, string(db));
-  if( reading(db) )
-    Error(33, 9, "DbConvert: reading database", INTERN, &fpos(db));
+  assert( !reading(db), "DbConvert: reading database");
   StringCopy(newname, string(db));
   StringCat(newname, INDEX_SUFFIX);
   StringCopy(oldname, string(db));
@@ -357,11 +363,8 @@ void DbConvert(OBJECT db, BOOLEAN full_name)
 	full_name ? FullSymName(symb(y), AsciiToFull(" ")) : SymName(symb(y)));
     }
     fclose(filep(db));
+    debug2(DBS, D, "  calling SortFile(%s, %s)", oldname, newname);
     SortFile( (char *) oldname, (char *) newname);
-    /* *** no longer using system sort command 
-    sprintf(buff, SYSTEM_SORT, newname, oldname);
-    system(buff);
-    *** */
   }
   else StringRemove(newname);
   StringRemove(oldname);
@@ -405,21 +408,23 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
   int i, lnum, num, count;  FILE_NUM index_fnum, dfnum;  long dfpos;
   BOOLEAN gall;  FULL_CHAR line[MAX_BUFF], sym_name[MAX_BUFF];
   ifdebug(DPP, D, ProfileOn("DbLoad"));
-  debug3(DBS, D, "DbLoad(%s, %d, %s, -)", string(stem), fpath, bool(create));
+  debug3(DBS, D, "[ DbLoad(%s, %d, %s, -)", string(stem), fpath, bool(create));
 
   /* open or else create index file fp */
+  debug0(DFS, D, "  calling DefineFile from DbLoad (1)");
   index_fnum = DefineFile(string(stem), INDEX_SUFFIX, &fpos(stem), INDEX_FILE,
 		 fpath);
   fp = OpenFile(index_fnum, create, FALSE);
   if( fp == null && create )
   { db = nilobj;
+    debug0(DFS, D, "  calling DefineFile from DbLoad (2)");
     dfnum = DefineFile(string(stem), DATA_SUFFIX, &fpos(stem),
       DATABASE_FILE, DATABASE_PATH);
     dfpos = 0L;  LexPush(dfnum, 0, DATABASE_FILE);  t = LexGetToken();
     while( type(t) == LBR )
     { res = Parse(&t, StartSym, FALSE, FALSE);
       if( t != nilobj || type(res) != CLOSURE )
-	Error(33, 10, "syntax error in database file %s",
+	Error(33, 6, "syntax error in database file %s",
 	  FATAL, &fpos(res), FileName(dfnum));
       assert( symbs != nilobj, "DbLoad: create && symbs == nilobj!" );
       if( symbs != nilobj )
@@ -428,7 +433,7 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
 	  if( type(y) == CLOSURE && actual(y) == actual(res) )  break;
 	}
 	if( link == symbs )
-	  Error(33, 11, "%s found in database but not declared in %s line",
+	  Error(33, 7, "%s found in database but not declared in %s line",
 	    FATAL, &fpos(res), SymName(actual(res)), KW_DATABASE);
       }
       for( tag = nilobj, link = Down(res); link != res; link = NextDown(link) )
@@ -439,14 +444,14 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
 	}
       }
       if( tag == nilobj )
-	Error(33, 12, "database symbol %s has no tag",
+	Error(33, 8, "database symbol %s has no tag",
 	  FATAL, &fpos(res), SymName(res));
       tag = ReplaceWithTidy(tag, TRUE);  /* && */
       if( !is_word(type(tag)) )
-	Error(33, 13, "database symbol tag is not a simple word",
+	Error(33, 9, "database symbol tag is not a simple word",
 	  FATAL, &fpos(res));
       if( StringEqual(string(tag), STR_EMPTY) )
-	Error(33, 14, "database symbol tag is an empty word", FATAL,&fpos(res));
+	Error(33, 10, "database symbol tag is an empty word", FATAL,&fpos(res));
       if( db == nilobj )
       {	StringCopy(line, FileName(dfnum));
 	i = StringLength(line) - StringLength(INDEX_SUFFIX);
@@ -459,7 +464,7 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
       DisposeObject(res);  dfpos = LexNextTokenPos();  t = LexGetToken();
     }
     if( type(t) != END )
-      Error(33, 15, "%s or end of file expected here", FATAL, &fpos(t), KW_LBR);
+      Error(33, 11, "%s or end of file expected here", FATAL, &fpos(t), KW_LBR);
     LexPop();
     if( db == nilobj )
     { StringCopy(line, FileName(dfnum));
@@ -470,7 +475,7 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
     }
     DbConvert(db, FALSE);
     if( (fp = OpenFile(index_fnum, FALSE, FALSE)) == null )
-      Error(33, 16, "cannot open database file %s",
+      Error(33, 12, "cannot open database file %s",
         FATAL, &fpos(db), FileName(index_fnum));
   }
 
@@ -486,15 +491,17 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
     Link(db, symbs);
   }
   if( fp == null )
-  { debug1(DBS, D, "DbLoad returning (empty) %s", string(db));
+  { debug1(DBS, D, "] DbLoad returning (empty) %s", string(db));
     ifdebug(DPP, D, ProfileOff("DbLoad"));
     return db;
   }
 
   /* read header lines of index file, find its symbols */
   left_pos(db) = 0;  lnum = 0;
-  while( StringFGets(line, MAX_BUFF, fp) != NULL && line[0] == '0' && line[1] == '0' )
-  { lnum++;
+  while( StringFGets(line, MAX_BUFF, fp) != NULL )
+  {
+    if( line[0] != '0' || line[1] != '0' )  break;
+    lnum++;
     left_pos(db) = (int) ftell(fp);
     gall = StringBeginsWith(line, AsciiToFull("00target "));
     sscanf( (char *) line, gall ? "00target %d" : "00symbol %d", &num);
@@ -527,20 +534,21 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs)
     }
     if( sym != nilobj && sym != StartSym )
     { if( cross_sym(sym) == nilobj )  CrossInit(sym);
-      link = Link(db, cross_sym(sym));
+      Link(db, cross_sym(sym));
+      link = LastDown(db);
       number(link) = num;  db_targ(link) = gall;
       if( gall )  is_extern_target(sym) = uses_extern_target(sym) = TRUE;
     }
     else
-    { Error(33, 17, "undefined symbol in database file %s (line %d)",
+    { Error(33, 13, "undefined symbol in database file %s (line %d)",
 	WARN, &fpos(db), FileName(index_fnum), lnum);
-      debug1(DBS, D, "DbLoad returning %s (error)", string(db));
+      debug1(DBS, D, "] DbLoad returning %s (error)", string(db));
       fclose(filep(db));  filep(db) = null;  /* effectively an empty database */
       ifdebug(DPP, D, ProfileOff("DbLoad"));
       return db;
     }
   }
-  debug1(DBS, D, "DbLoad returning %s", string(db));
+  debug1(DBS, D, "] DbLoad returning %s", string(db));
   ifdebug(DPP, D, ProfileOff("DbLoad"));
   return db;
 } /* end DbLoad */
@@ -641,8 +649,10 @@ FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, long *cont)
   }
   *dfnum = FileNum(buff, DATA_SUFFIX);
   if( *dfnum == NO_FILE )  /* can only occur in cross reference database */
+  { debug0(DFS, D, "  calling DefineFile from DbRetrieve");
     *dfnum = DefineFile(buff, DATA_SUFFIX, &fpos(db),
       DATABASE_FILE, SOURCE_PATH);
+  }
   *cont = ftell(filep(db));
   Child(y, Down(db));
   debug2(DBS, D, "DbRetrieve returning TRUE (in %s at %ld)",
@@ -667,8 +677,7 @@ FULL_CHAR *tag, FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, long *cont)
 { FULL_CHAR line[MAX_BUFF], fname[MAX_BUFF]; int symnum;
   ifdebug(DPP, D, ProfileOn("DbRetrieveNext"));
   debug2(DBS, D, "DbRetrieveNext( %s, %ld )", string(db), *cont);
-  if( !reading(db) )
-    Error(33, 18, "DbRetrieveNext: writing", INTERN, &fpos(db));
+  assert(reading(db), "DbRetrieveNext: not reading");
   if( filep(db) == null )
   { debug0(DBS, D, "DbRetrieveNext returning FALSE (empty database)");
     ifdebug(DPP, D, ProfileOff("DbRetrieveNext"));
@@ -688,8 +697,10 @@ FULL_CHAR *tag, FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, long *cont)
   }
   *dfnum = FileNum(fname, DATA_SUFFIX);
   if( *dfnum == NO_FILE )  /* can only occur in cross reference database */
+  { debug0(DFS, D, "  calling DefineFile from DbRetrieveNext");
     *dfnum = DefineFile(fname, DATA_SUFFIX, &fpos(db),
       DATABASE_FILE, SOURCE_PATH);
+  }
   NumToSym(db, symnum, *sym);  *cont = ftell(filep(db));
   debug2(DBS, D, "DbRetrieveNext returning TRUE (in %s at %ld)",
     FileName(*dfnum), *dfpos);

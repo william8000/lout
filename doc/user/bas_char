@@ -14,10 +14,12 @@ Technically, how to get every printable character in the ISO-LATIN-1
 character set, every character in the Adobe Systems Symbol font, plus
 the characters {@Char quotedblleft}, {@Char quotedblright}, {@Char fi},
 {@Char fl}, {@Char endash}, {@Char emdash}, {@Char bullet}, {@Char dagger},
-{@Char daggerdbl}, {@Char florin}, and {@Char fraction}.  In principle,
-there is no limit to the characters available, but to go beyond those
-given in this section requires expertise in defining encoding
-vectors and fonts @Cite { $kingston1995lout.expert}.
+{@Char daggerdbl}, {@Char florin}, and {@Char fraction}.  ISO-LATIN-2
+and Russian characters are available separately (consult directory
+@Code { software } in the Lout distribution).  In principle, there is no
+limit to the characters available, but to go beyond those given in this
+section requires expertise in defining encoding vectors and fonts
+@Cite { $kingston1995lout.expert}.
 }
 If it exists at all, you will find it here.
 @PP
@@ -49,7 +51,7 @@ type to get them at the right:
 @Rowa A { n } B { o } C { p } D { q }
 @Rowa A { r } B { s } C { t } D { u }
 @Rowa A { v } B { w } C { x } D { y }
-@Rowa A { z } B { ~ } C {   } D {   }
+@Rowa A { z } B {   } C {   } D {   }
 }
 Next come characters that have buttons but have a special meaning if
 they are typed directly, and consequently have to be enclosed in double
@@ -69,6 +71,7 @@ quote.chars @Index { quote characters }
 @Rowa A { "{" } B { "\"{\"" }
 @Rowa A { "|" } B { "\"|\"" }
 @Rowa A { "}" } B { "\"}\"" }
+@Rowa A { "~" } B { "\"~\"" }
 }
 If you think you want {@Code "\""}, you probably really want
 `` and '', for which see below.  You can place whole sequences of

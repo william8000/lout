@@ -1,9 +1,9 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -40,7 +40,7 @@
 /*  OBJECT MinSize(x, dim, extras)                                           */
 /*                                                                           */
 /*  Set fwd(x, dim) and back(x, dim) to their minimum possible values.       */
-/*  If dim == ROW, construct an extras list and return it in *extras.        */
+/*  If dim == ROWM, construct an extras list and return it in *extras.       */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -60,15 +60,16 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case WORD:
     case QWORD:
     
-      if( dim == COL )  FontWordSize(x);
+      if( dim == COLM )  FontWordSize(x);
       break;
 
 
     case CROSS:
 
       /* add index to the cross-ref */
-      if( dim == ROW )
-      {	z = New(cross_type(x));	/* CROSS_PREC or CROSS_FOLL */
+      if( dim == ROWM )
+      {	New(z, cross_type(x));	/* CROSS_PREC or CROSS_FOLL */
+	debug2(DCR, DD, "  MinSize CROSS: %ld %s", (long) x, EchoObject(x));
 	actual(z) = x;
 	Link(z, x);		/* new code to avoid disposal */
 	Link(*extras, z);
@@ -80,8 +81,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case PAGE_LABEL:
     
-      if( dim == ROW )
-      { z = New(PAGE_LABEL_IND);
+      if( dim == ROWM )
+      { New(z, PAGE_LABEL_IND);
 	actual(z) = x;
 	Link(z, x);
 	Link(*extras, z);
@@ -98,17 +99,17 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case HEAD:
 
-      if( dim == ROW )
+      if( dim == ROWM )
       {	
 	/* replace the galley x by a dummy closure y */
-	y = New(NULL_CLOS);
+	New(y, NULL_CLOS);
 	FposCopy(fpos(y), fpos(x));
 	ReplaceNode(y, x);
 
 	if( has_key(actual(x)) )
 	{
 	  /* galley is sorted, make insinuated cross-reference */
-	  z = backward(x) ? New(GALL_PREC) : New(GALL_FOLL);
+	  New(z, foll_or_prec(x));
 	  pinpoint(z) = y;
 	  Child(t, Down(x));
 	  actual(z) = CrossMake(whereto(x), t, (int) type(z));
@@ -119,15 +120,15 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	else
 	{
 	  /* galley is following, make UNATTACHED */
-	  z = New(UNATTACHED);  Link(z, x);
+	  New(z, UNATTACHED);  Link(z, x);
 	  pinpoint(z) = y;
 	  Link(*extras, z);
 	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
 	x = y;	/* now sizing y, not x */
-	back(x, COL) = fwd(x, COL) = 0;  /* fix non-zero size @Null bug!! */
+	back(x, COLM) = fwd(x, COLM) = 0;  /* fix non-zero size @Null bug!! */
       }
-      else external(x) = FALSE;
+      else external_ver(x) = external_hor(x) = FALSE;
       back(x, dim) = fwd(x, dim) = 0;
       break;
 
@@ -135,32 +136,30 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case CLOSURE:
 
       assert( !has_target(actual(x)), "MinSize: CLOSURE has target!" );
-      if( dim == ROW )
+      if( dim == ROWM )
       { if( indefinite(actual(x)) )
-	{ z = New(RECEPTIVE);
+	{ New(z, RECEPTIVE);
 	  actual(z) = x;
 	  Link(*extras, z);
 	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
 	else if( recursive(actual(x)) )
-	{ z = New(RECURSIVE);
+	{ New(z, RECURSIVE);
 	  actual(z) = x;
 	  Link(*extras, z);
 	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
-	else Error(12, 1, "MinSize: %s", INTERN, &fpos(x),
-	      "definite non-recursive closure");
+	else
+	{ assert(FALSE, "MinSize: definite non-recursive closure");
+	}
       }
-      else external(x) = FALSE;		/*  nb must be done just here! */
+      else external_ver(x) = external_hor(x) = FALSE;/* nb must be done here!*/
       back(x, dim) = fwd(x, dim) = 0;
       break;
 
 
     case ONE_COL:
     case ONE_ROW:
-    case PADJUST:
-    case HADJUST:
-    case VADJUST:
     case HCONTRACT:
     case VCONTRACT:
     
@@ -180,8 +179,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       fwd(x, dim)  = fwd(y, dim);
 
       /* insert index into *extras for expanding later */
-      if( dim == ROW )
-      {	z = New(EXPAND_IND);
+      if( dim == ROWM )
+      {	New(z, EXPAND_IND);
 	actual(z) = x;
 	Link(*extras, z);
 	/* Can't do Link(z, x) because Constrained goes up and finds z */
@@ -199,13 +198,37 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       break;
 
 
+    case HCOVER:
+    case VCOVER:
+
+      /* work out size and set to 0 if parallel */
+      Child(y, Down(x));
+      y = MinSize(y, dim, extras);
+      if( (dim == COLM) == (type(x) == HCOVER) )
+	back(x, dim) = fwd(x, dim) = 0;
+      else
+      {	back(x, dim) = back(y, dim);
+	fwd(x, dim)  = fwd(y, dim);
+      }
+
+      /* insert index into *extras for revising size later */
+      if( dim == ROWM )
+      {	New(z, COVER_IND);
+	actual(z) = x;
+	Link(*extras, z);
+	/* Can't do Link(z, x) because Constrained goes up and finds z */
+	debug2(DCR, DD, "  MinSize index: %ld %s", (long) z, EchoObject(z));
+      }	
+      break;
+
+
     case HSCALE:
     case VSCALE:
 
       /* work out size and set to 0 if parallel */
       Child(y, Down(x));
       y = MinSize(y, dim, extras);
-      if( (dim == COL) == (type(x) == HSCALE) )
+      if( (dim == COLM) == (type(x) == HSCALE) )
 	back(x, dim) = fwd(x, dim) = 0;
       else
       {	back(x, dim) = back(y, dim);
@@ -217,11 +240,11 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case ROTATE:
     
       Child(y, Down(x));
-      if( dim == COL )
-      {	y = MinSize(y, COL, extras);
-	whereto(x) = New(ACAT);
-	y = MinSize(y, ROW, &whereto(x));
-	RotateSize(&back(x, COL), &fwd(x, COL), &back(x, ROW), &fwd(x, ROW),
+      if( dim == COLM )
+      {	y = MinSize(y, COLM, extras);
+	New(whereto(x), ACAT);
+	y = MinSize(y, ROWM, &whereto(x));
+	RotateSize(&back(x, COLM), &fwd(x, COLM), &back(x, ROWM), &fwd(x, ROWM),
 	  y, sparec(constraint(x)));
       }
       else
@@ -235,11 +258,11 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
       Child(y, Down(x));
       y = MinSize(y, dim, extras);
-      if( dim == COL )
+      if( dim == COLM )
       { back(x, dim) = (back(y, dim) * bc(constraint(x))) / SF;
         fwd(x, dim)  = (fwd(y, dim)  * bc(constraint(x))) / SF;
 	if( bc(constraint(x)) == 0 )  /* Lout-supplied factor required */
-        { z = New(SCALE_IND);
+        { New(z, SCALE_IND);
 	  actual(z) = x;
 	  Link(*extras, z);
 	  debug1(DSF, DDD, "  MinSize: %s", EchoObject(z));
@@ -258,7 +281,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
       Child(y, Down(x));
       y = MinSize(y, dim, extras);
-      if( dim == COL )
+      if( dim == COLM )
       { y = BreakObject(y, &constraint(x));
         assert( FitsConstraint(back(y, dim), fwd(y, dim), constraint(x)),
 		"MinSize: BreakObject failed to fit!" );
@@ -277,11 +300,11 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     
       Child(y, Down(x));
       y = MinSize(y, dim, extras);
-      if( dim == ROW )
+      if( dim == ROWM )
       { if( !FitsConstraint(back(y, dim), fwd(y, dim), constraint(x)) )
-        { Error(12, 2, "forced to enlarge %s", WARN, &fpos(x), KW_HIGH);
-	  debug0(DSF, D, "offending object was:");
-	  ifdebug(DSF, D, DebugObject(y));
+        { Error(12, 1, "forced to enlarge %s", WARN, &fpos(x), KW_HIGH);
+	  debug0(DSF, DD, "offending object was:");
+	  ifdebug(DSF, DD, DebugObject(y));
 	  SetConstraint(constraint(x), MAX_LEN, size(y, dim), MAX_LEN);
         }
         back(x, dim) = back(y, dim);
@@ -300,7 +323,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
       Child(y, Down(x));
       y = MinSize(y, dim, extras);
-      if( (dim == COL) == (type(x) == HSHIFT) )
+      if( (dim == COLM) == (type(x) == HSHIFT) )
       { f = FindShift(x, y, dim);
 	back(x, dim) = min(MAX_LEN, max(0, back(y, dim) + f));
 	fwd(x, dim)  = min(MAX_LEN, max(0, fwd(y, dim)  - f));
@@ -325,7 +348,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case HCAT:
     case VCAT:
     
-      if( (dim == ROW) == (type(x) == VCAT) )
+      if( (dim == ROWM) == (type(x) == VCAT) )
       {
 	/********************************************************************/
 	/*                                                                  */
@@ -346,7 +369,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  if( is_index(type(y)) )
-	  { if( dim == ROW )
+	  { if( dim == ROWM )
 	    { link = PrevDown(link);
 	      MoveLink(NextDown(link), *extras, PARENT);
 	    }
@@ -361,11 +384,46 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	  else if( type(y) == GAP_OBJ )  g = y;
 	  else /* calculate size of y and accumulate it */
 	  { if( is_word(type(y)) )
-	    { if( dim == COL )
-	      {	FontWordSize(y);
+	    { if( dim == COLM )
+	      {
+		/* compress adjacent words if compatible */
+		if( prev != nilobj && width(gap(g)) == 0 && type(x) == ACAT &&
+		    is_word(type(prev)) && vspace(g) + hspace(g) == 0 &&
+		    units(gap(g)) == FIXED_UNIT &&
+		    mode(gap(g)) == EDGE_MODE && !mark(gap(g)) &&
+		    word_font(prev) == word_font(y) &&
+		    word_colour(prev) == word_colour(y) &&
+		    word_language(prev) == word_language(y) &&
+		    underline(prev) == underline(y) )
+		{
+		  unsigned typ;
+		  debug3(DSF, D, "compressing %s and %s at %s",
+		    EchoObject(prev), EchoObject(y), EchoFilePos(&fpos(prev)));
+		  if( StringLength(string(prev)) + StringLength(string(y))
+		      >= MAX_BUFF )
+		    Error(12, 2, "word %s%s is too long", FATAL, &fpos(prev),
+		      string(prev), string(y));
+		  typ = type(prev) == QWORD || type(y) == QWORD ? QWORD : WORD;
+		  y = MakeWordTwo(typ, string(prev), string(y), &fpos(prev));
+		  word_font(y) = word_font(prev);
+		  word_colour(y) = word_colour(prev);
+		  word_language(y) = word_language(prev);
+		  word_hyph(y) = word_hyph(prev);
+		  underline(y) = underline(prev);
+		  FontWordSize(y);
+		  Link(Up(prev), y);
+		  DisposeChild(Up(prev));
+		  DisposeChild(Up(g));
+		  DisposeChild(link);
+		  prev = y;
+		  link = Up(prev);
+		  continue;
+		}
+
+		FontWordSize(y);
 		debug4(DSF, DD, "FontWordSize( %s ) font %d = %s,%s",
 		EchoObject(y), word_font(y),
-		EchoLength(back(y, COL)), EchoLength(fwd(y, COL)));
+		EchoLength(back(y, COLM)), EchoLength(fwd(y, COLM)));
 	      }
 	    }
 	    else y = MinSize(y, dim, extras);
@@ -410,7 +468,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	back(x, dim) = min(MAX_LEN, b);
 	fwd(x, dim)  = min(MAX_LEN, f);
 
-	if( type(x) == ACAT && will_expand )  fwd(x, COL) = MAX_LEN;
+	if( type(x) == ACAT && will_expand )  fwd(x, COLM) = MAX_LEN;
       }
       else
       {
@@ -430,8 +488,10 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	dble_found = found = FALSE;  dble_fwd = 0;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
+	  debug4(DSF, DD, "  %s in %s, y = %s %s", dimen(dim),
+	    Image(type(x)), Image(type(y)), EchoObject(y));
 	  if( is_index(type(y)) )
-	  { if( dim == ROW )
+	  { if( dim == ROWM )
 	    { link = PrevDown(link);
 	      MoveLink(NextDown(link), *extras, PARENT);
 	    }
@@ -458,7 +518,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	  {
 	    /* calculate size of subobject y */
 	    if( is_word(type(y)) )
-	    { if( dim == COL )  FontWordSize(y);
+	    { if( dim == COLM )  FontWordSize(y);
 	    }
 	    else y = MinSize(y, dim, extras);
 	    if( found )
@@ -493,7 +553,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case COL_THR:
     case ROW_THR:
 
-      assert( (type(x) == COL_THR) == (dim == COL), "Manifest/COL_THR: dim!" );
+      assert( (type(x) == COL_THR) == (dim == COLM), "Manifest/COL_THR: dim!" );
       if( thr_state(x) == NOTSIZED )
       {	assert( Down(x) != x, "Manifest/COL_THR: Down(x)!" );
 	Child(y, Down(x));
@@ -521,7 +581,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       /* according to DSC Version 3.0, the BoundingBox parameters must be */
       /* integers; but we read them as floats and truncate since files    */
       /* with fractional values seem to be common in the real world       */
-      if( dim == ROW )  break;
+      if( dim == ROWM )  break;
       status = IG_LOOKING;
       Child(y, Down(x));
       fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y), &cp);
@@ -560,7 +620,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
 	    string(full_name));
 	  sparec(constraint(x)) = FALSE;
-	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
+	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
 	  break;
 
 	case IG_LOOKING:
@@ -569,8 +629,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    WARN, &fpos(x),
 	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
 	    string(full_name));
-	  back(y, COL) = fwd(y, COL) = back(y, ROW) = fwd(y, ROW) = 0;
-	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
+	  back(y, COLM) = fwd(y, COLM) = back(y, ROWM) = fwd(y, ROWM) = 0;
+	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
 	  sparec(constraint(x)) = TRUE;
 	  fclose(fp);
 	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
@@ -582,7 +642,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    &fpos(x), type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
 	    string(full_name));
 	  sparec(constraint(x)) = FALSE;
-	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
+	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
 	  fclose(fp);
 	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
 	  break;
@@ -593,8 +653,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	    WARN, &fpos(x),
 	    type(x) == INCGRAPHIC ? KW_INCGRAPHIC : KW_SINCGRAPHIC,
 	    string(full_name));
-	  back(y, COL) = fwd(y, COL) = back(y, ROW) = fwd(y, ROW) = 0;
-	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
+	  back(y, COLM) = fwd(y, COLM) = back(y, ROWM) = fwd(y, ROWM) = 0;
+	  back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
 	  sparec(constraint(x)) = TRUE;
 	  fclose(fp);
 	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
@@ -603,14 +663,14 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	case IG_OK:
 
 	  Child(y, Down(x));
-	  back(y, COL) = llx;  fwd(y, COL) = urx;
-	  back(y, ROW) = lly;  fwd(y, ROW) = ury;
+	  back(y, COLM) = llx;  fwd(y, COLM) = urx;
+	  back(y, ROWM) = lly;  fwd(y, ROWM) = ury;
 	  b = (urx - llx) * PT;
 	  b = max(0, min(b, MAX_LEN));
-	  back(x, COL) = fwd(x, COL) = b / 2;
+	  back(x, COLM) = fwd(x, COLM) = b / 2;
 	  b = (ury - lly) * PT;
 	  b = max(0, min(b, MAX_LEN));
-	  back(x, ROW) = fwd(x, ROW) = b / 2;
+	  back(x, ROWM) = fwd(x, ROWM) = b / 2;
 	  sparec(constraint(x)) = TRUE;
 	  fclose(fp);
 	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
@@ -623,7 +683,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     default:
     
-      Error(12, 9, "MinSize: %s", INTERN, &fpos(x), Image(type(x)));
+      assert1(FALSE, "MinSize", Image(type(x)));
       break;
 
 
@@ -633,10 +693,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		EchoLength(back(x, dim)), EchoLength(fwd(x, dim)) );
   ifdebug(DSF, DDD, DebugObject(x));
 
-  if( back(x, dim) < 0 )
-    Error(12, 10, "MinSize: back(x, dim) < 0!", INTERN, &fpos(x));
-  if( fwd(x, dim) < 0 )
-    Error(12, 11, "MinSize: fwd(x, dim) < 0!", INTERN, &fpos(x));
+  assert(back(x, dim) >= 0, "MinSize: back(x, dim) < 0!");
+  assert(fwd(x, dim) >= 0, "MinSize: fwd(x, dim) < 0!");
 
   return x;
 } /* end MinSize */

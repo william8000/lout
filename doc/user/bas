@@ -25,5 +25,7 @@ simple to use.
 @Include { bas_lang }
 @Include { bas_supe }
 @Include { bas_verb }
+@Include { bas_drop }
+@Include { bas_conv }
 @EndSections
 @End @Chapter

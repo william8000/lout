@@ -92,5 +92,6 @@ The @Code "indent" option gives the indent ({@Code "0f"}, @Code {"1f"},
 numbers will be done by Lout.  When @Code "@MakeIndex" is {@Code Bypass},
 @Code "@Index" and related symbols are ignored.  At present, bypass
 index symbols work only in books, not with ordinary documents or
-technical reports.
+technical reports.  There are corresponding symbols for creating
+bypass indexes A and B.
 @End @Appendix

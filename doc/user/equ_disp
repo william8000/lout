@@ -22,17 +22,15 @@ aligned.displays @Index { aligned displays }
 aligned.equations @Index { aligned equations }
 numbered.displays @Index { numbered displays }
 numbered.equations @Index { numbered equations }
-@BeginNumberedDisplays
 @BeginAlignedDisplays
 @CentredAlignedNumberedDisplay
   @Tag { fibeq }
-@Eq { F sub n ^= F sub n-1 + F sub n-2 }
+@Eq { F sub n ^= F sub {n-1} + F sub {n-2} }
 After the display we might have some more text for a while, and then
 we might want a second display, aligned on its equals sign with the
 first, and also numbered in sequence with it:
 @CentredAlignedNumberedDisplay
-@Eq { F sub n - F sub n-1 ^= F sub n-2 }
-@EndNumberedDisplays
+@Eq { F sub n - F sub {n-1} ^= F sub {n-2} }
 @EndAlignedDisplays
 Notice that the two displays are centred as a block as well as
 aligned.  Altogether there are four ways in which displays vary:
@@ -40,7 +38,8 @@ aligned.  Altogether there are four ways in which displays vary:
 @LI { A display can be raw or not raw (see below); }
 @LI { It can be a {@Code "@Display"}, {@Code "@LeftDisplay"},
 {@Code "@IndentedDisplay"}, {@Code "@QuotedDisplay"},
-{@Code "@CentredDisplay"} or {@Code "@CenteredDisplay"}; }
+{@Code "@CentredDisplay"}, {@Code "@CenteredDisplay"},
+or {@Code "@RightDisplay"}; }
 @LI { It can be aligned or not aligned; }
 @LI { It can be numbered or not numbered. }
 @EL
@@ -49,32 +48,18 @@ is called
 @ID @Code "@RawCentredAlignedNumberedDisplay"
 By leaving out some or all of {@Code Raw}, {@Code Aligned}, and
 {@Code Numbered}, and by changing or leaving out {@Code Centred},
-we get all these combinations.
-@PP
-When aligned displays are used, it is necessary to indicate where the
-aligned group begins and ends, by placing @Code "@BeginAlignedDisplays"
-beginaligneddisplays @Index @Code "@BeginAlignedDisplays"
-endaligneddisplays @Index @Code "@EndAlignedDisplays"
-just before the first, and @Code "@EndAlignedDisplays" just after the
-last.  The alignment points are indicated by preceding them by the
-symbol {@Code "^"}, so you aren't restricted to aligning at
-equals signs.  Numbered displays are similarly bracketed by
-@Code "@BeginNumberedDisplays" and {@Code "@EndNumberedDisplays"}.  So
-beginnumbereddisplays @Index @Code "@BeginNumberedDisplays"
-endnumbereddisplays @Index @Code "@EndNumberedDisplays"
+we get all these combinations.  Here
 numbereddisplay. @Index @Code "@NumberedDisplay"
 aligneddisplay. @Index @Code "@AlignedDisplay"
-then, here is how the two displays given earlier were made:
+then is how the two displays given earlier were made:
 @ID @OneRow @Code {
 "... a first example of a numbered display:"
-"@BeginNumberedDisplays"
 "@BeginAlignedDisplays"
 "@CentredAlignedNumberedDisplay"
 "  @Tag { fibeq }"
-"@Eq { F sub n ^= F sub n-1 + F sub n-2 }"
+"@Eq { F sub n ^= F sub { n-1 } + F sub { n-2 } }"
 "After the display we might ... numbered in sequence with it:"
-"@CentredAlignedNumberedDisplay @Eq { F sub n - F sub n-1 ^= F sub n-2 }"
-"@EndNumberedDisplays"
+"@CentredAlignedNumberedDisplay @Eq { F sub n - F sub { n-1 } ^= F sub { n-2 } }"
 "@EndAlignedDisplays"
 "Notice that the two displays are centred ..."
 }
@@ -84,28 +69,16 @@ and numbering work quite independently; they don't have to start or end
 together, and there can be non-aligned and non-numbered displays among
 the others.
 @PP
-@Code "@BeginNumberedDisplays" has two options:
-@ID @OneRow @Code {
-"@BeginNumberedDisplays"
-"   style { [tag] }"
-"   start { 12.5 }"
-}
-will cause the associated numbered displays to be labelled [12.5],
-[12.6], and so on.  The first label is the @Code style option with
-@Code tag replaced by the @Code start option.  Font changes and other
-symbols are acceptable within the @Code style option.  When omitted, the
-options have default values @Code "(tag)" and @Code "1" respectively.  A
-good value to give to a @Code "start" option in a section whose @Code "@Tag"
-option is @Code "integral.transforms" would be
-@ID @Code "start { @NumberOf { integral.transforms }.1 }"
-since then the correct section number is inserted automatically.  There
-ought to be a way of saying `the number of this section,' but there isn't.
-@PP
-@Code "@BeginNumberedDisplays" and @Code "@EndNumberedDisplays"
+When aligned displays are used, it is necessary to indicate where the
+aligned group begins and ends, by placing @Code "@BeginAlignedDisplays"
+beginaligneddisplays @Index @Code "@BeginAlignedDisplays"
+endaligneddisplays @Index @Code "@EndAlignedDisplays"
+just before the first, and @Code "@EndAlignedDisplays" just after the
+last.  The alignment points are indicated by preceding them by the
+symbol {@Code "^"}, so you aren't restricted to aligning at equals
+signs.  @Code "@BeginAlignedDisplays" and @Code "@EndAlignedDisplays"
 cannot span across several sections or subsections:  the equations
-numbered by them must lie within a single large-scale structure
-symbol.  The same is true of @Code "@BeginAlignedDisplays" and
-{@Code "@EndAlignedDisplays"}.
+aligned by them must lie within a single large-scale structure symbol.
 @PP
 In our example of aligned and numbered displays, the two displays
 were separated by some ordinary text.  Very often, though, aligned
@@ -134,8 +107,20 @@ between, and after each display; and you get to use the specialized
 displays that you need.  Raw and non-raw displays may be numbered and
 aligned together.
 @PP
+Numbered displays are numbered automatically.  Depending on where in
+the document they appear, the number might include a chapter number
+or section number, etc.  This is controlled by options in the setup
+file; for example, setting @Code "@ChapterNumInDisplays" to @Code Yes
+ensures that numbered displays will be numbered afresh at the beginning
+of each chapter, and that the number will include a chapter number.  There
+is also a @Code "@DisplayNumStyle" option which controls the style of
+displays; the default value, {@Code "(num)"}, encloses the number in
+parentheses as is conventional when numbering equations.
+@PP
 Every display symbol has an abbreviated form consisting of @Code "@"
 followed by its capital letters only.  For example,
-@Code "@BeginNumberedDisplays" may be abbreviated to {@Code "@BND"},
-and the display that has everything to {@Code "@RCAND"}.
+@Code "@BeginAlignedDisplays" may be abbreviated to {@Code "@BAD"}, and
+the display that has everything to {@Code "@RCAND"}.  Owing to an
+unfortunate clash between the initial letters of `raw' and `right',
+@Code "@RightDisplay" and the other right displays have no abbreviations.
 @End @Section

@@ -1,9 +1,9 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -59,63 +59,77 @@
 void SizeGalley(OBJECT hd, OBJECT env, BOOLEAN rows, BOOLEAN joined,
 BOOLEAN nonblock, BOOLEAN trig, STYLE *style, CONSTRAINT *c, OBJECT target,
 OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
-{ OBJECT y, link, z, crs, t, tlink, zlink, tmp;
+{ OBJECT y, link, z, crs, t, tlink, zlink, tmp, why;
   OBJECT extras, tmp1, tmp2, bt[2], ft[2], hold_env;
   BOOLEAN after_target;
   
   assert( type(hd) == HEAD && Down(hd) != hd, "SizeGalley: precondition!" );
   assert( !sized(hd), "SizeGalley: already sized!" );
-  debug6(DGM, D, "SizeGalley(hd, -, %s, %s, %s, %s, %s, %s, -, -, -), hd =",
-	bool(joined), bool(nonblock), bool(trig), EchoStyle(style),
-	EchoConstraint(c), SymName(target));
-  debug1(DGM, D, "  env = %s", EchoObject(env));
-  ifdebug(DGM, DD, DebugObject(hd));
+  debug6(DGM, D, "SizeGalley(%s, -, %s, %s, %s, %s, -, %s, -, -, -), hd =",
+	SymName(actual(hd)), bool(rows), bool(joined), bool(nonblock),
+	bool(trig), EchoConstraint(c));
+  debug1(DGM, DD, "  env = %s", EchoObject(env));
+  ifdebug(DGM, D, DebugObject(hd));
 
   /* manifest the child of hd, making sure it is simply joined if required */
-  tmp1 = target;
   Child(y, Down(hd));
+  tmp1 = target;
   crs = nilobj;
-  bt[COL] = ft[COL] = bt[ROW] = ft[ROW] = nilobj;
-  hold_env = New(ACAT);  Link(hold_env, env);
+  bt[COLM] = ft[COLM] = bt[ROWM] = ft[ROWM] = nilobj;
+  New(hold_env, ACAT);  Link(hold_env, env);
+  if( AllowCrossDb && type(y) == CLOSURE && has_optimize(actual(y))
+      && FindOptimize(y, env) )
+  {
+    SetOptimize(hd, style);
+  }
   debug0(DOM, D, "  [ calling Manifest from SizeGalley");
   if( joined )
-  { bt[COL] = New(THREAD);  ft[COL] = New(THREAD);
-    debug0(DGM, D, "  SizeGalley calling Manifest (joined)");
+  { New(bt[COLM], THREAD);  New(ft[COLM], THREAD);
+    debug0(DGM, DD, "  SizeGalley calling Manifest (joined)");
     y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd));
-    assert( Down(bt[COL]) != bt[COL] && Down(ft[COL]) != ft[COL],
+    assert( Down(bt[COLM]) != bt[COLM] && Down(ft[COLM]) != ft[COLM],
 	"SizeGalley: threads!" );
-    Child(tmp1, Down(bt[COL]));  Child(tmp2, Down(ft[COL]));
-    if( Down(bt[COL]) != LastDown(bt[COL]) ||
-	  Down(ft[COL]) != LastDown(ft[COL]) || tmp1 != tmp2 )
+    Child(tmp1, Down(bt[COLM]));  Child(tmp2, Down(ft[COLM]));
+    if( Down(bt[COLM]) != LastDown(bt[COLM]) ||
+	  Down(ft[COLM]) != LastDown(ft[COLM]) || tmp1 != tmp2 )
       Error(21, 1, "galley %s must have just one column mark",
 	FATAL, &fpos(y), SymName(actual(hd)) );
-    DisposeObject(bt[COL]);  DisposeObject(ft[COL]);
+    DisposeObject(bt[COLM]);  DisposeObject(ft[COLM]);
   }
   else
-  { debug0(DGM, D, "  SizeGalley calling Manifest (not joined)");
+  { debug0(DGM, DD, "  SizeGalley calling Manifest (not joined)");
     y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd));
   }
   debug0(DOM, D, "  ] returning from Manifest in SizeGalley");
   DisposeObject(hold_env);
-
-  /* horizontally size and break hd */
   debug0(DGM, DD, "SizeGalley: after manifesting, hd =");
   ifdebug(DGM, DD, DebugObject(hd));
-  debug0(DGM, DD, "SizeGalley horizontally sizing and breaking hd:");
-  CopyConstraint(constraint(hd), *c);
-  extras = New(ACAT);
-  debug0(DGM, D, "  SizeGalley calling MinSize(COL):");
-  y = MinSize(y, COL, &extras);
-  debug0(DOB, DD, "  calling BreakObject from SizeGalley");
-  debug0(DGM, D, "  SizeGalley calling BreakObject:");
-  y = BreakObject(y, c);
-  back(hd, COL) = back(y, COL);
-  fwd(hd, COL)  = fwd(y, COL);
 
-  assert( FitsConstraint(back(hd, COL), fwd(hd, COL), *c),
+  /* horizontally size hd */
+  debug0(DGM, DD, "SizeGalley horizontally sizing hd:");
+  New(extras, ACAT);
+  y = MinSize(y, COLM, &extras);
+
+  /* break hd if vertical galley */
+  if( gall_dir(hd) == ROWM )
+  {
+    CopyConstraint(constraint(hd), *c);
+    debug0(DOB, DD, "  calling BreakObject from SizeGalley");
+    debug0(DGM, DD, "  SizeGalley calling BreakObject:");
+    y = BreakObject(y, c);
+    back(hd, COLM) = back(y, COLM);
+    fwd(hd, COLM)  = fwd(y, COLM);
+    assert( FitsConstraint(back(hd, COLM), fwd(hd, COLM), *c),
 	"SizeGalley: BreakObject failed to fit!" );
-  debug2(DSF, D, "MinSize(hd, COL) = %s,%s",
-	  EchoLength(back(hd, COL)), EchoLength(fwd(hd, COL)) );
+    debug2(DSF, DD, "MinSize(hd, COLM) = %s,%s",
+	  EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)) );
+  }
+
+  /* hyphenate hd of horizontal optimal galley says so */
+  else if( opt_components(hd) != nilobj && opt_hyph(hd) && type(y) == ACAT )
+  { debug0(DOG, D, "  SizeGalley calling Hyphenate()");
+    y = Hyphenate(y);
+  }
 
   /* get the rows of hd to the top level, if required */
   seen_nojoin(hd) = FALSE;
@@ -136,32 +150,46 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 
 	case VCAT:
 	  
-	  TransferLinks(Down(y), y, Up(y));
-	  DisposeChild(Up(y));
-	  link = PrevDown(link);
+	  if( gall_dir(hd) == ROWM )
+	  { TransferLinks(Down(y), y, Up(y));
+	    DisposeChild(Up(y));
+	    link = PrevDown(link);
+	  }
+	  break;
+
+
+	case ACAT:
+	  
+	  if( gall_dir(hd) == COLM )
+	  { TransferLinks(Down(y), y, Up(y));
+	    DisposeChild(Up(y));
+	    link = PrevDown(link);
+	  }
 	  break;
 
 
 	case SPLIT:
 	  
 	  assert(Up(y)==LastUp(y), "SizeGalley COL_THR: Up(y)!=LastUp(y)!");
-	  Child(z, DownDim(y, ROW));
-	  if( is_indefinite(type(z)) )  external(z) = TRUE;
+	  Child(z, DownDim(y, ROWM));
+	  if( is_indefinite(type(z)) )  external_ver(z) = TRUE;
 	  else if( type(z) == VCAT )
 	  { OBJECT hor, thor, clink, dlink;
-	    Child(hor, DownDim(y, COL));
+	    Child(hor, DownDim(y, COLM));
 	    assert( type(hor) == COL_THR, "SizeGalley: missing COL_THR!" );
-	    Parent(thor, UpDim(z, COL));
+	    Parent(thor, UpDim(z, COLM));
 	    assert( hor == thor, "SizeGalley/SPLIT: hor != thor!" );
-	    clink = DownDim(y, COL);
-	    dlink = UpDim(z, COL);
+	    clink = DownDim(y, COLM);
+	    dlink = UpDim(z, COLM);
 	    for( tlink = LastDown(z);  tlink != z;  tlink = PrevDown(tlink) )
 	    { Child(t, tlink);
-	      if( type(t) == GAP_OBJ )  Link(NextDown(link), t);
+	      if( type(t) == GAP_OBJ )
+	      { Link(NextDown(link), t);
+	      }
 	      else
-	      {	tmp = New(SPLIT);
-		back(tmp, COL) = back(hor, COL);
-		fwd(tmp, COL) = fwd(hor, COL);
+	      {	New(tmp, SPLIT);
+		back(tmp, COLM) = back(hor, COLM);
+		fwd(tmp, COLM) = fwd(hor, COLM);
 		Link(NextDown(link), tmp);
 		Link(tmp, NextUp(clink));
 		Link(NextDown(dlink), t);
@@ -179,7 +207,10 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	case CLOSURE:
 	case HEAD:
 	  
-	  external(y) = TRUE;
+	  if( gall_dir(hd) == COLM )
+	    external_hor(y) = TRUE;
+	  else
+	    external_ver(y) = TRUE;
 	  break;
 
 
@@ -204,65 +235,71 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
       assert( Down(z) != z, "SizeObject SCALE: Down(z) == z!" );
       Child(t, Down(z));
 
-      /* use @Scale COL size constraint to determine a suitable scale factor */
-      Constrained(z, &zc, COL);
-      debug2(DGM, D, "Constrained(%s, -, COL) = %s", EchoObject(z),
+      /* use @Scale COLM size constraint to determine a suitable scale factor */
+      /* check that @Scale is not in a horizontal galley */
+      if( gall_dir(hd) == COLM )
+      { Error(21, 2, "%s with unspecified scale factor in horizontal galley",
+	  FATAL, &fpos(z), KW_SCALE);
+      }
+
+      Constrained(z, &zc, COLM, &why);
+      debug2(DGM, DD, "Constrained(%s, -, COLM) = %s", EchoObject(z),
 	EchoConstraint(&zc));
       if( !constrained(zc) )
-      { Error(21, 2, "replacing infinite scale factor (unconstrained width) by 1.0",
+      { Error(21, 3, "replacing infinite scale factor (unconstrained width) by 1.0",
 	  WARN, &fpos(z));
 	bc(constraint(z)) = fc(constraint(z)) = 1 * SF;
       }
-      else if( size(t, COL) == 0 )
-      { Error(21, 3, "replacing infinite scale factor (zero width object) by 1.0",
+      else if( size(t, COLM) == 0 )
+      { Error(21, 4, "replacing infinite scale factor (zero width object) by 1.0",
 	  WARN, &fpos(z));
 	bc(constraint(z)) = fc(constraint(z)) = 1 * SF;
       }
-      else if( (float) bfc(zc) / size(t, COL) > 100.0 )
-      { Error(21, 4, "replacing very large scale factor (over 100) by 1.0",
+      else if( (float) bfc(zc) / size(t, COLM) > 100.0 )
+      { Error(21, 5, "replacing very large scale factor (over 100) by 1.0",
 	  WARN, &fpos(z));
 	bc(constraint(z)) = fc(constraint(z)) = 1 * SF;
       }
-      else if( (float) bfc(zc) / size(t, COL) < 0.01 )
+      else if( (float) bfc(zc) / size(t, COLM) < 0.01 )
       { if( bfc(zc) == 0 )
-	  Error(21, 5, "object deleted (scale factor is zero)",
+	  Error(21, 6, "object deleted (scale factor is zero)",
 	    WARN, &fpos(z));
 	else
-	  Error(21, 6, "object deleted (scale factor is smaller than 0.01)",
+	  Error(21, 7, "object deleted (scale factor is smaller than 0.01)",
 	    WARN, &fpos(z));
 	bc(constraint(z)) = fc(constraint(z)) = 1 * SF;
 	tmp = MakeWord(WORD, STR_EMPTY, &fpos(t));
-	back(tmp, COL) = fwd(tmp, COL) = 0;
-	back(tmp, ROW) = fwd(tmp, ROW) = 0;
+	back(tmp, COLM) = fwd(tmp, COLM) = 0;
+	back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
 	word_font(tmp) = word_colour(tmp) = word_language(tmp) = 0;
 	word_hyph(tmp) = FALSE;
 	ReplaceNode(tmp, t);
 	DisposeObject(t);
 	t = tmp;
       }
-      else bc(constraint(z)) = fc(constraint(z)) = (bfc(zc) * SF)/size(t, COL);
+      else bc(constraint(z)) = fc(constraint(z)) = (bfc(zc) * SF)/size(t, COLM);
 
       /* calculate scaled size and adjust */
-      b = (back(t, COL) * fc(constraint(z))) / SF;
-      f = (fwd(t, COL) * fc(constraint(z))) / SF;
-      debug3(DGM, D, "AdjustSize(%s, %s, %s, COL)", EchoObject(z),
+      b = (back(t, COLM) * fc(constraint(z))) / SF;
+      f = (fwd(t, COLM) * fc(constraint(z))) / SF;
+      debug3(DGM, DD, "AdjustSize(%s, %s, %s, COLM)", EchoObject(z),
 	EchoLength(b), EchoLength(f));
-      AdjustSize(z, b, f, COL);
+      AdjustSize(z, b, f, COLM);
 
       /* if already vertically sized (because inside @Rotate) adjust that */
       if( vert_sized(z) )
-      { b = (back(t, ROW) * fc(constraint(z))) / SF;
-	f = (fwd(t, ROW) * fc(constraint(z))) / SF;
-	debug3(DGM, D, "AdjustSize(%s, %s, %s, ROW)", EchoObject(z),
-	  EchoLength(b), EchoLength(f));
-	AdjustSize(z, b, f, ROW);
+      { b = (back(t, ROWM) * fc(constraint(z))) / SF;
+	f = (fwd(t, ROWM) * fc(constraint(z))) / SF;
+	debug4(DGM, DD, "AdjustSize(%s, %s, %s, %s)", EchoObject(z),
+	  EchoLength(b), EchoLength(f), dimen(ROWM));
+	AdjustSize(z, b, f, ROWM);
       }
     }
   }
   DisposeObject(extras);
 
   /* size the rows of hd and attach indices where needed */
-  debug0(DGM, D, "  SizeGalley calling MinSize(ROW):");
+  debug0(DGM, DD, "  SizeGalley calling MinSize(ROWM):");
   debug0(DGM, DD, "SizeGalley sizing rows of hd =");
   ifdebug(DGM, DD, DebugObject(hd));
   *recs = *inners = *dest_index = nilobj;
@@ -271,39 +308,41 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
   { Child(y, link);
 
     if( type(y) == GAP_OBJ || is_index(type(y)) )  continue;
-    debug0(DGM, DDD, "  ROW sizing:");
+    debug0(DGM, DDD, "  ROWM sizing:");
     ifdebug(DGM, DDD, DebugObject(y));
-    extras = New(ACAT);
-    y = MinSize(y, ROW, &extras);
-    debug3(DSF, D, "MinSize( %s , ROW ) = %s,%s", EchoObject(y),
-	  EchoLength(back(y, ROW)), EchoLength(fwd(y, ROW)) );
-    debug0(DGM, DDD, "  ROW result:");
+    New(extras, ACAT);
+    y = MinSize(y, ROWM, &extras);
+    debug3(DSF, DD, "MinSize( %s , ROWM ) = %s,%s", EchoObject(y),
+	  EchoLength(back(y, ROWM)), EchoLength(fwd(y, ROWM)) );
+    debug0(DGM, DDD, "  ROWM result:");
     ifdebug(DGM, DDD, DebugObject(y));
 
     /* now attach indexes in front of y */
     for( zlink = Down(extras);  zlink != extras;  zlink = NextDown(zlink) )
     { Child(z, zlink);
       blocked(z) = FALSE;
-      /* debug1(DCR, D, "  extra: %s", EchoObject(z)); */
-      debug2(DGM, D, "  extra%s: %s",
+      /* debug1(DCR, DD, "  extra: %s", EchoObject(z)); */
+      debug2(DGM, DD, "  extra%s: %s",
 	after_target ? " after_target" : "", EchoObject(z));
       switch( type(z) )
       {
 	case RECEPTIVE:
 
-	  /* debug2(DCR, D, "  ... uses_ext  = %s, trig = %s",
+	  /* debug2(DCR, DD, "  ... uses_ext  = %s, trig = %s",
 	    bool(uses_extern_target(actual(actual(z)))), bool(trig)); */
 	  trigger_externs(z) = uses_extern_target(actual(actual(z))) && trig;
-	  non_blocking(z)    = nonblock;
-	  if( actual(actual(z)) == GalleySym )  *dest_index = z;
-	  if( actual(actual(z)) == GalleySym || actual(actual(z)) == InputSym )
+	  non_blocking(z) = nonblock;
+	  if( actual(actual(z)) == GalleySym || actual(actual(z)) == ForceGalleySym )
+	    *dest_index = z;
+	  if( actual(actual(z)) == GalleySym || actual(actual(z)) == ForceGalleySym
+	    || actual(actual(z)) == InputSym )
 	    after_target = TRUE;
 	  break;
 
 
 	case RECURSIVE:
 
-	  if( *recs == nilobj )  *recs = New(ACAT);
+	  if( *recs == nilobj )  New(*recs, ACAT);
 	  Link(*recs, z);
 	  break;
 
@@ -311,7 +350,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	case UNATTACHED:
 
 	  if( !after_target )	/* *** new semantics *** */
-	  { if( *inners == nilobj )  *inners = New(ACAT);
+	  { if( *inners == nilobj )  New(*inners, ACAT);
 	    Link(*inners, z);
 	  }
 	  break;
@@ -321,9 +360,11 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	case EXPAND_IND:
 	case GALL_PREC:
 	case GALL_FOLL:
+	case GALL_FOLL_OR_PREC:
 	case GALL_TARG:
 	case CROSS_PREC:
 	case CROSS_FOLL:
+	case CROSS_FOLL_OR_PREC:
 	case CROSS_TARG:
 	case PAGE_LABEL_IND:
 
@@ -331,9 +372,88 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 	  break;
 
 
+	case COVER_IND:
+
+	  /* adjust size of the COVER object, change it to @Scale etc. */
+	  { OBJECT cover, prnt, chld;  int dirn, thr_type, ok1, ok2, sf,subst;
+	    float sf1, sf2;  CONSTRAINT c;  LENGTH b, f;
+	    cover = actual(z);
+	    if( type(cover) == HCOVER )
+	    { dirn = COLM;
+	      thr_type = COL_THR;
+	      ok1 = VCAT;
+	      ok2 = VCAT;
+	      subst = HSCALE;
+	    }
+	    else
+	    { dirn = ROWM;
+	      thr_type = ROW_THR;
+	      ok1 = ACAT;
+	      ok2 = HCAT;
+	      subst = VSCALE;
+	    }
+	    Parent(prnt, UpDim(cover, dirn));
+	    while( type(prnt) == SPLIT || type(prnt) == thr_type )
+	      Parent(prnt, Up(prnt));
+	    Child(chld, Down(cover));
+	    if( type(prnt) != ok1 && type(prnt) != ok2 )
+	    {
+	      Error(21, 8, "%s replaced by %s (mark not shared)",
+		WARN, &fpos(cover), Image(type(cover)), Image(subst));
+	      debug2(DGM, DDD, "  cover = %s %s", Image(type(cover)),
+		EchoObject(cover));
+	      debug1(DGM, DDD, "  prnt = %s:", Image(type(prnt)));
+	      ifdebug(DGM, DDD, DebugObject(prnt));
+	      type(cover) = subst;
+	    }
+	    else if( back(chld, dirn) == 0 || fwd(chld, dirn) == 0 )
+	    { Error(21, 9, "%s replaced by %s (infinite scale factor)",
+		WARN, &fpos(cover), Image(type(cover)), Image(subst));
+	      type(cover) = subst;
+	    }
+	    else if( size(prnt, dirn) == 0 )
+	    { Error(21, 10, "%s replaced by %s (zero scale factor)",
+		WARN, &fpos(cover), Image(type(cover)), Image(subst));
+	      type(cover) = subst;
+	    }
+	    else /* sensible scale factor exists */
+	    {
+	      /* work out proposed scale factor and sizes for cover */
+	      sf1 = (float) back(prnt, dirn) / back(chld, dirn);
+	      sf2 = (float) fwd(prnt, dirn)  / fwd(chld, dirn);
+	      sf = max(sf1, sf2) * SF;
+	      b = (back(chld, dirn) * sf) / SF;
+	      f = (fwd(chld,  dirn) * sf) / SF;
+
+	      /* check whether new object fits */
+	      Constrained(cover, &c, dirn, &why);
+	      if( FitsConstraint(b, f, c) )
+	      {
+		/* it fits, so make cover a SCALE object with this size */
+		type(cover) = SCALE;
+		if( dirn == COLM )
+		{ bc(constraint(cover)) = sf;
+		  fc(constraint(cover)) = SF;
+		}
+		else
+		{ bc(constraint(cover)) = SF;
+		  fc(constraint(cover)) = sf;
+		}
+		AdjustSize(cover, b, f, dirn);
+	      }
+	      else
+	      { Error(21, 11, "%s replaced by %s (insufficient space)",
+		  WARN, &fpos(cover), Image(type(cover)), Image(subst));
+		type(cover) = subst;
+	      }
+	    }
+	  }
+	  break;
+
+
 	default:
 	  
-	  Error(21, 7, "SizeGalley: %s", INTERN, no_fpos, Image(type(z)));
+	  assert1(FALSE, "SizeGalley:", Image(type(z)));
 	  break;
 
       }
@@ -346,19 +466,19 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
   /* insinuate cross references */
   if( crs != nilobj )
   { 
-    debug1(DCR, D, "SizeGalley insinuating %s", EchoObject(crs));
+    debug1(DCR, DD, "SizeGalley insinuating %s", EchoObject(crs));
     TransferLinks(Down(crs), crs, Down(hd));
     DisposeObject(crs);
   }
 
   /* check that *dest_index was found if it was required, and exit */
   if( target != nilobj && *dest_index == nilobj )
-    Error(21, 8, "unexpected absence of %s from the body of %s",
+    Error(21, 12, "unexpected absence of %s from the body of %s",
       FATAL, &fpos(hd), SymName(target), SymName(actual(hd)));
   debug3(DGM, D, "SizeGalley returning %s,%s  %s;  hd =",
-    EchoLength(back(hd, COL)), EchoLength(fwd(hd, COL)),
+    EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)),
     EchoConstraint(&constraint(hd)));
-  ifdebug(DGM, DD, DebugObject(hd));
+  ifdebug(DGM, D, DebugGalley(hd, nilobj, 4));
   sized(hd) = TRUE;
 
 } /* end SizeGalley */

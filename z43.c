@@ -1,9 +1,9 @@
 /*@z43.c:Language Service:LanguageChange, LanguageString@*********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -95,7 +95,7 @@ static void ltab_insert(OBJECT x, LANGUAGE_TABLE *S)
   if( ltab_count(*S) == ltab_size(*S) - 1 )	/* one less since 0 unused */
     *S = ltab_rehash(*S, 2*ltab_size(*S));
   hash(pos, string(x), *S);
-  if( ltab_item(*S, pos) == nilobj )  ltab_item(*S, pos) = New(ACAT);
+  if( ltab_item(*S, pos) == nilobj )  New(ltab_item(*S, pos), ACAT);
   z = ltab_item(*S, pos);
   for( link = Down(z);  link != z;  link = NextDown(link) )
   { Child(y, link);
@@ -142,11 +142,23 @@ static void ltab_debug(LANGUAGE_TABLE S, FILE *fp)
 #endif
 
 
-static LANGUAGE_TABLE	names_tab;		/* the language names        */
-static OBJECT		*hyph_tab;		/* arry of hyph filenames    */
-static OBJECT		*canonical_tab;		/* array of lang names       */
-static int		lang_tabsize;		/* size of prev two arrays   */
-static int		lang_count;		/* number of languages       */
+static	LANGUAGE_TABLE	names_tab;		/* the language names        */
+static	OBJECT		*hyph_tab;		/* arry of hyph filenames    */
+static	OBJECT		*canonical_tab;		/* array of lang names       */
+static	int		lang_tabsize;		/* size of prev two arrays   */
+static	int		lang_count;		/* number of languages       */
+static	OBJECT		lang_ends[MAX_LANGUAGE];/* sentence endings        */
+
+/*@@**************************************************************************/
+/*                                                                           */
+/*  BOOLEAN LanguageSentenceEnds[]                                           */
+/*                                                                           */
+/*  LanguageSentenceEnds[ch] is TRUE if there exists a language in which     */
+/*  character ch could occur at the end of a sentence.                       */
+/*                                                                           */
+/*****************************************************************************/
+
+BOOLEAN LanguageSentenceEnds[MAX_CHARS];
 
 
 /*@::LanguageInit(), LanguageDefine()@****************************************/
@@ -158,7 +170,8 @@ static int		lang_count;		/* number of languages       */
 /*****************************************************************************/
 
 void LanguageInit(void)
-{ debug0(DLS, D, "LanguageInit()");
+{ int i;
+  debug0(DLS, D, "LanguageInit()");
   names_tab = ltab_new(INIT_LANGUAGE_NUM);
   lang_count = 0;
   lang_tabsize = INIT_LANGUAGE_NUM;
@@ -168,25 +181,27 @@ void LanguageInit(void)
   ifdebug(DMA, D, DebugRegisterUsage(MEM_LANG_TAB, 0,
     INIT_LANGUAGE_NUM * sizeof(OBJECT)));
   canonical_tab = (OBJECT *) malloc(INIT_LANGUAGE_NUM * sizeof(OBJECT));
+  for( i = 0;  i < MAX_CHARS;  i++ )  LanguageSentenceEnds[i] = FALSE;
   debug0(DLS, D, "LanguageInit returning.");
 } /* end LanguageInit */
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  LanguageDefine(names, hyph_file)                                         */
+/*  LanguageDefine(names, inside)                                            */
 /*                                                                           */
 /*  Define a language whose names are given by ACAT of words names, and      */
 /*  whose associated hyphenation patterns file name is hyph_file.            */
 /*                                                                           */
 /*****************************************************************************/
 
-void LanguageDefine(OBJECT names, OBJECT hyph_file)
-{ OBJECT link, y;
+void LanguageDefine(OBJECT names, OBJECT inside)
+{ OBJECT link, y, hyph_file;  BOOLEAN junk;  FULL_CHAR ch;
+  int len;
   assert( names != nilobj && type(names) == ACAT, "LanguageDefine: names!");
   assert( Down(names) != names, "LanguageDefine: names is empty!");
   debug2(DLS, D, "LanguageDefine(%s, %s)",
-    EchoObject(names), EchoObject(hyph_file));
+    EchoObject(names), EchoObject(inside));
 
   /* double table size if overflow */
   if( ++lang_count >= lang_tabsize )
@@ -212,30 +227,101 @@ void LanguageDefine(OBJECT names, OBJECT hyph_file)
     ltab_insert(y, &names_tab);
   }
 
-  /* initialize hyphenation file entry */
+  /* initialize canonical language name entry */
+  Child(y, Down(names));
+  canonical_tab[lang_count] = y;
+
+  /* make inside an ACAT if it isn't already */
+  if( type(inside) != ACAT )
+  { New(y, ACAT);
+    FposCopy(fpos(y), fpos(inside));
+    Link(y, inside);
+    inside = y;
+  }
+
+  /* initialize hyphenation file entry (first child of inside) */
+  Child(hyph_file, Down(inside));
+  DeleteLink(Down(inside));
   if( !is_word(type(hyph_file)) )
     Error(43, 3, "hyphenation file name expected here",
-      FATAL, &fpos(hyph_file));
-  if( StringEqual(string(hyph_file), STR_EMPTY) )
+      FATAL, &fpos(inside));
+  if( StringEqual(string(hyph_file), STR_EMPTY) ||
+      StringEqual(string(hyph_file), STR_HYPHEN) )
   { Dispose(hyph_file);
     hyph_tab[lang_count] = nilobj;
   }
   else hyph_tab[lang_count] = hyph_file;
 
-  /* initialize canonical language name entry */
-  Child(y, Down(names));
-  canonical_tab[lang_count] = y;
+  /* initialize sentence ends */
+  lang_ends[lang_count] = inside;
+  for( link = Down(inside);  link != inside;  link = NextDown(link) )
+  { Child(y, link);
+    if( type(y) == GAP_OBJ )
+    { link = PrevDown(link);
+      DisposeChild(NextDown(link));
+      continue;
+    }
+    if( !is_word(type(y)) )
+    { debug2(DLS, D, "word patterns failing on %s %s", Image(type(y)),
+	EchoObject(y));
+      Error(43, 4, "expected word ending pattern here", FATAL, &fpos(y));
+    }
+    len = StringLength(string(y));
+    if( len == 0 )
+      Error(43, 5, "empty word ending pattern", FATAL, &fpos(y));
+    ch = string(y)[len - 1];
+    LanguageSentenceEnds[ch] = TRUE;
+  }
 
   /* if initializing run, initialize the hyphenation table */
   if( InitializeAll )
-  { if( hyph_tab[lang_count] != nilobj && !ReadHyphTable(lang_count) )
-      fprintf(stderr,
-	"lout -x: hyphenation initialization failed for language %s\n",
-	string(canonical_tab[lang_count]));
+  { if( hyph_tab[lang_count] != nilobj )
+    junk = ReadHyphTable(lang_count);
   }
 
   debug0(DLS, D, "LanguageDefine returning.");
 } /* end LanguageDefine */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  BOOLEAN LanguageWordEndsSentence(OBJECT wd, BOOLEAN lc_prec)             */
+/*                                                                           */
+/*  Returns TRUE if word ends a sentence in the current language.  This is   */
+/*  so if it ends with a string in the list associated with the current      */
+/*  language.  If lc_prec is TRUE, it is also necessary for the character    */
+/*  preceding this suffix to be lower-case.                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+BOOLEAN LanguageWordEndsSentence(OBJECT wd, BOOLEAN lc_prec)
+{ OBJECT x, y, link;  int pos;
+  assert( is_word(type(wd)), "LanguageWordEndsSentence: wd!" );
+  debug2(DLS, D, "LanguageWordEndsSentence(%d %s)",
+    word_language(wd), EchoObject(wd));
+  x = lang_ends[word_language(wd)];
+  for( link = Down(x);  link != x;  link = NextDown(link) )
+  { Child(y, link);
+    if( StringEndsWith(string(wd), string(y)) )
+    {
+      if( !lc_prec )
+      { debug0(DLS, D, "LanguageWordEndsSentence returning TRUE (!lc_prec)");
+        return TRUE;
+      }
+
+      /* now check whether the preceding character is lower case */
+      pos = StringLength(string(wd)) - StringLength(string(y)) - 1;
+      if( pos >= 0 &&
+	MapIsLowerCase(string(wd)[pos], FontMapping(word_font(wd), &fpos(wd))))
+      {
+        debug0(DLS, D, "LanguageWordEndsSentence returning TRUE (!lc_prec)");
+        return TRUE;
+      }
+    }
+  }
+  debug0(DLS, D, "LanguageWordEndsSentence returning FALSE");
+  return FALSE;
+} /* end LanguageWordEndsSentence */
 
 
 /*@::LanguageChange(), LanguageString(), LanguageHyph()@**********************/
@@ -252,7 +338,7 @@ void LanguageChange(STYLE *style, OBJECT x)
 
   /* if argument is not a word, fail and exit */
   if( !is_word(type(x)) )
-  { Error(43, 4, "%s ignored (illegal left parameter)", WARN, &fpos(x),
+  { Error(43, 6, "%s ignored (illegal left parameter)", WARN, &fpos(x),
       KW_LANGUAGE);
     debug0(DLS, D, "LanguageChange returning (language unchanged)");
     return;
@@ -267,7 +353,7 @@ void LanguageChange(STYLE *style, OBJECT x)
   /* retrieve language record if present, else leave style unchanged */
   lname = ltab_retrieve(string(x), names_tab);
   if( lname == nilobj )
-    Error(43, 5, "%s ignored (unknown language %s)", WARN, &fpos(x),
+    Error(43, 7, "%s ignored (unknown language %s)", WARN, &fpos(x),
       KW_LANGUAGE, string(x));
   else language(*style) = word_language(lname);
 

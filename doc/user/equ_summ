@@ -47,8 +47,10 @@ precedence, with the precedence itself at right:
 @Code "from to widefrom wideto" (58)
 @Code "sqrt root" (56)
 @Code "over frac" (54)
-@Code "above labove cabove rabove mabove" (52)
-@Code "nextcol" (50)
+@Code "col lcol ccol rcol mcol" (52)
+@Code "row axisrow" (50)
+# @Code "above labove cabove rabove mabove" (52)
+# @Code "nextcol" (50)
 }
 See Section {@NumberOf symbols} for examples of matrices.  Here are some
 examples of the other symbols:
@@ -279,7 +281,8 @@ ragged @Break {
 ":="		@Dbl @Eq {  :=			}
 }
 @DP
-These can be negated by preceding them with {@Code "not"}, as in
+These can be negated by enclosing them in braces and preceding them with
+{@Code "not"}, as in
 negation. @Index { negation of equation symbols }
 {@Code "not =="}, for example, which yields {@Eq { not == }}.  The
 following short names define binary operators (medium space on each side):

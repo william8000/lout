@@ -18,6 +18,7 @@ you, and it provides several hundred mathematical symbols.
 @BeginSections
 @Include { equ_intr }
 @Include { equ_symb }
+@Include { equ_vert }
 @Include { equ_spac }
 @Include { equ_disp }
 @Include { equ_defs }

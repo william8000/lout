@@ -27,7 +27,8 @@ def @Tab
     named between   { no      }
     named side      { no      }
     named hmargin   { 0.3c    }
-    named vmargin   { 0.2v    }
+    named vmargin
+	{ @BackEnd @Case { PostScript @Yield 0.2v PlainText @Yield 0.5v } }
     named linewidth
 	named c { " cm" }
 	named i { " in" }

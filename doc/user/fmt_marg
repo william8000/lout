@@ -39,7 +39,7 @@ relevant options and their default values:
 }
 You get boxes by changing the @Code "@PageBoxType" option:
 page.box.type @Index @Code "@PageBoxType"
-@ID @Tab
+@ID @OneRow @Tab
     @Fmta { @Col @Code A ! @Col @CC B }
 {
 @Rowa
@@ -95,4 +95,27 @@ available vertical space, so if your angle is too steep the result
 will be too tall for the page and you will get a regrettably obscure
 warning message about a `broken size constraint.'  The solution is
 to try a smaller angle.
+@PP
+Another useful page background draws marks to show where the margins
+boundarymarks @Index @Code "@BoundaryMarks"
+cut.marks @Index { cut marks }
+lie:
+@ID @Code "@PageBackground { @BoundaryMarks }"
+produces something like this around each page:
+@DP @DP
+@ID { |@DisplayIndent 3c @High 2c @Wide @HExpand @VExpand @BoundaryMarks }
+@DP @DP
+The @Code "@BoundaryMarks" symbol has options for controlling the
+line width (thickness), the line length, and the gap between the
+ends of the lines and the corner of the text area:
+@ID @OneRow @Code {
+"@PageBackground {"
+"    @BoundaryMarks"
+"        linewidth { 0.2p }"
+"        length { 0.5c }"
+"        gap { 0.5c }"
+"}"
+}
+This shows the default values:  0.2 points for line width,
+0.5 centimetres for the others.
 @End @Section

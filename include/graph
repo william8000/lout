@@ -216,6 +216,7 @@ def @GraphFilledTriangle
 
 def @GraphNoLine
     named dashlength { 0.2 ft }
+    named linewidth  { "currentlinewidth" }
     named length
 	named cm left x { x"c" }
 	named in left x { x"i" }
@@ -231,6 +232,7 @@ def @GraphNoLine
 
 def @GraphSolid
     named dashlength { 0.2 ft }
+    named linewidth  { "currentlinewidth" }
     named length
 	named cm left x { x"c" }
 	named in left x { x"i" }
@@ -242,13 +244,14 @@ def @GraphSolid
     { 1.0 ft }
 {
     @HContract @VContract
-    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto xsize"
-       dashlength "solid end"
+    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto"
+       "/linewidth" linewidth "def xsize" dashlength "solid end"
     } @Graphic { length @Wide }
 }
 
 def @GraphDashed
     named dashlength { 0.2 ft }
+    named linewidth  { "currentlinewidth" }
     named length
 	named cm left x { x"c" }
 	named in left x { x"i" }
@@ -260,13 +263,14 @@ def @GraphDashed
     { 1.0 ft }
 {
     @HContract @VContract
-    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto xsize"
-       dashlength "dashed end"
+    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto"
+       "/linewidth" linewidth "def xsize" dashlength "dashed end"
     } @Graphic { length @Wide }
 }
 
 def @GraphDotted
     named dashlength { 0.2 ft }
+    named linewidth  { "currentlinewidth" }
     named length
 	named cm left x { x"c" }
 	named in left x { x"i" }
@@ -278,8 +282,8 @@ def @GraphDotted
     { 1.0 ft }
 {
     @HContract @VContract
-    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto xsize"
-       dashlength "dotted end"
+    { "lgraphdict begin newpath 0 0 moveto xsize 0 lineto"
+       "/linewidth" linewidth "def xsize" dashlength "dotted end"
     } @Graphic { length @Wide }
 }
 
@@ -1069,7 +1073,8 @@ def @Graph
     named yticklength                               { 0.5 ft   }
     named dataformat                                { xandy    }
     named dashlength                                { 0.2 ft   }
-    named symbolsize                                { 0.15 ft   }
+    named linewidth				    { "currentlinewidth"   }
+    named symbolsize                                { 0.15 ft  }
     body @Body
 @Begin
 
@@ -1146,6 +1151,7 @@ def @Graph
 	named color    named none { "none" }            { color      }
 	named paint    named none { "none" }            { paint      }
 	named dashlength                                { dashlength }
+	named linewidth                                 { linewidth  }
 	named symbolsize                                { symbolsize }
 	named dataformat                                { dataformat }
 	body data
@@ -1314,7 +1320,8 @@ def @Graph
        "[ [" data "]" dataformat
 	  "{" @Points "}"
 	  "{" @Pairs "}"
-	  "{ /dashlength" dashlength "def" @Col
+	  "{ /dashlength" dashlength "def"
+	  "  /linewidth"  linewidth  "def" @Col
 	  "  /symbolsize" symbolsize "def }"
 	  "{" @Paint "}"
        "]"

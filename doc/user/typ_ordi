@@ -26,26 +26,29 @@ document. @Index @Code "@Document"
 "@Document"
 "    @InitialFont { Times Base 12p }"
 "    @InitialBreak { adjust 1.2fx hyphen }"
+"    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
 "    @PageHeaders { Simple }"
 "    @FirstPageNumber { 1 }"
 "    @ColumnNumber { 1 }"
+"    @OptimizePages { No }"
 "//"
 "@Text @Begin"
 "..."
 "@End @Text"
 }
-This shows the six options of {@Code "@Document"}, with their default
+This shows the eight options of {@Code "@Document"}, with their default
 values.  As usual with options, the options of {@Code "@Document"}
 may be given in any order, and only the ones that need to be changed
 need be given at all.
 @PP
 Notice the @Code "//" after the last option.  Its meaning is beyond our
+"//" @Index { @Code "//" symbol }
 scope, but total disaster will ensue if it is forgotten.  The @Code "@Doc"
 symbol is an abbreviation for {@Code "@Document //"}, which is why you don't
 need @Code "//" with {@Code "@Doc"}.
 @PP
-The six options are a selection of setup file options (Section
+The eight options are a selection of setup file options (Section
 {@NumberOf setup}) that frequently need to be changed.  If your changes
 to the overall formatting are confined to these options, you can change
 them here and avoid having your own setup file.  If you already have
@@ -63,8 +66,10 @@ spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
 double spacing, and so on), and either @Code "hyphen" or @Code "nohyphen"
 for turning hyphenation on or off.
 @PP
-@Code "@InitialLanguage" determines the language of the bulk of the
-document.
+@Code "@InitialSpace" determines how Lout treats white space between
+two objects, as described in Section
+{@NumberOf white}.  @Code "@InitialLanguage" determines the language
+of the bulk of the document.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
 footers throughout the document.  Its value may be {@Code None},
@@ -116,6 +121,17 @@ producing full-width text wherever you want.  Just be aware that
 @Code "@FullWidth" always causes a fresh page to be begun, it will never
 appear on the same page as a figure or table, and it is not able to hold
 a table of contents, a section, or an appendix.
+@PP
+Lout ordinarily places lines onto a page until space runs out, then moves
+to the next page and so on.  This often produces ugly empty spaces at
+the bottoms of pages preceding large unbreakable displays.  Setting the
+@Code "@OptimizePages" option to {@Code "Yes"} causes Lout to examine the
+overall situation and try to minimize the ugliness, using the @TeX
+tex.page @SubIndex { page optimization }
+optimal paragraph breaking algorithm.  It takes two runs to do this,
+with intermediate results stored in Lout's cross reference database
+(Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
+it, which might be wise after major changes.
 @PP
 Within the @Code "@Text" symbol, it is possible to have a sequence
 of sections:
@@ -243,6 +259,8 @@ their default values:
 ordinary.layout @Index @Code "@OrdinaryLayout"
 @ID @OneRow @Code {
 "@Use { @OrdinaryLayout"
+"  # @IndexWord { index }"
+"  # @AppendixWord { appendix }"
 "  # @SectionNumbers { Arabic }"
 "  # @SectionHeadingFont { Bold }"
 "  # @SectionGap { 2.00v }"
@@ -251,6 +269,12 @@ ordinary.layout @Index @Code "@OrdinaryLayout"
 }
 Section {@NumberOf setup} explains how to make your own setup file and
 change its options.
+@PP
+The @Code "@IndexWord" option determines what the index is called, if
+there is one.  The default value, {@Code "index"}, produces the word
+`Index' in the current language.  Any other value produces itself.  The
+@Code "@AppendixWord" option is similar; its default value is `Appendix'
+in the current language.
 @PP
 @Code "@SectionNumbers" determines how sections will be numbered, and may
 be @Code { None }, @Code { Arabic }, @Code { Roman }, @Code { UCRoman },

@@ -19,11 +19,13 @@ symbol:
 "    @DateLine { No }"
 "    @InitialFont { Times Base 20p }"
 "    @InitialBreak { ragged 1.2fx nohyphen }"
+"    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
 "    @PageHeaders { Titles }"
 "    @FirstPageNumber { 1 }"
 "    @FirstOverheadNumber { 1 }"
 "    @FirstLectureNumber { 1 }"
+"    @OptimizePages { No }"
 "//"
 }
 This shows all the options of @Code "@OverheadTransparencies" with their
@@ -61,7 +63,10 @@ double spacing, and so on), and either @Code "hyphen" or @Code "nohyphen"
 for turning hyphenation on or off.  Adjusted lines and hyphenated words
 are difficult to read from overheads, so the default is not to have them.
 @PP
-@Code "@InitialLanguage" determines the language of the overheads.
+@Code "@InitialSpace" determines how Lout treats white space between
+two objects, as described in Section
+{@NumberOf white}.  @Code "@InitialLanguage" determines the language
+of the overheads.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
 footers.  Its value may be {@Code None}, {@Code Simple}, {@Code Titles},
@@ -74,6 +79,16 @@ page numbers only, @Code Titles produces full running titles, and
 @Code "@FirstOverheadNumber" is the number given to the first overhead,
 and @Code "@FirstLectureNumber" is the number given to the first lecture,
 of which more below.
+@PP
+Lout ordinarily places lines onto a page until space runs out, then moves
+to the next page and so on.  This often produces ugly empty spaces at
+the bottoms of pages preceding large unbreakable displays.  Setting the
+@Code "@OptimizePages" option to {@Code "Yes"} causes Lout to examine the
+overall situation and try to minimize the ugliness, using the @TeX
+optimal paragraph breaking algorithm.  It takes two runs to do this,
+with intermediate results stored in Lout's cross reference database
+(Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
+it, which might be wise after major changes.
 @PP
 After the compulsory {@Code "//"} come the overheads themselves.  There
 are two alternatives here:  you may either choose to make a simple
@@ -184,6 +199,7 @@ are all these options and their default values:
 "  # @DateLine { No }"
 "  # @FirstOverheadNumber { 1 }"
 "  # @FirstLectureNumber { 1 }"
+"  # @ContentsWord { contents }"
 "  # @LectureNumbers { Arabic }"
 "  # @OverheadNumbers { Arabic }"
 "  # @TitlePageFont { Helvetica Base }"
@@ -194,9 +210,11 @@ are all these options and their default values:
 "  # @ReferencesInContents { Yes }"
 "}"
 }
-For general information about setup files and their options,
-consult Section {@NumberOf setup}.  The first four options are as for
-@Code "@OverheadTransparencies" as described above.  @Code "@LectureNumbers"
+For general information about setup files and their options, consult
+Section {@NumberOf setup}.  The first four options are as for
+@Code "@OverheadTransparencies" as described above.  @Code "ContentsWord"
+determines table of contents heading; its default value, {@Code contents},
+produces `Contents' in the current language.  @Code "@LectureNumbers"
 and @Code "@OverheadNumbers" determine the style of numbering of lectures
 and overheads, and may be {@Code None}, {@Code Arabic}, {@Code Roman},
 {@Code UCRoman}, {@Code Alpha}, or {@Code UCAlpha} as usual.  Next come

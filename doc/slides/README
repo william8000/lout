@@ -9,13 +9,12 @@ the transparencies, type
 	lout all > outfile.ps
 
 in this directory.  This needs to be done
-three times to resolve all cross references.
-A copy of the final outfile.ps is included.
+twice to resolve all cross references.
+There should be no error messages at all
+after the second run.  A copy of the final
+outfile.ps is included.
 
 Jeff Kingston
 21 September 1994
 8 May 1995
-
-
-ps There should be no error messages at
-all after the third run.
+8 May 1996

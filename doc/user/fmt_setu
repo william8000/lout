@@ -110,14 +110,13 @@ clause.  It looks like this:
 "  # @InitialColour { black }"
 "  # @HeadingFont { Bold }"
 "  # @ParaGap { 1.30vx }"
-"  # @ParaIndent { 2.00f }"
 "}"
 }
 @Code "@DocumentLayout" is a symbol, and @Code { "@InitialFont" },
 document.layout @Index @Code "@DocumentLayout"
 @Code { "@InitialBreak" }, etc. are its options.  There are over one
 hundred options altogether; the display above just shows the first
-seven.  You change the overall format of your document by changing
+six.  You change the overall format of your document by changing
 these options.
 @PP
 As it stands, the options are all hidden within comments, so the
@@ -139,6 +138,8 @@ on the document type.  For ordinary documents (i.e. in the @Code "doc"
 setup file) this clause is
 @ID @OneRow @Code {
 "@Use { @OrdinaryLayout"
+"  # @IndexWord { index }"
+"  # @AppendixWord { appendix }"
 "  # @SectionNumbers { Arabic }"
 "  # @SubSectionNumbers { Arabic }"
 "  # @SubSubSectionNumbers { Arabic }"
@@ -146,7 +147,6 @@ setup file) this clause is
 "  # @SubAppendixNumbers { Arabic }"
 "  # @SubSubAppendixNumbers { Arabic }"
 "  # @SectionHeadingFont { Bold }"
-"  # @SubSectionHeadingFont { Bold }"
 "}"
 }
 Once again this is just some of the options.  In the @Code slides
@@ -154,6 +154,7 @@ setup file for overhead transparencies, we find this:
 @ID @OneRow @Code {
 "@Use { @OverheadLayout"
 "  # @DateLine { No }"
+"  # @ContentsWord { contents }"
 "  # @FirstLectureNumber { 1 }"
 "  # @FirstOverheadNumber { 1 }"
 "  # @LectureNumbers { Arabic }"

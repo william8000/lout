@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.06                          #
+#  Make file for installing Basser Lout Version 3.08                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  25 July 1995                                                               #
+#  8 May 1996                                                                 #
 #                                                                             #
 #     make lout         Compile the Lout source                               #
 #     make c2lout       Compile a small auxiliary program called c2lout       #
@@ -24,14 +24,20 @@
 #                                                                             #
 #  (1) Set exactly one of the following macros defined below to 1 and the     #
 #      others all to 0, to indicate the operating system under which the      #
-#      Lout binary is to run.  At present OSUNIX certainly works, OSDOS       #
-#      almost certainly works, and OSMAC doesn't work.                        #
+#      Lout binary is to run.  At present OSUNIX and OSDOS work but OSMAC     #
+#      doesn't work.                                                          #
 #                                                                             #
 #      OSUNIX    Unix in all its flavours, including Linux.                   #
 #      OSDOS     MS-DOS etc. ("rb" and "wb" file access modes where needed)   #
 #      OSMAC     Macintosh                                                    #
 #                                                                             #
-#  (2) Set the following four macros defined below to appropriate values:     #
+#  (2) Set the USESTAT macro defined below to 1 if the system you are         #
+#      compiling onto has the stat() file status system call.  If you are     #
+#      unsure, or know it doesn't, set USESTAT to 0.  The stat() call,        #
+#      if used, will allow Lout to determine the time of last change          #
+#      of database index files and rebuild them automatically if required.    #
+#                                                                             #
+#  (3) Set the following four macros defined below to appropriate values:     #
 #                                                                             #
 #      BINDIR    Directory where Lout's binary goes.  This directory is       #
 #                assumed to exist.                                            #
@@ -45,7 +51,7 @@
 #      MANDIR    Directory where the lout and c2lout online manual entries    #
 #                (in nroff -man) go.  This directory is assumed to exist.     #
 #                                                                             #
-#  (3) Set the following two macros defined below to appropriate values.      #
+#  (4) Set the following two macros defined below to appropriate values.      #
 #      I strongly recommend CHARIN=1 and CHAROUT=0 for all sites (English     #
 #      and non-English language).  This way we get a truly international      #
 #      standard in which everyone has access to accented characters, yet      #
@@ -80,7 +86,7 @@
 #                as \ddd escape sequences and which are printed as one-byte   #
 #                literal characters.                                          #
 #                                                                             #
-#  (4) Set macro USELOC to one of the following values, NOT TO A LOCALE.      #
+#  (5) Set macro USELOC to one of the following values, NOT TO A LOCALE.      #
 #                                                                             #
 #      0         Lout's error messages will always appear in English, and no  #
 #                source code related to locales will be compiled.             #
@@ -103,26 +109,28 @@
 #                expect setlocale(LC_MESSAGES, "") to return when you want    #
 #                to get German language error messages                        #
 #                                                                             #
-#  (5) This makefile assumes that Lout is not installed on your system        #
+#      For error messages in other languages, consult ./locale/README.        #
+#                                                                             #
+#  (6) This makefile assumes that Lout is not installed on your system        #
 #      already.  If you do have an earlier version of Lout installed,         #
 #      the simplest way to get rid of it is to type "make uninstall" now.     #
 #      Of course, this is assuming that the old version was installed in the  #
 #      same directories as where you are about to install the new version.    #
 #                                                                             #
-#  (6) Execute "make lout".  This will compile the Lout source, leaving the   #
+#  (7) Execute "make lout".  This will compile the Lout source, leaving the   #
 #      binary in this directory.  No changes are made in other directories.   #
 #                                                                             #
-#  (7) Execute "make c2lout".  This will compile the c2lout program, leaving  #
+#  (8) Execute "make c2lout".  This will compile the c2lout program, leaving  #
 #      its binary in this directory.  No changes to other directories.        #
 #                                                                             #
-#  (8) Execute "make install".  This will do the following things:            #
+#  (9) Execute "make install".  This will do the following things:            #
 #                                                                             #
-#      (a) Copy the lout and c2lout binaries into $(BINDIR);                  #
+#      (a) It will copy the lout and c2lout binaries into $(BINDIR);          #
 #                                                                             #
-#      (b) Create $(LIBDIR) and copy all the library files into it;           #
+#      (b) It will create $(LIBDIR) and copy all the library files into it;   #
 #                                                                             #
-#      (c) Perform an initializing "lout -x" run.  This run will do the       #
-#          following checks and initializations:                              #
+#      (c) It will perform an initializing "lout -x" run.  This run will      #
+#          do the following checks and initializations:                       #
 #                                                                             #
 #          (i)   It will read all the font files mentioned in file            #
 #                $(LIBDIR)/include/fontdefs and check that they               #
@@ -142,42 +150,42 @@
 #          something to do with the relatively large size of this file.  If   #
 #          this happens, change line 8 of file ./include/langdefs to          #
 #                                                                             #
-#              langdef Norwegian Norsk { }                                    #
+#            langdef Norwegian Norsk { -   . : ! ? .) :) ?) !) .' :' !' ?' }  #
 #                                                                             #
 #          to dis-inform Lout about this file, then "make uninstall" and      #
 #          "make install" again.  Lout will not be able to hyphenate          #
 #          Norwegian language words if you have to do this.                   #
 #                                                                             #
-#      (d) Change the mode of the files created in (c) to be publicly         #
-#          readable, just in case they weren't created that way.              #
+#      (d) It will change the mode of the files created in (c) to be          #
+#          publicly readable, just in case they weren't created that way.     #
 #                                                                             #
 #      It is good to build the various files during installation because      #
 #      later runs will not have write permission in the library directories.  #
 #                                                                             #
-#  (9) Execute "make installman".  This installs the manual entries for       #
+# (10) Execute "make installman".  This installs the manual entries for       #
 #      lout and c2lout into directory $(MANDIR), which is assumed to exist.   #
 #      These entries are troff files; plain text versions are also available  #
 #      in directory ./man if you need them (install them yourself).           #
 #                                                                             #
-# (10) Execute "make installdoc".  This creates directory $(DOCDIR) and       #
+# (11) Execute "make installdoc".  This creates directory $(DOCDIR) and       #
 #      copies the Lout documentation into it.                                 #
 #                                                                             #
-# (11) If you want French error messages, execute "make installfr" now.       #
+# (12) If you want French error messages, execute "make installfr" now.       #
 #      If you want German error messages, execute "make installde" now.       #
 #      These commands compile the error messages files into packed forms      #
 #      using the gencat command, and store them in $(LIBDIR)/locale.          #
 #                                                                             #
-# (12) Execute "make clean".  This cleans up this directory.                  #
+# (13) Execute "make clean".  This cleans up this directory.                  #
 #                                                                             #
-# (13) If the usual size of a piece of paper at your site is not A4, you      #
+# (14) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
-#      on line 623 of file $(LIBDIR)/include/dl.  You can find the list of    #
+#      on line 769 of file $(LIBDIR)/include/dl.  You can find the list of    #
 #      known page types in the User's Guide, $(LIBDIR)/doc/user/outfile.ps,   #
-#      and also at line 1496 in file $(LIBDIR)/include/dl.                    #
+#      and also at line 1810 in file $(LIBDIR)/include/dl.                    #
 #                                                                             #
-# (14) If the usual language at your site is not English, you might like to   #
+# (15) If the usual language at your site is not English, you might like to   #
 #      now change the default value of the @InitialLanguage option on line    #
-#      609 of file $(LIBDIR)/include/dl.  This will mean that by default the  #
+#      752 of file $(LIBDIR)/include/dl.  This will mean that by default the  #
 #      date and words like Chapter and July will appear in a different        #
 #      language, and hyphenation will be carried out according to patterns    #
 #      designed for that language.  You can find the list of known languages  #
@@ -185,7 +193,7 @@
 #      is not on the list, let me know and we can work together to add it.    #
 #      This has nothing to do with locales and USELOC.                        #
 #                                                                             #
-#  Mail jeff@cs.su.oz.au if you have any problems.                            #
+#  Mail jeff@cs.usyd.edu.au if you have any problems.                         #
 #                                                                             #
 ###############################################################################
 
@@ -193,27 +201,30 @@ OSUNIX  = 1
 OSDOS   = 0
 OSMAC   = 0
 
-BINDIR	= /usr/local/bin
-LIBDIR	= /usr/local/lib/lout
-DOCDIR	= /usr/local/lib/loutdoc
-MANDIR	= /usr/local/man/man1
+USESTAT = 1
+
+BINDIR	= /u12/staff/jeff/bin
+LIBDIR	= /u12/staff/jeff/lout.lib
+DOCDIR	= /u12/staff/jeff/lout.doc
+MANDIR	= /u12/staff/jeff/lout.man
 
 CHARIN	= 1
 CHAROUT	= 0
 
-USELOC	= 0
+USELOC	= 1
 LOC_FR	= fr
 LOC_DE	= de
 
-CC	= cc
+CC	= gcc
 
-COPTS	=
+COPTS	= -ansi -pedantic -Wall
 
 CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
 	  -DOS_DOS=$(OSDOS)					\
 	  -DOS_MAC=$(OSMAC)					\
+	  -DUSE_STAT=$(USESTAT)					\
 	  -DFONT_DIR=\"$(LIBDIR)/font\"				\
-	  -DEVEC_DIR=\"$(LIBDIR)/evec\"				\
+	  -DMAPS_DIR=\"$(LIBDIR)/maps\"				\
 	  -DINCL_DIR=\"$(LIBDIR)/include\"			\
 	  -DDATA_DIR=\"$(LIBDIR)/data\"				\
 	  -DHYPH_DIR=\"$(LIBDIR)/hyph\"				\
@@ -221,7 +232,7 @@ CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
 	  -DCHAR_IN=$(CHARIN)					\
 	  -DCHAR_OUT=$(CHAROUT)					\
 	  -DLOCALE_ON=$(USELOC)					\
-	  -DDEBUG_ON=0						\
+	  -DDEBUG_ON=0   					\
 	  -DASSERT_ON=1 $(COPTS)
 
 OBJS	= z01.o z02.o z03.o z04.o z05.o z06.o z07.o z08.o	\
@@ -275,10 +286,10 @@ install: lout c2lout
 	cp font/* $(LIBDIR)/font
 	chmod 644 $(LIBDIR)/font/*
 	@echo ""
-	mkdir $(LIBDIR)/evec
-	chmod 755 $(LIBDIR)/evec
-	cp evec/* $(LIBDIR)/evec
-	chmod 644 $(LIBDIR)/evec/*
+	mkdir $(LIBDIR)/maps
+	chmod 755 $(LIBDIR)/maps
+	cp maps/* $(LIBDIR)/maps
+	chmod 644 $(LIBDIR)/maps/*
 	@echo ""
 	mkdir $(LIBDIR)/locale
 	chmod 755 $(LIBDIR)/locale

@@ -24,7 +24,7 @@ for multilingual document formatting and several new symbols.
 @PP
 This manual was rendered into PostScript
 postscript @Index { PostScript }
-by Version 3.06 of the Basser Lout interpreter, using the symbols
+by Version 3.08 of the Basser Lout interpreter, using the symbols
 described in the User's Guide @Cite { $kingston1995lout.user }.
 @DP
 @Heading { Acknowledgment. }  Version 3 has benefited from hundreds of

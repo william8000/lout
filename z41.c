@@ -1,9 +1,9 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -166,8 +166,7 @@ static void WriteClosure(OBJECT x)
 
         default:
       
-	  Error(41, 3, "WriteClosure: %s",
-	    INTERN, &fpos(y), Image(type(actual(y))) );
+	  assert1(FALSE, "WriteClosure:", Image(type(actual(y))));
 	  break;
 
       } /* end switch */
@@ -300,7 +299,8 @@ static void WriteObject(OBJECT x, int outer_prec)
       }
 
       braces_needed = env != nilobj ||
-	(precedence(sym) <= outer_prec && (has_lpar(sym) || has_rpar(sym)));
+	(precedence(sym) <= outer_prec && (has_lpar(sym) || has_rpar(sym))) ||
+	outer_prec >= JUXTA_PREC;
 
       /* print environment */
       if( env != nilobj )
@@ -332,6 +332,10 @@ static void WriteObject(OBJECT x, int outer_prec)
       Child(y, Down(x));
       assert( type(y) == CLOSURE, "WriteObject/CROSS: type(y) != CLOSURE!" );
       if( DEFAULT_PREC <= outer_prec )  StringFPuts(KW_LBR, last_write_fp);
+      if( need_lvis(actual(y)) )
+      { StringFPuts(KW_LVIS, last_write_fp);
+        StringFPuts(STR_SPACE, last_write_fp);
+      }
       StringFPuts(SymName(actual(y)), last_write_fp);
       StringFPuts(KW_CROSS, last_write_fp);
       Child(y, LastDown(x));
@@ -350,6 +354,8 @@ static void WriteObject(OBJECT x, int outer_prec)
     case VSHIFT:	name = KW_VSHIFT;	goto SETC;
     case HSCALE:	name = KW_HSCALE;	goto SETC;
     case VSCALE:	name = KW_VSCALE;	goto SETC;
+    case HCOVER:	name = KW_HCOVER;	goto SETC;
+    case VCOVER:	name = KW_VCOVER;	goto SETC;
     case SCALE:		name = KW_SCALE;	goto SETC;
     case HCONTRACT:	name = KW_HCONTRACT;	goto SETC;
     case VCONTRACT:	name = KW_VCONTRACT;	goto SETC;
@@ -365,6 +371,8 @@ static void WriteObject(OBJECT x, int outer_prec)
     case XCHAR:		name = KW_XCHAR;	goto SETC;
     case FONT:		name = KW_FONT;		goto SETC;
     case SPACE:		name = KW_SPACE;	goto SETC;
+    case YUNIT:		name = KW_YUNIT;	goto SETC;
+    case ZUNIT:		name = KW_ZUNIT;	goto SETC;
     case BREAK:		name = KW_BREAK;	goto SETC;
     case UNDERLINE:	name = KW_UNDERLINE;	goto SETC;
     case COLOUR:	name = KW_COLOUR;	goto SETC;
@@ -372,6 +380,7 @@ static void WriteObject(OBJECT x, int outer_prec)
     case CURR_LANG:	name = KW_CURR_LANG;	goto SETC;
     case COMMON:	name = KW_COMMON;	goto SETC;
     case RUMP:		name = KW_RUMP;		goto SETC;
+    case INSERT:	name = KW_INSERT;	goto SETC;
     case NEXT:		name = KW_NEXT;		goto SETC;
     case OPEN:		name = KW_OPEN;		goto SETC;
     case TAGGED:	name = KW_TAGGED;	goto SETC;
@@ -414,7 +423,7 @@ static void WriteObject(OBJECT x, int outer_prec)
 
     default:
 
-      Error(41, 4, "WriteObject: %s", INTERN, &fpos(x), Image(type(x)));
+      assert1(FALSE, "WriteObject:", Image(type(x)));
       break;
 
   } /* end switch */
@@ -439,12 +448,12 @@ void AppendToFile(OBJECT x, FILE_NUM fnum, int *pos)
   { if( last_write_fnum != NO_FILE )  fclose(last_write_fp);
     str = FileName(fnum);
     if( StringLength(str) + StringLength(NEW_DATA_SUFFIX) >= MAX_BUFF )
-      Error(41, 5, "file name %s%s is too long",
+      Error(41, 3, "file name %s%s is too long",
 	FATAL, PosOfFile(fnum), str, NEW_DATA_SUFFIX);
     StringCopy(buff, str);  StringCat(buff, NEW_DATA_SUFFIX);
     last_write_fp = StringFOpen(buff, APPEND_TEXT);
     if( last_write_fp == null )
-      Error(41, 6, "cannot append to database file %s", FATAL, no_fpos, buff);
+      Error(41, 4, "cannot append to database file %s", FATAL, no_fpos, buff);
     last_write_fnum = fnum;
     (void) fseek(last_write_fp, 0L, SEEK_END);
   }
@@ -512,7 +521,7 @@ void CloseFiles(void)
       }
       debug2(DIO, D, "rename(%s, %s)", newname, oldname);
       if( StringRename(newname, oldname) != 0 )
-	Error(41, 9, "rename(%s, %s) failed", INTERN, no_fpos,newname,oldname);
+	Error(41, 5, "rename(%s, %s) failed", INTERN, no_fpos,newname,oldname);
     }
   }
   debug0(DIO, D, "CloseFiles returning.");

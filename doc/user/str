@@ -7,6 +7,7 @@
 @Include { str_list }
 @Include { str_foot }
 @Include { str_marg }
+@Include { str_theo }
 @Include { str_figs }
 @Include { str_larg }
 @Include { str_cros }

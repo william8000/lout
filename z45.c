@@ -1,9 +1,9 @@
-/*@z07.c:Character Mapping:LoadMapping(), SmallCaps()@************************/
+/*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -23,388 +23,448 @@
 /*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
 /*                                                                           */
 /*  FILE:         z45.c                                                      */
-/*  MODULE:       Character Mapping                                          */
-/*  EXTERNS:      LoadMapping(), SmallCaps()                                 */
+/*  MODULE:       External Sort                                              */
+/*  EXTERNS:      SortFile()                                                 */
+/*                                                                           */
+/*  This file is a cut-down version of the GNU sort utility, written by      */
+/*  Mike Haertel.  The cutting was done by Franck Arnaud and Jeff Kingston.  */
 /*                                                                           */
 /*****************************************************************************/
+
+/* sort - sort lines of text (with all kinds of options).
+   Copyright (C) 1988, 1991 Free Software Foundation
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+   Written December 1988 by Mike Haertel.
+   The author may be reached (Email) at the address mike@gnu.ai.mit.edu,
+   or (US mail) as Mike Haertel c/o Free Software Foundation. */
+
+#include <sys/types.h>
 #include "externs"
-#define MAX_MAP		 20		/* max number of encoding vectors    */
-#define MAX_CHAR	256		/* max chars represented in one char */
-#define	MAX_HASH	353		/* size of hash table                */
 
-typedef struct mapvec {
-  OBJECT	file_name;		/* name of file containing the vec   */
-  FILE_NUM	fnum;			/* the file number of this file      */
-  ENCODING	enc;			/* encoding used by this mapping     */
-  FULL_CHAR	mapping[MAX_CHAR];	/* mapped value                      */
-  FULL_CHAR	transform[MAX_CHAR];	/* transform after mapping           */
-} *MAP_VEC;
+#ifndef UCHAR_MAX
+#define UCHAR_MAX 255
+#endif
 
-static	MAP_VEC	map_table[MAX_MAP];	/* the mappings                      */
-static	int	maptop = 1;		/* first free slot in map_table[]    */
-					/* save 0 for "no mapping"           */
+/* from system.h */
 
-/*@::LoadMapping()@***********************************************************/
-/*                                                                           */
-/*  MAPPING LoadMapping(file_name, enc)                                      */
-/*                                                                           */
-/*  Declare file_name to be a character mapping file.  A file may be so      */
-/*  declared more than once.  The character names are from encoding enc.     */
-/*                                                                           */
-/*****************************************************************************/
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
 
-MAPPING LoadMapping(OBJECT file_name, ENCODING enc)
-{ FILE *fp;  MAP_VEC map;  MAPPING m;  int i;
-  FULL_CHAR charname[MAX_BUFF], mapname[MAX_BUFF], alg[MAX_BUFF];
-  FULL_CHAR charval, mapval;
-  debug2(DCM, D, "LoadMapping(%s, %d)", EchoObject(file_name), enc);
+/* end system.h */
 
-  /* if the file name is "-", it means no mapping file is supplied */
-  if( StringEqual(string(file_name), AsciiToFull("-")) )
-  { debug1(DCM, D, "LoadMapping returning 0 (file name is %s)",
-      string(file_name));
-    return (MAPPING) 0;
-  }
-
-  /* find out whether we've seen this file name before */
-  for( m = 1; m < maptop; m++ )
-  { if( map_table[m]->enc == enc &&
-        StringEqual(string(map_table[m]->file_name), string(file_name)) )
-      break;
-  }
-
-  /* if seen before, just return the previously assigned mapping number */
-  if( m < maptop )
-  { Dispose(file_name);
-    debug1(DCM, D, "LoadMapping returning %d (not new)", m);
-    return m;
-  }
-
-  /* new, so allocate a new slot in map_table for this new mapping */
-  if( maptop++ == MAX_MAP )
-    Error(45, 1, "too many character mappings", FATAL, &fpos(file_name));
-  ifdebug(DMA, D, DebugRegisterUsage(MEM_CMAPS, 1, sizeof(struct mapvec)));
-  map_table[m] = map = (MAP_VEC) malloc( sizeof(struct mapvec) );
-  if( map == (MAP_VEC) NULL )
-    Error(45, 2, "run out of memory when loading character mapping",
-      FATAL, &fpos(file_name));
-  map->file_name = file_name;
-  map->enc       = enc;
-  for( i = 0;  i < MAX_CHAR; i++ )
-  { map->mapping[i] = i;
-    map->transform[i] = (FULL_CHAR) '.';
-  }
-
-  /* define and open the file */
-  map->fnum = DefineFile(string(file_name), STR_EMPTY, &fpos(file_name),
-    MAPPING_FILE, ENCODING_PATH);
-  fp = OpenFile(map->fnum, FALSE, FALSE);
-  if( fp == NULL )  Error(45, 3, "cannot open character mapping file %s",
-      FATAL, PosOfFile(map->fnum), FileName(map->fnum));
-
-  /* read triples of the form (charname, charname, algorithm) and insert */
-  while( fscanf(fp, "%s %s %s", charname, mapname, alg) == 3 )
-  { charval = EvRetrieve(charname, enc);
-    if( charval == 0 )
-      Error(45, 4, "unknown character name %s in character mapping file %s",
-        FATAL, PosOfFile(map->fnum), charname, FileName(map->fnum));
-    mapval = EvRetrieve(mapname, enc);
-    if( mapval == 0 )
-      Error(45, 5, "unknown character name %s in character mapping file %s",
-	    FATAL, PosOfFile(map->fnum), mapname, FileName(map->fnum));
-    if( (alg[0] != '.' && alg[0] != '-') || alg[1] != '\0' )
-      Error(45, 6, "unknown algorithm %s in character mapping file %s",
-	    FATAL, PosOfFile(map->fnum), alg, FileName(map->fnum));
-    map->mapping[charval] = mapval;
-    map->transform[charval] = alg[0];
-  }
-  fclose(fp);
-  debug1(DCM, D, "LoadMapping returning %d (new mapping)", m);
-  return m;
-} /* end LoadMapping */
-
-/*@@**************************************************************************/
-/*                                                                           */
-/*  OBJECT DoWord(buff, q, x, fnum)                                          */
-/*                                                                           */
-/*  Replace WORD or QWORD x by a small caps version, based on word_font(x).  */
-/*                                                                           */
-/*****************************************************************************/
-
-static OBJECT DoWord(FULL_CHAR *buff, FULL_CHAR *q, OBJECT x, FONT_NUM fnum)
-{ OBJECT res;
-  *q++ = '\0';
-  res = MakeWord(type(x), buff, &fpos(x));
-  word_font(res) = fnum;
-  word_colour(res) = word_colour(x);
-  word_language(res) = word_language(x);
-  word_hyph(res) = word_hyph(x);
-  return res;
-} /* end DoWord */
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define UCHAR_LIM (UCHAR_MAX + 1)
+#define UCHAR(c) ((unsigned char) (c))
 
 
-/*****************************************************************************/
-/*                                                                           */
-/*  OBJECT DoVShift(x, vshift, chld)                                         */
-/*                                                                           */
-/*  Make an new VSHIFT object with the given shift and child.                */
-/*                                                                           */
-/*****************************************************************************/
+/* During the merge phase, the number of files to merge at once. */
+#define NMERGE 16
 
-static OBJECT DoVShift(OBJECT x, LENGTH vshift, OBJECT chld)
-{ OBJECT res;
-  res = New(VSHIFT);
-  FposCopy(fpos(res), fpos(x));
-  shift_type(res) = GAP_DEC;
-  units(shift_gap(res)) = FIXED_UNIT;
-  mode(shift_gap(res)) = EDGE_MODE;
-  width(shift_gap(res)) = vshift;
-  Link(res, chld);
-  return res;
+/* Initial buffer size for in core sorting.  Will not grow unless a
+   line longer than this is seen. */
+static int sortalloc =  524288;
+
+/* Guess of average line length. */
+static int linelength = 40;
+
+/* Maximum number of elements for the array(s) of struct line's, in bytes.  */
+#define LINEALLOC 262144
+
+
+/* bcopy -- from lib-text-util/bcopy.c */
+/* bcopy.c -- copy memory.
+   renamed jeff_bcopy as a portability fix by JK
+   Copy LENGTH bytes from SOURCE to DEST.  Does not null-terminate.
+   In the public domain.
+   By David MacKenzie <djm@gnu.ai.mit.edu>.  */
+
+static void
+jeff_bcopy (source, dest, length)
+     char *source, *dest;
+     unsigned length;
+{
+  if (source < dest)
+    /* Moving from low mem to hi mem; start at end.  */
+    for (source += length, dest += length; length; --length)
+      *--dest = *--source;
+  else if (source != dest)
+    /* Moving from hi mem to low mem; start at beginning.  */
+    for (; length; --length)
+      *dest++ = *source++;
+}
+/* end jeff_bcopy */
+
+/* local error */
+
+static void sort_error(char *err)
+{
+	fprintf(stderr,"sort: %s\n",err);
 }
 
-/*****************************************************************************/
-/*                                                                           */
-/*  void DoAddGap(new_acat)                                                  */
-/*                                                                           */
-/*  Add a new 0i gap object to new_acat.                                     */
-/*                                                                           */
-/*****************************************************************************/
+/* Lines are held in core as counted strings. */
+struct line
+{
+  char *text;			/* Text of the line. */
+  int length;			/* Length not including final newline. */
+  char *keybeg;			/* Start of first key. */
+  char *keylim;			/* Limit of first key. */
+};
 
-static void DoAddGap(OBJECT new_acat)
-{ OBJECT new_g;
-  new_g = New(GAP_OBJ);
-  FposCopy(fpos(new_g), fpos(new_acat));
-  hspace(new_g) = vspace(new_g) = 0;
-  SetGap(gap(new_g), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0*IN);
-  Link(new_acat, new_g);
-}
+/* Arrays of lines. */
+struct lines
+{
+  struct line *lines;		/* Dynamically allocated array of lines. */
+  int used;			/* Number of slots used. */
+  int alloc;			/* Number of slots allocated. */
+  int limit;			/* Max number of slots to allocate.  */
+};
 
-/*@::SmallCaps()@*************************************************************/
-/*                                                                           */
-/*  OBJECT SmallCaps(x, style)                                               */
-/*                                                                           */
-/*  Replace WORD or QWORD x by a small caps version, based on word_font(x).  */
-/*                                                                           */
-/*****************************************************************************/
-#define	INIT		0
-#define	ALL_NON		1
-#define	ALL_TRANS	2
-#define	MIXED_NON	3
-#define	MIXED_TRANS	4
-#define transformable(ch)	(transform[ch] == '-')
+/* Input buffers. */
+struct buffer
+{
+  char *buf;			/* Dynamically allocated buffer. */
+  int used;			/* Number of bytes used. */
+  int alloc;			/* Number of bytes allocated. */
+  int left;			/* Number of bytes left after line parsing. */
+};
 
-OBJECT SmallCaps(OBJECT x, STYLE *style)
-{ MAPPING m;  int i;  OBJECT new_y, new_x, new_acat, tmp;
-  FULL_CHAR *mapping, *transform, buff[MAX_BUFF], *p, *q;
-  FONT_NUM small_font;  LENGTH vshift;  int state;  STYLE new_style;
-  static OBJECT font_change_word = nilobj;
-  assert( is_word(type(x)), "SmallCaps: !is_word(type(x))" );
-  debug2(DCM, D, "SmallCaps(%s %s)", Image(type(x)), string(x));
+/* Allocate N bytes of memory dynamically, with error checking.  */
 
-  /* get the mapping and return if there isn't one for this font */
-  m = FontMapping(font_num(x));
-  if( m == 0 )
-  { debug0(DCM, D, "SmallCaps returning unchanged (mapping is 0)");
-    return x;
-  }
-  assert( 1 <= m && m < maptop, "SmallCaps: mapping out of range!" );
-  mapping = map_table[m]->mapping;
-  transform = map_table[m]->transform;
+char *
+xmalloc (n)
+     unsigned n;
+{
+  char *p;
 
-  /* apply the mapping to each character in turn */
-
-  /* if plain text, apply the mapping and exit */
-  if( BackEnd == PLAINTEXT )
-  {
-    for( i = 0;  string(x)[i] != '\0';  i++ )
-      string(x)[i] = mapping[string(x)[i]];
-    debug1(DCM, D, "SmallCaps returning (plain text) %s", EchoObject(x));
-    return x;
-  }
-
-  /* set up the font change word if not already done */
-  if( font_change_word == nilobj )
-  { font_change_word = MakeWord(WORD, AsciiToFull("0.7f"), no_fpos);
-  }
-
-  state = INIT;  q = buff;
-  for( p = string(x);  *p != '\0';  p++ )
-  {
-    debug2(DCM, DD, " examining %c (%s)", *p,
-      transformable(*p) ? "transformable" : "not transformable");
-    switch( state )
+  p = malloc (n);
+  if (p == 0)
     {
-      case INIT:
-
-        /* this state is for when we are at the first character */
-        if( transformable(*p) )
-        { *q++ = mapping[*p];
-
-	  /* work out what the smaller font is going to be, and the vshift */
-	  StyleCopy(new_style, *style);
-	  FontChange(&new_style, font_change_word);
-	  small_font = font(new_style);
-	  vshift = FontHalfXHeight(word_font(x)) - FontHalfXHeight(small_font);
-
-          state = ALL_TRANS;
-        }
-        else
-        { *q++ = mapping[*p];
-          state = ALL_NON;
-        }
-        break;
-
-
-      case ALL_NON:
-
-        /* in this state, all characters so far are non-transformable */
-        if( transformable(*p) )
-        { 
-	  /* work out what the smaller font is going to be */
-	  StyleCopy(new_style, *style);
-	  FontChange(&new_style, font_change_word);
-	  small_font = font(new_style);
-	  vshift = FontHalfXHeight(word_font(x)) - FontHalfXHeight(small_font);
-
-	  /* make a new WORD out of the current contents of buff */
-	  new_y = DoWord(buff, q, x, word_font(x));
-
-	  /* construct the skeleton of the result to replace x */
-	  new_x = New(ONE_COL);
-	  FposCopy(fpos(new_x), fpos(x));
-	  new_acat = New(ACAT);
-	  FposCopy(fpos(new_acat), fpos(x));
-	  Link(new_x, new_acat);
-	  Link(new_acat, new_y);
-	  DoAddGap(new_acat);
-
-	  /* start off a new buffer with *p */
-	  q = buff;
-	  *q++ = mapping[*p];
-	  state = MIXED_TRANS;
-        }
-        else *q++ = mapping[*p];
-        break;
-
-
-      case ALL_TRANS:
-
-        /* in this state, all characters so far are transformable */
-        if( transformable(*p) ) *q++ = mapping[*p];
-        else
-        {
-	  /* make a new @VShift WORD out of the current contents of buff */
-	  tmp = DoWord(buff, q, x, small_font);
-	  new_y = DoVShift(x, vshift, tmp);
-
-	  /* construct the skeleton of the result to replace x */
-	  new_x = New(ONE_COL);
-	  FposCopy(fpos(new_x), fpos(x));
-	  new_acat = New(ACAT);
-	  FposCopy(fpos(new_acat), fpos(x));
-	  Link(new_x, new_acat);
-	  Link(new_acat, new_y);
-	  DoAddGap(new_acat);
-
-	  /* start off a new buffer with *p */
-	  q = buff;
-	  *q++ = mapping[*p];
-	  state = MIXED_NON;
-        }
-        break;
-
-
-      case MIXED_NON:
-
-        /* in this state the previous char was non-transformable, but */
-        /* there have been characters before that that were transformable */
-        if( transformable(*p) )
-        {
-	  /* make a new WORD out of the current contents of buff */
-	  new_y = DoWord(buff, q, x, word_font(x));
-
-	  /* link the new word into the growing structure that replaces x */
-	  Link(new_acat, new_y);
-	  DoAddGap(new_acat);
-
-	  /* start off a new buffer with *p */
-	  q = buff;
-	  *q++ = mapping[*p];
-	  state = MIXED_TRANS;
-        }
-        else *q++ = mapping[*p];
-        break;
-
-
-      case MIXED_TRANS:
-
-        /* in this state the previous char was transformable, but there */
-        /* have been characters before that that were non-transformable */
-        if( transformable(*p) ) *q++ = mapping[*p];
-        else
-        {
-	  /* make a new @VShift WORD out of the current contents of buff */
-	  tmp = DoWord(buff, q, x, small_font);
-	  new_y = DoVShift(x, vshift, tmp);
-
-	  /* link the new word into the growing structure that replaces x */
-	  Link(new_acat, new_y);
-	  DoAddGap(new_acat);
-
-	  /* start off a new buffer with *p */
-	  q = buff;
-	  *q++ = mapping[*p];
-	  state = MIXED_NON;
-        }
-        break;
-
+      sort_error ("virtual memory exhausted");
+      exit (2);
     }
-  }
+  return p;
+}
 
-  /* now at termination, clean up the structure */
-  switch( state )
-  {
-    case INIT:
-    case ALL_NON:
+/* Change the size of an allocated block of memory P to N bytes,
+   with error checking.
+   If P is NULL, run xmalloc.
+   If N is 0, run free and return NULL.  */
 
-      /* original x is OK as is: either empty or all non-transformable */
-      break;
+char *
+xrealloc (p, n)
+     char *p;
+     unsigned n;
+{
+  if (p == 0)
+    return xmalloc (n);
+  if (n == 0)
+    {
+      free (p);
+      return 0;
+    }
+  p = realloc (p, n);
+  if (p == 0)
+    {
+      sort_error ("virtual memory exhausted");
+      exit (2);
+    }
+  return p;
+}
+
+static FILE *
+xfopen (file, how)
+     char *file, *how;
+{
+	FILE *fp;
+
+	if(strcmp(file,"-") == 0)
+	{
+		sort_error("do not use standard io");
+		exit(2);
+	}
+
+	fp = fopen(file,how);
+
+  if (fp == 0)
+    {
+      sort_error ("can't open file "); 
+      sort_error (file);
+      exit (2);
+    }
+  return fp;
+}
+
+static void
+xfclose (fp)
+     FILE *fp;
+{
+  fflush (fp);
+  if (fp != stdin && fp != stdout)
+    {
+      if (fclose (fp) != 0)
+	{
+	  sort_error ("error closing file");
+	  exit (2);
+	}
+    }
+  else
+    /* Allow reading stdin from tty more than once. */
+    clearerr (fp);
+}
+
+static void
+xfwrite (buf, ssize, nelem, fp)
+     char *buf;
+     int ssize, nelem;
+     FILE *fp;
+{
+  if (fwrite (buf, ssize, nelem, fp) != nelem)
+    {
+      sort_error ("write error");
+      exit (2);
+    }
+}
 
 
-    case ALL_TRANS:
+/* Initialize BUF, allocating ALLOC bytes initially. */
 
-      /* make a new @VShift WORD and replace x with it */
-      tmp = DoWord(buff, q, x, small_font);
-      new_x = DoVShift(x, vshift, tmp);
-      ReplaceNode(new_x, x);
-      Dispose(x);
-      x = new_x;
-      break;
+static void
+initbuf (buf, alloc)
+     struct buffer *buf;
+     int alloc;
+{
+  buf->alloc = alloc;
+  buf->buf = xmalloc (buf->alloc);
+  buf->used = buf->left = 0;
+}
+
+/* Fill BUF reading from FP, moving buf->left bytes from the end
+   of buf->buf to the beginning first.	If EOF is reached and the
+   file wasn't terminated by a newline, supply one.  Return a count
+   of bytes buffered. */
+
+static int
+fillbuf (buf, fp)
+     struct buffer *buf;
+     FILE *fp;
+{
+  int cc;
+
+  jeff_bcopy (buf->buf + buf->used - buf->left, buf->buf, buf->left);
+  buf->used = buf->left;
+
+  while (!feof (fp) && (buf->used == 0 || !memchr (buf->buf, '\n', buf->used)))
+    {
+      if (buf->used == buf->alloc)
+	{
+	  buf->alloc *= 2;
+	  buf->buf = xrealloc (buf->buf, buf->alloc);
+	}
+      cc = fread (buf->buf + buf->used, 1, buf->alloc - buf->used, fp);
+      if (ferror (fp))
+	{
+	  sort_error ("read error");
+	  exit (2);
+	}
+      buf->used += cc;
+    }
+
+  if (feof (fp) && buf->used && buf->buf[buf->used - 1] != '\n')
+    {
+      if (buf->used == buf->alloc)
+	{
+	  buf->alloc *= 2;
+	  buf->buf = xrealloc (buf->buf, buf->alloc);
+	}
+      buf->buf[buf->used++] = '\n';
+    }
+
+  return buf->used;
+}
+
+/* Initialize LINES, allocating space for ALLOC lines initially.
+   LIMIT is the maximum possible number of lines to allocate space
+   for, ever.  */
+
+static void
+initlines (lines, alloc, limit)
+     struct lines *lines;
+     int alloc;
+     int limit;
+{
+  lines->alloc = alloc;
+  lines->lines = (struct line *) xmalloc (lines->alloc * sizeof (struct line));
+  lines->used = 0;
+  lines->limit = limit;
+}
 
 
-    case MIXED_NON:
+/* Find the lines in BUF, storing pointers and lengths in LINES.
+   Also replace newlines with NULs. */
 
-      /* make a new WORD, add to new_acat, and replace x */
-      new_y = DoWord(buff, q, x, word_font(x));
-      Link(new_acat, new_y);
-      ReplaceNode(new_x, x);
-      Dispose(x);
-      x = new_x;
-      break;
+static void
+findlines (buf, lines)
+     struct buffer *buf;
+     struct lines *lines;
+{
+  register char *beg = buf->buf, *lim = buf->buf + buf->used, *ptr;
 
+  lines->used = 0;
 
-    case MIXED_TRANS:
+  while (beg < lim && (ptr = memchr (beg, '\n', lim - beg))
+	 && lines->used < lines->limit)
+    {
+      /* There are various places in the code that rely on a NUL
+	 being at the end of in-core lines; NULs inside the lines
+	 will not cause trouble, though. */
+      *ptr = '\0';
 
-      /* make a new @VShift WORD, add to new_acat, and replace x */
-      tmp = DoWord(buff, q, x, small_font);
-      new_y = DoVShift(x, vshift, tmp);
-      Link(new_acat, new_y);
-      ReplaceNode(new_x, x);
-      Dispose(x);
-      x = new_x;
-      break;
-  }
-  debug1(DCM, D, "SmallCaps returning %s", EchoObject(x));
-  return x;
-} /* end SmallCaps */
+      if (lines->used == lines->alloc)
+	{
+	  lines->alloc *= 2;
+	  lines->lines = (struct line *)
+	    xrealloc ((char *) lines->lines,
+		      lines->alloc * sizeof (struct line));
+	}
+
+      lines->lines[lines->used].text = beg;
+      lines->lines[lines->used].length = ptr - beg;
+
+      ++lines->used;
+      beg = ptr + 1;
+    }
+
+  buf->left = lim - beg;
+}
+
+/* Compare two lines A and B, returning negative, zero, or positive
+   depending on whether A compares less than, equal to, or greater than B. */
+
+static int
+compare (a, b)
+     register struct line *a, *b;
+{
+  int diff, tmpa, tmpb, mini;
+
+      tmpa = a->length, tmpb = b->length;
+      mini = min (tmpa, tmpb);
+      if (mini == 0)
+	diff = tmpa - tmpb;
+      else
+	{
+	  char *ap = a->text, *bp = b->text;
+
+	  diff = *ap - *bp;
+	  if (diff == 0)
+	    {
+	      diff = memcmp (ap, bp, mini);
+	      if (diff == 0)
+		diff = tmpa - tmpb;
+	    }
+	}
+
+  return diff;
+}
+
+/* Sort the array LINES with NLINES members, using TEMP for temporary space. */
+
+static void
+sortlines (lines, nlines, temp)
+     struct line *lines, *temp;
+     int nlines;
+{
+  register struct line *lo, *hi, *t;
+  register int nlo, nhi;
+
+  if (nlines == 2)
+    {
+      if (compare (&lines[0], &lines[1]) > 0)
+	*temp = lines[0], lines[0] = lines[1], lines[1] = *temp;
+      return;
+    }
+
+  nlo = nlines / 2;
+  lo = lines;
+  nhi = nlines - nlo;
+  hi = lines + nlo;
+
+  if (nlo > 1)
+    sortlines (lo, nlo, temp);
+
+  if (nhi > 1)
+    sortlines (hi, nhi, temp);
+
+  t = temp;
+
+  while (nlo && nhi)
+    if (compare (lo, hi) <= 0)
+      *t++ = *lo++, --nlo;
+    else
+      *t++ = *hi++, --nhi;
+  while (nlo--)
+    *t++ = *lo++;
+
+  for (lo = lines, nlo = nlines - nhi, t = temp; nlo; --nlo)
+    *lo++ = *t++;
+}
+
+/* Sort NFILES FILES onto OFP. */
+
+void SortFile(char *infile, char *outfile)  /* name changed from sort_one by JK */
+{
+  struct buffer buf;
+  struct lines lines;
+  struct line *tmp;
+  int i, ntmp;
+  FILE *fp,*ofp; 
+  
+  ofp = xfopen (outfile, WRITE_BINARY);
+
+  initbuf (&buf, sortalloc);
+  initlines (&lines, sortalloc / linelength + 1,
+	     LINEALLOC / sizeof (struct line));
+  ntmp = lines.alloc;
+  tmp = (struct line *) xmalloc (ntmp * sizeof (struct line));
+
+      fp = xfopen (infile, READ_BINARY);
+      while (fillbuf (&buf, fp))
+	{
+	  findlines (&buf, &lines);
+	  if (lines.used > ntmp)
+	    {
+	      while (lines.used > ntmp)
+		ntmp *= 2;
+	      tmp = (struct line *)
+		xrealloc ((char *) tmp, ntmp * sizeof (struct line));
+	    }
+	  sortlines (lines.lines, lines.used, tmp);
+
+	  for (i = 0; i < lines.used; ++i)
+	      {
+		xfwrite (lines.lines[i].text, 1, lines.lines[i].length, ofp);
+		putc ('\n', ofp);
+	      }
+	}
+      xfclose (fp);
+      xfclose (ofp);
+
+  free (buf.buf);
+  free ((char *) lines.lines);
+  free ((char *) tmp);
+
+}

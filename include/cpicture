@@ -49,14 +49,17 @@
 @Use { @DocumentLayout
   # @InitialFont	{ Times Base 12p	} # initial font
   # @InitialBreak	{ adjust 1.20fx hyphen	} # initial break
+  # @InitialSpace	{ lout			} # initial space style
   # @InitialLanguage	{ English		} # initial language
   # @InitialColour	{ black			} # initial colour
+  # @OptimizePages	{ No			} # optimize page breaks?
   # @HeadingFont	{ Bold			} # font for @Heading
   # @ParaGap		{ 1.30vx		} # gap between paragraphs
   # @ParaIndent		{ 2.00f			} # first-line indent for @PP
   # @DisplayGap		{ 1.00v			} # gap above, below displays
   # @DisplayIndent	{ 2.00f			} # @IndentedDisplay indent
   # @DefaultIndent	{ 0.5rt			} # @Display indent
+  # @DisplayNumStyle	{ (num)			} # style of display numbers
   # @WideIndent		{ 4.00f			} # @WideTaggedList indent
   # @VeryWideIndent	{ 8.00f			} # @VeryWideTaggedList indent
   # @ListGap		{ 1.00v			} # gap between list items
@@ -81,8 +84,14 @@
   # @PageBoxShadow	{ 0.60c			} # shadow margin if ShadowBox
   # @ColumnNumber	{ 1			} # number of columns (1 to 10)
   # @ColumnGap		{ 1.00c			} # column gap
+  # @FigureLocation	{ PageTop		} # default figure location
+  # @TableLocation	{ PageTop		} # default table location
+  # @FigureWord		{ figure		} # "Figure" word else anything
+  # @TableWord		{ table			} # "Table" word else anything
   # @FigureNumbers	{ Arabic		} # method of numbering figures
   # @TableNumbers	{ Arabic		} # method of numbering tables
+  # @FigureCaptionPos	{ Below 		} # Above or Below
+  # @TableCaptionPos	{ Below			} # Above or Below
   # @CaptionFont        {                       } # figure, table caption font
   # @CaptionBreak       {                       } # figure, table caption break
   # @MakeFigureContents { No                    } # list of figures at start
@@ -114,18 +123,44 @@
   # @IndexBreak		{ outdent 1.2fx		} # index entries break
   # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
   # @IndexColumnGap	{ 1.00c			} # index column gap
+  # @MakeIndexA		{ No 			} # make index A? Yes or No
+  # @IndexAFont		{			} # index A entries font
+  # @IndexABreak	{ outdent 1.2fx		} # index A entries break
+  # @IndexAColumnNumber	{ 2			} # index A columns (1 to 10)
+  # @IndexAColumnGap	{ 1.00c			} # index A column gap
+  # @MakeIndexB		{ No 			} # make index B? Yes or No
+  # @IndexBFont		{			} # index B entries font
+  # @IndexBBreak	{ outdent 1.2fx		} # index B entries break
+  # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)
+  # @IndexBColumnGap	{ 1.00c			} # index B column gap
+  # @IndexFont		{			} # index entries font
+  # @IndexBreak		{ outdent 1.2fx		} # index entries break
+  # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
+  # @IndexColumnGap	{ 1.00c			} # index column gap
   # @TopGap		{ 0.75c			} # gap between figures
   # @MidGap		{ 0.75c			} # gap above/below body text
   # @FootNoteNumbers	{ Arabic		} # footnote numbers
   # @FootNoteThrough	{ No			} # numbered through chapter?
+  # @FootNoteLocation	{ ColFoot		} # where the footnote appears
   # @FootNoteFont	{ 0.80f			} # font for footnotes
   # @FootNoteBreak	{ 1.20fx		} # break for footnotes
   # @FootLen		{ 2.00c			} # length of footnote line
+  # @FootAboveGap	{ 1.00v			} # gap above footnote line
   # @FootGap		{ 0.20c			} # gap between footnotes
   # @EndNoteNumbers	{ Arabic		} # endnote numbers
   # @EndNoteFont	{ 0.80f			} # font of endnotes
   # @EndNoteBreak	{ 1.20fx		} # break for endnotes
   # @EndNoteGap		{ 0.20c			} # gap between endnotes
+  # @TheoremThrough	{  No			} # numbered through whole doc?
+  # @TheoremNumbers	{  Arabic		} # theorem etc. numbers
+  # @DefinitionWord	{  definition		} # "Definition" word, etc.
+  # @LemmaWord		{  lemma		} # "Lemma" word, etc.
+  # @TheoremWord	{  theorem		} # "Theorem" word, etc.
+  # @PropositionWord	{  proposition		} # "Proposition" word, etc.
+  # @CorollaryWord	{  corollary		} # "Corollary" word, etc.
+  # @ExampleWord	{  example		} # "Example" word, etc.
+  # @ClaimWord		{  claim		} # "Claim" word, etc.
+  # @ProofWord		{  proof		} # "Proof" word, etc.
   # @MarginNoteFont	{ 0.80f			} # font of margin notes
   # @MarginNoteBreak	{ ragged 1.10fx		} # break style of margin notes
   # @MarginNoteHGap	{ 0.5c   		} # horizontal gap to notes

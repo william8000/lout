@@ -18,10 +18,12 @@ file and the @Code "@Report" symbol:
 "    @CoverSheet { Yes }"
 "    @InitialFont { Times Base 12p }"
 "    @InitialBreak { hyphen adjust 1.2fx }"
+"    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
 "    @PageHeaders { Simple }"
-"    @FirstPageNumber { 1 }"
 "    @ColumnNumber { 1 }"
+"    @FirstPageNumber { 1 }"
+"    @OptimizePages { No }"
 "//"
 }
 This shows all the options of {@Code "@Report"} with their default
@@ -88,8 +90,10 @@ spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
 double spacing, and so on), and either @Code "hyphen" or
 @Code "nohyphen" for turning hyphenation on or off.
 @PP
-@Code "@InitialLanguage" determines the language of the bulk of the
-report.
+@Code "@InitialSpace" determines how Lout treats white space between
+two objects, as described in Section
+{@NumberOf white}.  @Code "@InitialLanguage" determines the language
+of the bulk of the report.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
 footers throughout the report.  Its value may be {@Code None},
@@ -101,8 +105,6 @@ page, @Code Titles produces full running titles as in the present
 document, and @Code "NoTitles" is like @Code "Titles" with the running
 titles omitted, leaving just the page numbers.
 @PP
-@Code "@FirstPageNumber" is the page number given to the first page.
-@PP
 @Code "@ColumnNumber" is the number of columns per page in the bulk of
 the report, and may be anything from {@Code 1} (the default value) to
 {@Code 10}.  However, there is nothing analogous to the @Code "@FullWidth"
@@ -111,6 +113,18 @@ and all figures and tables will be printed full width, and the rest will
 be set in columns.  There is a separate @Code "@IndexColumnNumber" option
 in the setup file which determines the number of columns in the index
 (Section {@NumberOf indexes}).
+@PP
+@Code "@FirstPageNumber" is the page number given to the first page.
+@PP
+Lout ordinarily places lines onto a page until space runs out, then moves
+to the next page and so on.  This often produces ugly empty spaces at
+the bottoms of pages preceding large unbreakable displays.  Setting the
+@Code "@OptimizePages" option to {@Code "Yes"} causes Lout to examine the
+overall situation and try to minimize the ugliness, using the @TeX
+optimal paragraph breaking algorithm.  It takes two runs to do this,
+with intermediate results stored in Lout's cross reference database
+(Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
+it, which might be wise after major changes.
 @PP
 After the compulsory {@Code "//"} comes an optional abstract:
 abstract. @Index @Code "@Abstract"
@@ -250,6 +264,9 @@ is a representative sample of these options, showing their default values:
 "@Use { @ReportLayout"
 "    # @CoverSheet { Yes }"
 "    # @DateLine { No }"
+"    # @ReferencesBeforeAppendices { No }"
+"    # @AbstractWord { abstract }"
+"    # @ContentsWord { contents }"
 "    # @SectionNumbers { Arabic }"
 "    # @SectionHeadingFont { Bold }"
 "    # @SectionGap { 2.00v }"
@@ -257,7 +274,13 @@ is a representative sample of these options, showing their default values:
 "}"
 }
 @Code "@CoverSheet" and @Code "@DateLine" are as for {@Code "@Report"};
-you can set them in either place as you prefer.  The other four options
+you can set them in either place as you prefer.  @Code
+"@ReferencesBeforeAppendices" determines whether the reference list is
+printed out before or after any appendices.  @Code "@AbstractWord"
+determines the value of the title of the abstract if none is given there;
+its default value, {@Code abstract}, prodcues `Abstract' in the current
+language.  @Code "@ContentsWord" is similar; its default value produces
+`Contents' in the current language.  The other four options
 control the appearance of sections, and there are similar options for
 controlling the other large-scale structure symbols.
 @PP

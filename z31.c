@@ -1,9 +1,9 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -54,8 +54,7 @@ static	char	*usage_strings[] = {
 			"plain text output grids",
 			"database check tables",
 			"hyphenation pattern tables",
-			"encoding vectors",
-			"character mappingss",
+			"character mappings",
 			"colour tables",
 			"language tables",
 };
@@ -177,7 +176,6 @@ void MemInit(void)
   zz_lengths[ PAGE_LABEL  ] =
   zz_lengths[ UNDER_REC   ] =
   zz_lengths[ CROSS       ] =
-  zz_lengths[ HEAD        ] =
   zz_lengths[ SPLIT       ] =
   zz_lengths[ PAR         ] =
   zz_lengths[ ROW_THR     ] =
@@ -193,6 +191,8 @@ void MemInit(void)
   zz_lengths[ VSHIFT      ] =
   zz_lengths[ HSCALE      ] =
   zz_lengths[ VSCALE      ] =
+  zz_lengths[ HCOVER      ] =
+  zz_lengths[ VCOVER      ] =
   zz_lengths[ SCALE       ] =
   zz_lengths[ HCONTRACT   ] =
   zz_lengths[ VCONTRACT   ] =
@@ -209,6 +209,8 @@ void MemInit(void)
   zz_lengths[ XCHAR       ] =
   zz_lengths[ FONT        ] =
   zz_lengths[ SPACE       ] =
+  zz_lengths[ YUNIT       ] =
+  zz_lengths[ ZUNIT       ] =
   zz_lengths[ BREAK       ] =
   zz_lengths[ UNDERLINE   ] =
   zz_lengths[ COLOUR      ] =
@@ -216,6 +218,7 @@ void MemInit(void)
   zz_lengths[ CURR_LANG   ] =
   zz_lengths[ COMMON      ] =
   zz_lengths[ RUMP        ] =
+  zz_lengths[ INSERT      ] =
   zz_lengths[ NEXT        ] =
   zz_lengths[ ENV_OBJ     ] =
   zz_lengths[ ENV         ] =
@@ -229,11 +232,15 @@ void MemInit(void)
   zz_lengths[ GRAPHIC     ] =
 	ceiling(sizeof(struct closure_type), sizeof(ALIGN));
 
+  zz_lengths[ HEAD        ] =
+	ceiling(sizeof(struct head_type), sizeof(ALIGN));
+
   zz_lengths[ LBR         ] =
   zz_lengths[ RBR         ] =
   zz_lengths[ BEGIN       ] =
   zz_lengths[ END         ] =
   zz_lengths[ USE         ] =
+  zz_lengths[ NOT_REVEALED] =
   zz_lengths[ GSTUB_NONE  ] =
   zz_lengths[ GSTUB_INT   ] =
   zz_lengths[ GSTUB_EXT   ] =
@@ -250,13 +257,16 @@ void MemInit(void)
   zz_lengths[ PRECEDES    ] =
   zz_lengths[ FOLLOWS     ] =
   zz_lengths[ CROSS_FOLL  ] =
+  zz_lengths[ CROSS_FOLL_OR_PREC] =
   zz_lengths[ GALL_FOLL   ] =
+  zz_lengths[ GALL_FOLL_OR_PREC ] =
   zz_lengths[ CROSS_TARG  ] =
   zz_lengths[ GALL_TARG   ] =
   zz_lengths[ GALL_PREC   ] =
   zz_lengths[ CROSS_PREC  ] =
   zz_lengths[ PAGE_LABEL_IND] =
   zz_lengths[ SCALE_IND   ] =
+  zz_lengths[ COVER_IND   ] =
   zz_lengths[ EXPAND_IND  ] =
   zz_lengths[ THREAD      ] =
   zz_lengths[ CR_LIST     ] =

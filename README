@@ -1,5 +1,5 @@
-THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)
-BASSER LOUT VERSION 3 COPYRIGHT (C) 1994, 1995 Jeffrey H. Kingston
+THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)
+BASSER LOUT VERSION 3 COPYRIGHT (C) 1994, 1996 Jeffrey H. Kingston
 
 Jeffrey H. Kingston
 Basser Department of Computer Science
@@ -30,12 +30,12 @@ formatting system on Unix.  It contains the following directories:
 
     data           Lout databases (in Lout)
     doc            Lout documents (in Lout)
-    evec           Character encoding (CEV) and mapping (CMA) files
     font           Adobe Systems font metrics files
     hyph	   Lout hyphenation files (see hyph/README for info)
     include        Lout packages (in Lout)
     locale         Locale-specific error messages
     man            Lout and c2lout manual entries
+    maps           Lout Character Mapping (LCM) files
     software	   Information about Lout-related software from elsewhere
 
 and the following files:

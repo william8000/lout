@@ -1,9 +1,9 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -47,7 +47,7 @@ static OBJECT	filter_out_filename;	/* initial name of filter ouput file */
 
 void FilterInit(void)
 { filter_count = 0;
-  filter_active = New(ACAT);
+  New(filter_active, ACAT);
   sym_body(FilterInSym)  = MakeWord(WORD, FILTER_IN,  no_fpos);
   sym_body(FilterOutSym) = MakeWord(WORD, FILTER_OUT, no_fpos);
   sym_body(FilterErrSym) = MakeWord(WORD, FILTER_ERR, no_fpos);
@@ -69,7 +69,7 @@ OBJECT FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos)
 { FULL_CHAR buff[MAX_LINE];  FILE *fp;  OBJECT x, res;
   debug3(DFH, D, "FilterCreate(%s, %s, %s)", bool(use_begin),
     SymName(act), EchoFilePos(xfpos));
-  res = New(FILTERED);
+  New(res, FILTERED);
   FposCopy(fpos(res), *xfpos);
   ++filter_count;
   sprintf( (char *) buff, "%s%d", FILTER_IN, filter_count);
@@ -135,37 +135,48 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
   /* reset FilterInSym since Manifest of @Filter is now complete */
   sym_body(FilterInSym) = filter_in_filename;
 
-  /* execute the command, print error messages, and exit if status problem */
-  status = system( (char *) command);
-  err_fp = StringFOpen(FILTER_ERR, READ_TEXT);
-  if( err_fp != NULL )
-  { while( fgets(line, MAX_LINE, err_fp) != NULL )
-    { if( line[strlen(line)-1] == '\n' )
-	line[strlen(line)-1] = '\0';
-      Error(40, 2, "%s", WARN, &fpos(x), line);
-    }
-    fclose(err_fp);
-    StringRemove(FILTER_ERR);
+  if( SafeExecution )
+  {
+    /* if safe execution, print error message and return empty object */
+    Error(40, 2, "safe execution prohibiting command: %s", WARN, &fpos(x),
+      command);
+    res = MakeWord(WORD, STR_EMPTY, &fpos(x));
   }
-  if( status != 0 )
-    Error(40, 3, "failure (non-zero status) of filter: %s",
-      FATAL, &fpos(x), command);
+  else
+  {
+    /* execute the command, echo error messages, and exit if status problem */
+    status = system( (char *) command);
+    err_fp = StringFOpen(FILTER_ERR, READ_TEXT);
+    if( err_fp != NULL )
+    { while( fgets(line, MAX_LINE, err_fp) != NULL )
+      { if( line[strlen(line)-1] == '\n' )
+	  line[strlen(line)-1] = '\0';
+        Error(40, 3, "%s", WARN, &fpos(x), line);
+      }
+      fclose(err_fp);
+      StringRemove(FILTER_ERR);
+    }
+    if( status != 0 )
+      Error(40, 4, "failure (non-zero status) of filter: %s",
+        FATAL, &fpos(x), command);
 
-  /* read in output of system command as a Lout object */
-  SwitchScope(nilobj);
-  count = 0;
-  SetScope(env, &count);
-  filter_out_file =
-    DefineFile(string(sym_body(FilterOutSym)), STR_EMPTY, &fpos(x),
-      FILTER_FILE, SOURCE_PATH);
-  LexPush(filter_out_file, 0, FILTER_FILE);
-  t = NewToken(BEGIN, &fpos(x), 0, 0, BEGIN_PREC, FilterOutSym);
-  res = Parse(&t, nilobj, FALSE, FALSE);
-  LexPop();
-  for( i = 1;  i <= count;  i++ )  PopScope();
-  UnSwitchScope(nilobj);
-  StringRemove(string(sym_body(FilterOutSym)));
-  sym_body(FilterOutSym) = filter_out_filename;
+    /* read in output of system command as a Lout object */
+    SwitchScope(nilobj);
+    count = 0;
+    SetScope(env, &count, TRUE);
+    debug0(DFS, D, "  calling DefineFile from FilterExecute");
+    filter_out_file =
+      DefineFile(string(sym_body(FilterOutSym)), STR_EMPTY, &fpos(x),
+        FILTER_FILE, SOURCE_PATH);
+    LexPush(filter_out_file, 0, FILTER_FILE);
+    t = NewToken(BEGIN, &fpos(x), 0, 0, BEGIN_PREC, FilterOutSym);
+    res = Parse(&t, nilobj, FALSE, FALSE);
+    LexPop();
+    for( i = 1;  i <= count;  i++ )  PopScope();
+    UnSwitchScope(nilobj);
+    StringRemove(string(sym_body(FilterOutSym)));
+    sym_body(FilterOutSym) = filter_out_filename;
+  }
 
   debug1(DFH, D, "FilterExecute returning %s", EchoObject(res));
   return res;
@@ -187,7 +198,7 @@ void FilterWrite(OBJECT x, FILE *fp)
   Child(y, Down(x));
   in_fp = StringFOpen(string(y), READ_TEXT);
   if( in_fp == NULL )
-    Error(40, 4, "cannot read filter temporary file %s",
+    Error(40, 5, "cannot read filter temporary file %s",
       FATAL, &fpos(x), string(y));
   if( filter_use_begin(y) )
   { StringFPuts(KW_BEGIN, fp);
@@ -213,7 +224,7 @@ void FilterWrite(OBJECT x, FILE *fp)
 /*                                                                           */
 /*  FilterScavenge(all)                                                      */
 /*                                                                           */
-/*  Unlink unneeded filter files, or all reamining filter files if all.      */
+/*  Unlink unneeded filter files, or all remaining filter files if all.      */
 /*                                                                           */
 /*****************************************************************************/
 

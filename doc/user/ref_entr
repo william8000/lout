@@ -90,6 +90,9 @@ Here is the complete, fixed list of options that you may give to the
     A { "    @TRType  {}" }
     B { The type of a technical report, for example @Code "Research Note" }
 @Rowa
+    A { "    @URL  {}" }
+    B { The URL of the reference }
+@Rowa
     A { "    @Volume  {}" }
     B { The volume of a journal }
 @Rowa
@@ -99,8 +102,8 @@ Here is the complete, fixed list of options that you may give to the
     A { "}" }
 }
 Every reference may contain any of these options, although, depending
-on the {@Code "@Type"} option, only some will be printed.  You can't
-give an option twice; in particular, multiple authors must be placed
+on the {@Code "@Type"} option, only some will be printed.  You can't give
+an option twice; in particular, multiple authors must be placed
 within one @Code "@Author" option, arranged as you want them to appear.  Here
 is the complete set of values that you may give to the @Code "@Type" option:
 @ID @Tab
@@ -139,6 +142,13 @@ year of publication, and a brief reminder of the contents:
 Keep to lower-case letters, since mixed cases confuse the sorting, and
 give the full four digits of the year to avoid trouble in the year
 2000.  Multi-word tags are possible but not recommended.
+@PP
+Unusually for Lout, you can have @Code "/" characters inside the
+@Code "@URL" option without enclosing them in quotes:
+@ID @Code "@URL { ftp://ftp.cs.su.oz.au/jeff/lout }"
+In fact it is better not to use quotes because then Lout will
+be able to break lines at @Code "/" characters, which is very useful
+since URLs tend to be long and prone to causing bad line breaks.
 @PP
 Since the types within each broad category are similar, our plan is to
 give one example of each and briefly note how the others differ.  Here

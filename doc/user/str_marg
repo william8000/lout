@@ -1,5 +1,5 @@
 @Section
-   @Title { Margin notes }
+   @Title { Margin notes and arbitrary placement }
    @Tag { marginnotes }
 @Begin
 @PP
@@ -78,4 +78,79 @@ Margin notes inside footnotes, figures and tables work well.  Margin
 notes in multi-column documents are disastrous unless used very
 sparingly.  Margin notes do not appear in plain text output
 (Section {@NumberOf plain}).
+@PP
+A more radical way to place objects at arbitrary points on the current
+place. @Index @Code "@Place"
+page is provided by the @Code "@Place" symbol:
+@ID @Code {
+"@Place"
+"    x { right - 1 cm - xsize }"
+"    y { { foot + top } / 2 }"
+"{"
+"    @Box { Hello }"
+"}"
+}
+The placed object may be any object.  This particular example produces a
+box whose @I x (horizontal) position is such that its right edge is one
+centimetre from the right edge of the page, and whose @I y (vertical)
+position is halfway up &
+@Place
+    x { right - 1 cm - xsize }
+    y { { foot + top } / 2 }
+{
+    @Box { Hello }
+}
+the page.
+@PP
+In addition to numbers, Lout lengths (Section {@NumberOf objects}),
+and Fig lengths (Section {@NumberOf figlengths}), the following symbols
+may be used inside the @Code "x" and @Code "y" options:
+@ID @Tab
+    @Fmta { @Col @Code A ! @Col B }
+{
+@Rowa
+    A { left }
+    B { The left edge of the page }
+@Rowa
+    A { right }
+    B { The right edge of the page }
+@Rowa
+    A { foot }
+    B { The foot edge of the page }
+@Rowa
+    A { top }
+    B { The top edge of the page }
+@Rowa
+    A { "+" }
+    B { Addition (positive is to the right and up) }
+@Rowa
+    A { "-" }
+    B { Subtraction (negative is to the left and down) }
+@Rowa
+    A { "*" }
+    B { Multiplication }
+@Rowa
+    A { "/" }
+    B { Division }
+@Rowa
+    A { "xsize" }
+    B { The width of the object being placed }
+@Rowa
+    A { "xmark" }
+    B { The column mark of the object being placed (for expert users) }
+@Rowa
+    A { "ysize" }
+    B { The height of the object being placed }
+@Rowa
+    A { "ymark" }
+    B { The row mark of the object being placed (for expert users) }
+}
+The usual precedences and associativities apply to the mathematical
+operators; braces (not parentheses) may be used for grouping.  It is
+best to give values to @Code "x" and @Code y that do not depend on
+any assumptions about where the coordinate system's origin is; this
+is true of the examples above.  At the point where @Code "@Place" occurs,
+the result is an empty object.  As with margin notes, Lout has no idea
+that the translation is happening and will not lay out the rest of the
+page around the placed object.
 @End @Section

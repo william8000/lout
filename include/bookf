@@ -13,52 +13,125 @@
 extend @DocumentLayout
 export @Book @Preface @Introduction @Chapter @Appendix
 def @BookLayout
-    named @TitlePageFont             {  Helvetica Base		}
-    named @SeparateIntroNumbering    {  Yes			}
+    named @TitlePageFont		{  Helvetica Base		}
+    named @SeparateIntroNumbering	{  Yes				}
+    named @ChapterStartPages		{  Any				}
+    named @ReferencesBeforeAppendices	{  No				}
 
-    named @ChapterNumbers            {  Arabic			}
-    named @SectionNumbers            {  Arabic			}
-    named @SubSectionNumbers         {  Arabic			}
-    named @SubSubSectionNumbers      {  Arabic			}
-    named @AppendixNumbers           {  UCAlpha			}
-    named @SubAppendixNumbers        {  Arabic			}
-    named @SubSubAppendixNumbers     {  Arabic			}
+    named @PrefaceWord			{  preface			}
+    named @ContentsWord			{  contents			}
+    named @FigureListWord		{  figurelist			}
+    named @TableListWord		{  tablelist			}
+    named @IntroductionWord		{  introduction			}
+    named @ChapterWord			{  chapter			}
+    named @AppendixWord			{  appendix			}
+    named @IndexWord			{  index			}
+    named @IndexAWord			{  index			}
+    named @IndexBWord			{  index			}
 
-    named @PartHeadingFont           {  Helvetica Base 2.50f	}
+    named @ChapterNumbers		{  Arabic			}
+    named @SectionNumbers		{  Arabic			}
+    named @SubSectionNumbers		{  Arabic			}
+    named @SubSubSectionNumbers		{  Arabic			}
+    named @AppendixNumbers		{  UCAlpha			}
+    named @SubAppendixNumbers		{  Arabic			}
+    named @SubSubAppendixNumbers	{  Arabic			}
+
+    named @PartHeadingFont		{  Helvetica Base 2.50f		}
+    named @PartHeadingBreak		{  clines 1.2fx nohyphen	}
     named @PartHeadingFormat
-	left number right title	     {  @CD number @DP @CD title}
-    named @ChapterHeadingFont        {  Bold 2.00f		}
-    named @ChapterHeadingBreak       {  ragged 1.2fx nohyphen   }
+	left number right title		{  @CD number @DP @CD title	}
+
+    named @ChapterHeadingFont		{  Bold 2.00f			}
+    named @ChapterHeadingBreak		{  ragged 1.2fx nohyphen   	}
     named @ChapterHeadingFormat
-	left number right title	     {  number @DotSep title    }
-    named @SectionHeadingFont        {  Bold			}
-    named @SubSectionHeadingFont     {  Bold			}
-    named @SubSubSectionHeadingFont  {  Slope			}
-    named @AppendixHeadingFont       {  Bold 2.00f		}
-    named @SubAppendixHeadingFont    {  Bold			}
-    named @SubSubAppendixHeadingFont {  Slope			}
+	left number right title		{  number @DotSep title    	}
 
-    named @AbovePartGap              {  4.00f			}
-    named @AboveChapterGap           {  3.00f			}
-    named @SectionGap                {  2.00v			}
-    named @SubSectionGap             {  1.50v			}
-    named @SubSubSectionGap          {  1.50v			}
-    named @SubAppendixGap            {  2.00v			}
-    named @SubSubAppendixGap         {  1.50v			}
+    named @SectionHeadingFont		{  Bold				}
+    named @SectionHeadingBreak		{  ragged 1.2fx nohyphen	}
+    named @SectionHeadingFormat
+	left number right title		{  number @DotSep title    	}
 
-    named @IntroductionInContents    {  Yes			}
-    named @PartInContents            {  Yes			}
-    named @ChapterInContents         {  Yes			}
-    named @SectionInContents         {  Yes			}
-    named @SubSectionInContents      {  Yes			}
-    named @SubSubSectionInContents   {  No			}
-    named @AppendixInContents        {  Yes			}
-    named @SubAppendixInContents     {  Yes			}
-    named @SubSubAppendixInContents  {  No			}
-    named @ReferencesInContents      {  Yes			}
-    named @IndexInContents           {  Yes			}
+    named @SubSectionHeadingFont	{  Bold				}
+    named @SubSectionHeadingBreak	{  ragged 1.2fx nohyphen	}
+    named @SubSectionHeadingFormat
+	left number right title		{  number @DotSep title    	}
 
-    named @PartContentsIndent	     {  0.5rt                   }
+    named @SubSubSectionHeadingFont	{  Slope			}
+    named @SubSubSectionHeadingBreak	{  ragged 1.2fx nohyphen	}
+    named @SubSubSectionHeadingFormat
+	left number right title		{  number @DotSep title    	}
+
+    named @AppendixHeadingFont		{  Bold 2.00f			}
+    named @AppendixHeadingBreak		{  ragged 1.2fx nohyphen   	}
+    named @AppendixHeadingFormat
+	left number right title		{  number @DotSep title    	}
+
+    named @SubAppendixHeadingFont	{  Bold				}
+    named @SubAppendixHeadingBreak	{  ragged 1.2fx nohyphen   	}
+    named @SubAppendixHeadingFormat
+	left number right title		{  number @DotSep title    	}
+
+    named @SubSubAppendixHeadingFont	{  Slope			}
+    named @SubSubAppendixHeadingBreak	{  ragged 1.2fx nohyphen   	}
+    named @SubSubAppendixHeadingFormat
+	left number right title		{  number @DotSep title    	}
+
+    named @AbovePartGap			{  4.00f			}
+    named @AboveChapterGap		{  3.00f			}
+    named @SectionGap			{  2.00v			}
+    named @SubSectionGap		{  1.50v			}
+    named @SubSubSectionGap		{  1.50v			}
+    named @SubAppendixGap		{  2.00v			}
+    named @SubSubAppendixGap		{  1.50v			}
+
+    named @IntroductionInContents	{  Yes				}
+    named @PartInContents		{  Yes				}
+    named @ChapterInContents		{  Yes				}
+    named @SectionInContents		{  Yes				}
+    named @SubSectionInContents		{  Yes				}
+    named @SubSubSectionInContents	{  No				}
+    named @AppendixInContents		{  Yes				}
+    named @SubAppendixInContents	{  Yes				}
+    named @SubSubAppendixInContents	{  No				}
+    named @ReferencesInContents		{  Yes				}
+    named @IndexInContents		{  Yes				}
+    named @IndexAInContents		{  Yes				}
+    named @IndexBInContents		{  Yes				}
+
+    named @ChapterNumInTheorems		{  Yes				}
+    named @SectionNumInTheorems		{  No				}
+    named @SubSectionNumInTheorems	{  No				}
+    named @SubSubSectionNumInTheorems	{  No				}
+    named @AppendixNumInTheorems	{  Yes				}
+    named @SubAppendixNumInTheorems	{  No				}
+    named @SubSubAppendixNumInTheorems	{  No				}
+
+    named @ChapterNumInDisplays		{  Yes				}
+    named @SectionNumInDisplays		{  Yes				}
+    named @SubSectionNumInDisplays	{  No				}
+    named @SubSubSectionNumInDisplays	{  No				}
+    named @AppendixNumInDisplays	{  Yes				}
+    named @SubAppendixNumInDisplays	{  Yes				}
+    named @SubSubAppendixNumInDisplays	{  No				}
+
+    named @ChapterNumInFigures		{  Yes				}
+    named @SectionNumInFigures		{  No				}
+    named @SubSectionNumInFigures	{  No				}
+    named @SubSubSectionNumInFigures	{  No				}
+    named @AppendixNumInFigures		{  Yes				}
+    named @SubAppendixNumInFigures	{  No				}
+    named @SubSubAppendixNumInFigures	{  No				}
+
+    named @ChapterNumInTables		{  Yes				}
+    named @SectionNumInTables		{  No				}
+    named @SubSectionNumInTables	{  No				}
+    named @SubSubSectionNumInTables	{  No				}
+    named @AppendixNumInTables		{  Yes				}
+    named @SubAppendixNumInTables	{  No				}
+    named @SubSubAppendixNumInTables	{  No				}
+
+    named @PartContentsIndent		{  0.5rt			}
 @Begin
 
     #######################################################################
@@ -126,9 +199,17 @@ def @BookLayout
     #                                                                     #
     #######################################################################
 
-    def @Full force into { @FullPlace&&following } right x
+    def @Full right x
     {
-        x
+	def @Any  force into { @FullPlace&&following     } right x { x }
+	def @Odd  force into { @OddFullPlace&&following  } right x { x }
+	def @Even force into { @EvenFullPlace&&following } right x { x }
+
+	@ChapterStartPages @Case {
+	    Any  @Yield @Any  x
+	    Odd  @Yield @Odd  x
+	    Even @Yield @Even x
+	}
     }
 
 
@@ -138,9 +219,17 @@ def @BookLayout
     #                                                                     #
     #######################################################################
 
-    def @IntroFull force into { @IntroFullPlace&&following } right x
+    def @IntroFull right x
     {
-        x
+	def @Any  force into { @IntroFullPlace&&following     } right x { x }
+	def @Odd  force into { @IntroOddFullPlace&&following  } right x { x }
+	def @Even force into { @IntroEvenFullPlace&&following } right x { x }
+
+	@ChapterStartPages @Case {
+	    Any  @Yield @Any  x
+	    Odd  @Yield @Odd  x
+	    Even @Yield @Even x
+	}
     }
 
 
@@ -188,11 +277,13 @@ def @BookLayout
         named @AfterTitlePage {}
         named @InitialFont { @InitialFont }
         named @InitialBreak { @InitialBreak }
+        named @InitialSpace { @InitialSpace }
         named @InitialLanguage { @InitialLanguage }
         named @PageHeaders { @PageHeaders }
         named @ColumnNumber { @ColumnNumber }
         named @FirstPageNumber { @FirstPageNumber }
         named @IntroFirstPageNumber { @IntroFirstPageNumber }
+	named @OptimizePages { @OptimizePages }
     {
 	def @Before
 	{
@@ -217,9 +308,9 @@ def @BookLayout
 	def @ContentsPart
 	{
 	    //	@ChooseFull {
-		    //@AboveChapterGap
-		    @ChapterHeadingFont @Font @ChapterHeadingBreak @Break
-		    { {} @ChapterHeadingFormat @Word&&contents }
+		  //@AboveChapterGap
+		  @ChapterHeadingFont @Font @ChapterHeadingBreak @Break
+		  { {} @ChapterHeadingFormat contents @WordVal @ContentsWord }
 		}
 	    //
             //  @ContentsSection
@@ -228,9 +319,9 @@ def @BookLayout
 	def @FigureContentsPart
 	{
 	    //	@ChooseFull {
-		    //@AboveChapterGap
-		    @ChapterHeadingFont @Font @ChapterHeadingBreak @Break
-		    { {} @ChapterHeadingFormat @Word&&figurelist }
+		  //@AboveChapterGap
+		  @ChapterHeadingFont @Font @ChapterHeadingBreak @Break
+		  { {} @ChapterHeadingFormat figurelist @WordVal @FigureListWord }
 		}
 	    //
             //  @FigureContentsSection
@@ -239,15 +330,16 @@ def @BookLayout
 	def @TableContentsPart
 	{
 	    //	@ChooseFull {
-		    //@AboveChapterGap
-		    @ChapterHeadingFont @Font @ChapterHeadingBreak @Break
-		    { {} @ChapterHeadingFormat @Word&&tablelist }
+		  //@AboveChapterGap
+		  @ChapterHeadingFont @Font @ChapterHeadingBreak @Break
+		  {{} @ChapterHeadingFormat tablelist @WordVal @TableListWord }
 		}
 	    //
             //  @TableContentsSection
 	}
 
         def @BookIntro force into { @IntroColPlace&&preceding }
+	    named @Optimize { @OptimizePages }
         {
 		    @Before
             //1.1b  @TitlePageFont @Font
@@ -280,13 +372,14 @@ def @BookLayout
 		//@AboveChapterGap
 		@ChapterHeadingFont @Font @ChapterHeadingBreak @Break
 		{ {} @ChapterHeadingFormat @RefHeading @RefListTitle }
-                //  @PageMarker&&preceding @Tagged @Tag
-                //  @ReferencesInContents @MajorContentsEntry
-			title { @RefHeading @RefListTitle }
-			pagenum { @PageOf @Tag }
-                //  Start @Runner @MajorTitle { @RefHeading @RefListTitle }
 	    }
 	    //
+            //  @PageMarker&&preceding @Tagged @Tag
+	    //  @FootNoteThrough @Do @BeginFootNoteCounter
+            //  @ReferencesInContents @MajorContentsEntry
+		    title { @RefHeading @RefListTitle }
+		    pagenum { @PageOf @Tag }
+            //  Start @Runner @MajorTitle { @RefHeading @RefListTitle }
             //  @ReferencesSection
 	    //  NonStart @Runner @MajorTitle { @RefHeading @RefListTitle }
 	}
@@ -298,17 +391,61 @@ def @BookLayout
 	    {
 		//@AboveChapterGap
 		@ChapterHeadingFont @Font @ChapterHeadingBreak @Break
-		{ {} @ChapterHeadingFormat @Word&&index }
+		{ {} @ChapterHeadingFormat index @WordVal @IndexWord }
 		//  @PageMarker&&preceding @Tagged @Tag
+		//  @FootNoteThrough @Do @BeginFootNoteCounter
 		//  @IndexInContents @MajorContentsEntry
-		    title { @Word&&index }
+		    title { index @WordVal @IndexWord }
 		    pagenum { @PageOf @Tag }
-		//  Start @Runner @MajorTitle { @Word&&index }
+		//  Start @Runner @MajorTitle { index @WordVal @IndexWord }
+	        //  @IndexSection {
+		    NonStart @Runner @MajorTitle { index @WordVal @IndexWord }
+		    }
 	    }
-	    //  @IndexSection {NonStart @Runner @MajorTitle {@Word&&index}}
+	}
+
+	def @IndexAPart
+	    named @Tag {}
+	{
+	    @Full
+	    {
+		//@AboveChapterGap
+		@ChapterHeadingFont @Font @ChapterHeadingBreak @Break
+		{ {} @ChapterHeadingFormat index @WordVal @IndexAWord }
+	    }
+	    //  @PageMarker&&preceding @Tagged @Tag
+	    //  @FootNoteThrough @Do @BeginFootNoteCounter
+	    //  @IndexAInContents @MajorContentsEntry
+		    title { index @WordVal @IndexAWord }
+		    pagenum { @PageOf @Tag }
+	    //  Start @Runner @MajorTitle { index @WordVal @IndexAWord }
+	    //  @IndexASection {
+		    NonStart @Runner @MajorTitle { index @WordVal @IndexAWord }
+		}
+	}
+
+	def @IndexBPart
+	    named @Tag {}
+	{
+	    @Full
+	    {
+		//@AboveChapterGap
+		@ChapterHeadingFont @Font @ChapterHeadingBreak @Break
+		{ {} @ChapterHeadingFormat index @WordVal @IndexBWord }
+	    }
+	    //  @PageMarker&&preceding @Tagged @Tag
+	    //  @FootNoteThrough @Do @BeginFootNoteCounter
+	    //  @IndexBInContents @MajorContentsEntry
+		    title { index @WordVal @IndexBWord }
+		    pagenum { @PageOf @Tag }
+	    //  Start @Runner @MajorTitle { index @WordVal @IndexBWord }
+	    //  @IndexBSection {
+		    NonStart @Runner @MajorTitle { index @WordVal @IndexBWord }
+		}
 	}
 
         def @BookBody force into { @ColPlace&&preceding }
+	    named @Optimize { @OptimizePages }
         {
 	    # The first component of @BookBody must be indefinite, so that
 	    # its flushing is delayed until we reach the body galleys, either
@@ -318,9 +455,24 @@ def @BookLayout
 
 	        @IntroductionPlace
 	    //	@ChapterList 1
+	    //	@ReferencesBeforeAppendices @Do {
+		    @MakeReferences @Do @ReferencesPart
+		}
             //	@AppendixList 1
-	    //	@MakeReferences @Then @ReferencesPart
-	    //	@MakeIndex @Then @IndexPart
+	    //	@ReferencesBeforeAppendices @NoDo {
+		    @MakeReferences @Do @ReferencesPart
+		}
+	    //	@MakeIndexA @Do @IndexAPart
+	    //  @MakeIndexA @Case {
+		  Bypass  @Yield @BypassBeginIndexAPlace
+		  else    @Yield @Null
+		}
+	    //	@MakeIndexB @Do @IndexBPart
+	    //  @MakeIndexB @Case {
+		  Bypass  @Yield @BypassBeginIndexBPlace
+		  else    @Yield @Null
+		}
+	    //	@MakeIndex  @Do @IndexPart
 	    //  @MakeIndex @Case {
 		  Bypass  @Yield @BypassBeginIndexPlace
 		  else    @Yield @Null
@@ -328,6 +480,7 @@ def @BookLayout
         }
 
 	def @BookCombined force into { @ColPlace&&preceding }
+	    named @Optimize { @OptimizePages }
 	{
 		    @Before
             //1.1b  @TitlePageFont @Font
@@ -353,9 +506,24 @@ def @BookLayout
 		    }
 	    //  @IntroductionPlace
 	    //	@ChapterList 1
+	    //	@ReferencesBeforeAppendices @Do {
+		    @MakeReferences @Do @ReferencesPart
+		}
             //	@AppendixList 1
-	    //	@MakeReferences @Then @ReferencesPart
-	    //	@MakeIndex @Then @IndexPart
+	    //	@ReferencesBeforeAppendices @NoDo {
+		    @MakeReferences @Do @ReferencesPart
+		}
+	    //	@MakeIndexA @Do @IndexAPart
+	    //  @MakeIndexA @Case {
+		  Bypass  @Yield @BypassBeginIndexAPlace
+		  else    @Yield @Null
+		}
+	    //	@MakeIndexB @Do @IndexBPart
+	    //  @MakeIndexB @Case {
+		  Bypass  @Yield @BypassBeginIndexBPlace
+		  else    @Yield @Null
+		}
+	    //	@MakeIndex  @Do @IndexPart
 	    //  @MakeIndex @Case {
 		  Bypass  @Yield @BypassBeginIndexPlace
 		  else    @Yield @Null
@@ -363,13 +531,17 @@ def @BookLayout
 	}
 
         @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
-	{ @ColourCommand @InitialColour } @SetColour
+	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
         {
 
 	    @SeparateIntroNumbering @Case {
 
 		No  @Yield {
-		        @PageList
+		        Yes @BeginAllCounters {}
+		        Yes @BeginDisplayCounter {}
+		        Yes @BeginFigureCounter {}
+		        Yes @BeginTableCounter {}
+		    //	@PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }
 			    @FirstPageNumber
@@ -378,7 +550,11 @@ def @BookLayout
 		}
 
 		Yes @Yield {
-			@IntroPageList
+		        Yes @BeginAllCounters {}
+		        Yes @BeginDisplayCounter {}
+		        Yes @BeginFigureCounter {}
+		        Yes @BeginTableCounter {}
+		    //  @IntroPageList
 			    @ColumnNumber { 1 }
 			    @PageHeaders { @PageHeaders }
 			    @IntroFirstPageNumber
@@ -403,18 +579,13 @@ def @BookLayout
     #                                                                     #
     #######################################################################
 
-    export @FootNote @LongFootNote @EndNote @LongEndNote
     def @Preface force into { @PrefacePlace&&preceding }
         named @Tag {}
-        named @Title { @Word&&preface }
+        named @Title { preface @WordVal @PrefaceWord }
         named @RunningTitle { dft }
 	named @InitialLanguage {}
         body @Body
     {
-        macro @FootNote { @FullFootNote }
-        macro @LongFootNote { @LongFullFootNote }
-        macro @EndNote { @ColEndNote }
-        macro @LongEndNote { @LongColEndNote }
 
 	def @RunTitle { @InitialLanguage @Language { @RunningTitle @Dft @Title } }
         def @ER { NonStart @Runner @MajorTitle { @RunTitle } }
@@ -423,20 +594,15 @@ def @BookLayout
 	    //@AboveChapterGap
 	    @InitialLanguage @Language @ChapterHeadingFont @Font
 	    @ChapterHeadingBreak @Break { {} @ChapterHeadingFormat @Title }
-	    //  Start @Runner @MajorTitle { @RunTitle }
-	    //  @PageMarker&&preceding @Tagged @Tag
         }
 	//
-        //  @InitialLanguage @Language @BeginFigures	{}
-        //  @InitialLanguage @Language @BeginTables	{}
-        //  @InitialLanguage @Language @BeginFootNotes	{}
+	//  Start @Runner @MajorTitle { @RunTitle }
+	//  @PageMarker&&preceding @Tagged @Tag
+        //  @FootNoteThrough @Do @BeginFootNoteCounter
 	//
         //  @InitialLanguage @Language @Body
         //@SectionGap @InitialLanguage @Language @EndNoteList 1
         //@SectionGap @InitialLanguage @Language @ChapRefSection
-        //  @EndFigures @ER
-        //  @EndTables @ER
-        //  @EndFootNotes @ER
         //  @ER
     }
 
@@ -447,19 +613,13 @@ def @BookLayout
     #                                                                     #
     #######################################################################
 
-    export @FootNote @LongFootNote @EndNote @LongEndNote
     def @Introduction force into { @IntroductionPlace&&preceding }
         named @Tag {}
-        named @Title { @Word&&introduction }
+        named @Title { introduction @WordVal @IntroductionWord }
         named @RunningTitle { dft }
 	named @InitialLanguage {}
         body @Body
     {
-        macro @FootNote { @ColFootNote }
-        macro @LongFootNote { @LongColFootNote }
-        macro @EndNote { @ColEndNote }
-        macro @LongEndNote { @LongColEndNote }
-
 	def @RunTitle { @InitialLanguage @Language { @RunningTitle @Dft @Title } }
         def @ER { NonStart @Runner @MajorTitle { @RunTitle } }
 
@@ -467,24 +627,20 @@ def @BookLayout
 	    //@AboveChapterGap
 	        @InitialLanguage @Language @ChapterHeadingFont @Font
 		@ChapterHeadingBreak @Break { {} @ChapterHeadingFormat @Title }
-	    //  Start @Runner @MajorTitle { @RunTitle }
-	    //  @PageMarker&&preceding @Tagged @Tag
-	    //  @IntroductionInContents @MajorContentsEntry
-		    title { @InitialLanguage @Language @Title }
-		    pagenum { @PageOf @Tag }
         }
 	//
-        //  @InitialLanguage @Language @BeginFigures	{}
-        //  @InitialLanguage @Language @BeginTables	{}
-        //  @InitialLanguage @Language @BeginFootNotes	{}
+	//  Start @Runner @MajorTitle { @RunTitle }
+	//  @PageMarker&&preceding @Tagged @Tag
+	//  @IntroductionInContents @MajorContentsEntry
+		title { @InitialLanguage @Language @Title }
+		pagenum { @PageOf @Tag }
+        //  @FootNoteThrough @Do @BeginFootNoteCounter
 	//
         //  @InitialLanguage @Language @Body
+        //@SectionGap @InitialLanguage @Language @EndFigureList
         //@SectionGap @InitialLanguage @Language @EndNoteList 1
         //@SectionGap @InitialLanguage @Language @ChapRefSection
         //  @ER
-        //  @EndFigures @ER
-        //  @EndTables @ER
-        //  @EndFootNotes @ER
     }
 
 
@@ -494,8 +650,7 @@ def @BookLayout
     #                                                                     #
     #######################################################################
 
-    export @FootNote @LongFootNote @EndNote @LongEndNote
-	   @BeginSections @EndSections @Section
+    export @BeginSections @EndSections @Section
     def @Chapter force into { @ChapterList&&preceding }
         named @Tag {}
         named @Title {}
@@ -507,10 +662,6 @@ def @BookLayout
         named @BypassNumber { dft }
         body @Body
     {
-        macro @FootNote { @ColFootNote }
-        macro @LongFootNote { @LongColFootNote }
-        macro @EndNote { @ColEndNote }
-        macro @LongEndNote { @LongColEndNote }
 
         def @EndSectionsPlace { @Galley }
 
@@ -532,7 +683,9 @@ def @BookLayout
         def @ChapterLongNum
         {
 	    @ChapterNumbers @Then {
-	        @InitialLanguage @Language { @Word&&chapter @ChapterShortNum }
+	        @InitialLanguage @Language {
+		    chapter @WordVal @ChapterWord @ChapterShortNum
+		}
 	    }
         }
 
@@ -629,11 +782,16 @@ def @BookLayout
 	            }
 
 	                @InitialLanguage @Language ragged @Break
-			@SubSubSectionHeadingFont @Font @Protect
-			    {@SubSubSectionNum @DotSep @Title}
-	            //  @NumberMarker @Tag { @Tag } @SubSubSectionNum
+			@SubSubSectionHeadingFont @Font
+			@SubSubSectionHeadingBreak @Break @Protect
+			  { @SubSubSectionNum @SubSubSectionHeadingFormat @Title}
+	            //  @NumberMarker @Tag { @Tag } @Value { @SubSubSectionNum }
 	            //  @SubSubSectionList&&preceding @Tagged @Tag
 	            //  @PageMarker&&preceding @Tagged @Tag
+		    //  @SubSubSectionNumInTheorems @BeginAllCounters @SubSubSectionNum
+		    //  @SubSubSectionNumInDisplays @BeginDisplayCounter @SubSubSectionNum
+		    //  @SubSubSectionNumInFigures @BeginFigureCounter @SubSubSectionNum
+		    //  @SubSubSectionNumInTables @BeginTableCounter @SubSubSectionNum
 	            //  @SubSubSectionInContents @ContentsEntry
 			    indent { 9f }
 			    number { @SubSubSectionNum }
@@ -643,8 +801,9 @@ def @BookLayout
 	        }
 
 	            @InitialLanguage @Language @SubSectionHeadingFont @Font
-		    ragged @Break @Protect {@SubSectionNum @DotSep @Title}
-	        //  @NumberMarker @Tag { @Tag } @SubSectionNum
+		    @SubSectionHeadingBreak @Break @Protect
+		      { @SubSectionNum @SubSectionHeadingFormat @Title}
+	        //  @NumberMarker @Tag { @Tag } @Value { @SubSectionNum }
 	        //  @SubSectionList&&preceding @Tagged @Tag
 	        //  @PageMarker&&preceding @Tagged @Tag
 	        //  @SubSectionInContents @ContentsEntry
@@ -652,12 +811,17 @@ def @BookLayout
 		        number { @SubSectionNum }
 		        title { @InitialLanguage @Language @Title }
 		        pagenum { @PageOf @Tag }
+		//  @SubSectionNumInTheorems @BeginAllCounters @SubSectionNum
+		//  @SubSectionNumInDisplays @BeginDisplayCounter @SubSectionNum
+		//  @SubSectionNumInFigures @BeginFigureCounter @SubSectionNum
+		//  @SubSectionNumInTables @BeginTableCounter @SubSectionNum
 	        //  @InitialLanguage @Language @Body
             }
 
                 @InitialLanguage @Language @SectionHeadingFont @Font
-		ragged @Break @Protect { @SectionNum @DotSep @Title }
-            //  @NumberMarker @Tag { @Tag } @SectionNum
+		@SectionHeadingBreak @Break @Protect
+		  { @SectionNum @SectionHeadingFormat @Title }
+            //  @NumberMarker @Tag { @Tag } @Value { @SectionNum }
             //  @SectionList&&preceding @Tagged @Tag
             //  @PageMarker&&preceding @Tagged @Tag
             //  @SectionInContents @ContentsEntry
@@ -665,6 +829,10 @@ def @BookLayout
 		    number { @SectionNum }
 		    title { @InitialLanguage @Language @Title }
 		    pagenum { @PageOf @Tag }
+	    //  @SectionNumInTheorems @BeginAllCounters @SectionNum
+	    //  @SectionNumInDisplays @BeginDisplayCounter @SectionNum
+	    //  @SectionNumInFigures @BeginFigureCounter @SectionNum
+	    //  @SectionNumInTables @BeginTableCounter @SectionNum
             //  @InitialLanguage @Language @Body
             //  NonStart @Runner
 	            @MajorNum { @ChapterLongNum }
@@ -678,7 +846,7 @@ def @BookLayout
 	{
 	    //@AbovePartGap
 		    @InitialLanguage @Language @PartHeadingFont @Font
-		    clines @Break { @PartNumber @PartHeadingFormat @PartTitle }
+		    @PartHeadingBreak @Break { @PartNumber @PartHeadingFormat @PartTitle }
 	    //      @PartInContents @VeryMajorContentsEntry
 			indent { @PartContentsIndent }
 			title { @PartNumber @DotSep {@InitialLanguage @Language @PartTitle}}
@@ -687,16 +855,18 @@ def @BookLayout
 	    //1.1b
 	}
 
-	@Full {
-	    @PartTitle @Case {
-		""	@Yield ""
-		else	@Yield @Part
+	@InitialLanguage @Language {
+	    @Full {
+	        @PartTitle @Case {
+		    ""	@Yield ""
+		    else	@Yield @Part
+	        }
+	        //@AboveChapterGap
+		    @ChapterHeadingFont @Font @ChapterHeadingBreak @Break
+		    { @ChapterLongNum @ChapterHeadingFormat @Title }
 	    }
-	    //@AboveChapterGap
-		@InitialLanguage @Language @ChapterHeadingFont @Font 
-		@ChapterHeadingBreak @Break
-		{ @ChapterLongNum @ChapterHeadingFormat @Title }
-            //  @NumberMarker @Tag { @Tag } @ChapterShortNum
+	    //
+            //  @NumberMarker @Tag { @Tag } @Value { @ChapterShortNum }
             //  @ChapterList&&preceding  @Tagged @Tag
             //  @PageMarker&&preceding   @Tagged @Tag
             //  @ChapterInContents @MajorContentsEntry
@@ -704,21 +874,20 @@ def @BookLayout
 		    title { @InitialLanguage @Language @Title }
 		    pagenum { @PageOf @Tag }
             //  Start @Runner
-	            @MajorNum { @ChapterLongNum }
-	            @MajorTitle { @ChapterTitle }
+		    @MajorNum { @ChapterLongNum }
+		    @MajorTitle { @ChapterTitle }
+	    //  @ChapterNumInTheorems @BeginAllCounters @ChapterShortNum
+	    //  @ChapterNumInDisplays @BeginDisplayCounter @ChapterShortNum
+	    //  @ChapterNumInFigures @BeginFigureCounter @ChapterShortNum
+	    //  @ChapterNumInTables @BeginTableCounter @ChapterShortNum
+            //  @FootNoteThrough @Do @BeginFootNoteCounter
+	    //
+            //  @Body
+	    //@SectionGap @EndFigureList
+            //@SectionGap @EndNoteList 1
+            //@SectionGap @ChapRefSection
+            //  @ER
 	}
-	//
-        //  @InitialLanguage @Language @BeginFigures @ChapterShortNum
-        //  @InitialLanguage @Language @BeginTables @ChapterShortNum
-        //  @InitialLanguage @Language @BeginFootNotes	{}
-	//
-        //  @InitialLanguage @Language @Body
-        //@SectionGap @InitialLanguage @Language @EndNoteList 1
-        //@SectionGap @InitialLanguage @Language @ChapRefSection
-        //  @EndFigures @ER
-        //  @EndTables @ER
-        //  @EndFootNotes @ER
-        //  @ER
     }
 
 
@@ -728,8 +897,7 @@ def @BookLayout
     #                                                                     #
     #######################################################################
 
-    export @FootNote @LongFootNote @EndNote @LongEndNote
-	   @BeginSubAppendices @EndSubAppendices @SubAppendix
+    export @BeginSubAppendices @EndSubAppendices @SubAppendix
     def @Appendix force into { @AppendixList&&preceding }
         named @Tag {}
         named @Title {}
@@ -738,11 +906,6 @@ def @BookLayout
 	named @BypassNumber { dft }
         body @Body
     {
-        macro @FootNote { @ColFootNote }
-        macro @LongFootNote { @LongColFootNote }
-	macro @EndNote { @ColEndNote }
-	macro @LongEndNote { @LongColEndNote }
-
         def @EndSubAppendicesPlace { @Galley }
 
         def @EndSubAppendices force into { @EndSubAppendicesPlace&&preceding }
@@ -763,7 +926,9 @@ def @BookLayout
         def @AppendixLongNum
         {
             @AppendixNumbers @Then {
-		@InitialLanguage @Language { @Word&&appendix @AppendixShortNum }
+		@InitialLanguage @Language {
+		    appendix @WordVal @AppendixWord @AppendixShortNum
+		}
 	    }
         }
 
@@ -831,8 +996,9 @@ def @BookLayout
 		}
 
 	            @InitialLanguage @Language @SubSubAppendixHeadingFont @Font
-		    ragged @Break @Protect {@SubSubAppendixNum @DotSep @Title}
-	        //  @NumberMarker @Tag { @Tag } @SubSubAppendixNum
+		    @SubSubAppendixHeadingBreak @Break @Protect
+		      { @SubSubAppendixNum @SubSubAppendixHeadingFormat @Title}
+	        //  @NumberMarker @Tag { @Tag } @Value { @SubSubAppendixNum }
 	        //  @SubSubAppendixList&&preceding @Tagged @Tag
 	        //  @PageMarker&&preceding @Tagged @Tag
 	        //  @SubSubAppendixInContents @ContentsEntry
@@ -840,12 +1006,17 @@ def @BookLayout
 		        number { @SubSubAppendixNum }
 		        title { @InitialLanguage @Language @Title }
 		        pagenum { @PageOf @Tag }
+		//  @SubSubAppendixNumInTheorems @BeginAllCounters @SubSubAppendixNum
+		//  @SubSubAppendixNumInDisplays @BeginDisplayCounter @SubSubAppendixNum
+		//  @SubSubAppendixNumInFigures @BeginFigureCounter @SubSubAppendixNum
+		//  @SubSubAppendixNumInTables @BeginTableCounter @SubSubAppendixNum
 	        //  @InitialLanguage @Language @Body
             }
 
                 @InitialLanguage @Language @SubAppendixHeadingFont @Font
-		ragged @Break @Protect { @SubAppendixNum @DotSep @Title }
-            //  @NumberMarker @Tag { @Tag } @SubAppendixNum
+		@SubAppendixHeadingBreak @Break @Protect
+		  { @SubAppendixNum @SubAppendixHeadingFormat @Title }
+            //  @NumberMarker @Tag { @Tag } @Value { @SubAppendixNum }
             //  @SubAppendixList&&preceding @Tagged @Tag
             //  @PageMarker&&preceding @Tagged @Tag
             //  @SubAppendixInContents @ContentsEntry
@@ -853,6 +1024,10 @@ def @BookLayout
 		    number { @SubAppendixNum }
 		    title { @InitialLanguage @Language @Title }
 		    pagenum { @PageOf @Tag }
+	    //  @SubAppendixNumInTheorems @BeginAllCounters @SubAppendixNum
+	    //  @SubAppendixNumInDisplays @BeginDisplayCounter @SubAppendixNum
+	    //  @SubAppendixNumInFigures @BeginFigureCounter @SubAppendixNum
+	    //  @SubAppendixNumInTables @BeginTableCounter @SubAppendixNum
             //  @InitialLanguage @Language @Body
             //  NonStart @Runner
 	            @MajorNum { @AppendixLongNum }
@@ -862,12 +1037,14 @@ def @BookLayout
 
         }
 
-	@Full {
-	    //@AboveChapterGap
-		@InitialLanguage @Language @ChapterHeadingFont @Font 
-		@ChapterHeadingBreak @Break
-		{ @AppendixLongNum @ChapterHeadingFormat @Title }
-            //  @NumberMarker @Tag { @Tag } @AppendixShortNum
+	@InitialLanguage @Language {
+	    @Full {
+	        //@AboveChapterGap
+		    @AppendixHeadingFont @Font @AppendixHeadingBreak @Break
+		    { @AppendixLongNum @AppendixHeadingFormat @Title }
+	    }
+	    //
+            //  @NumberMarker @Tag { @Tag } @Value { @AppendixShortNum }
             //  @AppendixList&&preceding @Tagged @Tag
             //  @PageMarker&&preceding @Tagged @Tag
             //  @AppendixInContents @MajorContentsEntry
@@ -875,21 +1052,20 @@ def @BookLayout
 		    title { @InitialLanguage @Language @Title }
 		    pagenum { @PageOf @Tag }
             //  Start @Runner
-	            @MajorNum { @AppendixLongNum }
-	            @MajorTitle { @AppendixTitle }
+		    @MajorNum { @AppendixLongNum }
+		    @MajorTitle { @AppendixTitle }
+	    //  @AppendixNumInTheorems @Do @BeginAllCounters @AppendixShortNum
+	    //  @AppendixNumInDisplays @Do @BeginDisplayCounter @AppendixShortNum
+	    //  @AppendixNumInFigures @Do @BeginFigureCounter @AppendixShortNum
+	    //  @AppendixNumInTables @Do @BeginTableCounter @AppendixShortNum
+            //  @FootNoteThrough @Do @BeginFootNoteCounter
+	    //
+            //  @Body
+	    //@SubAppendixGap @EndFigureList
+            //@SubAppendixGap @EndNoteList 1
+            //@SubAppendixGap @ChapRefSection
+            //  @ER
 	}
-	//
-        //  @InitialLanguage @Language @BeginFigures @AppendixShortNum
-        //  @InitialLanguage @Language @BeginTables @AppendixShortNum
-        //  @InitialLanguage @Language @BeginFootNotes	{}
-	//
-        //  @InitialLanguage @Language @Body
-        //@SubAppendixGap @InitialLanguage @Language @EndNoteList 1
-        //@SubAppendixGap @InitialLanguage @Language @ChapRefSection
-        //  @EndFigures @ER
-        //  @EndTables @ER
-        //  @EndFootNotes @ER
-        //  @ER
     }
 
 @End @BookLayout

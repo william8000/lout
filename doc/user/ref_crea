@@ -106,6 +106,7 @@ to great lengths to do the right thing when options are omitted:
 @Rowa A { "        {  , @Month @Year" }	B { "}  @If  @Year @And @Month" }
 @Rowa A { "        {  , @Year " }	B { "}  @If  @Year @And @Not @Month" }
 @Rowa A { "        {  ." }		B { "}  @If  @True" }
+@Rowa A { "        {  {}  URL @URL." }	B { "}  @If  @URL" }
 @Rowa A { "        {  {}  @Note." }	B { "}  @If  @Note" }
 @Rowa A { "     }" }
 @Rowa A { "  }" }

@@ -1,9 +1,9 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -25,7 +25,7 @@
 /*  FILE:         z07.c                                                      */
 /*  MODULE:       Object Service                                             */
 /*  EXTERNS:      MakeWord(), MakeWordTwo(), DisposeObject(), CopyObject(),  */
-/*                SplitIsDefinite(), SmallCaps()                             */
+/*                SplitIsDefinite(), InsertObject()                          */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -42,8 +42,8 @@
 BOOLEAN SplitIsDefinite(OBJECT x)
 { OBJECT y1, y2;
   assert( type(x) == SPLIT, "SplitIsDefinite: x not a SPLIT!" );
-  Child(y1, DownDim(x, COL));
-  Child(y2, DownDim(x, ROW));
+  Child(y1, DownDim(x, COLM));
+  Child(y2, DownDim(x, ROWM));
   return is_definite(type(y1)) && is_definite(type(y2));
 } /* end SplitIsDefinite */
 
@@ -75,7 +75,8 @@ int DisposeObject(OBJECT x)
 /*****************************************************************************/
 
 OBJECT MakeWord(unsigned typ, FULL_CHAR *str, FILE_POS *pos)
-{ OBJECT res = NewWord(typ, StringLength(str), pos);
+{ OBJECT res;
+  NewWord(res, typ, StringLength(str), pos);
   StringCopy(string(res), str);
   FposCopy(fpos(res), *pos);
   debug4(DOS, DD, "MakeWord(%s, %s, %s) returning %s",
@@ -95,7 +96,10 @@ OBJECT MakeWord(unsigned typ, FULL_CHAR *str, FILE_POS *pos)
 OBJECT MakeWordTwo(unsigned typ, FULL_CHAR *str1, FULL_CHAR *str2, FILE_POS *pos)
 { int len1 = StringLength(str1);
   int len2 = StringLength(str2);
-  OBJECT res = NewWord(typ, len1 + len2, pos);
+  OBJECT res;
+  debug4(DOS, DD, "MakeWordTwo(%s, %s, %s, %s)",
+    Image(typ), str1, str2, EchoFilePos(pos));
+  NewWord(res, typ, len1 + len2, pos);
   StringCopy(string(res), str1);
   StringCopy(&string(res)[len1], str2);
   FposCopy(fpos(res), *pos);
@@ -123,24 +127,22 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case WORD:
     case QWORD:
     
-      res = NewWord(type(x), StringLength(string(x)), pos);
+      NewWord(res, type(x), StringLength(string(x)), pos);
       StringCopy(string(res), string(x));
       break;
 
 
     case GAP_OBJ:
     
-      res = New(GAP_OBJ);
+      New(res, GAP_OBJ);
       mark(gap(res)) = mark(gap(x));
       join(gap(res)) = join(gap(x));
+      hspace(res) = hspace(x);
+      vspace(res) = vspace(x);
       if( Down(x) != x )
       {	Child(y, Down(x));
 	tmp = CopyObject(y, pos);
 	Link(res, tmp);
-      }
-      else
-      {	hspace(res) = hspace(x);
-	vspace(res) = vspace(x);
       }
       break;
 
@@ -157,6 +159,8 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case VSHIFT:
     case HSCALE:
     case VSCALE:
+    case HCOVER:
+    case VCOVER:
     case SCALE:
     case HCONTRACT:
     case VCONTRACT:
@@ -172,6 +176,8 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case XCHAR:
     case FONT:
     case SPACE:
+    case YUNIT:
+    case ZUNIT:
     case BREAK:
     case UNDERLINE:
     case COLOUR:
@@ -179,6 +185,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case CURR_LANG:
     case COMMON:
     case RUMP:
+    case INSERT:
     case NEXT:
     case OPEN:
     case TAGGED:
@@ -190,7 +197,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case ACAT:
     case ENV_OBJ:
     
-      res = New(type(x));
+      New(res, type(x));
       for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
 	tmp = CopyObject(y, pos);
@@ -201,7 +208,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 
     case FILTERED:
 
-      res = New(type(x));
+      New(res, type(x));
       for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
 	Link(res, y);	/* do not copy children of FILTERED */
@@ -217,7 +224,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 
     case PAR:
     
-      res = New(PAR);
+      New(res, PAR);
       actual(res) = actual(x);
       assert( Down(x) != x, "CopyObject: PAR child!" );
       Child(y, Down(x));
@@ -228,7 +235,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 
     case CLOSURE:
     
-      res = New(CLOSURE);
+      New(res, CLOSURE);
       for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
 	assert( type(y) != CLOSURE, "CopyObject: CLOSURE!" );
@@ -242,7 +249,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 
     default:
     
-      Error(7, 1, "CopyObject: %s", INTERN, pos, Image(type(x)));
+      assert1(FALSE, "CopyObject:", Image(type(x)));
       break;
 
   } /* end switch */
@@ -251,3 +258,87 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
   debug1(DOS, DD, "CopyObject returning %s", EchoObject(res));
   return res;
 } /* end CopyObject */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  InsertObject(OBJECT x, OBJECT *ins)                                      */
+/*                                                                           */
+/*  Search through manifested object x for an ACAT where ins may be          */
+/*  attached.  If successful, set *ins to nilobj after the attachment.       */
+/*                                                                           */
+/*****************************************************************************/
+
+void InsertObject(OBJECT x, OBJECT *ins)
+{ OBJECT link, y, g;
+  debug2(DOS, D, "InsertObject(%s, %s)", EchoObject(x), EchoObject(*ins));
+  switch( type(x) )
+  {
+    case WORD:
+    case QWORD:
+    case NULL_CLOS:
+    case HEAD:
+    case CROSS:
+    case PAGE_LABEL:
+    case CLOSURE:
+    case INCGRAPHIC:
+    case SINCGRAPHIC:
+
+      break;
+
+
+    case ONE_COL:
+    case ONE_ROW:
+    case PADJUST:
+    case HADJUST:
+    case VADJUST:
+    case HCONTRACT:
+    case VCONTRACT:
+    case HEXPAND:
+    case VEXPAND:
+    case HSCALE:
+    case VSCALE:
+    case HCOVER:
+    case VCOVER:
+    case GRAPHIC:
+    case ROTATE:
+    case SCALE:
+    case WIDE:
+    case HIGH:
+    case HSHIFT:
+    case VSHIFT:
+    case HCAT:
+    case VCAT:
+    case COL_THR:
+    case ROW_THR:
+    case SPLIT:
+
+      for( link = Down(x);  link != x && *ins != nilobj;  link = NextDown(link) )
+      { Child(y, link);
+	InsertObject(y, ins);
+      }
+      break;
+
+
+    case ACAT:
+
+      New(g, GAP_OBJ);
+      SetGap(gap(g), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
+      hspace(g) = vspace(g) = 0;
+      Link(Down(x), g);
+      Link(Down(x), *ins);
+      *ins = nilobj;
+      break;
+
+
+    default:
+    
+      assert1(FALSE, "InsertObject:", Image(type(x)));
+      break;
+
+  }
+  debug1(DOS, D, "InsertObject returning (%s)",
+    *ins == nilobj ? "success" : "failure");
+} /* end InsertObject */
+
+

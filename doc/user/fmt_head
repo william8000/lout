@@ -144,13 +144,13 @@ footer.  It may be any object, but there are some peculiarities that
 will be explained now.
 @PP
 The full set of symbols of the DocumentLayout package unfortunately
-cannot be used within page header options.  This is because we are still
+cannot be used within page header options, because we are still
 setting up this package at this point; the symbols become available
 only after the @Code "@Use" clause.  However, the following symbols
 @I can be used:
 @ID @OneRow @Code {
-"@Font @Break @Language @Wide @Plain @Sym @R @I @B @BI @S"
-"@Date @Time `` '' -- --- @Bullet @ParSym @SectSym @Dagger @DaggerDbl"
+"@Underline @Font @Break @Language @Wide @Plain @Sym @R @I @B @BI"
+"@S @Date @Time `` '' -- --- @Bullet @ParSym @SectSym @Dagger @DaggerDbl"
 "@CDot @Sterling @Yen @Florin @Star @Degree @Minute @Second @Multiply"
 "@Divide @Lozenge @Register @CopyRight @TradeMark @Colour @Color"
 "@PageOf @Box @CurveBox @ShadowBox @Rotate @Scale @IncludeGraphic"
@@ -174,8 +174,7 @@ right. @Index @Code "@Right"
 @ID @Code "at left  @Centre { - 27 - }  @Right { at right }"
 produces
 @QD @HExpand { at left  @Centre { - 27 - }  @Right { at right } }
-The objects to be positioned should be enclosed in braces if they
-contain spaces, but may be arbitrary as usual.
+The objects should be enclosed in braces if they contain spaces.
 @PP
 The @Code "@PageNum" symbol produces the number of the current page, in
 page.num. @Index @Code "@PageNum"

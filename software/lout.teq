@@ -1,4 +1,4 @@
-LOUT.TEQ - TEX MATHEMATICS IN LOUT DOCUMENTS (VERSION 1.1)
+LOUT.TEQ - TEX MATHEMATICS IN LOUT DOCUMENTS (VERSION 2.0)
 
 Jeffrey H. Kingston
 jeff@cs.su.oz.au
@@ -15,9 +15,9 @@ output file (because the TeX fonts have to be included in it).
 
 Lout.teq is distributed as follows:
 
-   ftp://ftp.cs.su.oz.au/jeff/lout.teq.1.1.tar.gz
+   ftp://ftp.cs.su.oz.au/jeff/lout.teq.2.0.tar.gz
 
-In other words, in a gzipped tar file called "lout.teq.1.1.tar.gz"
+In other words, in a gzipped tar file called "lout.teq.2.0.tar.gz"
 in the "jeff" subdirectory of the home directory of "ftp ftp.cs.su.oz.au"
 with login name "ftp" or "anonymous" using any non-empty password.
 The distribution contains
@@ -32,7 +32,7 @@ The distribution contains
   *  A makefile and installation instructions (very easy)
 
 User documentation is contained in the Lout User's Guide distributed
-with Lout itself (Section 7.7).
+with Lout itself (Section 7.8).
 
 Lout.teq was designed and implemented by Jeffrey H. Kingston
 (jeff@cs.su.oz.au) of the Basser Department of Computer Science at the

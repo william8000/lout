@@ -101,16 +101,21 @@ first and last dash in each segment will have half the length of the
 others.
 @PP
 A @Code "dashlength" option controls the length of dashes and also the
-separation between dots:
+separation between dots, and a @Code "linewidth" option controls the
+width (thickness) of the lines and dots:
 @ID @OneRow @Code {
 "@Data"
 "    pairs { dashed }"
 "    dashlength { 0.2 ft }"
+"    linewidth { 0.5 pt }"
 "{"
 "    ..."
 "}"
 }
-This shows the default value, {@Code "0.2 ft"}.
+This shows the default values, {@Code "0.2 ft"} for @Code "dashlength"
+and {@Code "0.5 pt"} (half a point) for {@Code "linewidth"}.  Actually
+the default value for @Code "linewidth" is whatever happens to be
+already in use, but Lout sets line widths to half a point initially.
 @PP
 The @Code "pairs" option is also used for producing histograms, like
 histograms. @Index { histograms }

@@ -13,13 +13,15 @@ Lout
 Document Formatting System
 }
     @Author { Jeffrey H. Kingston }
-    @Edition { Version 3.06
-25 July, 1995 }
+    @Edition { Version 3.08
+May, 1996 }
     @Publisher {
-Copyright @CopyRight 1991, 1994, 1995 Jeffrey H. Kingston,
+Copyright @CopyRight 1991, 1996 Jeffrey H. Kingston,
 Basser Department of Computer Science,
 The University of Sydney 2006, Australia.  ISBN 0 86758 951 5.
 }
+    @InitialLanguage { English }
+    @OptimizePages { Yes }
 //
 
 @Include { preface }

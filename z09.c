@@ -1,9 +1,9 @@
 /*@z09.c:Closure Expansion:SearchEnv()@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -77,7 +77,7 @@ OBJECT SetEnv(OBJECT x, OBJECT y)
   ifdebug(DCE, D, DebugObject(x));
   assert( x!=nilobj && type(x)==CLOSURE, "SetEnv: x==nilobj or not CLOSURE!" );
   assert( y==nilobj || type(y)==ENV, "SetEnv: y!=nilobj && type(y) != ENV!" );
-  res = New(ENV);  Link(res, x);
+  New(res, ENV);  Link(res, x);
   if( y != nilobj )  Link(res, y);
   debug1(DCE, D, "SetEnv returning %s", EchoObject(res));
   return res;
@@ -164,8 +164,8 @@ OBJECT *crs, OBJECT *res_env)
   if( crs_wanted && has_tag(actual(x)) )
   { OBJECT tmp = CopyObject(x, no_fpos);  AttachEnv(env, tmp);
     y = CrossMake(actual(x), tmp, CROSS_TARG);
-    tmp = New(CROSS_TARG);  actual(tmp) = y;  Link(tmp, y);
-    if( *crs == nilobj )  *crs = New(CR_LIST);   Link(*crs, tmp);
+    New(tmp, CROSS_TARG);  actual(tmp) = y;  Link(tmp, y);
+    if( *crs == nilobj )  New(*crs, CR_LIST);   Link(*crs, tmp);
   }
 
   /* case x is a parameter */

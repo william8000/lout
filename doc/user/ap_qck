@@ -1,5 +1,5 @@
 @Appendix
-    @Title { Quick Reference Guide }
+    @Title { Lout Quick Reference Guide }
 @Begin
 10p @Font 1.17fx @Break @OneCol
 @Tab @Fmta { @Col 20c @Wide A ! @Col 20c @Wide B }
@@ -69,7 +69,6 @@ B {
 "@Section"
 "    @Title { ... }"
 "    @RunningTitle { ... }"
-"    @InitialLanguage { ... }"
 "    @Tag { ... }"
 "@Begin"
 "@PP"
@@ -109,6 +108,9 @@ B {
 @Rowa
     A { "@BI { bold-italic font }" }
     B { "@R { Roman font }" }
+@Rowa
+    A { "@S { small-caps font}" }
+    B { "@F { fixed-width font }" }
 }
 @LI @Code {
 "{ family face size } @Font { ... }"
@@ -170,6 +172,7 @@ B {
 @Rowa A { "@QD" } B { "@QuotedDisplay" }
 @Rowa A { "@CD" } B { "@CentredDisplay" }
 @Rowa             B { "@CenteredDisplay" }
+@Rowa             B { "@RightDisplay" }
 }
 @EndList
 
@@ -267,8 +270,7 @@ B {
 
 @LP
 @Heading { 12.  Footnotes, endnotes, margin notes }
-@LL
-@LI @Tab
+@LD @Tab
     @Fmta { @Col @Code A ! @Col @Code B }
     vmargin { 0.5vx }
 {
@@ -282,11 +284,6 @@ B {
     A { "@OuterNote { ... }" }
     B { "@InnerNote { ... }" }
 }
-@LI @Code {
-"@LongFootNote { @FootNum multi paragraphs }"
-"@LongEndNote { @EndNum multi paragraphs }"
-}
-@RawEndList
 }
 
 B {
@@ -357,13 +354,12 @@ B {
 @LP
 @Heading { 17.  Miscellaneous }
 @LD lines @Break {
-@Code "@S { Small Capitals }"
 @Code "@Underline { Underline }"
 @Code "@Date"
 @Code "@Time"
 @Code "German @Language { ... }"
 @Code "\# comment to end of line"
-@Code "\"#&/@^{}|\""   (enclose these characters in quotes)
+@Code "\"#&/@^{}|\"~"   (enclose these characters in quotes)
 }
 }
 } # end second table

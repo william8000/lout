@@ -1,0 +1,82 @@
+@Section
+   @Title { Theorems, lemmas, corollaries, definitions, propositions,
+examples, and claims }
+   @RunningTitle { Theorems, lemmas, etc. }
+   @Tag { theorems }
+@Begin
+@PP
+theorem. @Index @Code "@Theorem"
+A theorem is created like this:
+@ID @Code {
+"@LD @Theorem"
+"    @Title { Fermat's Last Theorem }"
+"{"
+"@Eq { a sup n + b sup n != c sup n } for all positive"
+"integers @Eq { a }, @Eq { b }, @Eq { c } and @Eq { n }"
+"when @Eq { n > 2 }."
+"@LP"
+"@Proof I have a proof of this theorem, but the margin"
+"is too small to contain it. @EndProof"
+"}"
+}
+where we have used the @Code "@LD" `left display' symbol from
+Section {@NumberOf displays} to get a left-justified display,
+and the @Code "@Eq" symbol from Chapter {@NumberOf equations}
+for the equations.  The result is
+@ID @Theorem
+    @Title { Fermat's Last Theorem }
+{
+@Eq { a sup n + b sup n != c sup n } for all positive
+integers @Eq { a }, @Eq { b }, @Eq { c } and @Eq { n }
+when @Eq { n > 2 }.
+@LP
+@Proof I have a proof of this theorem, but the margin
+is too small to contain it. @EndProof
+}
+The @Code "@Theorem" symbol produces an object with no adjacent
+vertical space, hence it needs to be used in conjuction with
+display or paragraph symbols.  The theorem is numbered automatically,
+with the title and number inserted at the start of the first
+paragraph.  @Code "@Title" may be omitted.
+@PP
+The @Code "@Proof" symbol produces @Proof @Null
+proof. @Index @Code "@Proof"
+with the appropriate following space, and the @Code "@EndProof" symbol produces
+endproof. @Index @Code "@EndProof"
+a box at the end of the line.  They may be used anywhere, not
+just within theorems.
+@PP
+There are seven symbols that produce independently numbered sequences
+in this way.  They are {@Code "@Theorem"}, {@Code "@Definition"},
+definition. @Index @Code "@Definition"
+claim. @Index @Code "@Claim"
+proposition. @Index @Code "@Proposition"
+lemma. @Index @Code "@Lemma"
+corollary. @Index @Code "@Corollary"
+example. @Index @Code "@Example"
+{@Code "@Claim"}, {@Code "@Proposition"}, {@Code "@Lemma"},
+{@Code "@Corollary"}, and {@Code "@Example"}.
+@PP
+The setup file contains options which determine whether the theorem
+numbers include a chapter number ({@Code "@ChapterNumInTheorems"}),
+or a section number ({@Code "@SectionNumInTheorems"}), and so on.  A
+section number automatically includes a chapter number, etc.  There
+are also options to change the word printed.  For example, if you
+need a sequence of conjectures, change the @Code "@ClaimWord" setup
+file option to
+@ID @Code "@ClaimWord { Conjecture }"
+and use the @Code "@Claim" symbol for your conjectures.  You can even put
+@ID @Code {
+"import @DocumentLayout"
+"macro @Conjecture { @Claim }"
+}
+into your @Code mydefs file (Section {@NumberOf definitions}) if you wish,
+so that you can write @Code "@Conjecture" in your documents instead of
+{@Code "@Claim"}.
+@PP
+Owing to problems behind the scenes, the @Code "@Theorem" symbol and its
+companions have a potential efficiency problem:  although all numbers are
+finalized on the second run, it takes Lout time proportional to the square
+of the highest theorem number to do this.  So large numbers of theorems
+numbered together might be slow.
+@End @Section

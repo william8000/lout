@@ -4,6 +4,7 @@ Jeffrey H. Kingston
 22 December 1992
 21 September 1994
 6 June 1995
+3 April 1996
 
 Basser Lout Version 3 incorporates automatic hyphenation using the
 method introduced by TeX (see Appendix H of the TeXBook by D. E. Knuth),
@@ -16,7 +17,9 @@ named in the langdef of that language.  For example:
 
 	langdef German Deutsch { german }
 
-means that unpacked Lout hyphenation file german.lh or its packed equivalent
+(There will usually be other information between the hyphenation file
+name and the closing brace, not relevant here.)  This example means that
+unpacked Lout hyphenation file german.lh or its packed equivalent
 german.lp (see below) is to be used when hyphenating German words.  These
 files are kept in the Lout system hyphenation directory (this directory).  If
 a language is desired but no hyphenation information file is available, the

@@ -24,9 +24,11 @@
    def @@Database          { @Code "@Database"          }
    def @@End               { @Code "@End"               }
    def @@Font              { @Code "@Font"              }
+   def @@ForceGalley       { @Code "@ForceGalley"       }
    def @@Galley            { @Code "@Galley"            }
    def @@Graphic           { @Code "@Graphic"           }
    def @@HAdjust           { @Code "@HAdjust"           }
+   def @@HCover            { @Code "@HCover"            }
    def @@HContract         { @Code "@HContract"         }
    def @@HExpand           { @Code "@HExpand"           }
    def @@High              { @Code "@High"              }
@@ -44,6 +46,7 @@
    def @@Merge             { @Code "@Merge"             }
    def @@Moment            { @Code "@Moment"            }
    def @@Next              { @Code "@Next"              }
+   def @@NotRevealed       { @Code "@NotRevealed"       }
    def @@Null              { @Code "@Null"              }
    def @@OneCol            { @Code "@OneCol"            }
    def @@OneRow            { @Code "@OneRow"            }
@@ -53,6 +56,7 @@
    def @@PrependGraphic    { @Code "@PrependGraphic"    }
    def @@Rotate            { @Code "@Rotate"            }
    def @@Rump              { @Code "@Rump"              }
+   def @@Insert            { @Code "@Insert"            }
    def @@Scale             { @Code "@Scale"             }
    def @@SetColor          { @Code "@SetColor"          }
    def @@SetColour         { @Code "@SetColour"         }
@@ -67,11 +71,14 @@
    def @@Use               { @Code "@Use"               }
    def @@VAdjust           { @Code "@VAdjust"           }
    def @@VContract         { @Code "@VContract"         }
+   def @@VCover            { @Code "@VCover"            }
    def @@VExpand           { @Code "@VExpand"           }
    def @@VScale            { @Code "@VScale"            }
    def @@VShift            { @Code "@VShift"            }
    def @@Wide              { @Code "@Wide"              }
    def @@Yield             { @Code "@Yield"             }
+   def @@YUnit             { @Code "@YUnit"             }
+   def @@ZUnit             { @Code "@ZUnit"             }
 
 
    ###################################################
@@ -281,6 +288,27 @@
 		 shape {
 			 xmark -0.3 cm
 			 {xmark ysize} ++ {0 0.3 cm}
+		       }
+		 linewidth { linewidth }
+		 linestyle { linestyle }
+		 dashlength { dashlength }
+	 x
+      }
+   }
+
+   def @ShowHMark
+      named linewidth  { 0.015 cm }
+      named linestyle  { dashed   }
+      named dashlength { 0.15 cm  }
+      named paint      { light    }
+      right x
+   {
+      @Fig
+      {   
+	 @Figure
+		 shape {
+			 -0.3 cm ymark
+			 {xsize ymark} ++ {0.3 cm 0}
 		       }
 		 linewidth { linewidth }
 		 linestyle { linestyle }

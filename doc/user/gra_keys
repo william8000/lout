@@ -98,8 +98,8 @@ from Section {@NumberOf data}, the complete result is
 }
 The first eight symbols have a @Code "symbolsize" option with the
 usual meaning and the usual default value ({@Code "0.15 ft"}).  The
-last four symbols have a @Code "dashlength" option with the usual
-default value, {@Code "0.2 ft"}, and a @Code "length" option, which
-determines the length of the line drawn by each symbol; its default value
-is {@Code "1.0 ft"}.
+last four symbols have @Code "dashlength" and @Code "linewidth" options
+with the usual default values, {@Code "0.2 ft"} and {@Code "0.5 pt"}
+respectively, and a @Code "length" option, which determines the length
+of the line drawn by each symbol; its default value is {@Code "1.0 ft"}.
 @End @Section

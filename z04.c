@@ -1,9 +1,9 @@
 /*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -42,7 +42,7 @@ OBJECT NewToken(unsigned char xtype, FILE_POS *xfpos, unsigned char xvspace,
 unsigned char xhspace, unsigned char xprec, OBJECT xactual)
 { OBJECT res;
   debug1(DTS, DDD, "NewToken(%s, ...)", Image(xtype));
-  res = New(xtype);  FposCopy(fpos(res), *xfpos);
+  New(res, xtype);  FposCopy(fpos(res), *xfpos);
   vspace(res) = xvspace;  hspace(res) = xhspace;
   precedence(res) = xprec;  actual(res) = xactual;
   debug1(DTS, DDD, "NewToken returning %s", EchoToken(res));
@@ -94,7 +94,7 @@ FULL_CHAR *EchoCatOp(unsigned xtype, BOOLEAN xmark, BOOLEAN xjoin)
     case ACAT:	return	(xmark ? xjoin ? KW_ACAT_MJ : AsciiToFull("??")
 			       : xjoin ? KW_ACAT_NJ : AsciiToFull("??") );
 
-    default:	Error(4, 1, "EchoCatOp: %d", INTERN, no_fpos, xtype);
+    default:	assert(FALSE, "EchoCatOp");
 		return STR_EMPTY;
 
   } /* end switch */
@@ -126,6 +126,7 @@ FULL_CHAR *EchoToken(OBJECT x)
     case TSPACE:
     case TJUXTA:
     case USE:
+    case NOT_REVEALED:
     case GSTUB_EXT:
     case GSTUB_INT:
     case GSTUB_NONE:
@@ -151,6 +152,8 @@ FULL_CHAR *EchoToken(OBJECT x)
     case VSHIFT:
     case HSCALE:
     case VSCALE:
+    case HCOVER:
+    case VCOVER:
     case SCALE:
     case HCONTRACT:
     case VCONTRACT:
@@ -166,6 +169,8 @@ FULL_CHAR *EchoToken(OBJECT x)
     case XCHAR:
     case FONT:
     case SPACE:
+    case YUNIT:
+    case ZUNIT:
     case BREAK:
     case UNDERLINE:
     case COLOUR:
@@ -173,6 +178,7 @@ FULL_CHAR *EchoToken(OBJECT x)
     case CURR_LANG:
     case COMMON:
     case RUMP:
+    case INSERT:
     case NEXT:
     case OPEN:
     case TAGGED:
@@ -195,7 +201,7 @@ FULL_CHAR *EchoToken(OBJECT x)
 
     default:
     
-      Error(4, 2, "EchoToken: %s", INTERN, &fpos(x), Image(type(x)));
+      assert1(FALSE, "EchoToken:", Image(type(x)));
       return STR_EMPTY;
   }
 } /* end EchoToken */

@@ -19,6 +19,7 @@ Document Formatting System
 Basser Dept. of Computer Science
 The University of Sydney
 }
+    @InitialLanguage { English }
 //
 
 @Overhead

@@ -9,15 +9,15 @@ labelled.refs @Index { labelled references }
 number beside the reference in the reference list and at the point(s)
 of citation.  There is a way to make Lout use a label of your choice
 instead of a number for each reference.  First change the following
-setup file options to the values shown:
+setup file options to the values shown (these options are explained
+in Section {@NumberOf changeref}):
 @ID @OneRow @Code {
 "@RefCiteLabels { @Label }"
 "@RefListLabels { @Label. }"
 "@RefListLabelWidth { 4.00f }"
 "@RefListSortKey { @Label }"
 }
-These options are explained in Section {@NumberOf changeref}.  Then make
-sure that every reference you cite has a {@Code "@Label"} option:
+Then make sure that every reference you cite has a {@Code "@Label"} option:
 @ID @OneRow @Code {
 "{ @Reference"
 "    @Tag { kingston1995lout.expert }"

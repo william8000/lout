@@ -40,5 +40,42 @@ New features introduced in Version 3.06
     Czech
     Plain text manual pages for people without troff
 
+New features introduced in Version 3.07
+
+    Bug fixes
+    @URL field added to references
+    @LongFootNote, @LongEndNote, @LongCaption stupidity removed
+    Matrices and delimiters in equations improved
+    Captions to figures and tables may be above or below
+    Theorems, definitions, claims, propositions, lemmas, corollaries, examples
+    Words like "Chapter" and "Theorem" may be changed by the user
+    Numbered displays have been re-implemented and are much improved
+    @RightDisplay symbol
+    @F symbol added as synonym for { Courier Base -1p } @Font ...
+    Ability to set simple document options in the command line
+    Horizontal galleys (for expert users)
+    Drop capitals (large capitals in top left corner of paragraph)
+    Optimal body text breaking (makes large in-line displays practical)
+    More flexible control of the format of chapter, section etc. headings
+    Option for starting chapters etc. on any, odd, or even pages
+    Command line option -S for safe execution (prohibits calls to system())
+    Symbols for up to three independent indexes at the end of each document
+    References work now when the citation point is after the reference list
+    Placement of objects at arbitrary points on the page
+    Reference lists may be before or after appendices
+    Choice of nine locations for figures and tables (page top, foot, etc.)
+    Numbering of footnotes works properly in all unusual cases now
+    Database index files created afresh automatically if system has stat()
+    Choice of rules for spaces between words (like Lout, troff, or TeX)
+    Spacing in equations (both eq and teq) further improved
+    Kerning of accented characters deduced from corresponding unaccented ones
+    @NotRevealed symbol (for expert users)
+    Another, hopefully better attempt made at Latin-2 formatting
+
+New features introduced in Version 3.08
+
+    Bug fixes
+
+
 Jeff Kingston
-25 July 1995
+8 May 1996

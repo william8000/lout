@@ -1,9 +1,9 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -24,7 +24,7 @@
 /*                                                                           */
 /*  FILE:         z25.c                                                      */
 /*  MODULE:       Object Echo                                                */
-/*  EXTERNS:      EchoObject(), PrintObject()                                */
+/*  EXTERNS:      EchoObject(), DebugObject()                                */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -118,7 +118,7 @@ static void newline(void)
 
 static void echo(OBJECT x, unsigned outer_prec)
 { OBJECT link, y, tmp, sym;
-  char *op;  int prec, i;
+  char *op, buff[20];  int prec, i, count;
   BOOLEAN npar_seen, name_printed, lbr_printed, braces_needed;
 
   switch( type(x) )
@@ -144,9 +144,11 @@ static void echo(OBJECT x, unsigned outer_prec)
 
 
     case SCALE_IND:
+    case COVER_IND:
     case EXPAND_IND:
     case GALL_PREC:
     case GALL_FOLL:
+    case GALL_FOLL_OR_PREC:
     case GALL_TARG:
     case CROSS_PREC:
     case CROSS_FOLL:
@@ -154,7 +156,7 @@ static void echo(OBJECT x, unsigned outer_prec)
     case RECURSIVE:
     case PAGE_LABEL_IND:
     
-	aprint("#"); cprint(Image(type(x))); aprint(" ");
+	/* aprint("#"); cprint(Image(type(x))); aprint(" "); */
 	echo(actual(x), NO_PREC);
 	break;
 
@@ -163,7 +165,8 @@ static void echo(OBJECT x, unsigned outer_prec)
     case RECEIVING:
     
 	aprint(type(x) == RECEIVING ? "#receiving " : "#receptive ");
-	if( external(actual(x)) )  aprint("(external) ");
+	if( external_ver(actual(x)) )  aprint("(external_ver) ");
+	if( external_hor(actual(x)) )  aprint("(external_hor) ");
 	if( threaded(actual(x)) )  aprint("(threaded) ");
 	if( blocked(x) )           aprint("(blocked) " );
 	if( trigger_externs(x) )   aprint("(trigger_externs) " );
@@ -235,7 +238,6 @@ static void echo(OBJECT x, unsigned outer_prec)
 
     case VCAT: op = "/", prec = VCAT_PREC;  goto ETC;
     case HCAT: op = "|", prec = HCAT_PREC;  goto ETC;
-    case ACAT: op = "&", prec = ACAT_PREC;  goto ETC;
     
 	ETC:
 	if( Down(x) == x )
@@ -255,6 +257,23 @@ static void echo(OBJECT x, unsigned outer_prec)
 	  else echo(y, prec);
 	}
 	if( prec <= outer_prec )  aprint(" }");
+	break;
+
+
+    case ACAT: op = "&", prec = ACAT_PREC; /*   goto ETC;  */
+
+	count = 0;
+	for( link = Down(x);  link != x;  link = NextDown(link) )
+	{ Child(y, link);
+	  if( type(y) == GAP_OBJ ) continue;
+	  count++;
+	  if( link == Down(x) || link == LastDown(x) )
+	    echo(y, prec);
+	  else if( NextDown(NextDown(link)) == LastDown(x) )
+	  { sprintf(buff, " ++%d++ ", count+1);
+	    aprint(buff);
+	  }
+	}
 	break;
 
 
@@ -326,7 +345,13 @@ static void echo(OBJECT x, unsigned outer_prec)
 	  echo(y, NO_PREC);
 	  cprint(KW_RBR);
 	}
+	/* ***
 	cprint(KW_CROSS);
+	aprint("<");
+	cprint(Image(cross_type(x)));
+	aprint(">");
+	*** */
+	aprint(" ");
 	if( NextDown(Down(x)) != x )
 	{ Child(y, NextDown(Down(x)));
 	  echo(y, NO_PREC);
@@ -358,16 +383,17 @@ static void echo(OBJECT x, unsigned outer_prec)
 
 	     case NPAR:	if( !name_printed )
 			{ cprint(SymName(sym));
+			  /* ***
 			  aprint("%");
 			  cprint(SymName(enclosing(sym)));
-			  /* ***
-			  if( external(x) || threaded(x) )
+			  *** */
+			  if( external_ver(x) || external_hor(x) || threaded(x) )
 			  { aprint(" #");
-			    if( external(x) )  aprint(" external");
+			    if( external_ver(x) )  aprint(" external_ver");
+			    if( external_hor(x) )  aprint(" external_hor");
 			    if( threaded(x) )  aprint(" threaded");
 			    newline();
 			  }
-			  *** */
 			  name_printed = TRUE;
 			}
 			newline();  aprint("  ");
@@ -381,16 +407,17 @@ static void echo(OBJECT x, unsigned outer_prec)
 
 	     case RPAR:	if( !name_printed )
 			{ cprint(SymName(sym));
+			  /* ***
 			  aprint("%");
 			  cprint(SymName(enclosing(sym)));
-			  /* ***
-			  if( external(x) || threaded(x) )
+			  *** */
+			  if( external_ver(x) || external_hor(x) || threaded(x) )
 			  { aprint(" #");
-			    if( external(x) )  aprint(" external");
+			    if( external_ver(x) )  aprint(" external_ver");
+			    if( external_hor(x) )  aprint(" external_hor");
 			    if( threaded(x) )  aprint(" threaded");
 			    newline();
 			  }
-			  *** */
 			  name_printed = TRUE;
 			}
 			if( npar_seen ) newline();
@@ -404,8 +431,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 			else echo(tmp, (unsigned) precedence(sym));
 			break;
 	
-	     default:	Error(25, 1, "echo: %s", INTERN, &fpos(y),
-			  Image(type(actual(y))) );
+	     default:	assert1(FALSE, "echo:", Image(type(actual(y))));
 			break;
 
 	    }
@@ -413,16 +439,17 @@ static void echo(OBJECT x, unsigned outer_prec)
 	}
 	if( !name_printed )
 	{ cprint( SymName(sym) );
+	  /* ***
 	  aprint("%");
 	  cprint(SymName(enclosing(sym)));
-	  /* ***
-	  if( external(x) || threaded(x) )
+	  *** */
+	  if( external_ver(x) || external_hor(x) || threaded(x) )
 	  { aprint(" #");
-	    if( external(x) )  aprint(" external");
+	    if( external_ver(x) )  aprint(" external_ver");
+	    if( external_hor(x) )  aprint(" external_hor");
 	    if( threaded(x) )  aprint(" threaded");
 	    newline();
 	  }
-	  *** */
 	}
 
 	/* print closing brace if needed */
@@ -434,13 +461,15 @@ static void echo(OBJECT x, unsigned outer_prec)
     
 	/* this should occur only in debug output case */
 	cprint(KW_SPLIT);  moveright();
-	Child(y, DownDim(x, COL));
-	aprint(" COL:");
+	Child(y, DownDim(x, COLM));
+	aprint(" COLM:");
 	echo(y, FORCE_PREC);
 	newline();
-	Child(y, DownDim(x, ROW));
-	aprint(" ROW:");
+	/* ***
+	Child(y, DownDim(x, ROWM));
+	aprint(" ROWM:");
 	echo(y, FORCE_PREC);
+	*** */
 	moveleft();
 	break;
 
@@ -576,8 +605,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 			moveleft();  newline();
 			break;
 
-	    default:	Error(25, 2, "echo: %s",
-			  FATAL, &fpos(y), Image(type(y)));
+	    default:	assert1(FALSE, "echo:", Image(type(y)));
 			break;
 	  }
 	}
@@ -597,7 +625,6 @@ static void echo(OBJECT x, unsigned outer_prec)
 	break;
 
 
-    case PAGE_LABEL:
     case ONE_COL:
     case ONE_ROW:
     case HCONTRACT:
@@ -609,8 +636,11 @@ static void echo(OBJECT x, unsigned outer_prec)
     case VADJUST:
     case HSCALE:
     case VSCALE:
+    case HCOVER:
+    case VCOVER:
     case COMMON:
     case RUMP:
+    case INSERT:
     case NEXT:
     case WIDE:
     case HIGH:
@@ -626,6 +656,8 @@ static void echo(OBJECT x, unsigned outer_prec)
     case XCHAR:
     case FONT:
     case SPACE:
+    case YUNIT:
+    case ZUNIT:
     case BREAK:
     case UNDERLINE:
     case COLOUR:
@@ -659,8 +691,9 @@ static void echo(OBJECT x, unsigned outer_prec)
 
     case CURR_LANG:
     case BACKEND:
+    case PAGE_LABEL:
 
-	/* predefined symbols that have no parameters */
+	/* predefined symbols that have (or may have) no parameters */
 	cprint(Image(type(x)));
 	break;
 
@@ -732,7 +765,7 @@ static void echo(OBJECT x, unsigned outer_prec)
 
     default:
     
-	Error(25, 3, "echo: %s", INTERN, no_fpos, Image(type(x)));
+	assert1(FALSE, "echo:", Image(type(x)));
 	break;
 
   } /* end switch */
@@ -800,15 +833,17 @@ FULL_CHAR *EchoIndex(OBJECT index)
   {
     case RECEIVING:
 
-      sprintf(buff, "receiving %s", type(actual(index)) == CLOSURE ?
-	SymName(actual(actual(index))) : Image(type(actual(index))));
+      sprintf(buff, "receiving %s%s", type(actual(index)) == CLOSURE ?
+	SymName(actual(actual(index))) : Image(type(actual(index))),
+	non_blocking(index) ? " (non_blocking)" : "");
       break;
 
 
     case RECEPTIVE:
 
-      sprintf(buff, "receptive %s", type(actual(index)) == CLOSURE ?
-	SymName(actual(actual(index))) : Image(type(actual(index))));
+      sprintf(buff, "receptive %s%s", type(actual(index)) == CLOSURE ?
+	SymName(actual(actual(index))) : Image(type(actual(index))),
+	non_blocking(index) ? " (non_blocking)" : "");
       break;
 
 
@@ -859,12 +894,15 @@ void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
     SymName(actual(hd)), SymName(whereto(hd)));
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
   { Child(y, link);
-    if( y == pinpt ) fprintf(stderr, "++");
-    switch( type(y) )
+    if( y == pinpt )
+    { fprintf(stderr, "++ %s ", Image(type(y)));
+      DebugObject(y);
+    }
+    else switch( type(y) )
     {
       case GAP_OBJ:
 
-	/* fprintf(stderr, "%s//\n", istr); */
+	fprintf(stderr, "%s%s %s\n", istr, "gap", EchoGap(&gap(y)));
 	break;
 
 
@@ -933,6 +971,8 @@ void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
       case VSHIFT:
       case HSCALE:
       case VSCALE:
+      case HCOVER:
+      case VCOVER:
       case HCONTRACT:
       case VCONTRACT:
       case HEXPAND:
@@ -947,6 +987,7 @@ void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
       case GRAPHIC:
       case ACAT:
       case HCAT:
+      case VCAT:
       case ROW_THR:
       case CROSS:
 
@@ -956,7 +997,8 @@ void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
 
       case CLOSURE:
 
-	fprintf(stderr, "%s%s\n", istr, SymName(actual(y)));
+	fprintf(stderr, "%s%s  external_hor = %s, external_ver = %s\n", istr,
+	  SymName(actual(y)), bool(external_hor(y)), bool(external_ver(y)));
 	break;
 
 

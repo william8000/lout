@@ -1,9 +1,9 @@
 /*@z44.c:Vertical Hyphenation:VerticalHyphenate()@****************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -97,6 +97,7 @@ static OBJECT FindTarget(OBJECT index)
     case UNATTACHED:
     case GALL_PREC:
     case GALL_FOLL:
+    case GALL_FOLL_OR_PREC:
 
       res = pinpoint(index);
       break;
@@ -106,6 +107,7 @@ static OBJECT FindTarget(OBJECT index)
     case RECEIVING:
     case RECURSIVE:
     case SCALE_IND:
+    case COVER_IND:
     case EXPAND_IND:
 
       res = actual(index);
@@ -131,7 +133,7 @@ static OBJECT FindTarget(OBJECT index)
 
     default:
 
-      Error(44, 1, "unknown index %s", INTERN, no_fpos, Image(type(index)));
+      assert1(FALSE, "FindTarget: unknown index", Image(type(index)));
       break;
   }
   debug1(DVH, DD, "FindTarget returning %s", EchoObject(res));
@@ -176,23 +178,26 @@ static OBJECT WhichComponent(OBJECT target)
 static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
 { OBJECT new_y, new_row_thread, s1, new_s1, s2, new_s2, link, sh, new_sh, tmp;
   assert( Up(nxt) != nxt, "EncloseInHCat: Up(nxt) == nxt!" );
-  new_y = New(HCAT);
+  New(new_y, HCAT);
+  adjust_cat(new_y) = FALSE;
   MoveLink(Up(nxt), new_y, CHILD);
   assert( Up(nxt) == nxt, "EncloseInHCat: Up(nxt) != nxt!" );
   FposCopy(fpos(new_y), fpos(y));
-  back(new_y, COL) = back(y, COL);
-  fwd(new_y, COL) = fwd(y, COL);
-  back(new_y, ROW) = back(nxt, ROW);
-  fwd(new_y, ROW) = fwd(nxt, ROW);
-  new_row_thread = New(ROW_THR);
-  back(new_row_thread, ROW) = back(new_y, ROW);
-  fwd(new_row_thread, ROW) = fwd(new_y, ROW);
+  back(new_y, COLM) = back(y, COLM);
+  fwd(new_y, COLM) = fwd(y, COLM);
+  back(new_y, ROWM) = back(nxt, ROWM);
+  fwd(new_y, ROWM) = fwd(nxt, ROWM);
+  New(new_row_thread, ROW_THR);
+  back(new_row_thread, ROWM) = back(new_y, ROWM);
+  fwd(new_row_thread, ROWM) = fwd(new_y, ROWM);
   for( link = Down(y);  link != y;  link = NextDown(link) )
   { Child(s1, link);
     if( type(s1) == GAP_OBJ )
-    { new_s1 = New(GAP_OBJ);
+    { New(new_s1, GAP_OBJ);
       FposCopy(fpos(new_s1), fpos(s1));
       GapCopy(gap(new_s1), gap(s1));
+      hspace(new_s1) = hspace(s1);
+      vspace(new_s1) = vspace(s1);
       Link(new_y, new_s1);
       continue;
     }
@@ -200,15 +205,15 @@ static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
       Child(s2, Down(s1));
     else s2 = s1;
     assert( type(s2) == SPLIT, "EncloseInHcat: type(s2) != SPLIT!" );
-    Child(sh, DownDim(s2, COL));
-    new_s2 = New(SPLIT);
+    Child(sh, DownDim(s2, COLM));
+    New(new_s2, SPLIT);
     FposCopy(fpos(new_s2), fpos(s2));
     if( s2 != s1 )
-    { new_s1 = New(type(s1));
-      back(new_s1, COL) = back(s1, COL);
-      fwd(new_s1, COL) = fwd(s1, COL);
-      back(new_s1, ROW) = back(new_row_thread, COL);
-      fwd(new_s1, ROW) = fwd(new_row_thread, COL);
+    { New(new_s1, type(s1));
+      back(new_s1, COLM) = back(s1, COLM);
+      fwd(new_s1, COLM) = fwd(s1, COLM);
+      back(new_s1, ROWM) = back(new_row_thread, COLM);
+      fwd(new_s1, ROWM) = fwd(new_row_thread, COLM);
       Link(new_y, new_s1);
       Link(new_s1, new_s2);
     }
@@ -217,29 +222,29 @@ static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
     { 
       /* replace sh by nxt in the copy */
       new_sh = nxt;
-      back(new_sh, COL) = back(s2, COL);
-      fwd(new_sh, COL) = fwd(s2, COL);
+      back(new_sh, COLM) = back(s2, COLM);
+      fwd(new_sh, COLM) = fwd(s2, COLM);
     }
     else
     {
       /* replace sh by an empty object of the same width in the copy */
-      new_sh = New(WIDE);
+      New(new_sh, WIDE);
       FposCopy(fpos(new_sh), fpos(sh));
-      SetConstraint(constraint(new_sh), back(sh,COL),size(sh,COL),fwd(sh,COL));
-      back(new_sh, COL) = back(sh, COL);
-      fwd(new_sh, COL) = fwd(sh, COL);
-      back(new_sh, ROW) = fwd(new_sh, ROW) = 0;
+      SetConstraint(constraint(new_sh), back(sh,COLM),size(sh,COLM),fwd(sh,COLM));
+      back(new_sh, COLM) = back(sh, COLM);
+      fwd(new_sh, COLM) = fwd(sh, COLM);
+      back(new_sh, ROWM) = fwd(new_sh, ROWM) = 0;
       tmp = MakeWord(WORD, STR_EMPTY, &fpos(sh));
-      back(tmp, COL) = fwd(tmp, COL) = 0;
-      back(tmp, ROW) = fwd(tmp, ROW) = 0;
+      back(tmp, COLM) = fwd(tmp, COLM) = 0;
+      back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
       Link(new_sh, tmp);
     }
     Link(new_s2, new_sh);
-    back(new_s2, COL) = back(new_sh, COL);
-    fwd(new_s2, COL) = fwd(new_sh, COL);
+    back(new_s2, COLM) = back(new_sh, COLM);
+    fwd(new_s2, COLM) = fwd(new_sh, COLM);
     Link(new_s2, new_row_thread);
-    back(new_s2, ROW) = back(new_row_thread, ROW);
-    fwd(new_s2, ROW) = fwd(new_row_thread, ROW);
+    back(new_s2, ROWM) = back(new_row_thread, ROWM);
+    fwd(new_s2, ROWM) = fwd(new_row_thread, ROWM);
     Link(new_row_thread, new_sh);
   }
   return new_y;
@@ -258,7 +263,7 @@ BOOLEAN VerticalHyphenate(OBJECT y)
 { OBJECT large_comp, index, z, link, g;
   OBJECT row_thread, s1, s2, sh, sv, shp, prev, nxt, large_comp_split;
   LENGTH rump_fwd;
-  debug1(DVH, D, "[ VerticalHyphenate(y: %s), y =", EchoLength(size(y, ROW)));
+  debug1(DVH, D, "[ VerticalHyphenate(y: %s), y =", EchoLength(size(y, ROWM)));
   ifdebug(DVH, D, DebugObject(y));
   debug0(DVH, DD, "galley before vertical hyphenation:");
   ifdebug(DVH, DD, Parent(z, Up(y)); DebugGalley(z, y, 2));
@@ -285,8 +290,8 @@ BOOLEAN VerticalHyphenate(OBJECT y)
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (child not SPLIT)");
       return FALSE;
     }
-    Child(sh, DownDim(s2, COL));
-    Child(sv, DownDim(s2, ROW));
+    Child(sh, DownDim(s2, COLM));
+    Child(sv, DownDim(s2, ROWM));
     if( type(sv) != ROW_THR )
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (no ROW_THR)");
       return FALSE;
@@ -296,7 +301,7 @@ BOOLEAN VerticalHyphenate(OBJECT y)
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (different ROW_THR)");
       return FALSE;
     }
-    Parent(shp, UpDim(sh, ROW));
+    Parent(shp, UpDim(sh, ROWM));
     if( shp != row_thread )
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (sh parent)");
       return FALSE;
@@ -304,7 +309,7 @@ BOOLEAN VerticalHyphenate(OBJECT y)
 
     /* Now sh is one of the HCAT components */
     if( type(sh) != VCAT )
-    { rump_fwd = max(rump_fwd, fwd(sh, ROW));
+    { rump_fwd = max(rump_fwd, fwd(sh, ROWM));
     }
     else if( large_comp != nilobj )
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (two VCATs)");
@@ -335,9 +340,9 @@ BOOLEAN VerticalHyphenate(OBJECT y)
   }
 
   /* make sure that first gap does not change when rearranging */
-  rump_fwd = max(rump_fwd, fwd(prev, ROW));
-  if( MinGap(rump_fwd, back(nxt, ROW), fwd(nxt, ROW), &gap(g)) !=
-      MinGap(fwd(prev, ROW), back(nxt, ROW), fwd(nxt, ROW), &gap(g)) )
+  rump_fwd = max(rump_fwd, fwd(prev, ROWM));
+  if( MinGap(rump_fwd, back(nxt, ROWM), fwd(nxt, ROWM), &gap(g)) !=
+      MinGap(fwd(prev, ROWM), back(nxt, ROWM), fwd(nxt, ROWM), &gap(g)) )
   { debug0(DVH, D, "] VerticalHyphenate returning FALSE (first gap changes)");
     return FALSE;
   }
@@ -363,8 +368,8 @@ BOOLEAN VerticalHyphenate(OBJECT y)
   TransferLinks(Up(g), large_comp, NextDown(Up(y)));
 
   /* change the size of y to its new, smaller value */
-  fwd(y, ROW) = fwd(row_thread, ROW) = fwd(large_comp, ROW)
-	      = fwd(large_comp_split, ROW) = fwd(prev, ROW);
+  fwd(y, ROWM) = fwd(row_thread, ROWM) = fwd(large_comp, ROWM)
+	      = fwd(large_comp_split, ROWM) = fwd(prev, ROWM);
 
   /* set link to the link of the first thing before y which is not an index */
   for( link = PrevDown(Up(y));  type(link) == LINK;  link = PrevDown(link) )
@@ -388,7 +393,7 @@ BOOLEAN VerticalHyphenate(OBJECT y)
   }
 
   debug1(DVH, D, "] VerticalHyphenate returning TRUE (y: %s)",
-    EchoLength(size(y, ROW)));
+    EchoLength(size(y, ROWM)));
   debug0(DVH, DD, "galley after vertical hyphenation:");
   ifdebug(DVH, DD, Parent(z, Up(y)); DebugGalley(z, y, 2));
   return TRUE;
@@ -411,7 +416,7 @@ static OBJECT BuildMergeTree(int n, OBJECT x, OBJECT *lenv, OBJECT *lact)
   debug2(DHY, DD, "BuildMergeTree(%d, %s, -. -)", n, EchoObject(x));
 
   if( n == 1 )
-  { res = New(ENV_OBJ);
+  { New(res, ENV_OBJ);
     Child(y, Down(x));
     MoveLink(Down(x), res, PARENT);
     assert(type(y)==CLOSURE && has_merge(actual(y)), "BuildMergeTree: has_m!");
@@ -431,22 +436,22 @@ static OBJECT BuildMergeTree(int n, OBJECT x, OBJECT *lenv, OBJECT *lact)
       if( is_merge(y) )  break;
     }
     assert( y != act, "BuildMergeTree: y!" );
-    merge = New(CLOSURE);
+    New(merge, CLOSURE);
     actual(merge) = y;
 
     /* build left parameter of the new @Merge */
-    left_par = New(PAR);
+    New(left_par, PAR);
     actual(left_par) = ChildSym(y, LPAR);
     Link(merge, left_par);
     Link(left_par, l);
 
     /* build right parameter of the new @Merge */
-    right_par = New(PAR);
+    New(right_par, PAR);
     actual(right_par) = ChildSym(y, RPAR);
     Link(merge, right_par);
     Link(right_par, r);
 
-    res = New(ENV_OBJ);
+    New(res, ENV_OBJ);
     Link(res, merge);
     Link(res, env);
   }

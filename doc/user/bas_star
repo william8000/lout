@@ -87,7 +87,7 @@ Some characters are symbols that produce special effects -- for
 example, @Code "{" and @Code "}" produce grouping -- and to turn off
 these effects the characters must be enclosed in double quotes:  @Code
 "\"{\"" produces "{".  The complete set of these special characters is
-@ID @Code "/    |    &    {    }    #    @    ^"
+@ID @Code "/    |    &    {    }    #    @    ^   ~"
 Section {@NumberOf characters} treats unusual characters in full detail,
 and you will need to read it before trying to produce @Code "\\" or
 @Code {"\""}.
@@ -96,14 +96,12 @@ Symbols like @Code "@Doc" and @Code "@Text" must be separated from
 each other by one or more spaces, otherwise Lout will think they are part
 of one symbol.  See Section {@NumberOf spaces} for the details.
 @PP
-People familiar with other document formatting systems might
-expect that leaving a blank line will cause Lout to start a new paragraph,
-or that typing two or more spaces is the same as typing one space.  In
-fact, the end of a line is treated by Lout exactly the same as one space,
-so a blank line (which is two line endings together) is equivalent to two
-spaces.  To get a new paragraph you must use a paragraph symbol.  And Lout
-does take note of how many spaces or line endings you type, and the
-results reflect this (Section {@NumberOf spaces}).
+People familiar with other document formatting systems might expect that
+leaving a blank line would cause Lout to start a new paragraph; but
+this is not so, you must use a paragraph symbol.  Lout will ordinarily
+take notice of how many spaces you type between words (Section
+{@NumberOf spaces}, but it is willing to mimic the spacing rules of two
+other systems, troff and @TeX, if you prefer (Section {@NumberOf white}).
 @PP
 When Lout runs, you might see some error messages beginning with
 error.messages @Index { error messages }
@@ -115,4 +113,23 @@ are nothing to worry about; they just mean that you have to run the
 course, if you see error messages about missing braces, unknown
 symbols, and so on, you need to revise your file.  Lout will tell
 you the line number of the problem, and how far along the line it is.
+@PP
+@BI { WARNING: }  Lout allows documents to cause arbitrary system commands
+to be executed.  These typically do useful things such as format computer
+programs and uncompress graphics files, but it is possible for a
+malicious person to send you a document which includes a command to delete
+all your files, send abusive mail to the President of the United States in
+your name, etc.  You can protect yourself against this possibility by using
+the `safe execution' flag:
+@ID @Code "lout -S suspect.document > out.ps"
+Then no system commands will be executed; instead, Lout will print them so
+that you can confirm for yourself that they are safe before running again
+without the flag.  These system commands are Lout's only potentially unsafe
+features, but you also need to worry about whether the resulting PostScript
+file contains malicious code, since the document may direct Lout to include
+arbitrary PostScript code in the output.  The safe execution of PostScript
+programs is a matter for PostScript interpreters, not for Lout.  For example,
+the popular Ghostview program has a @Code "-safer" command line option,
+which is rumoured to disable unsafe PostScript features, although the
+manual entry available to the author does not say so.
 @End @Section

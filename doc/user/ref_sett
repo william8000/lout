@@ -46,10 +46,9 @@ next step is to place
 database. @Index @Code "@Database"
 at the start of your document, just before {@Code "@Doc"},
 {@Code "@Document"}, {@Code "@Report"}, or whatever.  Alternatively,
-if you are using your own setup file, you may place it at the end of
-that file if you wish.  It informs Lout that you might be referring
-to @Code "@Reference" symbols in database @Code "refs" (that is, in
-file {@Code "refs.ld"}).
+you may place it at the end of your setup file.  It informs Lout that
+you might be referring to @Code "@Reference" symbols in database
+@Code "refs" (that is, in file {@Code "refs.ld"}).
 @PP
 If you want to maintain a central database, used by many documents, you
 won't want it in the same directory as any one of them.  A Unix
@@ -66,7 +65,16 @@ is to speed up the retrieval of your references.  Thanks to this file
 you can have hundreds or even thousands of references in your database,
 without slowing Lout down very much.  However, whenever you change your
 database file @I { you must remove its corresponding index file }, so
-that Lout knows to create it afresh.  The index file is stored in the
+that Lout knows to create it afresh.
+@FootNote {
+Depending on how it was installed on your system, Lout may be able to
+use the time of last modification of the database file and its index
+file to determine automatically whether the index file needs to be
+created afresh, thus saving you the trouble of removing it.  You can
+find out whether this is true of your system by typing the command
+{@Code "lout -V"}.
+}
+ The index file is stored in the
 same directory as the database file, and it has the same name except
 that it ends in @Code ".li" rather than @Code ".ld" (e.g.
 li.file @Index { @Code ".li" file }

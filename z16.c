@@ -1,9 +1,9 @@
 /*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -42,7 +42,7 @@
 
 LENGTH FindShift(OBJECT x, OBJECT y, int dim)
 { LENGTH len, res;
-  debug3(DSF, D, "FindShift(%s, %s, %s)", Image(type(x)),
+  debug3(DSF, DD, "FindShift(%s, %s, %s)", Image(type(x)),
     EchoObject(y), dimen(dim));
 
   /* first determine the magnitude of the shift */
@@ -54,8 +54,7 @@ LENGTH FindShift(OBJECT x, OBJECT y, int dim)
     case NEXT_UNIT:	len = (size(y, dim) * width(shift_gap(x))) / FR;
 			break;
 
-    default:		Error(16, 1, "FindShift: %s",
-			  INTERN,&fpos(x),"units");
+    default:		assert(FALSE, "FindShift: units");
 			break;
   }
 
@@ -71,12 +70,11 @@ LENGTH FindShift(OBJECT x, OBJECT y, int dim)
     case GAP_DEC:	res = - len;
 			break;
 
-    default:		Error(16, 2, "FindShift: %s",
-			  INTERN, &fpos(x),"type");
+    default:		assert(FALSE, "FindShift: type");
 			break;
   }
 
-  debug1(DSF, D, "FindShift returning %s", EchoLength(res));
+  debug1(DSF, DD, "FindShift returning %s", EchoLength(res));
   return res;
 } /* end FindShift */
 
@@ -169,7 +167,7 @@ OBJECT y, int dim)
   ifdebug(DSA, DD, DebugObject(y));
 
   /* DO_ADJUST ACAT is a special case because adjustment affects its size */
-  if( dim==COL && type(y)==ACAT && display_style(save_style(y)) == DO_ADJUST )
+  if( dim==COLM && type(y)==ACAT && display_style(save_style(y)) == DO_ADJUST )
   { back(x, dim) = *b;  fwd(x, dim) = *f;
     *b = back(y, dim);  *f = fwd(y, dim);
     debug2(DSA, D, "CatAdjustSize ACAT %s,%s", EchoLength(*b), EchoLength(*f));
@@ -235,8 +233,8 @@ OBJECT y, int dim)
     ifdebug(DSA, D, DebugObject(y));
     debug0(DSA, D, "x was");
     ifdebug(DSA, D, DebugObject(x));
-    Error(16, 3, "maximum size %s exceeded",
-      FATAL, &fpos(y), EchoLength(MAX_LEN));
+    Error(16, 1, "maximum size %s exceeded", FATAL, &fpos(y),
+      EchoLength(MAX_LEN));
   }
   *b = bb;  *f = ff;
   debug2(DSA, D, "CatAdjustSize returning %s,%s", EchoLength(*b), EchoLength(*f));
@@ -258,7 +256,8 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
   BOOLEAN ratm;  LENGTH tb, tf, cby, cfy, rby, rfy;
 
   debug6(DSA, D, "[ AdjustSize( %s(%s,%s), %s, %s, %s ), x =",
-	Image(type(x)), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
+	type(x) == CLOSURE ? SymName(actual(x)) : Image(type(x)),
+	EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
 	EchoLength(b), EchoLength(f), dimen(dim));
   ifdebug(DSA, DD, DebugObject(x) );
 
@@ -269,14 +268,14 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 
     /* these cases are unique because they have multiple parents */
     if( type(x) == COL_THR || type(x) == ROW_THR )
-    { assert( (type(x)==COL_THR) == (dim==COL), "AdjustSize: COL_THR!" );
+    { assert( (type(x)==COL_THR) == (dim==COLM), "AdjustSize: COL_THR!" );
       back(x, dim) = b;  fwd(x, dim) = f;
       for( link = Up(x);  link != x;  link = NextUp(link) )
       { Parent(y, link);
 	assert( type(y) == SPLIT, "AdjustSize: type(y) != SPLIT!") ;
 	AdjustSize(y, b, f, dim);
       }
-      debug0(DSA, D, "[ AdjustSize (thread case) returning.");
+      debug0(DSA, D, "] AdjustSize (thread case) returning.");
       return;
     }
 
@@ -297,9 +296,14 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 
       case HEAD:
       
-	if( dim == ROW )
+	if( gall_dir(y) == COLM )
 	{ back(x, dim) = b, fwd(x, dim) = f;
-	  debug0(DSA, D, "] AdjustSize ROW returning at HEAD");
+	  debug0(DSA, D, "] AdjustSize returning at horiz HEAD");
+	  return;
+	}
+	else if( dim == ROWM )
+	{ back(x, dim) = b, fwd(x, dim) = f;
+	  debug0(DSA, D, "] AdjustSize ROWM returning at HEAD");
 	  return;
 	}
 	else
@@ -329,10 +333,10 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 	    for( link = NextDown(lp);  link != rp;  link = NextDown(link) )
 	    { Child(z, link);
 	      if( type(z) == GAP_OBJ || is_index(type(z)) )  continue;
-	      debugcond3(DSA, DD,  dim == COL && fwd(z, dim) > 20*CM,
+	      debugcond3(DSA, DD,  dim == COLM && fwd(z, dim) > 20*CM,
 		  "  z %s (size %s,%s) = ", Image(type(z)),
 		  EchoLength(back(z, dim)), EchoLength(fwd(z, dim)));
-	      ifdebugcond(DSA, DD,  dim == COL && fwd(z, dim) > 20*CM, DebugObject(z));
+	      ifdebugcond(DSA, DD,  dim == COLM && fwd(z, dim) > 20*CM, DebugObject(z));
 	      tb = max(tb, back(z, dim));
 	      tf = max(tf, fwd(z, dim));
 	    }
@@ -340,12 +344,12 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 	  }
 	  if( back(y, dim) == b && fwd(y, dim) == f )
 	  {
-	    debug0(DSA, D, "] AdjustSize (COL) returning at HEAD (no wider)");
+	    debug0(DSA, D, "] AdjustSize (COLM) returning at HEAD (no wider)");
 	    return;
 	  }
-	  debug3(DSA, DD, "AdjustSize widening HEAD %s to b = %s, f = %s",
+	  debug3(DSA, D, "AdjustSize widening HEAD %s to b = %s, f = %s",
 		   SymName(actual(y)), EchoLength(b), EchoLength(f));
-	  ifdebugcond(DSA, DD,  dim == COL && f > 20*CM, DebugObject(y));
+	  ifdebugcond(DSA, DD,  dim == COLM && f > 20*CM, DebugObject(y));
 	  back(y, dim) = b;  fwd(y, dim) = f;
 	  if( Up(y) == y )
 	  {
@@ -360,7 +364,8 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 	  }
 	  assert(actual(index)!=nilobj, "AdjustSize: actual(index)==nilobj!" );
 	  assert( type(actual(index)) == CLOSURE, "AdjustSize: index non-C!" );
-	  if( actual(actual(index)) != GalleySym )
+	  if( actual(actual(index)) != GalleySym &&
+	      actual(actual(index)) != ForceGalleySym )
 	  {
 	    debug0(DSA, D, "] AdjustSize ret. at HEAD (not @Galley, so root)" );
 	    return;
@@ -377,9 +382,6 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case VCONTRACT:
       case HEXPAND:
       case VEXPAND:
-      case PADJUST:
-      case HADJUST:
-      case VADJUST:
       case ONE_COL:
       case ONE_ROW:
       case GRAPHIC:
@@ -392,8 +394,20 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case VSCALE:
 
 	back(x, dim) = b;  fwd(x, dim) = f;
-	if( (dim==COL) == (type(y)==HSCALE) )
+	if( (dim==COLM) == (type(y)==HSCALE) )
 	{ debug0(DSA, D, "] AdjustSize returning at HSCALE or VSCALE");
+	  return;
+	}
+	break;
+
+
+      case HCOVER:
+      case VCOVER:
+
+	/* dubious, but not likely to arise in practice */
+	back(x, dim) = b;  fwd(x, dim) = f;
+	if( (dim==COLM) == (type(y)==HCOVER) )
+	{ debug0(DSA, D, "] AdjustSize returning at HCOVER or VCOVER");
 	  return;
 	}
 	break;
@@ -402,7 +416,7 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case SCALE:
 
 	back(x, dim) = b;  fwd(x, dim) = f;
-	if( dim == COL )
+	if( dim == COLM )
 	{ b *= bc(constraint(y)) / SF;
 	  f *= bc(constraint(y)) / SF;
 	}
@@ -417,10 +431,10 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       
 	back(x, dim) = b;  fwd(x, dim) = f;
 	RotateSize(&cby, &cfy, &rby, &rfy, x, sparec(constraint(y)));
-	if( cby != back(y, COL) || cfy != fwd(y, COL) )
-	  AdjustSize(y, cby, cfy, COL);
-	if( rby != back(y, ROW) || rfy != fwd(y, ROW) )
-	  AdjustSize(y, rby, rfy, ROW);
+	if( cby != back(y, COLM) || cfy != fwd(y, COLM) )
+	  AdjustSize(y, cby, cfy, COLM);
+	if( rby != back(y, ROWM) || rfy != fwd(y, ROWM) )
+	  AdjustSize(y, rby, rfy, ROWM);
 	debug1(DSA, D, "] AdjustSize returning at %s.", Image(type(y)));
 	return;
 
@@ -428,9 +442,9 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case WIDE:
       case HIGH:
       
-	if( (type(y) == WIDE) == (dim == COL) )
+	if( (type(y) == WIDE) == (dim == COLM) )
 	{ if( !FitsConstraint(b, f, constraint(y)) )
-	  { Error(16, 4, "size constraint %s,%s,%s broken by %s,%s",
+	  { Error(16, 2, "size constraint %s,%s,%s broken by %s,%s",
 	      WARN, &fpos(y),
 	      EchoLength(bc(constraint(y))), EchoLength(bfc(constraint(y))),
 	      EchoLength(fc(constraint(y))), EchoLength(b), EchoLength(f));
@@ -450,7 +464,7 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case VSHIFT:
 
 	back(x, dim) = b;  fwd(x, dim) = f;
-	if( (type(y) == HSHIFT) == (dim == COL) )
+	if( (type(y) == HSHIFT) == (dim == COLM) )
 	{ tf = FindShift(y, x, dim);
 	  b = min(MAX_LEN, max(0, b + tf));
 	  f = min(MAX_LEN, max(0, f - tf));
@@ -461,7 +475,7 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case COL_THR:
       case ROW_THR:
 
-	assert( (type(y)==COL_THR) == (dim==COL), "AdjustSize: COL_THR!" );
+	assert( (type(y)==COL_THR) == (dim==COLM), "AdjustSize: COL_THR!" );
 	back(x, dim) = b;  fwd(x, dim) = f;
 	b = max(b, back(y, dim));
 	f = max(f, fwd(y, dim));
@@ -472,7 +486,7 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case HCAT:
       case ACAT:
 
-	if( (type(y) == VCAT) == (dim == ROW) )
+	if( (type(y) == VCAT) == (dim == ROWM) )
 	  CatAdjustSize(x, &b, &f, ratm, y, dim);
 	else
 	{
@@ -516,7 +530,7 @@ void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
       case CROSS:
       default:
       
-	Error(16, 5, "AdjustSize: %s", INTERN, &fpos(y), Image(type(y)));
+	assert1(FALSE, "AdjustSize:", Image(type(y)));
 	break;
 
     } /* end switch */

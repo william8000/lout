@@ -53,14 +53,17 @@
 @Use { @DocumentLayout
   # @InitialFont	{ Times Base 12p	} # initial font
   # @InitialBreak	{ adjust 1.20fx hyphen	} # initial break
+  # @InitialSpace	{ lout			} # initial space style
   # @InitialLanguage	{ English		} # initial language
   # @InitialColour	{ black			} # initial colour
+  # @OptimizePages	{ No			} # optimize page breaks?
   # @HeadingFont	{ Bold			} # font for @Heading
   # @ParaGap		{ 1.30vx		} # gap between paragraphs
   # @ParaIndent		{ 2.00f			} # first-line indent for @PP
   # @DisplayGap		{ 1.00v			} # gap above, below displays
   # @DisplayIndent	{ 2.00f			} # @IndentedDisplay indent
   # @DefaultIndent	{ 0.5rt			} # @Display indent
+  # @DisplayNumStyle	{ (num)			} # style of display numbers
   # @WideIndent		{ 4.00f			} # @WideTaggedList indent
   # @VeryWideIndent	{ 8.00f			} # @VeryWideTaggedList indent
   # @ListGap		{ 1.00v			} # gap between list items
@@ -85,8 +88,14 @@
   # @PageBoxShadow	{ 0.60c			} # shadow margin if ShadowBox
   # @ColumnNumber	{ 1			} # number of columns (1 to 10)
   # @ColumnGap		{ 1.00c			} # column gap
+  # @FigureLocation	{ PageTop		} # default figure location
+  # @TableLocation	{ PageTop		} # default table location
+  # @FigureWord		{ figure		} # "Figure" word else anything
+  # @TableWord		{ table			} # "Table" word else anything
   # @FigureNumbers	{ Arabic		} # method of numbering figures
   # @TableNumbers	{ Arabic		} # method of numbering tables
+  # @FigureCaptionPos	{ Below 		} # Above or Below
+  # @TableCaptionPos	{ Below			} # Above or Below
   # @CaptionFont        {                       } # figure, table caption font
   # @CaptionBreak       {                       } # figure, table caption break
   # @MakeFigureContents { No                    } # list of figures at start
@@ -118,18 +127,44 @@
   # @IndexBreak		{ outdent 1.2fx		} # index entries break
   # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
   # @IndexColumnGap	{ 1.00c			} # index column gap
+  # @MakeIndexA		{ No 			} # make index A? Yes or No
+  # @IndexAFont		{			} # index A entries font
+  # @IndexABreak	{ outdent 1.2fx		} # index A entries break
+  # @IndexAColumnNumber	{ 2			} # index A columns (1 to 10)
+  # @IndexAColumnGap	{ 1.00c			} # index A column gap
+  # @MakeIndexB		{ No 			} # make index B? Yes or No
+  # @IndexBFont		{			} # index B entries font
+  # @IndexBBreak	{ outdent 1.2fx		} # index B entries break
+  # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)
+  # @IndexBColumnGap	{ 1.00c			} # index B column gap
+  # @IndexFont		{			} # index entries font
+  # @IndexBreak		{ outdent 1.2fx		} # index entries break
+  # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
+  # @IndexColumnGap	{ 1.00c			} # index column gap
   # @TopGap		{ 0.75c			} # gap between figures
   # @MidGap		{ 0.75c			} # gap above/below body text
   # @FootNoteNumbers	{ Arabic		} # footnote numbers
   # @FootNoteThrough	{ No			} # numbered through chapter?
+  # @FootNoteLocation	{ ColFoot		} # where the footnote appears
   # @FootNoteFont	{ 0.80f			} # font for footnotes
   # @FootNoteBreak	{ 1.20fx		} # break for footnotes
   # @FootLen		{ 2.00c			} # length of footnote line
+  # @FootAboveGap	{ 1.00v			} # gap above footnote line
   # @FootGap		{ 0.20c			} # gap between footnotes
   # @EndNoteNumbers	{ Arabic		} # endnote numbers
   # @EndNoteFont	{ 0.80f			} # font of endnotes
   # @EndNoteBreak	{ 1.20fx		} # break for endnotes
   # @EndNoteGap		{ 0.20c			} # gap between endnotes
+  # @TheoremThrough	{  No			} # numbered through whole doc?
+  # @TheoremNumbers	{  Arabic		} # theorem etc. numbers
+  # @DefinitionWord	{  definition		} # "Definition" word, etc.
+  # @LemmaWord		{  lemma		} # "Lemma" word, etc.
+  # @TheoremWord	{  theorem		} # "Theorem" word, etc.
+  # @PropositionWord	{  proposition		} # "Proposition" word, etc.
+  # @CorollaryWord	{  corollary		} # "Corollary" word, etc.
+  # @ExampleWord	{  example		} # "Example" word, etc.
+  # @ClaimWord		{  claim		} # "Claim" word, etc.
+  # @ProofWord		{  proof		} # "Proof" word, etc.
   # @MarginNoteFont	{ 0.80f			} # font of margin notes
   # @MarginNoteBreak	{ ragged 1.10fx		} # break style of margin notes
   # @MarginNoteHGap	{ 0.5c   		} # horizontal gap to notes
@@ -185,45 +220,100 @@
 ###############################################################################
 
 @Use { @BookLayout
-  # @TitlePageFont		{ Helvetica Base} # title page font (not size)
-  # @SeparateIntroNumbering	{ Yes           } # separate intro page numbers
-  # @ChapterNumbers		{ Arabic	} # chapter numbers
-  # @SectionNumbers		{ Arabic	} # section numbers
-  # @SubSectionNumbers		{ Arabic	} # subsection numbers
-  # @SubSubSectionNumbers	{ Arabic	} # sub-subsection numbers
-  # @AppendixNumbers		{ UCAlpha	} # appendix numbers
-  # @SubAppendixNumbers		{ Arabic	} # subappendix numbers
-  # @SubSubAppendixNumbers	{ Arabic	} # sub-subappendix numbers
-  # @PartHeadingFont		{ Helvetica Base 2.50f} # part heading font
-  # @PartHeadingFormat          { @CD number @DP @CD title } # and format
-  # @ChapterHeadingFont		{ Bold 2.00f	} # chapter heading font
-  # @ChapterHeadingBreak	{ ragged 1.2fx nohyphen } # c. h. break style
-  # @ChapterHeadingFormat	{ number @DotSep title	} # format of chapter heading
-  # @SectionHeadingFont		{ Bold		} # section heading font
-  # @SubSectionHeadingFont	{ Bold		} # subsection heading font
-  # @SubSubSectionHeadingFont	{ Slope		} # sub-subsection heading font
-  # @AppendixHeadingFont	{ Bold 2.00f	} # appendix heading font
-  # @SubAppendixHeadingFont	{ Bold		} # subappendix heading font
-  # @SubSubAppendixHeadingFont	{ Slope		} # sub-subapp. heading font
-  # @AbovePartGap		{ 4.00f		} # space above part title
-  # @AboveChapterGap		{ 3.00f		} # above chapter, app. title
-  # @SectionGap			{ 2.00v		} # gap between sections
-  # @SubSectionGap		{ 1.50v		} # gap between subsections
-  # @SubSubSectionGap		{ 1.50v		} # gap between sub-subsections
-  # @SubAppendixGap		{ 2.00v		} # gap between subappendices
-  # @SubSubAppendixGap		{ 1.50v		} # gap between sub-subapps
-  # @IntroductionInContents	{ Yes		} # list intro. in contents
-  # @PartInContents		{ Yes		} # list parts in contents
-  # @ChapterInContents		{ Yes		} # list chapters in contents
-  # @SectionInContents		{ Yes		} # list sections in contents
-  # @SubSectionInContents	{ Yes		} # list subsections
-  # @SubSubSectionInContents	{ No		} # list sub-subsections
-  # @AppendixInContents		{ Yes		} # list appendices
-  # @SubAppendixInContents	{ Yes		} # list subappendices
-  # @SubSubAppendixInContents	{ No		} # list sub-subappendices
-  # @ReferencesInContents	{ Yes		} # list references
-  # @IndexInContents		{ Yes		} # list index
-  # @PartContentsIndent         { 0.5rt         } # indent of part contents entry
+  # @TitlePageFont		{ Helvetica Base	} # title page font (not size)
+  # @SeparateIntroNumbering	{ Yes           	} # separate intro page numbers
+  # @ChapterStartPages		{ Any			} # Any, Odd, or Even
+  # @ReferencesBeforeAppendices	{ No			} # pos of ref list
+  # @PrefaceWord		{ preface		} # "Preface" word etc.
+  # @ContentsWord		{ contents		} # "Contents" word etc.
+  # @FigureListWord		{ figurelist		} # "List of Figures" word etc.
+  # @TableListWord		{ tablelist		} # "List of Tables" word etc.
+  # @IntroductionWord		{ introduction		} # "Introduction" word etc.
+  # @ChapterWord		{ chapter		} # "Chapter" word etc.
+  # @AppendixWord		{ appendix		} # "Appendix" word etc.
+  # @IndexWord			{ index			} # "Index" word etc.
+  # @IndexAWord			{ index			} # "Index" word etc.
+  # @IndexBWord			{ index			} # "Index" word etc.
+  # @ChapterNumbers		{ Arabic		} # chapter numbers
+  # @SectionNumbers		{ Arabic		} # section numbers
+  # @SubSectionNumbers		{ Arabic		} # subsection numbers
+  # @SubSubSectionNumbers	{ Arabic		} # sub-subsection numbers
+  # @AppendixNumbers		{ UCAlpha		} # appendix numbers
+  # @SubAppendixNumbers		{ Arabic		} # subappendix numbers
+  # @SubSubAppendixNumbers	{ Arabic		} # sub-subappendix numbers
+  # @PartHeadingFont		{ Helvetica Base 2.50f	} # part heading font
+  # @PartHeadingBreak		{ clines 1.2fx nohyphen	} # part heading break
+  # @PartHeadingFormat          { @CD number @DP @CD title } # part heading format
+  # @ChapterHeadingFont		{ Bold 2.00f		} # chapter heading font
+  # @ChapterHeadingBreak	{ ragged 1.2fx nohyphen } # chapter heading break style
+  # @ChapterHeadingFormat	{ number @DotSep title  } # format of chapter heading
+  # @SectionHeadingFont		{ Bold			} # section heading font
+  # @SectionHeadingBreak	{ ragged 1.2fx nohyphen } # section heading break style
+  # @SectionHeadingFormat	{ number @DotSep title  } # format of section heading
+  # @SubSectionHeadingFont	{ Bold			} # subsection heading font
+  # @SubSectionHeadingBreak	{ ragged 1.2fx nohyphen } # subsection heading break style
+  # @SubSectionHeadingFormat	{ number @DotSep title  } # format of subsection heading
+  # @SubSubSectionHeadingFont	{ Slope			} # sub-subsection heading font
+  # @SubSubSectionHeadingBreak	{ ragged 1.2fx nohyphen } # sub-subsection heading break style
+  # @SubSubSectionHeadingFormat	{ number @DotSep title  } # format of sub-subsection heading
+  # @AppendixHeadingFont	{ Bold 2.00f		} # appendix heading font
+  # @AppendixHeadingBreak	{ ragged 1.2fx nohyphen } # appendix heading break style
+  # @AppendixHeadingFormat	{ number @DotSep title  } # format of appendix heading
+  # @SubAppendixHeadingFont	{ Bold			} # subappendix heading font
+  # @SubAppendixHeadingBreak	{ ragged 1.2fx nohyphen } # subappendix heading break style
+  # @SubAppendixHeadingFormat	{ number @DotSep title  } # format of subappendix heading
+  # @SubSubAppendixHeadingFont	{ Slope			} # sub-subapp. heading font
+  # @SubSubAppendixHeadingBreak	{ ragged 1.2fx nohyphen } # sub-subappendix heading break style
+  # @SubSubAppendixHeadingFormat{ number @DotSep title  } # format of sub-subappendix heading
+  # @AbovePartGap		{ 4.00f			} # space above part title
+  # @AboveChapterGap		{ 3.00f			} # above chapter, app. title
+  # @SectionGap			{ 2.00v			} # gap between sections
+  # @SubSectionGap		{ 1.50v			} # gap between subsections
+  # @SubSubSectionGap		{ 1.50v			} # gap between sub-subsections
+  # @SubAppendixGap		{ 2.00v			} # gap between subappendices
+  # @SubSubAppendixGap		{ 1.50v			} # gap between sub-subapps
+  # @IntroductionInContents	{ Yes			} # list intro. in contents
+  # @PartInContents		{ Yes			} # list parts in contents
+  # @ChapterInContents		{ Yes			} # list chapters in contents
+  # @SectionInContents		{ Yes			} # list sections in contents
+  # @SubSectionInContents	{ Yes			} # list subsections
+  # @SubSubSectionInContents	{ No			} # list sub-subsections
+  # @AppendixInContents		{ Yes			} # list appendices
+  # @SubAppendixInContents	{ Yes			} # list subappendices
+  # @SubSubAppendixInContents	{ No			} # list sub-subappendices
+  # @ReferencesInContents	{ Yes			} # list references
+  # @IndexInContents		{ Yes			} # list index
+  # @IndexAInContents		{ Yes			} # list index A
+  # @IndexBInContents		{ Yes			} # list index B
+  # @PartContentsIndent         { 0.5rt         	} # indent of part contents entry
+  # @ChapterNumInTheorems	{ Yes			} # chapter number in theorems
+  # @SectionNumInTheorems	{ No			} # section number in theorems
+  # @SubSectionNumInTheorems	{ No			} # subsection number in theorems
+  # @SubSubSectionNumInTheorems	{ No			} # subsubsection number in theorems
+  # @AppendixNumInTheorems	{ Yes			} # appendix number in theorems
+  # @SubAppendixNumInTheorems	{ No			} # subappendix number in theorems
+  # @SubSubAppendixNumInTheorems{ No			} # sub-subappendix number in theorems
+  # @ChapterNumInDisplays	{ Yes			} # chapter number in displays
+  # @SectionNumInDisplays	{ Yes			} # section number in displays
+  # @SubSectionNumInDisplays	{ No			} # subsection number in displays
+  # @SubSubSectionNumInDisplays	{ No			} # subsubsection number in displays
+  # @AppendixNumInDisplays	{ Yes			} # appendix number in displays
+  # @SubAppendixNumInDisplays	{ Yes			} # subappendix number in displays
+  # @SubSubAppendixNumInDisplays{ No			} # sub-subappendix number in displays
+  # @ChapterNumInFigures	{ Yes			} # chapter number in figures
+  # @SectionNumInFigures	{ No			} # section number in figures
+  # @SubSectionNumInFigures	{ No			} # subsection number in figures
+  # @SubSubSectionNumInFigures	{ No			} # subsubsection number in figures
+  # @AppendixNumInFigures	{ Yes			} # appendix number in figures
+  # @SubAppendixNumInFigures	{ No			} # subappendix number in figures
+  # @SubSubAppendixNumInFigures	{ No			} # sub-subappendix number in figures
+  # @ChapterNumInTables		{ Yes			} # chapter number in tables
+  # @SectionNumInTables		{ No			} # section number in tables
+  # @SubSectionNumInTables	{ No			} # subsection number in tables
+  # @SubSubSectionNumInTables	{ No			} # subsubsection number in tables
+  # @AppendixNumInTables	{ Yes			} # appendix number in tables
+  # @SubAppendixNumInTables	{ No			} # subappendix number in tables
+  # @SubSubAppendixNumInTables	{ No			} # sub-subappendix number in tables
 }
 
 

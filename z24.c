@@ -1,9 +1,9 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -85,8 +85,8 @@ void PrintInit(FILE *file_ptr)
   currentcolour = NO_COLOUR;
   cpexists = FALSE;
   wordcount = pagecount = 0;
-  needs = New(ACAT);
-  supplied = New(ACAT);
+  New(needs, ACAT);
+  New(supplied, ACAT);
   debug0(DGP, D, "PrintInit returning.");
 }
 
@@ -169,9 +169,9 @@ void PrintBeforeFirst(LENGTH h, LENGTH v, FULL_CHAR *label)
       /* print procedure definitions part of header */
       fprintf(out_fp, "%%%%BeginProlog\n");
       fprintf(out_fp, "%%%%BeginResource: procset %s\n", StartUpResource);
-      fprintf(out_fp, "/m { 3 1 roll moveto show } bind def\n");
-      fprintf(out_fp, "/s { exch currentpoint exch pop moveto show } bind def\n");
-      fprintf(out_fp, "/k { exch neg 0 rmoveto show } bind def\n");
+      fprintf(out_fp, "/m  { 3 1 roll moveto show } bind def\n");
+      fprintf(out_fp, "/s  { exch currentpoint exch pop moveto show } bind def\n");
+      fprintf(out_fp, "/k  { exch neg 0 rmoveto show } bind def\n");
       fprintf(out_fp, "/ul { gsave setlinewidth dup 3 1 roll\n");
       fprintf(out_fp, "      moveto lineto stroke grestore } bind def\n");
       fprintf(out_fp, "/in { %d mul } def\n", IN);
@@ -206,7 +206,7 @@ void PrintBeforeFirst(LENGTH h, LENGTH v, FULL_CHAR *label)
       fputs("    /Encoding exch def\n",                               out_fp);
       fputs("    currentdict end definefont pop\n",                   out_fp);
       fputs("  }\n",                                                  out_fp);
-      fputs("  stopped {}\n",                                         out_fp);
+      fputs("  stopped pop\n",                                         out_fp);
       fputs("} bind def\n\n",                                         out_fp);
 
       /* print definitions used by Lout output when including EPSF files     */
@@ -238,7 +238,7 @@ void PrintBeforeFirst(LENGTH h, LENGTH v, FULL_CHAR *label)
       fputs("%%EndResource\n\n",				  out_fp);
 
       /* print encoding vectors as resources */
-      EvPrintEncodings(out_fp);
+      MapPrintEncodings(out_fp);
 
       /* print prepend files (assumed to be organized as DSC 3.0 Resources) */
       for( fnum=FirstFile(PREPEND_FILE);  fnum!=NO_FILE;  fnum=NextFile(fnum) )
@@ -474,13 +474,15 @@ If you are trying to compile this you have the wrong CHAR_OUT value!
 /*                                                                           */
 /*****************************************************************************/
 
-#define KernLength(fnum, ch1, ch2, res)					\
-{ int i = finfo[fnum].kern_table[ch1], j;				\
+#define KernLength(fnum, mp, ch1, ch2, res)				\
+{ int ua_ch1 = mp[ch1];							\
+  int ua_ch2 = mp[ch2];							\
+  int i = finfo[fnum].kern_table[ua_ch1], j;				\
   if( i == 0 )  res = 0;						\
   else									\
   { FULL_CHAR *kc = finfo[fnum].kern_chars;				\
-    for( j = i;  kc[j] > ch2;  j++ );					\
-    res = (kc[j] == ch2) ?						\
+    for( j = i;  kc[j] > ua_ch2;  j++ );				\
+    res = (kc[j] == ua_ch2) ?						\
       finfo[fnum].kern_sizes[finfo[fnum].kern_value[j]] : 0;		\
   }									\
 } /* end KernLength */
@@ -495,8 +497,8 @@ If you are trying to compile this you have the wrong CHAR_OUT value!
 /*****************************************************************************/
 
 void PrintWord(OBJECT x, int hpos, int vpos)
-{ FULL_CHAR *p, *q, *a, *b, *lig;
-  int i, h, v, ksize;  char command;
+{ FULL_CHAR *p, *q, *a, *b, *lig, *unacc, *acc;
+  int i, h, v, ksize;  char command;  MAPPING m;
 
   debug5(DGP, DD, "PrintWord( %s, %d, %d ) font %d colour %d", string(x),
 	hpos, vpos, word_font(x), word_colour(x));
@@ -505,10 +507,6 @@ void PrintWord(OBJECT x, int hpos, int vpos)
   {
     case PLAINTEXT:
 
-      /* *** now rounding ***
-      h = hpos / PlainCharWidth;
-      v = vpos / PlainCharHeight;
-      *** */
       h = ((float) hpos / PlainCharWidth) + 0.5;
       v = ((float) vpos / PlainCharHeight) + 0.5;
       p = &page[v*hsize + h];
@@ -594,14 +592,17 @@ void PrintWord(OBJECT x, int hpos, int vpos)
       fputs("(", out_fp);
       p = string(x);
       fputs(EightBitToPrintForm[*p], out_fp);
+      m = font_mapping(finfo[word_font(x)].font_table);
+      unacc = MapTable[m]->map[MAP_UNACCENTED];
+      acc   = MapTable[m]->map[MAP_ACCENT];
       for( p++;  *p;  p++ )
-      { KernLength(word_font(x), *(p-1), *p, ksize);
+      { KernLength(word_font(x), unacc, *(p-1), *p, ksize);
         if( ksize != 0 )
         { fprintf(out_fp, ")%c %d(", command, -ksize);
           ++wordcount;
           command = 'k';
         }
-        fputs(EightBitToPrintForm[*p], out_fp);
+	fputs(EightBitToPrintForm[*p], out_fp);
       }
       if( ++wordcount >= 5 )
       { fprintf(out_fp, ")%c\n", command);
@@ -714,7 +715,7 @@ void PrintAfterLast(void)
 	{ Child(x, link);
 	  fprintf(out_fp, "%%%%+ %s", string(x));
 	}
-        EvPrintResources(out_fp);
+        MapPrintResources(out_fp);
 
         fprintf(out_fp, "%%%%Pages: %d\n", pagecount);
         fprintf(out_fp, "%%%%EOF\n");
@@ -908,7 +909,7 @@ void DefineGraphicNames(OBJECT x)
   }
 
   fprintf(out_fp, "%d %d %d %d %d %d %d LoutGraphic\n",
-    size(x, COL), size(x, ROW), back(x, COL), fwd(x, ROW),
+    size(x, COLM), size(x, ROWM), back(x, COLM), fwd(x, ROWM),
     currentfont <= 0 ? 12*PT : FontSize(currentfont, x),
     width(line_gap(save_style(x))), width(space_gap(save_style(x))));
 
@@ -975,9 +976,9 @@ void PrintGraphicInclude(OBJECT x, LENGTH colmark, LENGTH rowmark)
 
   /* generate appropriate header code */
   fprintf(out_fp, "BeginEPSF\n");
-  CoordTranslate(colmark - back(x, COL), rowmark - fwd(x, ROW));
+  CoordTranslate(colmark - back(x, COLM), rowmark - fwd(x, ROWM));
   CoordScale( (float) PT, (float) PT );
-  CoordTranslate(-back(y, COL), -back(y, ROW));
+  CoordTranslate(-back(y, COLM), -back(y, ROWM));
   fprintf(out_fp, "%%%%BeginDocument: %s\n", string(full_name));
 
   /* copy through the include file, except divert resources lines to needs */

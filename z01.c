@@ -1,9 +1,9 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -24,8 +24,8 @@
 /*                                                                           */
 /*  FILE:         z01.c                                                      */
 /*  MODULE:       Supervise                                                  */
-/*  EXTERNS:      main(), StartSym, GalleySym, InputSym, PrintSym,           */
-/*                AllowCrossDb, Encapsulated                                 */
+/*  EXTERNS:      main(), StartSym, GalleySym, ForceGalleySym, InputSym,     */
+/*                PrintSym, AllowCrossDb, Encapsulated                       */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -39,32 +39,47 @@
 
 POINTER MemCheck = 0;
 
+
 /*****************************************************************************/
 /*                                                                           */
-/*  StartSym      the symbol table entry for \Start (overall scope)          */
-/*  GalleySym     the symbol table entry for @Galley                         */
-/*  InputSym      the symbol table entry for @LInput                         */
-/*  PrintSym      the symbol table entry for \Print (root target)            */
-/*  FilterInSym   the symbol table entry for @FilterIn                       */
-/*  FilterOutSym  the symbol table entry for @FilterOut                      */
-/*  FilterErrSym  the symbol table entry for @FilterErr                      */
+/*  StartSym        the symbol table entry for \Start (overall scope)        */
+/*  GalleySym       the symbol table entry for @Galley                       */
+/*  ForceGalleySym  the symbol table entry for @ForceGalley                  */
+/*  InputSym        the symbol table entry for @LInput                       */
+/*  PrintSym        the symbol table entry for \Print (root target)          */
+/*  OptGallSym      the symbol table entry for @OptGall (optimal galley rec) */
+/*  FilterInSym     the symbol table entry for @FilterIn                     */
+/*  FilterOutSym    the symbol table entry for @FilterOut                    */
+/*  FilterErrSym    the symbol table entry for @FilterErr                    */
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT StartSym, GalleySym, InputSym, PrintSym,
+OBJECT StartSym, GalleySym, ForceGalleySym, InputSym, PrintSym, OptGallSym,
        FilterInSym, FilterOutSym, FilterErrSym;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  CommandOptions      Command-line options (ACAT of objects)               */
+/*                                                                           */
+/*****************************************************************************/
+
+OBJECT CommandOptions;
+
 
 /*****************************************************************************/
 /*                                                                           */
 /*  AllowCrossDb        Allow references to OldCrossDb and NewCrossDb        */
 /*  Encapsulated        Produce a one-page encapsulated PostScript file      */
 /*  Kern                Do kerning                                           */
+/*  SafeExecution       Execute safely, i.e. prohibit system() calls         */
 /*                                                                           */
 /*****************************************************************************/
 
 BOOLEAN AllowCrossDb;
 BOOLEAN Encapsulated;
 BOOLEAN Kern;
+BOOLEAN SafeExecution;
 
 
 /*****************************************************************************/
@@ -140,13 +155,15 @@ static FULL_CHAR *GetArg(char *argv[], int argc, int *i)
 
 int main(int argc, char *argv[])
 { int i, len;  FULL_CHAR *arg;
-  OBJECT t, res, s;			/* current token, parser output      */
+  OBJECT t, y, res, s;			/* current token, parser output      */
   BOOLEAN stdin_seen;			/* TRUE when stdin file seen         */
   int source_file_count;		/* number of source files in command */
   FULL_CHAR *cross_db;			/* name of cross reference database  */
   FULL_CHAR *outfile;			/* name of output file               */
   FILE *out_fp;
   long MemCheckLong;
+  FULL_CHAR oname[MAX_BUFF], oval[MAX_BUFF], buff[MAX_BUFF], *p;
+  int bp;  OBJECT z;
 
   /* set locale if that's what we are doing */
 #if LOCALE_ON
@@ -168,6 +185,7 @@ int main(int argc, char *argv[])
   InitializeAll = FALSE;
   AllowCrossDb = TRUE;
   Encapsulated = FALSE;
+  SafeExecution = FALSE;
   Kern = TRUE;
   MemInit();
   InitSym();
@@ -182,6 +200,7 @@ int main(int argc, char *argv[])
   cross_db = CROSS_DB;
   outfile = STR_STDOUT;
   source_file_count = 0;
+  New(CommandOptions, ACAT);
   for( i = 1;  i < argc;  i++ )
   {
     if( *argv[i] == CH_HYPHEN ) switch( *(argv[i]+1) )
@@ -246,10 +265,10 @@ int main(int argc, char *argv[])
 
       case CH_FLAG_ENCPATH:
      
-	/* add directory to encoding path */
+	/* add directory to character mapping path */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
 	  Error(1, 12, "usage: -C <directoryname>", FATAL, no_fpos);
-	AddToPath(ENCODING_PATH, arg);
+	AddToPath(MAPPING_PATH, arg);
 	break;
 
 
@@ -289,6 +308,7 @@ int main(int argc, char *argv[])
 	len = StringLength(arg) - StringLength(SOURCE_SUFFIX);
 	if( len >= 0 && StringEqual(&arg[len], SOURCE_SUFFIX) )
 	  StringCopy(&arg[len], STR_EMPTY);
+	debug0(DFS, D, "  calling DefineFile from main (1)");
 	DefineFile(arg, STR_EMPTY, no_fpos, SOURCE_FILE, SYSINCLUDE_PATH);
 	break;
 
@@ -300,6 +320,7 @@ int main(int argc, char *argv[])
 	  Error(1, 17, "two -h options illegal", FATAL, no_fpos);
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
 	  Error(1, 18, "usage: -h <filename>", FATAL, no_fpos);
+	debug0(DFS, D, "  calling DefineFile from main (2)");
 	DefineFile(arg, STR_EMPTY, no_fpos, HYPH_FILE, INCLUDE_PATH);
 	DefineFile(arg, HYPH_SUFFIX, no_fpos, HYPH_PACKED_FILE, INCLUDE_PATH);
 	break;
@@ -308,8 +329,16 @@ int main(int argc, char *argv[])
       case CH_FLAG_VERSION:
      
 	fprintf(stderr, "%s\n", LOUT_VERSION);
-	fprintf(stderr, "system include directory: %s\n", INCL_DIR);
-	fprintf(stderr, "system database directory: %s\n", DATA_DIR);
+	fprintf(stderr, "%-28s %s\n",
+	  "Basser Lout written by:", "Jeffrey H. Kingston (jeff@cs.usyd.edu.au)");
+	fprintf(stderr, "%-28s %s\n",
+	  "Free source available from:", "ftp://ftp.cs.usyd.edu.au/jeff/lout");
+	fprintf(stderr, "%-28s %s %s\n",
+	  "This executable compiled:", __TIME__, __DATE__);
+	fprintf(stderr, "%-28s %s\n", "System include directory:", INCL_DIR);
+	fprintf(stderr, "%-28s %s\n", "System database directory:", DATA_DIR);
+	fprintf(stderr, "Database index files created afresh automatically:%s\n",
+	  USE_STAT ? " yes" : " no");
 	exit(0);
 	break;
 
@@ -327,7 +356,7 @@ int main(int argc, char *argv[])
 	{ float len1, len2;  FULL_CHAR units1, units2;
 	  debug1(DGP, DD, "  command line %s", argv[i]+2);
 	  if( sscanf(argv[i]+2, "%f%c%f%c",&len1,&units1,&len2,&units2) != 4 )
-	  { Error(1, 21, "usage: lout -%c<length><length>",
+	  { Error(1, 19, "usage: lout -%c<length><length>",
 	      FATAL, no_fpos, *(argv[i]+1));
 	  }
 	  switch( units1 )
@@ -337,7 +366,7 @@ int main(int argc, char *argv[])
 	    case CH_UNIT_PT:	PlainCharWidth = len1 * PT; break;
 	    case CH_UNIT_EM:	PlainCharWidth = len1 * EM; break;
 
-	    default:	Error(1, 22, "lout -%c: units must be c, i, p, or m",
+	    default:	Error(1, 20, "lout -%c: units must be c, i, p, or m",
 				  FATAL, no_fpos, *(argv[i]+1));
 				break;
 	  }
@@ -348,7 +377,7 @@ int main(int argc, char *argv[])
 	    case CH_UNIT_PT:	PlainCharHeight = len2 * PT; break;
 	    case CH_UNIT_EM:	PlainCharHeight = len2 * EM; break;
 
-	    default:	Error(1, 23, "lout -%c: units must be c, i, p, or m",
+	    default:	Error(1, 21, "lout -%c: units must be c, i, p, or m",
 				  FATAL, no_fpos, *(argv[i]+1));
 				break;
 	  }
@@ -365,7 +394,7 @@ int main(int argc, char *argv[])
 
       case CH_FLAG_USAGE:
      
-	Error(1, 24, "usage: lout [ -i <filename> ] files", WARN, no_fpos);
+	Error(1, 22, "usage: lout [ -i <filename> ] files", WARN, no_fpos);
 	exit(0);
 	break;
 
@@ -387,11 +416,70 @@ int main(int argc, char *argv[])
      
 	/* read stdin as file name */
 	if( stdin_seen )
-	  Error(1, 25, "standard input specified twice", FATAL, no_fpos);
+	  Error(1, 23, "standard input specified twice", FATAL, no_fpos);
 	stdin_seen = TRUE;
+	debug0(DFS, D, "  calling DefineFile from main (3)");
 	DefineFile(STR_STDIN, STR_EMPTY, no_fpos, SOURCE_FILE, SOURCE_PATH);
 	break;
 
+
+      case CH_FLAG_OPTION:
+
+	/* read command-line document option */
+	if( sscanf(argv[i]+2, "%[^{ ] { %[^}] }", oname, oval) != 2 ||
+	  StringLength(oname) == 0 || StringLength(oval) == 0 )
+	  Error(1, 24, "error in command-line option %s", FATAL, no_fpos,
+	    argv[i]+2);
+	y = MakeWord(WORD, oname, no_fpos);
+	Link(CommandOptions, y);
+	New(y, ACAT);
+	Link(CommandOptions, y);
+	bp = 0;
+	for( p = oval;  *p != '\0';  p++ )  switch( *p )
+	{
+	  case ' ':
+	  case '\t':
+	  case '\n':
+	  case '{':
+	  case '}':
+
+	    if( bp > 0 )
+	    { buff[bp++] = '\0';
+	      if( Down(y) != y ) 
+	      { OBJECT g;
+		New(g, GAP_OBJ);
+		hspace(g) = 1;  vspace(g) = 0;
+		FposCopy(fpos(g), *no_fpos);
+		Link(y, g);
+	      }
+	      z = MakeWord(WORD, buff, no_fpos);
+	      Link(y, z);
+	      bp = 0;
+	    }
+	    break;
+
+
+	  default:
+
+	    buff[bp++] = *p;
+	    break;
+	}
+	if( bp > 0 )
+	{ buff[bp++] = '\0';
+	  z = MakeWord(WORD, buff, no_fpos);
+	  Link(y, z);
+	}
+	if( Down(y) == y )
+	  Error(1, 25, "error in command-line option %s", FATAL, no_fpos,
+	    argv[i]+2);
+	break;
+
+
+      case CH_FLAG_SAFE:
+
+	/* ensure safe execution by disabling system calls */
+	SafeExecution = TRUE;
+	break;
 
       default:
      
@@ -405,6 +493,7 @@ int main(int argc, char *argv[])
 	len = StringLength(arg) - StringLength(SOURCE_SUFFIX);
 	if( len >= 0 && StringEqual(&arg[len], SOURCE_SUFFIX) )
 	  StringCopy(&arg[len], STR_EMPTY);
+	debug0(DFS, D, "  calling DefineFile from main (4)");
 	DefineFile(AsciiToFull(argv[i]), STR_EMPTY, no_fpos,
 	    SOURCE_FILE, SOURCE_PATH);
 	source_file_count++;
@@ -426,7 +515,7 @@ int main(int argc, char *argv[])
   /* append default directories to file search paths */
   AddToPath(FONT_PATH,         AsciiToFull(FONT_DIR));
   AddToPath(HYPH_PATH,         AsciiToFull(HYPH_DIR));
-  AddToPath(ENCODING_PATH,     AsciiToFull(EVEC_DIR));
+  AddToPath(MAPPING_PATH,      AsciiToFull(MAPS_DIR));
   AddToPath(SYSDATABASE_PATH,  AsciiToFull(DATA_DIR));
   AddToPath(DATABASE_PATH,     AsciiToFull(DATA_DIR));
   AddToPath(SYSINCLUDE_PATH,   AsciiToFull(INCL_DIR));
@@ -434,17 +523,21 @@ int main(int argc, char *argv[])
 
   /* use stdin if no source files were mentioned */
   if( source_file_count == 0 )
+  { debug0(DFS, D, "  calling DefineFile from main (5)");
     DefineFile(STR_STDIN, STR_EMPTY, no_fpos, SOURCE_FILE, SOURCE_PATH);
+  }
 
   /* load predefined symbols into symbol table */
-  StartSym     = nilobj;  /* Not a mistake */
-  StartSym     = load(KW_START,     0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  GalleySym    = load(KW_GALLEY,    0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  InputSym     = load(KW_INPUT,     0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  PrintSym     = load(KW_PRINT,     0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  FilterInSym  = load(KW_FILTERIN,  0, FALSE,  FALSE,  FALSE, NO_PREC     );
-  FilterOutSym = load(KW_FILTEROUT, 0, FALSE,  FALSE,  FALSE, NO_PREC     );
-  FilterErrSym = load(KW_FILTERERR, 0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  StartSym       = nilobj;  /* Not a mistake */
+  StartSym       = load(KW_START,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  GalleySym      = load(KW_GALLEY,       0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  ForceGalleySym = load(KW_FORCE_GALLEY, 0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  InputSym       = load(KW_INPUT,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  PrintSym       = load(KW_PRINT,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  FilterInSym    = load(KW_FILTERIN,     0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  FilterOutSym   = load(KW_FILTEROUT,    0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  FilterErrSym   = load(KW_FILTERERR,    0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  OptGallSym     = load(KW_OPTGALL,      0, FALSE,  TRUE,   FALSE, DEFAULT_PREC);
 
 
   load(KW_BEGIN,       BEGIN,          FALSE,  FALSE,  FALSE, BEGIN_PREC  );
@@ -462,12 +555,15 @@ int main(int argc, char *argv[])
   load(KW_DATABASE,    DATABASE,       FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_SYSDATABASE, SYS_DATABASE,   FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_USE,         USE,            FALSE,  FALSE,  FALSE, NO_PREC     );
+  load(KW_NOT_REVEALED,NOT_REVEALED,   FALSE,  FALSE,  FALSE, NO_PREC     );
   load(KW_CASE,        CASE,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_YIELD,       YIELD,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_BACKEND,     BACKEND,        FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_XCHAR,       XCHAR,          FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_FONT,        FONT,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_SPACE,       SPACE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_YUNIT,       YUNIT,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_ZUNIT,       ZUNIT,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_BREAK,       BREAK,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_UNDERLINE,   UNDERLINE,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_COLOUR,      COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
@@ -476,6 +572,7 @@ int main(int argc, char *argv[])
   load(KW_CURR_LANG,   CURR_LANG,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
   load(KW_COMMON,      COMMON,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_RUMP,        RUMP,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_INSERT,      INSERT,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_NEXT,        NEXT,           FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_OPEN,        OPEN,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_TAGGED,      TAGGED,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
@@ -487,6 +584,8 @@ int main(int argc, char *argv[])
   load(KW_ONE_ROW,     ONE_ROW,        FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HSCALE,      HSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_VSCALE,      VSCALE,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_HCOVER,      HCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_VCOVER,      VCOVER,         FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_SCALE,       SCALE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_HCONTRACT,   HCONTRACT,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_VCONTRACT,   VCONTRACT,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
@@ -533,6 +632,7 @@ int main(int argc, char *argv[])
   t = NewToken(BEGIN, no_fpos, 0, 0, BEGIN_PREC, StartSym);
   res = Parse(&t, StartSym, TRUE, TRUE);
   debug0(DGT, D, "calling TransferEnd(res) from main()");
+  DisposeObject(CommandOptions);
   TransferEnd(res);
   TransferClose();
 

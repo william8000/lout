@@ -1,9 +1,9 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -60,7 +60,7 @@ FULL_CHAR *DebugInnersNames(OBJECT inners)
 
         default:
       
-	  Error(20, 1, "DebugInnersNames: %s", INTERN, &fpos(y),Image(type(y)));
+	  assert1(FALSE, "DebugInnersNames:", Image(type(y)));
 	  break;
       }
     }
@@ -107,11 +107,12 @@ void FlushGalley(OBJECT hd)
   OBJECT dest_index;		/* the index of dest                         */
   OBJECT inners;		/* list of galleys and PRECEDES to flush     */
   OBJECT link, y;		/* for scanning through the components of hd */
+  int dim;			/* direction of galley                       */
+  CONSTRAINT dest_par_constr;	/* the parallel size constraint on dest      */
+  CONSTRAINT dest_perp_constr;	/* the perpendicular size constraint on dest */
+  int pb, pf, f;		/* candidate replacement sizes for dest      */
 
-  CONSTRAINT dest_constraint;	/* the vertical size constraint on dest      */
-  int f;			/* candidate replacement value for dest_fwd  */
-
-  OBJECT dest_encl;		/* the VCAT enclosing dest, if any           */
+  OBJECT dest_encl;		/* the VCAT or ACAT enclosing dest, if any   */
   int    dest_side;		/* if dest_encl != nilobj, side dest is on   */
   BOOLEAN need_adjust;		/* TRUE as soon as dest_encl needs adjusting */
   LENGTH dest_back, dest_fwd;	/* the current size of dest_encl or dest     */
@@ -123,9 +124,12 @@ void FlushGalley(OBJECT hd)
   OBJECT stop_link;		/* most recently seen gap link of hd         */
   BOOLEAN prnt_flush;		/* TRUE when the parent of hd needs a flush  */
   OBJECT zlink, z, tmp, prnt;  int attach_status;  BOOLEAN remove_target;
+  OBJECT why;
+  LENGTH perp_back, perp_fwd;   /* current perp size of dest_encl            */
 
   debug1(DGF, D, "[ FlushGalley %s (hd)", SymName(actual(hd)));
   prnt_flush = FALSE;
+  dim = gall_dir(hd);
 
   RESUME:
   assert( type(hd) == HEAD, "FlushGalley: type(hd) != HEAD!" );
@@ -196,13 +200,6 @@ void FlushGalley(OBJECT hd)
 
 	case ATTACH_SUSPEND:
 
-	  /* ***
-	  ParentFlush(prnt_flush, dest_index, FALSE);
-	  if( inners != nilobj )  FlushInners(inners, nilobj);
-	  debug1(DGF, D, "] FlushGalley %s returning (ATTACH_SUSPEND)",
-	    SymName(actual(hd)));
-	  return;
-	  *** */
 	  /* AttachGalley only returns inners here if they really need to */
 	  /* be flushed; in particular the galley must be unsized before  */
 	  if( inners != nilobj )
@@ -220,26 +217,29 @@ void FlushGalley(OBJECT hd)
           if( actual(hd) != nilobj && force_target(actual(hd)) )
           {
             /* if hd is a forcing galley, close all predecessors */
-	    debug1(DGA, D, "  forcing ATTACH_NULL case for %s",
-	      SymName(actual(hd)));
+	    debug3(DGA, D, "  forcing ATTACH_NULL case for %s into %s (%s)",
+	      SymName(actual(hd)), SymName(whereto(hd)),
+	      remove_target ? "remove_target" : "not remove_target");
 	    Parent(prnt, Up(dest_index));
-	    /* debug0(DGA, DD, "  force: prnt ="); */
-	    /* ifdebug(DGA, DD, DebugObject(prnt)); */
-	    /* debug1(DGA, D,"  calling FreeGalley from FlushGalley(%s)", */
-	    /*   SymName(actual(hd))); */
 	    if( !non_blocking(dest_index) && remove_target )
+	    {
+	      /* ***
 	      prnt_flush = TRUE;
+	      *** */
+	      prnt_flush = non_blocking(dest_index) = TRUE;
+	    }
 	    FreeGalley(prnt, Up(dest_index), &inners, Up(dest_index),
 	      whereto(hd));
-	    /* debug0(DGA, DD, "  force: after FreeGalley, prnt ="); */
-	    /* ifdebug(DGA, DD, DebugObject(prnt)); */
           }
           else
 	  {
+	    debug3(DGA, D, "  non-force ATTACH_NULL case for %s into %s (%s)",
+	      SymName(actual(hd)), SymName(whereto(hd)),
+	      remove_target ? "remove_target" : "not remove_target");
 	    if( blocked(dest_index) && remove_target )  prnt_flush = TRUE;
 	  }
 	  DetachGalley(hd);
-	  KillGalley(hd);
+	  KillGalley(hd, TRUE);
           if( inners != nilobj ) FlushInners(inners, nilobj);
 	  else ParentFlush(prnt_flush, dest_index, remove_target);
 	  debug0(DGF, D, "] FlushGalley returning ATTACH_NULL");
@@ -248,8 +248,10 @@ void FlushGalley(OBJECT hd)
 
 	case ATTACH_ACCEPT:
 
-          /* if hd is a forcing galley, close all predecessors */
-          if( actual(hd) != nilobj && force_target(actual(hd)) )
+          /* if hd is a forcing galley, or actual(dest_index) is   */
+	  /* @ForceGalley, then close all predecessors             */
+          if( actual(hd) != nilobj && (force_target(actual(hd))
+	    || actual(actual(dest_index)) == ForceGalleySym) )
           { Parent(prnt, Up(dest_index));
 	    debug1(DGA, D, "  forcing ATTACH_ACCEPT case for %s",
 	      SymName(actual(hd)));
@@ -271,8 +273,7 @@ void FlushGalley(OBJECT hd)
 
 	default:
 
-	  Error(20, 2, "FlushGalley: attach_status %d", INTERN, no_fpos,
-	    attach_status);
+	  assert(FALSE, "FlushGalley: attach_status");
 	  break;
 
       }
@@ -291,8 +292,7 @@ void FlushGalley(OBJECT hd)
 
     default:
     
-      Error(20, 3, "FlushGalley: dest_index %s",
-	INTERN, &fpos(hd), Image(type(dest_index)));
+      assert1(FALSE, "FlushGalley: dest_index", Image(type(dest_index)));
       break;
   }
   dest = actual(dest_index);
@@ -337,8 +337,11 @@ void FlushGalley(OBJECT hd)
   /*    dest_back        back(dest_encl) including effect of accepted compts */
   /*    dest_fwd         fwd(dest_encl) including effect of accepted compts  */
   /*    dest_side        BACK or FWD, i.e. which side of the mark dest is on */
-  /*    dest_constraint  the size constraint on dest                         */
+  /*    dest_par_constr  the parallel size constraint on dest                */
+  /*    dest_perp_constr the perpendicular size constraint on dest           */
   /*    frame_size       size of frame enclosing dest_encl                   */
+  /*    perp_back        back(dest_encl) in other direction, incl accepteds  */
+  /*    perp_fwd         fwd(dest_encl) in other direction,  incl accepteds  */
   /*                                                                         */
   /*  if dest_encl is nilobj, these variables are not defined.               */
   /*                                                                         */
@@ -353,8 +356,8 @@ void FlushGalley(OBJECT hd)
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
   {
     Child(y, link);
-    if( type(y) == SPLIT )  Child(y, DownDim(y, ROW));
-    debug1(DGF, DD, "  examining %s", EchoIndex(y));
+    if( type(y) == SPLIT )  Child(y, DownDim(y, dim));
+    debug2(DGF, DD, "  examining %s %s", Image(type(y)), EchoObject(y));
     switch( type(y) )
     {
 
@@ -367,9 +370,11 @@ void FlushGalley(OBJECT hd)
 
 
       case SCALE_IND:
+      case COVER_IND:
       case EXPAND_IND:
       case GALL_PREC:
       case GALL_FOLL:
+      case GALL_FOLL_OR_PREC:
       case GALL_TARG:
       case CROSS_PREC:
       case CROSS_FOLL:
@@ -382,7 +387,7 @@ void FlushGalley(OBJECT hd)
       case PRECEDES:
       case UNATTACHED:
 	  
-	if( inners == nilobj )  inners = New(ACAT);
+	if( inners == nilobj )  New(inners, ACAT);
 	Link(inners, y);
 	break;
 
@@ -414,7 +419,13 @@ void FlushGalley(OBJECT hd)
 
 	  case BLOCK:	goto SUSPEND;
 
-	  case CLOSE:	goto REJECT;
+	  case CLOSE:	if( opt_components(hd) != nilobj )
+			{ DisposeObject(opt_components(hd));
+			  opt_components(hd) = nilobj;
+			  debug2(DOG, D, "FlushGalley(%s) de-optimizing %s",
+			    "(CLOSE problem)", SymName(actual(hd)));
+			}
+			goto REJECT;
 	}
 	break;
 
@@ -431,13 +442,12 @@ void FlushGalley(OBJECT hd)
       case VSHIFT:
       case HSCALE:
       case VSCALE:
+      case HCOVER:
+      case VCOVER:
       case HCONTRACT:
       case VCONTRACT:
       case HEXPAND:
       case VEXPAND:
-      case PADJUST:
-      case HADJUST:
-      case VADJUST:
       case ROTATE:
       case SCALE:
       case INCGRAPHIC:
@@ -445,37 +455,51 @@ void FlushGalley(OBJECT hd)
       case GRAPHIC:
       case ACAT:
       case HCAT:
+      case VCAT:
       case ROW_THR:
       case CLOSURE:
       case CROSS:
 
-	/* make sure y is not joined to a target below */
-	for( zlink = NextDown(link); zlink != hd; zlink = NextDown(zlink) )
-	{ Child(z, zlink);
-	  switch( type(z) )
-	  {
-	    case RECEPTIVE:
-	    case RECEIVING:	y = z;
+	if( dim == ROWM )
+	{
+	  /* make sure y is not joined to a target below (vertical case only) */
+	  for( zlink = NextDown(link); zlink != hd; zlink = NextDown(zlink) )
+	  { Child(z, zlink);
+	    switch( type(z) )
+	    {
+	      case RECEPTIVE:
+	      case RECEIVING:	y = z;
 				goto SUSPEND;
 
-	    case GAP_OBJ:	if( !join(gap(z)) )  zlink = PrevDown(hd);
+	      case GAP_OBJ:	if( !join(gap(z)) )  zlink = PrevDown(hd);
 				break;
 
-	    default:		break;
+	      default:		break;
+	    }
 	  }
+
+	  /* try vertical hyphenation before anything else */
+	  if( type(y) == HCAT )  VerticalHyphenate(y);
+
 	}
 
-	/* try vertical hyphenation before anything else */
-	if( type(y) == HCAT )  VerticalHyphenate(y);
-
 	/* check size constraint */
-	if( !external(dest) )
+	if( (dim == ROWM && !external_ver(dest)) ||
+	    (dim == COLM && !external_hor(dest)) )
 	{
 	  /* initialise dest_encl etc if not done yet */
 	  if( dest_encl == nilobj )
-	  { assert( UpDim(dest,COL) == UpDim(dest,ROW), "FlushG: UpDims!" );
+	  { assert( UpDim(dest,1-dim) == UpDim(dest,dim), "FlushG: UpDims!" );
+	    /* *** weird old code, trying for UpDim(dest, ROWM)?
 	    Parent(dest_encl, NextDown(Up(dest)));
-	    assert( type(dest_encl) == VCAT, "FlushGalley: dest != VCAT!" );
+	    *** */
+	    Parent(dest_encl, Up(dest));
+	    debug4(DGF, D, "  flush dest = %s %s, dest_encl = %s %s",
+	      Image(type(dest)), EchoObject(dest),
+	      Image(type(dest_encl)), EchoObject(dest_encl));
+	    assert( (dim==ROWM && type(dest_encl)==VCAT) ||
+	            (dim==COLM && type(dest_encl)==ACAT),
+	      "FlushGalley: dest != VCAT or ACAT!" );
 	    SetNeighbours(Up(dest), FALSE, &prec_gap, &prec_def,
 	      &succ_gap, &succ_def, &dest_side);
 	    assert(prec_gap != nilobj || is_indefinite(type(y)),
@@ -483,66 +507,112 @@ void FlushGalley(OBJECT hd)
 	    assert(succ_gap == nilobj, "FlushGalley: succ_gap != nilobj!" );
 	    assert(dest_side == FWD || is_indefinite(type(y)),
 	      "FlushGalley: dest_side != FWD || !is_indefinite(type(y))!");
-	    dest_back = back(dest_encl, ROW);
-	    dest_fwd  = fwd(dest_encl, ROW);
-	    Constrained(dest_encl, &dest_constraint, ROW);
-	    frame_size = constrained(dest_constraint) ? bfc(dest_constraint) :0;
+	    dest_back = back(dest_encl, dim);
+	    dest_fwd  = fwd(dest_encl, dim);
+	    perp_back = back(dest_encl, 1-dim);
+	    perp_fwd  = fwd(dest_encl, 1-dim);
+	    Constrained(dest_encl, &dest_par_constr, dim, &why);
+	    Constrained(dest_encl, &dest_perp_constr, 1-dim, &why);
+	    frame_size = constrained(dest_par_constr) ? bfc(dest_par_constr) :0;
 	  }
 
 	  if( !is_indefinite(type(y)) )
-	  { /* calculate effect of adding y to dest */
-	    f = dest_fwd  + fwd(y, ROW) - fwd(prec_def, ROW) +
-		  ActualGap(fwd(prec_def, ROW), back(y, ROW),
-			fwd(y, ROW), &gap(prec_gap), frame_size,
-			dest_back + dest_fwd - fwd(prec_def, ROW));
+	  {
+	    ifdebugcond(DGF, D,  mode(gap(prec_gap)) == NO_MODE,
+	      DebugGalley(hd, y, 4));
+
+	    /* calculate parallel effect of adding y to dest */
+	    f = dest_fwd  + fwd(y, dim) - fwd(prec_def, dim) +
+		  ActualGap(fwd(prec_def, dim), back(y, dim),
+			fwd(y, dim), &gap(prec_gap), frame_size,
+			dest_back + dest_fwd - fwd(prec_def, dim));
 	    debug3(DGF, DD, "  b,f: %s,%s;   dest_encl: %s",
 			EchoLength(dest_back), EchoLength(f),
-			EchoConstraint(&dest_constraint));
+			EchoConstraint(&dest_par_constr));
 
-	    /* check new size against constraint */
-	    if( units(gap(prec_gap))==FRAME_UNIT && width(gap(prec_gap)) > FR )
+	    /* check new size against parallel constraint */
+	    if( (units(gap(prec_gap))==FRAME_UNIT && width(gap(prec_gap)) > FR)
+	        || !FitsConstraint(dest_back, f, dest_par_constr)
+
+		/* *** new code for rejecting if optimizer says so *** */
+		|| (opt_components(hd) != nilobj && opt_comps_permitted(hd)<=0)
+		/* *****************************************************/
+
+	    )
+	    {
+	      if( opt_components(hd) != nilobj )
+	      { OBJECT z;
+
+		/* record the size of this just-completed target area for hd */
+		New(z, WIDE);
+		CopyConstraint(constraint(z), dest_par_constr);
+		Link(opt_constraints(hd), z);
+		ifdebug(DOG, D,
+		  debug2(DOG, D, "FlushGalley(%s) adding constraint %s",
+		    SymName(actual(hd)), EchoConstraint(&constraint(z)));
+		  if( units(gap(prec_gap))==FRAME_UNIT &&
+		      width(gap(prec_gap)) > FR ) 
+		  { debug1(DOG, D, "  prec_gap = %s", EchoGap(&gap(prec_gap)));
+		  }
+		  if( !FitsConstraint(dest_back, f, dest_par_constr) )
+		  { debug3(DOG, D, "  !FitsConstraint(%s, %s, %s)",
+		      EchoLength(dest_back), EchoLength(f),
+		      EchoConstraint(&dest_par_constr));
+		  }
+		  if( opt_comps_permitted(hd) <= 0 )
+		  { debug1(DOG, D, "  opt_comps_permitted = %2d",
+		      opt_comps_permitted(hd));
+		  }
+		  debug4(DOG, D, "prec_gap = %s;  y = %s (%s,%s):",
+		    EchoGap(&gap(prec_gap)), Image(type(y)),
+		    EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
+		  DebugObject(y);
+		)
+
+		/* refresh the number of components permitted into the next target */
+		if( opt_counts(hd) != nilobj && Down(opt_counts(hd)) != opt_counts(hd) )
+		{ Child(z, Down(opt_counts(hd)));
+		  opt_comps_permitted(hd) += comp_count(z) - 1;
+		  DisposeChild(Up(z));
+		}
+		else opt_comps_permitted(hd) = MAX_FILES;  /* a large number */
+		debug1(DOG, D, "  REJECT permitted = %2d", opt_comps_permitted(hd));
+	      }
 	      goto REJECT;
-	    if( !FitsConstraint(dest_back, f, dest_constraint) )
-	    { /* *** CONSTRAINT yc;  LENGTH size_to_ymark, fconstr; *** */
-
-	      goto REJECT;
-
-	      /* if vertical hyphenation is not suitable, reject */
-	      /* ***
-	      if( type(y) != HCAT || size(y, ROW) == 0 )
-		goto REJECT;
-	      *** */
-
-	      /* work out constraint on y and try vertical hyphenation */
-	      /* ***
-	      size_to_ymark = f - fwd(y, ROW);
-	      fconstr = min(fc(dest_constraint) - size_to_ymark,
-		bfc(dest_constraint) - size_to_ymark - dest_back);
-	      SetConstraint(yc, back(y, ROW), back(y, ROW) + fconstr, fconstr);
-	      if( !VerticalHyphenate(y, &yc) )
-		goto REJECT;
-	      *** */
-	
-	      /* vertical hyphenation claims to work, so recalculate f */
-	      /* ***
-	      f = dest_fwd  + fwd(y, ROW) - fwd(prec_def, ROW) +
-		      ActualGap(fwd(prec_def, ROW), back(y, ROW),
-			fwd(y, ROW), &gap(prec_gap), frame_size,
-			dest_back + dest_fwd - fwd(prec_def, ROW));
-	      if( !FitsConstraint(dest_back, f, dest_constraint) )
-		goto REJECT;
-	      *** */
 	    }
 
-	    /* accept component, possibly after vertical hyphenation */
-	    dest_fwd = f;  prec_def = y;
-	    need_adjust = TRUE;
-	  }
+	    /* calculate perpendicular effect of adding y to dest */
+	    pb = max(perp_back, back(y, 1-dim));
+	    pf = max(perp_fwd,  fwd(y,  1-dim));
 
-	} /* end if( !external(dest) ) */
+	    /* check new size against perpendicular constraint */
+	    if( !FitsConstraint(pb, pf, dest_perp_constr) )
+	    {
+	      if( opt_components(hd) != nilobj )
+	      { DisposeObject(opt_components(hd));
+		opt_components(hd) = nilobj;
+		debug1(DOG, D, "FlushGalley(%s) de-optimizing (perp problem)",
+		  SymName(actual(hd)));
+	      }
+	      goto REJECT;
+	    }
+
+	    /* accept definite component */
+	    dest_fwd = f;  prec_def = y;
+	    perp_back = pb;  perp_fwd = pf;
+	    need_adjust = TRUE;
+	    if( opt_components(hd) != nilobj )
+	    { opt_comps_permitted(hd)--;
+	      debug1(DOG, D, "  ACCEPT permitted = %2d", opt_comps_permitted(hd));
+	    }
+	  }
+	  /* accept indefinite component */
+
+	} /* end if( !external_ver(dest) ) */
 
 	/* accept this component into dest */
-	debug1(DGF, D, "  accept %s", EchoObject(y));
+	debug3(DGF, D, "  accept %s %s %s", Image(type(y)), EchoObject(y),
+	  EchoFilePos(&fpos(y)));
 	prnt_flush = prnt_flush || blocked(dest_index);
 	debug1(DGF, DDD, "    prnt_flush = %s", bool(prnt_flush));
 	debug1(DGF, DDD, "    inners = %s", DebugInnersNames(inners));
@@ -550,7 +620,8 @@ void FlushGalley(OBJECT hd)
 	{ Promote(hd, NextDown(link), dest_index);
 	  if( need_adjust )
 	  { debug0(DSA, D, "  calling AdjustSize from FlushGalley (ACCEPT)");
-	    AdjustSize(dest_encl, dest_back, dest_fwd, ROW);
+	    AdjustSize(dest_encl, dest_back, dest_fwd, dim);
+	    AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
 	  }
 	  FlushInners(inners, hd);
 	  goto RESUME;
@@ -560,7 +631,7 @@ void FlushGalley(OBJECT hd)
 
       default:
 	  
-	Error(20, 4, "FlushGalley: %s", INTERN, &fpos(y), Image(type(y)));
+	assert1(FALSE, "FlushGalley:", Image(type(y)));
 	break;
 
     } /* end switch */
@@ -577,12 +648,24 @@ void FlushGalley(OBJECT hd)
     { Promote(hd, hd, dest_index);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (EMPTY)");
-	AdjustSize(dest_encl, dest_back, dest_fwd, ROW);
+	AdjustSize(dest_encl, dest_back, dest_fwd, dim);
+	AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
       }
+    }
+    if( opt_components(hd) != nilobj )
+    { OBJECT z;
+      New(z, WIDE);
+      if( dest_encl != nilobj )
+        CopyConstraint(constraint(z), dest_par_constr);
+      else
+        SetConstraint(constraint(z), MAX_LEN, MAX_LEN, MAX_LEN);
+      Link(opt_constraints(hd), z);
+      debug2(DOG, D, "FlushGalley(%s) empty adding constraint %s",
+        SymName(actual(hd)), EchoConstraint(&constraint(z)));
     }
     DetachGalley(hd);
     debug0(DGF, D, "  calling KillGalley from FlushGalley");
-    KillGalley(hd);
+    KillGalley(hd, TRUE);
     ParentFlush(prnt_flush, dest_index, TRUE);
     debug1(DGF,D,"] FlushGalley %s returning (emptied).", SymName(actual(hd)));
     return;
@@ -598,7 +681,8 @@ void FlushGalley(OBJECT hd)
     { Promote(hd, stop_link, dest_index);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (REJECT)");
-	AdjustSize(dest_encl, dest_back, dest_fwd, ROW);
+	AdjustSize(dest_encl, dest_back, dest_fwd, dim);
+	AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
       }
     }
     DetachGalley(hd);
@@ -617,7 +701,8 @@ void FlushGalley(OBJECT hd)
     { Promote(hd, stop_link, dest_index);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (SUSPEND)");
-	AdjustSize(dest_encl, dest_back, dest_fwd, ROW);
+	AdjustSize(dest_encl, dest_back, dest_fwd, dim);
+	AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
       }
     }
 
@@ -632,16 +717,20 @@ void FlushGalley(OBJECT hd)
       val = ReadFromFile(eg_fnum(eg), eg_fpos(eg));
       UnSwitchScope(nilobj);
       if( val == nilobj )
-	Error(20, 5, "error in database file %s",
+	Error(20, 1, "error in database file %s",
 	  FATAL, &fpos(y), FileName(eg_fnum(eg)));
       assert( type(val) == CLOSURE, "AttachG: db CLOSURE!" );
-      index2 = New(UNATTACHED);
+      New(index2, UNATTACHED);
       pinpoint(index2) = nilobj;
-      hd2 = New(HEAD);
+      New(hd2, HEAD);
+      limiter(hd2) = nilobj;
       FposCopy(fpos(hd2), fpos(val));
+      opt_components(hd2) = opt_constraints(hd2) = nilobj;
+      gall_dir(hd2) = horiz_galley(actual(val));
       actual(hd2) = actual(val);
-      backward(hd2) = TargetSymbol(val, &whereto(hd2));
-      backward(hd2) = sized(hd2) = FALSE;
+      foll_or_prec(hd2) = TargetSymbol(val, &whereto(hd2));
+      foll_or_prec(hd2) = GALL_FOLL;
+      sized(hd2) = FALSE;
       ready_galls(hd2) = nilobj;
       must_expand(hd2) = TRUE;
       Link(index2, hd2);
@@ -670,14 +759,14 @@ void FlushGalley(OBJECT hd)
 	  val = ReadFromFile(eg_fnum(eg), eg_fpos(eg));
 	  UnSwitchScope(nilobj);
 	  if( val == nilobj )
-	    Error(20, 5, "error in database file %s",
+	    Error(20, 2, "error in database file %s",
 	      FATAL, &fpos(y), FileName(eg_fnum(eg)));
 	  assert( type(val) == CLOSURE, "AttachG: db CLOSURE!" );
 	  if( !has_merge(actual(val)) )  DisposeObject(val);
 	  else /* add val to hd2 */
 	  { if( type(hd2) != ACAT )
 	    { OBJECT tmp = hd2;
-	      hd2 = New(ACAT);
+	      New(hd2, ACAT);
 	      MoveLink(Up(tmp), hd2, CHILD);
 	      Link(hd2, tmp);
 	    }
@@ -723,7 +812,7 @@ void FlushGalley(OBJECT hd)
       {
 	debug1(DGF, DD, "  ext gall gall_targ %s", SymName(sym));
 	cr = GallTargEval(sym, &fpos(actual(y)));
-	ins = New(GALL_TARG);
+	New(ins, GALL_TARG);
 	actual(ins) = cr;
 	Link(Up(y), ins);
 	Child(tag, LastDown(cr));
@@ -731,8 +820,8 @@ void FlushGalley(OBJECT hd)
 	found = DbRetrieve(OldCrossDb, TRUE, sym, string(tag),
 		newseq, &tfnum, &tfpos, &tcont);
 	if( found )
-	{ if( ready_galls(hd) == nilobj )  ready_galls(hd) = New(ACAT);
-	  eg = New(EXT_GALL);
+	{ if( ready_galls(hd) == nilobj )  New(ready_galls(hd), ACAT);
+	  New(eg, EXT_GALL);
 	  debug1(DGF, DD, "  ext gall retrieved: into %s", SymName(sym));
 	  eg_fnum(eg) = tfnum;
 	  eg_fpos(eg) = tfpos;
@@ -761,6 +850,8 @@ void FlushGalley(OBJECT hd)
       }
       else
       {	Child(z, Down(y));
+	if( opt_components(z) != nilobj )
+	  GazumpOptimize(z, actual(y));
 	DetachGalley(z);
       }
       goto RESUME;

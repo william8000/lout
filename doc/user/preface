@@ -6,23 +6,24 @@ system.
 @IndexBlanks
 @PP
 There are three other documents describing Lout:  the Expert's Guide
-@Cite { $kingston1995lout.expert }, formerly called `Document Formatting
-with Lout,' which you need if you want to add new features to Lout; a
-journal paper on the design and implementation of Lout
-@Cite { $kingston1993lout.design }; and a set of overhead transparencies
-@Cite { $kingston1994lout.overheads } that cover much the same ground
-as this Guide.  These documents are all distributed with the software.
+@Cite { $kingston1995lout.expert }, which you need if you want to add
+new features to Lout; a journal paper on the design and implementation
+of Lout @Cite { $kingston1993lout.design }; and a set of overhead
+transparencies @Cite { $kingston1994lout.overheads } that cover much
+the same ground as this Guide.  These documents are all distributed
+with the software.
 @PP
 Lout is distributed free of charge under the GNU Public License.  The
 gnu. @Index { GNU Public License }
-primary source is a gzipped tar file called @Code "lout.3.06.tar.gz"
-or similar which is kept in subdirectory @Code jeff of the home directory of
-@Code ftp to {@Code "ftp.cs.su.oz.au"} with login name @Code anonymous
-and any non-empty password.  This is redistributed on the
-@Code comp.sources.misc newsgroup, which is archived at several sites
-around the world.  The distribution contains source code, libraries,
-documentation, license, and installation instructions.  Distribution by
-uuencoded email is also available, from me.
+primary source is directory
+@ID @Code "ftp://ftp.cs.su.oz.au/jeff/lout"
+in which may be found the main distribution, which is a gzipped tar file
+called @Code "lout.3.08.tar.gz" or similar, and various other things
+including a PostScript version of this manual.  The main distribution
+is redistributed on the @Code comp.sources.misc newsgroup, which is
+archived at several sites around the world.  The distribution contains
+source code, libraries, documentation, license, and installation
+instructions.  Distribution by uuencoded email is also available, from me.
 @PP
 A mailing list has been set up for discussion of all topics related to
 Lout.  To subscribe, send email to @Code "lout-request@niif.spb.su"
@@ -31,18 +32,6 @@ item, send email to {@Code "lout@niif.spb.su"}; it will be forwarded to
 all subscribers via email.  To unsubscribe, send email to
 @Code "lout-request@niif.spb.su" containing the word @Code "unsubscribe"
 in the Subject line.
-@PP
-Version 2 documents should port to Version 3 almost unchanged.  If you
-version. @Index { versions of Lout }
-are using your own setup files, you will have to reconstruct them from
-copies of the new Version 3 ones.  You may also need to revise some of
-the options to {@Code "@Document"}, {@Code "@Report"}, and
-{@Code "@Book"}.  Then delete all {@Code "@BeginFigures"},
-{@Code "@EndFigures"}, {@Code "@BeginTables"}, and {@Code "@EndTables"}
-symbols, change @Code "@EndList" at the end of raw lists only to
-{@Code "@RawEndList"}, change the syntax of @Code "@TagItem" symbols
-to the new form (Section {@NumberOf lists}), delete all database index
-({@Code .li}) files, and you should be right.
 @PP
 Lout began in 1984 as a research project into the design of a high-level
 language for document formatting.  At that time my name for the subject
@@ -60,7 +49,10 @@ research phase ended in October 1991 with the first public release of Lout.
 @PP
 Since then the system has been steadily improved and extended.  Optimal
 paragraph breaking and automatic hyphenation were copied from Donald
-E. Knuth's @TeX system @Cite { $knuth1984tex }.  The strongest
+E. Knuth's @TeX system @Cite { $knuth1984tex }, and the optimal paragraph
+breaking algorithm was applied to the problem of producing optimal page
+breaks.  The first implementations of horizontal galleys and optimal
+page breaking were by my student Gabor Inokai.  The strongest
 knuth @Index { Knuth, D. E. }
 tex. @Index { @TeX }
 influence during this period has come from Lout's users; indeed the

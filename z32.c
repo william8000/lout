@@ -1,9 +1,9 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -94,6 +94,8 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     case VADJUST:
     case HSCALE:
     case VSCALE:
+    case HCOVER:
+    case VCOVER:
     case ROTATE:
     case SCALE:
     case SPLIT:
@@ -133,7 +135,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
 
     default:
     
-      Error(32, 2, "Next: %s", INTERN, &fpos(x), Image(type(x)));
+      assert1(FALSE, "Next:", Image(type(x)));
       break;
 
   } /* end switch */

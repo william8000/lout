@@ -31,7 +31,8 @@ and the alphabetic list symbols of Section {@NumberOf lists} also
 vary with the current language.  So it's worth doing for the sake of
 knowing that non-English parts will appear as they should.
 @PP
-At the time of writing, the following languages were available:
+At the time of writing, the following languages were available as
+part of the standard distribution of Lout:
 @ID @OneRow @Code {
 Czech Cesky Cestina
 Danish Dansk
@@ -41,17 +42,14 @@ Finnish Suomi
 French Francais Fran{@Char ccedilla}ais
 German Deutsch
 Norwegian Norsk
+Polish Polski
 Russian
 Slovenian Slovenia Slovenija
 Spanish Espa{@Char ntilde}ol
 Swedish Svenska
 }
 As shown, most languages have alternative names, all equally acceptable
-to the @Code "@Language" symbol.  Russian also has an alternative name,
-but since it is written using Cyrillic characters, we can't show it
-here.  For other languages, the only course is to turn hyphenation off
-and avoid language-specific symbols such as @Code "@Date" and the
-alphabetic lists.
+to the @Code "@Language" symbol.
 @PP
 If your entire document is in a language other than English, you need
 to change the @Code "@InitialLanguage" option:
@@ -61,11 +59,9 @@ If you are using your own setup file (Section {@NumberOf setup}), you
 can change it there.  If not, you can change it at the start of your
 document, as explained in Section {@NumberOf ordinary}.
 @PP
-The fonts listed in Section {@NumberOf fonts} cannot be used with
-Czech, Russian and Slovenian, because they do not contain all of the
-characters used in those languages.  Consult files @Code "russian.fd" and
-@Code "latin2.fd" in the Lout system include directory for the family
-and face names of fonts available for use with these languages.  These
-fonts, and other material needed for these languages, are distributed
-separately from the main Lout distribution.
+Czech, Polish, and Slovenian use the ISO-LATIN-2 character set, and
+Russian uses Cyrillic characters.  Consult directory @Code "software"
+in the Lout distribution to find out how to get the extra things you
+need for these languages.  Other left-to-right languages are easily
+added, so please consult the author if your language is not listed.
 @End @Section

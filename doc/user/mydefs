@@ -20,11 +20,13 @@
    def @@Graphic           { @Code "@Graphic"           }
    def @@HAdjust           { @Code "@HAdjust"           }
    def @@HContract         { @Code "@HContract"         }
+   def @@HCover            { @Code "@HCover"            }
    def @@HExpand           { @Code "@HExpand"           }
    def @@HScale            { @Code "@HScale"            }
    def @@High              { @Code "@High"              }
    def @@HShift            { @Code "@HShift"            }
    def @@Include           { @Code "@Include"           }
+   def @@Insert            { @Code "@Insert "           }
    def @@IncludeGraphic    { @Code "@IncludeGraphic"    }
    def @@Key               { @Code "@Key"               }
    def @@LClos             { @Code "@LClos"             }
@@ -55,6 +57,7 @@
    def @@Use               { @Code "@Use"               }
    def @@VAdjust           { @Code "@VAdjust"           }
    def @@VContract         { @Code "@VContract"         }
+   def @@VCover            { @Code "@VCover"            }
    def @@VExpand           { @Code "@VExpand"           }
    def @@VScale            { @Code "@VScale"            }
    def @@VShift            { @Code "@VShift"            }
@@ -147,3 +150,27 @@
 
       }
    }
+
+   def @ShowHMark
+      named linewidth  { 0.03 cm }
+      named linestyle  { dotted   }
+      named dashlength { 0.06 cm  }
+      named paint      { light    }
+      right x
+   {
+      @Fig
+      {   
+	 @Figure
+		 shape {
+			 -0.3 cm ymark
+			 {xsize ymark} ++ {0.3 cm 0}
+		       }
+		 linewidth { linewidth }
+		 linestyle { linestyle }
+		 dashlength { dashlength }
+	 x
+      }
+   }
+
+   import @Eq
+   def @ExA { 1 over sqrt { 1 - 4 x sup 2 } }

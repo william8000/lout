@@ -1,9 +1,9 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -34,7 +34,6 @@
 #ifndef M_PI
 #define M_PI       3.1415926535897931160E0
 #endif
-
 #include "externs"
 
 
@@ -69,7 +68,18 @@ void EnlargeToConstraint(LENGTH *b, LENGTH *f, CONSTRAINT *c)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  float ScaleToConstraint(b, f, c)                                         */
+/*  ReflectConstraint(xc, yc)                                                */
+/*                                                                           */
+/*  Set xc to the constraint which is yc with its back and forward reversed. */
+/*                                                                           */
+/*****************************************************************************/
+
+#define ReflectConstraint(xc, yc)  SetConstraint(xc, fc(yc), bfc(yc), bc(yc))
+
+
+/*@::ScaleToConstraint(), InvScaleConstraint(), etc@**************************/
+/*                                                                           */
+/*  int ScaleToConstraint(b, f, c)                                           */
 /*                                                                           */
 /*  Return the scale factor needed to scale object of size b, f down so it   */
 /*  has a size which fits tightly into constraint c.                         */
@@ -90,7 +100,7 @@ int ScaleToConstraint(LENGTH b, LENGTH f, CONSTRAINT *c)
 } /* end ScaleToConstraint */
 
 
-/*@::InvScaleConstraint(), ReflectConstraint(), etc.@*************************/
+/*****************************************************************************/
 /*                                                                           */
 /*  InvScaleConstraint(yc, sf, xc)                                           */
 /*                                                                           */
@@ -111,17 +121,6 @@ void InvScaleConstraint(CONSTRAINT *yc, LENGTH sf, CONSTRAINT *xc)
   fc(*yc)  = fc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, fc(*xc)  * SF / sf);
   debug1(DSC, DD, "InvScaleConstraint returning %s", EchoConstraint(yc));
 } /* end InvScaleConstraint */
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  ReflectConstraint(xc, yc)                                                */
-/*                                                                           */
-/*  Set xc to the constraint which is yc with its back and forward reversed. */
-/*                                                                           */
-/*****************************************************************************/
-
-#define ReflectConstraint(xc, yc)  SetConstraint(xc, fc(yc), bfc(yc), bc(yc))
 
 
 /*****************************************************************************/
@@ -207,29 +206,65 @@ CONSTRAINT *hc, CONSTRAINT *vc, int dim)
   debug2(DSC, DD, "  c1: %s;  c2: %s", EchoConstraint(&c1), EchoConstraint(&c2));
 
   /* return the minimum of the two constraints, rotated */
-  if( dim == COL )
-  { SemiRotateConstraint(c, back(y, ROW), fwd(y, ROW), theta, &c1);
+  if( dim == COLM )
+  { SemiRotateConstraint(c, back(y, ROWM), fwd(y, ROWM), theta, &c1);
     ReflectConstraint(c3, c2);
-    SemiRotateConstraint(&dc, fwd(y, ROW), back(y, ROW), psi, &c3);
+    SemiRotateConstraint(&dc, fwd(y, ROWM), back(y, ROWM), psi, &c3);
     MinConstraint(c, &dc);
   }
   else
-  { SemiRotateConstraint(c, back(y, COL), fwd(y, COL), psi, &c1);
-    SemiRotateConstraint(&dc, fwd(y, COL), back(y, COL), theta, &c2);
+  { SemiRotateConstraint(c, back(y, COLM), fwd(y, COLM), psi, &c1);
+    SemiRotateConstraint(&dc, fwd(y, COLM), back(y, COLM), theta, &c2);
     MinConstraint(c, &dc);
   }
 
   debug1(DSC, DD, "RotateConstraint returning %s", EchoConstraint(c));
 } /* end RotateConstraint */
 
+/*@::InsertScale()@***********************************************************/
+/*                                                                           */
+/*  BOOLEAN InsertScale(x, c)                                                */
+/*                                                                           */
+/*  Insert a @Scale object above x so that x is scaled horizontally to fit   */
+/*  constraint c.  If this is not possible, owing to the necessary scale     */
+/*  factor being too small, then don't do it; return FALSE instead.          */
+/*                                                                           */
+/*****************************************************************************/
+
+BOOLEAN InsertScale(OBJECT x, CONSTRAINT *c)
+{ int scale_factor; OBJECT prnt;
+  scale_factor = ScaleToConstraint(back(x, COLM), fwd(x, COLM), c);
+  if( scale_factor >= 0.2 * SF )
+  {
+    New(prnt, SCALE);
+    FposCopy(fpos(prnt), fpos(x));
+
+    /* set horizontal size and scale factor */
+    bc(constraint(prnt)) = scale_factor;
+    back(prnt, COLM) = ( back(x, COLM) * scale_factor ) / SF;
+    fwd(prnt,  COLM) = ( fwd(x,  COLM) * scale_factor ) / SF;
+
+    /* set vertical size and scale factor */
+    fc(constraint(prnt)) = 1 * SF;
+    back(prnt, ROWM) = back(x, ROWM);
+    fwd(prnt, ROWM) = fwd(x, ROWM);
+
+    /* link prnt above x and return */
+    ReplaceNode(prnt, x);
+    Link(prnt, x);
+    return TRUE;
+  }
+  else return FALSE;
+} /* end InsertScale */
+
 
 /*@::CatConstrained()@********************************************************/
 /*                                                                           */
-/*  static CatConstrained(x, xc, ratm, y, dim)                               */
+/*  static CatConstrained(x, xc, ratm, y, dim, OBJECT *why)                  */
 /*                                                                           */
 /*  Calculate the size constraint of object x, as for Constrained below.     */
 /*  y is the enclosing VCAT etc. object;  ratm is TRUE if a ^ lies after     */
-/*  x anywhere.  dim is COL or ROW.                                          */
+/*  x anywhere.  dim is COLM or ROWM.                                        */
 /*                                                                           */
 /*  The meaning of the key variables is as follows:                          */
 /*                                                                           */
@@ -249,7 +284,7 @@ CONSTRAINT *hc, CONSTRAINT *vc, int dim)
 /*****************************************************************************/
 
 static void CatConstrained(OBJECT x, CONSTRAINT *xc, BOOLEAN ratm,
-OBJECT y, int dim)
+OBJECT y, int dim, OBJECT *why)
 { int side;			/* the size of y that x is on: BACK, ON, FWD */
   CONSTRAINT yc;		/* constraints on y                          */
   LENGTH backy, fwdy;		/* back(y), fwd(y) would be if x was (0, 0)  */
@@ -260,7 +295,7 @@ OBJECT y, int dim)
   OBJECT prec_def, sd;	/* definite object preceding (succeeding) x  */
   int tb, tbf, tf, tbc, tbfc, tfc, mxy, myz;
 
-  Constrained(y, &yc, dim);
+  Constrained(y, &yc, dim, why);
   if( constrained(yc) )
   {
     /* find the link of x, and its neighbours and their links */
@@ -378,17 +413,30 @@ OBJECT y, int dim)
 
 /*@::Constrained()@***********************************************************/
 /*                                                                           */
-/*  Constrained(x, xc, dim)                                                  */
+/*  Constrained(x, xc, dim, why)                                             */
 /*                                                                           */
 /*  Calculate the size constraint of object x, and return it in *xc.         */
 /*                                                                           */
+/*  If the resulting constraint is a hard one caused by coming up against    */
+/*  a HIGH (vertical) or WIDE (horizontal), set *why to this object; if      */
+/*  not, leave *why unchanged.                                               */
+/*                                                                           */
 /*****************************************************************************/
 
-void Constrained(OBJECT x, CONSTRAINT *xc, int dim)
+void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 { OBJECT y, link, lp, rp, z, tlink, g;  CONSTRAINT yc, hc, vc;
   BOOLEAN ratm;  LENGTH xback, xfwd;  int tb, tf, tbf, tbc, tfc;
-  debug2(DSC, DD, "[ Constrained( %s, xc, %s )", EchoObject(x), dimen(dim));
+  debug2(DSC, DD, "[ Constrained(%s, xc, %s, why)", EchoObject(x), dimen(dim));
   assert( Up(x) != x, "Constrained: x has no parent!" );
+
+  /* a CLOSURE which is external_ver is unconstrained in the ROWM direction */
+  /* a CLOSURE which is external_hor is unconstrained in both directions   */
+  if( type(x) == CLOSURE && ((dim==ROWM && external_ver(x)) || external_hor(x)) )
+  {
+    SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+    debug1(DSC, DD, "] Constrained returning %s (external)",EchoConstraint(xc));
+    return;
+  }
 
   /* find y, the parent of x */
   link = UpDim(x, dim);  ratm = FALSE;
@@ -409,34 +457,47 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim)
     case VCONTRACT:
     case HEXPAND:
     case VEXPAND:
-    case PADJUST:
-    case HADJUST:
-    case VADJUST:
     case SPLIT:
     
-      Constrained(y, xc, dim);
+      Constrained(y, xc, dim, why);
       break;
 
 
-    case VSCALE:
     case HSCALE:
+    case VSCALE:
     
-      if( (dim == COL) != (type(y) == HSCALE) )  Constrained(y, xc, dim);
+      if( (dim == COLM) != (type(y) == HSCALE) )  Constrained(y, xc, dim, why);
+      else SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+      break;
+
+
+    case HCOVER:
+    case VCOVER:
+    
+      /* dubious, but not likely to arise anyway */
+      if( (dim == COLM) != (type(y) == HCOVER) )  Constrained(y, xc, dim, why);
       else SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
       break;
 
 
     case SCALE:
 
-      Constrained(y, &yc, dim);
-      InvScaleConstraint(xc,
-	dim == COL ? bc(constraint(y)) : fc(constraint(y)), &yc);
+      Constrained(y, &yc, dim, why);
+      if( dim == COLM && bc(constraint(y)) == 0 )
+      {
+	/* Lout-supplied factor required later, could be tiny */
+	SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+      }
+      else
+      { InvScaleConstraint(xc,
+	  dim == COLM ? bc(constraint(y)) : fc(constraint(y)), &yc);
+      }
       break;
 
 
     case ROTATE:
     
-      Constrained(y, &hc, COL);  Constrained(y, &vc, ROW);
+      Constrained(y, &hc, COLM, why);  Constrained(y, &vc, ROWM, why);
       RotateConstraint(xc, x, sparec(constraint(y)), &hc, &vc, dim);
       break;
 
@@ -444,27 +505,30 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim)
     case WIDE:
     case HIGH:
     
-      Constrained(y, xc, dim);
-      if( (type(y)==WIDE) == (dim==COL) )  MinConstraint(xc, &constraint(y));
+      Constrained(y, xc, dim, why);
+      if( (type(y)==WIDE) == (dim==COLM) )
+      { MinConstraint(xc, &constraint(y));
+	*why = y;
+      }
       break;
 
 
     case HSHIFT:
     case VSHIFT:
 
-      if( (type(y) == HSHIFT) == (dim == COL) )
-      { Constrained(y, &yc, dim);
+      if( (type(y) == HSHIFT) == (dim == COLM) )
+      { Constrained(y, &yc, dim, why);
 	tf = FindShift(y, x, dim);
 	SetConstraint(*xc,
 	  min(bc(yc), bfc(yc)) - tf, bfc(yc), min(fc(yc), bfc(yc)) + tf);
       }
-      else Constrained(y, xc, dim);
+      else Constrained(y, xc, dim, why);
       break;
 
 
     case HEAD:
     
-      if( dim == ROW ) SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
+      if( dim == ROWM ) SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
       else
       {	CopyConstraint(yc, constraint(y));
 	debug1(DSC, DD, "  head: %s; val is:", EchoConstraint(&yc));
@@ -477,8 +541,8 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim)
     case COL_THR:
     case ROW_THR:
 
-      assert( (type(y)==COL_THR) == (dim==COL), "Constrained: COL_THR!" );
-      Constrained(y, &yc, dim);
+      assert( (type(y)==COL_THR) == (dim==COLM), "Constrained: COL_THR!" );
+      Constrained(y, &yc, dim, why);
       tb = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - fwd(y, dim);
       tb = min(bc(yc), tb);
       tf = bfc(yc) == MAX_LEN ? MAX_LEN : bfc(yc) - back(y, dim);
@@ -491,11 +555,11 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim)
     case HCAT:
     case ACAT:
     
-      if( (type(y)==VCAT) == (dim==ROW) )
-      {	CatConstrained(x, xc, ratm, y, dim);
+      if( (type(y)==VCAT) == (dim==ROWM) )
+      {	CatConstrained(x, xc, ratm, y, dim, why);
 	break;
       }
-      Constrained(y, &yc, dim);
+      Constrained(y, &yc, dim, why);
       if( !constrained(yc) )  SetConstraint(*xc, MAX_LEN, MAX_LEN, MAX_LEN);
       else
       {
@@ -539,8 +603,11 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim)
       break;
 
 
-    default:  Error(15, 1, "Constrained: %s", INTERN, &fpos(y),Image(type(y)));
-	      break;
+    default:
+    
+      assert1(FALSE, "Constrained:", Image(type(y)));
+      break;
+
   }
   debug1(DSC, DD, "] Constrained returning %s", EchoConstraint(xc));
 } /* end Constrained */
@@ -600,7 +667,7 @@ FULL_CHAR *EchoConstraint(CONSTRAINT *c)
 /*****************************************************************************/
 
 void DebugConstrained(OBJECT x)
-{ OBJECT y, link;
+{ OBJECT y, link, why;
   CONSTRAINT c;
   debug1(DSC, DDD, "DebugConstrained( %s )", EchoObject(x) );
   switch( type(x) )
@@ -619,18 +686,18 @@ void DebugConstrained(OBJECT x)
 
     case CLOSURE:
     
-      Constrained(x, &c, COL);
-      debug2(DSC, DD, "Constrained( %s, &c, COL ) = %s",
+      Constrained(x, &c, COLM, &why);
+      debug2(DSC, DD, "Constrained( %s, &c, COLM ) = %s",
 	EchoObject(x), EchoConstraint(&c));
-      Constrained(x, &c, ROW);
-      debug2(DSC, DD, "Constrained( %s, &c, ROW ) = %s",
+      Constrained(x, &c, ROWM, &why);
+      debug2(DSC, DD, "Constrained( %s, &c, ROWM ) = %s",
 	EchoObject(x), EchoConstraint(&c));
       break;
 
 
     case SPLIT:
     
-      link = DownDim(x, COL);  Child(y, link);
+      link = DownDim(x, COLM);  Child(y, link);
       DebugConstrained(y);
       break;
 
@@ -642,11 +709,10 @@ void DebugConstrained(OBJECT x)
     case VCONTRACT:
     case HEXPAND:
     case VEXPAND:
-    case PADJUST:
-    case HADJUST:
-    case VADJUST:
     case HSCALE:
     case VSCALE:
+    case HCOVER:
+    case VCOVER:
     case SCALE:
     case WIDE:
     case HIGH:
@@ -670,7 +736,7 @@ void DebugConstrained(OBJECT x)
 
     default:
     
-      Error(15, 2, "DebugConstrained: %s", INTERN, &fpos(x), Image(type(x)));
+      assert1(FALSE, "DebugConstrained:", Image(type(x)));
       break;
 
   }

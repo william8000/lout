@@ -1,9 +1,9 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -43,9 +43,9 @@ FULL_CHAR *EchoStyle(STYLE *style)
 { static FULL_CHAR res[100];
   static char *hyphwords[] = { "hyph_undef", "hyph_off", "hyph_on" };
   static char *fillwords[] = { "fill_undef", "fill_off", "fill_on" };
+  static char *spacewords[] = { "lout", "comp", "troff", "tex" };
   static char *displaywords[] = { "undef", "adjust", "outdent", "left",
 			     "centre", "right", "do" };
-  static char *capswords[] = { "nosmallcaps", "smallcaps" };
 
   StringCopy(res, AsciiToFull("["));
   StringCat(res, EchoCatOp(VCAT,mark(line_gap(*style)),join(line_gap(*style))));
@@ -54,6 +54,8 @@ FULL_CHAR *EchoStyle(STYLE *style)
   StringCat(res, font(*style) == 0 ?
 		   AsciiToFull("nofont") : FontFamilyAndFace(font(*style)));
   StringCat(res, AsciiToFull(" ("));
+  StringCat(res, AsciiToFull(spacewords[space_style(*style)]));
+  StringCat(res, AsciiToFull(" "));
   StringCat(res, EchoGap(&space_gap(*style)));
   StringCat(res, AsciiToFull("), "));
   StringCat(res, AsciiToFull(hyph_style(*style) < 3 ?
@@ -64,9 +66,18 @@ FULL_CHAR *EchoStyle(STYLE *style)
   StringCat(res, AsciiToFull(":"));
   StringCat(res, AsciiToFull(display_style(*style) < 7 ?
 		    displaywords[display_style(*style)] : "?"));
-  StringCat(res, AsciiToFull(":"));
-  StringCat(res, AsciiToFull(small_caps(*style) < 2 ?
-		    capswords[small_caps(*style)] : "?"));
+  if( small_caps(*style) > 0 ) StringCat(res, AsciiToFull(":smallcaps"));
+  if( vadjust(*style) ) StringCat(res, AsciiToFull(":vadjust"));
+  if( hadjust(*style) ) StringCat(res, AsciiToFull(":hadjust"));
+  if( padjust(*style) ) StringCat(res, AsciiToFull(":padjust"));
+  if( yunit(*style) != 0 )
+  { StringCat(res, AsciiToFull(":y="));
+    StringCat(res, EchoLength(yunit(*style)));
+  }
+  if( zunit(*style) != 0 )
+  { StringCat(res, AsciiToFull(":z="));
+    StringCat(res, EchoLength(zunit(*style)));
+  }
   StringCat(res, AsciiToFull("]"));
   return res;
 } /* end EchoStyle */
@@ -81,13 +92,26 @@ FULL_CHAR *EchoStyle(STYLE *style)
 /*                                                                           */
 /*****************************************************************************/
 
-void SpaceChange(STYLE *style, OBJECT x)
+void changespace(STYLE *style, OBJECT x)
 { GAP res_gap;  unsigned gap_inc;
-  debug2(DSS, D, "SpaceChange(%s, %s)", EchoStyle(style), EchoObject(x));
-  if( !is_word(type(x)) )
-  { Error(11, 1, "invalid left parameter of %s", WARN, &fpos(x), KW_SPACE);
+  assert( is_word(type(x)), "changespace: type(x)!" );
+  if( beginsbreakstyle(string(x)[0]) )
+  {
+    /* should be a new space style option */
+    if( StringEqual(string(x), STR_SPACE_LOUT) )
+	space_style(*style) = SPACE_LOUT;
+    else if( StringEqual(string(x), STR_SPACE_COMPRESS) )
+	space_style(*style) = SPACE_COMPRESS;
+    else if( StringEqual(string(x), STR_SPACE_SEPARATE) )
+	space_style(*style) = SPACE_SEPARATE;
+    else if( StringEqual(string(x), STR_SPACE_TROFF) )
+	space_style(*style) = SPACE_TROFF;
+    else if( StringEqual(string(x), STR_SPACE_TEX) )
+	space_style(*style) = SPACE_TEX;
+    else Error(11, 1, "unknown option to %s symbol (%s)",
+	   WARN, &fpos(x), KW_SPACE, string(x));
   }
-  else
+  else /* should be a new space gap */
   { GetGap(x, style, &res_gap, &gap_inc);
     if( gap_inc != GAP_ABS && units(res_gap) != units(space_gap(*style)) )
     { Error(11, 2, "spacing %s is not compatible with current spacing",
@@ -100,6 +124,40 @@ void SpaceChange(STYLE *style, OBJECT x)
 	     gap_inc == GAP_INC ? width(space_gap(*style)) + width(res_gap) :
 	     max(width(space_gap(*style)) - width(res_gap), 0);
     }
+  }
+  debug1(DSS, D, "SpaceChange returning %s", EchoStyle(style));
+} /* end SpaceChange */
+
+
+void SpaceChange(STYLE *style, OBJECT x)
+{ OBJECT link, y;
+  debug2(DSS, D, "SpaceChange(%s, %s)", EchoStyle(style), EchoObject(x));
+  switch( type(x) )
+  {
+    case NULL_CLOS: break;
+
+    case WORD:
+    case QWORD:	if( !StringEqual(string(x), STR_EMPTY) )
+		  changespace(style, x);
+		break;
+
+
+    case ACAT:	for( link = Down(x);  link != x;  link = NextDown(link) )
+		{ Child(y, link);
+		  if( type(y) == GAP_OBJ || type(y) == NULL_CLOS )  continue;
+		  else if( is_word(type(y)) )
+		  { if( !StringEqual(string(y), STR_EMPTY) )
+		      changespace(style, y);
+		  }
+		  else Error(11, 3, "invalid left parameter of %s",
+			 WARN, &fpos(x), KW_SPACE);
+		}
+		break;
+
+
+    default:	Error(11, 4, "invalid left parameter of %s",
+		  WARN, &fpos(x), KW_SPACE);
+		break;
   }
   debug1(DSS, D, "SpaceChange returning %s", EchoStyle(style));
 } /* end SpaceChange */
@@ -138,13 +196,13 @@ static void changebreak(STYLE *style, OBJECT x)
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_CENTRE;
     else if( StringEqual(string(x), STR_BREAK_RLINES) )
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_RIGHT;
-    else Error(11, 3, "unknown option to %s symbol (%s)",
+    else Error(11, 5, "unknown option to %s symbol (%s)",
 	   WARN, &fpos(x), KW_BREAK, string(x));
   }
   else /* should be a new inter-line gap */
   { GetGap(x, style, &res_gap, &gap_inc);
     if( gap_inc != GAP_ABS && units(res_gap) != units(line_gap(*style)) )
-      Error(11, 4, "line spacing %s is not compatible with current spacing",
+      Error(11, 6, "line spacing %s is not compatible with current spacing",
         WARN, &fpos(x), string(x));
     else
     { units(line_gap(*style)) = units(res_gap);
@@ -176,15 +234,59 @@ void BreakChange(STYLE *style, OBJECT x)
 		  { if( !StringEqual(string(y), STR_EMPTY) )
 		      changebreak(style, y);
 		  }
-		  else Error(11, 5, "invalid left parameter of %s",
+		  else Error(11, 7, "invalid left parameter of %s",
 			 WARN, &fpos(x), KW_BREAK);
 		}
 		break;
 
 
-    default:	Error(11, 6, "invalid left parameter of %s",
+    default:	Error(11, 8, "invalid left parameter of %s",
 		  WARN, &fpos(x), KW_BREAK);
 		break;
   }
   debug1(DSS, D, "BreakChange returning %s", EchoStyle(style));
 } /* end BreakChange */
+
+
+/*@::YUnitChange(), ZUnitChange()@********************************************/
+/*                                                                           */
+/*  YUnitChange(style, x)                                                    */
+/*                                                                           */
+/*  Change the current value of the y unit as indicated by object x.         */
+/*                                                                           */
+/*****************************************************************************/
+
+void YUnitChange(STYLE *style, OBJECT x)
+{ GAP res_gap; unsigned gap_inc;
+  GetGap(x, style, &res_gap, &gap_inc);
+  if( units(res_gap) != FIXED_UNIT )
+    Error(11, 9, "this unit not allowed with %s symbol",
+      WARN, &fpos(x), KW_YUNIT);
+  else
+  { if( gap_inc == GAP_ABS ) yunit(*style) = width(res_gap);
+    else if( gap_inc == GAP_INC ) yunit(*style) += width(res_gap);
+    else yunit(*style) = max(yunit(*style) - width(res_gap), 0);
+  }
+} /* end YUnitChange */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  ZUnitChange(style, x)                                                    */
+/*                                                                           */
+/*  Change the current value of the z unit as indicated by object x.         */
+/*                                                                           */
+/*****************************************************************************/
+
+void ZUnitChange(STYLE *style, OBJECT x)
+{ GAP res_gap; unsigned gap_inc;
+  GetGap(x, style, &res_gap, &gap_inc);
+  if( units(res_gap) != FIXED_UNIT )
+    Error(11, 10, "this unit not allowed with %s symbol",
+      WARN, &fpos(x), KW_ZUNIT);
+  else
+  { if( gap_inc == GAP_ABS ) zunit(*style) = width(res_gap);
+    else if( gap_inc == GAP_INC ) zunit(*style) += width(res_gap);
+    else zunit(*style) = max(zunit(*style) - width(res_gap), 0);
+  }
+} /* end ZUnitChange */

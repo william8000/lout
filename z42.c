@@ -1,9 +1,9 @@
 /*@z42.c:Colour Service:ColourChange, ColourCommand@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -110,7 +110,7 @@ static void ctab_insert(OBJECT x, COLOUR_TABLE *S)
     Error(42, 2, "too many colours (maximum is %d)",
       FATAL, &fpos(x), MAX_COLOUR);
   hash(pos, string(x), *S);
-  if( ctab_name(*S, pos) == nilobj )  ctab_name(*S, pos) = New(ACAT);
+  if( ctab_name(*S, pos) == nilobj )  New(ctab_name(*S, pos), ACAT);
   Link(ctab_name(*S, pos), x);
   word_colour(x) = num;
   ctab_num(*S, num) = x;

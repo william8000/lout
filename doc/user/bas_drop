@@ -1,0 +1,45 @@
+@Section
+   @Title { Drop capitals }
+   @Tag { dropcaps }
+@Begin
+@PP
+There are two symbols for producing drop capitals, {@Code "@DropCapTwo"}
+DropCapTwo.sym @Index @Code "@DropCapTwo"
+DropCapThree.sym @Index @Code "@DropCapThree"
+and {@Code "@DropCapThree"}.  Place the capital to be dropped just
+before the symbol, and the rest of the paragraph after it:
+@ID @Code {
+"I @DropCapTwo {"
+"it is a truth universally acknowledged, that a single man"
+"in possession of a good fortune, must be in want of a wife."
+"}"
+}
+produces the object
+@ID 3i @Wide {
+I @DropCapTwo {
+it is a truth universally acknowledged, that a single man
+in possession of a good fortune, must be in want of a wife.
+}
+}
+@Code "@DropCapThree" is the same except that the capital is larger,
+and spreads over three lines instead of two.
+@PP
+Because Lout occasionally gets the height of the enlarged capital
+slightly wrong, there is a @Code "height" option which allows you
+to change the height if you need to:
+@ID @Code {
+"H @DropCapTwo height { 1.5v }"
+"{"
+"   ..."
+"}"
+}
+This shows the default value for the height of the capital in
+{@Code "@DropCapTwo"}:  1.5 times the current inter-line
+spacing.  The default height in @Code "@DropCapThree" is {@Code "2.5v"}.
+@PP
+These symbols produce an object which may appear anywhere in the
+usual way.  A paragraph symbol will be needed after the paragraph.  The
+paragraph breaking style of the body of the paragraph will be
+{@Code "adjust"}, and hyphenation will be off.  These settings cannot
+be changed at present.
+@End @Section

@@ -12,6 +12,8 @@ Lout Document Formatting Language }
 The University of Sydney 2006,
 Australia }
     @DateLine { 27 January, 1993 }
+    @InitialLanguage { English }
+    @OptimizePages { Yes }
 //
 
 @Abstract
@@ -28,30 +30,30 @@ and possible solutions.
 {@B Keywords}  document formatting typesetting
 }
 
-@Include { s1.0 }
-@Include { s2.0 }
-@Include { s2.1 }
-@Include { s2.2 }
-@Include { s2.3 }
-@Include { s2.4 }
-@Include { s2.5 }
-@Include { s2.9 }
-@Include { s3.0 }
-@Include { s3.1 }
-@Include { s3.2 }
-@Include { s3.3 }
-@Include { s3.4 }
-@Include { s3.9 }
-@Include { s4.0 }
-@Include { s5.0 }
-@Include { s5.1 }
-@Include { s5.2 }
-@Include { s5.3 }
-@Include { s5.4 }
-@Include { s5.5 }
-@Include { s5.9 }
-@Include { s6.0 }
-@Include { s6.1 }
-@Include { s6.2 }
-@Include { s6.9 }
-@Include { s7.0 }
+@Include { s1_0 }
+@Include { s2_0 }
+@Include { s2_1 }
+@Include { s2_2 }
+@Include { s2_3 }
+@Include { s2_4 }
+@Include { s2_5 }
+@Include { s2_9 }
+@Include { s3_0 }
+@Include { s3_1 }
+@Include { s3_2 }
+@Include { s3_3 }
+@Include { s3_4 }
+@Include { s3_9 }
+@Include { s4_0 }
+@Include { s5_0 }
+@Include { s5_1 }
+@Include { s5_2 }
+@Include { s5_3 }
+@Include { s5_4 }
+@Include { s5_5 }
+@Include { s5_9 }
+@Include { s6_0 }
+@Include { s6_1 }
+@Include { s6_2 }
+@Include { s6_9 }
+@Include { s7_0 }

@@ -113,6 +113,7 @@ em.unit @Index { em (unit of measurement) }
 f.unit @Index { @Code f unit of measurement }
 s.unit @Index { @Code s unit of measurement }
 v.unit @Index { @Code v unit of measurement }
+units.of @Index { units of measurement }
 may be given using any one of the following seven units of measurement:
 @ID @OneRow @Tab
     @Fmta { @Col @Code A ! @Col B }

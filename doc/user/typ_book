@@ -18,10 +18,13 @@ book. @Index @Code "@Book"
 "    @AfterTitlePage {}"
 "    @InitialFont { Times Base 12p }"
 "    @InitialBreak { adjust 1.2fx hyphen }"
+"    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
 "    @PageHeaders { Titles }"
-"    @FirstPageNumber { 1 }"
 "    @ColumnNumber { 1 }"
+"    @FirstPageNumber { 1 }"
+"    @IntroFirstPageNumber { 1 }"
+"    @OptimizePages { No }"
 "//"
 }
 This shows all the options of @Code "@Book" with their default values.  As
@@ -66,8 +69,10 @@ spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
 double spacing, and so on), and either @Code "hyphen" or
 @Code "nohyphen" for turning hyphenation on or off.
 @PP
-@Code "@InitialLanguage" determines the language of the bulk of the
-book.
+@Code "@InitialSpace" determines how Lout treats white space
+between two objects, as described in Section
+{@NumberOf white}.  @Code "@InitialLanguage" determines the
+language of the bulk of the book.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
 footers throughout the book.  Its value may be {@Code None},
@@ -78,9 +83,6 @@ produces full running titles as in the present document, and
 @Code "NoTitles" is like @Code "Titles" with the running titles
 omitted, leaving just the page numbers.
 @PP
-@Code "@FirstPageNumber" is the page number given to the first
-non-introductory page.
-@PP
 @Code "@ColumnNumber" is the number of columns per page in the bulk of
 the book, and may be anything from {@Code 1} (the default value) to
 {@Code 10}.  Irrespective of its value, all prefatory material, all
@@ -88,6 +90,21 @@ chapter and appendix headings, and all figures and tables will be
 printed full width.  There is a separate @Code "@IndexColumnNumber"
 option in the setup file which determines the number of columns in
 the index (Section {@NumberOf indexes}).
+@PP
+@Code "@FirstPageNumber" is the page number given to the first
+non-introductory page.  @Code "@IntroFirstPageNumber" is the
+page number of the first introductory page (it will ordinarily appear
+in Roman but must be given in Arabic).
+@PP
+Lout ordinarily places lines onto a page until space runs out, then moves
+to the next page and so on.  This often produces ugly empty spaces at
+the bottoms of pages preceding large unbreakable displays.  Setting the
+@Code "@OptimizePages" option to {@Code "Yes"} causes Lout to examine the
+overall situation and try to minimize the ugliness, using the @TeX
+optimal paragraph breaking algorithm.  It takes two runs to do this,
+with intermediate results stored in Lout's cross reference database
+(Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
+it, which might be wise after major changes.
 @PP
 After the compulsory @Code "//" comes an optional preface:
 preface. @Index @Code "@Preface"
@@ -267,6 +284,9 @@ representative sample of these options, showing their default values:
 "@Use { @BookLayout"
 "    # @TitlePageFont { Helvetica Base }"
 "    # @SeparateIntroNumbering { Yes }"
+"    # @ReferencesBeforeAppendices { No }"
+"    # @ChapterStartPages { Any }"
+"    # @ChapterWord { chapter }"
 "    # @ChapterNumbers { Arabic }"
 "    # @ChapterHeadingFont { Bold 2.00f }"
 "    # @ChapterHeadingBreak { ragged 1.2fx nohyphen }"
@@ -278,12 +298,21 @@ representative sample of these options, showing their default values:
 Section {@NumberOf setup} explains how to make your own setup file and
 change its options.  @Code "@TitlePageFont" is the font used on the title
 title.page.font. @Index @Code "@TitlePageFont"
-page of the book, not including a size.  @Code "@SeparateIntroNumbering"
+page of the book, not including a size.  @Code "@ChapterStartPages"
+determines what kinds of pages chapters and other major components of the
+book may begin on, and may be {@Code Any}, {@Code Odd}, or {@Code Even},
+meaning any page, odd-numbered pages only, or even-numbered pages
+only.  @Code "@SeparateIntroNumbering"
 separate.intro.numbering @Index @Code "@SeparateIntroNumbering"
 determines whether the introductory part of the book is to have a
-separate numbering sequence or not.  The other six options control
-the appearance of chapters, and there are similar but less extensive
-options for controlling the other large-scale structure symbols.
+separate numbering sequence or not.  @Code "@ReferencesBeforeAppendices"
+references.before.appendices @Index @Code "@ReferencesBeforeAppendices"
+determines whether any final list of references appears before or
+after any appendices.  @Code "@ChapterWord" determines
+the word used in chapter titles; its default value, {@Code "chapter"},
+produces `Chapter' in the current language.  The other six options control
+the appearance of chapters, and there are similar options for controlling
+the other large-scale structure symbols.
 @PP
 @Code "@ChapterNumbers" determines how chapters will be numbered, and may
 be @Code { None }, @Code { Arabic }, @Code { Roman }, @Code { UCRoman },

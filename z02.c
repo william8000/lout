@@ -1,9 +1,9 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -261,7 +261,7 @@ void LexPop(void)
 /*****************************************************************************/
 
 #define setword(typ, res, file_pos, str, len)				\
-{ res = NewWord(typ, len, &file_pos);					\
+{ NewWord(res, typ, len, &file_pos);					\
   FposCopy(fpos(res), file_pos);					\
   for( c = 0;  c < len;  c++ ) string(res)[c] = str[c];			\
   string(res)[c] = '\0';						\
@@ -438,6 +438,7 @@ OBJECT LexGetToken(void)
 	/* no next file, so take continuation */
 	else switch( ftype )
 	{
+
 	  case SOURCE_FILE:
 	  case DATABASE_FILE:
 	  
@@ -446,6 +447,7 @@ OBJECT LexGetToken(void)
 	    next_token = NewToken(UNEXPECTED_EOF, &file_pos,0,0,NO_PREC,nilobj);
 	    --p;  startline = p;
 	    break;
+
 
 	  case FILTER_FILE:
 	  
@@ -457,6 +459,7 @@ OBJECT LexGetToken(void)
 	    --p;  startline = p;
 	    break;
 
+
 	  case INCLUDE_FILE:
 
 	    LexPop();
@@ -464,7 +467,11 @@ OBJECT LexGetToken(void)
 	    hcount = 0;
 	    break;
 
-	  default:  Error(2, 8, "unknown file type", INTERN, no_fpos);
+
+	  default:
+	  
+	    assert(FALSE, "unknown file type");
+	    break;
 
 	} /* end switch */
 	break;
@@ -493,7 +500,7 @@ OBJECT LexGetToken(void)
 	}
 	else if( type(res) == MACRO )
 	{ if( recursive(res) )
-	  { Error(2, 9, "recursion in macro", WARN, &file_pos);
+	  { Error(2, 8, "recursion in macro", WARN, &file_pos);
 	    setword(WORD, res, file_pos, startpos, p-startpos);
 	  }
 	  else
@@ -510,7 +517,7 @@ OBJECT LexGetToken(void)
 	  chpt = p;
 	  t = LexGetToken();
 	  if( type(t) != LBR )
-	  { Error(2, 10, "%s expected (after %s)",
+	  { Error(2, 9, "%s expected (after %s)",
 	      WARN, &fpos(t), KW_LBR, SymName(res));
 	    Dispose(t);
 	    res = nilobj;
@@ -519,7 +526,7 @@ OBJECT LexGetToken(void)
 	  fname = Parse(&t, nilobj, FALSE, FALSE);
 	  fname = ReplaceWithTidy(fname, FALSE);
 	  if( !is_word(type(fname)) )
-	  { Error(2, 11, "name of include file expected here",
+	  { Error(2, 10, "name of include file expected here",
 	      WARN, &fpos(fname));
 	    Dispose(fname);
 	    res = nilobj;
@@ -528,6 +535,7 @@ OBJECT LexGetToken(void)
 	  len = StringLength(string(fname)) - StringLength(SOURCE_SUFFIX);
 	  if( len >= 0 && StringEqual(&string(fname)[len], SOURCE_SUFFIX) )
 	    StringCopy(&string(fname)[len], STR_EMPTY);
+	  debug0(DFS, D, "  calling DefineFile from LexGetToken");
 	  fnum = DefineFile(string(fname), STR_EMPTY, &fpos(fname),
 	      INCLUDE_FILE,
 	      predefined(res)==INCLUDE ? INCLUDE_PATH : SYSINCLUDE_PATH);
@@ -558,7 +566,7 @@ OBJECT LexGetToken(void)
 
 	  case NEWLINE:
 	  case ENDFILE:	--p;
-			Error(2, 12, "unterminated string", WARN, &file_pos);
+			Error(2, 11, "unterminated string", WARN, &file_pos);
 			setword(QWORD, res, file_pos, startpos, q-1-startpos);
 			break;
 
@@ -567,7 +575,7 @@ OBJECT LexGetToken(void)
 
 	  case ESCAPE:	q--;
 			if( chtbl[*p] == NEWLINE || chtbl[*p] == ENDFILE )
-			{ Error(2, 13, "unterminated string", WARN, &file_pos);
+			{ Error(2, 12, "unterminated string", WARN, &file_pos);
 			  setword(QWORD, res, file_pos, startpos, q-startpos);
 			}
 			else if( octaldigit(*p) )
@@ -578,14 +586,14 @@ OBJECT LexGetToken(void)
 			    count++;
 			  } while( octaldigit(*p) && count < 3 );
 			  if( ch == '\0' )
-			    Error(2, 14, "skipping null character in string",
+			    Error(2, 13, "skipping null character in string",
 			      WARN, &file_pos);
 			  else *q++ = ch;
 			}
 			else *q++ = *p++;
 			break;
 
-	  default:	Error(2, 15, "LexGetToken: error in quoted string",
+	  default:	Error(2, 14, "LexGetToken: error in quoted string",
 			  INTERN, &file_pos);
 			break;
 
@@ -595,14 +603,14 @@ OBJECT LexGetToken(void)
 
       default:
       
-	Error(2, 16, "LexGetToken: bad chtbl[]", INTERN, &file_pos);
+	assert(FALSE, "LexGetToken: bad chtbl[]");
 	break;
 
   } while( res == nilobj );
 
   if( p - startline >= MAX_LINE )
   { col_num(file_pos) = 1;
-    Error(2, 17, "line is too long (or final newline missing)",FATAL,&file_pos);
+    Error(2, 15, "line is too long (or final newline missing)",FATAL,&file_pos);
   }
 
   chpt = p;
@@ -648,7 +656,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
   debug2(DFH, D, "LexScanFilter(fp, %s, %s)",
     bool(end_stop), EchoFilePos(err_pos));
   if( next_token != nilobj )
-  { Error(2, 18, "filter parameter in macro", FATAL, err_pos);
+  { Error(2, 16, "filter parameter in macro", FATAL, err_pos);
   }
 
   p = chpt;  depth = 0;
@@ -686,7 +694,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 
       case ENDFILE:
       
-	Error(2, 19, "end of file reached while reading filter parameter",
+	Error(2, 17, "end of file reached while reading filter parameter",
 	  FATAL, err_pos);
 	break;
 
@@ -726,31 +734,36 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 	  if( end_stop && StringBeginsWith(p, KW_END) )
 	  { finished = TRUE;
 	  }
-	  else if( StringBeginsWith(p, KW_INCLUDE) )
-	  { OBJECT incl_fname, t;  FILE *incl_fp;  int ch;
+	  else if( StringBeginsWith(p, KW_INCLUDE) ||
+		   StringBeginsWith(p, KW_SYSINCLUDE) )
+	  { OBJECT incl_fname, t;  FILE *incl_fp;  int ch;  FILE_NUM fnum;
+	    BOOLEAN sysinc = StringBeginsWith(p, KW_SYSINCLUDE);
 	    clear();
-	    p += StringLength(KW_INCLUDE);
+	    p += sysinc ? StringLength(KW_SYSINCLUDE):StringLength(KW_INCLUDE);
 	    chpt = p;
 	    t = LexGetToken();
-	    if( type(t) != LBR )  Error(2, 20, "expected %s here (after %s)",
-		FATAL, &fpos(t), KW_LBR, KW_INCLUDE);
+	    if( type(t) != LBR )  Error(2, 18, "expected %s here (after %s)",
+		FATAL, &fpos(t), KW_LBR, sysinc ? KW_SYSINCLUDE : KW_INCLUDE);
 	    incl_fname = Parse(&t, nilobj, FALSE, FALSE);
 	    p = chpt;
 	    incl_fname = ReplaceWithTidy(incl_fname, FALSE);
 	    if( !is_word(type(incl_fname)) )
-	      Error(2, 21, "expected file name here", FATAL,&fpos(incl_fname));
+	      Error(2, 19, "expected file name here", FATAL,&fpos(incl_fname));
+	    /* ***
 	    incl_fp = StringFOpen(string(incl_fname), READ_TEXT);
-	    if( incl_fp == NULL )
-	      Error(2, 22, "cannot open include file %s",
-		FATAL, &fpos(incl_fname), string(incl_fname));
 	    Dispose(incl_fname);
+	    *** */
+	    debug0(DFS, D, "  calling DefineFile from LexScanFilter");
+	    fnum = DefineFile(string(incl_fname), STR_EMPTY, &fpos(incl_fname),
+	      INCLUDE_FILE, sysinc ? SYSINCLUDE_PATH : INCLUDE_PATH);
+	    Dispose(incl_fname);
+	    incl_fp = OpenFile(fnum, FALSE, TRUE);
+	    if( incl_fp == NULL )
+	      Error(2, 20, "cannot open include file %s",
+		FATAL, PosOfFile(fnum), FileName(fnum));
 	    while( (ch = getc(incl_fp)) != EOF )
 	      putc(ch, fp);
 	    fclose(incl_fp);
-	  }
-	  else if( StringBeginsWith(p, KW_SYSINCLUDE) )
-	  { Error(2, 23, "%s in filter parameter not implemented",
-	      FATAL, &file_pos, KW_SYSINCLUDE);
 	  }
 	  else
 	  { clear();
@@ -767,7 +780,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 
       default:
       
-	Error(2, 24, "LexScanFilter: bad chtbl[]", INTERN, &file_pos);
+	assert(FALSE, "LexScanFilter: bad chtbl[]");
 	break;
 
   };
@@ -775,7 +788,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;
 
   if( p - startline >= MAX_LINE )
   { col_num(file_pos) = 1;
-    Error(2, 25, "line is too long (or final newline missing)",FATAL,&file_pos);
+    Error(2, 21, "line is too long (or final newline missing)",FATAL,&file_pos);
   }
 
   chpt = p;

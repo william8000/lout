@@ -1,9 +1,9 @@
 /*@z34.c:Rotation Service:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -66,18 +66,18 @@ OBJECT y, LENGTH theta)
   ifdebug(DRS, D, sprintf(buff2, "%.1f", ang));
   debug2(DRS, D, "RotateSize( %s, %s )", EchoObject(y), buff2);
   debug4(DRS, DD, "  ycb %s, ycf %s, yrb %s, yrf %s",
-	EchoLength(back(y, COL)), EchoLength(fwd(y, COL)),
-	EchoLength(back(y, ROW)), EchoLength(fwd(y, ROW)));
+	EchoLength(back(y, COLM)), EchoLength(fwd(y, COLM)),
+	EchoLength(back(y, ROWM)), EchoLength(fwd(y, ROWM)));
 
   /* set up coordinates of the four corners of y */
-  ycorners[0].x =   (float) fwd(y, COL);
-  ycorners[0].y =   (float) back(y, ROW);
-  ycorners[1].x = - (float) back(y, COL);
-  ycorners[1].y =   (float) back(y, ROW);
-  ycorners[2].x = - (float) back(y, COL);
-  ycorners[2].y = - (float) fwd(y, ROW);
-  ycorners[3].x =   (float) fwd(y, COL);
-  ycorners[3].y = - (float) fwd(y, ROW);
+  ycorners[0].x =   (float) fwd(y, COLM);
+  ycorners[0].y =   (float) back(y, ROWM);
+  ycorners[1].x = - (float) back(y, COLM);
+  ycorners[1].y =   (float) back(y, ROWM);
+  ycorners[2].x = - (float) back(y, COLM);
+  ycorners[2].y = - (float) fwd(y, ROWM);
+  ycorners[3].x =   (float) fwd(y, COLM);
+  ycorners[3].y = - (float) fwd(y, ROWM);
 
   /* rotate these four corners by theta and store their extremes */
   maxx = maxy = (float) - MAX_LEN;

@@ -1,0 +1,15 @@
+@Chapter
+   @Title { Principles }
+   @Tag { principles }
+@Begin
+@LP
+The document formatting language Lout is based on just four key ideas:
+objects, definitions, cross references, and galleys.  In this chapter we
+concentrate on them, postponing the inevitable details to later chapters.
+@BeginSections
+@Include { pri_obje }
+@Include { pri_defi }
+@Include { pri_cros }
+@Include { pri_gall }
+@EndSections
+@End @Chapter

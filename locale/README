@@ -2,28 +2,22 @@ Locale-specific error messages
 
 Lout offers the option of locale-specific error messages.  To
 get them, install with USELOC set to 1 in the make file, as
-described in detail there.  At present the languages supported are:
+described in detail there.  If USELOC is set to 1 when installing,
+Lout will look for a file called $(LIBDIR)/locale/msgs.<loc>
+where <loc> stands for the current locale, for its error messages.
 
-  msgs.fr	French
-  msgs.de	German
+At present we have
 
-If the language you need is not on this list, it probably means that
-no-one has got around to translating Lout's 500 or so error messages
-into your language yet.  If you are willing to do this translation,
-the procedure is as follows:
+  msgs.english  The up-to-date messages list, in English
+  old.msgs.fr	French messages from Version 3.05, out of date
+  old.msgs.de	German messages from Version 3.05, out of date
 
-(1) Send mail to me (jeff@cs.su.oz.au) volunteering your services.
-
-(2) I will send you a file of almost 500 error messages, in English.
-
-(3) You translate this file into your language and return it to me
-    in a form that won't be corrupted by email (e.g. uuencoded).
-
-(4) I produce a revised Lout distribution with your translated
-    error messages as an integral part, so that they will be
-    installed automatically.  You receive this either by ftp or
-    by electronic mail, as you prefer.
+Someone needs to translate the new errors list, msgs.english,
+into these languages (and others) and send it to me.  Please
+send me any translations you do (perhaps ask first) so that
+I can stop people doing duplicate work.
 
 Jeffrey H. Kingston
 11 November 1994
 9 July 1995
+3 April 1996

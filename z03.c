@@ -1,9 +1,9 @@
 /*@z03.c:File Service:Declarations, no_fpos@******************************** */
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -31,14 +31,17 @@
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
-#define MAX_TYPES	 12			/* number of file types      */
-#define MAX_PATHS	  8			/* number of search paths    */
+#if USE_STAT
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
 #define	INIT_TAB 	  3			/* initial file table size   */
 
 #define	file_number(x)	word_font(x)		/* file number of file x     */
 #define	type_of_file(x) word_colour(x)		/* type of file x            */
-#define	updated(x)	fwd(x, COL)		/* TRUE when x is updated    */
-#define	path(x)		back(x, COL)		/* search path for file x    */
+#define	updated(x)	fwd(x, COLM)		/* TRUE when x is updated    */
+#define	path(x)		back(x, COLM)		/* search path for file x    */
 
 
 /*****************************************************************************/
@@ -119,7 +122,7 @@ static void ftab_insert(OBJECT x, FILE_TABLE *S)
     Error(3, 2, "too many files (maximum is %d)",
       FATAL, &fpos(x), MAX_FILES);
   hash(pos, string(x), *S);
-  if( ftab_name(*S, pos) == nilobj )  ftab_name(*S, pos) = New(ACAT);
+  if( ftab_name(*S, pos) == nilobj )  New(ftab_name(*S, pos), ACAT);
   Link(ftab_name(*S, pos), x);
   file_number(x) = num;
   ftab_num(*S, num) = x;
@@ -167,17 +170,18 @@ static void ftab_debug(FILE_TABLE S, FILE *fp)
 
 static	char	*file_types[]		/* the type names for debug  */
 		= { "source", "include", "incgraphic", "database", "index",
-		    "font", "prepend", "hyph", "hyphpacked", "encoding",
+		    "font", "prepend", "hyph", "hyphpacked",
 		    "mapping", "filter" };
 #endif
 
 
+static	OBJECT		empty_path;		/* file path with just "" in */
 static	FILE_TABLE	file_tab;		/* the file table            */
 static	OBJECT		file_type[MAX_TYPES];	/* files of each type        */
 static	OBJECT		file_path[MAX_PATHS];	/* the search paths          */
 static	char		*file_mode[MAX_TYPES] =
 { READ_TEXT, READ_TEXT, READ_TEXT, READ_TEXT, READ_BINARY, READ_TEXT,
-  READ_TEXT, READ_TEXT, READ_BINARY, READ_TEXT, READ_TEXT, READ_TEXT };
+  READ_TEXT, READ_TEXT, READ_BINARY, READ_TEXT, READ_TEXT };
 
 
 /*****************************************************************************/
@@ -201,10 +205,13 @@ FILE_POS *no_fpos = &no_file_pos;
 /*****************************************************************************/
 
 void InitFiles(void)
-{ int i;
-  for( i = 0;  i < MAX_TYPES; i++ )  file_type[i]  = New(ACAT);
-  for( i = 0;  i < MAX_PATHS; i++ )  file_path[i] = New(ACAT);
+{ int i;  OBJECT tmp;
+  for( i = 0;  i < MAX_TYPES; i++ )  New(file_type[i], ACAT);
+  for( i = 0;  i < MAX_PATHS; i++ )  New(file_path[i], ACAT);
   file_tab = ftab_new(INIT_TAB);
+  New(empty_path, ACAT);
+  tmp = MakeWord(WORD, STR_EMPTY, no_fpos);
+  Link(empty_path, tmp);
 } /* end InitFiles */
 
 
@@ -353,7 +360,9 @@ FILE_NUM DatabaseFileNum(FILE_POS *xfpos)
       str = FileName(file_num(*xfpos));
       fnum = FileNum(str, DATA_SUFFIX);
       if( fnum == NO_FILE )
+      { debug0(DFS, D, "  calling DefineFile from DatabaseFileNum");
 	fnum = DefineFile(str, DATA_SUFFIX, xfpos, DATABASE_FILE, SOURCE_PATH);
+      }
       break;
 
 
@@ -368,7 +377,7 @@ FILE_NUM DatabaseFileNum(FILE_POS *xfpos)
 
       /* return the enclosing source file (recursively if necessary) */
       if( file_num(fpos(x)) == NO_FILE )
-	Error(3, 16, "DatabaseFileNum: filter file position unknown",
+	Error(3, 7, "DatabaseFileNum: filter file position unknown",
 	  INTERN, no_fpos);
       fnum = DatabaseFileNum(&fpos(x));
       break;
@@ -376,7 +385,7 @@ FILE_NUM DatabaseFileNum(FILE_POS *xfpos)
 
     default:
 
-      Error(3, 17, "DatabaseFileNum: unexpected file type", INTERN, no_fpos);
+      Error(3, 8, "DatabaseFileNum: unexpected file type", INTERN, no_fpos);
       fnum = NO_FILE;
       break;
 
@@ -420,13 +429,13 @@ static void append_fpos(FILE_POS *pos)
   if( file_num(fpos(x)) > 0 )
   { append_fpos( &fpos(x) );
     if( StringLength(buff[bp]) + 2 >= MAX_BUFF )
-      Error(3, 7, "file position %s... is too long to print",
+      Error(3, 9, "file position %s... is too long to print",
         FATAL, no_fpos, buff[bp]);
     StringCat(buff[bp], STR_SPACE);
     StringCat(buff[bp], STR_DIRECTORY);
   }
   if( StringLength(buff[bp]) + StringLength(string(x)) + 13 >= MAX_BUFF )
-    Error(3, 8, "file position %s... is too long to print",
+    Error(3, 10, "file position %s... is too long to print",
       FATAL, no_fpos, buff[bp]);
   StringCat(buff[bp], STR_SPACE);
   StringCat(buff[bp], STR_QUOTE);
@@ -466,11 +475,11 @@ FULL_CHAR *EchoFileSource(FILE_NUM fnum)
     assert( x != nilobj, "EchoFileSource: x == nilobj!" );
     if( type_of_file(x) == FILTER_FILE )
     { StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 15, "filter")));
-      /* for estrip's benefit: Error(3, 15, "filter"); */
+      /* for estrip's benefit: Error(3, 11, "filter"); */
       StringCat(buff[bp], STR_SPACE);
     }
     StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 9, "file")));
-    /* for estrip's benefit: Error(3, 9, "file"); */
+    /* for estrip's benefit: Error(3, 12, "file"); */
     StringCat(buff[bp], STR_SPACE);
     x = ftab_num(file_tab, fnum);
     StringCat(buff[bp], STR_QUOTE);
@@ -481,14 +490,14 @@ FULL_CHAR *EchoFileSource(FILE_NUM fnum)
       for(;;)
       { nextx = ftab_num(file_tab, file_num(fpos(x)));
 	StringCat(buff[bp], AsciiToFull(condcatgets(MsgCat, 3, 10, "from")));
-	/* for estrip's benefit: Error(3, 10, "from"); */
+	/* for estrip's benefit: Error(3, 13, "from"); */
 	StringCat(buff[bp], STR_SPACE);
         StringCat(buff[bp], STR_QUOTE);
         StringCat(buff[bp], string(nextx));
         StringCat(buff[bp], STR_QUOTE);
 	StringCat(buff[bp], STR_SPACE);
         StringCat(buff[bp],  AsciiToFull(condcatgets(MsgCat, 3, 11, "line")));
-	/* for estrip's benefit: Error(3, 11, "line"); */
+	/* for estrip's benefit: Error(3, 14, "line"); */
 	StringCat(buff[bp], STR_SPACE);
         StringCat(buff[bp], StringInt( (int) line_num(fpos(x))));
 	if( file_num(fpos(nextx)) == 0 )  break;
@@ -542,15 +551,15 @@ FILE_POS *PosOfFile(FILE_NUM fnum)
 /*                          read_mode)                                       */
 /*                                                                           */
 /*  Search the given path for a file whose name is str.  If found, open      */
-/*  it; return the resulting FILE *.                                         */
+/*  it with mode read_mode; return the resulting FILE *.                     */
 /*                                                                           */
 /*  If check_ld is TRUE, it means that the file to be opened is a .li file   */
 /*  and OpenFile() is required to check whether the corresponding .ld file   */
-/*  is present.  If it is, then the search must stop.                        */
+/*  is present.  If it is, then the search must stop.  Furthermore, if the   */
+/*  .li file is out of date wrt the .ld file, it is to be removed.           */
 /*                                                                           */
 /*  If check_lt is TRUE, it means that the file to be opened is a source     */
-/*  file and OpenFile() is required to check for a .lt suffix version if     */
-/*  the file does not open.                                                  */
+/*  file and OpenFile() is required to check for a .lt suffix version.       */
 /*                                                                           */
 /*  Also return the full path name in object *full_name if different from    */
 /*  the existing name, else nilobj.                                          */
@@ -559,92 +568,118 @@ FILE_POS *PosOfFile(FILE_NUM fnum)
 
 static FILE *SearchPath(FULL_CHAR *str, OBJECT fpath, BOOLEAN check_ld,
 BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
-{ FULL_CHAR buff[MAX_BUFF];  OBJECT link, y;  FILE *fp, *fp2;
+{ FULL_CHAR buff[MAX_BUFF], buff2[MAX_BUFF];
+  OBJECT link, y, path;  FILE *fp, *fp2;
   debug4(DFS, DD, "SearchPath(%s, %s, %s, %s, -)", str, EchoObject(fpath),
 	bool(check_ld), bool(check_lt));
-  *full_name = nilobj;
 
   /* if file name is "stdin" just return it */
   if( StringEqual(str, STR_STDIN) )
-  { fp = stdin;
-    debug0(DFS, DD, "  opened stdin");
+  {
+    debug0(DFS, DD, "  SearchPath returning stdin");
+    *full_name = nilobj;
+    return stdin;
   }
 
-  /* else if file name is a full path name, ignore fpath */
-  else if( StringBeginsWith(str, STR_DIRECTORY) )
-  { fp = StringFOpen(str, read_mode);
-    debug1(DFS, DD, fp==null ? "  failed on %s" : "  succeeded on %s", str);
+  /* use fpath if relative file name, use empty_path if absolute filename */
+  path = StringBeginsWith(str, STR_DIRECTORY) ? empty_path : fpath;
 
-    /* if check_lt, see if str.lout exists as well as or instead of str */
-    if( check_lt )
+  /* try opening each path name in the search path */
+  fp = null;
+  for( link = Down(path);  fp == null && link != path;  link = NextDown(link) )
+  { Child(y, link);
+
+    /* set buff to the full path name */
+    if( StringLength(string(y)) == 0 )
     { StringCopy(buff, str);
-      StringCat(buff, SOURCE_SUFFIX);
-      fp2 = StringFOpen(buff, read_mode);
-      debug1(DFS, DD, fp2==null ? "  failed on %s" : "  succeeded on %s",buff);
-      if( fp2 != null )
-      {	if( fp != null )
-	  Error(3, 12, "files %s and %s both exist", FATAL, xfpos, str, buff);
-	fp = fp2;
-	*full_name = MakeWord(WORD, buff, xfpos);
-      }
     }
-  }
+    else
+    { if( StringLength(string(y)) + StringLength(STR_DIRECTORY) +
+	  StringLength(str) >= MAX_BUFF )
+	Error(3, 15, "file path name %s%s%s is too long",
+	  FATAL, &fpos(y), string(y), STR_DIRECTORY, str);
+      StringCopy(buff, string(y));
+      StringCat(buff, STR_DIRECTORY);
+      StringCat(buff, str);
+    }
 
-  /* else prepend each element of fpath to str in turn and attempt to open */
-  else
-  { fp = null;
-    for( link = Down(fpath);  fp==null && link!=fpath; link = NextDown(link) )
-    { Child(y, link);
+    /* try opening the full path name */
+    fp = StringFOpen(buff, read_mode);
+    debug1(DFS, DD, fp == null ? "  fail %s" : "  succeed %s", buff);
 
-      /* set buff to hold the full path name and attempt to open it */
-      if( StringLength(string(y)) == 0 )
-      { StringCopy(buff, str);
-	fp = StringFOpen(str, read_mode);
-	debug1(DFS,DD, fp==null ? "  failed on %s" : "  succeeded on %s", str);
-      }
-      else
-      {	if( StringLength(string(y)) + 1 + StringLength(str) >= MAX_BUFF )
-	  Error(3, 13, "file path name %s/%s is too long",
-	    FATAL, &fpos(y), string(y), str);
-	StringCopy(buff, string(y));
-	StringCat(buff, STR_DIRECTORY);
-	StringCat(buff, str);
-	fp = StringFOpen(buff, read_mode);
-	debug1(DFS,DD, fp==null ? "  failed on %s" : "  succeeded on %s",buff);
-	if( fp != null ) *full_name = MakeWord(WORD, buff, xfpos);
-      }
-
-      /* if failed to find .li file, exit if corresponding .ld file is found */
-      if( fp == null && check_ld )
-      {	StringCopy(&buff[StringLength(buff) - StringLength(INDEX_SUFFIX)],
+    /* if failed to find .li file, exit if corresponding .ld file */
+    if( check_ld && fp == null )
+    {
+        StringCopy(buff2, buff);
+        StringCopy(&buff2[StringLength(buff2) - StringLength(INDEX_SUFFIX)],
 	  DATA_SUFFIX);
-	fp = StringFOpen(buff, READ_TEXT);
-	debug1(DFS,DD,fp==null ? "  failed on %s" : "  succeeded on %s", buff);
-	if( fp != null )
-	{ fclose(fp);
+        fp2 = StringFOpen(buff2, READ_TEXT);
+        debug1(DFS, DD, fp2 == null ? "  fail %s" : "  succeed %s", buff2);
+        if( fp2 != null )
+        { fclose(fp2);
 	  debug0(DFS, D, "SearchPath returning null (adjacent .ld file)");
+	  *full_name = nilobj;
+	  return null;
+        }
+    }
+
+#if USE_STAT
+    /*****************************************************************/
+    /*                                                               */
+    /*  If your compiler won't compile this bit, it is probably      */
+    /*  because you either don't have the stat() system call on      */
+    /*  your system (it is not ANSI C), or because it can't be       */
+    /*  found in the header files declared at the top of this file.  */
+    /*                                                               */
+    /*  The simple correct thing to do is to set the USESTAT macro   */
+    /*  in the makefile to 0.  You won't lose much.                  */
+    /*                                                               */
+    /*****************************************************************/
+
+    /* if found .li file, compare dates with corresponding .ld file  */
+    if( check_ld && fp != null )
+    {
+      struct stat indexstat, datastat;
+      StringCopy(buff2, buff);
+      StringCopy(&buff2[StringLength(buff2) - StringLength(INDEX_SUFFIX)],
+	DATA_SUFFIX);
+      debug2(DFS, D, "SearchPath comparing dates of .li %s and .ld %s",
+	buff, buff2);
+      if( stat( (char *) buff, &indexstat) == 0 &&
+	  stat( (char *) buff2, &datastat) == 0 )
+      {
+	debug2(DFS, D, "SearchPath mtimes are .li %d and .ld %d",
+	  (int) indexstat.st_mtime, (int) datastat.st_mtime);
+	if( datastat.st_mtime > indexstat.st_mtime )
+	{ fclose(fp);
+	  debug1(DFS, D, "SearchPath calling StringRemove(%s)", buff);
+	  StringRemove(buff);
+	  debug0(DFS, D, "SearchPath returning null (.li out of date)");
+	  *full_name = nilobj;
 	  return null;
 	}
       }
+    }
+#endif
 
-      /* if check_lt, see if buff.lout exists as well as or instead of buff */
-      if( check_lt )
-      {	StringCat(buff, SOURCE_SUFFIX);
-	fp2 = StringFOpen(buff, READ_TEXT);
-	debug1(DFS,DD,fp2==null ? "  failed on %s" : "  succeeded on %s",buff);
-	StringCopy(&buff[StringLength(buff) - StringLength(SOURCE_SUFFIX)],
-	  STR_EMPTY);
-	if( fp2 != null )
-	{ if( fp != null )
-	    Error(3, 14, "files %s and %s%s both exist",
-	      FATAL, xfpos, buff, buff, SOURCE_SUFFIX);
-	  fp = fp2;
-	  *full_name = MakeWord(WORD, buff, xfpos);
-	}
+    /* if check_lt, see if buff.lt exists as well as or instead of buff */
+    if( check_lt )
+    {
+      StringCopy(buff2, buff);
+      StringCat(buff2, SOURCE_SUFFIX);
+      fp2 = StringFOpen(buff2, READ_TEXT);
+      debug1(DFS, DD, fp2 == null ? "  fail %s" : "  succeed %s", buff2);
+      if( fp2 != null )
+      { if( fp != null )
+	  Error(3, 16, "files %s and %s both exist", FATAL, xfpos,buff,buff2);
+	fp = fp2;
       }
     }
+
   }
   debug1(DFS, DD, "SearchPath returning (fp %s null)", fp==null ? "==" : "!=");
+  *full_name = (fp == null || StringLength(string(y)) == 0) ? nilobj :
+    MakeWord(WORD, buff, xfpos);
   return fp;
 } /* end SearchPath */
 
@@ -658,7 +693,8 @@ BOOLEAN check_lt, OBJECT *full_name, FILE_POS *xfpos, char *read_mode)
 /*                                                                           */
 /*  If check_ld is TRUE, it means that the file to be opened is a .li file   */
 /*  and OpenFile() is required to check whether the corresponding .ld file   */
-/*  is present.  If it is, then the search must stop.                        */
+/*  is present.  If it is, then the search must stop.  Furthermore, if the   */
+/*  .li file is out of date wrt the .ld file, it is to be removed.           */
 /*                                                                           */
 /*  If check_lt is TRUE, it means that the file to be opened is a source     */
 /*  file and OpenFile() is required to check for a .lout suffix version      */
@@ -718,9 +754,18 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
   { char buff[MAX_BUFF];
     fclose(fp);
     sprintf(buff, UNCOMPRESS_COM, (char *) string(*full_name), LOUT_EPS);
-    system(buff);
-    fp = fopen(LOUT_EPS, READ_TEXT);
-    *compressed = TRUE;
+    if( SafeExecution )
+    {
+      Error(3, 17, "safe execution prohibiting command: %s", WARN, xfpos,buff);
+      *compressed = FALSE;
+      fp = null;
+    }
+    else
+    {
+      system(buff);
+      fp = fopen(LOUT_EPS, READ_TEXT);
+      *compressed = TRUE;
+    }
   }
   else *compressed = FALSE;
 

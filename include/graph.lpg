@@ -85,7 +85,7 @@ lgraphdict begin
 
 % stroke a solid line:  <length> <dashlength> solid -
 /solid
-{ pop pop [] 0 setdash stroke
+{ pop pop [] 0 setdash linewidth setlinewidth stroke
 } def
   
 % stroke a dashed line:   <length> <dashlength> dashed -
@@ -95,7 +95,7 @@ lgraphdict begin
    {  dup [ exch 4 2 roll 2 copy div
       1 sub 2 div ceiling dup 4 1 roll
       1 add mul sub exch div ] 0 setdash
-   } ifelse stroke
+   } ifelse linewidth setlinewidth stroke
 } def
 
 % stroke a cdashed line:  <length> <dashlength> cdashed -
@@ -105,7 +105,7 @@ lgraphdict begin
    { dup [ 4 2 roll exch 2 copy exch div
      2 div ceiling div 1 index sub
      ] exch 2 div setdash
-   } ifelse stroke
+   } ifelse linewidth setlinewidth stroke
 } def
 
 % stroke a dotted line:  <length> <dashlength> dotted -
@@ -114,7 +114,7 @@ lgraphdict begin
    { exch pop 1 pt max [ exch 0 exch ] 0 setdash }
    { 1 index exch div ceiling div 0.99999 mul
      [ 0 3 2 roll ] 0 setdash
-   } ifelse gsave 1 setlinecap stroke grestore newpath
+   } ifelse gsave 1 setlinecap linewidth setlinewidth stroke grestore newpath
 } def
 
 % stroke a noline line:  <length> <dashlength> noline -
@@ -128,7 +128,7 @@ lgraphdict begin
   xprev yprev trpoint lineto
   xcurr yprev trpoint lineto
   xcurr ymin trpoint yextra sub lineto 
-  stroke
+  linewidth setlinewidth stroke
 } def
 
 % stroke an x histogram: - xhisto -
@@ -137,7 +137,7 @@ lgraphdict begin
   xcurr yprev trpoint lineto
   xcurr ycurr trpoint lineto
   xmin ycurr trpoint exch xextra sub exch lineto 
-  stroke
+  linewidth setlinewidth stroke
 } def
 
 % stroke a surface y histogram: - surfaceyhisto -
@@ -154,7 +154,7 @@ lgraphdict begin
   }
   { xcurr ycurr trpoint lineto
   } ifelse
-  stroke
+  linewidth setlinewidth stroke
 } def
 
 % stroke a surface x histogram: - surfacexhisto -
@@ -169,7 +169,7 @@ lgraphdict begin
   lastpair
   { xmin ycurr trpoint exch xextra sub exch lineto 
   } if
-  stroke
+  linewidth setlinewidth stroke
 } def
 
 % stroke a filled y histogram: - filledyhisto -
@@ -274,7 +274,7 @@ lgraphdict begin
 { newpath
   xcurr ycurr trpoint moveto
   0 symbolsize 1.5 mul rmoveto
-  symbolsize neg symbolsize -2.5 neg rlineto
+  symbolsize neg symbolsize -2.5 mul rlineto
   symbolsize 2 mul 0 rlineto
   closepath [] 0 setdash stroke
 } def
@@ -284,7 +284,7 @@ lgraphdict begin
 { newpath
   xcurr ycurr trpoint moveto
   0 symbolsize 1.5 mul rmoveto
-  symbolsize neg symbolsize -2.5 neg rlineto
+  symbolsize neg symbolsize -2.5 mul rlineto
   symbolsize 2 mul 0 rlineto
   closepath gsave [] 0 setdash stroke grestore fill
 } def

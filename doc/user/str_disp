@@ -23,7 +23,9 @@ the latter indents at the right margin as well as at the left. There are
 also @Code "@CentredDisplay" and @Code "@CenteredDisplay" symbols which
 centreddisplay. @Index @Code "@CentredDisplay"
 centereddisplay. @Index @Code "@CenteredDisplay"
-centre the display just like {@Code "@Display"} does.
+centre the display just like {@Code "@Display"} does, and
+rightdisplay. @Index @Code "@RightDisplay"
+@Code "@RightDisplay" which right-justifies the display.
 @PP
 If you use displays frequently you might prefer abbreviated forms of
 their names.  These are made from @Code "@" and the capital letters of
@@ -33,7 +35,8 @@ id. @Index @Code "@ID"
 qd. @Index @Code "@QD"
 cd. @Index @Code "@CD"
 the full name:  {@Code "@D"}, {@Code "@LD"}, {@Code "@ID"}, {@Code "@QD"},
-and {@Code "@CD"}.
+and {@Code "@CD"}.  Owing to an unfortunate clash with the name of
+another symbol, there is no abbreviation for {@Code "@RightDisplay"}.
 @PP
 Displays often need to be set using a different font, paragraph
 breaking style, and so on to the surrounding text.  It's best to set

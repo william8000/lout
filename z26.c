@@ -1,9 +1,9 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -48,8 +48,7 @@ static	BOOLEAN	instring = FALSE;	/* TRUE while making a string        */
 /*****************************************************************************/
 
 void BeginString(void)
-{ if( instring )
-    Error(26, 1, "BeginString: currently in string", INTERN, no_fpos);
+{ assert(!instring, "BeginString: currently in string");
   instring = TRUE;  curr = (curr + 1) % MULTI;
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
   StringCopy(buff[curr], "");  bp = 0;
@@ -66,8 +65,7 @@ void BeginString(void)
 
 void AppendString(FULL_CHAR *str)
 { int len;
-  if( !instring )
-    Error(26, 2, "AppendString: no current string", INTERN, no_fpos);
+  assert(instring, "AppendString: no current string");
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
   if( bp == MAX_BUFF ) return;		/* no space, do nothing */
 
@@ -79,7 +77,7 @@ void AppendString(FULL_CHAR *str)
   else
   { StringCopy(&buff[curr][bp], str);
     while( buff[curr][bp] != '\0' )  bp++;
-    if( bp >= MAX_BUFF )  Error(26, 3, "AppendString abort", INTERN, no_fpos);
+    if( bp >= MAX_BUFF )  Error(26, 1, "AppendString abort", INTERN, no_fpos);
   }
 } /* end AppendString */
 
@@ -93,7 +91,7 @@ void AppendString(FULL_CHAR *str)
 /*****************************************************************************/
 
 FULL_CHAR *EndString(void)
-{ if( !instring )  Error(26, 4, "EndString: no string", INTERN, no_fpos);
+{ assert(instring, "EndString: no string");
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
   instring = FALSE;
   return buff[curr];
@@ -143,127 +141,135 @@ FULL_CHAR *Image(unsigned int c)
   switch(c)
   {
 
-    case LINK:		return  AsciiToFull("link");
+    case LINK:			return  AsciiToFull("link");
 
-    case SPLIT:		return  AsciiToFull("split");
-    case HEAD:		return  AsciiToFull("head");
-    case PAR:		return  AsciiToFull("par");
-    case WORD:		return  AsciiToFull("word");
-    case QWORD:		return  AsciiToFull("qword");
-    case GAP_OBJ:	return  AsciiToFull("gap_obj");
-    case ROW_THR:	return  AsciiToFull("row_thr");
-    case COL_THR:	return  AsciiToFull("col_thr");
-    case CLOSURE:	return  AsciiToFull("closure");
-    case NULL_CLOS:	return  KW_NULL;
-    case PAGE_LABEL:	return  KW_PAGE_LABEL;
-    case CROSS:		return  KW_CROSS;
-    case ONE_COL:	return  KW_ONE_COL;
-    case ONE_ROW:	return  KW_ONE_ROW;
-    case WIDE:		return  KW_WIDE;
-    case HIGH:		return  KW_HIGH;
-    case HSHIFT:	return  KW_HSHIFT;
-    case VSHIFT:	return  KW_VSHIFT;
-    case HSCALE:	return  KW_HSCALE;
-    case VSCALE:	return  KW_VSCALE;
-    case HCONTRACT:	return  KW_HCONTRACT;
-    case VCONTRACT:	return  KW_VCONTRACT;
-    case HEXPAND:	return  KW_HEXPAND;
-    case VEXPAND:	return  KW_VEXPAND;
-    case PADJUST:	return  KW_PADJUST;
-    case HADJUST:	return  KW_HADJUST;
-    case VADJUST:	return  KW_VADJUST;
-    case ROTATE:	return  KW_ROTATE;
-    case SCALE:		return  KW_SCALE;
-    case CASE:		return  KW_CASE;
-    case YIELD:		return  KW_YIELD;
-    case BACKEND:	return  KW_BACKEND;
-    case FILTERED:	return  AsciiToFull("filtered");
-    case XCHAR:		return  KW_XCHAR;
-    case FONT:		return  KW_FONT;
-    case SPACE:		return  KW_SPACE;
-    case BREAK:		return  KW_BREAK;
-    case UNDERLINE:	return  KW_UNDERLINE;
-    case COLOUR:	return  KW_COLOUR;
-    case LANGUAGE:	return  KW_LANGUAGE;
-    case CURR_LANG:	return  KW_CURR_LANG;
-    case COMMON:	return  KW_COMMON;
-    case RUMP:		return  KW_RUMP;
-    case NEXT:		return  KW_NEXT;
-    case ENV_OBJ:	return  AsciiToFull("env_obj");
-    case ENV:		return  KW_ENV;
-    case CLOS:		return  KW_CLOS;
-    case LVIS:		return  KW_LVIS;
-    case LUSE:		return  KW_LUSE;
-    case OPEN:		return  KW_OPEN;
-    case TAGGED:	return  KW_TAGGED;
-    case INCGRAPHIC:	return  KW_INCGRAPHIC;
-    case SINCGRAPHIC:	return  KW_SINCGRAPHIC;
-    case GRAPHIC:	return  KW_GRAPHIC;
-    case ACAT:		return  AsciiToFull("acat");
-    case HCAT:		return  AsciiToFull("hcat");
-    case VCAT:		return  AsciiToFull("vcat");
+    case SPLIT:			return  AsciiToFull("split");
+    case HEAD:			return  AsciiToFull("head");
+    case PAR:			return  AsciiToFull("par");
+    case WORD:			return  AsciiToFull("word");
+    case QWORD:			return  AsciiToFull("qword");
+    case GAP_OBJ:		return  AsciiToFull("gap_obj");
+    case ROW_THR:		return  AsciiToFull("row_thr");
+    case COL_THR:		return  AsciiToFull("col_thr");
+    case CLOSURE:		return  AsciiToFull("closure");
+    case NULL_CLOS:		return  KW_NULL;
+    case PAGE_LABEL:		return  KW_PAGE_LABEL;
+    case CROSS:			return  KW_CROSS;
+    case ONE_COL:		return  KW_ONE_COL;
+    case ONE_ROW:		return  KW_ONE_ROW;
+    case WIDE:			return  KW_WIDE;
+    case HIGH:			return  KW_HIGH;
+    case HSHIFT:		return  KW_HSHIFT;
+    case VSHIFT:		return  KW_VSHIFT;
+    case HSCALE:		return  KW_HSCALE;
+    case VSCALE:		return  KW_VSCALE;
+    case HCOVER:		return  KW_HCOVER;
+    case VCOVER:		return  KW_VCOVER;
+    case HCONTRACT:		return  KW_HCONTRACT;
+    case VCONTRACT:		return  KW_VCONTRACT;
+    case HEXPAND:		return  KW_HEXPAND;
+    case VEXPAND:		return  KW_VEXPAND;
+    case PADJUST:		return  KW_PADJUST;
+    case HADJUST:		return  KW_HADJUST;
+    case VADJUST:		return  KW_VADJUST;
+    case ROTATE:		return  KW_ROTATE;
+    case SCALE:			return  KW_SCALE;
+    case CASE:			return  KW_CASE;
+    case YIELD:			return  KW_YIELD;
+    case BACKEND:		return  KW_BACKEND;
+    case FILTERED:		return  AsciiToFull("filtered");
+    case XCHAR:			return  KW_XCHAR;
+    case FONT:			return  KW_FONT;
+    case SPACE:			return  KW_SPACE;
+    case YUNIT:			return  KW_YUNIT;
+    case ZUNIT:			return  KW_ZUNIT;
+    case BREAK:			return  KW_BREAK;
+    case UNDERLINE:		return  KW_UNDERLINE;
+    case COLOUR:		return  KW_COLOUR;
+    case LANGUAGE:		return  KW_LANGUAGE;
+    case CURR_LANG:		return  KW_CURR_LANG;
+    case COMMON:		return  KW_COMMON;
+    case RUMP:			return  KW_RUMP;
+    case INSERT:		return  KW_INSERT;
+    case NEXT:			return  KW_NEXT;
+    case ENV_OBJ:		return  AsciiToFull("env_obj");
+    case ENV:			return  KW_ENV;
+    case CLOS:			return  KW_CLOS;
+    case LVIS:			return  KW_LVIS;
+    case LUSE:			return  KW_LUSE;
+    case OPEN:			return  KW_OPEN;
+    case TAGGED:		return  KW_TAGGED;
+    case INCGRAPHIC:		return  KW_INCGRAPHIC;
+    case SINCGRAPHIC:		return  KW_SINCGRAPHIC;
+    case GRAPHIC:		return  KW_GRAPHIC;
+    case ACAT:			return  AsciiToFull("acat");
+    case HCAT:			return  AsciiToFull("hcat");
+    case VCAT:			return  AsciiToFull("vcat");
 
-    case TSPACE:	return  AsciiToFull("tspace");
-    case TJUXTA:	return  AsciiToFull("tjuxta");
-    case LBR:		return  AsciiToFull("lbr");
-    case RBR:		return  AsciiToFull("rbr");
-    case UNEXPECTED_EOF:return  AsciiToFull("unexpected_eof");
-    case BEGIN:		return  KW_BEGIN;
-    case END:		return  KW_END;
-    case USE:		return  KW_USE;
-    case GSTUB_NONE:	return  AsciiToFull("gstub_none");
-    case GSTUB_INT:	return  AsciiToFull("gstub_int");
-    case GSTUB_EXT:	return  AsciiToFull("gstub_ext");
-    case INCLUDE:	return  KW_INCLUDE;
-    case SYS_INCLUDE:	return  KW_SYSINCLUDE;
-    case PREPEND:	return  KW_PREPEND;
-    case SYS_PREPEND:	return  KW_SYSPREPEND;
-    case DATABASE:	return  KW_DATABASE;
-    case SYS_DATABASE:	return  KW_SYSDATABASE;
-    case START:	 	return  AsciiToFull("start");
+    case TSPACE:		return  AsciiToFull("tspace");
+    case TJUXTA:		return  AsciiToFull("tjuxta");
+    case LBR:			return  AsciiToFull("lbr");
+    case RBR:			return  AsciiToFull("rbr");
+    case UNEXPECTED_EOF:	return  AsciiToFull("unexpected_eof");
+    case BEGIN:			return  KW_BEGIN;
+    case END:			return  KW_END;
+    case USE:			return  KW_USE;
+    case NOT_REVEALED:		return  KW_NOT_REVEALED;
+    case GSTUB_NONE:		return  AsciiToFull("gstub_none");
+    case GSTUB_INT:		return  AsciiToFull("gstub_int");
+    case GSTUB_EXT:		return  AsciiToFull("gstub_ext");
+    case INCLUDE:		return  KW_INCLUDE;
+    case SYS_INCLUDE:		return  KW_SYSINCLUDE;
+    case PREPEND:		return  KW_PREPEND;
+    case SYS_PREPEND:		return  KW_SYSPREPEND;
+    case DATABASE:		return  KW_DATABASE;
+    case SYS_DATABASE:		return  KW_SYSDATABASE;
+    case START:	 		return  AsciiToFull("start");
 
-    case DEAD:		return  AsciiToFull("dead");
-    case UNATTACHED:	return  AsciiToFull("unattached");
-    case RECEPTIVE:	return  AsciiToFull("receptive");
-    case RECEIVING:	return  AsciiToFull("receiving");
-    case RECURSIVE:	return  AsciiToFull("recursive");
-    case PRECEDES:	return  AsciiToFull("precedes");
-    case FOLLOWS:	return  AsciiToFull("follows");
-    case CROSS_FOLL:	return  AsciiToFull("cross_foll");
-    case GALL_FOLL:	return  AsciiToFull("gall_foll");
-    case CROSS_TARG:	return  AsciiToFull("cross_targ");
-    case GALL_TARG:	return  AsciiToFull("gall_targ");
-    case GALL_PREC:	return  AsciiToFull("gall_prec");
-    case CROSS_PREC:	return  AsciiToFull("cross_prec");
-    case PAGE_LABEL_IND:return  AsciiToFull("page_label_ind");
-    case SCALE_IND:	return  AsciiToFull("scale_ind");
-    case EXPAND_IND:	return  AsciiToFull("expand_ind");
-    case THREAD:	return  AsciiToFull("thread");
-    case CROSS_SYM:	return  AsciiToFull("cross_sym");
-    case CR_ROOT:	return  AsciiToFull("cr_root");
-    case MACRO:		return  KW_MACRO;
-    case LOCAL:		return  AsciiToFull("local");
-    case LPAR:		return  AsciiToFull("lpar");
-    case NPAR:		return  AsciiToFull("npar");
-    case RPAR:		return  AsciiToFull("rpar");
-    case CR_LIST:	return  AsciiToFull("cr_list");
-    case EXT_GALL:	return  AsciiToFull("ext_gall");
-    case DISPOSED:	return  AsciiToFull("disposed");
+    case DEAD:			return  AsciiToFull("dead");
+    case UNATTACHED:		return  AsciiToFull("unattached");
+    case RECEPTIVE:		return  AsciiToFull("receptive");
+    case RECEIVING:		return  AsciiToFull("receiving");
+    case RECURSIVE:		return  AsciiToFull("recursive");
+    case PRECEDES:		return  AsciiToFull("precedes");
+    case FOLLOWS:		return  AsciiToFull("follows");
+    case CROSS_FOLL:		return  AsciiToFull("cross_foll");
+    case GALL_FOLL:		return  AsciiToFull("gall_foll");
+    case GALL_FOLL_OR_PREC:	return  AsciiToFull("gall_foll_or_prec");
+    case CROSS_TARG:		return  AsciiToFull("cross_targ");
+    case GALL_TARG:		return  AsciiToFull("gall_targ");
+    case GALL_PREC:		return  AsciiToFull("gall_prec");
+    case CROSS_PREC:		return  AsciiToFull("cross_prec");
+    case PAGE_LABEL_IND:	return  AsciiToFull("page_label_ind");
+    case SCALE_IND:		return  AsciiToFull("scale_ind");
+    case COVER_IND:		return  AsciiToFull("cover_ind");
+    case EXPAND_IND:		return  AsciiToFull("expand_ind");
+    case THREAD:		return  AsciiToFull("thread");
+    case CROSS_SYM:		return  AsciiToFull("cross_sym");
+    case CR_ROOT:		return  AsciiToFull("cr_root");
+    case MACRO:			return  KW_MACRO;
+    case LOCAL:			return  AsciiToFull("local");
+    case LPAR:			return  AsciiToFull("lpar");
+    case NPAR:			return  AsciiToFull("npar");
+    case RPAR:			return  AsciiToFull("rpar");
+    case CR_LIST:		return  AsciiToFull("cr_list");
+    case EXT_GALL:		return  AsciiToFull("ext_gall");
+    case DISPOSED:		return  AsciiToFull("disposed");
 
-    case BACK:		return  AsciiToFull("back");
-    case ON:		return  AsciiToFull("on");
-    case FWD:		return  AsciiToFull("fwd");
+    case BACK:			return  AsciiToFull("back");
+    case ON:			return  AsciiToFull("on");
+    case FWD:			return  AsciiToFull("fwd");
 
-    case PROMOTE:	return  AsciiToFull("promote");
-    case CLOSE:		return  AsciiToFull("close");
-    case BLOCK:		return  AsciiToFull("block");
-    case CLEAR:		return  AsciiToFull("clear");
+    case PROMOTE:		return  AsciiToFull("promote");
+    case CLOSE:			return  AsciiToFull("close");
+    case BLOCK:			return  AsciiToFull("block");
+    case CLEAR:			return  AsciiToFull("clear");
 
-    case GAP_ABS:	return  AsciiToFull("abs");
-    case GAP_INC:	return  AsciiToFull("inc");
-    case GAP_DEC:	return  AsciiToFull("dec");
+    case GAP_ABS:		return  AsciiToFull("abs");
+    case GAP_INC:		return  AsciiToFull("inc");
+    case GAP_DEC:		return  AsciiToFull("dec");
 
-    default:		sprintf( (char *) b, "?? (%d)", c);
-			return b;
+    default:			sprintf( (char *) b, "?? (%d)", c);
+				return b;
   } /* end switch */
 } /* end Image */

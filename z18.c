@@ -1,9 +1,9 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
-/*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.08)                       */
+/*  COPYRIGHT (C) 1991, 1996 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
+/*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
@@ -33,9 +33,9 @@
 #define	MAX_DEPTH  	30			/* max depth of galleys      */
 static OBJECT		root_galley = nilobj;	/* the root galley           */
 static OBJECT		targets[MAX_DEPTH];	/* currently open \Inputs    */
-static CONSTRAINT	constraints[MAX_DEPTH];	/* their COL constraints     */
+static CONSTRAINT	constraints[MAX_DEPTH];	/* their COLM constraints    */
 static int		itop;			/* stack top	             */
-static CONSTRAINT	initial_constraint;	/* initial COL constraint    */
+static CONSTRAINT	initial_constraint;	/* initial COLM constraint   */
 static STYLE		InitialStyle;		/* initial style             */
 
 #if DEBUG_ON
@@ -60,38 +60,51 @@ static void debug_targets(void)
 /*****************************************************************************/
 
 void TransferInit(OBJECT InitEnv)
-{ OBJECT dest, x, y, recs, inners, nothing, dest_index, up_hd;
+{ OBJECT dest, x, y, recs, inners, nothing, dest_index, up_hd, why;
   debug1(DGT, D, "TransferInit( %s )", EchoObject(InitEnv));
   SetConstraint(initial_constraint, MAX_LEN-1, MAX_LEN-1, MAX_LEN-1);
 
-  /* set initial environment and style */
+  /* set initial style */
   SetGap(line_gap(InitialStyle),  FALSE, FALSE, FIXED_UNIT, MARK_MODE, 18*PT);
+  vadjust(InitialStyle)         = FALSE;
+  hadjust(InitialStyle)         = FALSE;
+  padjust(InitialStyle)         = FALSE;
+  space_style(InitialStyle)     = SPACE_LOUT;
   SetGap(space_gap(InitialStyle), FALSE, TRUE,  FIXED_UNIT, EDGE_MODE,  1*EM);
-  font(InitialStyle)            = 0;			/* i.e. undefined    */
-  colour(InitialStyle)          = 0;			/* i.e. undefined    */
-  language(InitialStyle)        = 0;			/* i.e. undefined    */
   hyph_style(InitialStyle)      = HYPH_UNDEF;
   fill_style(InitialStyle)      = FILL_UNDEF;
   display_style(InitialStyle)   = DISPLAY_UNDEF;
-  display_style(InitialStyle)   = SMALL_CAPS_OFF;
+  small_caps(InitialStyle)      = SMALL_CAPS_OFF;
+  font(InitialStyle)            = 0;			/* i.e. undefined    */
+  colour(InitialStyle)          = 0;			/* i.e. undefined    */
+  language(InitialStyle)        = 0;			/* i.e. undefined    */
+  yunit(InitialStyle)           = 0;			/* i.e. zero         */
+  zunit(InitialStyle)           = 0;			/* i.e. zero         */
 
   /* construct destination for root galley */
-  up_hd = New(HEAD);
-  dest_index = New(RECEIVING);
-  dest = New(CLOSURE);  actual(dest) = PrintSym;
+  New(up_hd, HEAD);
+  limiter(up_hd) = opt_components(up_hd) = opt_constraints(up_hd) = nilobj;
+  gall_dir(up_hd) = ROWM;
+  New(dest_index, RECEIVING);
+  New(dest, CLOSURE);  actual(dest) = PrintSym;
   actual(dest_index) = dest;
-  external(dest) = TRUE;
+  external_ver(dest) = TRUE;
+  external_hor(dest) = FALSE;
   threaded(dest) = FALSE;
   blocked(dest_index) = FALSE;
   Link(up_hd, dest_index);
 
   /* construct root galley */
-  root_galley = New(HEAD);
+  New(root_galley, HEAD);
+  limiter(root_galley) = nilobj;
+  opt_components(root_galley) = opt_constraints(root_galley) = nilobj;
+  gall_dir(root_galley) = ROWM;
   FposCopy(fpos(root_galley), *no_fpos);
   actual(root_galley) = whereto(root_galley) = nilobj;
   ready_galls(root_galley) = nilobj;
-  backward(root_galley) = must_expand(root_galley) = sized(root_galley) =FALSE;
-  x = New(CLOSURE);  actual(x) = InputSym;
+  must_expand(root_galley) = sized(root_galley) =FALSE;
+  foll_or_prec(root_galley) = GALL_FOLL;
+  New(x, CLOSURE);  actual(x) = InputSym;
   Link(root_galley, x);
   SizeGalley(root_galley, InitEnv, TRUE, FALSE, FALSE, FALSE, &InitialStyle,
     &initial_constraint, nilobj, &nothing, &recs, &inners);
@@ -103,12 +116,13 @@ void TransferInit(OBJECT InitEnv)
   Child(y, Down(root_galley));
   assert( type(y) == RECEPTIVE && type(actual(y)) == CLOSURE &&
 	actual(actual(y)) == InputSym, "TransferInit: initial galley!" );
-  assert( external(actual(y)), "TransferInit: input sym not external!" );
+  assert( external_ver(actual(y)), "TransferInit: input sym not external!" );
   blocked(y) = TRUE;
-  targets[itop = 0] = New(ACAT);
+  itop = 0;
+  New(targets[itop], ACAT);
   Link(targets[itop], y);
-  Constrained(actual(y), &constraints[itop], COL);
-  debug2(DSC, DD, "Constrained( %s, COL ) = %s",
+  Constrained(actual(y), &constraints[itop], COLM, &why);
+  debug2(DSC, DD, "Constrained( %s, COLM ) = %s",
 	EchoObject(y), EchoConstraint(&constraints[itop]));
 
   debug0(DGT, D, "TransferInit returning.");
@@ -125,7 +139,7 @@ void TransferInit(OBJECT InitEnv)
 /*****************************************************************************/
 
 OBJECT TransferBegin(OBJECT x)
-{ OBJECT xsym, index, y, link, env, new_env, hold_env, res, hd, target;
+{ OBJECT xsym, index, y, link, env, new_env, hold_env, res, hd, target, why;
   CONSTRAINT c;
   debug1(DGT, D, "TransferBegin( %s )", EchoObject(x));
   ifdebug(DGT, DD, debug_targets());
@@ -154,16 +168,18 @@ OBJECT TransferBegin(OBJECT x)
     new_env = SetEnv(y, nilobj);
   }
   else new_env = env;
-  hold_env = New(ACAT);  Link(hold_env, new_env);
+  New(hold_env, ACAT);  Link(hold_env, new_env);
   debug1(DGT, DD, "  new env chain: %s", EchoObject(new_env));
 
   /* convert x into an unsized galley called hd */
-  index = New(UNATTACHED);
+  New(index, UNATTACHED);
   pinpoint(index) = nilobj;
-  hd = New(HEAD);
+  New(hd, HEAD);
+  limiter(hd) = opt_components(hd) = opt_constraints(hd) = nilobj;
+  gall_dir(hd) = ROWM;
   FposCopy(fpos(hd), fpos(x));
   actual(hd) = xsym;
-  backward(hd) = TargetSymbol(x, &whereto(hd));
+  foll_or_prec(hd) = TargetSymbol(x, &whereto(hd));
   ready_galls(hd) = nilobj;
   must_expand(hd) = TRUE;
   sized(hd) = FALSE;
@@ -199,15 +215,15 @@ OBJECT TransferBegin(OBJECT x)
     if( ++itop >= MAX_DEPTH )
       Error(18, 2, "galley nested too deeply (max is %d)",
 	FATAL, &fpos(x), MAX_DEPTH);
-    targets[itop] = New(ACAT);  target = nilobj;
+    New(targets[itop], ACAT);  target = nilobj;
     for( link = Down(hd);  link != hd;  link = NextDown(link) )
     { Child(y, link);
       if( type(y) == RECEPTIVE && actual(actual(y)) == InputSym )
       {
-	Constrained(actual(y), &constraints[itop], COL);
+	Constrained(actual(y), &constraints[itop], COLM, &why);
 	if( FitsConstraint(0, 0, constraints[itop]) )
 	{ Link(targets[itop], y);  target = y;
-	  debug2(DSC, DD, "Constrained( %s, COL ) = %s",
+	  debug2(DSC, DD, "Constrained( %s, COLM ) = %s",
 	    EchoObject(y), EchoConstraint(&constraints[itop]));
 	  env = DetachEnv(actual(y));
 	  AttachEnv(new_env, actual(y));
@@ -221,10 +237,10 @@ OBJECT TransferBegin(OBJECT x)
     }
 
     /* return a token appropriate to the new target */
-    if( target == nilobj || external(actual(target)) )
+    if( target == nilobj || external_ver(actual(target)) )
       res = NewToken(GSTUB_EXT, no_fpos, 0, 0, precedence(xsym), nilobj);
     else
-    { Constrained(actual(target), &c, ROW);
+    { Constrained(actual(target), &c, ROWM, &why);
       if( constrained(c) )
 	Error(18, 4, "right parameter of %s is vertically constrained",
 	  FATAL, &fpos(target), SymName(xsym));
@@ -263,13 +279,16 @@ void TransferComponent(OBJECT x)
     return;
   }
   Child(dest_index, Down(targets[itop]));
-  assert( external(actual(dest_index)), "TransferComponent: internal!" );
+  assert( external_ver(actual(dest_index)), "TransferComponent: internal!" );
 
   /* make the component into a galley */
-  hd = New(HEAD);
+  New(hd, HEAD);
+  limiter(hd) = opt_components(hd) = opt_constraints(hd) = nilobj;
+  gall_dir(hd) = ROWM;
   FposCopy(fpos(hd), fpos(x));
   actual(hd) = whereto(hd) = ready_galls(hd) = nilobj;
-  backward(hd) = must_expand(hd) = sized(hd) = FALSE;
+  foll_or_prec(hd) = GALL_FOLL;
+  must_expand(hd) = sized(hd) = FALSE;
   Link(hd, x);
   dest = actual(dest_index);
   env = GetEnv(dest);
@@ -281,17 +300,23 @@ void TransferComponent(OBJECT x)
   /* promote the components, remembering where old spot was */
   start_search = PrevDown(Up(dest_index));
   debug0(DSA, D, "  calling AdjustSize from TransferComponent");
-  AdjustSize(dest, back(hd, COL), fwd(hd, COL), COL);
+  AdjustSize(dest, back(hd, COLM), fwd(hd, COLM), COLM);
   Promote(hd, hd, dest_index);
   DeleteNode(hd);
 
   /* flush any widowed galleys attached to \Input */
   if( Down(dest_index) != dest_index )
   { OBJECT tinners, index;
-    tinners = New(ACAT);
+    New(tinners, ACAT);
     while( Down(dest_index) != dest_index )
     { Child(y, Down(dest_index));
       assert( type(y) == HEAD, "TransferComponent: input child!" );
+      if( opt_components(y) != nilobj )
+      { DisposeObject(opt_components(y));
+	opt_components(y) = nilobj;
+	debug1(DOG, D, "TransferComponent de-optimizing %s (@Input case)",
+	  SymName(actual(y)));
+      }
       DetachGalley(y);
       Parent(index, Up(y));
       MoveLink(Up(index), NextDown(start_search), PARENT);
@@ -338,23 +363,26 @@ void TransferEnd(OBJECT x)
   Child(dest_index, Down(targets[itop]));
 
   /* make the component into a galley */
-  hd = New(HEAD);  FposCopy(fpos(hd), fpos(x));
+  New(hd, HEAD);  FposCopy(fpos(hd), fpos(x));
+  limiter(hd) = opt_components(hd) = opt_constraints(hd) = nilobj;
+  gall_dir(hd) = ROWM;
   actual(hd) = whereto(hd) = ready_galls(hd) = nilobj;
-  backward(hd) = must_expand(hd) = sized(hd) = FALSE;
+  foll_or_prec(hd) = GALL_FOLL;
+  must_expand(hd) = sized(hd) = FALSE;
   Link(hd, x);  dest = actual(dest_index);  env = GetEnv(dest);
   debug1(DGT, DD, "  current env chain: %s", EchoObject(env));
-  SizeGalley(hd, env, external(dest), threaded(dest), FALSE, TRUE,
-	&save_style(dest), &constraints[itop], nilobj, &nothing, &recs, &inners);
+  SizeGalley(hd, env, external_ver(dest), threaded(dest), FALSE, TRUE,
+    &save_style(dest), &constraints[itop], nilobj, &nothing, &recs, &inners);
   if( recs != nilobj )  ExpandRecursives(recs);
 
   /* promote the components, remembering where old spot was */
   start_search = PrevDown(Up(dest_index));
   debug0(DSA, D, "calling AdjustSize from TransferEnd (a)");
-  AdjustSize(dest, back(hd, COL), fwd(hd, COL), COL);
-  if( !external(dest) )
+  AdjustSize(dest, back(hd, COLM), fwd(hd, COLM), COLM);
+  if( !external_ver(dest) )
   { Child(z, LastDown(hd));
     debug0(DSA, D, "calling AdjustSize from TransferEnd (b)");
-    AdjustSize(dest, back(z, ROW), fwd(z, ROW), ROW);
+    AdjustSize(dest, back(z, ROWM), fwd(z, ROWM), ROWM);
     Interpose(dest, VCAT, hd, z);
   }
   Promote(hd, hd, dest_index);  DeleteNode(hd);
@@ -362,10 +390,16 @@ void TransferEnd(OBJECT x)
   /* flush any widowed galleys attached to \Input */
   if( Down(dest_index) != dest_index )
   { OBJECT tinners, index;
-    tinners = New(ACAT);
+    New(tinners, ACAT);
     while( Down(dest_index) != dest_index )
     { Child(y, Down(dest_index));
       assert( type(y) == HEAD, "TransferComponent: input child!" );
+      if( opt_components(y) != nilobj )
+      { DisposeObject(opt_components(y));
+	opt_components(y) = nilobj;
+	debug1(DOG, D, "TransferComponent de-optimizing %s (@Input case)",
+	  SymName(actual(y)));
+      }
       DetachGalley(y);
       Parent(index, Up(y));
       MoveLink(Up(index), NextDown(start_search), PARENT);

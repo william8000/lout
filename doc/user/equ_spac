@@ -14,15 +14,9 @@ space (zero, thin, medium, and thick), and different rules for spacing
 within superscripts and subscripts to those applying outside, according
 to a leading authority @Cite { $knuth1984tex }.  {@Code "@Eq"} therefore
 takes the spacing decisions upon itself, and consequently chooses to
-ignore all white space in its input, even between two objects.
-@FootNote {
-This effect is produced by enclosing the entire equation in
-space. @Index @Code "@Space"
-{@Code "0c @Space"}.  The simplest way to restore the effect of white
-space to part of an equation is to enclose that part in a @Code "@Font"
-symbol.  {@Code "@Eq"} also changes the value of the @Code v unit, so if
-a paragraph of filled text is desired within an equation, it may be
-necessary to enclose it in a @Code "@Break" symbol. }
+ignore all white space in its input, even between two objects.  (The
+simplest way to restore the effect of white space to part of an equation
+is to enclose that part in a @Code "@Font" symbol.)
 @PP
 Every symbol provided by {@Code "@Eq"} has a {@I {full name}}, which
 full.name @Index { full name of equation symbol }
