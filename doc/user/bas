@@ -21,8 +21,8 @@ simple to use.
 @Include { bas_line }
 @Include { bas_hyph }
 @Include { bas_unde }
-@Include { bas_date }
 @Include { bas_lang }
+@Include { bas_date }
 @Include { bas_supe }
 @Include { bas_verb }
 @Include { bas_drop }

@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -1289,7 +1289,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	{
 	  if( type(y) == UNDER_REC )   /* generate an underline now */
 	  { BackEnd->PrintUnderline(word_font(y),word_colour(y),
-              word_colour(y), back(y, COLM), fwd(y, COLM), pg - xmk);
+              word_texture(y), back(y, COLM), fwd(y, COLM), pg - xmk);
 	    link = PrevDown(link);     /* remove all trace of underlining */
 	    DisposeChild(Up(y));       /* in case we print this object again */
 	  }

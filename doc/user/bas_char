@@ -303,6 +303,284 @@ like the other fonts.  Typing @Code "@B @Sym alpha" is therefore useless,
 and anyway there is no bold @Sym alpha character in any font distributed
 with Lout (except see Section {@NumberOf teq}).
 @PP
+Next there are the dingbats.  Here they are with their
+dingbats. @Index { dingbats characters }
+(regrettably meaningless) names:
+@FootNote {
+If you see only conventional characters in this table, the problem
+is that your viewer does not have access to the Dingbats font.  The
+author's viewer has this problem, for example, but his printer doesn't.
+}
+@CD @Tbl
+    indent { ctr }
+    iv { ctr }
+    rule { yes }
+    font { -1p }
+    width { 1.0c }
+    margin { 0.2f }
+    aiv { top }
+    afont { Helvetica Base -2p }
+    aformat { 
+	@Cell paint { @Xrgb grey95 } -90d @Rotate B |
+	@Cell ruleright { double } -90d @Rotate C |
+	@Cell paint { @Xrgb grey95 } -90d @Rotate D |
+	@Cell ruleright { double } -90d @Rotate E |
+	@Cell paint { @Xrgb grey95 } -90d @Rotate F |
+	@Cell ruleright { double } -90d @Rotate G |
+	@Cell paint { @Xrgb grey95 } -90d @Rotate H |
+	@Cell ruleright { double } -90d @Rotate I |
+	@Cell paint { @Xrgb grey95 } -90d @Rotate J |
+	@Cell ruleright { double } -90d @Rotate K |
+	@Cell paint { @Xrgb grey95 } -90d @Rotate L |
+	@Cell -90d @Rotate M | }
+    bformat { 
+	@Cell paint { @Xrgb grey95 } indent { right } B |
+	@Cell ruleright { double } font { Dingbats Base -1p } @Char C |
+	@Cell paint { @Xrgb grey95 } indent { right } D |
+	@Cell ruleright { double } font { Dingbats Base -1p } @Char E |
+	@Cell paint { @Xrgb grey95 } indent { right } F |
+	@Cell ruleright { double } font { Dingbats Base -1p } @Char G |
+	@Cell paint { @Xrgb grey95 } indent { right } H |
+	@Cell ruleright { double } font { Dingbats Base -1p } @Char I |
+	@Cell paint { @Xrgb grey95 } indent { right } J |
+	@Cell ruleright { double } font { Dingbats Base -1p } @Char K |
+	@Cell paint { @Xrgb grey95 } indent { right } L |
+	@Cell font { Dingbats Base -1p } @Char M | }
+{
+    @Rowa 
+	B { "@"Ding } C{ Dingbat } 
+	D { "@"Ding } E{ Dingbat } 
+	F { "@"Ding } G{ Dingbat } 
+	H { "@"Ding } I{ Dingbat } 
+	J { "@"Ding } K{ Dingbat } 
+	L { "@"Ding } M{ Dingbat } 
+    @Rowb
+	B{a1} C{a1}
+	D{a2} E{a2}
+	F{a202} G{a202}
+	H{a3} I{a3}
+	J{a4} K{a4}
+	L{a5} M{a5}
+    @Rowb
+	B{a119} C{a119}
+	D{a118} E{a118}
+	F{a117} G{a117}
+	H{a11} I{a11}
+	J{a12} K{a12}
+	L{a13} M{a13}
+    @Rowb
+	B{a14} C{a14}
+	D{a15} E{a15}
+	F{a16} G{a16}
+	H{a105}I{a105}
+	J{a17} K{a17}
+	L{a18} M{a18}
+    @Rowb
+	B{a19} C{a19}
+	D{a20} E{a20}
+	F{a21} G{a21}
+	H{a22} I{a22}
+	J{a23} K{a23}
+	L{a24} M{a24}
+    @Rowb
+	B{a25} C{a25}
+	D{a26} E{a26}
+	F{a27} G{a27}
+	H{a28}I{a28}
+	J{a6} K{a6}
+	L{a7} M{a7}
+    @Rowb
+	B{a8} C{a8}
+	D{a9} E{a9}
+	F{a10} G{a10}
+	H{a29} I{a29}
+	J{a30} K{a30}
+	L{a31} M{a31}
+    @Rowb
+	B{a32} C{a32}
+	D{a33} E{a33}
+	F{a34} G{a34}
+	H{a35} I{a35}
+	J{a36} K{a36}
+	L{a37} M{a37}
+    @Rowb
+	B{a38} C{a38}
+	D{a39} E{a39}
+	F{a40} G{a40}
+	H{a41} I{a41}
+	J{a42} K{a42}
+	L{a43} M{a43}
+    @Rowb
+	B{a44} C{a44}
+	D{a45} E{a45}
+	F{a46} G{a46}
+	H{a47} I{a47}
+	J{a48} K{a48}
+	L{a49} M{a49}
+    @Rowb
+	B{a50} C{a50}
+	D{a51} E{a51}
+	F{a52} G{a52}
+	H{a54} I{a54}
+	J{a55} K{a55}
+	L{a56} M{a56}
+    @Rowb
+	B{a57} C{a57}
+	D{a58} E{a58}
+	F{a59} G{a59}
+	H{a60} I{a60}
+	J{a61} K{a61}
+	L{a62} M{a62}
+    @Rowb	
+	B{a63} C{a63}
+	D{a64} E{a64}
+	F{a65} G{a65}
+	H{a66} I{a66}
+	J{a67} K{a67}
+	L{a68} M{a68}
+    @Rowb	
+	B{a69} C{a69}
+	D{a70} E{a70}
+	F{a71} G{a71}
+	H{a72} I{a72}
+	J{a73} K{a73}
+	L{a74} M{a74}
+    @Rowb	
+	B{a203} C{a203}
+	D{a75} E{a75}
+	F{a204} G{a204}
+	H{a76} I{a76}
+	J{a77} K{a77}
+	L{a78} M{a78}
+    @Rowb	
+	B{a79} C{a79}
+	D{a81} E{a81}
+	F{a82} G{a82}
+	H{a83} I{a83}
+	J{a84} K{a84}
+	L{a97} M{a97}
+    @Rowb	
+	B{a98} C{a98}
+	D{a99} E{a99}
+	F{a100} G{a100}
+	H{a101} I{a101}
+	J{a102} K{a102}
+	L{a103} M{a103}
+    @Rowb	
+	B{a104} C{a104}
+	D{a106} E{a106}
+	F{a107} G{a107}
+	H{a108} I{a108}
+	J{a112} K{a112}
+	L{a111} M{a111}
+    @Rowb	
+	B{a110} C{a110}
+	D{a109} E{a109}
+	F{a120} G{a120}
+	H{a121} I{a121}
+	J{a122} K{a122}
+	L{a123} M{a123}
+    @Rowb	
+	B{a124} C{a124}
+	D{a125} E{a125}
+	F{a126} G{a126}
+	H{a127} I{a127}
+	J{a128} K{a128}
+	L{a129} M{a129}
+    @Rowb	
+	B{a130} C{a130}
+	D{a131} E{a131}
+	F{a132} G{a132}
+	H{a133} I{a133}
+	J{a134} K{a134}
+	L{a135} M{a135}
+    @Rowb	
+	B{a136} C{a136}
+	D{a137} E{a137}
+	F{a138} G{a138}
+	H{a139} I{a139}
+	J{a140} K{a140}
+	L{a141} M{a141}
+    @Rowb	
+	B{a142} C{a142}
+	D{a143} E{a143}
+	F{a144} G{a144}
+	H{a145} I{a145}
+	J{a146} K{a146}
+	L{a147} M{a147}
+    @Rowb	
+	B{a148} C{a148}
+	D{a149} E{a149}
+	F{a150} G{a150}
+	H{a151} I{a151}
+	J{a152} K{a152}
+	L{a153} M{a153}
+    @Rowb	
+	B{a154} C{a154}
+	D{a155} E{a155}
+	F{a156} G{a156}
+	H{a157} I{a157}
+	J{a158} K{a158}
+	L{a159} M{a159}
+    @Rowb	
+	B{a160} C{a160}
+	D{a161} E{a161}
+	F{a163} G{a163}
+	H{a164} I{a164}
+	J{a196} K{a196}
+	L{a165} M{a165}
+    @Rowb	
+	B{a192} C{a192}
+	D{a166} E{a166}
+	F{a167} G{a167}
+	H{a168} I{a168}
+	J{a169} K{a169}
+	L{a170} M{a170}
+    @Rowb	
+	B{a171} C{a171}
+	D{a172} E{a172}
+	F{a173} G{a173}
+	H{a162} I{a162}
+	J{a174} K{a174}
+	L{a175} M{a175}
+    @Rowb	
+	B{a176} C{a176}
+	D{a177} E{a177}
+	F{a178} G{a178}
+	H{a179} I{a179}
+	J{a193} K{a193}
+	L{a180} M{a180}
+    @Rowb	
+	B{a199} C{a199}
+	D{a181} E{a181}
+	F{a200} G{a200}
+	H{a182} I{a182}
+	J{a201} K{a201}
+	L{a183} M{a183}
+    @Rowb	
+	B{a184} C{a184}
+	D{a197} E{a197}
+	F{a185} G{a185}
+	H{a194} I{a194}
+	J{a198} K{a198}
+	L{a186} M{a186}
+    @Rowb	
+	B{a195} C{a195}
+	D{a187} E{a187}
+	F{a188} G{a188}
+	H{a189} I{a189}
+	J{a190} K{a190}
+	L{a191} M{a191}
+}
+The easiest way to get a dingbat is to write, for example,
+@ID @Code "@Ding a123"
+which produces the dingbat with the given name from the table
+above.  This is just a shorthand for
+@ID @Code @Verbatim {
+{ Dingbats Base } @Font { @Char a123 }
+}
+In other words, dingbats are just another font.
+@PP
 Finally we have a few more characters that you get with the @Code "@Char"
 symbol, although they aren't ISO-LATIN-1 characters.
 @ID @OneRow -3p @Font @Tab

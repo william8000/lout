@@ -340,4 +340,14 @@ Changes and new features introduced in Version 3.27 [22 November 2002]
     In @Diag, @Box and @ShadowBox now have NNW, NNE, SSW, and SSE tags
     User's Guide has revised and larger (17-page) index
 
+Changes and new features introduced in Version 3.28 [December 2002]
+
+    Bug fixes
+    @Colophon symbol produces colophons in books
+    Nonpareil and Ruby programming languages supported by prg2lout
+    Eight-bit characters considered printable by prg2lout
+    "lout -t" ignores texture changes, for when tools don't support them
+    @Ding symbol (like @Sym) for dingbats
+    Dingbats fully documented in Chapter 1 of the User's Guide
+
 Jeff Kingston

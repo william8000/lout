@@ -11,7 +11,7 @@
 ###########################################################################
 
 extend @BasicSetup @DocumentSetup
-export @Book @Preface @Abbreviations @Introduction @Chapter @Appendix @Colophon
+export @Book @Preface @Abbreviations @Introduction @Chapter @Appendix
 def @BookSetup
     named @TitlePageFont		{  Helvetica Base		}
     named @SeparateIntroNumbering	{  Yes				}
@@ -588,38 +588,6 @@ def @BookSetup
 		@IndexBSection @RunB
 	}
 
-	def @ColophonPart
-	    named @Tag {}
-	{
-	    def @RunC
-	    {
-		NonStart @Runner
-		    @MajorNum {}
-		    @MajorTitle { index @WordVal @ColophonWord }
-		    @MinorNum {}
-		    @MinorTitle { index @WordVal @ColophonWord }
-		    @Owner { @Tag }
-		    @Prefix { @ColophonPrefix }
-	    }
-
-	    @LargeScaleStructure
-		tag { @Tag }
-		type { Major }
-		initiallanguage { @InitialLanguage }
-		title { colophon @WordVal @ColophonWord }
-		aboveheadinggap { @AboveChapterGap }
-		headingfont { @ChapterHeadingFont }
-		headingbreak { @ChapterHeadingBreak }
-		headingformat { @Num @ChapterHeadingFormat @Body }
-		incontents { @ColophonInContents }
-		pnprefix { @ColophonPrefix }
-		inrunners { Yes }
-		sendheader { @Full @Body }
-		innergap { @SectionGap }
-		wantindefinite { Yes }
-		@ColophonSection @RunC
-	}
-
         def @BookIntro force into { @IntroColPlace&&preceding }
 	    named @Optimize { @OptimizePages }
         {
@@ -679,7 +647,6 @@ def @BookSetup
 		  Bypass  @Yield @BypassBeginIndexPlace
 		  else    @Yield @Null
 		}
-            //  @MakeColophon @Do @ColophonPart
         }
 
 	def @BookCombined force into { @ColPlace&&preceding }
@@ -730,7 +697,6 @@ def @BookSetup
 		  Bypass  @Yield @BypassBeginIndexPlace
 		  else    @Yield @Null
 		}
-            //  @MakeColophon @Do @ColophonPart
 	}
 
         @InitialFont @Font { @InitialBreak setoutdent @InitialOutdent } @Break
@@ -1358,19 +1324,33 @@ def @BookSetup
     }
 
 
-    #######################################################################
-    #                                                                     #
-    #  Colophon.                                                          #
-    #                                                                     #
-    #######################################################################
-
-    def @Colophon into { @ColophonList&&preceding }
+    def @Colophon force into { @ColophonPlace&&preceding }
         named @Tag {}
 	named @InitialLanguage {}
+	named @PartNumber {}
+	named @PartTitle {}
+	named @PartText {}
+        named @BypassNumber { dft }
         body @Body
     {
 
-        @InitialLanguage @Language @Body
+	@LargeScaleStructure
+	    tag { @Tag }
+	    type { Major }
+	    initiallanguage { @InitialLanguage }
+	    aboveheadinggap { @AboveChapterGap }
+	    headingfont { @AppendixHeadingFont }
+	    headingbreak { @AppendixHeadingBreak }
+	    headingformat { @Num @AppendixHeadingFormat @Body }
+	    incontents { @ColophonInContents }
+	    contentsindent { 0f }
+	    word { colophon @WordVal @ColophonWord }
+	    numbers { None }
+	    pnprefix { @ColophonPrefix }
+	    sendheader { @ChapterFull @Body }
+	    innergap { @SubAppendixGap }
+	    inrunners { Yes }
+	    @Body
 
     }
 

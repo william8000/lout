@@ -33,10 +33,12 @@ Setup files (containing mainly lists of options settable by the user)
        eiffel           Eiffel
        java             Java
        modula           Modula-2 (quick hack, does not use prg2lout)
+       np               Nonpareil
        pas              Pascal (quick hack, does not use prg2lout)
        perl             Perl + Pod
        pod              Pod
        python           Python
+       ruby             Ruby
 
 Source files containing Lout and PostScript source code for the packages
 ------------------------------------------------------------------------
@@ -67,10 +69,12 @@ Source files containing Lout and PostScript source code for the packages
        eiffelf          Eiffel
        javaf            Java
        modulaf          Modula-2
+       npf              Nonpareil
        pasf             Pascal
        perlf            Perl
        podf             Pod
        pythonf          Python
+       rubyf            Ruby
 
 Obsolete source files retained for backward compatibility
 ---------------------------------------------------------

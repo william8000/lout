@@ -326,11 +326,6 @@ def @DocumentSetup
     named @IndexBSpacerFont	{  +3p 			} # font of index B spacer
     named @IndexBSpacerFormat
 	right @Body		{  @Body		} # format of index B spacer
-    named @MakeColophon		{  No			} # make colophon? Yes or No
-    named @ColophonFont		{			} # font for colophon
-    named @ColophonBreak	{			} # break style for colophon
-    named @ColophonColumnNumber	{  1			} # colophon columns (1 to 10)
-    named @ColophonColumnGap	{  1.00c @OrIfPlain 6s	} # colophon column gap
     named @TopGap		{  0.75c @OrIfPlain 2f	} # gap between figures
     named @MidGap		{  0.75c @OrIfPlain 2f	} # gap above/below body text
 
@@ -1232,7 +1227,6 @@ def @DocumentSetup
     def @IndexPlace		{ @Galley }
     def @IndexAPlace		{ @Galley }
     def @IndexBPlace		{ @Galley }
-    def @ColophonPlace		{ @Galley }
     def @AfterLinePlace		{ @ForceGalley }
 
     def @TryAfterLinePlace right x
@@ -1440,11 +1434,6 @@ def @DocumentSetup
     {
 	@HExpand num @ColsOf gap { @IndexBColumnGap } @EqualWidth @VExpand @IndexBPlace
     }
-    
-    def @ColophonColList right num
-    {
-	@HExpand num @ColsOf gap { @ColophonColumnGap } @EqualWidth @VExpand @ColophonPlace
-    }
 
 
     ###########################################################################
@@ -1578,7 +1567,6 @@ def @DocumentSetup
 	    @IndexAColList @IndexAColumnNumber
 	    @IndexBColList @IndexBColumnNumber
 	    @IndexColList  @IndexColumnNumber
-	    @ColophonColList @ColophonColumnNumber
 	}
     }
 
@@ -1591,7 +1579,6 @@ def @DocumentSetup
 	    @IndexAColList @IndexAColumnNumber
 	    @IndexBColList @IndexBColumnNumber
 	    @IndexColList  @IndexColumnNumber
-	    @ColophonColList @ColophonColumnNumber
 	}
     }
 
@@ -4716,23 +4703,6 @@ def @DocumentSetup
     }
 
     def @BypassEndIndexB { @Null }
-
-
-    ###########################################################################
-    #                                                                         #
-    #  Colophon.                                                              #
-    #                                                                         #
-    ###########################################################################
-
-    def @ColophonList { @Galley //1vx @ColophonList }
-
-    def @ColophonSection into { @ColophonPlace&&following }
-	right etc
-    {
-	// @ColophonBreak @Break @ColophonFont @Font @ColophonList
-	// etc
-	//1rt
-    }
 
 
     ###########################################################################

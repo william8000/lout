@@ -8,7 +8,7 @@ texture.sym @Index { @Code "@Texture" symbol }
 and @Code "@Colour" do.  It causes the object to its right to be printed
 in a texture specified by the object to its
 left:
-@ID @Code "striped @Texture 50p @Font ABC"
+@ID @Code "striped @Texture 40p @Font ABC"
 produces
 @FootNote {
 If you can't see the result here, or if you can see it but without
@@ -16,9 +16,12 @@ texture, then the fault is probably in your PostScript viewer.
 The PostScript viewer used by the author (a 1997 version of @I { gv })
 shows a blank space here and throughout this section wherever a
 texture is supposed to appear, but when printed on his printer
-the textures appear correctly.
+the textures appear correctly.  Some viewers may fail altogether when
+given a PostScript file with textures.  In that case, run your document
+again using @OneCol @I { lout -t } instead of @I { lout }.  This will
+cause Lout to ignore all textures and print everything in solid colour.
 }
-@CD striped @Texture 50p @Font ABC
+@CD striped @Texture 40p @Font ABC
 The object to the right of @Code "@Texture" may be arbitrary as usual.
 @PP
 # Textures are harder to specify than colours, and only a few
@@ -39,7 +42,7 @@ striped @Texture
     angle { 45d }
     hshift { 1p }
     vshift { 3p }
-50p @Font ABC
+40p @Font ABC
 }
 produces
 @CD striped @Texture
@@ -47,7 +50,7 @@ produces
     angle { 45d }
     hshift { 1p }
     vshift { 3p }
-50p @Font ABC
+40p @Font ABC
 with the texture scaled by a factor of 2, printed at an angle of 45
 degrees, and shifted one point horizontally and three points
 vertically.  The @Code scale option causes equal scaling in the

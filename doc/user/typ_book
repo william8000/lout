@@ -64,7 +64,9 @@ with no page headers or footers, and using the same margins as for even
 pages, after the very last page of the book; even after the index if
 there is one.  It is intended to make it possible to include a back
 cover, so @Code "@PageOf last.page" (Section {@NumberOf cross}) does
-not take account of any @Code "@AtEnd" page.
+not take account of any @Code "@AtEnd" page.  (To make a colophon,
+which occupies any number of numbered pages after the index, consult
+the @Code "@Colophon" symbol below.)
 @PP
 The remaining options are a selection of setup file options (Section
 {@NumberOf setup}) that frequently need to be changed.  If your changes
@@ -265,11 +267,12 @@ beginsubsubappendices.books @SubIndex { in books }
 endsubsubappendices.books @SubIndex { in books }
 sub-sub-subappendices.
 @PP
-The book ends with the last chapter or appendix; any reference list or
-index will be appended automatically.  Although we have described how to
-create books as though everything was in one large file, in practice it
-is much better to divide the book into multiple files, following the
-method given in Section {@NumberOf organizing}.
+Apart from any colophon, described below, the book ends with the last
+chapter or appendix; any reference list or index will be appended
+automatically.  Although we have described how to create books as
+though everything was in one large file, in practice it is much better
+to divide the book into multiple files, following the method given in
+Section {@NumberOf organizing}.
 @PP
 In addition to the {@Code "@Title"} option, each large-scale structure
 symbol (i.e. {@Code "@Preface"}, {@Code "@Introduction"}, {@Code "@Chapter"},
@@ -299,6 +302,37 @@ by two pages containing the part number, title, and text, and there
 will also be an entry made in the table of contents.  Parts are @I not
 numbered automatically:  you have to supply your own numbers or letters
 as shown above.
+@PP
+After the last chapter or appendix, an optional colophon may be given:
+@ID @OneRow @Code @Verbatim {
+@Colophon @Begin
+This document was typeset using the Lout document
+formatting system.  The resulting PostScript file
+was converted to PDF using GNU @I { ps2pdf }.
+@End @Colophon
+}
+For this to work, however, the @Code "@MakeColophon" option of the
+setup file must be changed to @Code Yes (see next paragraph).  A
+colophon appears at the very end of the book, after the index.  It may
+occupy several pages, and these will be numbered as usual.  See also
+the @Code "@AtEnd" option above, which is intended to hold a one-page
+unnumbered back cover.  As the example suggests, colophons these days
+are generally used for notes concerning how a book was produced.  They
+are an old form that has been revived; previously, according to my
+dictionary, they contained information now printed on the title page.
+@PP
+A colophon is like a preface except that it appears at the end, and
+should logically be implemented like the {@Code "@Preface"} symbol.
+Unfortunately, owing to problems behind the scenes it has instead
+been implemented like glossaries and indexes:  you have to set a
+@Code "@MakeColophon" option in the setup file to {@Code Yes}.  There
+are setup file options for setting the font and break style, column
+number and column gap, and heading ({@Code "@ColophonFont"},
+{@Code "@ColophonBreak"}, {@Code "@ColophonColumnNumber"},
+{@Code "@ColophonColumnGap"}, and {@Code "@ColophonWord"}).  There are
+also {@Code "@ColophonInContents"} and {@Code "@ColophonPrefix"}
+options for determining whether the colophon appears in the table
+of contents, and its prefix when structured page numbers are used.
 @PP
 The features described in other chapters are all available within
 books.  A table of contents and index will appear automatically, and
@@ -393,8 +427,7 @@ write, say,
 "@ChapterHeadingFormat { @Box paint { lightgrey } { number @DP title } }"
 to get the title below the number, both enclosed in a box.  The default
 value uses the @Code "@DotSep" symbol from Section {@NumberOf headers}
-to produce the number and title separated by a dot and two spaces, roughly
-the same as
+to show the number and title separated by a dot and two spaces, like
 @ID @Code "@ChapterHeadingFormat { number.  title }"
 except when there is no number.  This option is applied
 to other major headings, in the preface, introduction, table of
@@ -414,16 +447,16 @@ within @Code "@PartHeadingFormat" to change this.
 @PP
 The example of boxed titles for chapters given above suffers from two
 practical deficiencies.  First, the box won't extend right across the
-page, and second, when there is no @Code "number" we don't want the
+page, and second, when there is no @Code "number" we don't want
 @Code "@DP" either.  Here is a value for @Code "@ChapterHeadingFormat"
-that solves both of these problems and looks good in practice:
-@ID @OneCol @Code {
-"@ChapterHeadingFormat {"
-"    number @Case {"
-"        {} @Yield @Box paint { lightgrey } @HExpand { title }"
-"        else @Yield @Box paint { lightgrey } @HExpand { number @DP title }"
-"    }"
-"}"
+that solves both problems:
+@ID @OneCol @Code @Verbatim {
+@ChapterHeadingFormat {
+    number @Case {
+        {} @Yield @Box paint { lightgrey } @HExpand { title }
+        else @Yield @Box paint { lightgrey } @HExpand { number @DP title }
+    }
+}
 }
 The @Code "@Case" symbol (Expert's Guide @Cite { $kingston1995lout.expert })
 distinguishes between the cases where @Code "number" is empty and non-empty;

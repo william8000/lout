@@ -11,9 +11,10 @@
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
 /*                                                                           */
-/*  C and C++, Eiffel, and Blue by Jeff Kingston                             */
+/*  C and C++, Eiffel, Blue, Java, Nonpareil by Jeff Kingston                */
 /*  Perl and Pod by Jeff Kingston and Mark Summerfield                       */
 /*  Python by Mark Summerfield                                               */
+/*  Ruby by Michael Piotrowski                                               */
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
@@ -191,30 +192,46 @@ CHAR_PAIR pairs[] = {
 
 #define AllCharacters	NULL	/* code will recognize NULL and do this */
 
+/* It is not possible to further categorize the characters in the G1
+ * area of ISO 8859 code sets (code points 0xA0 through 0xFF) because
+ * there are no fixed ranges (e.g., 0xA1 is a punctuation mark in
+ * Latin 1, but a letter in Latin 2).  However, this is not really a
+ * problem since all characters in this area can be considered
+ * printable. */
+
+#define G1_Characters	"\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377"
+
+
 unsigned char AllPrintable[] = 
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ;
+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" G1_Characters ;
 
 unsigned char AllPrintablePlusNL[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n" ;
+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n" G1_Characters ;
 
 unsigned char AllPrintablePlusTab[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\t" ;
+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\t" G1_Characters ;
 
 unsigned char AllPrintableTabNL[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t" ;
+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t" G1_Characters ;
 
 unsigned char AllPrintableTabNLFF[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t\f" ;
+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t\f" G1_Characters ;
 
 unsigned char Letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ;
 
 unsigned char Letter_Digit[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789" ;
+
+unsigned char NonpareilOperatorPunct[] = "!@$%^&*=+|;<>/?";
+
+unsigned char Ruby_Methodname[] =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789?!=" ;
+
 
 #define SepLetters 							\
 U "A", U "B", U "C", U "D", U "E", U "F", U "G", U "H", U "I", U "J",	\
@@ -245,6 +262,10 @@ U "",  U "",  U "",  U "",   U "",  U ""
 U "/", U ")", U "]", U "}",  U ">", U "!", U "%", U "#", U "|", U ",",	\
 U ":", U ";", U "$", U "\"", U "^", U "&", U "*", U "-", U "=", U "+",	\
 U "~", U "'", U "@", U "?",  U ".", U "`"
+
+#define SepNonpareilOperatorPunct					\
+U "!", U "@", U "$", U "%",  U "^", U "&", U "*", U "=", U "+",	U "|",	\
+U ";", U "<", U ">",  U "/", U "?"
 
 #define	PercentLetters							\
 U "%A", U "%B", U "%C", U "%D", U "%E", U "%F", U "%G", U "%H", U "%I",	\
@@ -316,7 +337,7 @@ U "%s", U "%t", U "%u", U "%v", U "%w", U "%x", U "%y", U "%z", U "%_"
 /*      will go through the other filter first.  Since the result has to     */
 /*      be verbatim, there is no special treatment of white space characters */
 /*      and no insertion of line numbers.  However, if braces are printed    */
-/*      they really ought to match, so prog2lout checks this and will        */
+/*      they really ought to match, so prg2lout checks this and will         */
 /*      complain and insert braces into the verbatim part if necessary.      */
 /*                                                                           */
 /*****************************************************************************/
@@ -641,12 +662,12 @@ TOKEN PythonSnglStringToken = {
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
   AllPrintable,		/* inside, any printable is OK		            */
-  U "\\",			/* within strings, \\ is the escape character       */
+  U "\\",		/* within strings, \\ is the escape character       */
   AllPrintablePlusNL,	/* after escape char, any printable char or nl OK   */
   U "",			/* strings do not permit "inner escapes"            */
   U "",			/* and so there is no end innner escape either      */
   U "",			/* no bracketing delimiter			    */
-  U "'",			/* strings end with a ' character                   */
+  U "'",		/* strings end with a ' character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -758,6 +779,37 @@ TOKEN NumberToken = {
 
 /*****************************************************************************/
 /*                                                                           */
+/*  Operators, when user-defined from a set of punctuation characters        */
+/*                                                                           */
+/*****************************************************************************/
+
+#define OperatorToken(start, legal) /* define operator token */		\
+{									\
+  U "operator",		/* name used for debugging only       */	\
+  PRINT_WHOLE_QUOTED,	/* print this token as usual          */	\
+  U "@PO",		/* Lout command for formatting this   */	\
+  U "",			/* no alternate command               */	\
+  U "",			/* no following command               */	\
+  FALSE,		/* token not just start of line       */	\
+  { start },		/* token begins with any of these     */	\
+  { NULL },		/* no start2 needed		      */	\
+  { NULL },		/* so no brackets2 either	      */	\
+  { NULL },		/* so no end2 either		      */	\
+  U legal,		/* inside, same as start              */	\
+  U "", U "",		/* no escape character                */	\
+  U "", U "",		/* no inner escape; no end inner esc  */	\
+  U "",			/* no bracketing delimiter	      */	\
+  U "",			/* no ending delimiter                */	\
+  FALSE,		/* end not have to be at line start   */	\
+  FALSE,		/* don't end delimiter twice to stop  */	\
+}
+
+TOKEN NonpareilOperatorToken =
+  OperatorToken(SepNonpareilOperatorPunct, NonpareilOperatorPunct);
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  Tokens defining comments in various languages.                           */
 /*                                                                           */
 /*****************************************************************************/
@@ -847,6 +899,28 @@ TOKEN BlueCommentToken = {
   U "'",		/* end of "inner escape" in Blue comment            */
   U "",			/* no bracketing delimiter			    */
   U "",			/* no ending delimiter; end of line will end it     */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN NonpareilCommentToken = {
+  U "comment",		/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  U "@PC",		/* Lout command for formatting comments             */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { U "#" },		/* comments begin with this character pair          */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintablePlusTab,	/* inside, any printable char is OK (not NL)        */
+  U "",			/* no escape character within comments              */
+  U "",			/* so nothing legal after escape char either        */
+  U "`",		/* start of "inner escape" in Nonpareil comment     */
+  U "'",		/* end of "inner escape" in Nonpareil comment       */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* no end delimiter (end of line will end it)       */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -1047,6 +1121,7 @@ TOKEN GreaterToken		= FixedToken(">",  "greater @A @PO");
 TOKEN QuestionToken		= FixedToken("?",  "@PO");
 TOKEN CommaToken		= FixedToken(",",  "@PO");
 TOKEN DotToken			= FixedToken(".",  "@PO");
+TOKEN DotDotToken		= FixedToken("..",  "@PO");
 TOKEN LessEqualToken		= FixedToken("<=", "lessequal @A @PO");
 TOKEN GreaterEqualToken		= FixedToken(">=", "greaterequal @A @PO");
 TOKEN CNotEqualToken		= FixedToken("!=", "notequal @A @PO");
@@ -1092,6 +1167,59 @@ TOKEN PythonPowerToken          = FixedToken( "**",  "@PO" ) ;
 TOKEN PythonBitLeftShiftToken   = FixedToken( "<<",  "@PO" ) ;
 TOKEN PythonBitRightShiftToken  = FixedToken( ">>",  "@PO" ) ;
 TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" ) ;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/* Ruby specifics                                                            */
+/*                                                                           */
+/*****************************************************************************/
+
+TOKEN RubyIdentifierToken = {
+  U "identifier",	/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  U "@PI",		/* Lout command for formatting identifiers          */
+  U "@PK",		/* Alternate command (for keywords)                 */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { SepLetters, U "_", U "$",
+    U "@@", U "@" },	/* identifiers begin with these			    */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  Ruby_Methodname,	/* inside, letters, underscores, digits, !, ?, =    */
+  U "",			/* no escape character within identifiers           */
+  U "",			/* so nothing legal after escape char either        */
+  U "",			/* identifiers do not permit "inner escapes"        */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* no bracketing delimiter			    */
+  U "",			/* identifiers do not end with a delimiter          */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN RubyGenDelimStringToken = {
+  U "generalized string", /* used by error messages involving this token    */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  U "@PS",		/* Lout command for formatting strings              */
+  U "",			/* no alternate command                             */
+  U "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { U "%", U "%q", U "%Q", U "%w",
+    U "%r", U "%x" },   /* generalized strings begin with these 	    */
+  { SepPunct },		/* start2 can be any punctuation character	    */
+  { BktPunct },		/* bracketing delimiters to match SepPunct	    */
+  { EndPunct },		/* end2 must match start2			    */
+  AllCharacters,	/* inside, any character at all is OK               */
+  U "\\",		/* within strings, \\ is the escape character       */
+  AllCharacters,	/* after escape char, any character at all is OK    */
+  U "",			/* strings do not permit "inner escapes"            */
+  U "",			/* and so there is no end innner escape either      */
+  U "",			/* will be using bracket2 for bracket delimiter     */
+  U "",			/* will be using end2 for the end delimiter here    */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
 
 
 /*****************************************************************************/
@@ -1185,7 +1313,7 @@ TOKEN PerlDoubleQuoteStringToken = {
   AllCharacters,	/* after escape char, any character at all is OK    */
   U "", U "",		/* no "inner escapes"; no end innner escape         */
   U "",			/* no bracketing delimiter			    */
-  U "\"",			/* strings end with a " character                   */
+  U "\"",		/* strings end with a " character                   */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -2557,6 +2685,49 @@ LANGUAGE PythonLanguage = {
 
 /*****************************************************************************/
 /*                                                                           */
+/*  Ruby                                                                     */
+/*                                                                           */
+/*****************************************************************************/
+
+LANGUAGE RubyLanguage = {
+  { "Ruby", "ruby" },
+  "ruby", "@Ruby",
+  NO_MATCH_ERROR,
+  {
+    &BackSlashToken,
+    /* &PerlRegExpLPar, */ /* This produces extra space between the paren and
+			      the slash */
+    &PerlRegExpEq, &PerlRegExpMatch, &PerlRegExpNoMatch,
+    &PerlRegExpSplit, &PerlRegExpIf, &PerlRegExpAnd, &PerlRegExpAnd2,
+    &PerlRegExpOr, &PerlRegExpOr2, &PerlRegExpXor, &PerlRegExpNot,
+    &PerlRegExpNot2, &PerlRegExpUnless,
+    &PerlDoubleQuoteStringToken, &PerlSingleQuoteStringToken,
+    &PerlBackQuoteStringToken, &RubyGenDelimStringToken,
+    &RubyIdentifierToken, &NumberToken,
+    &PerlCommentToken, &PerlCommentEscapeToken,
+    &SemicolonToken, &CommaToken, &ColonToken, &EiffelDotToken,
+    &HereEOTuq, &HereEOTdq, &HereEOTfq, &HereEOTbq,
+    &HereEOFuq, &HereEOFdq, &HereEOFfq, &HereEOFbq,
+    &HereENDuq, &HereENDdq, &HereENDfq, &HereENDbq,
+    &HereBLAuq, &HereBLAdq, &HereBLAfq, &HereBLAbq,
+    &ExclamationToken, &EqualToken, &CNotEqualToken, &LeftParenToken,
+    &RightParenToken, &LeftBracketToken, &RightBracketToken, &LeftBraceToken,
+    &RightBraceToken, &AssignToken, &QuestionAssignToken, &PlusToken,
+    &MinusToken, &StarToken, &PercentToken, &HatToken, &SlashToken, &BarToken,
+    &LessToken, &GreaterToken, &LessEqualToken, &CircumToken,
+    &GreaterEqualToken
+  },
+  { "alias", "and", "begin", "break", "case", "catch", "class", "def", "do",
+    "elsif", "else", "fail", "ensure", "for", "end", "if", "in", "module",
+    "next", "not", "or", "raise", "redo", "rescue", "retry", "return", "then",
+    "throw", "super", "unless", "undef", "until", "when", "while", "yield"
+  }
+};
+
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  Eiffel and Blue                                                          */
 /*                                                                           */
 /*****************************************************************************/
@@ -2641,6 +2812,42 @@ LANGUAGE JavaLanguage = {
     "public", "return", "short", "static", "strictfp", "super", "switch",
     "synchronized", "this", "throw", "throws", "transient", "try", "void",
     "volatile", "while",
+  }
+};
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Nonpareil (December 2002 - still evolving)                               */
+/*                                                                           */
+/*****************************************************************************/
+
+LANGUAGE NonpareilLanguage = {
+  { "Nonpareil", "nonpareil" },
+  "nonpareil", "@Nonpareil",
+  NO_MATCH_ERROR,
+  {
+    &CStringToken, &IdentifierToken, &NumberToken,
+    &NonpareilCommentToken, &PythonCommentEscapeToken,
+    /* overlaps with NonpareilOperatorToken so omitted: &PlusToken, */
+    &MinusToken,
+    &LeftBracketToken,
+    &RightBracketToken,
+    &CommaToken,
+    &ArrowToken,
+    &ColonToken,
+    &AssignToken,
+    &LeftParenToken,
+    &RightParenToken,
+    &EiffelDotToken,
+    &DotDotToken,
+    &NonpareilOperatorToken,
+  },
+  {
+    "cvt", "invariant", "pre", "noncreation", "postfix",
+    "and", "or", "not", "false", "true",
+    "class", "else", "elsif", "end", "extension", "if", "in", "infix",
+    "inherit", "inspect", "is", "let", "prefix", "private", "public",
+    "then", "when", "yield",
   }
 };
 
@@ -2835,9 +3042,11 @@ LANGUAGE *languages[] = {
   & CLanguage,
   & EiffelLanguage,
   & JavaLanguage,
+  & NonpareilLanguage,
   & PerlLanguage,
   & PodLanguage,
   & PythonLanguage,
+  & RubyLanguage,
   NO_LANGUAGE
 };
 

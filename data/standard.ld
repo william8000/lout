@@ -554,23 +554,23 @@
 { glossary @Word @CurrLang @Case {
     Croatian	@Yield { ?? }
     Czech	@Yield { ?? }
-    Danish	@Yield { ?? }
+    Danish	@Yield { Ordforklaringer }
     Dutch       @Yield { ?? }
     English	@Yield { Glossary }
     EnglishUK	@Yield { Glossary }
     Finnish	@Yield { ?? }
-    French	@Yield { ?? }
+    French	@Yield { Glossaire }
     German	@Yield { Glossar }
     Hungarian	@Yield { ?? }
     Italian	@Yield { ?? }
-    Norwegian   @Yield { ?? }
+    Norwegian   @Yield { Ordforklaringer }
     Polish	@Yield { ?? }
     Portuguese  @Yield { ?? }
     Russian	@Yield { ?? }
     Slovak	@Yield { ?? }
     Slovenian   @Yield { ?? }
-    Spanish	@Yield { ?? }
-    Swedish	@Yield { ?? }
+    Spanish	@Yield { Glosario }
+    Swedish	@Yield { Ordf{@Char odieresis}rklaringar }
     UpperSorbian @Yield { ?? }
   }
 }
@@ -596,6 +596,30 @@
     Spanish	@Yield { Indice }
     Swedish	@Yield { Index }
     UpperSorbian @Yield { Indeks }
+  }
+}
+
+{ colophon @Word @CurrLang @Case {
+    Croatian	@Yield { ?? }
+    Czech	@Yield { ?? }
+    Danish	@Yield { ?? }
+    Dutch       @Yield { ?? }
+    English	@Yield { Colophon }
+    EnglishUK	@Yield { Colophon }
+    Finnish	@Yield { ?? }
+    French	@Yield { ?? }
+    German	@Yield { ?? }
+    Hungarian	@Yield { ?? }
+    Italian	@Yield { ?? }
+    Norwegian   @Yield { ?? }
+    Polish	@Yield { ?? }
+    Portuguese  @Yield { ?? }
+    Russian	@Yield { ?? }
+    Slovak	@Yield { ?? }
+    Slovenian   @Yield { ?? }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { ?? }
+    UpperSorbian @Yield { ?? }
   }
 }
 

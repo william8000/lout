@@ -122,9 +122,15 @@ A:: {
 }
 }
 In practice one usually only retags individual nodes.  It is best to
-use only upper-case letters and digits in tags, because Lout and
-PostScript have tags of their own containing lower-case letters, and
-any mixup causes total disaster.
+use only upper-case letters in tags, because Lout and PostScript have
+tags of their own containing lower-case letters, and any mixup causes
+total disaster.  Although the above example uses digits, these can
+cause problems since a tag like {@Code "A@1@S"} will be interpreted
+by Lout as @Code "A@1" followed by the @Code "@S" small capitals
+symbol.  (This problem can itself be avoided by enclosing the entire
+tag in quotes, as in {@Code "\"A@1@S\""}; this works because tags are
+just words to Lout, although they are symbols to PostScript.  But
+better to avoid the whole problem by not using digits.)
 @PP
 When a tag lies within the object following some node, it is
 automatically retagged in this way with tag {@Code IN}.  For example, in
@@ -147,8 +153,8 @@ Although @Code from and @Code to are just two of several options within
 given, they have a special virtue not shared by any other options.  It is
 possible to give the name of an entire node, not just a tag denoting one
 point, to them:
-@ID @Verbatim {
-@Code {
+@ID {
+@Code @Verbatim {
 A:: @Circle
 @DP
 B:: @Ellipse { Hello, world }
@@ -173,9 +179,9 @@ The @Code "::" symbol has a @Code restrict option which can be
 diagrams. @RawIndex { diagrams }
 diagrams.restrict @SubIndex { @Code "restrict" option }
 restrict.diagrams @Index { @Code "restrict" option (diagrams) }
-used to save printer memory in deeply nested structures (such as
-the syntax diagrams of Section {@NumberOf dia_synt}) by restricting
-the tags promoted by @Code "::" to a limited set:
+used to save printer memory in deeply nested structures (such as the
+syntax diagrams of Section {@NumberOf dia_synt}) by restricting the
+tags promoted by @Code "::" to a limited set and discarding the rest:
 @ID {
 @Code {
 "A:: restrict { (E) (W) } @Ellipse"

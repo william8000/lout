@@ -33,17 +33,19 @@ blue. @Index { Blue program printing }
 c. @Index { C and C++ program printing }
 eiffel. @Index { Eiffel program printing }
 java. @Index { Java program printing }
+nonpareil. @Index { Nonpareil program printing }
 perl. @Index { Perl program printing }
 pod. @Index { Pod (for Perl) printing }
 python. @Index { Python program printing }
+ruby. @Index { Ruby program printing }
 @CD @Tbl
     mv { 0.5vx }
     af { Italic }
-    arb { yes }
     aformat { @Cell A | @Cell B | @Cell C | @Cell D | @Cell E }
     bformat { @Cell A | @Cell @Code B | @Cell @Code C | @Cell @Code D | @Cell E }
 {
 @Rowa
+    rb { yes }
     A { Language name }
     B { Setup file name }
     C { Lout symbol }
@@ -74,6 +76,12 @@ python. @Index { Python program printing }
     D { fixed }
     E { No }
 @Rowb
+    A { Nonpareil }
+    B { np }
+    C { "@Nonpareil" }
+    D { symbol }
+    E { Yes }
+@Rowb
     A { Perl }
     B { perl }
     C { "@Perl" }
@@ -91,6 +99,13 @@ python. @Index { Python program printing }
     C { "@Python" }
     D { varying }
     E { No }
+@Rowb
+    A { Ruby }
+    B { ruby }
+    C { "@Ruby" }
+    D { fixed }
+    E { No }
+    rb { yes }
 }
 C and C++ are handled together since, for formatting purposes, they
 differ only in that C++ has some additional keywords plus an extra

@@ -1,6 +1,6 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -908,7 +908,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   if( incg_files != nilobj )
   {
     pnl;
-    p0("LoutReadFormEPS {");
+    p0("/LoutReadFormEPS {");
     p1("  currentfile 0 (Lout_Marker_%s)", (char *) TimeString());
     p0("  /SubFileDecode filter exch 1");
     p1("  { 2 copy 4 index %d string readstring 4 1 roll", STRING_SIZE);

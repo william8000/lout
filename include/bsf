@@ -110,7 +110,7 @@ export
     @Word @Roman @UCRoman @Alpha @UCAlpha @Months @ShortMonths @WeekDays
     @ShortWeekDays @TwelveHours @ShortHours @MeriDiems @ShortMeriDiems
 
-    @Sym @R @I @B @BI @S @F @II
+    @Sym @Ding @R @I @B @BI @S @F @II
     "~" "~~" "``" "''" ",," "--" "---" "..."
 
     @Bullet @ParSym @SectSym @Dagger @DaggerDbl @CDot @Sterling @Yen @Florin
@@ -279,18 +279,19 @@ def @BasicSetup
 
     ###########################################################################
     #                                                                         #
-    #   @Sym, font symbols, and miscellaneous special characters.             #
+    #   @Sym, @Ding font symbols, and miscellaneous special characters.       #
     #                                                                         #
     ###########################################################################
 
-    def @Sym right x { { Symbol Base } @Font @Char x	}
+    def @Sym  right x { { Symbol Base } @Font @Char x	}
+    def @Ding right x { { Dingbats Base } @Font @Char x	}
 
-    def @R   right x { Base @Font x			}
-    def @I   right x { Slope @Font x			}
-    def @B   right x { Bold @Font x			}
-    def @BI  right x { BoldSlope @Font x		}
-    def @S   right x { smallcaps @Font x		}
-    def @F   right x { @FixedWidthFont @Font x 		}
+    def @R    right x { Base @Font x			}
+    def @I    right x { Slope @Font x			}
+    def @B    right x { Bold @Font x			}
+    def @BI   right x { BoldSlope @Font x		}
+    def @S    right x { smallcaps @Font x		}
+    def @F    right x { @FixedWidthFont @Font x 		}
 
     def @II
 	right x

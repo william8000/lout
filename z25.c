@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */

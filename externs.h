@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.27 (November 2002)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.28 (December 2002)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -444,6 +444,7 @@ typedef void *POINTER;
 #define	CH_FLAG_FFPLAIN		'P'	/* the -P command line flag          */
 #define	CH_FLAG_SUPPRESS	's'	/* the -s command line flag          */
 #define	CH_FLAG_SAFE		'S'	/* the -S command line flag          */
+#define	CH_FLAG_NOTEXTURE	't'	/* the -t command line flag          */
 #define	CH_FLAG_USAGE		'u'	/* the -u command line flag          */
 #define	CH_FLAG_UNSAFE		'U'	/* the -U command line flag          */
 #define	CH_FLAG_VERSION		'V'	/* the -V command line flag          */
@@ -3498,6 +3499,7 @@ extern	FULL_LENGTH PlainCharHeight;	/* character height		     */
 extern	BOOLEAN	  PlainFormFeed;	/* true if using \f		     */
 
 /*****  z52.c	  Texture Service        **************************************/
+extern	BOOLEAN	  UseTexture;
 extern	void	  TextureInit(void);
 extern	void	  TextureChange(STYLE *style, OBJECT x);
 extern	FULL_CHAR *TextureCommand(TEXTURE_NUM pnum);

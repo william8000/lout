@@ -91,18 +91,6 @@ page numbers only, @Code Titles produces full running titles, and
 @Code "@FirstOverheadNumber" is the number given to the first overhead,
 and @Code "@FirstLectureNumber" is the number given to the first lecture,
 of which more below.  See preceding sections for {@Code "@OptimizePages"}.
-# Lout ordinarily places lines onto a page until space runs out, then moves
-# to the next page and so on.  This often produces ugly empty spaces at
-# the bottoms of pages preceding large unbreakable displays.  Setting the
-# @Code "@OptimizePages" option to {@Code "Yes"} causes Lout to examine the
-# overall situation and try to minimize the ugliness, using the @TeX
-# optimal paragraph breaking algorithm.  It takes two runs to do this,
-# with intermediate results stored in Lout's cross reference database
-# (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-# it, which might be wise after major changes.  It is possible for the
-# optimizer to cycle, never settling on a single final best
-# version; this is usually caused by footnotes or floating figures inserted
-# at points which end up near page boundaries.
 @PP
 After the compulsory {@Code "//"} come the overheads themselves.  There
 are two alternatives:  a series of overheads, corresponding to a single
@@ -112,6 +100,9 @@ overhead. @Index @Code "@Overhead"
 @ID @OneRow @Code {
 "@SysInclude { slides }"
 "@OverheadTransparencies"
+"    @Title { ... }"
+"    @Author { ... }"
+"    @DateLine { ... }"
 "    ..."
 "//"
 "@Overhead ... @End @Overhead"
@@ -168,6 +159,9 @@ lecture. @Index @Code "@Lecture"
 @ID @OneRow @Code {
 "@SysInclude { slides }"
 "@OverheadTransparencies"
+"    @Title { ... }"
+"    @Author { ... }"
+"    @DateLine { ... }"
 "    ..."
 "//"
 "@Lecture ... @End @Lecture"
@@ -191,18 +185,15 @@ If @Code "@Title" is non-empty the series of overheads will begin with
 an overhead containing the title alone, centred on the page using the
 @Code "clines" paragraph breaking style.  This means that it makes
 sense to have a multi-line title.  Any text following the @Code "@Begin"
-will appear under the lecture title as you would expect.
-@PP
-Within the body of {@Code "@Lecture"}, place a series of overheads
+will appear under the lecture title as you would expect.  Within the
+body of {@Code "@Lecture"}, place a series of overheads
 bracketed by @Code "@BeginOverheads" and {@Code "@EndOverheads"}:
 beginoverheads. @Index @Code "@BeginOverheads"
 endoverheads. @Index @Code "@EndOverheads"
 @ID @OneRow @Code {
 "@BeginOverheads"
 "@Overhead ... @End @Overhead"
-"@Overhead ... @End @Overhead"
 "..."
-"@Overhead ... @End @Overhead"
 "@EndOverheads"
 }
 The @Code "@Overhead" symbol is exactly as described earlier.

@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -165,6 +165,7 @@ static void PrintUsage(FILE *fp)
   lput0("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'");
   lput0("  -c file         use file.li instead of lout.li for crossrefs"    );
   lput0("  -M              save memory (don't read in database indexes)"    );
+  lput0("  -t              ignore texture changes, always use solid colour" );
   lput0("  -x              initializing run, not for ordinary use"	    );
   lput0("  -u              print this usage message on stderr and exit"	    );
   lput0("  -V              print version and configuration information"	    );
@@ -178,7 +179,7 @@ static void PrintVersion(FULL_CHAR *lib, FILE *fp)
   lput2("%-28s %s",
     "Basser Lout written by:", "Jeffrey H. Kingston (jeff@it.usyd.edu.au)");
   lput2("%-28s %s",
-    "Free source available from:", "ftp://ftp.cs.usyd.edu.au/jeff/lout");
+    "Free source available from:", "ftp://ftp.it.usyd.edu.au/jeff/lout");
   lput3("%-28s %s %s",
     "This executable compiled:", __TIME__, __DATE__);
   lput4("%-28s %s%s%s", "System include directory:", lib, STR_DIR, INCL_DIR);
@@ -443,6 +444,12 @@ int main(int argc, char *argv[])
 	debug0(DFS, D, "  calling DefineFile from main (2)");
 	DefineFile(arg, STR_EMPTY, no_fpos, HYPH_FILE, INCLUDE_PATH);
 	DefineFile(arg, HYPH_SUFFIX, no_fpos, HYPH_PACKED_FILE, INCLUDE_PATH);
+	break;
+
+
+      case CH_FLAG_NOTEXTURE:
+     
+	UseTexture = FALSE;
 	break;
 
 

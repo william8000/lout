@@ -15,27 +15,40 @@ Changing language is quite analogous to changing font using the
 @Code "@Font" symbol.
 @PP
 At the time of writing, the following languages were available:
-@ID @OneRow @Code {
-Croatian Hrvatski
-Czech Cesky Cestina cs
-Danish Dansk da
-Dutch Nederlands nl
-English en
-EnglishUK en-GB
-Finnish Suomi fi
-French Francais Fran{@Char ccedilla}ais fr
-German Deutsch de
-Hungarian Magyar hu
-Italian Italiano it
-Norwegian Norsk no
-Polish Polski pl
-Portuguese Português pt
-Russian ru
-Slovak Slovensky Slovencina
-Slovenian Slovenia Slovenija sl
-Spanish Espa{@Char ntilde}ol es
-Swedish Svenska sv
-UpperSorbian hornjoserbsce serbsce
+@CD @OneRow @Tbl
+    aformat { @Cell ml { 0i } @Code A | @Cell mr { 0i } @Code B }
+    mv { 0.5vx }
+{
+@Rowa
+    A { Croatian Hrvatski }
+    B { Italian Italiano it }
+@Rowa
+    A { Czech Cesky Cestina cs }
+    B { Norwegian Norsk no }
+@Rowa
+    A { Danish Dansk da }
+    B { Polish Polski pl }
+@Rowa
+    A { Dutch Nederlands nl }
+    B { Portuguese Português pt }
+@Rowa
+    A { English en }
+    B { Russian ru }
+@Rowa
+    A { EnglishUK en-GB }
+    B { Slovak Slovensky Slovencina }
+@Rowa
+    A { Finnish Suomi fi }
+    B { Slovenian Slovenia Slovenija sl }
+@Rowa
+    A { French Francais Fran{@Char ccedilla}ais fr }
+    B { Spanish Espa{@Char ntilde}ol es }
+@Rowa
+    A { German Deutsch de }
+    B { Swedish Svenska sv }
+@Rowa
+    A { Hungarian Magyar hu }
+    B { UpperSorbian hornjoserbsce serbsce }
 }
 File @Code "include/langdefs" in the distribution always has the exact
 list of known languages.  As shown, most languages have alternative

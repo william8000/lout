@@ -1,6 +1,6 @@
 /*@z52.c:Texture Service:TextureChange, TextureCommand@***********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.27)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.28)                       */
 /*  COPYRIGHT (C) 1991, 2002 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -162,6 +162,17 @@ static TEXTURE_TABLE pat_tab;
 
 /*****************************************************************************/
 /*                                                                           */
+/*  UseTexture                                                               */
+/*                                                                           */
+/*  When set to FALSE (by z01.c), means to ignore texture changing commands. */
+/*                                                                           */
+/*****************************************************************************/
+
+BOOLEAN UseTexture = TRUE;
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  TextureInit()                                                            */
 /*                                                                           */
 /*  Initialize this module.                                                  */
@@ -197,6 +208,12 @@ void TextureChange(STYLE *style, OBJECT x)
   { Error(42, 3, "%s ignored (illegal left parameter)", WARN, &fpos(x),
       KW_TEXTURE);
     debug0(DTX, D, "TextureChange returning (texture unchanged)");
+    return;
+  }
+
+  /* if not using textures, do nothing */
+  if( !UseTexture )
+  { debug0(DTX, D, "TextureChange returning (not UseTexture)");
     return;
   }
 

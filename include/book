@@ -206,6 +206,11 @@
   # @IndexBSpacerBelow	{ 1v			} # space below index B spacer
   # @IndexBSpacerFont	{ +3p			} # font of index B spacer
   # @IndexBSpacerFormat	{ @Body			} # format of index B spacer
+  # @MakeColophon	{ No			} # make colophon? Yes or No
+  # @ColophonFont	{ 			} # font for colophon
+  # @ColophonBreak	{ 			} # break style for colophon
+  # @ColophonColumnNumber { 1			} # colophon columns (1 to 10)
+  # @ColophonColumnGap	{ 1.00c @OrIfPlain 6s	} # colophon column gap
   # @TopGap		{ 0.75c	@OrIfPlain 2f	} # gap between figures
   # @MidGap		{ 0.75c	@OrIfPlain 2f	} # gap above/below body text
   # @FootNoteNumbers	{ Arabic		} # footnote numbers
@@ -318,6 +323,7 @@
   # @IndexWord			{ index		} # word for "Index"
   # @IndexAWord			{ index		} # word for "Index" (A)
   # @IndexBWord			{ index		} # word for "Index" (B)
+  # @ColophonWord		{ colophon	} # word for "Colophon"
   # @ChapterNumbers		{ Arabic	} # kind of chapter numbers
   # @FirstChapterNumber		{ 1		} # first chapter number (Arabic)
   # @SectionNumbers		{ Arabic	} # kind of section numbers
@@ -379,6 +385,7 @@
   # @IndexInContents		{ Yes		} # add index to contents
   # @IndexAInContents		{ Yes		} # add index A to contents
   # @IndexBInContents		{ Yes		} # add index B to contents
+  # @ColophonInContents		{ Yes		} # add colophon to contents
   # @PartContentsIndent         { 0.5rt		} # indent of part contents entry
   # @ChapterNumInTheorems	{ Yes		} # theorem num has chapter num
   # @SectionNumInTheorems	{ No		} # theorem num has section num
@@ -426,6 +433,7 @@
   # @IndexPrefix		{		} # for structured page nums
   # @IndexAPrefix		{		} # for structured page nums
   # @IndexBPrefix		{		} # for structured page nums
+  # @ColophonPrefix		{		} # for structured page nums
 }
 
 

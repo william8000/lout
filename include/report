@@ -325,7 +325,7 @@
   # @AbstractWord		{ abstract	} # word for "Abstract"
   # @ContentsWord		{ contents	} # word for "Contents"
   # @AppendixWord		{ appendix	} # word for "Appendix"
-  # @GlossaryWor		{ glossary	} # word for "Glossary"
+  # @GlossaryWord		{ glossary	} # word for "Glossary"
   # @IndexWord			{ index		} # word for "Index"
   # @IndexAWord			{ index		} # word for "Index" (A)
   # @IndexBWord			{ index		} # word for "Index" (B)

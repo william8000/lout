@@ -20,6 +20,7 @@ chapter as a whole whose contents are as follows:
 @ID @OneRow @Code {
 "@Chapter"
 "    @Title { Australian Native Plants }"
+"    @Tag { natives }"
 "@Begin"
 "Australian native plants provide a distinctive identity to the garden.  Although"
 "less colourful than their European alternatives, some banksias and grevilleas do"
