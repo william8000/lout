@@ -326,13 +326,29 @@ representative sample of these options, showing their default values:
 "}"
 }
 Section {@NumberOf setup} explains how to make your own setup file and
-change its options.  @Code "@TitlePageFont" is the font used on the title
+change its options; here we just explain what the options do.
+@PP
+@Code "@TitlePageFont" is the font used on the title
 title.page.font. @Index @Code "@TitlePageFont"
-page of the book, not including a size.  @Code "@ChapterStartPages"
-determines what kinds of pages chapters and other major components of the
-book may begin on, and may be {@Code Any}, {@Code Odd}, or {@Code Even},
-meaning any page, odd-numbered pages only, or even-numbered pages
-only.  @Code "@SeparateIntroNumbering"
+page of the book, not including a size.
+@PP
+@Code "@ChapterStartPages" determines what kinds of pages chapters and
+chapter.start.pages @Index @Code "@ChapterStartPages"
+other major components of the book may begin on, and may be {@Code Any},
+{@Code Odd}, or {@Code Even}, meaning any page, odd-numbered pages only,
+or even-numbered pages only.  It may also be {@Code SamePage}, which
+means that chapters and appendices will continue directly after the
+previous chapter or appendix, on the same page (other major components
+such as the table of contents and index will start on a fresh page
+as usual).  If you switch to {@Code SamePage}, you will probably need
+to adjust {@Code "@ChapterHeadingFont"} and {@Code "@AboveChapterGap"},
+described below, since their default values are intended for use with
+chapters and appendices that start on a fresh page; and you will also
+need to begin the body of your chapter with a paragraph symbol such as
+@Code "@LP" or {@Code "@PP"}, since otherwise there will be no
+vertical space between the chapter heading and body.
+@PP
+@Code "@SeparateIntroNumbering"
 separate.intro.numbering @Index @Code "@SeparateIntroNumbering"
 determines whether the introductory part of the book is to have a
 separate numbering sequence or not.  @Code "@ReferencesBeforeAppendices"

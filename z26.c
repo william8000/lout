@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -127,27 +127,8 @@ FULL_CHAR *EchoLength(int len)
   i = (i + 1) % 8;
   if( len == MAX_FULL_LENGTH )
     sprintf( (char *) buff[i], "%s", "INF");
-  else switch( BackEnd )
-  {
-    case POSTSCRIPT:
-    case PDF:
-
-      sprintf( (char *) buff[i], "%.3fc", (float) len/CM);
-      break;
-
-    case PLAINTEXT:
-
-      if( length_dim == COLM )
-      {
-        sprintf( (char *) buff[i], "%.2fs", (float) len/PlainCharWidth);
-      }
-      else
-      {
-        sprintf( (char *) buff[i], "%.2ff", (float) len/PlainCharHeight);
-      }
-      break;
-
-  }
+  else
+    BackEnd->PrintLength(buff[i], len, ROWM);
   return buff[i];
 } /* end EchoLength */
 

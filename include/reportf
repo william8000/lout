@@ -16,7 +16,21 @@ def @ReportSetup
     named @CoverSheet			{ Yes			}
     named @ContentsSeparate		{ No			}
     named @DateLine			{ No			}
+    named @AboveTitleGap		{ 1i			}
+    named @TitleFont			{ Bold			}
+    named @TitleBreak			{ clines 1.4vx		}
+    named @AuthorFont			{ Italic		}
+    named @AuthorBreak			{ clines 		}
+    named @InstitutionFont		{ 			}
+    named @InstitutionBreak		{ clines 		}
+    named @DateLineFont			{ 			}
+    named @DateLineBreak		{ 			}
     named @AbstractDisplay		{ No			}
+    named @AbstractFont			{			}
+    named @AbstractBreak		{			}
+    named @AbstractFormat
+		left @Title
+		right @Body		{ @Centre @Title @DP @Body }
     named @AbstractTitle		{ dft			}
     named @ReferencesBeforeAppendices	{ No			}
 
@@ -268,7 +282,7 @@ def @ReportSetup
 	def @DateValue right indent
 	{
 	    @DateLine @Case {
-		No	@Yield {}
+		No	@Yield @Null
 		Yes	@Yield @Date
 		else	@Yield @DateLine
 	    }
@@ -276,10 +290,11 @@ def @ReportSetup
 
 	def @TitleMaterial
 	{
-	    //1i    @B {clines 1.4vx} @Break @Cntr @Title
-	    //1.00v @I clines @Break { |0.5rt @Author | }
-	    //1.00v clines @Break @Cntr @Institution
-	    //1.00v clines @Break @Cntr @DateValue
+	    //@AboveTitleGap
+		    @TitleFont @Font @TitleBreak @Break @Cntr @Title
+	    //1.00v @AuthorFont @Font @AuthorBreak @Break @Cntr @Author
+	    //1.00v @InstitutionFont @Font @InstitutionBreak @Break @Cntr @Institution
+	    //1.00v @DateLineFont @Font @DateLineBreak @Break @Cntr @DateValue
 	}
 
 	def @AbstractPart
@@ -296,14 +311,16 @@ def @ReportSetup
 
 		"" @Yield @Null
 
-		else @Yield @AbstractDisplay @Case {
+		else @Yield
+		{
+		    @AbstractFont @Font @AbstractBreak @Break
+		    @AbstractDisplay @Case {
 		    
-		    No @Yield { @Title @DP @Abstract }
+			No @Yield { @Title @AbstractFormat @Abstract }
 
-		    Yes @Yield { |0.5rt @Title |
-				 @DP
-				 |@DisplayIndent @Abstract |@DisplayIndent
-				}
+			Yes @Yield { |@DisplayIndent
+			    @Title @AbstractFormat @Abstract |@DisplayIndent }
+		    }
 		}
 	    }
 	}

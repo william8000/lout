@@ -1,6 +1,7 @@
 Basser Lout Version 3 and the PostScript Document Structuring Conventions
 Jeffrey H. Kingston
 24 March 1994
+Modified to explain changes in font inclusion, 3 June 2000
 
 The following notes detail all areas known to the author where Lout does
 not fully conform to Version 3.0 of the PostScript Document Structuring
@@ -43,17 +44,22 @@ relating to commonly available fonts should be placed in the document
 setup section.  However no definition of which fonts fall into this
 category is offered, so this requirement is not observed by Lout.
 Instead, Lout generates one "%%IncludeResource: font" in the page setup
-section for each font used on the corresponding page, except for fonts
-used on the first page which are done once only in the document setup
-section.  This implies that fonts used on many pages but not the first
-will generate many "%%IncludeResource: font" comments, one for each page
-on which the font is used, which in turn implies that these fonts might
-be downloaded many times (Lout itself never downloads any font, but a
-document manager might react to an "%%IncludeResource: font" comment by
-doing so).  However, most fonts used by most people are already in the
-printer, and in these cases "it is highly likely that the font server
-or document manager would ignore the inclusion request, because the
-font would already be available on the printer" (p678).
+section for each font used on the corresponding page.  (It used to be
+the case that fonts used on the first page were an exception to this
+rule; they were done once only in the document setup section.  This
+exception has been removed from Lout Version 3.22 and above.)  Thus,
+fonts used on many pages will generate many "%%IncludeResource: font"
+comments, one for each page on which the font is used, which in turn
+implies that these fonts might be downloaded many times (Lout itself
+never downloads any font, but a document manager might react to an
+"%%IncludeResource: font" comment by doing so).  However, most fonts
+used by most people are already in the printer, and in these cases
+"it is highly likely that the font server or document manager would
+ignore the inclusion request, because the font would already be
+available on the printer" (p678).  The rationale for putting all
+"%%IncludeResource: font" comments into page setups is that it gives
+document managers exact information about what fonts are used on
+each page, which, hopefully, they can put to good use.
 
 PageResources.  This comment is supposed to list all resources needed
 or supplied on the current page except for procsets (p685).  At present

@@ -171,9 +171,9 @@
 125	175	braceright
 126	176	asciitilde
 127	177	-none-
-128	200	-none-
-129	201	-none-
-130	202	-none-
+128	200	quotesinglebase
+129	201	quotedblbase
+130	202	ellipsis
 131	203	-none-
 132	204	-none-
 133	205	quotedblleft

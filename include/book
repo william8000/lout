@@ -263,7 +263,7 @@
   # @TitlePageFont		{ Helvetica Base} # title page font (not size)
   # @SeparateIntroNumbering	{ Yes		} # separate intro page numbers
   # @PrefaceAfterContents  	{ No		} # Yes or No
-  # @ChapterStartPages		{ Any		} # Any, Odd, or Even
+  # @ChapterStartPages		{ Any		} # Any, Odd, Even, SamePage
   # @ReferencesBeforeAppendices	{ No		} # references before appendices
   # @PrefaceWord		{ preface	} # word for "Preface"
   # @ContentsWord		{ contents	} # word for "Contents"

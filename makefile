@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.21                          #
+#  Make file for installing Basser Lout Version 3.22                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  10 May 2000                                                                #
+#  3 June 2000                                                                #
 #                                                                             #
 #     make prg2lout     Compile a small auxiliary program called prg2lout     #
 #     make lout         Compile the Lout source                               #
@@ -28,11 +28,26 @@
 #      Lout binary is to run.  At present OSUNIX and OSDOS work but OSMAC     #
 #      doesn't work.                                                          #
 #                                                                             #
-#      OSUNIX    Unix in all its flavours, including Linux.                   #
-#      OSDOS     MS-DOS etc. ("rb" and "wb" file access modes where needed)   #
-#      OSMAC     Macintosh                                                    #
+#         OSUNIX   Unix in all its flavours, including Linux.                 #
+#         OSDOS    MS-DOS etc. ("rb" and "wb" file access modes where needed) #
+#         OSMAC    Macintosh                                                  #
 #                                                                             #
-#  (2) This may be the trickiest step of all.  On some systems, for example   #
+#  (2) If you want to install Lout with debugging on for some reason, for     #
+#      example if a guru has asked you to do this in the course of tracking   #
+#      down some problem with Lout, then set these two macros as follows:     #
+#                                                                             #
+#         DEBUGGING = 1                                                       #
+#         TRACING = -g                                                        #
+#                                                                             #
+#      Lout will run a bit slower and its binary will be a bit larger if      #
+#      you do this.  The normal, non-debugging values are                     #
+#                                                                             #
+#         DEBUGGING = 0                                                       #
+#         TRACING =                                                           #
+#                                                                             #
+#      These should appear like this below.                                   #
+#                                                                             #
+#  (3) This may be the trickiest step of all.  On some systems, for example   #
 #      NT under Visual C++, Lout's use of the system ftell() call causes      #
 #      a problem.  This problem typically manifests itself on the *second*    #
 #      pass over a large document such as the Lout User's Guide: a message    #
@@ -49,13 +64,13 @@
 #         Cygnus gnuwin32 gcc              djgpp                              #
 #                                          Mingw32                            #
 #                                                                             #
-#  (3) Set the USESTAT macro defined below to 1 if the system you are         #
+#  (4) Set the USESTAT macro defined below to 1 if the system you are         #
 #      compiling onto has the stat() file status system call.  If you are     #
 #      unsure, or know it doesn't, set USESTAT to 0.  The stat() call,        #
 #      if used, will allow Lout to determine the time of last change          #
 #      of database index files and rebuild them automatically if required.    #
 #                                                                             #
-#  (4) Set the SAFEDFT macro defined below to 1 if you want safe execution    #
+#  (5) Set the SAFEDFT macro defined below to 1 if you want safe execution    #
 #      (i.e. disabling calls to system()) to be the default behaviour.  You   #
 #      can always specify safe or unsafe execution by means of the -S and     #
 #      -U options to lout when processing a document; SAFEDFT means that      #
@@ -63,7 +78,7 @@
 #      required when formatting computer programs, so if in doubt, do not     #
 #      change the value of SAFEDFT.                                           #
 #                                                                             #
-#  (5) Set the following four macros defined below to appropriate values:     #
+#  (6) Set the following four macros defined below to appropriate values:     #
 #                                                                             #
 #      BINDIR    Directory where Lout's binary goes.  This directory is       #
 #                assumed to exist.                                            #
@@ -78,7 +93,7 @@
 #      MANDIR    Directory where the lout and prg2lout online manual entries  #
 #                (in nroff -man) go.  This directory is assumed to exist.     #
 #                                                                             #
-#  (6) Set the following two macros defined below to appropriate values.      #
+#  (7) Set the following two macros defined below to appropriate values.      #
 #      I strongly recommend CHARIN=1 and CHAROUT=0 for all sites (English     #
 #      and non-English language).  This way we get a truly international      #
 #      standard in which everyone has access to accented characters, yet      #
@@ -113,7 +128,7 @@
 #                as \ddd escape sequences and which are printed as one-byte   #
 #                literal characters.                                          #
 #                                                                             #
-#  (7) Set macro USELOC to one of the following values, NOT TO A LOCALE.      #
+#  (8) Set macro USELOC to one of the following values, NOT TO A LOCALE.      #
 #                                                                             #
 #      0         Lout's error messages will always appear in English, and no  #
 #                source code related to locales will be executed (although    #
@@ -139,16 +154,16 @@
 #                                                                             #
 #      For error messages in other languages, consult ./locale/README.        #
 #                                                                             #
-#  (8) Set macro COLLATE to either 0 or 1.  If you set it to 1, Lout will     #
+#  (9) Set macro COLLATE to either 0 or 1.  If you set it to 1, Lout will     #
 #      use the strcoll() routine by default when sorting alphabetically       #
 #      (e.g. when sorting indexes), otherwise Lout will sort by default       #
-#      based on the ISO codes of the characters.  This defaul setting may     #
+#      based on the ISO codes of the characters.  This default setting may    #
 #      be changed during individual runs of Lout by the -l and -L flags.      #
 #                                                                             #
-#  (9) Execute "make prg2lout".  This will compile the prg2lout program,      #
+# (10) Execute "make prg2lout".  This will compile the prg2lout program,      #
 #      leaving its binary in this directory.  Other directories unchanged.    #
 #                                                                             #
-# (10) If you want to be able to produce compressed PDF files, as opposed to  #
+# (11) If you want to be able to produce compressed PDF files, as opposed to  #
 #      uncompressed ones, you need to:                                        #
 #                                                                             #
 #      (a) obtain the zlib compression library from                           #
@@ -172,16 +187,16 @@
 #      If you don't want zlib support or cannot obtain it or cannot use it,   #
 #      leave the PDF_COMPRESSION, ZLIB, and ZLIBPATH variables as they are.   #
 #                                                                             #
-# (11) Execute "make lout".  This will compile the Lout source, leaving the   #
+# (12) Execute "make lout".  This will compile the Lout source, leaving the   #
 #      binary in this directory.  No changes are made in other directories.   #
 #                                                                             #
-# (12) This makefile assumes that Lout is not installed on your system        #
+# (13) This makefile assumes that Lout is not installed on your system        #
 #      already.  If you do have an earlier version of Lout installed,         #
 #      the simplest way to get rid of it is to type "make uninstall" now.     #
 #      Of course, this is assuming that the old version was installed in the  #
 #      same directories as where you are about to install the new version.    #
 #                                                                             #
-# (13) Execute "make install".  This will do the following things:            #
+# (14) Execute "make install".  This will do the following things:            #
 #                                                                             #
 #      (a) It will copy the lout and prg2lout binaries into $(BINDIR);        #
 #                                                                             #
@@ -204,22 +219,22 @@
 #      It is good to build the various files during installation because      #
 #      later runs will not have write permission in the library directories.  #
 #                                                                             #
-# (14) Execute "make installman".  This installs the manual entries for lout  #
+# (15) Execute "make installman".  This installs the manual entries for lout  #
 #      and prg2lout into directory $(MANDIR), which is assumed to exist.      #
 #      These entries are troff files; plain text versions are also available  #
 #      in directory ./man if you need them (install them yourself).           #
 #                                                                             #
-# (15) Execute "make installdoc".  This creates directory $(DOCDIR) and       #
+# (16) Execute "make installdoc".  This creates directory $(DOCDIR) and       #
 #      copies the Lout documentation into it.                                 #
 #                                                                             #
-# (16) If you want French error messages, execute "make installfr" now.       #
+# (17) If you want French error messages, execute "make installfr" now.       #
 #      If you want German error messages, execute "make installde" now.       #
 #      These commands compile the error messages files into packed forms      #
 #      using the gencat command, and store them in $(LIBDIR)/locale.          #
 #                                                                             #
-# (17) Execute "make clean".  This cleans up this directory.                  #
+# (18) Execute "make clean".  This cleans up this directory.                  #
 #                                                                             #
-# (18) If the usual size of a piece of paper at your site is not A4, you      #
+# (19) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
 #      on line 59 of file $(LIBDIR)/include/dsf:                              #
 #                                                                             #
@@ -232,7 +247,7 @@
 #      rest.  You can find the list of known page types, alternative to A4,   #
 #      in the User's Guide, and also at line 640 in $(LIBDIR)/include/dsf.    #
 #                                                                             #
-# (19) If the usual language at your site is not English, you might like to   #
+# (20) If the usual language at your site is not English, you might like to   #
 #      now change the default value of the @InitialLanguage option on line    #
 #      255 of file $(LIBDIR)/include/bsf.  This will mean that by default     #
 #      the date and words like Chapter and July will appear in a different    #
@@ -254,6 +269,9 @@ DBFIX   = 0
 
 USESTAT = 1
 SAFEDFT = 0
+
+DEBUGGING = 1
+TRACING = -g
 
 BINDIR	= /export/home/6monthspace/jeff/bin
 LIBDIR	= /export/home/6monthspace/jeff/lout.lib
@@ -305,7 +323,8 @@ CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
 	  -DCHAR_OUT=$(CHAROUT)					\
 	  -DLOCALE_ON=$(USELOC)					\
 	  -DASSERT_ON=1 $(COPTS)				\
-	  -DDEBUG_ON=1  -g					\
+	  -DDEBUG_ON=$(DEBUGGING)				\
+	  $(TRACING)						\
 	  -DPDF_COMPRESSION=$(PDF_COMPRESSION)			\
 	  $(ZLIBPATH)
 
@@ -314,7 +333,8 @@ OBJS	= z01.o z02.o z03.o z04.o z05.o z06.o z07.o z08.o	\
 	  z17.o z18.o z19.o z20.o z21.o z22.o z23.o z24.o	\
 	  z25.o z26.o z27.o z28.o z29.o z30.o z31.o z32.o	\
 	  z33.o z34.o z35.o z36.o z37.o z38.o z39.o z40.o	\
-	  z41.o z42.o z43.o z44.o z45.o z46.o z47.o z48.o
+	  z41.o z42.o z43.o z44.o z45.o z46.o z47.o z48.o	\
+	  z49.o z50.o z51.o
 
 lout:	$(OBJS)
 	$(CC) -o lout $(OBJS) $(ZLIB) -lm

@@ -1,6 +1,6 @@
 /*@z42.c:Colour Service:ColourChange, ColourCommand@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -195,7 +195,7 @@ void ColourChange(STYLE *style, OBJECT x)
 
   /* if argument is empty, fail and exit */
   if( StringEqual(string(x), STR_EMPTY) )
-  { if( BackEnd != PLAINTEXT )
+  { if( BackEnd->colour_avail )
       Error(42, 4, "%s ignored (empty left parameter)", WARN, &fpos(x),
         KW_COLOUR);
     debug0(DCO, D, "ColourChange returning (colour unchanged)");

@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -795,10 +795,13 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	      label_string);
 	    debug1(DCR, D, "label_string = %s", label_string);
 	    if( first )
-	    { PrintBeforeFirst(size(hd, COLM), size(y, ROWM), label_string);
+	    { BackEnd->PrintBeforeFirstPage(size(hd, COLM), size(y, ROWM),
+		label_string);
 	      first = FALSE;
 	    }
-	    else PrintBetween(size(hd, COLM), size(y, ROWM), label_string);
+	    else
+	      BackEnd->PrintBetweenPages(size(hd, COLM), size(y, ROWM),
+		label_string);
 	    if( page_label != nilobj )
 	    { DisposeObject(page_label);
 	      page_label = nilobj;

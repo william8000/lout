@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.21 (May 2000)")
+#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.22 (June 2000)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -377,7 +377,6 @@ typedef unsigned char FULL_CHAR;
 /*****************************************************************************/
 
 typedef void *POINTER;
-
 
 /*@::Character literals@******************************************************/
 /*                                                                           */
@@ -867,7 +866,6 @@ typedef union
 	FULL_LENGTH	ofont_spacewidth;
 	MAPPING		ofont_mapping	: 7;
 	BOOLEAN		ofont_recoded	: 1;
-	BOOLEAN		ofont_firstpage	: 1;
   } os32;
 
   struct
@@ -1102,7 +1100,6 @@ typedef union
 /*      font_spacewidth Preferred width of space between words in this font  */
 /*      font_mapping    The mapping to apply with this font                  */
 /*      font_recoded    TRUE if font needs recoding in PostScript output     */
-/*      font_firstpage  TRUE if this font is used on the very first page     */
 /*                                                                           */
 /*  WORD, QWORD when used in hash table to check whether crs defined twice   */
 /*                                                                           */
@@ -1795,7 +1792,6 @@ typedef union rec
 #define	font_spacewidth(x)	(x)->os1.ou3.os32.ofont_spacewidth
 #define	font_mapping(x)		(x)->os1.ou3.os32.ofont_mapping
 #define	font_recoded(x)		(x)->os1.ou3.os32.ofont_recoded
-#define	font_firstpage(x)	(x)->os1.ou3.os32.ofont_firstpage
 
 
 /*@::FONT_INFO@***************************************************************/
@@ -1826,7 +1822,7 @@ typedef struct font_rec {
   COMPOSITE		*cmp_table;		/* composites to build	     */
   int			cmp_top;		/* length of cmp_table	     */
   OBJECT		font_table;		/* record of sized fonts     */
-  OBJECT		original_font;		/* font rec before resizing  */
+  OBJECT		original_face;		/* face object of this font  */
   SHORT_LENGTH		underline_pos;		/* position of underline     */
   SHORT_LENGTH		underline_thick;	/* thickness of underline    */
   unsigned short	*kern_table;		/* first kerning chars       */
@@ -1860,6 +1856,48 @@ typedef struct mapvec {
   FULL_CHAR     hash_table[MAX_CHASH];  /* character hash table for inverse  */
   FULL_CHAR     map[MAPS][MAX_CHARS];   /* the mappings                      */
 } *MAP_VEC;
+
+
+/*@::BACK_END@****************************************************************/
+/*                                                                           */
+/*  typedef BACK_END - an OO-like record describing one back end             */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef struct back_end_rec {
+  int code;				/* the code number of the back end   */
+  FULL_CHAR *name;			/* string name of the back end	     */
+  BOOLEAN scale_avail;			/* TRUE if @Scale is available	     */
+  BOOLEAN rotate_avail;			/* TRUE if @Rotate is available	     */
+  BOOLEAN graphic_avail;		/* TRUE if @Graphic is available     */
+  BOOLEAN incgraphic_avail;		/* TRUE if @IncludeGraphic is avail. */
+  BOOLEAN plaingraphic_avail;		/* TRUE if @PlainGraphic is avail.   */
+  BOOLEAN fractional_spacing_avail;	/* TRUE if fractional spacing avail. */
+  BOOLEAN uses_font_metrics;		/* TRUE if actual font metrics used  */
+  BOOLEAN colour_avail;			/* TRUE if colour is available       */
+  void (*PrintInitialize)(FILE *fp);
+  void (*PrintLength)(FULL_CHAR *buff, int length, int length_dim);
+  void (*PrintPageSetupForFont)(OBJECT face, int font_curr_page,
+    FULL_CHAR *font_name, FULL_CHAR *first_size_str);
+  void (*PrintPageResourceForFont)(FULL_CHAR *font_name, BOOLEAN first);
+  void (*PrintMapping)(MAPPING m);
+  void (*PrintBeforeFirstPage)(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label);
+  void (*PrintBetweenPages)(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label);
+  void (*PrintAfterLastPage)(void);
+  void (*PrintWord)(OBJECT x, int hpos, int vpos);
+  void (*PrintPlainGraphic)(OBJECT x, FULL_LENGTH xmk,FULL_LENGTH ymk,OBJECT z);
+  void (*PrintUnderline)(FONT_NUM fnum, FULL_LENGTH xstart, FULL_LENGTH xstop,
+    FULL_LENGTH ymk);
+  void (*CoordTranslate)(FULL_LENGTH xdist, FULL_LENGTH ydist);
+  void (*CoordRotate)(FULL_LENGTH amount);
+  void (*CoordScale)(float hfactor, float vfactor);
+  void (*SaveGraphicState)(OBJECT x);
+  void (*RestoreGraphicState)(void);
+  void (*PrintGraphicObject)(OBJECT x);
+  void (*DefineGraphicNames)(OBJECT x);
+  void (*SaveTranslateDefineSave)(OBJECT x,FULL_LENGTH xdist,FULL_LENGTH ydist);
+  void (*PrintGraphicInclude)(OBJECT x,FULL_LENGTH colmark,FULL_LENGTH rowmark);
+} *BACK_END;
 
 
 /*@::object types@************************************************************/
@@ -2176,8 +2214,8 @@ typedef struct mapvec {
 
 /* back ends */
 #define POSTSCRIPT       0		/* PostScript back end               */
-#define	PLAINTEXT	 1		/* plain text back end               */
-#define	PDF		 2
+#define	PDF		 1		/* PDF back end			     */
+#define	PLAINTEXT	 2		/* plain text back end               */
 
 /* error types */
 #define	INTERN	0			/* internal error (i.e. bug)         */
@@ -2843,20 +2881,15 @@ extern	OBJECT	  FilterErrSym;
 extern	OBJECT	  VerbatimSym;
 extern	OBJECT	  RawVerbatimSym;
 extern	OBJECT	  OptGallSym;
+extern	BACK_END  BackEnd;
 extern	OBJECT	  CommandOptions;
 extern	BOOLEAN	  AllowCrossDb;
 extern	BOOLEAN	  UseCollate;
 extern	BOOLEAN	  InMemoryDbIndexes;
-extern	BOOLEAN	  Encapsulated;
 extern	BOOLEAN	  Kern;
 extern	BOOLEAN	  SafeExecution;
 extern	BOOLEAN   AltErrorFormat;
-extern	int	  BackEnd;
 extern	int	  TotalWordCount;
-extern	FULL_CHAR *BackEndWord;
-extern	FULL_LENGTH	  PlainCharWidth;
-extern	FULL_LENGTH	  PlainCharHeight;
-extern	BOOLEAN	  PlainFormFeed;
 extern	BOOLEAN	  InitializeAll;
 #if LOCALE_ON
 extern	nl_catd	  MsgCat;
@@ -3049,26 +3082,7 @@ extern	void	  FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 		    FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg,int count);
 
 /*****  z24.c	  Print Service         **************************************/
-extern	void	  PrintInit(FILE *file_ptr);
-extern	void	  PrintBeforeFirst(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label);
-extern	void	  PrintBetween(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label);
-extern	void	  PrintWord(OBJECT x, int hpos, int vpos);
-extern	void	  PrintPlainGraphicObject(OBJECT x, FULL_LENGTH xmk,
-		    FULL_LENGTH ymk, OBJECT z);
-extern	void	  PrintUnderline(FONT_NUM fnum, FULL_LENGTH xstart,
-		    FULL_LENGTH xstop, FULL_LENGTH ymk);
-extern	void	  PrintAfterLast(void);
-extern	void	  CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist);
-extern	void	  CoordRotate(FULL_LENGTH amount);
-extern	void	  CoordScale(float hfactor, float vfactor);
-extern	void	  SaveGraphicState(OBJECT x);
-extern	void	  RestoreGraphicState(void);
-extern	void	  PrintGraphicObject(OBJECT x);
-extern	void	  DefineGraphicNames(OBJECT x);
-extern	void	  SaveTranslateDefineSave(OBJECT x,
-		    FULL_LENGTH xdist, FULL_LENGTH ydist);
-extern	void	  PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
-		    FULL_LENGTH rowmark);
+extern	char	  *EightBitToPrintForm[];
 
 /*****  z25.c	  Object Echo	        **************************************/
 extern	FULL_CHAR *EchoObject(OBJECT x);
@@ -3217,9 +3231,9 @@ extern	MAP_VEC	  MapTable[];
 extern	MAPPING	  MapLoad(OBJECT filename, BOOLEAN recoded);
 extern	FULL_CHAR MapCharEncoding(FULL_CHAR *str, MAPPING m);
 extern	FULL_CHAR *MapEncodingName(MAPPING m);
-extern	void	  MapPrintEncodings(FILE *fp);
-extern	void	  MapEnsurePrinted(MAPPING m, int curr_page, FILE *fp);
-extern	void	  MapPrintResources(FILE *fp);
+extern	void	  MapPrintEncodings();
+extern	void	  MapEnsurePrinted(MAPPING m, int curr_page);
+extern	void	  MapPrintPSResources(FILE *fp);
 extern	OBJECT	  MapSmallCaps(OBJECT x, STYLE *style);
 extern	BOOLEAN	  MapIsLowerCase(FULL_CHAR ch, MAPPING m);
 
@@ -3300,7 +3314,7 @@ extern	BOOLEAN	  EnvReadRetrieve(FILE_NUM fnum, int offset, OBJECT *env);
 extern	void	  EnvReadInsert(FILE_NUM fnum, int offset, OBJECT env);
 extern	void	  EnvDebug(void);
 
-/*****  z48.c	  PDF back end          **************************************/
+/*****  z48.c	  PDF back end (old)    **************************************/
 extern	void      PDFFile_Init(FILE* in_fp, int in_h_bound, int in_v_bound,
 				int in_IN, int in_CM, int in_PT, int in_EM);
 extern	void      PDFFile_BeginFontEncoding(FILE* in_fp,
@@ -3338,6 +3352,18 @@ extern	void    PDFText_Kern(FILE* in_fp, int in_kern);
 extern	void    PDFText_Close(FILE* in_fp);
 extern	BOOLEAN PDFHasValidTextMatrix(void);
 
+/*****  z49.c	  PostScript back end   **************************************/
+extern	BOOLEAN	  Encapsulated;		/* TRUE if EPS file is wanted	     */
+extern	BACK_END  PS_BackEnd;		/* PostScript back end record        */
+
+/*****  z50.c	  PDF back end (new)    **************************************/
+extern	BACK_END  PDF_BackEnd;		/* PDF back end record               */
+
+/*****  z51.c	  Plain text back end   **************************************/
+extern	BACK_END  Plain_BackEnd;	/* Plain Text back end record        */
+extern	FULL_LENGTH PlainCharWidth;	/* character width                   */
+extern	FULL_LENGTH PlainCharHeight;	/* character height		     */
+extern	BOOLEAN	  PlainFormFeed;	/* true if using \f		     */
 
 /*@::assert(), debug(), debug flags@******************************************/
 /*                                                                           */
@@ -3457,9 +3483,12 @@ extern	struct dbs 	dbg[];
 #define	DEX	45		/*  z45.c   -dex   External Sort             */
 #define	DOG	46		/*  z46.c   -dex   Optimal Galleys           */
 #define	DET	47		/*  z47.c   -det   Environment Table         */
-#define	DPD	48		/*  z48.c   -dpd   PDF Back End              */
-#define	DPP	49		/*          -dpp   Profiling                 */
-#define	ANY	50		/*          -d     any                       */
+#define	DPD	48		/*  z48.c   -dpd   PDF Back End (old)        */
+#define	DPO	49		/*  z49.c   -dpo   PostScript Back End       */
+#define	DPF	50		/*  z50.c   -dpf   PDF Back End              */
+#define	DPT	51		/*  z51.c   -dpt   Plain Text Back End       */
+#define	DPP	52		/*          -dpp   Profiling                 */
+#define	ANY	53		/*          -d     any                       */
 
 #else
 #define ifdebug(cat, urg, x)

@@ -8,6 +8,9 @@ packages available with Basser Lout.  The reader who masters these
 examples will be well prepared to read the packages themselves.  The
 examples have not been simplified in any way, since an important part of
 their purpose is to show Lout in actual practice.
+@PP
+Although all these examples have been taken from real code, they do
+not necessarily represent the current state of the Lout packages.
 @BeginSections
 @Include { exa_equa }
 @Include { exa_para }

@@ -1,6 +1,6 @@
-/*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
+/*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -25,7 +25,7 @@
 /*  FILE:         z01.c                                                      */
 /*  MODULE:       Supervise                                                  */
 /*  EXTERNS:      main(), StartSym, GalleySym, ForceGalleySym, InputSym,     */
-/*                PrintSym, AllowCrossDb, Encapsulated                       */
+/*                PrintSym, AllowCrossDb                                     */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs.h"
@@ -69,51 +69,28 @@ OBJECT StartSym, GalleySym, ForceGalleySym, InputSym, PrintSym, OptGallSym,
 
 /*****************************************************************************/
 /*                                                                           */
+/*  BackEnd             The back end (PostScript, PDF, etc.) to use          */
 /*  CommandOptions      Command-line options (ACAT of objects)               */
-/*                                                                           */
-/*****************************************************************************/
-
-OBJECT CommandOptions;
-
-
-/*****************************************************************************/
-/*                                                                           */
 /*  UseCollate          Use local collation sequence rather than ASCII       */
 /*  AllowCrossDb        Allow references to OldCrossDb and NewCrossDb        */
 /*  InMemoryDbIndexes   True if cr database index file is to be in-memory    */
-/*  Encapsulated        Produce a one-page encapsulated PostScript file      */
 /*  Kern                Do kerning                                           */
 /*  SafeExecution       Execute safely, i.e. prohibit system() calls         */
 /*  AltErrorFormat      Use alternative error message format                 */
-/*                                                                           */
-/*****************************************************************************/
-
-BOOLEAN UseCollate;
-BOOLEAN AllowCrossDb;
-BOOLEAN InMemoryDbIndexes;
-BOOLEAN Encapsulated;
-BOOLEAN Kern;
-BOOLEAN SafeExecution;
-BOOLEAN	AltErrorFormat;
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  BackEnd		POSTSCRIPT, PLAINTEXT or PDF                         */
-/*  BackEndWord         "PostScript" or "PlainText"                          */
-/*  PlainCharWidth      if PLAINTEXT, the width of each character            */
-/*  PlainCharHeight     if PLAINTEXT, the height of each character           */
-/*  PlainFormFeed       if PLAINTEXT, TRUE if separate components with \f.   */
 /*  InitializeAll       TRUE if this is an initializing run.                 */
 /*  MsgCat              category for locale-specific messages                */
 /*  TotalWordCount      total number of words printed                        */
 /*                                                                           */
 /*****************************************************************************/
 
-int BackEnd;
-FULL_CHAR *BackEndWord;
-FULL_LENGTH PlainCharWidth, PlainCharHeight;
-BOOLEAN PlainFormFeed;
+BACK_END BackEnd;
+OBJECT CommandOptions;
+BOOLEAN UseCollate;
+BOOLEAN AllowCrossDb;
+BOOLEAN InMemoryDbIndexes;
+BOOLEAN Kern;
+BOOLEAN SafeExecution;
+BOOLEAN	AltErrorFormat;
 BOOLEAN InitializeAll;
 #if LOCALE_ON
 nl_catd MsgCat;
@@ -255,8 +232,7 @@ int main(int argc, char *argv[])
   /* initialise various modules, add current directory to search paths */
   TotalWordCount = 0;
   seen_wordcount = FALSE;
-  BackEnd = POSTSCRIPT;
-  BackEndWord = STR_POSTSCRIPT;
+  BackEnd = PS_BackEnd;
   PlainCharWidth = PLAIN_WIDTH;
   PlainCharHeight = PLAIN_HEIGHT;
   PlainFormFeed = FALSE;
@@ -479,8 +455,7 @@ int main(int argc, char *argv[])
 
       case CH_FLAG_PDF:
 
-	BackEnd = PDF;
-	BackEndWord = STR_PDF;
+	BackEnd = PDF_BackEnd;
 	break;
 
 
@@ -488,8 +463,7 @@ int main(int argc, char *argv[])
 
 	if( StringEqual(AsciiToFull(argv[i]+1), STR_PDF) )
 	{
-	  BackEnd = PDF;
-	  BackEndWord = STR_PDF;
+	  BackEnd = PDF_BackEnd;
 	  break;
 	}
 	PlainFormFeed = TRUE;
@@ -498,8 +472,7 @@ int main(int argc, char *argv[])
 
       case CH_FLAG_PLAIN:
      
-	BackEnd = PLAINTEXT;
-	BackEndWord = STR_PLAINTEXT;
+	BackEnd = Plain_BackEnd;
 	if( *(argv[i]+2) != '\0' )
 	{ float len1, len2;  FULL_CHAR units1, units2;
 	  if( sscanf(argv[i]+2, "%f%c%f%c",&len1,&units1,&len2,&units2) != 4 )
@@ -670,28 +643,32 @@ int main(int argc, char *argv[])
 #if OS_DOS
     /* For DOS/Win32 we need to set binary mode on stdout to prevent
        PDF compressed streams and xrefs from being corrupted - Uwe 12/98 */
-    if( BackEnd != PLAINTEXT && _setmode(_fileno(stdout), _O_BINARY) == -1 )
+    if( BackEnd->code != PLAINTEXT &&
+	_setmode(_fileno(stdout), _O_BINARY) == -1 )
       Error(1, 31, "cannot set binary mode on stdout", FATAL, no_fpos);
 #endif
     out_fp = stdout;
   }
   else
-  { out_fp = StringFOpen(outfile, BackEnd==PLAINTEXT ? WRITE_TEXT:WRITE_BINARY);
+  { out_fp = StringFOpen(outfile,
+		BackEnd->code == PLAINTEXT ? WRITE_TEXT : WRITE_BINARY);
     if( out_fp == null )
       Error(1, 27, "cannot open output file %s", FATAL, no_fpos, outfile);
   }
+
+  /* initialize miscellaneous modules */
   ColourInit();
   LanguageInit();
-  PrintInit(out_fp);
+  BackEnd->PrintInitialize(out_fp);
 
   /* append default directories to file search paths */
-  AddToPath(FONT_PATH,       MakeWordThree(lib, STR_DIR, AsciiToFull(FONT_DIR)));
-  AddToPath(HYPH_PATH,       MakeWordThree(lib, STR_DIR, AsciiToFull(HYPH_DIR)));
-  AddToPath(MAPPING_PATH,    MakeWordThree(lib, STR_DIR, AsciiToFull(MAPS_DIR)));
-  AddToPath(SYSDATABASE_PATH,MakeWordThree(lib, STR_DIR, AsciiToFull(DATA_DIR)));
-  AddToPath(DATABASE_PATH,   MakeWordThree(lib, STR_DIR, AsciiToFull(DATA_DIR)));
-  AddToPath(SYSINCLUDE_PATH, MakeWordThree(lib, STR_DIR, AsciiToFull(INCL_DIR)));
-  AddToPath(INCLUDE_PATH,    MakeWordThree(lib, STR_DIR, AsciiToFull(INCL_DIR)));
+  AddToPath(FONT_PATH,      MakeWordThree(lib, STR_DIR, AsciiToFull(FONT_DIR)));
+  AddToPath(HYPH_PATH,      MakeWordThree(lib, STR_DIR, AsciiToFull(HYPH_DIR)));
+  AddToPath(MAPPING_PATH,   MakeWordThree(lib, STR_DIR, AsciiToFull(MAPS_DIR)));
+  AddToPath(SYSDATABASE_PATH,MakeWordThree(lib,STR_DIR, AsciiToFull(DATA_DIR)));
+  AddToPath(DATABASE_PATH,  MakeWordThree(lib, STR_DIR, AsciiToFull(DATA_DIR)));
+  AddToPath(SYSINCLUDE_PATH,MakeWordThree(lib, STR_DIR, AsciiToFull(INCL_DIR)));
+  AddToPath(INCLUDE_PATH,   MakeWordThree(lib, STR_DIR, AsciiToFull(INCL_DIR)));
 
   /* use stdin if no source files were mentioned */
   if( source_file_count == 0 )
@@ -700,18 +677,18 @@ int main(int argc, char *argv[])
   }
 
   /* load predefined symbols into symbol table */
-  StartSym       = nilobj;  /* Not a mistake */
-  StartSym       = load(KW_START,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  GalleySym      = load(KW_GALLEY,       0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  ForceGalleySym = load(KW_FORCE_GALLEY, 0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  InputSym       = load(KW_INPUT,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  PrintSym       = load(KW_PRINT,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
-  FilterInSym    = load(KW_FILTERIN,     0, FALSE,  FALSE,  FALSE, NO_PREC     );
-  FilterOutSym   = load(KW_FILTEROUT,    0, FALSE,  FALSE,  FALSE, NO_PREC     );
-  FilterErrSym   = load(KW_FILTERERR,    0, FALSE,  FALSE,  FALSE, NO_PREC     );
-  OptGallSym     = load(KW_OPTGALL,      0, FALSE,  TRUE,   FALSE, DEFAULT_PREC);
-  VerbatimSym    = load(KW_VERBATIM,VERBATIM,FALSE, TRUE,   FALSE, DEFAULT_PREC);
-  RawVerbatimSym = load(KW_RAWVERBATIM,RAW_VERBATIM,FALSE, TRUE,   FALSE, DEFAULT_PREC);
+  StartSym      = nilobj;  /* Not a mistake */
+  StartSym      = load(KW_START,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  GalleySym     = load(KW_GALLEY,       0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  ForceGalleySym= load(KW_FORCE_GALLEY, 0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  InputSym      = load(KW_INPUT,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  PrintSym      = load(KW_PRINT,        0, FALSE,  FALSE,  TRUE,  NO_PREC     );
+  FilterInSym   = load(KW_FILTERIN,     0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  FilterOutSym  = load(KW_FILTEROUT,    0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  FilterErrSym  = load(KW_FILTERERR,    0, FALSE,  FALSE,  FALSE, NO_PREC     );
+  OptGallSym    = load(KW_OPTGALL,      0, FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  VerbatimSym   = load(KW_VERBATIM,VERBATIM,FALSE, TRUE,   FALSE, DEFAULT_PREC);
+  RawVerbatimSym= load(KW_RAWVERBATIM,RAW_VERBATIM,FALSE,TRUE,FALSE,DEFAULT_PREC);
 
 
   load(KW_BEGIN,        BEGIN,          FALSE,  FALSE,  FALSE, BEGIN_PREC  );
@@ -847,7 +824,7 @@ int main(int argc, char *argv[])
   TransferClose();
 
   /* close various modules */
-  PrintAfterLast();
+  BackEnd->PrintAfterLastPage();
   CrossClose();
   CloseFiles();
 

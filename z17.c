@@ -1,6 +1,6 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -205,7 +205,7 @@ FULL_LENGTH MinGap(FULL_LENGTH a, FULL_LENGTH b, FULL_LENGTH c, GAP *xgap)
     case EDGE_MODE:	res = find_min(MAX_FULL_LENGTH, a + w + b);
 			break;
 
-    case MARK_MODE:	if( BackEnd != PLAINTEXT )
+    case MARK_MODE:	if( BackEnd->fractional_spacing_avail )
 			  res = find_max(w, a + b + (FULL_LENGTH) (0.1 * w) );
 			else
 			  res = find_max(w, a + b);
@@ -257,7 +257,7 @@ FULL_LENGTH ExtraGap(FULL_LENGTH a, FULL_LENGTH b, GAP *xgap, int dir)
     case EDGE_MODE:	res = 0;
 			break;
 
-    case MARK_MODE:	if( BackEnd != PLAINTEXT )
+    case MARK_MODE:	if( BackEnd->fractional_spacing_avail )
 			  res = find_max(0, (FULL_LENGTH) (0.9 * w) - a - b);
 			else
 			  res = find_max(0, w - a - b);
@@ -331,7 +331,7 @@ FULL_LENGTH ActualGap(FULL_LENGTH prevf, FULL_LENGTH b, FULL_LENGTH f,
     case EDGE_MODE:	w2 = prevf + w + b;
 			break;
 
-    case MARK_MODE:	if( BackEnd != PLAINTEXT )
+    case MARK_MODE:	if( BackEnd->fractional_spacing_avail )
 			  w2 = find_max(w, prevf + b + (FULL_LENGTH) (0.1 * w) );
 			else
 			  w2 = find_max(w, prevf + b);

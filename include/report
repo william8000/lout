@@ -266,7 +266,19 @@
   # @CoverSheet			{ Yes		} # make cover sheet
   # @ContentsSeparate		{ No		} # contents on separate pages
   # @DateLine			{ No		} # Yes, No, or a date
+  # @AboveTitleGap		{ 1i		} # space above title
+  # @TitleFont			{ Bold		} # title font
+  # @TitleBreak			{ clines 1.4vx	} # title break
+  # @AuthorFont			{ Italic	} # author font
+  # @AuthorBreak		{ clines	} # author break
+  # @InstitutionFont		{		} # institution font
+  # @InstitutionBreak		{ clines	} # institution break
+  # @DateLineFont		{		} # dateline font
+  # @DateLineBreak		{		} # dateline break
   # @AbstractDisplay		{ No		} # abstract full width display
+  # @AbstractFont		{ 		} # font of abstract
+  # @AbstractBreak		{ 		} # break style of abstract
+  # @AbstractFormat		{ @Centre @Title @DP @Body } # abstract format
   # @AbstractTitle		{ dft		} # abstract title (dft is @AbstractWord)
   # @ReferencesBeforeAppendices	{ No		} # references before appendices
   # @AbstractWord		{ abstract	} # word for "Abstract"

@@ -263,6 +263,16 @@ Changes and new features introduced in Version 3.21 [10 May 2000]
     there is now a fontdefs database, so you need to replace this line with
     "@SysDatabase @FontDef { fontdefs }".
 
+Changes and new features introduced in Version 3.22 [3 June 2000]
+
+    Bug fixes
+    More setup file options for controlling the appearance of reports
+    Makefile now explicitly explains how to compile with debugging on/off
+    Added quotesinglebase, quotedblbase, ellipsis to LtLatin2.LCM file
+    Object-oriented back end (of interest to implementors only)
+    Chapters without page breaks option (see @ChapterStartPages, User's Guide)
+    Font includes all in page setups now (of interest to implementors only)
+
 
 Things that ought to be done but haven't been done yet
 
@@ -271,4 +281,4 @@ Things that ought to be done but haven't been done yet
     Review Uwe's proposal for moving word row marks to the baseline
 
 Jeff Kingston
-10 May 2000
+3 June 2000

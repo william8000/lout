@@ -1,6 +1,6 @@
 /*@z27.c:Debug Service:Debug flags@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -80,7 +80,10 @@ struct dbs  dbg[] = {
     {"ex",    {0, 0, 0}},		/* External Sort             */
     {"og",    {0, 0, 0}},		/* Optimal Galleys           */
     {"et",    {0, 0, 0}},		/* Environment Table         */
-    {"pd",    {0, 0, 0}},		/* PDF Back End              */
+    {"pd",    {0, 0, 0}},		/* PDF Back End (old)        */
+    {"po",    {0, 0, 0}},		/* PostScript Back End       */
+    {"pf",    {0, 0, 0}},		/* PDF Back End              */
+    {"pt",    {0, 0, 0}},		/* Plain Text Back End       */
     {"pp",    {0, 0, 0}},		/* Profiling                 */
     {"",      {0, 0, 0}},		/* any                       */
 };

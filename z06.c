@@ -1,6 +1,6 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -64,7 +64,8 @@ static void check_yield(OBJECT y, OBJECT *res_yield, BOOLEAN *all_literals)
   Child(s1, Down(y));
   debug1(DOP, DD, "  checkyield(%s)", EchoObject(y));
   if( is_word(type(s1)) )
-  { if( StringEqual(string(s1),BackEndWord) || StringEqual(string(s1),STR_ELSE) )
+  { if( StringEqual(string(s1), BackEnd->name) ||
+	StringEqual(string(s1),STR_ELSE) )
       if( *res_yield == nilobj )  *res_yield = y;
   }
   else if( type(s1) == ACAT )
@@ -72,7 +73,8 @@ static void check_yield(OBJECT y, OBJECT *res_yield, BOOLEAN *all_literals)
     { Child(z, link);
       if( type(z) == GAP_OBJ )  continue;
       if( is_word(type(z)) )
-      { if( StringEqual(string(z),BackEndWord)||StringEqual(string(s1),STR_ELSE))
+      { if( StringEqual(string(z), BackEnd->name) ||
+	    StringEqual(string(s1), STR_ELSE))
 	  if( *res_yield == nilobj )  *res_yield = y;
       }
       else

@@ -1,6 +1,6 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -482,7 +482,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 
     case ROTATE:
     
-      if( BackEnd != PLAINTEXT && InsertScale(x, c) )
+      if( BackEnd->scale_avail && InsertScale(x, c) )
       {
 	Parent(x, Up(x));
 	Error(13, 3, "%s object scaled horizontally by factor %.2f (too wide)",
@@ -557,7 +557,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	  EchoStyle(&save_style(x)), Image(type(x)), EchoObject(x));
 	x = BreakObject(x, c);
       }
-      else if( BackEnd != PLAINTEXT && InsertScale(x, c) )
+      else if( BackEnd->scale_avail && InsertScale(x, c) )
       { OBJECT tmp;
 	tmp = x;
 	Parent(x, Up(x));
@@ -589,7 +589,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
     case INCGRAPHIC:
     case SINCGRAPHIC:
 
-      if( BackEnd != PLAINTEXT && InsertScale(x, c) )
+      if( BackEnd->scale_avail && InsertScale(x, c) )
       {
 	Parent(x, Up(x));
 	Error(13, 7, "%s scaled horizontally by factor %.2f (too wide)",

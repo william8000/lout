@@ -1,6 +1,6 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -292,41 +292,7 @@ FULL_CHAR *MapEncodingName(MAPPING m)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  static PrintMapping(MAPPING m, FILE *fp)                                 */
-/*                                                                           */
-/*  Print mapping m onto fp.                                                 */
-/*                                                                           */
-/*****************************************************************************/
-
-static void PrintMapping(MAPPING m, FILE *fp)
-{ MAP_VEC map = MapTable[m]; int i;
-  switch( BackEnd )
-  {
-    case POSTSCRIPT:
-
-      fprintf(fp, "%%%%BeginResource: encoding %s\n", string(map->name));
-      fprintf(fp, "/%s [\n", string(map->name));
-      for( i = 0;  i < MAX_CHARS;  i++ )
-        fprintf(fp, "/%s%c", string(map->vector[i]), (i+1)%8 != 0 ? ' ' : '\n');
-      fprintf(fp, "] def\n");
-      fprintf(fp, "%%%%EndResource\n\n");
-      break;
-
-
-    case PDF:
-
-      PDFFile_BeginFontEncoding(fp, (char*) string(map->name));
-      for( i = 0;  i < MAX_CHARS;  i++ )
-	fprintf(fp, "/%s%c", string(map->vector[i]), (i+1)%8 != 0 ? ' ' : '\n');
-      PDFFile_EndFontEncoding(fp);
-      break;
-  }
-}
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  void MapEnsurePrinted(MAPPING m, int curr_page, FILE *fp)                */
+/*  void MapEnsurePrinted(MAPPING m, int curr_page)                          */
 /*                                                                           */
 /*  Ensure that MAPPING m is printed on page curr_page, if required.         */
 /*  It's required if it has neither been printed on the current page         */
@@ -334,46 +300,53 @@ static void PrintMapping(MAPPING m, FILE *fp)
 /*                                                                           */
 /*****************************************************************************/
 
-void MapEnsurePrinted(MAPPING m, int curr_page, FILE *fp)
+void MapEnsurePrinted(MAPPING m, int curr_page)
 { MAP_VEC map = MapTable[m];
   assert( map->seen_recoded, "MapEnsurePrinted: not seen_recoded!" );
   if( map->last_page_printed < curr_page && map->last_page_printed != 1 )
   { map->last_page_printed = curr_page;
-    PrintMapping(m, fp);
+    BackEnd->PrintMapping(m);
   }
 }
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  MapPrintEncodings(fp) [OBSOLETE]                                         */
+/*  MapPrintEncodings()                                                      */
 /*                                                                           */
-/*  Print all encoding vectors in PostScript form on file fp.                */
+/*  Print all encoding vectors in existence so far; this counts as printing  */
+/*  them on "page 1", but in fact they will appear in the document setup     */
+/*  section.                                                                 */
 /*                                                                           */
 /*****************************************************************************/
 
-void MapPrintEncodings(FILE *fp)
-{ MAPPING m;
+void MapPrintEncodings()
+{ MAPPING m;  MAP_VEC map;
   for( m = 1;  m < maptop;  m++ )
-    if( MapTable[m]->seen_recoded )  PrintMapping(m, fp);
+  { if( MapTable[m]->seen_recoded )
+    { BackEnd->PrintMapping(m);
+      map = MapTable[m];
+      map->last_page_printed = 1;
+    }
+  }
 } /* end MapPrintEncodings */
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  MapPrintResources(fp)                                                    */
+/*  MapPrintPSResources(fp)                                                  */
 /*                                                                           */
-/*  Print resource entries for all encoding vectors on file fp.              */
+/*  Print PostScript resource entries for all encoding vectors on file fp.   */
 /*                                                                           */
 /*****************************************************************************/
 
-void MapPrintResources(FILE *fp)
+void MapPrintPSResources(FILE *fp)
 { MAPPING m;  MAP_VEC map;
   for( m = 1;  m < maptop;  m++ )  if( MapTable[m]->seen_recoded )
   { map = MapTable[m];
     fprintf(fp, "%%%%+ encoding %s\n", string(map->name));
   }
-} /* end MapPrintResources */
+} /* end MapPrintPSResources */
 
 
 /*@@**************************************************************************/
@@ -469,7 +442,7 @@ OBJECT MapSmallCaps(OBJECT x, STYLE *style)
   uc = MapTable[m]->map[MAP_UPPERCASE];
 
   /* if plain text, apply the mapping and exit */
-  if( BackEnd == PLAINTEXT )
+  if( !(BackEnd->scale_avail) )
   {
     for( i = 0;  string(x)[i] != '\0';  i++ )
       if( uc[string(x)[i]] != '\0' )

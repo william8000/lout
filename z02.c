@@ -1,6 +1,6 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -389,6 +389,14 @@ static void srcnext(void)
       /* at end of file since blksize = 0; so add missing newline char */
       blksize++;
       last_char = *(buf+blksize-1) = CH_NEWLINE;
+
+      /* this adjustment breaks LexNextTokenPos, so fatal error if database */
+      if( ftype == DATABASE_FILE )
+      {
+	line_num(file_pos) = col_num(file_pos) = 0;
+	Error(2, 25, "a database file must end with a newline; this one doesn't",
+	  FATAL, &file_pos);
+      }
     }
     debugcond4(DLA, DD, stack_free <= 1,
       "srcnext: %d = fread(0x%x, %d, %d, fp)",

@@ -178,17 +178,14 @@ Finally we have three options that control the abstract.
 @Code "@AbstractDisplay" may be @Code { Yes } or {@Code No};
 it determines whether the abstract is displayed (occupying
 the full page width except for an indent at each side like a quoted
-display) or inline (occupying the column width).
-@Code "@AbstractTitle" is the title of the abstract; its default
-value is @Code Abstract or its equivalent in the current language.
+display) or inline (occupying the column width).  There is a more
+general option, {@Code "@AbstractFormat"}, in the setup file that
+offers more formatting choices.  @Code "@AbstractTitle" is the title
+of the abstract; its default value is @Code Abstract or its equivalent
+in the current language.  Finally, @Code "@Abstract" contains the
 abstract. @Index @Code "@Abstract"
-Finally, @Code "@Abstract" contains the abstract itself; it may be
-empty or absent, in which case there will be no abstract.
-@PP
-The abstract may contain footnotes in the usual way.  Regrettably, each
-footnote in the abstract will generate one spurious `unresolved cross
-reference' error message that does not go away.  This slight problem
-might be fixed in the future.
+abstract itself; it may be empty or absent, in which case there will
+be no abstract.  The abstract may contain footnotes in the usual way.
 @PP
 After the compulsory {@Code "//"} comes the report body in the
 form of a sequence of sections:

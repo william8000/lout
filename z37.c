@@ -1,6 +1,6 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -40,7 +40,7 @@
 
 /*****************************************************************************/
 /*                                                                           */
-/* These definitions have been movet to "externs.h" since z24.c needs them:  */
+/* These definitions have been moved to "externs.h" since z24.c needs them:  */
 /*                                                                           */
 /*  struct metrics {							     */
 /*    SHORT_LENGTH up;							     */
@@ -63,7 +63,7 @@
 /*    COMPOSITE		*cmp_table;		   composites to build       */
 /*    int               cmp_top;                   length of cmp_table       */
 /*    OBJECT		font_table;		   record of sized fonts     */
-/*    OBJECT            original_font;             font rec before resizing  */
+/*    OBJECT            original_face;             face object of font       */
 /*    SHORT_LENGTH	underline_pos;             position of underline     */
 /*    SHORT_LENGTH	underline_thick;           thickness of underline    */
 /*    unsigned short	*kern_table;		   first kerning chars       */
@@ -78,23 +78,23 @@
 /*                                                                           */
 /*  Private data structures of this module                                   */
 /*                                                                           */
-/*            +++++++++++++++++++++++++++++++++                              */
-/*            +                               +                              */
-/*  root ->   +  ACAT                         +                              */
-/*            +                               +                              */
-/*            +                               +                              */
-/*            +++++++++++++++++++++++++++++++++                              */
+/*            +++++++++++++++++++++++++++                                    */
+/*            +                         +                                    */
+/*  root ->   +  ACAT                   +                                    */
+/*            +                         +                                    */
+/*            +                         +                                    */
+/*            +++++++++++++++++++++++++++                                    */
 /*                    |                                 font families...     */
 /*                    |                                                      */
 /*              +-----+-----------------------------------------------+ ...  */
 /*              |                                                     |      */
 /*              |                                                     |      */
-/*            +++++++++++++++++++++++++++++++++                              */
-/*            +                               +                              */
-/*  family -> + WORD                          +                              */
-/*            +   string (family name)        +                              */
-/*            +                               +                              */
-/*            +++++++++++++++++++++++++++++++++                              */
+/*            +++++++++++++++++++++++++++                                    */
+/*            +                         +                                    */
+/*  family -> + WORD                    +                                    */
+/*            +   string (family name)  +                                    */
+/*            +                         +                                    */
+/*            +++++++++++++++++++++++++++                                    */
 /*                    |                           faces of this family...    */
 /*                    |                                                      */
 /*              +-----+-----------------------------------------------+ ...  */
@@ -107,7 +107,6 @@
 /*            +   font_recoded                +                              */
 /*            +   font_mapping                +                              */
 /*            +   font_page                   +                              */
-/*            +   font_firstpage              +                              */
 /*            +                               +                              */
 /*            +++++++++++++++++++++++++++++++++                              */
 /*                |                                 size records...          */
@@ -317,7 +316,7 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
 	bfound = TRUE;
       }
       else if( StringEqual(command, "L") &&
-	BackEnd != PLAINTEXT && ch != '\0' )
+	BackEnd->uses_font_metrics && ch != '\0' )
       { if( lig[ch] == 1 )  lig[ch] = (*ligtop) - MAX_CHARS;
 	lig[(*ligtop)++] = ch;
 	i++;  /* skip L */
@@ -357,23 +356,21 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
       if( lig[ch] == 1 )  lig[ch] = 0;	/* set to known if unknown */
       else if( lig[ch] > 1 )		/* add '\0' to end of ligs */
 	lig[(*ligtop)++] = '\0';
-      switch( BackEnd )
+      if( BackEnd->uses_font_metrics )
       {
-	case POSTSCRIPT:
-	case PDF:	 fnt[ch].left  = llx;
-			 fnt[ch].down  = lly - xheight2;
-			 fnt[ch].right = wx;
-			 fnt[ch].up    = ury - xheight2;
-			 fnt[ch].last_adjust =
-			   (urx == 0 || wx == 0 || fixed_pitch) ? 0 : urx - wx;
-			 break;
-
-	case PLAINTEXT:  fnt[ch].left  = 0;
-			 fnt[ch].down  = - PlainCharHeight / 2;
-			 fnt[ch].right = PlainCharWidth;
-			 fnt[ch].up    = PlainCharHeight / 2;
-			 fnt[ch].last_adjust = 0;
-			 break;
+	fnt[ch].left  = llx;
+	fnt[ch].down  = lly - xheight2;
+	fnt[ch].right = wx;
+	fnt[ch].up    = ury - xheight2;
+	fnt[ch].last_adjust = (urx==0 || wx==0 || fixed_pitch) ? 0 : urx - wx;
+      }
+      else
+      {
+	fnt[ch].left  = 0;
+	fnt[ch].down  = - PlainCharHeight / 2;
+	fnt[ch].right = PlainCharWidth;
+	fnt[ch].up    = PlainCharHeight / 2;
+	fnt[ch].last_adjust = 0;
       }
       debug6(DFT, DDD, "  fnt[%c] = (%d,%d,%d,%d,%d)",ch, fnt[ch].left,
 	fnt[ch].down, fnt[ch].right, fnt[ch].up, fnt[ch].last_adjust);
@@ -393,7 +390,7 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
 /*****************************************************************************/
 
 static void ReadCompositeMetrics(OBJECT face, OBJECT Extrafilename,
-  FILE_NUM extra_fnum, int *lnum, unsigned short int composite[],
+  FILE_NUM extra_fnum, int *lnum, unsigned short composite[],
   COMPOSITE cmp[], int *cmptop, FILE *fp)
 { char *status;
   FULL_CHAR buff[MAX_BUFF], composite_name[100], name[100];
@@ -661,7 +658,6 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 
   /* say that this font is currently unused on any page */
   font_page(face) = 0;
-  font_firstpage(face) = FALSE;
 
   /* get a new number for this (default) font size */
   if( ++font_count >= finfo_size )
@@ -684,9 +680,10 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
     no_fpos);
   Link(face, first_size);
   font_num(first_size) = font_count;
-  font_size(first_size) = (BackEnd != PLAINTEXT) ? SZ_DFT : PlainCharHeight;
+  font_size(first_size) = BackEnd->uses_font_metrics ? SZ_DFT : PlainCharHeight;
   font_recoded(first_size) = font_recoded(face);
   font_mapping(first_size) = font_mapping(face);
+  font_num(face) = font_num(first_size); /* Uwe's suggestion, helps PDF */
   /* leaves font_xheight2 and font_spacewidth still to do */
 
 
@@ -851,7 +848,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	  ReadCharMetrics(face, fixed_pitch, xheight2, lig, &ligtop,
 	    fnum, fnt, &lnum, fp);
 	}
-	else if( BackEnd != PLAINTEXT && Kern &&
+	else if( BackEnd->uses_font_metrics && Kern &&
 	  StringEqual(command, AsciiToFull("StartKernPairs")) )
 	{ FULL_CHAR ch1, ch2, last_ch1;
 	  FULL_CHAR name1[30], name2[30];
@@ -962,7 +959,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 
   /* complete the initialization of first_size */
   font_xheight2(first_size) =
-    (BackEnd != PLAINTEXT) ? xheight2 : PlainCharHeight / 4;
+    BackEnd->uses_font_metrics ? xheight2 : PlainCharHeight / 4;
   ch = MapCharEncoding(STR_PS_SPACENAME, font_mapping(first_size));
   font_spacewidth(first_size) = ch == '\0' ? 0 : fnt[ch].right;
 
@@ -1016,7 +1013,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   /***************************************************************************/
 
   finfo[font_count].font_table = first_size;
-  finfo[font_count].original_font = face;
+  finfo[font_count].original_face = face;
   finfo[font_count].underline_pos = xheight2 - under_pos;
   finfo[font_count].underline_thick = under_thick;
   finfo[font_count].size_table = fnt;
@@ -1308,7 +1305,7 @@ void FontChange(STYLE *style, OBJECT x)
   }
 
   /* search fonts of face for desired size; return if already present */
-  if( BackEnd == PLAINTEXT )  flen = PlainCharHeight;
+  if( !(BackEnd->uses_font_metrics) )  flen = PlainCharHeight;
   for( link=NextDown(NextDown(Down(face))); link!=face; link = NextDown(link) )
   { Child(fsize, link);
     if( font_size(fsize) == flen )
@@ -1349,13 +1346,13 @@ void FontChange(STYLE *style, OBJECT x)
   new = MakeWord(WORD, string(old), no_fpos);
   Link(face, new);
   font_num(new)         = font_count;
-  font_size(new)        = BackEnd != PLAINTEXT ? flen : font_size(old);
+  font_size(new)        = BackEnd->uses_font_metrics ? flen : font_size(old);
   font_xheight2(new)    = font_xheight2(old) * font_size(new) / font_size(old);
   font_recoded(new)	= font_recoded(old);
   font_mapping(new)	= font_mapping(old);
   font_spacewidth(new)	= font_spacewidth(old) * font_size(new)/font_size(old);
   finfo[font_count].font_table = new;
-  finfo[font_count].original_font = face;
+  finfo[font_count].original_face = face;
   finfo[font_count].underline_pos =
     (finfo[font_num(old)].underline_pos * font_size(new)) / font_size(old);
   finfo[font_count].underline_thick =
@@ -1388,7 +1385,7 @@ void FontChange(STYLE *style, OBJECT x)
   if( newcmp == (COMPOSITE *) NULL )
     Error(37, 54, "run out of memory when changing font or font size",
       FATAL, &fpos(x));
-  for( i = 0;  i < cmptop;  i++ )
+  for( i = 1;  i < cmptop;  i++ )  /* NB position 0 is unused */
   { newcmp[i].char_code = oldcmp[i].char_code;
     if( newcmp[i].char_code != (FULL_CHAR) '\0' )
     { newcmp[i].x_offset = (oldcmp[i].x_offset*font_size(new)) / font_size(old);
@@ -1475,7 +1472,7 @@ void FontWordSize(OBJECT x)
   if( *p )
   { if( word_font(x) < 1 || word_font(x) > font_count )
       Error(37, 56, "no current font at word %s", FATAL, &fpos(x), string(x));
-    if( word_colour(x) == 0 && BackEnd != PLAINTEXT )
+    if( word_colour(x) == 0 && BackEnd->colour_avail )
       Error(37, 57, "no current colour at word %s", FATAL, &fpos(x), string(x));
     if( word_language(x) == 0 )
       Error(37, 58, "no current language at word %s", FATAL,&fpos(x),string(x));
@@ -1579,11 +1576,11 @@ void FontWordSize(OBJECT x)
 /*****************************************************************************/
 
 FULL_LENGTH FontSize(FONT_NUM fnum, OBJECT x)
-{ debug1(DFT, DD, "FontSize( %d )", fnum);
+{ debug1(DFT, D, "FontSize( %d )", fnum);
   assert( fnum <= font_count, "FontSize!" );
   if( fnum <= 0 )
     Error(37, 61, "no current font at this point", FATAL, &fpos(x));
-  debug1(DFT, DD, "FontSize returning %d", font_size(finfo[fnum].font_table));
+  debug1(DFT, D, "FontSize returning %d", font_size(finfo[fnum].font_table));
   return font_size(finfo[fnum].font_table);
 } /* end FontSize */
 
@@ -1755,42 +1752,13 @@ void FontPrintPageSetup(FILE *fp)
     assert( is_word(type(face)), "FontPrintPageSetup: face!" );
     assert( Down(face) != face, "FontDebug: Down(face)!");
 
-    /* record that face is used on the first page, if this is the first page */
-    if( font_curr_page == 1 )  font_firstpage(face) = TRUE;
-
-    /* print font encoding command unless already done */
-    if( !font_firstpage(face) || font_curr_page == 1 )
-    { Child(first_size, NextDown(NextDown(Down(face))));
-      assert( is_word(type(first_size)), "FontPrintPageSetup: first_size!" );
-      Child(ps_name, Down(face));
-      assert( is_word(type(ps_name)), "FontPrintPageSetup: ps_name!" );
-      fprintf(fp, "%%%%IncludeResource: font %s\n", string(ps_name));
-
-      switch( BackEnd )
-      {
-	case POSTSCRIPT:
-
-	  if( font_recoded(face) )
-	  {
-	    MapEnsurePrinted(font_mapping(face), font_curr_page, fp);
-	    fprintf(fp, "/%s%s %s /%s LoutRecode\n",
-	      string(ps_name), string(first_size),
-	      MapEncodingName(font_mapping(face)), string(ps_name));
-	    fprintf(fp, "/%s { /%s%s LoutFont } def\n", string(first_size),
-	      string(ps_name), string(first_size));
-	  }
-	  else fprintf(fp, "/%s { /%s LoutFont } def\n", string(first_size),
-	    string(ps_name));
-	  break;
-
-	
-	case PDF:
-
-	  PDFFont_AddFont(fp, string(first_size), string(ps_name),
-	    MapEncodingName(font_mapping(face)));
-	  break;
-      }
-    }
+    /* print font encoding command */
+    Child(first_size, NextDown(NextDown(Down(face))));
+    assert( is_word(type(first_size)), "FontPrintPageSetup: first_size!" );
+    Child(ps_name, Down(face));
+    assert( is_word(type(ps_name)), "FontPrintPageSetup: ps_name!" );
+    BackEnd->PrintPageSetupForFont(face, font_curr_page,
+      string(ps_name), string(first_size));
   }
   debug0(DFT, DD, "FontPrintPageSetup returning.");
 } /* end FontPrintPageSetup */
@@ -1805,7 +1773,7 @@ void FontPrintPageSetup(FILE *fp)
 /*****************************************************************************/
 
 void FontPrintPageResources(FILE *fp)
-{ OBJECT face, ps_name, link;
+{ OBJECT face, ps_name, link, pface, pname, plink;
   BOOLEAN first;
   assert(font_root!=nilobj && type(font_root)==ACAT, "FontDebug: font_root!");
   assert(font_used!=nilobj && type(font_used)==ACAT, "FontDebug: font_used!");
@@ -1819,20 +1787,22 @@ void FontPrintPageResources(FILE *fp)
     Child(ps_name, Down(face));
     assert( is_word(type(ps_name)), "FontPrintPageResources: ps_name!" );
 
-    switch( BackEnd )
+    /* make sure this ps_name has not been printed before (ugly, I know). */
+    /* Repeats arise when the font appears twice in the database under    */
+    /* different family-face names, perhaps because of sysnonyms like     */
+    /* Italic and Slope, or perhaps because of different encoding vectors */
+    for( plink = Down(font_used);  plink != link;  plink = NextDown(plink) )
     {
-      case POSTSCRIPT:
-
-	fprintf(fp, "%s font %s\n",
-	  first ? "%%PageResources:" : "%%+", string(ps_name));
-	first = FALSE;
+      Child(pface, plink);
+      Child(pname, Down(pface));
+      if( StringEqual(string(pname), string(ps_name)) )
 	break;
-
-
-      case PDF:
-
-	/* PDFWriteFontResource(fp, string(ps_name)); */
-	break;
+    }
+    if( plink == link )
+    {
+      /* not seen before, so print it */
+      BackEnd->PrintPageResourceForFont(string(ps_name), first);
+      first = FALSE;
     }
   }
   debug0(DFT, DD, "FontPrintPageResources returning.");

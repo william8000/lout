@@ -226,7 +226,8 @@ def @BookSetup
 
     #######################################################################
     #                                                                     #
-    #  @Full - this sends text to a full-width place.                     #
+    #  @Full - this sends text to a full-width place on a new page, even  #
+    #  if @ChapterStartPages is SamePage.                                 #
     #                                                                     #
     #######################################################################
 
@@ -237,7 +238,7 @@ def @BookSetup
 	def @Even force into { @EvenFullPlace&&following } right x { x }
 
 	@ChapterStartPages @Case {
-	    Any  @Yield @Any  x
+	    { Any SamePage } @Yield @Any  x
 	    Odd  @Yield @Odd  x
 	    Even @Yield @Even x
 	}
@@ -246,20 +247,23 @@ def @BookSetup
 
     #######################################################################
     #                                                                     #
-    #  @NoForceFull - this sends text to a full-width place.              #
+    #  @ChapterFull - this sends text to a full-width place on a new      #
+    #  page, unless @ChapterStartPages is SamePage, in which case it      #
+    #  doesn't send the text anywhere.                                    #
     #                                                                     #
     #######################################################################
 
-    def @NoForceFull right x
+    def @ChapterFull right x
     {
-	def @Any  into { @FullPlace&&following     } right x { x }
-	def @Odd  into { @OddFullPlace&&following  } right x { x }
-	def @Even into { @EvenFullPlace&&following } right x { x }
+	def @Any  force into { @FullPlace&&following     } right x { x }
+	def @Odd  force into { @OddFullPlace&&following  } right x { x }
+	def @Even force into { @EvenFullPlace&&following } right x { x }
 
 	@ChapterStartPages @Case {
 	    Any  @Yield @Any  x
 	    Odd  @Yield @Odd  x
 	    Even @Yield @Even x
+	    SamePage @Yield x
 	}
     }
 
@@ -277,7 +281,7 @@ def @BookSetup
 	def @Even force into { @IntroEvenFullPlace&&following } right x { x }
 
 	@ChapterStartPages @Case {
-	    Any  @Yield @Any  x
+	    { Any SamePage } @Yield @Any  x
 	    Odd  @Yield @Odd  x
 	    Even @Yield @Even x
 	}
@@ -436,7 +440,7 @@ def @BookSetup
 		incontents { @ReferencesInContents }
 		pnprefix { @ReferencesPrefix }
 		inrunners { Yes }
-		sendheader { @Full @Body }
+		sendheader { @ChapterFull @Body }
 		innergap { @SectionGap }
 		@ReferencesSection
 
@@ -1053,7 +1057,7 @@ def @BookSetup
 	    indisplays { @ChapterNumInDisplays }
 	    infigures { @ChapterNumInFigures }
 	    intables { @ChapterNumInTables }
-	    sendheader { @Full @Body }
+	    sendheader { @ChapterFull @Body }
 	    innergap { @SectionGap }
 	    inrunners { Yes }
 	    @Body
@@ -1252,7 +1256,7 @@ def @BookSetup
 	    indisplays { @AppendixNumInDisplays }
 	    infigures { @AppendixNumInFigures }
 	    intables { @AppendixNumInTables }
-	    sendheader { @Full @Body }
+	    sendheader { @ChapterFull @Body }
 	    innergap { @SubAppendixGap }
 	    inrunners { Yes }
 	    @Body

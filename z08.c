@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -1542,7 +1542,7 @@ OBJECT *enclose, BOOLEAN fcr)
 
     case BACKEND:
 
-      res = MakeWord(WORD, BackEndWord, &fpos(x));
+      res = MakeWord(WORD, BackEnd->name, &fpos(x));
       ReplaceNode(res, x);
       DisposeObject(x);
       x = Manifest(res, env, style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);

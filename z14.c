@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -135,7 +135,7 @@ typedef struct {
     badness = (SQRT_LOOSE_BAD*(col_width - I.nat_width)) / col_width;	\
     I.badness += badness * badness;					\
   }									\
-  else if( BackEnd != PLAINTEXT && allow_shrink &&			\
+  else if( BackEnd->fractional_spacing_avail && allow_shrink &&		\
     MAX_SHRINK*(I.nat_width-col_width) <= I.space_width )		\
   { I.class = TIGHT;							\
     badness = (SQRT_TIGHT_BAD*(col_width - I.nat_width)) / col_width;	\

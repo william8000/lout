@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.21)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -223,7 +223,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 	/* if first occurrence of this font on this page, notify font */
 	if( string(x)[0] != '\0' )
-	{ face = finfo[word_font(x)].original_font;
+	{ face = finfo[word_font(x)].original_face;
 	  if( font_page(face) < font_curr_page )
 	  { debug3(DFT, DD, "FAPO: x = %s, word_font = %d, face = %s",
 	      string(x), word_font(x), EchoObject(face));
@@ -241,11 +241,11 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	assert( underline(x) == UNDER_OFF || underline(x) == UNDER_ON,
 	  "FixAndPrintObject: underline(x)!" );
 	if( string(x)[0] != '\0' )
-	{ PrintWord(x, word_save_mark(x), pg - xmk);
+	{ BackEnd->PrintWord(x, word_save_mark(x), pg - xmk);
 	  if( underline(x) == UNDER_ON )
 	  {
 	    FontWordSize(x);  /* to restore fwd(x, COLM) */
-	    PrintUnderline(word_font(x), word_save_mark(x),
+	    BackEnd->PrintUnderline(word_font(x), word_save_mark(x),
 	      word_save_mark(x) + fwd(x, COLM), pg - xmk);
 	  }
 	}
@@ -334,30 +334,22 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
       debug0(DRS, DD, "FixAndPrintObject at VSCALE");
       CountChild(y, Down(x), count);
-      switch( BackEnd )
+      if( BackEnd->scale_avail )
       {
-	case PLAINTEXT:
-
-	  break;
-
-
-	case POSTSCRIPT:
-	case PDF:
-
-          if( dim == COLM )
-            FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
-          else if( (scale_factor = ScaleFactor(xb+xf, size(y, ROWM))) > 0 )
-          { SaveGraphicState(y);
-	    CoordTranslate(0, pg-(xmk-xb+(FULL_LENGTH) (back(y,ROWM)*scale_factor)));
-	    CoordScale(1.0, scale_factor);
-            FixAndPrintObject(y, 0, back(y,ROWM), fwd(y,ROWM), dim,
-	      NO_SUPPRESS, 0, count);
-	    RestoreGraphicState();
-          }
-          else if( !is_word(type(y)) || string(y)[0] != '\0' )
-            Error(23, 1, "object deleted (it cannot be scaled vertically)",
-	      WARN, &fpos(x));
-	  break;
+	if( dim == COLM )
+	  FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
+	else if( (scale_factor = ScaleFactor(xb+xf, size(y, ROWM))) > 0 )
+	{ BackEnd->SaveGraphicState(y);
+	  BackEnd->CoordTranslate(0,
+	    pg - (xmk - xb + (FULL_LENGTH) (back(y, ROWM) * scale_factor)));
+	  BackEnd->CoordScale(1.0, scale_factor);
+	  FixAndPrintObject(y, 0, back(y,ROWM), fwd(y,ROWM), dim,
+	    NO_SUPPRESS, 0, count);
+	  BackEnd->RestoreGraphicState();
+	}
+	else if( !is_word(type(y)) || string(y)[0] != '\0' )
+	  Error(23, 1, "object deleted (it cannot be scaled vertically)",
+	    WARN, &fpos(x));
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -367,37 +359,27 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     
       debug0(DRS, DD, "FixAndPrintObject at HSCALE");
       CountChild(y, Down(x), count);
-      switch( BackEnd )
-      {
-	case PLAINTEXT:
-
-	  break;
-
-
-	case POSTSCRIPT:
-	case PDF:
-
-          if( dim == COLM )
-          { save_mark(x) = xmk;
-	    bc(constraint(x)) = xb;
-	    fc(constraint(x)) = xf;
-            if( (scale_factor = ScaleFactor(xb+xf, size(y, COLM))) > 0 )
-	      FixAndPrintObject(y, 0, back(y, COLM), fwd(y, COLM), dim,
-		NO_SUPPRESS, pg, count);
-            else if( !is_word(type(y)) || string(y)[0] != '\0' )
-	      Error(23, 2, "object deleted (it cannot be scaled horizontally)",
-		WARN, &fpos(y));
-          }
-          else if( (scale_factor =
-	    ScaleFactor(bc(constraint(x))+fc(constraint(x)),size(y,COLM))) > 0 )
-          { SaveGraphicState(y);
-	    CoordTranslate(save_mark(x) - bc(constraint(x))
+      if( BackEnd->scale_avail )
+      {	if( dim == COLM )
+        { save_mark(x) = xmk;
+	  bc(constraint(x)) = xb;
+	  fc(constraint(x)) = xf;
+          if( (scale_factor = ScaleFactor(xb+xf, size(y, COLM))) > 0 )
+	    FixAndPrintObject(y, 0, back(y, COLM), fwd(y, COLM), dim,
+	      NO_SUPPRESS, pg, count);
+          else if( !is_word(type(y)) || string(y)[0] != '\0' )
+	    Error(23, 2, "object deleted (it cannot be scaled horizontally)",
+	      WARN, &fpos(y));
+        }
+        else if( (scale_factor =
+	  ScaleFactor(bc(constraint(x))+fc(constraint(x)),size(y,COLM))) > 0 )
+        { BackEnd->SaveGraphicState(y);
+	  BackEnd->CoordTranslate(save_mark(x) - bc(constraint(x))
 	       + (FULL_LENGTH) (back(y, COLM)*scale_factor), 0);
-	    CoordScale(scale_factor, 1.0);
-            FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
-	    RestoreGraphicState();
-          }
-	  break;
+	  BackEnd->CoordScale(scale_factor, 1.0);
+          FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
+	  BackEnd->RestoreGraphicState();
+        }
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -406,41 +388,30 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case SCALE:
 
       CountChild(y, Down(x), count);
-      switch( BackEnd )
+      if( BackEnd->scale_avail )
       {
-	case PLAINTEXT:
-
-	  /* printable only if scale factor is one */
-	  if( bc(constraint(x)) == SF && fc(constraint(x)) == SF )
-	  {
-	    FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-	  }
-	  break;
-
-
-	case POSTSCRIPT:
-	case PDF:
-
-          if( dim == COLM )
-          { assert( bc(constraint(x)) > 0, "FAPO: horizontal scale factor!" );
-	    save_mark(x) = xmk;
-	    yb = xb * SF / bc(constraint(x));
-	    yf = xf * SF / bc(constraint(x));
-            FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, pg, count);
-          }
-          else
-          { assert( fc(constraint(x)) > 0, "FAPO: vertical scale factor!" );
-	    yb = xb * SF / fc(constraint(x));
-	    yf = xf * SF / fc(constraint(x));
-	    SaveGraphicState(y);
-	    CoordTranslate(save_mark(x), pg - xmk);
-	    CoordScale( (float) bc(constraint(x))/SF,
-	      (float) fc(constraint(x))/SF);
-            FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS,
-	      0, count);
-	    RestoreGraphicState();
-          }
-	  break;
+        if( dim == COLM )
+        { assert( bc(constraint(x)) > 0, "FAPO: horizontal scale factor!" );
+	  save_mark(x) = xmk;
+	  yb = xb * SF / bc(constraint(x));
+	  yf = xf * SF / bc(constraint(x));
+          FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, pg, count);
+        }
+        else
+        { assert( fc(constraint(x)) > 0, "FAPO: vertical scale factor!" );
+	  yb = xb * SF / fc(constraint(x));
+	  yf = xf * SF / fc(constraint(x));
+	  BackEnd->SaveGraphicState(y);
+	  BackEnd->CoordTranslate(save_mark(x), pg - xmk);
+	  BackEnd->CoordScale( (float)bc(constraint(x))/SF,
+	    (float)fc(constraint(x))/SF);
+          FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, 0, count);
+	  BackEnd->RestoreGraphicState();
+        }
+      }
+      else if( bc(constraint(x)) == SF && fc(constraint(x)) == SF )
+      {
+	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -474,42 +445,30 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case ROTATE:
     
       CountChild(y, Down(x), count);
-      switch( BackEnd )
+      if( BackEnd->rotate_avail )
       {
-	case PLAINTEXT:
-
-	  /* printable only if angle is zero */
-	  if( sparec(constraint(x)) == 0 )
-	  {
-	    FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-	  }
-	  break;
-
-
-	case POSTSCRIPT:
-	case PDF:
-
-          if( dim == COLM )
-          { CONSTRAINT colc, rowc, yc;
-            save_mark(x) = xmk;
-	    SetConstraint(colc, back(x,COLM), MAX_FULL_LENGTH, fwd(x,COLM));
-	    SetConstraint(rowc, back(x,ROWM), MAX_FULL_LENGTH, fwd(x,ROWM));
-	    RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc,COLM);
-	    FixAndPrintObject(y, 0, bc(yc), fc(yc), COLM,NO_SUPPRESS,pg,count);
-          }
-          else
-          { CONSTRAINT colc, rowc, yc;
-	    SaveGraphicState(y);
-	    CoordTranslate(save_mark(x), pg - xmk);
-	    CoordRotate(sparec(constraint(x)));
-	    SetConstraint(colc, back(x,COLM), MAX_FULL_LENGTH, fwd(x,COLM));
-	    SetConstraint(rowc, back(x,ROWM), MAX_FULL_LENGTH, fwd(x,ROWM));
-	    RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc, ROWM);
-	    FixAndPrintObject(y, 0, bc(yc), fc(yc), ROWM, NO_SUPPRESS,0,count);
-	    RestoreGraphicState();
-          }
-	  break;
+        if( dim == COLM )
+        { CONSTRAINT colc, rowc, yc;
+          save_mark(x) = xmk;
+	  SetConstraint(colc, back(x,COLM), MAX_FULL_LENGTH, fwd(x,COLM));
+	  SetConstraint(rowc, back(x,ROWM), MAX_FULL_LENGTH, fwd(x,ROWM));
+	  RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc,COLM);
+	  FixAndPrintObject(y, 0, bc(yc), fc(yc), COLM,NO_SUPPRESS,pg,count);
+        }
+        else
+        { CONSTRAINT colc, rowc, yc;
+	  BackEnd->SaveGraphicState(y);
+	  BackEnd->CoordTranslate(save_mark(x), pg - xmk);
+	  BackEnd->CoordRotate(sparec(constraint(x)));
+	  SetConstraint(colc, back(x,COLM), MAX_FULL_LENGTH, fwd(x,COLM));
+	  SetConstraint(rowc, back(x,ROWM), MAX_FULL_LENGTH, fwd(x,ROWM));
+	  RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc, ROWM);
+	  FixAndPrintObject(y, 0, bc(yc), fc(yc), ROWM, NO_SUPPRESS,0,count);
+	  BackEnd->RestoreGraphicState();
+        }
       }
+      else if( sparec(constraint(x)) == 0 )
+	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
 
@@ -517,47 +476,37 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case PLAIN_GRAPHIC:
 
       CountChild(y, LastDown(x), count);
-      switch( BackEnd )
+      if( BackEnd->plaingraphic_avail )
       {
-
-	case POSTSCRIPT:
-	case PDF:
-
+	if( dim == COLM )
+	{
+	  back(x, dim) = xb;
+	  fwd(x, dim)  = xf;
+	  save_mark(x) = xmk - back(x, dim);
+	  debug2(DGP, DD, "PLAIN_GRAPHIC COLM storing size %s, %s",
+	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
           FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-	  break;
-
-
-	case PLAINTEXT:
-
-          if( dim == COLM )
-          {
-	    back(x, dim) = xb;
-	    fwd(x, dim)  = xf;
-	    save_mark(x) = xmk - back(x, dim);
-	    debug2(DGP, DD, "PLAIN_GRAPHIC COLM storing size %s, %s",
-	      EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
-            FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+	}
+	else
+	{ OBJECT tmp, pre, post;
+          Child(tmp, Down(x));
+          if( type(tmp) == VCAT )
+          { Child(pre, Down(tmp));
+            Child(post, LastDown(tmp));
           }
-          else
-          { OBJECT tmp, pre, post;
-            Child(tmp, Down(x));
-            if( type(tmp) == VCAT )
-            { Child(pre, Down(tmp));
-              Child(post, LastDown(tmp));
-            }
-            else pre = tmp, post = nilobj;
-	    back(x, dim) = xb;
-	    fwd(x, dim)  = xf;
-            PrintPlainGraphicObject(pre, save_mark(x),
+          else pre = tmp, post = nilobj;
+	  back(x, dim) = xb;
+	  fwd(x, dim)  = xf;
+          BackEnd->PrintPlainGraphic(pre, save_mark(x),
+	    pg - (xmk - back(x, dim)), x);
+          FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+          if( post != nilobj )
+	    BackEnd->PrintPlainGraphic(post, save_mark(x),
 	      pg - (xmk - back(x, dim)), x);
-            FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-            if( post != nilobj )
-	      PrintPlainGraphicObject(post, save_mark(x),
-		pg - (xmk - back(x, dim)), x);
-          }
-	  break;
-
-      } /* end switch */
+	}
+      }
+      else
+	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
 
@@ -565,63 +514,45 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case GRAPHIC:
     
       CountChild(y, LastDown(x), count);
-      switch( BackEnd )
+      if( BackEnd->graphic_avail )
       {
-	case PLAINTEXT:
+	if( dim == COLM )
+	{
+	  /* if first occurrence of this font on this page, notify font */
+	  if( font(save_style(x)) > 0 )
+	  { face = finfo[font(save_style(x))].original_face;
+	    if( font_page(face) < font_curr_page )  FontPageUsed(face);
+	  }
 
-          FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-	  break;
-
-
-	case POSTSCRIPT:
-	case PDF:
-
-          if( dim == COLM )
-          {
-	    /* if first occurrence of this font on this page, notify font */
-	    if( font(save_style(x)) > 0 )
-	    { face = finfo[font(save_style(x))].original_font;
-	      if( font_page(face) < font_curr_page )  FontPageUsed(face);
-	    }
-
-	    back(x, dim) = xb;
-	    fwd(x, dim)  = xf;
-	    debug2(DGP, DD, "GRAPHIC COLM storing size %s, %s",
-	      EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
-	    save_mark(x) = xmk - back(x, COLM);
-            FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, pg, count);
+	  back(x, dim) = xb;
+	  fwd(x, dim)  = xf;
+	  debug2(DGP, DD, "GRAPHIC COLM storing size %s, %s",
+	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+	  save_mark(x) = xmk - back(x, COLM);
+          FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, pg, count);
+	}
+	else
+	{ OBJECT tmp, pre, post;
+          Child(tmp, Down(x));
+          if( type(tmp) == VCAT )
+          { Child(pre, Down(tmp));
+            Child(post, LastDown(tmp));
           }
-          else
-          { OBJECT tmp, pre, post;
-            Child(tmp, Down(x));
-            if( type(tmp) == VCAT )
-            { Child(pre, Down(tmp));
-              Child(post, LastDown(tmp));
-            }
-            else pre = tmp, post = nilobj;
-	    back(x, dim) = xb;
-	    fwd(x, dim)  = xf;
+          else pre = tmp, post = nilobj;
+	  back(x, dim) = xb;
+	  fwd(x, dim)  = xf;
 
-	    SaveTranslateDefineSave(x, save_mark(x), pg - (xmk + fwd(x, ROWM)));
-	    /* ***
-            SaveGraphicState(x);
-            CoordTranslate(save_mark(x), pg - (xmk + fwd(x, ROWM)));
-	    debug4(DGP, DD, "GRAPHIC ROWM calling %s,%s %s,%s",
-	      EchoLength(back(x, COLM)), EchoLength(fwd(x, COLM)),
-	      EchoLength(back(x, ROWM)), EchoLength(fwd(x, ROWM)));
-            DefineGraphicNames(x);
-            SaveGraphicState(x);
-	    *** */
-
-            PrintGraphicObject(pre);
-            RestoreGraphicState();
-            FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, xb + xf, count);
-            if( post != nilobj )  PrintGraphicObject(post);
-            RestoreGraphicState();
-          }
-	  break;
-
-      } /* end switch */
+	  BackEnd->SaveTranslateDefineSave(x, save_mark(x),
+	    pg - (xmk + fwd(x, ROWM)));
+          BackEnd->PrintGraphicObject(pre);
+          BackEnd->RestoreGraphicState();
+          FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, xb + xf, count);
+          if( post != nilobj )  BackEnd->PrintGraphicObject(post);
+          BackEnd->RestoreGraphicState();
+	}
+      }
+      else
+        FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
 
@@ -630,33 +561,23 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case SINCGRAPHIC:
 
       CountChild(y, Down(x), count);
-      switch( BackEnd )
+      if( BackEnd->incgraphic_avail )
       {
-	case PLAINTEXT:
-
-	  break;
-
-
-	case POSTSCRIPT:
-	case PDF:
-
-          if( dim == COLM )
-	  { save_mark(x) = xmk;
-	    if( incgraphic_ok(x) )
-	    { debug2(DGP, DD, "  %s (style %s)",
-		EchoObject(x), EchoStyle(&save_style(x)));
-	      face = finfo[font(save_style(x))].original_font;
-	      if( font_page(face) < font_curr_page )
-	      {	debug3(DFT, DD, "FAPO-IG: x = %s, font = %d, face = %s",
-		  string(x), font(save_style(x)), EchoObject(face));
-		FontPageUsed(face);
-	      }
+	if( dim == COLM )
+	{ save_mark(x) = xmk;
+	  if( incgraphic_ok(x) )
+	  { debug2(DGP, DD, "  %s (style %s)",
+	      EchoObject(x), EchoStyle(&save_style(x)));
+	    face = finfo[font(save_style(x))].original_face;
+	    if( font_page(face) < font_curr_page )
+	    { debug3(DFT, DD, "FAPO-IG: x = %s, font = %d, face = %s",
+		string(x), font(save_style(x)), EchoObject(face));
+	      FontPageUsed(face);
 	    }
 	  }
-          else if( incgraphic_ok(x) )
-	    PrintGraphicInclude(x, save_mark(x), pg - xmk);
-	  break;
-
+	}
+	else if( incgraphic_ok(x) )
+	  BackEnd->PrintGraphicInclude(x, save_mark(x), pg - xmk);
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -946,7 +867,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  fwd(x, dim) = actual_size;
 	  debug2(DGP, DD, "  oversize, actual_size = %s, frame_size = %s",
 	      EchoLength(actual_size), EchoLength(frame_size));
-	  if( BackEnd != PLAINTEXT && InsertScale(x, &c) )
+	  if( BackEnd->scale_avail && InsertScale(x, &c) )
 	  {
 	    /* the problem has just been fixed, by inserting a @Scale above x */
 	    OBJECT prnt;
@@ -1191,7 +1112,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	if( !is_definite(type(y)) )
 	{
 	  if( type(y) == UNDER_REC )   /* generate an underline now */
-	    PrintUnderline(back(y, ROWM), back(y, COLM), fwd(y, COLM), pg - xmk);
+	    BackEnd->PrintUnderline(back(y, ROWM), back(y, COLM),
+	      fwd(y, COLM), pg - xmk);
 	  continue;
 	}
 	FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
