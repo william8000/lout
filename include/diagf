@@ -160,6 +160,11 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
+    import @Geometry named pathgap
+	named thin   { 0.08 ft }
+	named medium { 0.16 ft }
+	named thick  { 0.24 ft }
+					{ thin	         	}
     named arrow                 	{ no			}
     named arrowstyle             	{ solid			}
     named arrowwidth             	{ 0.3f			}
@@ -258,7 +263,7 @@ def @DiagSetup
 	   @CircleArrowHead @BoxArrowHead
 
 	   @Link
-	   @Line @Arrow @Curve @CurveArrow
+	   @Line @DoubleLine @Arrow @DoubleArrow @Curve @CurveArrow
 	   @ACurve @ACurveArrow @CCurve @CCurveArrow
 	   @Bezier @BezierArrow
 	   @HVLine @HVArrow @VHLine @VHArrow
@@ -377,6 +382,11 @@ def @DiagSetup
 	    named medium { 0.08 ft }
 	    named thick  { 0.12 ft }
 						{ pathwidth     	}
+        import @Geometry named pathgap
+	    named thin   { 0.08 ft }
+	    named medium { 0.16 ft }
+	    named thick  { 0.24 ft }
+						{ pathgap	     	}
 	named arrow				{ arrow			}
 	named arrowstyle			{ arrowstyle		}
 	named arrowwidth			{ arrowwidth		}
@@ -2243,6 +2253,11 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ pathwidth		}
+            import @Geometry named pathgap
+		named thin   { 0.08 ft }
+		named medium { 0.16 ft }
+		named thick  { 0.24 ft }
+						{ pathgap		}
 
             named arrow				{ arrow			}
             named arrowstyle			{ arrowstyle		}
@@ -2401,6 +2416,39 @@ def @DiagSetup
 	       {arrow @ToArrowLength arrowlength}
 	       "{" from "}" "{" to "}"
 	       xindent zindent "ldiaglinepath"
+               # FROM	:< {from??CTR angleto to??CTR}
+               # FROM	:: from boundaryatangle FROM@ANGLE
+               # 	++ {arrow @FromArrowLength arrowlength}atangle FROM@ANGLE
+               # TO  	:< FROM@ANGLE
+               # TO  	:: to boundaryatangle { TO@ANGLE - 180d }
+               # ++ {arrow @ToArrowLength arrowlength} atangle {TO@ANGLE - 180d}
+               # 		
+               # LMID	:: FROM ** 0.5 ++ TO ** 0.5
+               # LMID	:< FROM@ANGLE
+               # XINDENT	:= xindent min { FROM distance LMID }
+               # LFROM	:: FROM ++ XINDENT atangle FROM@ANGLE
+               # LFROM	:< FROM@ANGLE
+               # ZINDENT	:= zindent min { TO distance LMID }
+               # LTO 	:: TO -- ZINDENT atangle FROM@ANGLE
+               # LTO 	:< FROM@ANGLE
+	       #
+               # if cond { direct }
+               # then { FROM TO }
+               # else { FROM LFROM LMID LTO TO }
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    import @Geometry
+	    def @DoubleLinePath
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	       {arrow @FromArrowLength arrowlength}
+	       {arrow @ToArrowLength arrowlength}
+	       "{" from "}" "{" to "}"
+	       xindent zindent pathgap "ldiagdoublelinepath"
                # FROM	:< {from??CTR angleto to??CTR}
                # FROM	:: from boundaryatangle FROM@ANGLE
                # 	++ {arrow @FromArrowLength arrowlength}atangle FROM@ANGLE
@@ -3161,6 +3209,7 @@ def @DiagSetup
 	    {
 		path @Case {
 		    line			@Yield @LinePath
+		    doubleline			@Yield @DoubleLinePath
 		    { acurve curve }		@Yield @ACurvePath
 		    ccurve			@Yield @CCurvePath
 		    bezier			@Yield @BezierPath
@@ -3323,6 +3372,11 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ pathwidth		}
+            import @Geometry named pathgap
+		named thin   { 0.08 ft }
+		named medium { 0.16 ft }
+		named thick  { 0.24 ft }
+						{ pathgap		}
 
             named arrow				{ arrow			}
             named arrowstyle			{ arrowstyle		}
@@ -3447,6 +3501,7 @@ def @DiagSetup
 			pathstyle	{ pathstyle		}
 			pathdashlength	{ pathdashlength	}
 			pathwidth	{ pathwidth		}
+			pathgap 	{ pathgap		}
 			arrow		{ arrow			}
 			arrowstyle	{ arrowstyle		}
 			arrowwidth	{ arrowwidth		}
@@ -3521,7 +3576,9 @@ def @DiagSetup
         }
 
 	macro @Line		{ @Link path { line     }		}
+	macro @DoubleLine	{ @Link path { doubleline }		}
 	macro @Arrow		{ @Link path { line     } arrow { yes }	}
+	macro @DoubleArrow	{ @Link path {doubleline} arrow { yes }	}
 	macro @Curve		{ @Link path { curve	}		}
 	macro @CurveArrow	{ @Link path { curve	} arrow { yes }	}
 	macro @ACurve		{ @Link path { acurve	}		}

@@ -55,6 +55,7 @@
   # @DisplayNumStyle	{ (num)			} # style of display numbers
   # @WideIndent		{ 4.00f	@OrIfPlain 10s	} # @WideTaggedList indent
   # @VeryWideIndent	{ 8.00f	@OrIfPlain 20s	} # @VeryWideTaggedList indent
+  # @ListOuterGap	{ 1.00v	@OrIfPlain 1f	} # gap before, after lists
   # @ListGap		{ 1.00v	@OrIfPlain 1f	} # gap between list items
   # @ListIndent		{ 0s			} # indent of list items
   # @ListRightIndent	{ 0s			} # right indent of list items
@@ -110,6 +111,7 @@
   # @ContentsGap	{ 0.20v	@OrIfPlain 0f	} # extra gap above minor entry
   # @ContentsGapAbove	{ 0.80v	@OrIfPlain 1f	} # extra gap above major entry
   # @ContentsGapBelow	{ 0.00v	@OrIfPlain 0f	} # extra gap below major entry
+  # @ContentsFont       { Bold                  } # font for major entry
   # @ContentsPartGapAbove { 1.00v @OrIfPlain 1f	} # extra gap above `part' entry
   # @ContentsPartGapBelow { 0.00v @OrIfPlain 0f	} # extra gap below `part' entry
   # @ContentsFormat	{ number @DotSep title	} # contents entry format
@@ -153,6 +155,7 @@
   # @FootNoteLocation	{ ColFoot		} # where the footnote appears
   # @FootNoteFont	{ 0.80f			} # font for footnotes
   # @FootNoteBreak	{ 1.2fx	@OrIfPlain 1fx	} # break for footnotes
+  # @FootNoteFormat     { { number &0.05f } @Insert body } # footnote format
   # @FootLen		{ 2.00c	@OrIfPlain 10s	} # length of footnote line
   # @FootAboveGap	{ @DisplayGap		} # gap above footnote line
   # @FootGap		{ 0.20c	@OrIfPlain 1fx	} # gap between footnotes
@@ -164,14 +167,29 @@
   # @EndNoteNumbers	{ Arabic		} # endnote numbers
   # @EndNoteFont	{ 0.80f			} # font of endnotes
   # @EndNoteBreak	{ 1.2fx	@OrIfPlain 1fx	} # break for endnotes
+  # @EndNoteFormat	{ { number &0.05f } @Insert body } # endnote format
   # @EndNoteGap		{ 0.20c	@OrIfPlain 1f	} # gap between endnotes
   # @TheoremWord	{ theorem		} # "Theorem" word, etc.
+  # @TheoremTitleFormat	{ (title)		} # only if title present
+  # @TheoremFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
   # @DefinitionWord	{ definition		} # "Definition" word, etc.
+  # @DefinitionTitleFormat { (title)		} # only if title present
+  # @DefinitionFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
   # @ClaimWord		{ claim			} # "Claim" word, etc.
+  # @ClaimTitleFormat	{ (title)		} # only if title present
+  # @ClaimFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
   # @PropositionWord	{ proposition		} # "Proposition" word, etc.
+  # @PropositionTitleFormat { (title)		} # only if title present
+  # @PropositionFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
   # @LemmaWord		{ lemma			} # "Lemma" word, etc.
+  # @LemmaTitleFormat	{ (title)		} # only if title present
+  # @LemmaFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
   # @CorollaryWord	{ corollary		} # "Corollary" word, etc.
+  # @CorollaryTitleFormat { (title)		} # only if title present
+  # @CorollaryFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
   # @ExampleWord	{ example		} # "Example" word, etc.
+  # @ExampleTitleFormat	{ (title)		} # only if title present
+  # @ExampleFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
   # @ProofWord		{ proof			} # "Proof" word, etc.
   # @PageHeaders	{ Simple		} # None Simple Titles NoTitles
   # @PageNumbers	{ Arabic		} # page numbers

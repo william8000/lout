@@ -192,14 +192,22 @@ Changes and new features introduced in Version 3.14 [released March 1999]
     "lout -PDF" now available as alternative to "lout -Z"
     Cross referencing list items yields just the raw item number now
 
+Changes and new features introduced in Version 3.15 [May 1999]
+
+    Bug fixes
+    @FootNoteFormat option for controlling format of footnotes
+    @TheoremFormat option for controlling format of theorems (etc.)
+    @ListOuterGap setup file option for space before and after lists
+    Standardized and improved "slides" package, incl. new setup file options
+      (NB please send me @Word&&lecture and @Word&&overhead in your language)
+    Faster database reading (uses more memory though); prevent with -M
+    @DoubleLine symbol in diagrams for drawing a double line
+    -l and -L flags for selecting collation order (see lout -u)
+
 Things that ought to be done but haven't been done yet
 
-    Reinstate Uwe's collation code that was lost by 3.14 bug fixes
-    Review and possible inclusion of new @Eq symbol by Mark Shields
     pdfmark in PostScript output
     Review Uwe's proposal for moving word row marks to the baseline
-    Implement Mark Burton's suggestion for "freshpage" as well as "newpage"
-    Several suggestions for enhancing the overhead transparencies package
 
 Jeff Kingston
-30 March 1999
+16 May 1999

@@ -1707,6 +1707,63 @@ ldiagdict begin
   % (leaving ldiaglinepath) 0 ldiagdebugprint
 } def
 
+% fromarrowlength toarrowlength { from } { to } xindent zindent pathgap ldiagdoublelinepath -
+/ldiagdoublelinepath
+{
+  % (entering ldiagdoublelinepath) 0 ldiagdebugprint
+  /pathgap exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel to (CTR) ldiagdolabel ldiagangleto
+  /FROM@ANGLE ldiagangledef 
+  from (CTR) ldiagdolabel FROM@ANGLE from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FROM@ANGLE ldiagatangle ldiagpadd
+  /FROM ldiagpointdef
+
+  FROM@ANGLE /TO@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel TO@ANGLE 180 dg sub to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TO@ANGLE 180 dg sub ldiagatangle ldiagpadd /TO ldiagpointdef
+
+  FROM 0.5 ldiagpmul TO 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  FROM@ANGLE /LMID@ANGLE ldiagangledef
+
+  /XINDENT xindent FROM LMID ldiagdistance ldiagmin def
+  FROM 0 0 XINDENT FROM@ANGLE ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+
+  /ZINDENT zindent TO LMID ldiagdistance ldiagmin def
+  0 0 ZINDENT FROM@ANGLE ldiagatangle TO ldiagpsub /LTO ldiagpointdef
+  FROM@ANGLE /LTO@ANGLE ldiagangledef
+
+  direct {
+    FROM pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    TO   pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    []
+    FROM pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    TO   pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+  }
+  {
+    FROM  pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    LFROM pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    LMID  pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    LTO   pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    TO    pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    []
+    FROM  pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    LFROM pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    LMID  pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    LTO   pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    TO    pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+  } ifelse
+
+  % (leaving ldiagdoublelinepath) 0 ldiagdebugprint
+} def
+
 % fromarrowlen toarrowlen { from } { to } xindent zindent bias ldiagacurvepath -
 /ldiagacurvepath
 {

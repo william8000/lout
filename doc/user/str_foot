@@ -98,6 +98,7 @@ options, with their default values:
 "@FootNoteNumbers { Arabic }"
 "@FootNoteFont { 0.80f }"
 "@FootNoteBreak { 1.20fx }"
+"@FootNoteFormat { { number &0.05f } @Insert body }"
 "@FootLen { 2.00c }"
 "@FootAboveGap { 1.00v }"
 "@FootGap { 0.20c }"
@@ -126,6 +127,17 @@ footnotebreak. @Index @Code "@FootNoteBreak"
 font and paragraph breaking style of footnotes.  The default value
 of @Code "@FootNoteFont" produces the same font family and face as the
 bulk of the document, but reduced to 0.8 times the original size.
+@PP
+@Code "@FootNoteFormat" determines the format of the footnote.  The
+@Code number symbol within it must appear exactly once, and is replaced
+by the number of the footnote (if numbered).  The @Code body symbol is
+replaced by the body (that is, the content) of the footnote.  The default
+value shown uses symbols from raw Lout to add a small space at the right of
+the number, then insert it at the beginning of the first paragraph of
+the body.  Another suitable value might be
+@ID @Code "@FootNoteFormat { number |1fx body }"
+which places the body in a separate column to the number, one
+font width to the right of the left edge of the number.
 @PP
 @Code "@FootLen" determines the length of the small horizontal line
 footlen. @Index @Code "@FootLen"

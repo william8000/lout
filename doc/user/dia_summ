@@ -434,6 +434,30 @@ A:: @Circle /0.8c |1.5c B:: @Circle
 @LI {
 @Code {
 "@Link"
+"    path { doubleline }"
+}
+||6ct
+@Diag {
+//0.5f
+A:: @Circle /0.8c |1.5c B:: @Circle 
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { doubleline } from { A } to { B }
+}
+&2.5c
+#@Diag {
+#|1.5c B:: @Circle /0.8c A:: @Circle 
+#//
+#@ShowTags @Link
+#    pathstyle { solid dashed }
+#    path { line } from { A } to { B }
+#}
+}
+
+@LI {
+@Code {
+"@Link"
 "    path { curve }"
 "    bias { 2.0f }"
 }
@@ -846,6 +870,10 @@ path also has an abbreviation which adds a forward arrow:
     B { Line }
     C { Arrow }
 @Rowa
+    A { doubleline }
+    B { DoubleLine }
+    C { DoubleArrow }
+@Rowa
     A { curve }
     B { Curve }
     C { CurveArrow }
@@ -931,8 +959,8 @@ have been omitted where they are the same as the {@Code linklabel} options.
 @Rowa
   A { "   path" }
   B { line }
-  C { {@Code "line"}, {@Code "curve"}, {@Code "acurve"}, {@Code "ccurve"},
-{@Code "bezier"},
+  C { {@Code "line"}, {@Code "doubleline"}, {@Code "curve"}, {@Code "acurve"},
+{@Code "ccurve"}, {@Code "bezier"},
 {@Code "vhline"}, {@Code "hvline"}, {@Code "vhcurve"}, {@Code "hvcurve"},
 {@Code "lvrline"}, {@Code "rvlline"}, {@Code "lvrcurve"}, {@Code "rvlcurve"},
 {@Code "dwrapline"}, {@Code "uwrapline"}, {@Code "dwrapcurve"},
@@ -988,6 +1016,10 @@ have been omitted where they are the same as the {@Code linklabel} options.
   C { any @I length }
 @Rowa
   A { "   pathwidth" }
+  B { thin }
+  C { {@Code thin}, {@Code medium}, {@Code thick}, or any @I length }
+@Rowa
+  A { "   pathgap" }
   B { thin }
   C { {@Code thin}, {@Code medium}, {@Code thick}, or any @I length }
 @Rowa

@@ -235,8 +235,7 @@ endsubsubsections.reports @SubIndex { in reports }
 }
 There are no sub-sub-subsections.
 @PP
-After the sections comes an optional sequence of appendices, each
-introduced by @Code "@Appendix" in the usual way:
+After the sections comes an optional sequence of appendices:
 appendix.reports @SubIndex { in technical reports }
 @ID @OneRow @Code {
 "@Appendix"
@@ -345,9 +344,8 @@ than the initial font size.
 @Code "@SectionGap" determines how much space is left blank before each
 section title;  the default value shown above is twice the current
 inter-line spacing.  The special value @Code "2b" may be used to get a
-page break rather than a space.  There are similar options for other
-large-scale structure symbols, which determine how much space is left
-before each one.  @Code "@SectionInContents" determines whether or not an
-entry is made in the table of contents for each section; it may be
-@Code Yes or {@Code No}.
+page break rather than a space.  @Code "@SectionInContents" determines
+whether or not an entry is made in the table of contents for each section;
+it may be @Code Yes or {@Code No}.  There are similar options for other
+large-scale structure symbols.
 @End @Section

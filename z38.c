@@ -1,6 +1,6 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -355,6 +355,7 @@ static OBJECT DoWord(FULL_CHAR *buff, FULL_CHAR *q, OBJECT x, FONT_NUM fnum)
   word_colour(res) = word_colour(x);
   word_language(res) = word_language(x);
   word_hyph(res) = word_hyph(x);
+  underline(res) = UNDER_OFF;
   return res;
 } /* end DoWord */
 
@@ -375,6 +376,7 @@ static OBJECT DoVShift(OBJECT x, FULL_LENGTH vshift, OBJECT chld)
   units(shift_gap(res)) = FIXED_UNIT;
   mode(shift_gap(res)) = EDGE_MODE;
   width(shift_gap(res)) = vshift;
+  underline(res) = UNDER_OFF;
   Link(res, chld);
   return res;
 }
@@ -393,6 +395,7 @@ static void DoAddGap(OBJECT new_acat)
   FposCopy(fpos(new_g), fpos(new_acat));
   hspace(new_g) = vspace(new_g) = 0;
   SetGap(gap(new_g), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0*IN);
+  underline(new_g) = UNDER_OFF;
   Link(new_acat, new_g);
 }
 

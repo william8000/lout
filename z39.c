@@ -1,6 +1,6 @@
 /*@z39.c:String Handler:AsciiToFull(), StringEqual(), etc.@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -24,7 +24,7 @@
 /*                                                                           */
 /*  FILE:         z39.c                                                      */
 /*  MODULE:       String Handler                                             */
-/*  EXTERNS:      AsciiToFull(), StringEqual(), StringLessEqual(),           */
+/*  EXTERNS:      AsciiToFull(), StringEqual(),                              */
 /*                StringCat(), StringCopy(), StringLength(),                 */
 /*                StringFOpen(), StringFPuts(), StringFGets(),               */
 /*                StringRemove(), StringRename(), StringBeginsWith(),        */
@@ -39,7 +39,6 @@
 /*                                                                           */
 /*          AsciiToFull(str)          Returns ASCII string as FULL_CHARs.    */
 /*  BOOLEAN StringEqual(a, b)         TRUE if strings a and b are equal      */
-/*  BOOLEAN StringLessEqual(a, b)     TRUE if string a <= string b           */
 /*          StringCat(a, b)           Catenate string b onto end of a        */
 /*          StringCopy(a, b)          Overwrite string a with string b       */
 /*          StringLength(a)           Length of string a                     */
@@ -56,27 +55,22 @@
 
 /*****************************************************************************/
 /*                                                                           */
-/*  BOOLEAN StringLessEqual(FULL_CHAR *a, FULL_CHAR *b)                      */
+/*  int strcollcmp(char *a, char *b)                                         */
 /*                                                                           */
 /*  Written by Valery Ushakov (uwe).                                         */
 /*                                                                           */
-/*  If COLLATE, check whether a <= b.  Otherwise this routine is replaced    */
-/*  by a macro defined in extrerns.h                                         */
-/*                                                                           */
-/*  NB: must match compare() in z45.c.                                       */
+/*  Like strcoll, but returns 0 only iff strcmp returns 0.                   */
+/*  This allow to test for equality using only strcmp. --uwe                 */
 /*                                                                           */
 /*****************************************************************************/
 
-#if COLLATE
-BOOLEAN StringLessEqual(FULL_CHAR *a, FULL_CHAR *b)
+int strcollcmp(char *a, char *b)
 {
-  int coll = strcoll ((char *)a, (char *)b);
-  if (coll == 0)  /* then disambiguate with strcmp */
-     coll = strcmp ((char *)a, (char *)b);
-  return coll <= 0;
+  int order = strcoll (a, b);
+  if( order == 0 ) /* then disambiguate with strcmp */
+    order = strcmp (a, b);
+  return order;
 }
-#endif /* COLLATE */
-
 
 /*@::StringBeginsWith(), StringContains(), StringInt(), StringFiveInt()@******/
 /*                                                                           */

@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -36,7 +36,7 @@
 /*                                                                           */
 /*  static SetUnderline(x)                                                   */
 /*                                                                           */
-/*  Set underline() flags in object x to TRUE as appropriate.                */
+/*  Set underline() flags in object x to UNDER_ON as appropriate.            */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -50,8 +50,8 @@ static void SetUnderline(OBJECT x)
     }
   }
   debug3(DOM, DDD, "  SetUnderline underline() := %s for %s %s",
-    bool(TRUE), Image(type(x)), EchoObject(x));
-  underline(x) = TRUE;
+    "UNDER_ON", Image(type(x)), EchoObject(x));
+  underline(x) = UNDER_ON;
 } /* end SetUnderline */
 
 
@@ -861,12 +861,13 @@ OBJECT *enclose, BOOLEAN fcr)
 /*  the result; so expansion will stop at a CROSS or FORCE_CROSS object.     */
 /*                                                                           */
 /*  A postcondition of Manifest() is that the underline() flag is set to     */
-/*  either TRUE or FALSE in every WORD, every QWORD, and every child of      */
-/*  every ACAT, including the gaps.  This can be verified by checking that   */
-/*  the WORD and QWORD cases set underline() to FALSE, and the ACAT case     */
-/*  sets every child of the ACAT to FALSE.  To see that the correct subset   */
-/*  of these flags gets changed to TRUE, consult SetUnderline().  The        */
-/*  underline() flag is undefined otherwise.                                 */
+/*  either UNDER_ON or UNDER_OFF in every WORD, every QWORD, and every child */
+/*  of every ACAT, including the gaps.  This can be verified by checking     */
+/*  that the WORD and QWORD cases set underline() to UNDER_OFF, and the ACAT */
+/*  case sets every child of the ACAT to UNDER_OFF.  To see that the correct */
+/*  subset of these flags gets changed to UNDER_ON, consult SetUnderline().  */
+/*  The underline() flag is undefined otherwise, and should have value       */
+/*  UNDER_UNDEF.                                                             */
 /*                                                                           */
 /*****************************************************************************/
 #define MAX_DEPTH 500
@@ -1003,9 +1004,9 @@ OBJECT *enclose, BOOLEAN fcr)
 	word_language(x) = language(*style);
 	word_hyph(x) = hyph_style(*style) == HYPH_ON;
 	debug3(DOM, DDD, "  manfifest/WORD underline() := %s for %s %s",
-	  bool(FALSE), Image(type(x)), EchoObject(x));
-	underline(x) = FALSE;
+	  "UNDER_OFF", Image(type(x)), EchoObject(x));
 	if( small_caps(*style) && ok )  x = MapSmallCaps(x, style);
+	underline(x) = UNDER_OFF;
 	ReplaceWithSplit(x, bthr, fthr);
 	break;
       }
@@ -1037,8 +1038,8 @@ OBJECT *enclose, BOOLEAN fcr)
       }
       else y = Manifest(y, env, &new_style, nbt, nft, target, crs, ok, FALSE, enclose, fcr);
       debug3(DOM, DDD, "  manfifest/ACAT1 underline() := %s for %s %s",
-	bool(FALSE), Image(type(y)), EchoObject(y));
-      underline(y) = FALSE;
+	"UNDER_OFF", Image(type(y)), EchoObject(y));
+      underline(y) = UNDER_OFF;
       /* ??? if( is_word(type(y)) ) */
       if( ok && *crs != nilobj )
       {	
@@ -1055,8 +1056,8 @@ OBJECT *enclose, BOOLEAN fcr)
 	Child(g, gaplink);
 	assert( type(g) == GAP_OBJ, "Manifest ACAT: no GAP_OBJ!" );
         debug3(DOM, DDD, "  manfifest/ACAT2 underline() := %s for %s %s",
-	  bool(FALSE), Image(type(g)), EchoObject(g));
-        underline(g) = FALSE;
+	  "UNDER_OFF", Image(type(g)), EchoObject(g));
+        underline(g) = UNDER_OFF;
 	link = NextDown(gaplink);
 	assert( link != x, "Manifest ACAT: GAP_OBJ is last!" );
 	Child(y, link);
@@ -1073,8 +1074,8 @@ OBJECT *enclose, BOOLEAN fcr)
 	}
 	else y = Manifest(y, env, &new_style, nbt, nft, target, crs, ok, FALSE, enclose, fcr);
         debug3(DOM, DDD, "  manifest/ACAT3 underline() := %s for %s %s",
-	  bool(FALSE), Image(type(y)), EchoObject(y));
-        underline(y) = FALSE;
+	  "UNDER_OFF", Image(type(y)), EchoObject(y));
+        underline(y) = UNDER_OFF;
 
 	/* manifest the gap object */
 	if( Down(g) != g )
@@ -1200,6 +1201,8 @@ OBJECT *enclose, BOOLEAN fcr)
 	    word_language(prev) == word_language(y) )
 	    /* no need to compare underline() since both are false */
 	{ unsigned typ;
+	  assert( underline(prev) == UNDER_OFF, "Manifest/ACAT: underline(prev)!" );
+	  assert( underline(y) == UNDER_OFF, "Manifest/ACAT: underline(y)!" );
 	  if( StringLength(string(prev))+StringLength(string(y)) >= MAX_BUFF )
 	    Error(8, 24, "word %s%s is too long",
 	      FATAL, &fpos(prev), string(prev), string(y));
@@ -1210,11 +1213,9 @@ OBJECT *enclose, BOOLEAN fcr)
 	  word_colour(y) = word_colour(prev);
 	  word_language(y) = word_language(prev);
 	  word_hyph(y) = word_hyph(prev);
-	  /* ***
-	  underline(y) = underline(prev);
+	  underline(y) = UNDER_OFF;
           debug3(DOM, DDD, "  manifest/ACAT4 underline() := %s for %s %s",
-	    bool(underline(y)), Image(type(y)), EchoObject(y));
-	  *** */
+	    "UNDER_OFF", Image(type(y)), EchoObject(y));
 	  MoveLink(link, y, CHILD);
 	  DisposeObject(z);
 	  DisposeChild(Up(prev));
@@ -1276,11 +1277,12 @@ OBJECT *enclose, BOOLEAN fcr)
 	        word_colour(z) = colour(*style);
 	        word_language(z) = language(*style);
 	        word_hyph(z) = hyph_style(*style) == HYPH_ON;
+		underline(z) = UNDER_OFF;
 	        Link(new_acat, z);
 	        New(z, GAP_OBJ);
 	        hspace(z) = hspace(g);
 	        vspace(z) = 0;
-	        underline(z) = FALSE;
+	        underline(z) = UNDER_OFF;
 	        GapCopy(gap(z), space_gap(*style));
 	        width(gap(z)) *= hspace(z);
 	        Link(new_acat, z);

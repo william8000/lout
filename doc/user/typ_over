@@ -3,7 +3,15 @@
    @Tag { overheads }
 @Begin
 @PP
-To produce overhead transparencies (hereafter called overheads), start off
+To produce overhead transparencies
+@FootNote {
+In Version 3.15 overhead transparencies were updated and brought into line
+with the other document types.  Although existing source files do not need
+to be modified, their printed appearance may change (spacing, running
+headers).  There are some new setup file options, and some changes to
+existing setup file options.
+}
+(hereafter called overheads), start off
 overheads. @Index { overhead transparencies }
 slides. @RawIndex { slides @I see overhead transparencies }
 with the @Code slides setup file and the @Code "@OverheadTransparencies"
@@ -53,8 +61,8 @@ your own setup file, change them in either place and omit them in
 the other.
 @PP
 @Code "@InitialFont" is the font in which the overheads will be set, and
-should contain a family, a face, and a size.  Experience shows that 20
-points is a good font size for overheads, so that is the default size.
+should contain a family, a face, and a size.  A good font size for
+overheads is 20 points, so that is the default size.
 @PP
 @Code "@InitialBreak" controls the behaviour of paragraph breaking in
 the overheads.  It should have three parts:  a paragraph
@@ -63,11 +71,9 @@ spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
 double spacing, and so on), and either @Code "hyphen" or @Code "nohyphen"
 for turning hyphenation on or off.  Adjusted lines and hyphenated words
 are difficult to read from overheads, so the default is not to have them.
-@PP
 @Code "@InitialSpace" determines how Lout treats white space between
-two objects, as described in Section
-{@NumberOf white}.  @Code "@InitialLanguage" determines the language
-of the overheads.
+objects (Section {@NumberOf white}).  @Code "@InitialLanguage"
+determines the language of the overheads.
 @PP
 @Code "@PageOrientation" determines the orientation of the page.  Its
 value may be {@Code Portrait} (the default), {@Code Landscape},
@@ -84,28 +90,25 @@ page numbers only, @Code Titles produces full running titles, and
 @Code "@FirstPageNumber" is the number given to the first page,
 @Code "@FirstOverheadNumber" is the number given to the first overhead,
 and @Code "@FirstLectureNumber" is the number given to the first lecture,
-of which more below.
-@PP
-Lout ordinarily places lines onto a page until space runs out, then moves
-to the next page and so on.  This often produces ugly empty spaces at
-the bottoms of pages preceding large unbreakable displays.  Setting the
-@Code "@OptimizePages" option to {@Code "Yes"} causes Lout to examine the
-overall situation and try to minimize the ugliness, using the @TeX
-optimal paragraph breaking algorithm.  It takes two runs to do this,
-with intermediate results stored in Lout's cross reference database
-(Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
-it, which might be wise after major changes.  It is possible for the
-optimizer to cycle, never settling on a single final best
-version; this is usually caused by footnotes or floating figures inserted
-at points which end up near page boundaries.
+of which more below.  See preceding sections for {@Code "@OptimizePages"}.
+# Lout ordinarily places lines onto a page until space runs out, then moves
+# to the next page and so on.  This often produces ugly empty spaces at
+# the bottoms of pages preceding large unbreakable displays.  Setting the
+# @Code "@OptimizePages" option to {@Code "Yes"} causes Lout to examine the
+# overall situation and try to minimize the ugliness, using the @TeX
+# optimal paragraph breaking algorithm.  It takes two runs to do this,
+# with intermediate results stored in Lout's cross reference database
+# (Section {@NumberOf cross}); so deleting file {@Code lout.li} will reset
+# it, which might be wise after major changes.  It is possible for the
+# optimizer to cycle, never settling on a single final best
+# version; this is usually caused by footnotes or floating figures inserted
+# at points which end up near page boundaries.
 @PP
 After the compulsory {@Code "//"} come the overheads themselves.  There
-are two alternatives here:  you may either choose to make a simple
-series of overheads, corresponding to a single lecture, or you may
-choose to make a series of series of overheads, corresponding to a
-series of lectures.  To make a simple series of overheads, use this
+are two alternatives:  a series of overheads, corresponding to a single
+lecture, or a series of series of overheads, corresponding to a series
+of lectures.  If the first is wanted, use this arrangement:
 overhead. @Index @Code "@Overhead"
-arrangement:
 @ID @OneRow @Code {
 "@SysInclude { slides }"
 "@OverheadTransparencies"
@@ -137,6 +140,18 @@ use lists and displays more than paragraphs, but all the usual features
 are available.  Each overhead begins on a fresh page, but it may occupy
 more than one page.
 @PP
+@Code "@Overhead" also has a @Code "@Format" option which allows you to
+specify an arbitrary format for the body of the overhead (that is,
+everything except its title).  For example,
+@ID @Code "@Format { @CurveBox @HExpand @VExpand @Body }"
+encloses the body in a curvebox, with the box expanded to the full
+available width and height.  Unlike the similar option for figures
+and tables, however, this @Code "@Format" option unfortunately has
+not been set up to work with multi-page overheads, so if you use the
+format just given you have to make sure your overheads all fit on one
+page.  To draw boxes around the @I entire page, use the @Code "@PageBox"
+setup file options.
+@PP
 Lout does not provide any special support for overlays.  A good way to
 make them is to first produce one overhead containing all the layers
 simultaneously.  Once this is correct, enclose the entire body of the
@@ -147,8 +162,8 @@ to appear in that layer in {@Code "black @Colour"} (or any other
 colour).  This works because @Code "white @Colour" makes an object
 invisible without altering its size.
 @PP
-We turn now to the second major alternative, which is to make a series
-of lectures, each of which is a series of overheads.  Use this arrangement:
+We turn now to the second major alternative, which is a series
+of lectures, like this:
 lecture. @Index @Code "@Lecture"
 @ID @OneRow @Code {
 "@SysInclude { slides }"
@@ -175,7 +190,8 @@ the usual options:
 If @Code "@Title" is non-empty the series of overheads will begin with
 an overhead containing the title alone, centred on the page using the
 @Code "clines" paragraph breaking style.  This means that it makes
-sense to have a multi-line title.
+sense to have a multi-line title.  Any text following the @Code "@Begin"
+will appear under the lecture title as you would expect.
 @PP
 Within the body of {@Code "@Lecture"}, place a series of overheads
 bracketed by @Code "@BeginOverheads" and {@Code "@EndOverheads"}:
@@ -195,14 +211,16 @@ The features described in other chapters are available with
 overheads.  Endnotes and references appear automatically at the
 end of the overheads.  You can have a table of contents, by setting
 the @Code "@MakeContents" option of the setup file to {@Code Yes}.  It
-will appear automatically after any title overhead.  However, it is not
+will appear automatically after any title overhead.  The setup file
+options have been set on the assumption that you want your lectures
+to appear in the table of contents, but not individual overheads.  It is not
 possible to have an index, and it is not possible to have multiple columns.
 @PP
 Within the @Code slides setup file there is an @Code "@OverheadSetup"
 symbol whose options control the appearance of features specific to
 overhead.setup. @Index @Code "@OverheadSetup"
 overheads (in other words, the features described in this section).  Here
-are all these options and their default values:
+are some of these options and their default values:
 @ID @OneRow @Code {
 "@Use { @OverheadSetup"
 "  # @DateLine { No }"
@@ -213,24 +231,33 @@ are all these options and their default values:
 "  # @OverheadNumbers { Arabic }"
 "  # @TitlePageFont { Helvetica Base }"
 "  # @LectureHeadingFont { Bold 1.20f }"
+"  # @LectureHeadingFormat { @Centre number @DP @Centre title @DP }"
+"  # @OverheadHeadingFormat { @Centre title @DP }"
 "  # @OverheadHeadingFont { Bold }"
 "  # @LectureInContents { Yes }"
 "  # @OverheadInContents { No }"
 "  # @ReferencesInContents { Yes }"
 "}"
 }
-For general information about setup files and their options, consult
+For an introduction to setup files and their options, consult
 Section {@NumberOf setup}.  The first four options are as for
-@Code "@OverheadTransparencies" as described above.  @Code "ContentsWord"
-determines table of contents heading; its default value, {@Code contents},
+@Code "@OverheadTransparencies" as described above.  @Code "@ContentsWord"
+determines the table of contents heading; its default value, {@Code contents},
 produces `Contents' in the current language.  @Code "@LectureNumbers"
 and @Code "@OverheadNumbers" determine the style of numbering of lectures
 and overheads, and may be {@Code None}, {@Code Arabic}, {@Code Roman},
 {@Code UCRoman}, {@Code Alpha}, or {@Code UCAlpha} as usual.  Next come
-options for controlling the font used for the overall title page, the
-title page of each lecture, and the heading of one overhead, and finally
-three options which determine which entries are made in the table of
-contents, if there is one.
+options for setting the font of the overall title page, the
+title page of each lecture, and so on, and finally options which
+determine which entries are made in any table of contents.
+@PP
+The @Code "@LectureHeadingFormat" option determines the
+format of the heading of each lecture.  Within it, the symbol @Code "number" 
+stands for the number of the lecture, including the `Lecture' word if
+there is one, and @Code "title" stands for the title of the lecture.  The
+default value centres the number and title, with display gaps below
+each one.  @Code "@OverheadHeadingFormat" is similar; it has the same
+symbols but the default value chooses not to use {@Code "number"}.
 @PP
 Other setup file options exist which permit you to have a box drawn
 around each overhead, and to change the page size, margins, and

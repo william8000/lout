@@ -135,7 +135,9 @@ options which affect the appearance of the path in the same way as the
 options of {@Code "@Node"} affect the outline.  When {@Code pathstyle}
 contains just one value (as opposed to a sequence of values) @Code "@Diag"
 tries to divide the path into fewer segments than it would otherwise, to
-make dashed and dotted paths look as good as possible.
+make dashed and dotted paths look as good as possible.  There is also
+a {@Code pathgap} option which affects only @Code doubleline paths; it
+determines the gap between the centres of the two lines.
 @PP
 The @Code "@Link" symbol has an @Code arrow option, which adds an
 arrow. @Index { arrows }

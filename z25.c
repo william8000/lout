@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -131,6 +131,13 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 
 	aprint("#dead");
 	break;
+
+
+    case UNDER_REC:
+    
+	aprint("#under_rec");
+	break;
+
 
     case UNATTACHED:
     

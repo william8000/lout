@@ -24,10 +24,10 @@ $set 1
 25 error in command-line option %s
 26 unknown command line flag %s
 27 cannot open output file %s
-27 cannot set binary mode on stdout
 28 -o: output file name %s ends with %s
 29 total of all words printed: %d
 30 unable to initialize collation
+31 cannot set binary mode on stdout
 $set 2
 1 too many open files when opening include file %s; open files are:
 2 too many open files when opening database file %s; open files are:
@@ -527,10 +527,10 @@ $set 44
 2 %s may not have a body parameter
 3 %s must have a right parameter
 $set 45
-1 run out of memory when sorting index file %s
-2 run out of memory when sorting index file %s
-3 line too long when sorting index file %s
-4 run out of memory when sorting index file %s
+1 run out of memory when reading index file %s
+2 run out of memory when reading index file %s
+3 line too long when reading index file %s
+4 run out of memory when reading index file %s
 5 cannot open index file %s for reading
 6 cannot open index file %s for writing
 $set 46

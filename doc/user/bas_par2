@@ -25,7 +25,7 @@ break. @Index @Code "@Break"
 This example causes every paragraph in the following object to be
 broken using the @Code ragged style, of which more below.
 @PP
-The first two of the eight styles perform @I { line adjustment }, which
+The first two of the nine styles perform @I { line adjustment }, which
 line.adjustment @Index { line adjustment }
 means that they enlarge the spaces between the objects making up each
 line so as to fill the lines completely:

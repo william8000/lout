@@ -1,6 +1,6 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -63,6 +63,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
       word_colour(y) = word_colour(x);
       word_language(y) = word_language(x);
       word_hyph(y) = word_hyph(x);
+      underline(y) = underline(x);
       MergeNode(y, x);  x = y;
       *done = TRUE;
       break;
@@ -119,6 +120,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
 
     case ACAT:
     
+      /* *** seems identical!
       link = LastDown(x);
       while( link != x && !*done )
       {	Child(y, link);
@@ -127,6 +129,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
 	if( !*done )  link = PrevDown(link);
       }
       break;
+      *** */
 
 
     case COL_THR:

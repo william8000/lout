@@ -423,6 +423,26 @@
   }
 }
 
+{ lecture @Word @CurrLang @Case {
+    Czech	@Yield { Lecture }
+    Danish	@Yield { Lecture }
+    Dutch       @Yield { Lecture }
+    English	@Yield { Lecture }
+    EnglishUK	@Yield { Lecture }
+    Finnish	@Yield { Lecture }
+    French	@Yield { Lecture }
+    German	@Yield { Lecture }
+    Hungarian	@Yield { Lecture }
+    Italian	@Yield { Lecture }
+    Norwegian   @Yield { Lecture }
+    Polish	@Yield { Lecture }
+    Russian	@Yield { Lecture }
+    Slovenian   @Yield { Lecture }
+    Spanish	@Yield { Lecture }
+    Swedish	@Yield { Lecture }
+  }
+}
+
 { index @Word @CurrLang @Case {
     Czech	@Yield { Index }
     Danish	@Yield { Indeks }

@@ -1,6 +1,6 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -420,13 +420,15 @@ OBJECT *crs, OBJECT *res_env)
 	  assert( is_word(type(db)), "CrossExpand: db!" );
 	  if( DbRetrieve(db, FALSE, sym, string(tag), seq, &dfnum, &dfpos,
 	      &dlnum, &cont) )
-	  { SwitchScope(nilobj);
+	  {
+	    SwitchScope(nilobj);
 	    count = 0;
-	    /* condition db != OldCrossDb added to fix inconsistency with      */
-	    /* the call to AttachEnv below, which always carried it;           */
-	    /* but there may still be a problem when db != OldCrossDb because  */
-	    /* in that case all symbols currently visible are declared visible */
-	    /* in the database entry; perhaps InitialEnvironment would be best */
+	    /* condition db != OldCrossDb added to fix inconsistency with */
+	    /* the call to AttachEnv below, which always carried it; but  */
+	    /* there may still be a problem when db != OldCrossDb because */
+	    /* in that case all symbols currently visible are declared    */
+	    /* visible in the database entry; perhaps InitialEnvironment  */
+	    /* would be best */
 	    if( db != OldCrossDb )
 	    { SetScope(env, &count, FALSE);
 	      debug2(DCR, D, "Retrieving %s, env = %s", SymName(sym),
@@ -700,6 +702,10 @@ void CrossSequence(OBJECT x)
 
 	    debug4(DCR, DD, "  inserting galley (%s) %s&%s %s",
 	      Image(cs_type(y)), SymName(sym), string(gall_tag(cs)), string(y));
+	    if( Down(y) != y )
+	      Child(val, Down(y));
+            else
+	      val = nilobj;
 	    DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos,
 	      string(y), cs_fnum(y), (long) cs_pos(y), cs_lnum(y), FALSE);
 	    link = PrevDown(link);
@@ -869,6 +875,7 @@ void CrossSequence(OBJECT x)
 	AppendToFile(target_val(cs), target_file(cs), &target_pos(cs),
 	  &target_lnum(cs));
 	DisposeObject(target_val(cs));
+	target_val(cs) = nilobj;
 	for( link = Down(cs);  link != cs;  link = NextDown(link) )
 	{ Child(tag, link);
 	  assert( is_word(type(tag)) && !StringEqual(string(tag), STR_EMPTY),
@@ -1051,12 +1058,13 @@ void CrossClose(void)
   /* add to NewCrossDb those entries of OldCrossDb from other source files */
   /* but set check to FALSE so that we don't worry about duplication there */
   cont = 0L;  len = StringLength(DATA_SUFFIX);
-  while( DbRetrieveNext(OldCrossDb, &g,&sym,tag,seq,&dfnum,&dfpos,&dlnum,&cont) )
+  while( DbRetrieveNext(OldCrossDb,&g,&sym,tag,seq,&dfnum,&dfpos,&dlnum,&cont))
   { if( g ) continue;
     StringCopy(buff, FileName(dfnum));
     StringCopy(&buff[StringLength(buff) - len], STR_EMPTY);
     if( FileNum(buff, STR_EMPTY) == NO_FILE )
-      DbInsert(NewCrossDb, FALSE, sym, tag, no_fpos, seq, dfnum, dfpos, dlnum, FALSE);
+      DbInsert(NewCrossDb, FALSE, sym, tag, no_fpos, seq, dfnum, dfpos,
+	dlnum, FALSE);
   }
 
   /* close OldCrossDb's .li file so that NewCrossDb can use its name */

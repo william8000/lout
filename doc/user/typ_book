@@ -41,7 +41,7 @@ style which centres each line (Section {@NumberOf paras}).  The
 @Code "@Publisher" option will appear at the foot of the title page.
 @PP
 The {@Code "@BeforeTitlePage"} option will come out on the page (or
-pages) preceding the title page.  This is where publishers traditionally
+pages) preceding the title page.  This is where publishers
 advertise other books of a similar kind, perhaps from a series.
 @PP
 If {@Code "@OnTitlePage"} is given it will replace the title page
@@ -86,7 +86,7 @@ value may be {@Code Portrait} (the default), {@Code Landscape},
 Section {@NumberOf pagesize} for further details.
 @PP
 @Code "@PageHeaders" determines the appearance of page headers and
-footers throughout the book.  Its value may be {@Code None},
+footers.  Its value may be {@Code None},
 {@Code Simple}, {@Code Titles}, or {@Code NoTitles}.  Section
 {@NumberOf headers} has the details, but just briefly, {@Code None}
 and {@Code Simple} are not really suitable for books, @Code Titles
@@ -168,7 +168,7 @@ beginchapters. @Index @Code "@BeginChapters"
 endchapters. @Index @Code "@EndChapters"
 needed, because these chapters are not inside any other large-scale
 structure symbol.  Within a chapter, there may be a sequence of sections,
-each introduced by @Code "@Section" in the usual way, all bracketed
+each introduced by {@Code "@Section"}, all bracketed
 section.books @SubIndex { in books }
 by @Code "@BeginSections" and {@Code "@EndSections"}:
 beginsections.books @SubIndex { in books }
@@ -197,11 +197,11 @@ endsubsections.books @SubIndex { in books }
 "@SubSection ... @End @SubSection"
 "@EndSubSections"
 }
-The subsections may contain sub-subsections in the same
+The subsections may contain sub-subsections, but
 subsubsection.books @SubIndex { in books }
 beginsubsubsections.books @SubIndex { in books }
 endsubsubsections.books @SubIndex { in books }
-way.  There are no sub-sub-subsections.
+there are no sub-sub-subsections.
 @PP
 After the chapters comes an optional sequence of appendices.  Each
 is introduced by @Code "@Appendix" in the usual way:
@@ -271,10 +271,10 @@ part.text @Index @Code "@PartText"
 }
 Any chapter with a non-empty @Code "@PartTitle" option will become the
 first chapter of a part.  It will be preceded by two pages containing the
-part number, part title, and part text, and there will also be an entry
+part number, title, and text, and there will also be an entry
 made in the table of contents.  @Code "@PartNumber" and @Code "@PartText"
-may be omitted if desired.  Parts are @I not numbered automatically:  you
-have to supply your own numbers or letters as in the example above.
+may be omitted.  Parts are @I not numbered automatically:  you
+have to supply your own numbers or letters as shown above.
 @PP
 The features described in other chapters are all available within
 books.  A table of contents and index will appear automatically, and
@@ -337,8 +337,8 @@ appendices, for which it is {@Code UCAlpha}.  This produces the appendices
 numbered in upper-case letters (A, B, C, etc.) that were mentioned earlier.
 @PP
 @Code "@ChapterHeadingFont" is the font used for chapter headings.  The
-default value shown above produces the bold face from the family of the
-initial font, at twice the initial size.  A family name is acceptable
+default value shown above produces the bold face of the initial font
+family, at twice the initial size.  A family name is acceptable
 here as well.  @Code "@ChapterHeadingBreak" is the break style for
 chapter headings.
 @PP
@@ -355,8 +355,8 @@ value uses the @Code "@DotSep" symbol from Section {@NumberOf headers}
 to produce the number and title separated by a dot and two spaces, roughly
 the same as
 @ID @Code "@ChapterHeadingFormat { number.  title }"
-except when there is no number.  For consistency this option is applied
-to other major headings as well:  in the preface, introduction, table of
+except when there is no number.  This option is applied
+to other major headings, in the preface, introduction, table of
 contents, appendices, reference list, and index.  In all these other
 cases, @Code "number" is an empty object, except for appendices, when it
 contains @Code "Appendix A" or whatever.
@@ -364,8 +364,8 @@ contains @Code "Appendix A" or whatever.
 There is a @Code "@PartHeadingFormat" option for determining the
 format of part headings.  It works in the same way as
 {@Code "@ChapterHeadingFormat"}, with @Code "number" and @Code "title"
-symbols standing for the @Code "@PartNumber" and @Code "@PartTitle"
-options of the relevant @Code "@Chapter" symbol.  The default value is
+symbols standing for the relevant @Code "@PartNumber" and @Code "@PartTitle"
+options.  The default value is
 @ID @Code "@PartHeadingFormat { @CD number @DP @CD title }"
 which centres the number and title.  The default paragraph breaking
 style is {@Code "clines"}, but you may place a @Code "@Break" symbol
@@ -376,7 +376,7 @@ practical deficiencies.  First, the box won't extend right across the
 page, and second, when there is no @Code "number" we don't want the
 @Code "@DP" either.  Here is a value for @Code "@ChapterHeadingFormat"
 that solves both of these problems and looks good in practice:
-@ID @Code {
+@ID @OneCol @Code {
 "@ChapterHeadingFormat {"
 "    number @Case {"
 "        {} @Yield @Box paint { lightgrey } @HExpand { title }"
@@ -384,14 +384,13 @@ that solves both of these problems and looks good in practice:
 "    }"
 "}"
 }
-This uses the @Code "@Case" symbol (described in the Expert's Guide
-@Cite { $kingston1995lout.expert }) to distinguish between the cases
-where @Code "number" is empty and non-empty; and it uses the
-@Code "@HExpand" symbol to expand the horizontal space occupied by the
+The @Code "@Case" symbol (Expert's Guide @Cite { $kingston1995lout.expert })
+distinguishes between the cases where @Code "number" is empty and non-empty;
+the @Code "@HExpand" symbol expands the horizontal space occupied by the
 heading to the maximum possible, so that when the box is drawn around it
-it will occupy the full page width.  The format object can be as
+it will occupy the full page width.  The format can be as
 complicated as you like, and there is no need to squeeze it all onto
-one line; as always in Lout, the end of a line is the same as one space.
+one line; as always, the end of a line is the same as one space.
 @PP
 Every chapter and appendix begins on a new page.  @Code "@AboveChapterGap"
 determines how much space is left blank above the chapter title; the

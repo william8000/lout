@@ -1,6 +1,6 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -256,6 +256,7 @@ BOOLEAN InsertScale(OBJECT x, CONSTRAINT *c)
   if( scale_factor >= 0.2 * SF )
   {
     New(prnt, SCALE);
+    underline(prnt) = underline(x);
     FposCopy(fpos(prnt), fpos(x));
 
     /* set horizontal size and scale factor */

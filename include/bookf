@@ -305,12 +305,7 @@ def @BookSetup
 	{
 	    @BeforeTitlePage @Case {
 		""   @Yield @Null
-		else @Yield {
-		   # //1i   |0.5rt @TitlePageFont @Font 2.0f @Font
-		   #		{ 1.2fx clines } @Break @Title |
-		   # //1.1b
-		    @BeforeTitlePage
-		}
+		else @Yield @BeforeTitlePage
 	    }
 	}
 

@@ -131,7 +131,7 @@ export
     @BeginDisplayCounter
 
     @Heading "^" "&-" @If @Not @And @Or @True
-    @PP @LP @LLP @DP @NP @CNP
+    @PP @LP @LLP @DP @LOP @NP @CNP
 
     @BeginAlignedDisplays
     @EndAlignedDisplays
@@ -265,6 +265,7 @@ def @BasicSetup
 	right num	  { (num)		} # display number style
     named @WideIndent	  { 4.0f @OrIfPlain 10s	} # @WideTaggedList indent
     named @VeryWideIndent { 8.0f @OrIfPlain 20s	} # @VeryWideTaggedList indent
+    named @ListOuterGap	  { 1.0v @OrIfPlain 1f	} # gap before, after list
     named @ListGap	  { 1.0v @OrIfPlain 1f	} # gap between list items
     named @ListIndent	  { 0s			} # indent of list items
     named @ListRightIndent{ 0s			} # right indent of list items
@@ -1147,6 +1148,7 @@ def @BasicSetup
     macro @LP	{ //{@ParaGap}			  	}
     macro @LLP	{ //{1vx}				}
     macro @DP	{ //{@DisplayGap}			}
+    macro @LOP	{ //{@ListOuterGap}			}
     macro @NP	{ //{1.1b}				}
     macro @CNP	{ // 3.2v @High //0io //{}		}
 
@@ -1478,7 +1480,7 @@ def @BasicSetup
     macro @TI   @TagItem		{ // tagitem tag		}
     macro @DTI  @DropTagItem		{ // droptagitem tag		}
     macro @REL  @RawEndList		{ // & endlist // 		}
-    macro @EL   @EndList		{ // & endlist @DP		}
+    macro @EL   @EndList		{ // & endlist @LOP		}
 
 
     macro @RLL    @RawLeftList		{ @RawList style {}
@@ -1518,27 +1520,27 @@ def @BasicSetup
 					        labelwidth { @VeryWideIndent } }
 
 
-    macro @L     @List			{ @DP @RawList			}
-    macro @LL    @LeftList		{ @DP @RawLeftList		}
-    macro @IL    @IndentedList		{ @DP @RawIndentedList		}
-    macro @QL    @QuotedList		{ @DP @RawQuotedList		}
-    macro @CL    @CentredList		{ @DP @RawCentredList		}
-    macro        @CenteredList		{ @DP @RawCenteredList		}
-    macro @NL    @NumberedList		{ @DP @RawNumberedList		}
-    macro @PNL   @ParenNumberedList	{ @DP @RawParenNumberedList	}
-    macro @RL    @RomanList		{ @DP @RawRomanList		}
-    macro @PRL   @ParenRomanList	{ @DP @RawParenRomanList	}
-    macro @UCRL  @UCRomanList		{ @DP @RawUCRomanList		}
-    macro @PUCRL @ParenUCRomanList	{ @DP @RawParenUCRomanList	}
-    macro @AL    @AlphaList		{ @DP @RawAlphaList		}
-    macro @PAL   @ParenAlphaList	{ @DP @RawParenAlphaList	}
-    macro @UCAL  @UCAlphaList		{ @DP @RawUCAlphaList		}
-    macro @PUCAL @ParenUCAlphaList	{ @DP @RawParenUCAlphaList	}
-    macro @BL    @BulletList		{ @DP @RawBulletList		}
-    macro @SL    @StarList		{ @DP @RawStarList		}
-    macro @DL    @DashList		{ @DP @RawDashList		}
-    macro @TL    @TaggedList		{ @DP @RawTaggedList		}
-    macro @WTL   @WideTaggedList	{ @DP @RawWideTaggedList	}
-    macro @VWTL  @VeryWideTaggedList	{ @DP @RawVeryWideTaggedList	}
+    macro @L     @List			{ @LOP @RawList			}
+    macro @LL    @LeftList		{ @LOP @RawLeftList		}
+    macro @IL    @IndentedList		{ @LOP @RawIndentedList		}
+    macro @QL    @QuotedList		{ @LOP @RawQuotedList		}
+    macro @CL    @CentredList		{ @LOP @RawCentredList		}
+    macro        @CenteredList		{ @LOP @RawCenteredList		}
+    macro @NL    @NumberedList		{ @LOP @RawNumberedList		}
+    macro @PNL   @ParenNumberedList	{ @LOP @RawParenNumberedList	}
+    macro @RL    @RomanList		{ @LOP @RawRomanList		}
+    macro @PRL   @ParenRomanList	{ @LOP @RawParenRomanList	}
+    macro @UCRL  @UCRomanList		{ @LOP @RawUCRomanList		}
+    macro @PUCRL @ParenUCRomanList	{ @LOP @RawParenUCRomanList	}
+    macro @AL    @AlphaList		{ @LOP @RawAlphaList		}
+    macro @PAL   @ParenAlphaList	{ @LOP @RawParenAlphaList	}
+    macro @UCAL  @UCAlphaList		{ @LOP @RawUCAlphaList		}
+    macro @PUCAL @ParenUCAlphaList	{ @LOP @RawParenUCAlphaList	}
+    macro @BL    @BulletList		{ @LOP @RawBulletList		}
+    macro @SL    @StarList		{ @LOP @RawStarList		}
+    macro @DL    @DashList		{ @LOP @RawDashList		}
+    macro @TL    @TaggedList		{ @LOP @RawTaggedList		}
+    macro @WTL   @WideTaggedList	{ @LOP @RawWideTaggedList	}
+    macro @VWTL  @VeryWideTaggedList	{ @LOP @RawVeryWideTaggedList	}
 
 @End @BasicSetup

@@ -17,7 +17,7 @@ the screen, but it can be redirected to a file, or piped through the
 Of course, plain text is an extremely limited medium of communication
 compared with PostScript, and this forces Lout to make some rather
 drastic compromises:
-@BulletList
+@BulletList gap { @ParaGap }
 @LI { Symbols like {@Code "@Bullet"}, which stand for unusual characters,
 produce printable characters which approximate the PostScript ones.  For
 example, {@Code "@Bullet"} produces {@Code "o"}.  However, the @Code "@Char"

@@ -76,15 +76,15 @@ def @DocumentSetup
     named @FigureLocation	{  PageTop		} # default figure location
     named @TableLocation	{  PageTop		} # default table location
     named @FigureFormat
-    	named @II right x { |2.00f x |      }
-    	named @QQ right x { |2.00f x |2.00f }
+    	named @II right x { |@DisplayIndent x |      }
+    	named @QQ right x { |@DisplayIndent x |@DisplayIndent }
     	named @CC right x { |0.5rt x |      }
     	named @RR right x { |1.0rt x |      }
 	right @Body
 				{  @CC @Body		} # default figure format
     named @TableFormat
-    	named @II right x { |2.00f x |      }
-    	named @QQ right x { |2.00f x |2.00f }
+    	named @II right x { |@DisplayIndent x |      }
+    	named @QQ right x { |@DisplayIndent x |@DisplayIndent }
     	named @CC right x { |0.5rt x |      }
     	named @RR right x { |1.0rt x |      }
 	right @Body
@@ -95,17 +95,21 @@ def @DocumentSetup
     named @TableNumbers		{  Arabic		} # method of numbering tables
     named @FigureCaptionPos	{  Below		} # Above or Below
     named @TableCaptionPos	{  Below		} # Above or Below
-    named @CaptionFont          {			} # figure, table caption font
-    named @CaptionBreak         {			} # figure, table caption break
-    named @CaptionFormat
-	right number
-				{  @B {number @Sep @OneCol}	} # figure, table caption format
+    named @FigureCaptionFont    {			} # figure caption font
+    named @FigureCaptionBreak   {			} # figure caption break
+    named @FigureCaptionFormat named word {} named number {} named caption {}
+				{  @B { word @NumSep number. &2s } @Insert caption }
+    named @TableCaptionFont    {			} # figure caption font
+    named @TableCaptionBreak   {			} # figure caption break
+    named @TableCaptionFormat named word {} named number {} named caption {}
+				{  @B { word @NumSep number. &2s } @Insert caption }
     named @MakeFigureContents   {  No			} # list of figures at start
     named @MakeTableContents    {  No			} # list of tables at start
     named @MakeContents		{  No			} # make contents? Yes or No
     named @ContentsGap		{  0.20v @OrIfPlain 0f	} # extra gap above minor entry
     named @ContentsGapAbove	{  0.80v @OrIfPlain 1f	} # extra gap above major entry
     named @ContentsGapBelow	{  0.00v @OrIfPlain 0f	} # extra gap below major entry
+    named @ContentsFont    	{  Bold                 } # font for major entry
     named @ContentsPartGapAbove	{  1.00v @OrIfPlain 1f  } # extra gap above part entry
     named @ContentsPartGapBelow	{  0.00v @OrIfPlain 0f  } # extra gap below part entry
     named @ContentsFormat
@@ -247,6 +251,8 @@ def @DocumentSetup
     named @FootNoteLocation	{  ColFoot		} # where the footnote appears
     named @FootNoteFont		{  0.80f		} # font for footnotes
     named @FootNoteBreak	{  1.2fx @OrIfPlain 1fx	} # break for footnotes
+    named @FootNoteFormat left number right body
+				{  { number &0.05f } @Insert body } # break for footnotes
     named @FootLen		{  2.00c @OrIfPlain 10s	} # length of footnote line
     named @FootAboveGap		{  @DisplayGap		} # gap above footnote line
     named @FootGap		{  0.20c @OrIfPlain 1fx	} # gap between footnotes
@@ -260,15 +266,39 @@ def @DocumentSetup
     named @EndNoteNumbers	{  Arabic		} # endnote numbers
     named @EndNoteFont		{  0.80f		} # font of endnotes
     named @EndNoteBreak		{  1.2fx @OrIfPlain 1fx	} # break for endnotes
+    named @EndNoteFormat left number right body
+				{  { number &0.05f } @Insert body } # break for endnotes
     named @EndNoteGap		{  0.20c @OrIfPlain 1f	} # gap between endnotes
 
     named @TheoremWord		{  theorem		} # "Theorem" word, etc.
+    named @TheoremTitleFormat right title
+				{  (title)              } # Theorem title format if present
+    named @TheoremFormat named word {} named number {} named title {} named body {} # theorem format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @DefinitionWord	{  definition		} # "Definition" word, etc.
+    named @DefinitionTitleFormat{  (title)              } # Definition title format if present
+    named @DefinitionFormat named word {} named number {} named title {} named body {} # definition format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @ClaimWord		{  claim		} # "Claim" word, etc.
+    named @ClaimTitleFormat	{  (title)              } # Claim title format if present
+    named @ClaimFormat named word {} named number {} named title {} named body {} # claim format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @PropositionWord	{  proposition		} # "Proposition" word, etc.
+    named @PropositionTitleFormat{  (title)             } # Proposition title format if present
+    named @PropositionFormat named word {} named number {} named title {} named body {} # proposition format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @LemmaWord		{  lemma		} # "Lemma" word, etc.
+    named @LemmaTitleFormat	{  (title)              } # Lemma title format if present
+    named @LemmaFormat named word {} named number {} named title {} named body {} # lemma format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @CorollaryWord	{  corollary		} # "Corollary" word, etc.
+    named @CorollaryTitleFormat	{  (title)              } # Corollary title format if present
+    named @CorollaryFormat named word {} named number {} named title {} named body {} # corollary format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @ExampleWord		{  example		} # "Example" word, etc.
+    named @ExampleTitleFormat	{  (title)              } # Example title format if present
+    named @ExampleFormat named word {} named number {} named title {} named body {} # example format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @ProofWord		{  proof		} # "Proof" word, etc.
 
     named @PageHeaders		{  Simple		} # None Simple Titles NoTitles
@@ -1418,10 +1448,10 @@ def @DocumentSetup
 	{
 	    @FootNoteFont @Font @FootNoteBreak @Break @Label @Case {
 		"Numbered" @Yield {
-		    { @FootNoteCounterIncrement @Tag & @FootLabel &0.05f }
-		      @Insert x
-		    }
-		else @Yield { @FootLabel &0.05f } @Insert x
+		    { @FootNoteCounterIncrement @Tag & @FootLabel }
+		      @FootNoteFormat x
+		}
+		else @Yield { @FootLabel @FootNoteFormat x }
 	    }
 	}
 
@@ -2201,8 +2231,8 @@ def @DocumentSetup
 	@MakeContents.wanted @Case {
 	    Yes.Yes   @Yield { @SendContents @ContentsItem
 				   indent { indent }
-				   number { @B number }
-				   title { @B title }
+				   number { @ContentsFont @Font number }
+				   title { @ContentsFont @Font title }
 				   pagenum { pagenum }
 				   pregap { pregap }
 				   postgap { postgap }
@@ -2223,7 +2253,7 @@ def @DocumentSetup
 	{
 	    //pregap
 	    //0.5vx
-	    |indent @B @OneCol title |
+	    |indent @ContentsFont @Font @OneCol title |
 	    //0.5vx
 	    //postgap
 	}
@@ -2386,7 +2416,7 @@ def @DocumentSetup
 	def @ENote into { @EndNoteList&&following }
 	{
 	    @EndNoteFont @Font @EndNoteBreak @Break
-	    { @EndNoteList&&preceding @Tagged @Tag  ftag & x }
+	    { { @EndNoteList&&preceding @Tagged @Tag ftag } @EndNoteFormat x }
 	}
 
 	@Null & @EndNoteFont @Font ftag & @ENote
@@ -2543,15 +2573,16 @@ def @DocumentSetup
 	{
 	   @Title @Case {
 		""   @Yield @Null
-		else @Yield (@Title)
+		else @Yield @TheoremTitleFormat @Title
 	   }
 	}
 
-	{
-	    @PageMark @Tag
-	    @TheoremCounterIncrement @Tag
-	    @B { {theorem @WordVal @TheoremWord} @NumSep {@TheoremNum @Tag} @TheoremTitle: } &2s
-	} @Insert x
+	{ @PageMark @Tag @TheoremCounterIncrement @Tag } @Insert
+	@TheoremFormat
+	    word { theorem @WordVal @TheoremWord }
+	    number { @TheoremNum @Tag }
+	    title { @TheoremTitle }
+	    body { x }
     }
 
     macro @Proof { @B { {proof @WordVal @ProofWord}: } &2s }
@@ -2605,12 +2636,12 @@ def @DocumentSetup
 	   }
 	}
 
-	{
-	    @PageMark @Tag
-	    @DefinitionCounterIncrement @Tag
-	    @B { {definition @WordVal @DefinitionWord} @NumSep
-		 {@DefinitionNum @Tag} @DefinitionTitle: } &2s
-	} @Insert x
+	{ @PageMark @Tag @DefinitionCounterIncrement @Tag } @Insert
+	@DefinitionFormat
+	    word { definition @WordVal @DefinitionWord }
+	    number { @DefinitionNum @Tag }
+	    title { @DefinitionTitle }
+	    body { x }
     }
 
 
@@ -2660,12 +2691,12 @@ def @DocumentSetup
 	   }
 	}
 
-	{
-	    @PageMark @Tag
-	    @ClaimCounterIncrement @Tag
-	    @B { {claim @WordVal @ClaimWord} @NumSep
-		 {@ClaimNum @Tag} @ClaimTitle: } &2s
-	} @Insert x
+	{ @PageMark @Tag @ClaimCounterIncrement @Tag } @Insert
+	@ClaimFormat
+	    word { claim @WordVal @ClaimWord }
+	    number { @ClaimNum @Tag }
+	    title { @ClaimTitle }
+	    body { x }
     }
 
 
@@ -2715,12 +2746,12 @@ def @DocumentSetup
 	   }
 	}
 
-	{
-	    @PageMark @Tag
-	    @PropositionCounterIncrement @Tag
-	    @B { {proposition @WordVal @PropositionWord} @NumSep
-		 {@PropositionNum @Tag} @PropositionTitle: } &2s
-	} @Insert x
+	{ @PageMark @Tag @PropositionCounterIncrement @Tag } @Insert
+	@PropositionFormat
+	    word { proposition @WordVal @PropositionWord }
+	    number { @PropositionNum @Tag }
+	    title { @PropositionTitle }
+	    body { x }
     }
 
 
@@ -2770,12 +2801,12 @@ def @DocumentSetup
 	   }
 	}
 
-	{
-	    @PageMark @Tag
-	    @LemmaCounterIncrement @Tag
-	    @B { {lemma @WordVal @LemmaWord} @NumSep
-		 {@LemmaNum @Tag} @LemmaTitle: } &2s
-	} @Insert x
+	{ @PageMark @Tag @LemmaCounterIncrement @Tag } @Insert
+	@LemmaFormat
+	    word { lemma @WordVal @LemmaWord }
+	    number { @LemmaNum @Tag }
+	    title { @LemmaTitle }
+	    body { x }
     }
 
 
@@ -2825,12 +2856,12 @@ def @DocumentSetup
 	   }
 	}
 
-	{
-	    @PageMark @Tag
-	    @CorollaryCounterIncrement @Tag
-	    @B { {corollary @WordVal @CorollaryWord} @NumSep
-		 {@CorollaryNum @Tag} @CorollaryTitle: } &2s
-	} @Insert x
+	{ @PageMark @Tag @CorollaryCounterIncrement @Tag } @Insert
+	@CorollaryFormat
+	    word { corollary @WordVal @CorollaryWord }
+	    number { @CorollaryNum @Tag }
+	    title { @CorollaryTitle }
+	    body { x }
     }
 
 
@@ -2880,13 +2911,14 @@ def @DocumentSetup
 	   }
 	}
 
-	{
-	    @PageMark @Tag
-	    @ExampleCounterIncrement @Tag
-	    @B { {example @WordVal @ExampleWord} @NumSep
-		 {@ExampleNum @Tag} @ExampleTitle: } &2s
-	} @Insert x
+	{ @PageMark @Tag @ExampleCounterIncrement @Tag } @Insert
+	@ExampleFormat
+	    word { example @WordVal @ExampleWord }
+	    number { @ExampleNum @Tag }
+	    title { @ExampleTitle }
+	    body { x }
     }
+
 
     ###########################################################################
     #                                                                         #
@@ -3505,16 +3537,6 @@ def @DocumentSetup
 	    @BypassNumber @Dft @NumberOf @Tag
 	}
 
-	def @FigureLabel
-	{
-	    @FigureNumbers @Case {
-		No   @Yield @Null
-		else @Yield {
-		    @CaptionFormat { {figure @WordVal @FigureWord} @NumSep @FigureNumber }
-		}
-	    }
-	}
-
 	def @ContentsCaption
 	{
 	    @ShortCaption @Dft @Caption
@@ -3554,10 +3576,24 @@ def @DocumentSetup
 	    }
 	}
 
+	#def @FigureLabel
+	#{
+	#    @FigureNumbers @Case {
+	#	No   @Yield @Null
+	#	else @Yield {
+	#	    @CaptionFormat { {figure @WordVal @FigureWord} @NumSep @FigureNumber }
+	#	}
+	#    }
+	#}
+
 	def @CaptionVal
 	{
-	    @CaptionFont @Font @CaptionBreak @Break
-	    { ||0.5rt @FigureLabel @Insert @Caption }
+	    @FigureCaptionFont @Font @FigureCaptionBreak @Break
+	    { ||0.5rt @FigureCaptionFormat
+		 word { figure @WordVal @FigureWord }
+		 number { @FigureNumber }
+		 caption { @Caption }
+	    }
 	}
 
 	def @FigureVal
@@ -3745,16 +3781,6 @@ def @DocumentSetup
 	    @BypassNumber @Dft @NumberOf @Tag
 	}
 
-	def @TableLabel
-	{
-	    @TableNumbers @Case {
-		No   @Yield @Null
-		else @Yield {
-		    @CaptionFormat { {table @WordVal @TableWord} @NumSep @TableNumber }
-		}
-	    }
-	}
-
 	def @ContentsCaption
 	{
 	    @ShortCaption @Dft @Caption
@@ -3794,10 +3820,24 @@ def @DocumentSetup
 	    }
 	}
 
+	#def @TableLabel
+	#{
+	#    @TableNumbers @Case {
+	#	No   @Yield @Null
+	#	else @Yield {
+	#	    @CaptionFormat { {table @WordVal @TableWord} @NumSep @TableNumber }
+	#	}
+	#    }
+	#}
+
 	def @CaptionVal
 	{
-	    @CaptionFont @Font @CaptionBreak @Break
-	    { ||0.5rt @TableLabel @Insert @Caption }
+	    @TableCaptionFont @Font @TableCaptionBreak @Break
+	    { ||0.5rt @TableCaptionFormat
+		 word { table @WordVal @TableWord }
+		 number { @TableNumber }
+		 caption { @Caption }
+	    }
 	}
 
 	def @TableVal
@@ -4382,7 +4422,7 @@ def @DocumentSetup
 	named headingbreak {}		# its heading break
 	named headingformat		# its heading format
 	    left @Num right @Body {}
-	named incontents { No }
+	named incontents { No }         # entry in table of contents required
 	named contentsindent { 0f }	# only if type is Major
 	named word {}
 	named numbers { None }
@@ -4508,9 +4548,9 @@ def @DocumentSetup
 
 	def @Heading
 	{
-@BackEnd @Case {
-	{ PostScript PlainText } @Yield {
-	    type @Case {
+          @BackEnd @Case {
+	    { PostScript PlainText } @Yield {
+	      type @Case {
 
 		Minor @Yield {
 		    headingfont @Font
@@ -4529,8 +4569,9 @@ def @DocumentSetup
 		    headingbreak @Break { bypassnumber headingformat title }
 		}
 	    }
-	}
-	PDF @Yield {
+	  }
+
+	  PDF @Yield {
 
 # Rats! Cannot use the tag for the name of the link because the source
 # link has no access to the tag
@@ -4590,8 +4631,8 @@ def @DocumentSetup
 #	      }	# @Graphic
 #	    }		# non-"" case
 #	  }		# tag @Case
-	}
-}
+	  }
+          }
 	}
 
 	def @IfMajor right x
@@ -4628,9 +4669,6 @@ def @DocumentSetup
             //  intables @BeginTableCounter @ShortNum
             //  initiallanguage @Language @Body
 	    //innergap  @IfMajor endifmajor innergap
-	    # //innergap @IfMajor @EndFigureList
-	    # //innergap @IfMajor @EndNoteList 1
-	    # //innergap @IfMajor @ChapRefSection
             //  @Run NonStart
 	}
     }

@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -78,7 +78,9 @@ OBJECT CommandOptions;
 
 /*****************************************************************************/
 /*                                                                           */
+/*  UseCollate          Use local collation sequence rather than ASCII       */
 /*  AllowCrossDb        Allow references to OldCrossDb and NewCrossDb        */
+/*  InMemoryDbIndexes   True if cr database index file is to be in-memory    */
 /*  Encapsulated        Produce a one-page encapsulated PostScript file      */
 /*  Kern                Do kerning                                           */
 /*  SafeExecution       Execute safely, i.e. prohibit system() calls         */
@@ -86,7 +88,9 @@ OBJECT CommandOptions;
 /*                                                                           */
 /*****************************************************************************/
 
+BOOLEAN UseCollate;
 BOOLEAN AllowCrossDb;
+BOOLEAN InMemoryDbIndexes;
 BOOLEAN Encapsulated;
 BOOLEAN Kern;
 BOOLEAN SafeExecution;
@@ -162,6 +166,8 @@ static void PrintUsage(FILE *fp)
   lput("  -P              like -p but with form-feed char between pages"    );
   lput("  -S              safe execution (disable calls to system(3))"	    );
   lput("  -U              unsafe execution (allow calls to system(3))"	    );
+  lput("  -l              ASCII collation order when sorting indexes etc."  );
+  lput("  -L              locale collation order when sorting indexes etc." );
   lput("  -o file         output to file instead of stdout"		    );
   lput("  -e file         error messages to file instead of stderr"	    );
   lput("  -a              alternative error format:  file:line:col ..."	    );
@@ -174,6 +180,7 @@ static void PrintUsage(FILE *fp)
   lput("  -D directory    add directory to database file search path"	    );
   lput("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'" );
   lput("  -c file         use file.li instead of lout.li for crossrefs"	    );
+  lput("  -M              save memory (don't read in database indexes)"     );
   lput("  -x              initializing run, not for ordinary use"	    );
   lput("  -u              print this usage message on stderr and exit"	    );
   lput("  -V              print version and configuration information"	    );
@@ -245,11 +252,6 @@ int main(int argc, char *argv[])
   MsgCat = catopen(catname, 0);
 #endif
 
-#if COLLATE
-  if (!setlocale (LC_COLLATE, ""))
-    Error(1, 30, "unable to initialize collation", WARN, no_fpos);
-#endif /* COLLATE */
-
   /* initialise various modules, add current directory to search paths */
   TotalWordCount = 0;
   seen_wordcount = FALSE;
@@ -259,7 +261,9 @@ int main(int argc, char *argv[])
   PlainCharHeight = PLAIN_HEIGHT;
   PlainFormFeed = FALSE;
   InitializeAll = FALSE;
+  UseCollate = COLLATE;
   AllowCrossDb = TRUE;
+  InMemoryDbIndexes = TRUE;
   Encapsulated = FALSE;
   SafeExecution = SAFE_DFT ? TRUE : FALSE;
   Kern = TRUE;
@@ -300,10 +304,31 @@ int main(int argc, char *argv[])
 	break;
 
 
+      case CH_FLAG_MEMCR:
+     
+	/* don't use in-memory database indexes */
+	InMemoryDbIndexes = FALSE;
+	break;
+
+
       case CH_FLAG_NOKERN:
      
 	/* suppress kerning */
 	Kern = FALSE;
+	break;
+
+
+      case CH_FLAG_NOCOLLATE:
+     
+	/* suppress local collation */
+	UseCollate = FALSE;
+	break;
+
+
+      case CH_FLAG_COLLATE:
+     
+	/* invoke local collation */
+	UseCollate = TRUE;
 	break;
 
 
@@ -430,7 +455,7 @@ int main(int argc, char *argv[])
 	  USE_STAT ? " yes" : " no");
 	fprintf(stderr, "Safe execution (disabling system()) is default:%s\n",
 	  SAFE_DFT ? " yes" : " no");
-	fprintf(stderr, "strcoll() used for sorting collation sequence:%s\n",
+	fprintf(stderr, "strcoll() used for sorting by default:%s\n",
 	  COLLATE ? " yes" : " no");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Basser Lout comes with ABSOLUTELY NO WARRANTY.\n");
@@ -523,12 +548,13 @@ int main(int argc, char *argv[])
 	break;
 
 
-      case 'M':
+      case CH_FLAG_MEMCHECK:
 
-	sscanf(argv[i], "-M%ld", &MemCheckLong);
+	sscanf(argv[i], "-m%ld", &MemCheckLong);
 	MemCheck = (POINTER) MemCheckLong;
 	fprintf(stderr, "checking memory location %ld\n", (long) MemCheck);
 	break;
+
 
       case '\0':
      
@@ -625,6 +651,12 @@ int main(int argc, char *argv[])
     }
   } /* for */
 
+  if( UseCollate )
+  {
+    if (!setlocale (LC_COLLATE, ""))
+      Error(1, 30, "unable to initialize collation", WARN, no_fpos);
+  }
+
   /* start timing if required */
   ifdebug(DPP, D, ProfileOn("main"));
 
@@ -635,7 +667,7 @@ int main(int argc, char *argv[])
     /* For DOS/Win32 we need to set binary mode on stdout to prevent
        PDF compressed streams and xrefs from being corrupted - Uwe 12/98 */
     if( BackEnd != PLAINTEXT && _setmode(_fileno(stdout), _O_BINARY) == -1 )
-      Error(1, 27, "cannot set binary mode on stdout", FATAL, no_fpos);
+      Error(1, 31, "cannot set binary mode on stdout", FATAL, no_fpos);
 #endif
     out_fp = stdout;
   }

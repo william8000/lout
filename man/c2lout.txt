@@ -1,7 +1,7 @@
 
 
 
-C2LOUT(1)                 User Commands                 C2LOUT(1)
+User Commands                                           C2LOUT(1)
 
 
 
@@ -9,7 +9,7 @@ NAME
      c2lout - convert C and C++ source code into Lout
 
 SYNOPSIS
-     c2lout [ options ] C-files
+     c2lout [ options ] Cfiles...
 
 DESCRIPTION
      Reformat C and C++ source code for input to the  Lout  docu-
@@ -17,11 +17,11 @@ DESCRIPTION
      strings, tab characters, etc.
 
      c2lout reads the named C and C++ files and  produces  output
-     suitable for input to "lout -s".  Thus,
+     suitable for input to lout -s.  Thus,
 
-          c2lout myprog.c | lout -s | lpr
+          c2lout foo.c | lout -s | lpr
 
-     will print myprog.c on a PostScript printer.  Each file will
+     will print foo.c on a PostScript printer.   Each  file  will
      start on a new page, preceded by its name in bold.
 
 OPTIONS
@@ -38,57 +38,58 @@ OPTIONS
 
      -n   Do not print the file name before each C or C++ file.
 
-     -f<font>
+     -f font
           Select a font family.  The  default  is  -fCourier  for
           -pfixed, and -fTimes for -pvarying and -psymbol.
 
-     -s<size>
+     -s size
           Select a Lout font size.  The default is -s9p  (meaning
           9  points)  for  -pfixed,  and  -s10p for -pvarying and
           -psymbol.  These work well with 80-character-wide  pro-
           grams.
 
-     -v<vsize>
+     -v vsize
           Select a Lout vertical inter-line gap.  The default  is
           -v1.1fx  meaning  1.1 times the font size measured from
           baseline to baseline.
 
-     -t<num>
-          Set the tab interval to <num>  characters  (default  is
+     -t num
+          Set the tab interval  to  num  characters  (default  is
           -t8).
 
-     -T<width>
+     -T width
           Without this option, c2lout simulates tabs with spaces.
           With this option, c2lout simulates tabs with Lout tabu-
-          lation operators; <width>  is  the  width  of  one  tab
-          interval  in  the  final print, measured in Lout units.
-          This guarantees alignment of characters following  tabs
-          even with varying-width fonts, provided <width> is suf-
-          ficiently large.  For example,  -T0.5i  produces  half-
-          inch tab intervals.
+          lation operators; width is the width of one tab  inter-
+          val  in  the final print, measured in Lout units.  This
+          guarantees alignment of characters following tabs  even
+          with  varying-width  fonts,  provided  width  is suffi-
+          ciently large.  For example, -T0.5i produces  half-inch
+          tab intervals.
 
-     -u   Print usage information on stderr.
+     -u   Print usage information on stderr and exit.
 
-     -V   Print version information on stderr.
+     -V   Print version information on stderr and exit.
 
-RAW MODE
-     There is a "raw mode" usage of c2lout invoked by a -r  flag.
-     This  converts  one C file into Lout-readable source without
-     any heading or trailing information.  Synopsis:
+  Raw Mode
+     There is a raw mode usage of c2lout invoked  by  a  -r  flag
+     (must be the first argument).  This converts one C file into
+     Lout-readable source without any heading or trailing  infor-
+     mation.  Synopsis:
 
-         c2lout -r  -i<infile>  -o<outfile>  -e<errfile>  -t<num>
-     -T<width>
+          c2lout  -r  -i infile  -o outfile   -e errfile   -t num
+          -T width
 
      Users should never need this mode; it is  invoked  automati-
      cally  from  within  Lout  by the @CP symbol from the cprint
      package (see reference).
 
 SEE ALSO
-     lout(1), lpr(1), ghostview(1)
+     lout(1), lpr(1), ghostview(1).
 
 REFERENCES
-     Jeffrey H. Kingston, "A User's Guide to  the  Lout  Document
-     Formatting System", Chapter 11.
+     Jeffrey H. Kingston, A User's Guide  to  the  Lout  Document
+     Formatting System, Chapter 11.
 
 AUTHOR
      Jeffrey H. Kingston

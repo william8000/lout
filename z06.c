@@ -1,6 +1,6 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -878,8 +878,10 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 
       /* load cross-references from previous run, open new cross refs */
       if( AllowCrossDb )
-      {	NewCrossDb = DbCreate(MakeWord(WORD, string(cross_name), no_fpos));
-	OldCrossDb = DbLoad(cross_name, SOURCE_PATH, FALSE, nilobj);
+      {
+	  NewCrossDb = DbCreate(MakeWord(WORD, string(cross_name), no_fpos));
+	  OldCrossDb = DbLoad(cross_name, SOURCE_PATH, FALSE, nilobj,
+	    InMemoryDbIndexes);
       }
       else OldCrossDb = NewCrossDb = nilobj;
 

@@ -25,7 +25,11 @@ The @Code "@DP" `display paragraph' symbol produces a somewhat larger
 dp. @Index @Code "@DP"
 vertical space, equal to the amount used before and after displays
 (Section {@NumberOf displays}), with no indent.  To get even larger
-vertical spaces, use @Code "@DP" repeatedly.
+vertical spaces, use @Code "@DP" repeatedly.  Another symbol,
+{@Code "@LOP"}, leaves a paragraph break the size of the gap left
+lop. @Index @Code "@LOP"
+outside (that is, before and after) lists (Section {@NumberOf lists}).  This
+is usually equal to {@Code "@DP"}.
 @PP
 The {@Code "@NP"} `new page' symbol causes the following paragraph to
 page. @Index { page, skipping to next }
@@ -96,6 +100,6 @@ to get no extra spacing, change it to {@Code "1.00vx"}.  The
 @Code "@ParaIndent" option determines the width of the indent produced
 by {@Code "@PP"}, and its default value is twice the current font
 size.  The @Code "@DisplayGap" option determines the amount of vertical
-space inserted by {@Code "@DP"}, and many other things as well, such
-as the vertical space before and after displays and lists.
+space inserted by {@Code "@DP"}, as well as the vertical space before
+and after displays.
 @End @Section

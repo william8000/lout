@@ -1157,20 +1157,75 @@ def @TblSetup
 		@OneRow { /0io x /0io }
 	    }
 
+	    def @PDFColourCommand right col
+	    {
+	        def @ColourCoords
+	        {
+	            col @Case {
+			nochange	@Yield  { nochange    }
+	                darkblue        @Yield  { 0.0 0.0 0.5 }
+	                blue            @Yield  { 0.0 0.0 1.0 }
+	                lightblue       @Yield  { 0.5 0.5 1.0 }
+	                darkgreen       @Yield  { 0.0 0.5 0.0 }
+	                green           @Yield  { 0.0 1.0 0.0 }
+	                lightgreen      @Yield  { 0.5 1.0 0.5 }
+	                darkred         @Yield  { 0.5 0.0 0.0 }
+	                red             @Yield  { 1.0 0.0 0.0 }
+	                lightred        @Yield  { 1.0 0.5 0.5 }
+	                darkcyan        @Yield  { 0.0 0.5 0.5 }
+	                cyan            @Yield  { 0.0 1.0 1.0 }
+	                lightcyan       @Yield  { 0.5 1.0 1.0 }
+	                darkmagenta     @Yield  { 0.5 0.0 0.5 }
+	                magenta         @Yield  { 1.0 0.0 1.0 }
+	                lightmagenta    @Yield  { 1.0 0.5 1.0 }
+	                darkyellow      @Yield  { 0.5 0.5 0.0 }
+	                yellow          @Yield  { 1.0 1.0 0.0 }
+	                lightyellow     @Yield  { 1.0 1.0 0.5 }
+	                darkgray        @Yield  { 0.2 0.2 0.2 }
+	                gray            @Yield  { 0.5 0.5 0.5 }
+	                lightgray       @Yield  { 0.8 0.8 0.8 }
+	                darkgrey        @Yield  { 0.2 0.2 0.2 }
+	                grey            @Yield  { 0.5 0.5 0.5 }
+	                lightgrey       @Yield  { 0.8 0.8 0.8 }
+	                black           @Yield  { 0.0 0.0 0.0 }
+                	white           @Yield  { 1.0 1.0 1.0 }
+		    }
+	        }
+
+		@ColourCoords "rg" @ColourCoords "RG"
+	    }
+
+	    def @PDFAddPaint right col
+	    {
+	        col @Case {
+	            none @Yield ""
+	            nochange @Yield "q f Q"
+	            else @Yield { "q" @PDFColourCommand col "f Q" }
+	        }
+	    }
+
 	    def @FillBox left col right x
 	    {
 	      @BackEnd @Case {
-		{ PostScript PDF } @Yield {{"LoutBox ltbl"col} @Graphic x}
-		PlainText          @Yield { rpc @PlainGraphic x }
-	    }
+		PostScript @Yield {{"LoutBox ltbl"col} @Graphic x}
+		PDF        @Yield {{
+				     "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"
+				     @PDFAddPaint col "S"
+				   } @Graphic x}
+		PlainText  @Yield { rpc @PlainGraphic x }
+	      }
 	    }
 
 	    def @PaintBox left col right x
 	    {
 	      @BackEnd @Case {
-		{ PostScript PDF } @Yield {{"LoutBox ltbl"col} @Graphic x}
-		PlainText          @Yield { x }
-	    }
+		PostScript @Yield {{"LoutBox ltbl"col} @Graphic x}
+		PDF        @Yield {{
+				     "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"
+				     @PDFAddPaint col "S"
+				   } @Graphic x}
+		PlainText  @Yield { x }
+	      }
 	    }
 
 	    def @HRule left col right thick

@@ -1,6 +1,6 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -310,6 +310,7 @@ void FlushGalley(OBJECT hd)
       break;
   }
   dest = actual(dest_index);
+  if( underline(dest) == UNDER_UNDEF )  underline(dest) = UNDER_OFF;
   target_is_internal =
     (dim==ROWM && !external_ver(dest)) || (dim==COLM && !external_hor(dest));
   debug1(DGF, DD, "  dest_index: %s", EchoObject(dest_index));
@@ -399,6 +400,7 @@ void FlushGalley(OBJECT hd)
 
       case GAP_OBJ:
 
+	underline(y) = underline(dest);
 	prec_gap = y;
 	if( target_is_internal )
 	{ assert( dest_encl != nilobj, "FlushGalley/GAP_OBJ: dest_encl!" );
@@ -429,6 +431,7 @@ void FlushGalley(OBJECT hd)
       case CROSS_TARG:
       case PAGE_LABEL_IND:
 
+	underline(y) = underline(dest);
 	break;
 
 
@@ -520,6 +523,7 @@ void FlushGalley(OBJECT hd)
       case CROSS:
       case FORCE_CROSS:
 
+	underline(y) = underline(dest);
 	if( dim == ROWM )
 	{
 	  /* make sure y is not joined to a target below (vertical case only) */
@@ -854,7 +858,8 @@ void FlushGalley(OBJECT hd)
 
 	/* merge galleys whose seq strings are equal */
 	if( found && StringEqual(newseq, string(seq)) )
-	{ SwitchScope(nilobj);
+	{
+	  SwitchScope(nilobj);
 	  val = ReadFromFile(eg_fnum(eg), eg_fpos(eg), eg_lnum(eg));
 	  UnSwitchScope(nilobj);
 	  if( val == nilobj )

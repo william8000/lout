@@ -1,6 +1,6 @@
 /*@z05.c:Read Definitions:ReadFontDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -198,7 +198,7 @@ void ReadDatabaseDef(unsigned typ, OBJECT encl)
   }
   if( Down(symbs) != symbs )
     (void) DbLoad(fname, typ == DATABASE ? DATABASE_PATH : SYSDATABASE_PATH,
-      TRUE, symbs);
+      TRUE, symbs, InMemoryDbIndexes);
 } /* end ReadDatabaseDef */
 
 

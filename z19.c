@@ -1,6 +1,6 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -365,6 +365,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     debug1(DGA, DD, "  SizeGalley tg_inners: %s", DebugInnersNames(tg_inners));
     if( recs != nilobj )  ExpandRecursives(recs);
     dest = actual(dest_index);
+    if( underline(dest) == UNDER_UNDEF )  underline(dest) = UNDER_OFF;
 
     /* verify that hd satisfies any horizontal constraint on dest */
     if( dim == ROWM )
@@ -504,6 +505,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	case GAP_OBJ:
 
+	  underline(y) = underline(dest);
 	  if( !join(gap(y)) )  seen_nojoin(hd) = TRUE;
 	  break;
 
@@ -514,6 +516,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	case NULL_CLOS:
 	case PAGE_LABEL:
 
+	  underline(y) = underline(dest);
 	  break;
 
 
@@ -555,6 +558,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	case COL_THR:
 	    
 
+	  underline(y) = underline(dest);
 	  if( dim == ROWM )
 	  {
 	    /* make sure y is not joined to a target below (vertical only) */

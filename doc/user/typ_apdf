@@ -3,12 +3,11 @@
    @Tag { pdf }
 @Begin
 @PP
-Lout offers PDF (Adobe Portable Document Format) output as an alternative
+You can get Lout to produce PDF (Adobe Portable Document Format) output as
+an alternative to PostScript, by adding @Code "-PDF" to the command line
+like this:
 pdf. @Index { PDF documents }
-to PostScript.  Any document that can be produced by Lout in
-PostScript can be produced in PDF as well, by adding a @Code "-Z"
-flag to the Unix command line:
-@ID @Code "lout -Z simple > simple.pdf"
+@ID @Code "lout -PDF simple > simple.pdf"
 No other changes are required.
 @PP
 The PDF output is superior to PostScript in providing links:  when viewed

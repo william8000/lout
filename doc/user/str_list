@@ -31,7 +31,7 @@ preceding text
 @EndList
 following text
 }
-with @Code "@DP" inserted automatically before, between, and after
+with space inserted automatically before, between, and after
 the items.
 @PP
 As the example shows, the @Code "@List" symbol causes the items to be
@@ -326,9 +326,11 @@ items.  Once again this must be a length, although since it is
 vertical rather than horizontal, somewhat different kinds of lengths
 are appropriate:  @Code "1.5v" for 1.5 times the current vertical space
 between lines, or the default value, {@Code "@DisplayGap"}, which produces
-the amount of vertical space used before and after displays.  There
-is no option for the space before or after the list as a whole; to
-change this, use a raw list and insert your own.
+the amount of vertical space used before and after displays.  Owing to
+problems behind the scenes, there is no list option for the space before or after
+the list as a whole.  To change this space in one list, use a raw list and
+insert your own paragraph symbols; to change it in every list there is a
+setup file option, described below.
 @PP
 The @Code "start" option is the number assigned to the first
 item.  It must be decimal:
@@ -384,5 +386,7 @@ by setting options called {@Code "@ListTagWidth"}, {@Code "@ListIndent"},
 {@Code "@ListRightIndent"}, and {@Code "@ListGap"} in the setup
 file (Section {@NumberOf setup}).  These default values will then apply
 automatically to every list in the document unless overridden by an option,
-just as the usual default values do.
+just as the usual default values do.  The setup file also has a
+{@Code "@ListOuterGap"} option which determines the gap before the first
+and after the last list item in non-raw lists.
 @End @Section

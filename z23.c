@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -169,7 +169,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       {
         Child(z, Down(y));
 	Parent(thr, UpDim(x, dim));
-        debug7(DGP, D, "  calling SPAN %s(xmk %s, x %s,%s, cons %s, z %s,%s)",
+        debug7(DGP, DD, "  calling SPAN %s(xmk %s, x %s,%s, cons %s, z %s,%s)",
 	    dimen(dim), EchoLength(xmk),
 	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
 	    EchoConstraint(&constraint(y)),
@@ -180,7 +180,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  find_max(f, bfc(constraint(y)) - back(z, dim)),
 	  dim, FALSE, pg, 1);
 	*** */
-	debug5(DGP, D, "  calling FAPO from %s (y = %s, bfc = %s, z = %s,%s",
+	debug5(DGP, DD, "  calling FAPO from %s (y = %s, bfc = %s, z = %s,%s",
 	  Image(type(x)), Image(type(y)), EchoLength(bfc(constraint(y))),
 	  EchoLength(back(z, dim)), EchoLength(fwd(z, dim)));
 	/* ***
@@ -226,11 +226,16 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       }
       else
       {
-	debug3(DGP, DD, "  FAPO %s %s (underline = %s)", Image(type(x)),
-	  string(x), bool(underline(x)));
+	debug4(DGP, D, /* underline(x) == UNDER_UNDEF, */
+	  "  FAPO %s %s %s (underline = %s)", EchoFilePos(&fpos(x)),
+	  Image(type(x)),
+	  string(x), underline(x) == UNDER_OFF ? "UNDER_OFF" :
+		     underline(x) == UNDER_ON  ? "UNDER_ON" : "UNDER_UNDEF");
+	assert( underline(x) == UNDER_OFF || underline(x) == UNDER_ON,
+	  "FixAndPrintObject: underline(x)!" );
 	if( string(x)[0] != '\0' )
 	{ PrintWord(x, word_save_mark(x), pg - xmk);
-	  if( underline(x) )
+	  if( underline(x) == UNDER_ON )
 	  {
 	    FontWordSize(x);  /* to restore fwd(x, COLM) */
 	    PrintUnderline(word_font(x), word_save_mark(x),
@@ -674,7 +679,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  if( link != x && mode(gap(g)) == TAB_MODE &&
 	      units(gap(g)) == AVAIL_UNIT && width(gap(g)) == 0 )
 	  {
-	    debug2(DGP, D, "  FAPO-CAT converting 0rt (back(x, dim) %s, xb %s)",
+	    debug2(DGP, DD, "  FAPO-CAT converting 0rt (back(x, dim) %s, xb %s)",
 	      EchoLength(back(x, dim)), EchoLength(xb));
 	    fwd(prev, dim) += xb - back(x, dim);
 	    back(x, dim) = xb;
@@ -694,12 +699,12 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    inc = FindAdjustIncrement(x, frame_size, dim);
 	  else inc = 0;
 
-	  debug6(DGP, D, "[ FAPO-CAT %s (%s,%s): xmk %s, xb %s, xf %s",
+	  debug6(DGP, DD, "[ FAPO-CAT %s (%s,%s): xmk %s, xb %s, xf %s",
 	    Image(type(x)), EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
 	    EchoLength(xmk), EchoLength(xb), EchoLength(xf));
 
 	  mk = back_edge + back(prev, dim);
-	  debug4(DGP, D, "  FAPO-CAT back_edge %s, mk %s, framesize %s, inc %s",
+	  debug4(DGP, DD, "  FAPO-CAT back_edge %s, mk %s, framesize %s, inc %s",
 	    EchoLength(back_edge), EchoLength(mk), EchoLength(frame_size),
 	    EchoLength(inc));
 
@@ -720,7 +725,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    }
 	    else
 	    {
-	      debug5(DGP, D, "  FAPO-CAT (b) calling FAPO(%s, %s, %s, %s+%s)",
+	      debug5(DGP, DD, "  FAPO-CAT (b) calling FAPO(%s, %s, %s, %s+%s)",
 	        Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
 		EchoLength(fwd(prev, dim)), EchoLength(inc));
 	      FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
@@ -734,7 +739,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  }
 	  if( suppress )
 	  {
-	    debug4(DGP, D, "  FAPO-CAT (c) calling FAPO(%s, %s, %s, %s)",
+	    debug4(DGP, DD, "  FAPO-CAT (c) calling FAPO(%s, %s, %s, %s)",
 	      Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
 	      EchoLength(fwd(prev, dim)));
 	    FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
@@ -742,7 +747,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  }
 	  else
 	  {
-	    debug5(DGP,D,"  FAPO-CAT (d) calling FAPO(%s, %s, %s, max(%s, %s))",
+	    debug5(DGP, DD,"  FAPO-CAT (d) calling FAPO(%s, %s, %s, max(%s, %s))",
 	      Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
 	      EchoLength(fwd(prev, dim)), EchoLength(xmk + xf - mk));
 	    FixAndPrintObject(prev, mk, back(prev,dim),
@@ -753,7 +758,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  fwd(x, dim) = mk + fwd(prev, dim) - back_edge - back(x, dim);
 	}
 	else back(x, dim) = xb, fwd(x, dim) = xf;
-	debug0(DGP, D, "] FAPO-CAT returning.");
+	debug0(DGP, DD, "] FAPO-CAT returning.");
       }
       else
       { OBJECT start_group, zlink, m;  BOOLEAN dble_found;
@@ -1069,11 +1074,11 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  while( link != x )
 	  {
 	    /* check for underlining */
-	    if( underline(prev) )
+	    if( underline(prev) == UNDER_ON )
 	    {
 	      debug3(DGP, DD, "  FAPO/ACAT1 underline() := %s for %s %s",
 	        bool(FALSE), Image(type(prev)), EchoObject(prev));
-	      underline(prev) = FALSE;
+	      underline(prev) = UNDER_OFF;
 	      if( !underlining )
 	      {
 	        /* underlining begins here */
@@ -1084,7 +1089,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 		    font(save_style(x));
 	        underline_xstart = mk - back(prev, dim);
 	      }
-	      if( !underline(g) )
+	      if( underline(g) == UNDER_OFF )
 	      {
 	        /* underlining ends here */
 	        debug2(DGP, DD, "underlining ends at %s %s",
@@ -1127,13 +1132,17 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  }
 
 	  /* check for underlining */
-	  debug3(DGP, DD, "  underlining is %s in %s %s", bool(underline(prev)),
-	    Image(type(prev)), EchoObject(prev));
-	  if( underline(prev) )
+	  debugcond3(DGP, D, underline(prev) == UNDER_UNDEF,
+	    "  underlining is UNDER_UNDEF in %s: %s %s in para:",
+	    EchoFilePos(&fpos(prev)), Image(type(prev)), EchoObject(prev));
+	  debugcond1(DGP, D, underline(prev)==UNDER_UNDEF, "%s", EchoObject(x));
+	  assert( underline(prev) == UNDER_OFF || underline(prev) == UNDER_ON,
+	    "FixAndPrint: underline(prev)!" );
+	  if( underline(prev) == UNDER_ON )
 	  {
 	    debug3(DGP, DD, "  FAPO/ACAT1 underline() := %s for %s %s",
 	      bool(FALSE), Image(type(prev)), EchoObject(prev));
-	    underline(prev) = FALSE;
+	    underline(prev) = UNDER_OFF;
 	    if( !underlining )
 	    {
 	      /* underlining begins here */

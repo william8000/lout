@@ -1,6 +1,6 @@
 /*@z44.c:Vertical Hyphenation:VerticalHyphenate()@****************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -238,6 +238,7 @@ static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
       tmp = MakeWord(WORD, STR_EMPTY, &fpos(sh));
       back(tmp, COLM) = fwd(tmp, COLM) = 0;
       back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
+      underline(tmp) = UNDER_OFF;
       Link(new_sh, tmp);
     }
     Link(new_s2, new_sh);

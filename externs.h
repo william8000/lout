@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -30,10 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-
-#if LOCALE_ON || COLLATE
 #include <locale.h>
-#endif
 
 #if LOCALE_ON
 #include <nl_types.h>
@@ -98,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.14 (March 1999)")
+#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.15 (may 1999)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -344,6 +341,15 @@ typedef unsigned MAPPING;
 
 /*****************************************************************************/
 /*                                                                           */
+/*  LINE - a line from a database index file.                                */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef char *LINE;
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  typedef FULL_CHAR - one of the characters manipulated by Lout.           */
 /*                                                                           */
 /*  This program does not deal with 7-bit ASCII characters.  Instead, its    */
@@ -382,29 +388,33 @@ typedef void *POINTER;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	CH_FLAG_OUTFILE		'o'	/* the -o command line flag          */
-#define	CH_FLAG_SUPPRESS	's'	/* the -s command line flag          */
-#define	CH_FLAG_NOKERN		'k'	/* the -k command line flag          */
-#define	CH_FLAG_CROSS		'c'	/* the -c command line flag          */
-#define	CH_FLAG_ERRFILE		'e'	/* the -e command line flag          */
 #define	CH_FLAG_ALTERR		'a'	/* the -a command line flag          */
-#define	CH_FLAG_EPSFIRST	'E'	/* first letter of the -EPS flag     */
-#define	CH_FLAG_DIRPATH		'D'	/* the -D command line flag          */
+#define	CH_FLAG_CROSS		'c'	/* the -c command line flag          */
 #define	CH_FLAG_ENCPATH		'C'	/* the -C command line flag          */
+#define	CH_FLAG_DEBUG		'd'	/* the -d command line flag          */
+#define	CH_FLAG_DIRPATH		'D'	/* the -D command line flag          */
+#define	CH_FLAG_ERRFILE		'e'	/* the -e command line flag          */
+#define	CH_FLAG_EPSFIRST	'E'	/* first letter of the -EPS flag     */
 #define	CH_FLAG_FNTPATH		'F'	/* the -F command line flag          */
-#define	CH_FLAG_HYPPATH		'H'	/* the -H command line flag          */
-#define	CH_FLAG_INCPATH		'I'	/* the -I command line flag          */
-#define	CH_FLAG_INCLUDE		'i'	/* the -i command line flag          */
 #define	CH_FLAG_HYPHEN		'h'	/* the -h command line flag          */
-#define	CH_FLAG_VERSION		'V'	/* the -V command line flag          */
-#define	CH_FLAG_USAGE		'u'	/* the -u command line flag          */
+#define	CH_FLAG_HYPPATH		'H'	/* the -H command line flag          */
+#define	CH_FLAG_INCLUDE		'i'	/* the -i command line flag          */
+#define	CH_FLAG_INCPATH		'I'	/* the -I command line flag          */
+#define	CH_FLAG_NOKERN		'k'	/* the -k command line flag          */
+#define CH_FLAG_NOCOLLATE       'l'     /* the -l command line flag          */
+#define CH_FLAG_COLLATE         'L'     /* the -L command line flag          */
+#define CH_FLAG_MEMCHECK        'm'     /* the -m command line flag          */
+#define	CH_FLAG_MEMCR		'M'	/* the -M command line flag	     */
+#define	CH_FLAG_OUTFILE		'o'	/* the -o command line flag          */
 #define	CH_FLAG_PLAIN		'p'	/* the -p command line flag          */
 #define	CH_FLAG_FFPLAIN		'P'	/* the -P command line flag          */
-#define	CH_FLAG_DEBUG		'd'	/* the -d command line flag          */
+#define	CH_FLAG_SUPPRESS	's'	/* the -s command line flag          */
+#define	CH_FLAG_SAFE		'S'	/* the -S command line flag          */
+#define	CH_FLAG_USAGE		'u'	/* the -u command line flag          */
+#define	CH_FLAG_UNSAFE		'U'	/* the -U command line flag          */
+#define	CH_FLAG_VERSION		'V'	/* the -V command line flag          */
 #define	CH_FLAG_INITALL		'x'	/* the -x command line flag          */
 #define	CH_FLAG_OPTION		'-'	/* the -- command line flag          */
-#define	CH_FLAG_SAFE		'S'	/* the -S command line flag          */
-#define	CH_FLAG_UNSAFE		'U'	/* the -U command line flag          */
 #define	CH_FLAG_WORDS		'w'	/* the -w command line flag          */
 #define	CH_FLAG_PDF		'Z'	/* the -Z command line flag	     */
 
@@ -758,9 +768,9 @@ typedef union
   struct /* used by WORD objects only, except underline used by all */
 	 /* objects, including GAP_OBJ                                  */
   {	FONT_NUM	oword_font     : 12;
-	COLOUR_NUM	oword_colour   : 12;
+	COLOUR_NUM	oword_colour   : 11;
 	LANGUAGE_NUM	oword_language : 6;
-	unsigned	ounderline     : 1;
+	unsigned	ounderline     : 2;
 	unsigned	oword_hyph     : 1;
   } os22;
 
@@ -780,13 +790,14 @@ typedef union
 	BOOLEAN		oopt_gazumped: 1;
 	BOOLEAN		oadjust_cat  : 1;
 	BOOLEAN		oforce_gall  : 1;
-	unsigned	ounderline   : 1;
+	unsigned	ounderline   : 2;
 	/* don't forget ounderline from os22 applies in this union! */
   } os23;
 
   struct /* used by WORD and QWORD when they are database nodes */
   {	unsigned short	oleft_pos;
-	unsigned short	oreading;
+	unsigned char	oreading;
+	unsigned char	oin_memory;
   } os24;
 
   struct /* used by WORD and QWORD when they are font records */
@@ -828,7 +839,8 @@ typedef union
 /*                                                                           */
 /*  typedef THIRD_UNION - eight bytes usually holding an object size.        */
 /*                                                                           */
-/*  In database records this space is used for a file pointer; in certain    */
+/*  In database records this space is used for a file pointer, or a pointer  */
+/*  to a LINE array if the database is in-memory; in certain                 */
 /*  WORD objects used privately in z10.c it is used for a galley-position.   */
 /*  In font records it holds the font size, space width, etc.  In filter     */
 /*  words it holds a pointer to the symbol being filtered.                   */
@@ -842,7 +854,8 @@ typedef union
 	FULL_LENGTH	ofwd[2];
   } os31;
 
-  FILE *ofilep;
+  FILE *odb_filep;
+  LINE *odb_lines;
 
   struct
   {	FULL_LENGTH	ofont_size;
@@ -854,17 +867,10 @@ typedef union
   } os32;
 
   struct
-  {
-	unsigned char	ocs_type;
+  {	unsigned char	ocs_type;
 	FILE_NUM	ocs_fnum;
 	int		ocs_pos;
 	int		ocs_lnum;
-
-	/*** old values
-	BOOLEAN ogall_rec;
-	unsigned char ogall_type;
-	int	ogall_pos;
-	***/
   } os33;
 
   union rec *ofilter_actual;
@@ -1077,7 +1083,9 @@ typedef union rec
 #define	incgraphic_ok(x)	cross_type(x)
 
 #define	left_pos(x)		(x)->os1.ou2.os24.oleft_pos
+#define	db_lineslen(x)		left_pos(x)
 #define	reading(x)		(x)->os1.ou2.os24.oreading
+#define	in_memory(x)		(x)->os1.ou2.os24.oin_memory
 
 #define	is_tag(x)		(x)->os1.ou2.os26.ois_tag
 #define	has_tag(x)		(x)->os1.ou2.os26.ohas_tag
@@ -1110,7 +1118,8 @@ typedef union rec
 #define	comp_count(x)		back(x, COLM)
 #define	fwd(x, dim)		(x)->os1.ou3.os31.ofwd[dim]
 #define	size(x, dim)		(back(x, dim) + fwd(x, dim))
-#define	filep(x)		(x)->os1.ou3.ofilep
+#define	db_filep(x)		(x)->os1.ou3.odb_filep
+#define	db_lines(x)		(x)->os1.ou3.odb_lines
 #define	filter_actual(x)	(x)->os1.ou3.ofilter_actual
 #define	db_checksym(x)		filter_actual(x)
 
@@ -1451,7 +1460,12 @@ typedef struct mapvec {
 #define	FILL_OFF	     1		/* no filling of lines               */
 #define	FILL_ON		     2		/* fill lines with text              */
 
-/* spoace_style(style) options                                               */
+/* underline(obj) options                                                    */
+#define	UNDER_UNDEF	     0		/* underline undefined               */
+#define	UNDER_OFF	     1		/* no underlining	             */
+#define	UNDER_ON	     2		/* underline this                    */
+
+/* space_style(style) options                                                */
 #define	SPACE_LOUT	     0		/* interpret white space Lout's way  */
 #define	SPACE_COMPRESS	     1		/* compress multiple white spaces    */
 #define	SPACE_SEPARATE	     2		/* compress an separate              */
@@ -1583,12 +1597,13 @@ typedef struct mapvec {
 #define	MEM_FILES	 4		/* table of file names               */
 #define	MEM_CROSSREF	 5		/* table of file names               */
 #define	MEM_PAGES	 6		/* page grids (-p only)              */
-#define	MEM_DBCHECK	 7		/* page grids (-p only)              */
-#define	MEM_HYPH_PATS	 8		/* hyphenation patterns              */
-#define	MEM_CMAPS	 9		/* character maps                    */
-#define	MEM_COLOUR_TAB	10		/* colour table                      */
-#define	MEM_LANG_TAB	11		/* language table                    */
-#define	MEM_USAGE_MAX	12		/* number of memory usage types      */
+#define	MEM_DBCHECK	 7		/* database checks                   */
+#define	MEM_DB	         8		/* in_memory database                */
+#define	MEM_HYPH_PATS	 9		/* hyphenation patterns              */
+#define	MEM_CMAPS	10		/* character maps                    */
+#define	MEM_COLOUR_TAB	11		/* colour table                      */
+#define	MEM_LANG_TAB	12		/* language table                    */
+#define	MEM_USAGE_MAX	13		/* number of memory usage types      */
 
 /*@::Keywords@****************************************************************/
 /*                                                                           */
@@ -2213,6 +2228,8 @@ extern	OBJECT	  RawVerbatimSym;
 extern	OBJECT	  OptGallSym;
 extern	OBJECT	  CommandOptions;
 extern	BOOLEAN	  AllowCrossDb;
+extern	BOOLEAN	  UseCollate;
+extern	BOOLEAN	  InMemoryDbIndexes;
 extern	BOOLEAN	  Encapsulated;
 extern	BOOLEAN	  Kern;
 extern	BOOLEAN	  SafeExecution;
@@ -2530,7 +2547,8 @@ extern	void	  DbInsert(OBJECT db, BOOLEAN gall, OBJECT sym, FULL_CHAR *tag,
 		    long dfpos, int dlnum, BOOLEAN check);
 extern	void	  DbConvert(OBJECT db, BOOLEAN full_name);
 extern	void	  DbClose(OBJECT db);
-extern	OBJECT	  DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs);
+extern	OBJECT	  DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs,
+		    BOOLEAN in_memory);
 extern	BOOLEAN	  DbRetrieve(OBJECT db, BOOLEAN gall, OBJECT sym,
 		    FULL_CHAR *tag, FULL_CHAR *seq, FILE_NUM *dfnum,
 		    long *dfpos, int *dlnum, long *cont);
@@ -2587,13 +2605,11 @@ extern	BOOLEAN	  MapIsLowerCase(FULL_CHAR ch, MAPPING m);
 
 /*****  z39.c	  String Handler        **************************************/
 #define		  AsciiToFull(x)	( (FULL_CHAR *) (x) )
-#if COLLATE
-#define		  StringEqual(a, b)	(strcoll((char *)(a), (char *)(b))==0)
-extern BOOLEAN    StringLessEqual(FULL_CHAR *a, FULL_CHAR *b);
-#else
 #define		  StringEqual(a, b)	(strcmp((char *)(a), (char *)(b))==0)
-#define		  StringLessEqual(a, b) (strcmp((char*)(a),(char*)(b))<=0)
-#endif
+extern int	  strcollcmp(char *a, char *b);
+#define		  StringLessEqual(a, b) \
+		    ( UseCollate ? strcollcmp((char *)(a),(char *)(b)) <= 0 \
+				 : strcmp((char *)(a),(char *)(b)) <= 0 )
 #define		  StringCat(a, b)	strcat((char *)(a),(char *)(b))
 #define		  StringCopy(a, b)	strcpy((char *)(a),(char *)(b))
 #define		  StringLength(a)	strlen((char *)(a))
@@ -2642,6 +2658,9 @@ extern	OBJECT	  ConvertGalleyList(OBJECT x);
 extern	OBJECT	  BuildEnclose(OBJECT hd);
 
 /*****  z45.c	  External Sort         **************************************/
+extern	LINE	  *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, int *len);
+extern	void	  WriteLines(FILE *fp, LINE *lines, int len);
+extern	void	  SortLines(LINE *lines, int lines_len);
 extern	void	  SortFile(FULL_CHAR *infile, FULL_CHAR *outfile);
 
 /*****  z46.c	  Optimal Galleys       **************************************/

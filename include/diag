@@ -121,6 +121,7 @@
   # pathstyle		{ solid			}
   # pathdashlength	{ 0.2f			}
   # pathwidth		{ 0.02f			}
+  # pathgap		{ 0.04f			}
   # arrow		{ no			}
   # arrowstyle		{ solid			}
   # arrowwidth		{ 0.45f			}

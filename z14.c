@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -563,6 +563,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   word_colour(tmp) = 0;
   word_language(tmp) = 0;
   word_hyph(tmp) = 0;
+  underline(tmp) = UNDER_OFF;
   Link(x, tmp);
 
   /* if extend_unbreakable, run through x and set every gap in the     */
@@ -732,10 +733,12 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	word_colour(t1) = 0;
 	word_language(t1) = 0;
 	word_hyph(t1) = 0;
+	underline(t1) = UNDER_OFF;
 	New(t2, WIDE);
 	SetConstraint(constraint(t2), MAX_FULL_LENGTH, outdent_margin,
 	  MAX_FULL_LENGTH);
 	back(t2, COLM) = 0;  fwd(t2, COLM) = outdent_margin;
+	underline(t2) = UNDER_OFF;
 	Link(t2, t1);
 	Link(y, t2);
 	New(z, GAP_OBJ);

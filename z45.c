@@ -1,6 +1,6 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -32,14 +32,13 @@
 /*****************************************************************************/
 #include "externs.h"
 
-typedef char *LINE;
 #define BUFF_SIZE	4096		/* size of one memory buffer */
 #define LINES_GUESS     2000		/* initial guess of number of lines */
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  LINE *ReadLines(FILE *fp, FULL_CHAR *fname, int *nel)                    */
+/*  LINE *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, *nel) */
 /*                                                                           */
 /*  Read all of the lines of fp into memory and return a null-terminated     */
 /*  array of pointers to these lines, and set *nel to the number of lines.   */
@@ -48,9 +47,12 @@ typedef char *LINE;
 /*  fname is the name of the file being sorted, and is used for error        */
 /*  messages only.                                                           */
 /*                                                                           */
+/*  if first_line is non-null then it is a pointer to a string which is      */
+/*  to become as the first line of the result.  This string needs copying.   */
+/*                                                                           */
 /*****************************************************************************/
 
-static LINE *ReadLines(FILE *fp, FULL_CHAR *fname, int *len)
+LINE *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, int *len)
 {
   char *buff;				/* the current input line buffer     */
   char *buff_top;			/* first spot off end of buffer      */
@@ -68,7 +70,7 @@ static LINE *ReadLines(FILE *fp, FULL_CHAR *fname, int *len)
   /* initialize buff to be empty with size BUFF_SIZE */
   buff = malloc(BUFF_SIZE * sizeof(char));
   if( buff == NULL )
-    Error(45, 1, "run out of memory when sorting index file %s",
+    Error(45, 1, "run out of memory when reading index file %s",
       FATAL, no_fpos, fname);
   buff_top = buff + BUFF_SIZE;
   bp = buff;
@@ -78,8 +80,16 @@ static LINE *ReadLines(FILE *fp, FULL_CHAR *fname, int *len)
   lines = malloc(lines_length * sizeof(LINE *));
   lines_top = &lines[lines_length];
   lp = lines;
-  *lp++ = bp;
 
+  /* add first_line to lines buffer if required */
+  if( first_line != (FULL_CHAR *) null )
+  {
+    *lp = malloc((StringLength(first_line) + 1) * sizeof(char));
+    StringCopy( (char *) *lp, first_line);
+    lp++;
+  }
+
+  *lp++ = bp;
   while( (ch = getc(fp)) != EOF )
   {
     debug4(DEX, DD, "lines: [%d  %d(%d)  %d]",
@@ -96,7 +106,7 @@ static LINE *ReadLines(FILE *fp, FULL_CHAR *fname, int *len)
       debug0(DEX, D, "  getting new buff");
       buff = malloc(BUFF_SIZE * sizeof(char));
       if( buff == NULL )
-	Error(45, 2, "run out of memory when sorting index file %s",
+	Error(45, 2, "run out of memory when reading index file %s",
 	  FATAL, no_fpos, fname);
       buff_top = buff + BUFF_SIZE;
       for( p = buff, q = *(lp-1);  q != bp;  *p++ = *q++ );
@@ -104,7 +114,7 @@ static LINE *ReadLines(FILE *fp, FULL_CHAR *fname, int *len)
       debug1(DEX, D, "  copied into new buff: %s", buff);
       *(lp-1) = buff;
       if( bp == buff_top )
-	Error(45, 3, "line too long when sorting index file %s",
+	Error(45, 3, "line too long when reading index file %s",
 	  FATAL, no_fpos, fname);
     }
 
@@ -120,7 +130,7 @@ static LINE *ReadLines(FILE *fp, FULL_CHAR *fname, int *len)
         debug1(DEX, D, "  realloc(lines, %d)", 2 * lines_length);
 	lines = realloc(lines, 2 * lines_length * sizeof(LINE *));
 	if( lines == NULL )
-	  Error(45, 4, "run out of memory when sorting index file %s",
+	  Error(45, 4, "run out of memory when reading index file %s",
 	    FATAL, no_fpos, fname);
 	lp = &lines[lines_length];
 	lines_length = 2 * lines_length;
@@ -150,7 +160,7 @@ static LINE *ReadLines(FILE *fp, FULL_CHAR *fname, int *len)
 /*                                                                           */
 /*****************************************************************************/
 
-static void WriteLines(FILE *fp, LINE *lines, int len)
+void WriteLines(FILE *fp, LINE *lines, int len)
 { int i;
   for( i = 0;  i < len;  i++ )
   { fputs(lines[i], fp);
@@ -161,17 +171,34 @@ static void WriteLines(FILE *fp, LINE *lines, int len)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  Line comparison function (for qsort)                                     */
+/*  Line comparison functions (for qsort)                                    */
+/*                                                                           */
+/*  By Jeff Kingston and Valery Ushakov (uwe).                               */
 /*                                                                           */
 /*****************************************************************************/
 
-static int compare(char **a, char **b)
+static int pstrcmp(const void *a, const void *b)	/* !UseCollate */
 {
-#if COLLATE
-  return strcmp(*a, *b);  /* needs revising! */
-#else
-  return strcmp(*a, *b);
-#endif
+  return strcmp (*(char **)a, *(char **)b);
+}
+
+static int pstrcollcmp(const void *a, const void *b)	/* UseCollate */
+{
+  return strcollcmp (*(char **)a, *(char**)b);
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void SortLines(LINE *lines, int lines_len)                               */
+/*                                                                           */
+/*  Sort the given lines.                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+void SortLines(LINE *lines, int lines_len)
+{
+  qsort(lines, lines_len, sizeof(LINE), (UseCollate ? pstrcollcmp : pstrcmp));
 }
 
 
@@ -203,9 +230,8 @@ void SortFile(FULL_CHAR *infile, FULL_CHAR *outfile)
 	    FATAL, no_fpos, outfile);
 
   /* read lines, sort them, and write them out again sorted */
-  lines = ReadLines(in_fp, infile, &lines_len);
-  qsort(lines, lines_len, sizeof(char *),
-    (int (*) (const void *, const void *)) &compare);
+  lines = ReadLines(in_fp, infile, (FULL_CHAR *) NULL, &lines_len);
+  SortLines(lines, lines_len);
   WriteLines(out_fp, lines, lines_len);
   fclose(out_fp);
 }

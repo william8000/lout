@@ -15,19 +15,30 @@ export @OverheadTransparencies @Lecture @Overhead
 def @OverheadSetup
     named @DateLine			{ No			}
     named @ContentsWord			{ contents		}
+    named @LectureWord			{ lecture		}
+    named @OverheadWord			{ 			}
     named @LectureNumbers		{ Arabic		}
     named @FirstLectureNumber		{ 1			}
     named @OverheadNumbers		{ Arabic		}
     named @FirstOverheadNumber		{ 1			}
     named @TitlePageFont		{ Helvetica Base      	}
     named @LectureHeadingFont		{ Bold 1.20f		}
-    named @LectureHeadingBreak		{ clines 1.2fx nohyphen	}
+    named @LectureHeadingBreak		{ 1.2fx nohyphen	}
     named @LectureHeadingFormat
-	    left number right title	{ number @DotSep title	}
+	    left number right title	{ @Centre number @DP @Centre title @DP }
+    named @AboveLectureGap              { 3.0f                  }
     named @OverheadHeadingFont		{ Bold			}
-    named @OverheadHeadingBreak		{ clines 1.2fx nohyphen	}
+    named @OverheadHeadingBreak		{ 1.2fx nohyphen	}
     named @OverheadHeadingFormat
-	    left number right title	{ number @DotSep title	}
+	    left number right title	{ @Centre title @DP }
+    named @OverheadFormat
+	named @II right x { |@DisplayIndent x |               }
+	named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+	named @CC right x { |0.5rt x          |               }
+	named @RR right x { |1.0rt x          |               }
+	right @Body
+					{ @Body }
+    named @AboveOverheadGap             { 1.0f                  }
     named @LectureInContents		{ Yes			}
     named @OverheadInContents		{ No			}
     named @ReferencesInContents		{ Yes			}
@@ -39,6 +50,10 @@ def @OverheadSetup
     named @OverheadNumInFigures		{ No			}
     named @LectureNumInTables		{ Yes			}
     named @OverheadNumInTables		{ No			}
+    named @LectureNumInRunners		{ Yes			}
+    named @OverheadNumInRunners		{ Yes			}
+    named @LecturePrefix		{			}
+    named @OverheadPrefix		{			}
 @Begin
 
     #######################################################################
@@ -81,6 +96,15 @@ def @OverheadSetup
 		@Galley
         //1.1b	@LecOverheadsList @Next num
     }
+
+
+    #######################################################################
+    #                                                                     #
+    #  @Full - this sends text to a full-width place.                     #
+    #                                                                     #
+    #######################################################################
+
+    def @Full force into { @FullPlace&&following } right x { x }
 
 
     #######################################################################
@@ -181,7 +205,7 @@ def @OverheadSetup
 		    @ColumnNumber { 1 }
 		    @PageHeaders { @PageHeaders }
 		    @Orient { @PageOrientation }
-		    extra { No }
+		    extra { Yes }
 		    @FirstPageNumber
             //	@OverheadsBody
             //	Start @Runner
@@ -199,38 +223,43 @@ def @OverheadSetup
 	named @Tag {}
 	named @Title {}
 	named @RunningTitle { dft }
+	named @Format
+            named @II right x { |@DisplayIndent x |               }
+            named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+            named @CC right x { |0.5rt x          |               }
+            named @RR right x { |1.0rt x          |               }
+                right @Body { @OverheadFormat @Body }
 	named @InitialLanguage {}
 	named @BypassNumber { dft }
 	body @Body
     {
 
-	def @OverheadNum
-	{
-	    @OverheadNumbers @Then {
-		@BypassNumber @Dft {
-		    @OverheadNumbers @Num @OverheadsList&&@Tag @Open { num }
-		}
-	    }
-	}
-
-	@DP { |0.5rt @InitialLanguage @Language @OverheadHeadingFont @Font
-	      @OverheadHeadingBreak @Break { {} @OverheadHeadingFormat @Title } | }
-        //  Start @Runner
-		@MajorTitle { @GetTitle }
-		@MinorNum { @OverheadNum }
-        //  @NumberMarker @Tag { @Tag } @Value { @OverheadNum }
-        //  @PageMark @Tag
-        //  @OverheadsList&&preceding @Tagged @Tag
-        //  @OverheadInContents @ContentsEntry
-		indent { 0f }
-		number { @OverheadNum }
-		title { @InitialLanguage @Language @Title }
-		pagenum { @PageOf @Tag }
-        @DP @InitialLanguage @Language @Body
-        //  NonStart @Runner
-		@MajorTitle { @GetTitle }
-		@MinorNum { @OverheadNum }
-
+	@LargeScaleStructure
+	    tag { @Tag }
+	    type { Major }
+	    initiallanguage { @InitialLanguage }
+	    title { @Title }
+	    majortitle { @GetTitle }
+	    runningtitle { @RunningTitle }
+	    aboveheadinggap { @AboveOverheadGap }
+	    headingfont { @OverheadHeadingFont }
+	    headingbreak { @OverheadHeadingBreak }
+	    headingformat { @Num @OverheadHeadingFormat @Body }
+	    incontents { @OverheadInContents }
+	    contentsindent { 0f }
+	    numbers { @OverheadNumbers }
+	    attachnum { @OverheadsList&&preceding @Tagged @Tag }
+	    retrievenum { @OverheadsList&&@Tag @Open { num } }
+	    bypassnumber { @BypassNumber }
+	    pnprefix { @OverheadPrefix }
+	    intheorems { @OverheadNumInTheorems }
+            indisplays { @OverheadNumInDisplays }
+            infigures { @OverheadNumInFigures }
+            intables { @OverheadNumInTables }
+	    sendheader { @Full @Body }
+	    innergap { @DisplayGap }
+            inrunners { @OverheadNumInRunners }
+	    @Format @Body
     }
 
 
@@ -255,7 +284,7 @@ def @OverheadSetup
 	{}
 
         macro @BeginOverheads
-	{   @LecOverheadsList { @Title @Case { "" @Yield 1 else @Yield 2 } }
+	{   //1.1b @LecOverheadsList 1
 	    // @EndOverheadsPlace //
 	}
 
@@ -268,106 +297,75 @@ def @OverheadSetup
 	    }
         }
 
-        def @LectureTitle
-	{
-	    @InitialLanguage @Language { @RunningTitle @Dft @Title }
-	}
-
-        def @ER
-        {
-	    NonStart @Runner
-		@MajorTitle { @GetTitle }
-		@MinorTitle { @LectureTitle }
-		@MajorNum { @LectureNum }
-		@MinorNum { @LectureNum }
-        }
-
         def @Overhead force into { @LecOverheadsList&&preceding }
             named @Tag {}
             named @Title {}
             named @RunningTitle { dft }
+	    named @Format
+                named @II right x { |@DisplayIndent x |               }
+                named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+                named @CC right x { |0.5rt x          |               }
+                named @RR right x { |1.0rt x          |               }
+		    right @Body { @OverheadFormat @Body }
 	    named @InitialLanguage { @InitialLanguage }
 	    named @BypassNumber { dft }
             body @Body
         {
 
-            def @OverheadNum
-	    {
-		@OverheadNumbers @Then {
-		    @BypassNumber @Dft {
-			@LectureNum @Join @OverheadNumbers @Num
-			{ @LecOverheadsList&&@Tag @Open { num } }
-		    }
-		}
-	    }
-
-	    @DP	{ |0.5rt @InitialLanguage @Language @OverheadHeadingFont @Font
-		@OverheadHeadingBreak @Break @Title | }
-            //  Start @Runner
-	            @MajorTitle { @GetTitle }
-	            @MinorTitle { @LectureTitle }
-	            @MajorNum { @LectureNum }
-	            @MinorNum { @OverheadNum }
-            //  @NumberMarker @Tag { @Tag } @Value { @OverheadNum }
-            //  @PageMark @Tag
-            //  @LecOverheadsList&&preceding @Tagged @Tag
-            //  @OverheadInContents @ContentsEntry
-		    indent { 2f }
-		    number { @OverheadNum }
-		    title { @InitialLanguage @Language @Title }
-		    pagenum { @PageOf @Tag }
-	    //  @OverheadNumInTheorems @BeginAllCounters @OverheadNum
-	    //  @OverheadNumInDisplays @BeginDisplayCounter @OverheadNum
-	    //  @OverheadNumInFigures @BeginFigureCounter @OverheadNum
-	    //  @OverheadNumInTables @BeginTableCounter @OverheadNum
-            @DP @InitialLanguage @Language @Body
-            //  NonStart @Runner
-	            @MajorTitle { @GetTitle }
-	            @MinorTitle { @LectureTitle }
-	            @MajorNum { @LectureNum }
-	            @MinorNum { @OverheadNum }
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Minor }
+		initiallanguage { @InitialLanguage }
+		title { @Title }
+		runningtitle { @RunningTitle }
+		headingfont { @OverheadHeadingFont }
+		headingbreak { @OverheadHeadingBreak }
+		headingformat { @Num @OverheadHeadingFormat @Body }
+		incontents { @OverheadInContents }
+		contentsindent { 2f }
+		numbers { @OverheadNumbers }
+		attachnum { @LecOverheadsList&&preceding @Tagged @Tag }
+		retrievenum { @LecOverheadsList&&@Tag @Open { num } }
+		bypassnumber { @BypassNumber }
+		prefix { @LectureNum }
+		majornum { @LectureNum }
+		majortitle { @GetTitle }
+		intheorems { @OverheadNumInTheorems }
+		indisplays { OverheadNumInDisplays }
+		infigures { @OverheadNumInFigures }
+		inrunners { @OverheadNumInRunners }
+		@Format @Body
 
         }
 
-	def @LectureStart
-	{
-            //  Start @Runner
-	            @MajorTitle { @GetTitle }
-	            @MinorTitle { @LectureTitle }
-	            @MajorNum { @LectureNum }
-	            @MinorNum { @LectureNum @Join 1 }
-	    @DP |0.5rt @InitialLanguage @Language @LectureHeadingFont @Font 
-		@LectureHeadingBreak @Break { {} @LectureHeadingFormat @Title } |
-            //  NonStart @Runner
-	            @MajorTitle { @GetTitle }
-	            @MinorTitle { @LectureTitle }
-	            @MajorNum { @LectureNum }
-	            @MinorNum { @LectureNum @Join 1 }
-	}
-
-	    @Title @Case {
-	        "" 	@Yield @Null
-	        else	@Yield @LectureStart
-	    }
-
-        //  @NumberMarker @Tag { @Tag } @Value { @LectureNum }
-        //  @PageMark @Tag
-        //  @LectureList&&preceding  @Tagged @Tag
-        //  @LectureInContents @ContentsEntry
-		number { @LectureNum }
-		title { @InitialLanguage @Language @Title }
-		pagenum { @PageOf @Tag }
-	//
-        //  @FootNoteThrough @Do @BeginFootNoteCounter
-	#//1.1b
-	//  @LectureNumInTheorems @BeginAllCounters @LectureNum
-	//  @LectureNumInDisplays @BeginDisplayCounter @LectureNum
-	//  @LectureNumInFigures @BeginFigureCounter @LectureNum
-	//  @LectureNumInTables @BeginTableCounter @LectureNum
-        //  @InitialLanguage @Language @Body
-        //1.1b @InitialLanguage @Language @EndFigureList
-        //1.1b @InitialLanguage @Language @EndNoteList 1
-        //  @ER
+	@LargeScaleStructure
+	    tag { @Tag }
+	    type { Major }
+	    initiallanguage { @InitialLanguage }
+	    title { @Title }
+	    runningtitle { @RunningTitle }
+	    aboveheadinggap { @AboveLectureGap }
+	    headingfont { @LectureHeadingFont }
+	    headingbreak { @LectureHeadingBreak }
+	    headingformat { @Num @LectureHeadingFormat @Body }
+	    incontents { @LectureInContents }
+	    contentsindent { 0f }
+	    word { lecture @WordVal @LectureWord }
+	    numbers {  @LectureNumbers }
+	    attachnum { @LectureList&&preceding @Tagged @Tag }
+	    retrievenum { @LectureList&&@Tag @Open { num } }
+	    bypassnumber { @BypassNumber }
+	    pnprefix { @LecturePrefix }
+	    majortitle { @GetTitle }
+	    intheorems { @LectureNumInTheorems }
+	    indisplays { @LectureNumInDisplays }
+	    infigures { @LectureNumInFigures }
+	    intables { @LectureNumInTables }
+	    sendheader { @Full @Body }
+	    innergap { @DisplayGap }
+	    inrunners { @LectureNumInRunners }
+	    @Body
+	    
     }
 
 @End @OverheadSetup

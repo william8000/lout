@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.14)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -50,6 +50,7 @@ void Interpose(OBJECT z, int typ, OBJECT x, OBJECT y)
   fwd(encl, COLM) = fwd(x, COLM);
   back(encl, ROWM) = back(y, ROWM);
   fwd(encl, ROWM) = fwd(y, ROWM);
+  underline(encl) = underline(z);
 } /* end Interpose */
 
 

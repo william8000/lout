@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.14                          #
+#  Make file for installing Basser Lout Version 3.15                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  30 March 1999                                                              #
+#  9 May 1999                                                                 #
 #                                                                             #
 #     make lout         Compile the Lout source                               #
 #     make c2lout       Compile a small auxiliary program called c2lout       #
@@ -69,7 +69,7 @@
 #                assumed to exist.                                            #
 #                                                                             #
 #      LIBDIR    Directory where Lout's libraries go.  This directory will    #
-#                be created (but it's parent must exist already).             #
+#                be created (but its parent must exist already).              #
 #                                                                             #
 #      DOCDIR    Directory where the documents describing the Lout system     #
 #                (written in Lout) go.  This directory will be created (but   #
@@ -116,7 +116,8 @@
 #  (7) Set macro USELOC to one of the following values, NOT TO A LOCALE.      #
 #                                                                             #
 #      0         Lout's error messages will always appear in English, and no  #
-#                source code related to locales will be compiled.             #
+#                source code related to locales will be executed (although    #
+#                file <locale.h> will be read for collation stuff).           #
 #                                                                             #
 #      1         Lout's error messages may appear in languages other than     #
 #                English, depending on the current locale.  The Lout source   #
@@ -139,9 +140,10 @@
 #      For error messages in other languages, consult ./locale/README.        #
 #                                                                             #
 #  (8) Set macro COLLATE to either 0 or 1.  If you set it to 1, Lout will     #
-#      use the strcoll() routine when sorting things alphabetically (e.g.     #
-#      when sorting indexes), otherwise Lout will sort based on the ISO       #
-#      codes of the characters.                                               #
+#      use the strcoll() routine by default when sorting alphabetically       #
+#      (e.g. when sorting indexes), otherwise Lout will sort by default       #
+#      based on the ISO codes of the characters.  This defaul setting may     #
+#      be changed during individual runs of Lout by the -l and -L flags.      #
 #                                                                             #
 #  (9) Execute "make c2lout".  This will compile the c2lout program, leaving  #
 #      its binary in this directory.  No changes to other directories.        #
@@ -224,7 +226,7 @@
 # (18) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
 #      on line 57 of file $(LIBDIR)/include/dsf.  You can find the list of    #
-#      known page types in the User's Guide, and also at line 585 in file     #
+#      known page types in the User's Guide, and also at line 615 in file     #
 #      $(LIBDIR)/include/dsf.                                                 #
 #                                                                             #
 # (19) If the usual language at your site is not English, you might like to   #

@@ -194,15 +194,19 @@ There are setup file options for controlling the appearance of figures and
 tables.  Only those for figures will be given here, since the ones for tables
 are identical except that @Code Table replaces @Code Figure in their
 names.  Here they all are:
+@FootNote { These are as of Version 3.15 and above.  Prior to that
+there were {@Code "@CaptionFont"}, {@Code "@CaptionBreak"}, and
+{@Code "@CaptionFormat"} options, and {@Code "@CaptionFormat"}
+took values that did not include the @Code "caption" symbol. }
 @ID @OneCol @Code {
 "@FigureLocation { PageTop }"
 "@FigureFormat { @CC @Body }"
 "@FigureWord { figure }"
 "@FigureNumbers { Arabic }"
 "@FigureCaptionPos { Below }"
-"@CaptionFont { }"
-"@CaptionBreak { }"
-"@CaptionFormat { @B { number @DotSep @OneCol } }"
+"@FigureCaptionFont { }"
+"@FigureCaptionBreak { }"
+"@FigureCaptionFormat { @B { word @NumSep number. &2s } @Insert caption }"
 "@MakeFigureContents { No }"
 "@FigureListWord { figurelist }"
 }
@@ -238,18 +242,22 @@ appears in the @Code "report" setup file, and means that a section
 number will not appear in the figure number (unless you change the
 option to {@Code Yes}).
 @PP
-@Code "@CaptionFont" and @Code "@CaptionBreak" determine the font and
-paragraph breaking style used in the captions of figures and tables.  Their
+@Code "@FigureCaptionFont" and @Code "@FigureCaptionBreak" determine the
+font and paragraph breaking style used in the captions of figures.  Their
 default values are empty, meaning to use the initial font and break styles;
 but, for example, you could have
-@ID @Code "@CaptionFont { -2p }"
+@ID @Code "@FigureCaptionFont { -2p }"
 in your setup file to get a smaller font size in your captions.
 @PP
-The @Code "@CaptionFormat" option determines the format of the
-caption.  Within it, the symbol @Code number stands for the number
-of the symbol (including {@Code "@FigureWord"}).  Actually this option
-only controls the format of the number part of the caption, inserted
-at the beginning of the first paragraph of the caption.
+The @Code "@FigureCaptionFormat" option determines the format of the
+caption.  Within it, the symbol @Code word stands for the `Figure'
+word as defined by {@Code "@FigureWord"}); the @Code number
+symbol stands for the number of the figure; and @Code caption stands
+for the body of the caption.  The default value shown above prints
+the word and number and a period in bold, inserted together with a
+gap of two spaces into the first paragraph of the caption.  If you
+don't use the @Code "@Insert" symbol you'll run into problems with
+multi-paragraph captions.
 @PP
 You can get a list of figures at the start of your document by setting
 the @Code "@MakeFigureContents" setup file option to {@Code Yes}.  The
