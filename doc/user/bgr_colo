@@ -44,5 +44,9 @@ nominal colour can look quite different on screen and on paper.  The
 standard Lout @Code "@SetColour" symbol can provide many more colours
 setcolour. @Index @Code "@SetColour"
 @Cite { $kingston1995lout.expert}, although they must be specified
-using numbers rather than names.
+using numbers rather than names.  For example,
+@ID @Code "{ 0.5 0.5 1.0 } @SetColour Hello"
+prints @Code Hello in a colour containing red at intensity 0.5, green
+at intensity 0.5, and blue at intensity 1.0, which turns out, in the
+strange world of colour coordinates, to be a light blue.
 @End @Section

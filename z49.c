@@ -1,6 +1,6 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -70,6 +70,131 @@ static FILE		*out_fp;	/* file to print PostScript on       */
 
 /*****************************************************************************/
 /*                                                                           */
+/*  Data structures for checking links                                       */
+/*                                                                           */
+/*  We keep a hash table of all dest points, and an ordinary list of all     */
+/*  source points.  To check that no dest point appears twice, we consult    */
+/*  the hash table once for each dest point to ensure it is not already      */
+/*  there.  To check that every source point has an dest, we run through     */
+/*  the list of source points at end of run and look each one up in the      */
+/*  dest point hash table.                                                   */
+/*                                                                           */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/*                                                                           */
+/*  LINK_DEST_TABLE                                                          */
+/*                                                                           */
+/*  A symbol table permitting access to link dest name objects.              */
+/*  The table will automatically enlarge to accept any number of entries.    */
+/*                                                                           */
+/*     ltab_new(newsize)         New empty table, newsize capacity           */
+/*     ltab_insert(x, &S)        Insert new link dest name object x into S   */
+/*     ltab_retrieve(str, S)     Retrieve link dest name object named str    */
+/*     ltab_debug(S, fp)         Debug print of table S to file fp           */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef struct
+{ int linktab_size;				/* size of table             */
+  int linktab_count;				/* number of objects held    */
+  OBJECT linktab_item[1];
+} *LINK_DEST_TABLE;
+
+#define	ltab_size(S)	(S)->linktab_size
+#define	ltab_count(S)	(S)->linktab_count
+#define	ltab_item(S, i)	(S)->linktab_item[i]
+
+#define hash(pos, str, S)						\
+{ FULL_CHAR *p = str;							\
+  pos = *p++;								\
+  while( *p ) pos += *p++;						\
+  pos = pos % ltab_size(S);						\
+}
+
+static LINK_DEST_TABLE ltab_new(int newsize)
+{ LINK_DEST_TABLE S;  int i;
+  /* ifdebug(DMA, D, DebugRegisterUsage(MEM_LINK_TAB, 1,
+    2*sizeof(int) + newsize * sizeof(OBJECT))); */
+  S = (LINK_DEST_TABLE)
+	  malloc(2*sizeof(int) + newsize * sizeof(OBJECT));
+  if( S == (LINK_DEST_TABLE) NULL )
+    Error(43, 1, "run out of memory enlarging link dest table", FATAL, no_fpos);
+  ltab_size(S) = newsize;
+  ltab_count(S) = 0;
+  for( i = 0;  i < newsize;  i++ )  ltab_item(S, i) = nilobj;
+  return S;
+} /* end ltab_new */
+
+static void ltab_insert(OBJECT x, LINK_DEST_TABLE *S);
+
+static LINK_DEST_TABLE ltab_rehash(LINK_DEST_TABLE S, int newsize)
+{ LINK_DEST_TABLE NewS;  int i;
+  NewS = ltab_new(newsize);
+  for( i = 1;  i <= ltab_size(S);  i++ )
+  { if( ltab_item(S, i) != nilobj )
+      ltab_insert(ltab_item(S, i), &NewS);
+  }
+  free(S);
+  return NewS;
+} /* end ltab_rehash */
+
+static void ltab_insert(OBJECT x, LINK_DEST_TABLE *S)
+{ int pos;  OBJECT z, link, y;
+  if( ltab_count(*S) == ltab_size(*S) - 1 )	/* one less since 0 unused */
+    *S = ltab_rehash(*S, 2*ltab_size(*S));
+  hash(pos, string(x), *S);
+  if( ltab_item(*S, pos) == nilobj )  New(ltab_item(*S, pos), ACAT);
+  z = ltab_item(*S, pos);
+  for( link = Down(z);  link != z;  link = NextDown(link) )
+  { Child(y, link);
+    if( StringEqual(string(x), string(y)) )
+    { Error(43, 2, "link name %s used twice (first at%s)",
+	WARN, &fpos(x), string(x), EchoFilePos(&fpos(y)));
+    }
+  }
+  Link(ltab_item(*S, pos), x);
+} /* end ltab_insert */
+
+static OBJECT ltab_retrieve(FULL_CHAR *str, LINK_DEST_TABLE S)
+{ OBJECT x, link, y;  int pos;
+  hash(pos, str, S);
+  x = ltab_item(S, pos);
+  if( x == nilobj )  return nilobj;
+  for( link = Down(x);  link != x;  link = NextDown(link) )
+  { Child(y, link);
+    if( StringEqual(str, string(y)) )  return y;
+  }
+  return nilobj;
+} /* end ltab_retrieve */
+
+#if DEBUG_ON
+static void ltab_debug(LINK_DEST_TABLE S, FILE *fp)
+{ int i;  OBJECT x, link, y;
+  fprintf(fp, "  table size: %d;  current number of keys: %d\n",
+    ltab_size(S), ltab_count(S));
+  for( i = 0;  i < ltab_size(S);  i++ )
+  { x = ltab_item(S, i);
+    fprintf(fp, "ltab_item(S, %d) =", i);
+    if( x == nilobj )
+      fprintf(fp, " <nilobj>");
+    else if( type(x) != ACAT )
+      fprintf(fp, " not ACAT!");
+    else for( link = Down(x);  link != x;  link = NextDown(link) )
+    { Child(y, link);
+      fprintf(fp, " %s",
+	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
+    }
+    fprintf(fp, "\n");
+  }
+} /* end ltab_debug */
+#endif
+
+static	LINK_DEST_TABLE	link_dest_tab;		/* the link dest names       */
+static	OBJECT		link_source_list;	/* the link source names     */
+
+/*****************************************************************************/
+/*                                                                           */
 /*  Print a number x on file fp.                                             */
 /*                                                                           */
 /*****************************************************************************/
@@ -106,6 +231,8 @@ static void PS_PrintInitialize(FILE *fp)
   New(needs, ACAT);
   New(supplied, ACAT);
   debug0(DPO, DD, "PS_PrintInitialize returning.");
+  link_dest_tab = ltab_new(200);
+  New(link_source_list, ACAT);
 } /* end PS_PrintInitialize */
 
 
@@ -388,10 +515,10 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   for( fnum = FirstFile(PREPEND_FILE);  fnum != NO_FILE;  fnum=NextFile(fnum) )
   { FULL_CHAR buff[MAX_BUFF];  FILE *fp;
     if( (fp = OpenFile(fnum, FALSE, FALSE)) == null )
-      Error(49, 1, "cannot open %s file %s", WARN, PosOfFile(fnum),
+      Error(49, 3, "cannot open %s file %s", WARN, PosOfFile(fnum),
 	KW_PREPEND, FileName(fnum));
     else if( StringFGets(buff, MAX_BUFF, fp) == NULL )
-      Error(49, 2, "%s file %s is empty", WARN, PosOfFile(fnum),
+      Error(49, 4, "%s file %s is empty", WARN, PosOfFile(fnum),
 	KW_PREPEND, FileName(fnum));
     else
     {
@@ -401,7 +528,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
 	Link(supplied, tmp);
       }
       else
-	Error(49, 3, "%s file %s lacks PostScript BeginResource comment",
+	Error(49, 5, "%s file %s lacks PostScript BeginResource comment",
 	  WARN, PosOfFile(fnum), KW_PREPEND, FileName(fnum));
       StringFPuts(buff, out_fp);
       p2("%% %s file %s\n", KW_PREPEND, FileName(fnum));
@@ -415,6 +542,10 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   fputs("%%EndProlog\n\n", out_fp);
   fputs("%%BeginSetup\n", out_fp);
   MapPrintEncodings();
+
+  /* pdfmark compatibility code, as in the pdfmark Reference Manual p10 */
+  p0("/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse\n");
+
   /* FontPrintPageSetup(out_fp); */
   fputs("%%EndSetup\n\n", out_fp);
   fprintf(out_fp, "%%%%Page: ");
@@ -494,7 +625,7 @@ static void PS_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
   currentcolour = NO_COLOUR;
   if( Encapsulated )
   { PS_PrintAfterLastPage();
-    Error(49, 4, "truncating -EPS document at end of first page",
+    Error(49, 6, "truncating -EPS document at end of first page",
       FATAL, no_fpos);
   }
   fprintf(out_fp, "\n%%%%Page: ");
@@ -711,18 +842,33 @@ static void PS_PrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
 
 /*****************************************************************************/
 /*                                                                           */
-/*  PS_PrintUnderline(fnum, xstart, xstop, ymk)                              */
+/*  PS_PrintUnderline(fnum, col, xstart, xstop, ymk)                         */
 /*                                                                           */
-/*  Draw an underline suitable for font fnum, from xstart to xstop at the    */
-/*  appropriate distance below mark ymk.                                     */
+/*  Draw an underline suitable for font fnum, in colour col, from xstart to  */
+/*  xstop at the appropriate distance below mark ymk.                        */
 /*                                                                           */
 /*****************************************************************************/
 
-static void PS_PrintUnderline(FONT_NUM fnum, FULL_LENGTH xstart,
-  FULL_LENGTH xstop, FULL_LENGTH ymk)
+static void PS_PrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
+  FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
 {
-  debug4(DPO, DD, "PrintUnderline(fnum %d, xstart %s, xstop %s, ymk %s )",
-    fnum, EchoLength(xstart), EchoLength(xstop), EchoLength(ymk));
+  debug5(DPO, DD, "PrintUnderline(fnt %d, col %d, xstart %s, xstop %s, ymk %s)",
+    fnum, col, EchoLength(xstart), EchoLength(xstop), EchoLength(ymk));
+
+  /* if colour is different to previously then print change */
+  if( col != currentcolour )
+  { currentcolour = col;
+    if( currentcolour > 0 )
+    { fprintf(out_fp, "%s", ColourCommand(currentcolour));
+      if( ++wordcount >= 5 )
+      {	putc('\n', out_fp);
+	wordcount = 0;
+      }
+      else putc(' ', out_fp);
+    }
+  }
+
+  /* now print the underline command */
   fprintf(out_fp, "%d %d %d %d ul\n", xstart, xstop,
     ymk - finfo[fnum].underline_pos, finfo[fnum].underline_thick);
   debug0(DPO, DD, "PrintUnderline returning.");
@@ -797,7 +943,7 @@ static void PS_SaveGraphicState(OBJECT x)
   fprintf(out_fp, "gsave\n");
   gs_stack_top++;
   if( gs_stack_top >= MAX_GS )
-    Error(49, 5, "rotations, graphics etc. too deeply nested (max is %d)",
+    Error(49, 7, "rotations, graphics etc. too deeply nested (max is %d)",
       FATAL, &fpos(x), MAX_GS);
   gs_stack[gs_stack_top].gs_font	= currentfont;
   gs_stack[gs_stack_top].gs_colour	= currentcolour;
@@ -869,7 +1015,7 @@ void PS_PrintGraphicObject(OBJECT x)
 	  /* ignore: @Wide, indexes are sometimes inserted by Manifest */
 	}
 	else
-	{ Error(49, 6, "error in left parameter of %s",
+	{ Error(49, 8, "error in left parameter of %s",
 	    WARN, &fpos(x), KW_GRAPHIC);
 	  debug1(DPO, D, "  type(y) = %s, y =", Image(type(y)));
 	  ifdebug(DPO, D, DebugObject(y));
@@ -880,7 +1026,7 @@ void PS_PrintGraphicObject(OBJECT x)
 
     default:
     
-      Error(49, 7, "error in left parameter of %s", WARN, &fpos(x), KW_GRAPHIC);
+      Error(49, 9, "error in left parameter of %s", WARN, &fpos(x), KW_GRAPHIC);
       debug1(DPO, D, "  type(x) = %s, x =", Image(type(x)));
       ifdebug(DPO, D, DebugObject(x));
       break;
@@ -1070,10 +1216,10 @@ void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
       }
       else
       { if( StringBeginsWith(buff, AsciiToFull("%%LanguageLevel:")) )
-	  Error(49, 8, "ignoring LanguageLevel comment in %s file %s",
+	  Error(49, 10, "ignoring LanguageLevel comment in %s file %s",
 	    WARN, &fpos(x), KW_INCGRAPHIC, string(full_name));
 	if( StringBeginsWith(buff, AsciiToFull("%%Extensions:")) )
-	  Error(49, 9, "ignoring Extensions comment in %s file %s",
+	  Error(49, 11, "ignoring Extensions comment in %s file %s",
 	    WARN, &fpos(x), KW_INCGRAPHIC, string(full_name));
 	if( !strip_out(buff) )  StringFPuts(buff, out_fp);
 	state = (StringFGets(buff, MAX_BUFF, fp) == NULL) ? FINISHED : SKIPPING;
@@ -1102,6 +1248,122 @@ void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
   wordcount = 0;
   debug0(DPO, D, "PS_PrintGraphicInclude returning.");
 } /* end PS_PrintGraphicInclude */
+/*****************************************************************************/
+/*                                                                           */
+/*  char *ConvertToPDFName(name)                                             */
+/*                                                                           */
+/*  Convert string(name) to a suitable PDF label.  The result is in static   */
+/*  memory and must be copied before the next call to ConvertToPDFName.      */
+/*                                                                           */
+/*  At present our algorithm is to prefix the label with "LOUT" and to       */
+/*  replace all non-alphanumerics by one underscore.                         */
+/*                                                                           */
+/*****************************************************************************/
+#define in_range(ch, a, b)	( (ch) >= (a) && (ch) <= (b) )
+#define is_lower(ch)		in_range(ch, 'a', 'z')
+#define is_upper(ch)		in_range(ch, 'A', 'Z')
+#define is_digit(ch)		in_range(ch, '0', '9')
+#define is_alphanum(ch)		(is_lower(ch) || is_upper(ch) || is_digit(ch))
+
+char *ConvertToPDFName(OBJECT name)
+{ static char buff[200];
+  char *q;
+  FULL_CHAR *p;
+  strcpy(buff, "LOUT");
+  q = &buff[strlen(buff)];
+  for( p = string(name);  *p != '\0';  p++ )
+  {
+    if( q >= &buff[199] )
+      Error(49, 12, "tag %s is too long", FATAL, &fpos(name), string(name));
+    if( is_alphanum(*p) )
+      *q++ = (char) *p;
+    else
+      *q++ = '_';
+  }
+  *q++ = '\0';
+  return buff;
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PS_LinkSource(name, llx, lly, urx, ury)                                  */
+/*                                                                           */
+/*  Print a link source point.                                               */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PS_LinkSource(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{ debug5(DPO, D, "PS_LinkSource(%s, %d, %d, %d, %d)", EchoObject(name),
+    llx, lly, urx, ury);
+
+  /* print the link source point */
+  fprintf(out_fp,
+    "\n[ /Rect [%d %d %d %d] /Subtype /Link /Dest /%s /ANN pdfmark\n",
+    llx, lly, urx, ury, ConvertToPDFName(name));
+
+  /* remember it so that at end of run can check if it has an dest point */
+  Link(link_source_list, name);
+  debug0(DPO, D, "PS_LinkSource returning.");
+} /* end PS_LinkSource */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PS_LinkDest(name, llx, lly, urx, ury)                                    */
+/*                                                                           */
+/*  Print a link dest point (note llx etc are not used), after making sure   */
+/*  that no previously printed dest point has the same name.                 */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PS_LinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{ OBJECT prev;
+  debug5(DPO, D, "PS_LinkDest(%s, %d, %d, %d, %d)", EchoObject(name),
+    llx, lly, urx, ury);
+
+  prev = ltab_retrieve(string(name), link_dest_tab);
+  if( prev == nilobj )
+  {
+    /* not used previously, so print it and remember it */
+    fprintf(out_fp, "\n[ /Dest /%s /DEST pdfmark\n", ConvertToPDFName(name));
+    ltab_insert(name, &link_dest_tab);
+  }
+  else
+  {
+    /* used previously, so don't print it, and warn the user */
+    Error(49, 13, "link destination %s ignored (there is already one at%s)",
+      WARN, &fpos(name), string(name), EchoFilePos(&fpos(prev)));
+  }
+  debug0(DPO, D, "PS_LinkDest returning.");
+} /* end PS_LinkDest */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PS_LinkCheck()                                                           */
+/*                                                                           */
+/*  Called at end of run; will check that for every link source point there  */
+/*  is a link dest point.                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PS_LinkCheck()
+{ OBJECT y, link;
+  debug0(DPO, D, "PS_LinkCheck()");
+
+  for( link=Down(link_source_list); link!=link_source_list; link=NextDown(link) )
+  { Child(y, link);
+    assert( is_word(type(y)), " PS_LinkCheck: !is_word(type(y))!");
+    if( ltab_retrieve(string(y), link_dest_tab) == nilobj )
+      Error(49, 14, "link name %s has no destination point", WARN, &fpos(y),
+	string(y));
+  }
+
+  debug0(DPO, D, "PS_LinkCheck returning.");
+} /* end PS_LinkCheck */
 
 
 /*****************************************************************************/
@@ -1143,6 +1405,9 @@ static struct back_end_rec ps_back = {
   PS_DefineGraphicNames,
   PS_SaveTranslateDefineSave,
   PS_PrintGraphicInclude,
+  PS_LinkSource,
+  PS_LinkDest,
+  PS_LinkCheck,
 };
 
 BACK_END PS_BackEnd = &ps_back;

@@ -273,12 +273,18 @@ Changes and new features introduced in Version 3.22 [3 June 2000]
     Chapters without page breaks option (see @ChapterStartPages, User's Guide)
     Font includes all in page setups now (of interest to implementors only)
 
+Changes and new features introduced in Version 3.23 [24 June 2000]
+
+    Bug fixes, including Uwe's fix of the nasty bug reported by Matej Cepl,
+      and my fix of a table running headers bug reported by Matthew Neumann.
+    Cross links (see User's Guide, Cross References and Links section)
+    New symbols for expert users: @LinkSource and @LinkDest
+    @Python symbol for typesetting Python programs using prg2lout.
 
 Things that ought to be done but haven't been done yet
 
-    PDF-like features in PostScript output
     Various improvements/bug fixes for PDF output
     Review Uwe's proposal for moving word row marks to the baseline
 
 Jeff Kingston
-3 June 2000
+24 June 2000

@@ -1,6 +1,6 @@
 /*@z44.c:Vertical Hyphenation:VerticalHyphenate()@****************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -191,6 +191,7 @@ static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
   New(new_row_thread, ROW_THR);
   back(new_row_thread, ROWM) = back(new_y, ROWM);
   fwd(new_row_thread, ROWM) = fwd(new_y, ROWM);
+  thr_state(new_row_thread) = SIZED;
   for( link = Down(y);  link != y;  link = NextDown(link) )
   { Child(s1, link);
     if( type(s1) == GAP_OBJ )

@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -95,17 +95,18 @@ static FULL_LENGTH FindAdjustIncrement(OBJECT x, FULL_LENGTH frame_size,int dim)
 
 /*@::FixAndPrintObject()@*****************************************************/
 /*                                                                           */
-/*  FixAndPrintObject(x, xmk, xb, xf, dim, suppress, pg, count)              */
+/*  OBJECT FixAndPrintObject(x, xmk, xb, xf, dim, suppress, pg, count,       */
+/*           actual_back, actual_fwd)                                        */
 /*                                                                           */
 /*  Fix the absolute position of object x in dimension dim, in such a way    */
 /*  that the principal mark of x has coordinate xmk, and x has actual size   */
-/*  (xb, xf), where xb >= back(x, dim) and xf >= fwd(x, dim).                */
+/*  (xb, xf), where usually xb >= back(x, dim) and xf >= fwd(x, dim).        */
 /*                                                                           */
 /*  Actually, in the case where x includes an object lying on a thread       */
 /*  leading outside x, the final size of x may be different.  Because        */
-/*  of this, the procedure sets back(x, dim) and fwd(x, dim) to the actual   */
+/*  of this, the procedure sets *actual_back and *actual_fwd to the actual   */
 /*  size of x upon return.  The caller assumes that x will exactly occupy    */
-/*  this space back(x, dim), fwd(x, dim).                                    */
+/*  this space (actual_back, actual_fwd).                                    */
 /*                                                                           */
 /*  The suppress parameter is true if a temporary suppression of adjustment  */
 /*  in this direction is in effect (because a neighbouring adjustment has    */
@@ -121,21 +122,29 @@ static FULL_LENGTH FindAdjustIncrement(OBJECT x, FULL_LENGTH frame_size,int dim)
 /*                                                                           */
 /*  x is child number count of its parent (used by COL_THR and ROW_THR only) */
 /*                                                                           */
+/*  FixAndPrintObject ordinarily returns the object passed to it; however    */
+/*  it occasionally replaces that object with another, and then it is the    */
+/*  replacement object that is returned.                                     */
+/*                                                                           */
 /*****************************************************************************/
 
-void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
-  FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg, int count)
-{ OBJECT y, link, prev, g, uplink, z, face, thr;
+OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
+  FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg, int count,
+  FULL_LENGTH *actual_back, FULL_LENGTH *actual_fwd)
+{ OBJECT y, link, prev, g, z, face, thr, fixed_thr, res, uplink, tmp;
   FULL_LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
+  FULL_LENGTH aback, afwd;
   int i; float scale_factor;  BOOLEAN jn;
-  debug8(DGP, DD, "[ FixAndPrintObject(%s %s, %s, %s,%s, %s, %s, pg, %d)",
+  debug8(DGP, DD, "[ FixAndPrintObject(%s %s%s, %s, %s,%s, %s, %s, pg, count)",
     Image(type(x)),
     ((type(x) == WORD || type(x) == QWORD) ? string(x) : STR_EMPTY),
+    EchoFilePos(&fpos(x)),
     EchoLength(xmk), EchoLength(xb), EchoLength(xf),dimen(dim),
-    (suppress == SUPPRESS ? "suppress" : "no_suppress"), count);
+    (suppress == SUPPRESS ? "suppress" : "no_suppress"));
   debug2(DGP, DD, "  size(x) = %s,%s;  x =",
     EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
   ifdebug(DGP, DD, DebugObject(x));
+  res = x;
 
   /*** start and stop debugging
   if( dim == COLM && is_word(type(x)) &&
@@ -156,7 +165,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case CROSS:
     case FORCE_CROSS:
     
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
@@ -172,6 +181,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	save_mark(y) = xmk - back(thr, dim) + back(z, dim);
 
         /* do the fix now if the first column is also the last one */
+	debug2(DGP, DD, "  pre-inc spanner_fixed(y) = %d, spanner_count(y) = %d",
+	  spanner_fixed(y), spanner_count(y));
 	if( ++spanner_fixed(y) == spanner_count(y) )
 	{
 	  debug6(DGP, DD, "  f+last SPAN: yf = max(%s + %s - %s, %s, %s - %s)",
@@ -180,13 +191,19 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    EchoLength(bfc(constraint(y))), EchoLength(back(z, dim)));
 	  yf = find_max(xmk + xf - save_mark(y), fwd(z, dim));
 	  yf = find_max(yf, bfc(constraint(y)) - back(z, dim));
-          FixAndPrintObject(z, save_mark(y), back(z, dim), yf, dim,FALSE,pg,1);
+          z = FixAndPrintObject(z, save_mark(y), back(z, dim), yf, dim,
+		FALSE, pg, 1, &aback, &afwd);
+	  spanner_fixed(y) = 0; /* restart for if printed again */
 	}
+	*actual_back = back(x, dim); *actual_fwd = fwd(x, dim);
       }
       else
       {
-        FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-	back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+	debug6(DGP, DD, "%s alternate FixAndPrintObject(%s, %s, %s, %s, %s, ..)",
+	  Image(type(x)), Image(type(y)), EchoLength(xmk), EchoLength(xb),
+	  EchoLength(xf), dimen(dim));
+        y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	      actual_back, actual_fwd);
       }
       break;
 
@@ -195,9 +212,12 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case VSPAN:
 
       /* do the fix on the last one */
-      CountChild(y, DownDim(x, dim), count);
-      if( type(y) == HSPANNER || type(y) == VSPANNER )
+      if( (dim == COLM) == (type(x) == HSPAN) )
       {
+        CountChild(y, DownDim(x, dim), count);
+	assert(type(y) == HSPANNER || type(y) == VSPANNER, "FAPO HSPAN/VSPAN!");
+	debug2(DGP, DD, "  pre-inc spanner_fixed(y) = %d, spanner_count(y) = %d",
+	  spanner_fixed(y), spanner_count(y));
 	if( ++spanner_fixed(y) == spanner_count(y) )
 	{
           Child(z, Down(y));
@@ -207,7 +227,10 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    EchoLength(bfc(constraint(y))), EchoLength(back(z, dim)));
 	  yf = find_max(xmk + xf - save_mark(y), fwd(z, dim));
 	  yf = find_max(yf, bfc(constraint(y)) - back(z, dim));
-          FixAndPrintObject(z, save_mark(y), back(z, dim), yf, dim,FALSE,pg,1);
+          z = FixAndPrintObject(z, save_mark(y), back(z, dim), yf, dim,
+		FALSE, pg, 1, &aback, &afwd);
+	  *actual_back = back(x, dim); *actual_fwd = fwd(x, dim);
+	  spanner_fixed(y) = 0; /* restart for if printed again */
 	}
       }
       break;
@@ -233,24 +256,13 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       }
       else
       {
-	debug4(DGP, D, /* underline(x) == UNDER_UNDEF, */
-	  "  FAPO %s %s %s (underline = %s)", EchoFilePos(&fpos(x)),
-	  Image(type(x)),
-	  string(x), underline(x) == UNDER_OFF ? "UNDER_OFF" :
-		     underline(x) == UNDER_ON  ? "UNDER_ON" : "UNDER_UNDEF");
-	assert( underline(x) == UNDER_OFF || underline(x) == UNDER_ON,
-	  "FixAndPrintObject: underline(x)!" );
 	if( string(x)[0] != '\0' )
 	{ BackEnd->PrintWord(x, word_save_mark(x), pg - xmk);
-	  if( underline(x) == UNDER_ON )
-	  {
-	    FontWordSize(x);  /* to restore fwd(x, COLM) */
-	    BackEnd->PrintUnderline(word_font(x), word_save_mark(x),
-	      word_save_mark(x) + fwd(x, COLM), pg - xmk);
-	  }
+	  /* NB if this word is to be underlined, it will be already enclosed
+	     in an ACAT by Manifest, and that ACAT will do the underlining */
 	}
       }
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
@@ -260,12 +272,13 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       CountChild(y, Down(x), count);
       if( (dim == COLM) == (type(x) == WIDE) )
       { yf = bfc(constraint(x)) - back(y, dim);
-        FixAndPrintObject(y, xmk, back(y,dim), yf, dim, NO_SUPPRESS, pg,count);
-        back(x, dim) = xb;  fwd(x, dim) = xf;
+        y = FixAndPrintObject(y, xmk, back(y,dim), yf, dim, NO_SUPPRESS, pg,
+	      count, &aback, &afwd);
+        *actual_back = xb;  *actual_fwd = xf;
       }
       else
-      {	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-	back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      {	y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	      actual_back, actual_fwd);
       }
       break;
 
@@ -281,16 +294,17 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	ymk = xmk - f;
 	yb = find_max(0, xb - f);
 	yf = find_max(0, xf + f);
-	FixAndPrintObject(y, ymk, yb, yf, dim, suppress, pg, count);
+	y = FixAndPrintObject(y, ymk, yb, yf, dim, suppress, pg, count,
+	      &aback, &afwd);
 
 	/* recalculate the size of x as in MinSize */
 	f = FindShift(x, y, dim);
-	back(x, dim) = find_min(MAX_FULL_LENGTH, find_max(0, back(y, dim) + f));
-	fwd(x, dim)  = find_min(MAX_FULL_LENGTH, find_max(0, fwd(y, dim)  - f));
+	*actual_back = find_min(MAX_FULL_LENGTH, find_max(0, aback + f));
+	*actual_fwd  = find_min(MAX_FULL_LENGTH, find_max(0, afwd  - f));
       }
       else
-      {	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-	back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      {	y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	      actual_back, actual_fwd);
       }
       break;
 
@@ -300,13 +314,13 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     
       CountChild(y, Down(x), count);
       if( (dim == COLM) == (type(x) == HCONTRACT) )
-      {	FixAndPrintObject(y, xmk, back(y,dim), fwd(y,dim), dim,
-	  NO_SUPPRESS, pg, count);
-        back(x, dim) = xb;  fwd(x, dim) = xf;
+      {	y = FixAndPrintObject(y, xmk, back(y,dim), fwd(y,dim), dim,
+	  NO_SUPPRESS, pg, count, &aback, &afwd);
+        *actual_back = xb;  *actual_fwd = xf;
       }
       else
-      {	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-        back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      {	y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	      actual_back, actual_fwd);
       }
       break;
 
@@ -320,12 +334,13 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     
       CountChild(y, Down(x), count);
       if( (dim == COLM) == (type(x) == ONE_COL || type(x) == HEXPAND) )
-      { FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
-        back(x, dim) = xb;  fwd(x, dim) = xf;
+      { y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
+	      &aback, &afwd);
+        *actual_back = xb;  *actual_fwd = xf;
       }
       else
-      {	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-	back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      {	y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	      actual_back, actual_fwd);
       }
       break;
 
@@ -337,21 +352,22 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       if( BackEnd->scale_avail )
       {
 	if( dim == COLM )
-	  FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
+	  y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
+		&aback, &afwd);
 	else if( (scale_factor = ScaleFactor(xb+xf, size(y, ROWM))) > 0 )
 	{ BackEnd->SaveGraphicState(y);
 	  BackEnd->CoordTranslate(0,
 	    pg - (xmk - xb + (FULL_LENGTH) (back(y, ROWM) * scale_factor)));
 	  BackEnd->CoordScale(1.0, scale_factor);
-	  FixAndPrintObject(y, 0, back(y,ROWM), fwd(y,ROWM), dim,
-	    NO_SUPPRESS, 0, count);
+	  y = FixAndPrintObject(y, 0, back(y,ROWM), fwd(y,ROWM), dim,
+	    NO_SUPPRESS, 0, count, &aback, &afwd);
 	  BackEnd->RestoreGraphicState();
 	}
 	else if( !is_word(type(y)) || string(y)[0] != '\0' )
 	  Error(23, 1, "object deleted (it cannot be scaled vertically)",
 	    WARN, &fpos(x));
       }
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
@@ -365,8 +381,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  bc(constraint(x)) = xb;
 	  fc(constraint(x)) = xf;
           if( (scale_factor = ScaleFactor(xb+xf, size(y, COLM))) > 0 )
-	    FixAndPrintObject(y, 0, back(y, COLM), fwd(y, COLM), dim,
-	      NO_SUPPRESS, pg, count);
+	    y = FixAndPrintObject(y, 0, back(y, COLM), fwd(y, COLM), dim,
+	      NO_SUPPRESS, pg, count, &aback, &afwd);
           else if( !is_word(type(y)) || string(y)[0] != '\0' )
 	    Error(23, 2, "object deleted (it cannot be scaled horizontally)",
 	      WARN, &fpos(y));
@@ -377,11 +393,12 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  BackEnd->CoordTranslate(save_mark(x) - bc(constraint(x))
 	       + (FULL_LENGTH) (back(y, COLM)*scale_factor), 0);
 	  BackEnd->CoordScale(scale_factor, 1.0);
-          FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
+          y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
+		&aback, &afwd);
 	  BackEnd->RestoreGraphicState();
         }
       }
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
@@ -395,7 +412,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  save_mark(x) = xmk;
 	  yb = xb * SF / bc(constraint(x));
 	  yf = xf * SF / bc(constraint(x));
-          FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, pg, count);
+          y = FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, pg, count,
+		&aback, &afwd);
         }
         else
         { assert( fc(constraint(x)) > 0, "FAPO: vertical scale factor!" );
@@ -405,15 +423,17 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  BackEnd->CoordTranslate(save_mark(x), pg - xmk);
 	  BackEnd->CoordScale( (float)bc(constraint(x))/SF,
 	    (float)fc(constraint(x))/SF);
-          FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, 0, count);
+          y = FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, 0, count,
+		&aback, &afwd);
 	  BackEnd->RestoreGraphicState();
         }
       }
       else if( bc(constraint(x)) == SF && fc(constraint(x)) == SF )
       {
-	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+	y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	      &aback, &afwd);
       }
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
@@ -421,12 +441,13 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
       CountChild(y, LastDown(x), count);
       if( dim == COLM )
-      { FixAndPrintObject(y, xmk, back(y,dim), fwd(y,dim), dim,
-	  NO_SUPPRESS, pg, count);
+      { y = FixAndPrintObject(y, xmk, back(y,dim), fwd(y,dim), dim,
+	  NO_SUPPRESS, pg, count, &aback, &afwd);
+	*actual_back = back(x, dim);  *actual_fwd = fwd(x, dim);
       }
       else
-      {	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-        back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      {	y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	      actual_back, actual_fwd);
       }
       break;
 
@@ -436,9 +457,12 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       /* this object has the size of its second child; but its first */
       /* child gets printed too, in the same space                   */
       CountChild(y, Down(x), count);
-      FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+      y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	&aback, &afwd);
       CountChild(y, LastDown(x), count);
-      FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+      y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+	&aback, &afwd);
+      *actual_back = back(x, dim);  *actual_fwd = fwd(x, dim);
       break;
 
 
@@ -453,7 +477,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  SetConstraint(colc, back(x,COLM), MAX_FULL_LENGTH, fwd(x,COLM));
 	  SetConstraint(rowc, back(x,ROWM), MAX_FULL_LENGTH, fwd(x,ROWM));
 	  RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc,COLM);
-	  FixAndPrintObject(y, 0, bc(yc), fc(yc), COLM,NO_SUPPRESS,pg,count);
+	  y = FixAndPrintObject(y, 0, bc(yc), fc(yc), COLM, NO_SUPPRESS, pg,
+		count, &aback, &afwd);
         }
         else
         { CONSTRAINT colc, rowc, yc;
@@ -463,13 +488,14 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  SetConstraint(colc, back(x,COLM), MAX_FULL_LENGTH, fwd(x,COLM));
 	  SetConstraint(rowc, back(x,ROWM), MAX_FULL_LENGTH, fwd(x,ROWM));
 	  RotateConstraint(&yc, y, sparec(constraint(x)), &colc, &rowc, ROWM);
-	  FixAndPrintObject(y, 0, bc(yc), fc(yc), ROWM, NO_SUPPRESS,0,count);
+	  y = FixAndPrintObject(y, 0, bc(yc), fc(yc), ROWM, NO_SUPPRESS, 0,
+		count, &aback, &afwd);
 	  BackEnd->RestoreGraphicState();
         }
       }
       else if( sparec(constraint(x)) == 0 )
-	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+	y = FixAndPrintObject(y,xmk,xb,xf,dim,suppress,pg,count,&aback,&afwd);
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
@@ -480,12 +506,13 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       {
 	if( dim == COLM )
 	{
-	  back(x, dim) = xb;
+	  back(x, dim) = xb;		/* NB state change here */
 	  fwd(x, dim)  = xf;
 	  save_mark(x) = xmk - back(x, dim);
 	  debug2(DGP, DD, "PLAIN_GRAPHIC COLM storing size %s, %s",
 	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
-          FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+          y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+		&aback, &afwd);
 	}
 	else
 	{ OBJECT tmp, pre, post;
@@ -499,15 +526,16 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  fwd(x, dim)  = xf;
           BackEnd->PrintPlainGraphic(pre, save_mark(x),
 	    pg - (xmk - back(x, dim)), x);
-          FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
+          y = FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count,
+		&aback, &afwd);
           if( post != nilobj )
 	    BackEnd->PrintPlainGraphic(post, save_mark(x),
 	      pg - (xmk - back(x, dim)), x);
 	}
       }
       else
-	FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+	y = FixAndPrintObject(y, xmk,xb,xf,dim,suppress,pg,count,&aback,&afwd);
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
@@ -524,12 +552,13 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    if( font_page(face) < font_curr_page )  FontPageUsed(face);
 	  }
 
-	  back(x, dim) = xb;
+	  back(x, dim) = xb;  /* NB state change here */
 	  fwd(x, dim)  = xf;
 	  debug2(DGP, DD, "GRAPHIC COLM storing size %s, %s",
 	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
 	  save_mark(x) = xmk - back(x, COLM);
-          FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, pg, count);
+          y = FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, pg, count,
+		&aback, &afwd);
 	}
 	else
 	{ OBJECT tmp, pre, post;
@@ -546,14 +575,38 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    pg - (xmk + fwd(x, ROWM)));
           BackEnd->PrintGraphicObject(pre);
           BackEnd->RestoreGraphicState();
-          FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, xb + xf, count);
+          y = FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, xb + xf,
+		count, &aback, &afwd);
           if( post != nilobj )  BackEnd->PrintGraphicObject(post);
           BackEnd->RestoreGraphicState();
 	}
       }
       else
-        FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+        y = FixAndPrintObject(y, xmk,xb,xf,dim,suppress,pg,count,&aback,&afwd);
+      *actual_back = xb;  *actual_fwd = xf;
+      break;
+
+
+    case LINK_SOURCE:
+    case LINK_DEST:
+    
+      CountChild(y, LastDown(x), count);
+      if( dim == COLM )
+	save_mark(x) = xmk;
+      else
+      {	Child(z, Down(x));
+	if( type(x) == LINK_SOURCE )
+	  BackEnd->LinkSource(z, save_mark(x) - back(x, COLM),
+	    (pg - xmk) - xf, save_mark(x) + fwd(x, COLM),
+	    (pg - xmk) + xb);
+	else
+	  BackEnd->LinkDest(z, save_mark(x) - back(x, COLM),
+	    (pg - xmk) - xf, save_mark(x) + fwd(x, COLM),
+	    (pg - xmk) + xb);
+      }
+      y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
+	    &aback, &afwd);
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
@@ -579,15 +632,16 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	else if( incgraphic_ok(x) )
 	  BackEnd->PrintGraphicInclude(x, save_mark(x), pg - xmk);
       }
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
     case SPLIT:
     
       link = DownDim(x, dim);  CountChild(y, link, count);
-      FixAndPrintObject(y, xmk, xb, xf, dim, suppress, pg, count);
-      back(x, dim) = back(y, dim);  fwd(x, dim) = fwd(y, dim);
+      y = FixAndPrintObject(y, xmk, find_max(back(y, dim), xb),
+	find_max(fwd(y, dim), xf), dim, suppress, pg, count,
+	actual_back, actual_fwd);
       break;
 
 
@@ -604,15 +658,21 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	if( link != x )
 	{
 
-	  /* handle the special case of a 0rt gap at the beginning (left  */
-	  /* justify) by converting it to 0ie but increasing fwd(prev)    */
-	  /* to the max. possible                                         */
+	  /*******************************************************************/
+	  /*                                                                 */
+	  /*  handle the special case of a 0rt gap at the beginning (left    */
+	  /*  justify) by converting it to 0ie but increasing fwd(prev) to   */
+	  /*  the maximum possible                                           */
+	  /*                                                                 */
+	  /*******************************************************************/
+
 	  NextDefiniteWithGap(x, link, y, g, jn);
 	  if( link != x && mode(gap(g)) == TAB_MODE &&
 	      units(gap(g)) == AVAIL_UNIT && width(gap(g)) == 0 )
 	  {
 	    debug2(DGP, DD, "  FAPO-CAT converting 0rt (back(x, dim) %s, xb %s)",
 	      EchoLength(back(x, dim)), EchoLength(xb));
+	    /* NB state change here */
 	    fwd(prev, dim) += xb - back(x, dim);
 	    back(x, dim) = xb;
 	    mode(gap(g)) = EDGE_MODE;
@@ -620,24 +680,37 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  }
 	  FirstDefinite(x, link, prev, jn);
 
-	  /* the frame size is the total width actually available */
+	  /*******************************************************************/
+	  /*                                                                 */
+	  /*  Initialize the following variables:                            */
+	  /*                                                                 */
+	  /*  frame_size   the total width actually available                */
+	  /*                                                                 */
+	  /*  back_edge    where the first element begins                    */
+	  /*                                                                 */
+	  /*  inc          the adjust increment, used when adjusting gaps    */
+	  /*                                                                 */
+	  /*  mk           where the mark of prev is to go                   */
+	  /*                                                                 */
+	  /*******************************************************************/
+
 	  frame_size = back(x, dim) + xf;
-
-	  /* back_edge is where the first element begins */
 	  back_edge = xmk - back(x, dim);
-
-	  /* inc is the adjust increment, used when adjusting gaps */
 	  if( adjust_cat(x) && !suppress )
 	    inc = FindAdjustIncrement(x, frame_size, dim);
 	  else inc = 0;
-
 	  mk = back_edge + back(prev, dim);
-	  debug4(DGP, DD, "  FAPO-CAT back_edge %s, mk %s, framesize %s, inc %s",
+	  debug4(DGP, DD, "  FAPO-CAT back_edge %s, mk %s, frame %s, inc %s",
 	    EchoLength(back_edge), EchoLength(mk), EchoLength(frame_size),
 	    EchoLength(inc));
 
-	  NextDefiniteWithGap(x, link, y, g, jn);
+	  /*******************************************************************/
+	  /*                                                                 */
+	  /*  Fix each element "prev" in turn along the cat operator         */
+	  /*                                                                 */
+	  /*******************************************************************/
 
+	  NextDefiniteWithGap(x, link, y, g, jn);
 	  while( link != x )
 	  {
 	    if( mode(gap(g)) == TAB_MODE && units(gap(g)) == AVAIL_UNIT &&
@@ -647,45 +720,57 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	      debug5(DGP,D,"  FAPO (a) calling FAPO(%s, %s, %s, max(%s, %s))",
 	        Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
 		EchoLength(fwd(prev, dim)), EchoLength(xmk+xf-mk-size(y,dim)));
-	      FixAndPrintObject(prev, mk, back(prev, dim),
+	      prev = FixAndPrintObject(prev, mk, back(prev, dim),
 		find_max(fwd(prev, dim), xmk+xf-mk - size(y, dim)),
-		dim, NO_SUPPRESS, pg, count);
+		dim, NO_SUPPRESS, pg, count, &aback, &afwd);
 	    }
 	    else
 	    {
 	      debug5(DGP, DD, "  FAPO-CAT (b) calling FAPO(%s, %s, %s, %s+%s)",
 	        Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
 		EchoLength(fwd(prev, dim)), EchoLength(inc));
-	      FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
-	        dim, NO_SUPPRESS, pg, count);
+	      prev = FixAndPrintObject(prev, mk, back(prev, dim),
+		fwd(prev, dim) + inc, dim, NO_SUPPRESS, pg, count,&aback,&afwd);
 	    }
-	    /* NB fwd(prev, dim) may be changed by the call to FAPO */
-	    mk += ActualGap(fwd(prev, dim), back(y, dim), fwd(y, dim), &gap(g),
+	    mk += ActualGap(afwd, back(y, dim), fwd(y, dim), &gap(g),
 		    frame_size, mk - back_edge);
 	    prev = y;
 	    NextDefiniteWithGap(x, link, y, g, jn);
 	  }
+
+	  /*******************************************************************/
+	  /*                                                                 */
+	  /*  At end, fix last element in conformity with "suppress"         */
+	  /*  and set *actual_back and *actual_fwd.                          */
+	  /*                                                                 */
+	  /*******************************************************************/
+
 	  if( suppress )
 	  {
 	    debug4(DGP, DD, "  FAPO-CAT (c) calling FAPO(%s, %s, %s, %s)",
 	      Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
 	      EchoLength(fwd(prev, dim)));
-	    FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
-	      dim, NO_SUPPRESS, pg, count);
+	    prev = FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
+	      dim, NO_SUPPRESS, pg, count, &aback, &afwd);
 	  }
 	  else
 	  {
-	    debug5(DGP, DD,"  FAPO-CAT (d) calling FAPO(%s, %s, %s, max(%s, %s))",
+	    debug5(DGP, DD,"  FAPO-CAT (d) calls FAPO(%s, %s, %s, max(%s, %s))",
 	      Image(type(prev)), EchoLength(mk), EchoLength(back(prev, dim)),
 	      EchoLength(fwd(prev, dim)), EchoLength(xmk + xf - mk));
-	    FixAndPrintObject(prev, mk, back(prev,dim),
+	    ifdebug(DGP, DD, DebugObject(prev));
+	    prev = FixAndPrintObject(prev, mk, back(prev,dim),
 	      find_max(fwd(prev, dim), xmk + xf - mk),
-	      dim, NO_SUPPRESS, pg, count);
+	      dim, NO_SUPPRESS, pg, count, &aback, &afwd);
 	  }
-	  back(x, dim) = find_max(back(x, dim), xb);
-	  fwd(x, dim) = mk + fwd(prev, dim) - back_edge - back(x, dim);
+	  *actual_back = find_max(back(x, dim), xb);
+	  *actual_fwd = mk + fwd(prev, dim) - back_edge - *actual_back;
+	  debugcond4(DGP, DD, type(x) == HCAT,
+	    "HCAT original (%s, %s) to actual (%s, %s)",
+	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
+	    EchoLength(*actual_back), EchoLength(*actual_fwd));
 	}
-	else back(x, dim) = xb, fwd(x, dim) = xf;
+	else *actual_back = xb, *actual_fwd = xf;
 	debug0(DGP, DD, "] FAPO-CAT returning.");
       }
       else
@@ -702,7 +787,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  m = y;
 	  start_group = link;
 	  dble_found = !jn;
-	  debug4(DGP, DD, "  starting first group %s (%sdbl_found): b = %s, f = %s",
+	  debug4(DGP, DD, "  starting first group %s (%sdbl_found): b %s, f %s",
 	    Image(type(y)), dble_found ? "" : "not ",
 	    EchoLength(b), EchoLength(f));
 	
@@ -714,14 +799,14 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	      /* finish off and fix the group ending just before g */
 	      debug2(DGP, DD, "  finishing group: b = %s, f = %s",
 		EchoLength(b), EchoLength(f));
-	      FixAndPrintObject(m, xmk+b, b, xf-b, dim,
-		NO_SUPPRESS, pg, count);
+	      m = FixAndPrintObject(m, xmk+b, b, xf-b, dim,
+		NO_SUPPRESS, pg, count, &aback, &afwd);
 	      b = back(m, dim);  f = fwd(m, dim);
 	      for( zlink = start_group;  zlink != link;  zlink=NextDown(zlink) )
 	      { CountChild(z, zlink, count);
 		if( !is_definite(type(z)) || z == m )  continue;
-		FixAndPrintObject(z, xmk + b, b, xf - b, dim,
-		  SUPPRESS, pg, count);
+		z = FixAndPrintObject(z, xmk + b, b, xf - b, dim,
+		  SUPPRESS, pg, count, &aback, &afwd);
 		b = find_max(b, back(z, dim));  f = find_max(f, fwd(z, dim));
 	      }
 	      dlen = find_max(dlen, b + f);
@@ -755,31 +840,34 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    /* finish off and fix this last group */
 	    debug2(DGP, DD, "  finishing last group: b = %s, f = %s",
 	        EchoLength(b), EchoLength(f));
-	    FixAndPrintObject(m, xmk+b, b, xf - b, dim, NO_SUPPRESS, pg,count);
+	    m = FixAndPrintObject(m, xmk+b, b, xf - b, dim, NO_SUPPRESS, pg,
+		  count, &aback, &afwd);
 	    b = back(m, dim);  f = fwd(m, dim);
 	    for( zlink = start_group;  zlink != x;  zlink = NextDown(zlink) )
 	    { CountChild(z, zlink, count);
 	      if( !is_definite(type(z)) || z == m )  continue;
-	      FixAndPrintObject(z, xmk+b, b, xf - b, dim, SUPPRESS, pg, count);
+	      z = FixAndPrintObject(z, xmk+b, b, xf - b, dim, SUPPRESS, pg,
+		    count, &aback, &afwd);
 	      b = find_max(b, back(z, dim));  f = find_max(f, fwd(z, dim));
 	    }
 	    dlen = find_max(dlen, b + f);
-	    back(x, dim) = 0;  fwd(x, dim) = dlen;
+	    *actual_back = 0;  *actual_fwd = dlen;
 	  }
 	  else
 	  {
 	    /* finish off and fix this last and only group */
 	    debug2(DGP, DD, "  finishing last and only group: b = %s, f = %s",
 	      EchoLength(b), EchoLength(f));
-	    FixAndPrintObject(m, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
-	    b = back(m, dim);  f = fwd(m, dim);
+	    m = FixAndPrintObject(m, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
+	      &b, &f);
 	    for( zlink = start_group;  zlink != x;  zlink = NextDown(zlink) )
 	    { CountChild(z, zlink, count);
 	      if( !is_definite(type(z)) || z == m )  continue;
-	      FixAndPrintObject(z, xmk, xb, xf, dim, SUPPRESS, pg, count);
-	      b = find_max(b, back(z, dim));  f = find_max(f, fwd(z, dim));
+	      z = FixAndPrintObject(z, xmk, xb, xf, dim, SUPPRESS, pg, count,
+		    &aback, &afwd);
+	      b = find_max(b, aback);  f = find_max(f, afwd);
 	    }
-	    back(x, dim) = b;  fwd(x, dim) = f;
+	    *actual_back = b;  *actual_fwd = f;
 	  }
 	}
       }
@@ -793,7 +881,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	FULL_LENGTH actual_size,
 	adjust_indent, frame_size, back_edge, adjust_inc, inc, adjust_sofar;
 	int adjustable_gaps, gaps_sofar;
-	BOOLEAN underlining; int underline_xstart; FONT_NUM underline_font;
+	BOOLEAN underlining; int underline_xstart;
+	FONT_NUM underline_font;  COLOUR_NUM underline_colour;
 	OBJECT urec, last_bad_gap;
       
 
@@ -814,7 +903,11 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	/*********************************************************************/
 
 	FirstDefinite(x, link, y, jn);
-	if( link == x )  break;  /* no definite children, nothing to print */
+	if( link == x )
+	{
+	  *actual_back = back(x, dim); *actual_fwd = fwd(x, dim);
+	  break;  /* no definite children, nothing to print */
+	}
 
 	/*** nasty bug finder 
 	{ OBJECT ff = y;
@@ -890,8 +983,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 		WARN, &fpos(x), EchoLength(size(x, COLM)),
 		(float) bc(constraint(prnt)) / SF, EchoLength(frame_size));
 	    }
-	    FixAndPrintObject(prnt, xmk, back(prnt, dim), fwd(prnt, dim), dim,
-	      NO_SUPPRESS, pg, count);
+	    prnt = FixAndPrintObject(prnt, xmk, back(prnt, dim), fwd(prnt, dim), dim,
+	      NO_SUPPRESS, pg, count, &aback, &afwd);
 	  }
 	  else
 	  {
@@ -920,32 +1013,34 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
         else
         {
 
-	  /*********************************************************************/
-	  /*                                                                   */
-	  /*  The line may be displayed in one of four ways:  centred, right-  */
-	  /*  justified, adjusted, or none of the above (i.e. left justified). */
-	  /*  An overfull line is always adjusted; otherwise, the line will    */
-	  /*  be centred or right justified if the display style asks for it;  */
-	  /*  otherwise, the line will be adjusted if adjust_cat(x) == TRUE    */
-	  /*  (i.e. there is an enclosing @PAdjust) or if the display style is */
-	  /*  DO_ADJUST (meaning that this line is one of a paragraph set in   */
-	  /*  the adjust or outdent break style, other than the last line);    */
-	  /*  otherwise, the line is left justified.                           */
-	  /*                                                                   */
-	  /*  The second step is to decide which of these four cases holds     */
-	  /*  for this line, and to record the decision in these variables:    */
-	  /*                                                                   */
-	  /*    will_adjust      TRUE if the adjusted style applies; in this   */
-	  /*                     case, variables adjust_inc and inc will be    */
-	  /*                     set to the appropriate adjustment value;      */
-	  /*                                                                   */
-	  /*    adjust_indent    If centring or right justification applies,   */
-	  /*                     the indent to produce this, else zero.        */
-	  /*                                                                   */
-	  /*  NB adjust_inc may be negative, if the optimal paragraph breaker  */
-	  /*  has chosen to shrink some gaps.                                  */
-	  /*                                                                   */
-	  /*********************************************************************/
+	  /********************************************************************/
+	  /*                                                                  */
+	  /*  The line may be displayed in one of four ways:  centred, right- */
+	  /*  justified, adjusted, or none of the above (i.e. left justified).*/
+	  /*  An overfull line is always adjusted; otherwise, the line will   */
+	  /*  be centred or right justified if the display style asks for it; */
+	  /*  otherwise, the line will be adjusted if adjust_cat(x) == TRUE   */
+	  /*  (i.e. there is an enclosing @PAdjust) or if the display style is*/
+	  /*  DO_ADJUST (meaning that this line is one of a paragraph set in  */
+	  /*  the adjust or outdent break style, other than the last line);   */
+	  /*  otherwise, the line is left justified.                          */
+	  /*                                                                  */
+	  /*  The second step is to decide which of these four cases holds    */
+	  /*  for this line, and to record the decision in these variables:   */
+	  /*                                                                  */
+	  /*    will_adjust      TRUE if the adjusted style applies; in this  */
+	  /*                     case, variables adjust_inc and inc will be   */
+	  /*                     set to the appropriate adjustment value;     */
+	  /*                                                                  */
+	  /*    adjust_indent    If centring or right justification applies,  */
+	  /*                     the indent to produce this, else zero.       */
+	  /*                                                                  */
+	  /*  NB adjust_inc may be negative, if the optimal paragraph breaker */
+	  /*  has chosen to shrink some gaps.                                 */
+	  /*                                                                  */
+	  /*  NB we are assigning to adjust_cat here; is this a problem?      */
+	  /*                                                                  */
+	  /********************************************************************/
 
 	  if( actual_size > frame_size )
 	  { 
@@ -987,18 +1082,18 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    inc = find_max(adjust_inc, 0);
 	    gaps_sofar = 0;	/* number of gaps adjusted so far */
 	    adjust_sofar = 0;	/* total width of adjustments so far */
-	    debug2(DGP, DD, "will_adjust: adjustable_gaps = %d, adjust_inc = %s",
+	    debug2(DGP, DD,"will_adjust: adjustable_gaps = %d, adjust_inc = %s",
 	      adjustable_gaps, EchoLength(adjust_inc));
 	  }
 	  else will_adjust = FALSE;
 
 
-	  /*********************************************************************/
-	  /*                                                                   */
-	  /*  The third and final step is to traverse x, fixing subobjects.    */
-	  /*  Variable adjusting is true while adjusting is occurring.         */
-	  /*                                                                   */
-	  /*********************************************************************/
+	  /********************************************************************/
+	  /*                                                                  */
+	  /*  The third and final step is to traverse x, fixing subobjects.   */
+	  /*  Variable "adjusting" is true while adjusting is occurring.      */
+	  /*                                                                  */
+	  /********************************************************************/
 
 	  underlining = FALSE;
 	  adjusting = will_adjust && last_bad_gap == nilobj;
@@ -1011,9 +1106,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    /* check for underlining */
 	    if( underline(prev) == UNDER_ON )
 	    {
-	      debug3(DGP, DD, "  FAPO/ACAT1 underline() := %s for %s %s",
+	      debug3(DGP, D, "  FAPO/ACAT1 underline() := %s for %s %s",
 	        bool(FALSE), Image(type(prev)), EchoObject(prev));
-	      underline(prev) = UNDER_OFF;
 	      if( !underlining )
 	      {
 	        /* underlining begins here */
@@ -1022,17 +1116,20 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 		  Image(type(prev)), EchoObject(prev));
 	        underline_font = is_word(type(prev)) ? word_font(prev) :
 		    font(save_style(x));
+		underline_colour = is_word(type(prev)) ? word_colour(prev) :
+		    colour(save_style(x));
 	        underline_xstart = mk - back(prev, dim);
 	      }
 	      if( underline(g) == UNDER_OFF )
 	      {
 	        /* underlining ends here */
-	        debug2(DGP, DD, "underlining ends at %s %s",
+	        debug2(DGP, D, "underlining ends at %s %s",
 		  Image(type(prev)), EchoObject(prev));
 	        New(urec, UNDER_REC);
 	        back(urec, COLM) = underline_xstart;
 	        fwd(urec, COLM) = mk + fwd(prev, dim);
 	        back(urec, ROWM) = underline_font;
+	        fwd(urec, ROWM) = underline_colour;
 	        underlining = FALSE;
 	        Link(Up(prev), urec);
 	      }
@@ -1042,9 +1139,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    if( adjusting && width(gap(g)) > 0 )
 	    { int tmp;
 
-	      FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
-	        dim, NO_SUPPRESS, pg, count);
-
+	      prev = FixAndPrintObject(prev, mk, back(prev, dim),
+		fwd(prev, dim) + inc, dim, NO_SUPPRESS, pg, count,&aback,&afwd);
 	      gaps_sofar++;
 	      tmp = ((frame_size - actual_size) * gaps_sofar) / adjustable_gaps;
 	      mk += save_actual_gap(g) + (tmp - adjust_sofar);
@@ -1052,8 +1148,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    }
 	    else
 	    {
-	      FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
-	        dim, NO_SUPPRESS, pg, count);
+	      prev = FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev,dim),
+	        dim, NO_SUPPRESS, pg, count, &aback, &afwd);
 
 	      mk += save_actual_gap(g);
 	    }
@@ -1067,17 +1163,16 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  }
 
 	  /* check for underlining */
-	  debugcond3(DGP, D, underline(prev) == UNDER_UNDEF,
+	  debugcond3(DGP, DD, underline(prev) == UNDER_UNDEF,
 	    "  underlining is UNDER_UNDEF in %s: %s %s in para:",
 	    EchoFilePos(&fpos(prev)), Image(type(prev)), EchoObject(prev));
-	  debugcond1(DGP, D, underline(prev)==UNDER_UNDEF, "%s", EchoObject(x));
+	  debugcond1(DGP, DD, underline(prev)==UNDER_UNDEF, "%s",EchoObject(x));
 	  assert( underline(prev) == UNDER_OFF || underline(prev) == UNDER_ON,
 	    "FixAndPrint: underline(prev)!" );
 	  if( underline(prev) == UNDER_ON )
 	  {
-	    debug3(DGP, DD, "  FAPO/ACAT1 underline() := %s for %s %s",
+	    debug3(DGP, D, "  FAPO/ACAT1 underline() := %s for %s %s",
 	      bool(FALSE), Image(type(prev)), EchoObject(prev));
-	    underline(prev) = UNDER_OFF;
 	    if( !underlining )
 	    {
 	      /* underlining begins here */
@@ -1086,6 +1181,8 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	      underlining = TRUE;
 	      underline_font = is_word(type(prev)) ? word_font(prev) :
 		    font(save_style(x));
+	      underline_colour = is_word(type(prev)) ? word_colour(prev) :
+		    colour(save_style(x));
 	      underline_xstart = mk - back(prev, dim);
 	    }
 
@@ -1096,14 +1193,15 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    back(urec, COLM) = underline_xstart;
 	    fwd(urec, COLM) = mk + fwd(prev, dim);
 	    back(urec, ROWM) = underline_font;
+	    fwd(urec, ROWM) = underline_colour;
 	    underlining = FALSE;
 	    Link(Up(prev), urec);
 	  }
 
 	  /* fix the last definite subobject, prev, which must exist */
-	  FixAndPrintObject(prev, mk, back(prev, dim),
+	  prev = FixAndPrintObject(prev, mk, back(prev, dim),
 	    frame_size - (mk - xmk) - back(x, dim),
-	    dim, NO_SUPPRESS, pg, count);
+	    dim, NO_SUPPRESS, pg, count, &aback, &afwd);
 
         }
       }
@@ -1112,20 +1210,24 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	if( !is_definite(type(y)) )
 	{
 	  if( type(y) == UNDER_REC )   /* generate an underline now */
-	    BackEnd->PrintUnderline(back(y, ROWM), back(y, COLM),
+	  { BackEnd->PrintUnderline(back(y, ROWM), fwd(y, ROWM), back(y, COLM),
 	      fwd(y, COLM), pg - xmk);
+	    link = PrevDown(link);     /* remove all trace of underlining */
+	    DisposeChild(Up(y));       /* in case we print this object again */
+	  }
 	  continue;
 	}
-	FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count);
+	y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
+	      &aback, &afwd);
       }
-      back(x, dim) = xb;  fwd(x, dim) = xf;
+      *actual_back = xb;  *actual_fwd = xf;
       break;
 
 
     case COL_THR:
     case ROW_THR:
 
-      /* find and delete the child number count of y */
+      /* *** old code
       assert( (type(x) == COL_THR) == (dim == COLM), "FixAndPrintObject: thr!" );
       for( link = Down(x), uplink = Up(x), i = 1;
 	link != x && uplink != x && i < count;
@@ -1136,24 +1238,89 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	Image(type(x)),
 	EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
 	i, Image(type(y)), EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
-      MoveLink(uplink, link, CHILD);  DeleteLink(link);  /* IMPORTANT!!! */
+      MoveLink(uplink, link, CHILD);  DeleteLink(link);
       assert( type(y) != GAP_OBJ, "FAPO: THR!");
 
-      /* assign size if not done previously */
-      /* ***
-      if( thr_state(x) != FINALSIZE && type(y) != START_HVSPAN &&
-	  type(y) != START_HSPAN && type(y) != START_VSPAN &&
-	  type(y) != HSPAN && type(y) != VSPAN )
-      *** */
       if( thr_state(x) != FINALSIZE )
       {	back(x, dim) = xb;  fwd(x, dim) = xf;
 	thr_state(x) = FINALSIZE;
       }
 
-      /* fix y */
-      FixAndPrintObject(y, xmk, back(x, dim), fwd(x, dim), dim,
+      y = FixAndPrintObject(y, xmk, back(x, dim), fwd(x, dim), dim,
 	NO_SUPPRESS, pg, count);
       if( Up(x) == x )  Dispose(x);
+      break;
+      *** */
+
+      /* convert everyone to FIXED_COL_THR or FIXED_ROW_THR as appropriate */
+      if( thr_state(x) == FINALSIZE )
+	debug1(DGP, D, "thr_state(%d)", (int) x);
+      assert(thr_state(x) != FINALSIZE, "FAPO/COL_THR: thr_state(x)!");
+      ifdebug(DGP, D,
+	link = Down(x);
+	uplink = Up(x);
+	while( link != x && uplink != x )
+	{
+	  Parent(tmp, uplink);
+	  debug1(DGP, D, "parnt: %s", EchoObject(tmp));
+	  Child(tmp, link);
+	  debug1(DGP, D, "child: %s", EchoObject(tmp));
+	  link = NextDown(link);
+	  uplink = NextUp(uplink);
+	}
+	while( uplink != x )
+	{ Parent(tmp, uplink);
+	  debug1(DGP, D, "extra parnt: %s", EchoObject(tmp));
+	  uplink = NextUp(uplink);
+	}
+	while( link != x )
+	{ Child(tmp, link);
+	  debug1(DGP, D, "extra child: %s", EchoObject(tmp));
+	  link = NextDown(link);
+	}
+      )
+      i = 1;  res = nilobj;
+      while( Down(x) != x && Up(x) != x )
+      {
+	New(fixed_thr, type(x) == COL_THR ? FIXED_COL_THR : FIXED_ROW_THR);
+	MoveLink(Up(x), fixed_thr, CHILD);
+	MoveLink(Down(x), fixed_thr, PARENT);
+	back(fixed_thr, dim) = xb;
+	fwd(fixed_thr, dim) = xf;
+	if( count == i )
+	  res = fixed_thr;
+	i++;
+      }
+      if( Up(x) != x || Down(x) != x )
+      {
+	debug2(DGP, D, "links problem at %s %d:", Image(type(x)), (int) x);
+	if( Up(x) != x )
+	{
+	  Parent(tmp, Up(x));
+	  debug1(DGP, D, "first parent is %s", EchoObject(tmp));
+	}
+	if( Down(x) != x )
+	{
+	  Child(tmp, Down(x));
+	  debug1(DGP, D, "first child is %s", EchoObject(tmp));
+	}
+      }
+      assert( Up(x) == x && Down(x) == x, "FAPO/COL_THR: x links!" );
+      Dispose(x);
+      assert(res != nilobj, "FixAndPrintObject: COL_THR res!");
+      x = res;
+      /* NB NO BREAK! */
+
+
+    case FIXED_COL_THR:
+    case FIXED_ROW_THR:
+
+      assert( (type(x) == FIXED_COL_THR) == (dim == COLM),
+	"FixAndPrintObject: fixed_thr!" );
+      CountChild(y, Down(x), count);
+      y = FixAndPrintObject(y, xmk, back(x, dim), fwd(x, dim), dim,
+	NO_SUPPRESS, pg, count, &aback, &afwd);
+      *actual_back = back(x, dim);  *actual_fwd = fwd(x, dim);
       break;
 
 
@@ -1175,6 +1342,7 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
 
   } /* end switch */
-  debug2(DGP, DD, "] FixAndPrintObject returning (size now %s,%s).",
-	EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+  debug2(DGP, DD, "] FixAndPrintObject returning (actual %s,%s).",
+	EchoLength(*actual_back), EchoLength(*actual_fwd));
+  return res;
 } /* end FixAndPrintObject */

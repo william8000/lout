@@ -1,6 +1,6 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -81,16 +81,16 @@ FULL_CHAR *DebugInnersNames(OBJECT inners)
 
 static void ParentFlush(BOOLEAN prnt_flush, OBJECT dest_index, BOOLEAN kill)
 { OBJECT prnt;
-  debug3(DGF, D, "ParentFlush(%s, %s, %s)",
+  debug3(DGF, DD, "ParentFlush(%s, %s, %s)",
     bool(prnt_flush), EchoIndex(dest_index), bool(kill));
   if( prnt_flush )
   { Parent(prnt, Up(dest_index));
     if( kill )  DeleteNode(dest_index);
-    debug0(DGF, D, "  calling FlushGalley from ParentFlush");
+    debug0(DGF, DD, "  calling FlushGalley from ParentFlush");
     FlushGalley(prnt);
   }
   else if( kill )  DeleteNode(dest_index)
-  debug0(DGF, D, "ParentFlush returning.");
+  debug0(DGF, DD, "ParentFlush returning.");
 } /* end ParentFlush */
 
 
@@ -140,7 +140,7 @@ void FlushGalley(OBJECT hd)
   RESUME:
   assert( type(hd) == HEAD, "FlushGalley: type(hd) != HEAD!" );
   debug1(DGF, D, "  resuming FlushGalley %s, hd =", SymName(actual(hd)));
-  ifdebugcond(DGF, D, actual(hd) == nilobj, DebugGalley(hd, nilobj, 4));
+  ifdebugcond(DGF, DD, actual(hd) == nilobj, DebugGalley(hd, nilobj, 4));
   assert( Up(hd) != hd, "FlushGalley: resume found no parent to hd!" );
 
 
@@ -172,7 +172,7 @@ void FlushGalley(OBJECT hd)
     
       /* the galley is currently not attached to a destination */
       attach_status = AttachGalley(hd, &inners, &y);
-      debug1(DGF, D, "  ex-AttachGalley inners: %s", DebugInnersNames(inners));
+      debug1(DGF, DD, "  ex-AttachGalley inners: %s", DebugInnersNames(inners));
       Parent(dest_index, Up(hd));
       switch( attach_status )
       {
@@ -210,7 +210,7 @@ void FlushGalley(OBJECT hd)
 	  /* be flushed; in particular the galley must be unsized before  */
 	  if( inners != nilobj )
 	  {
-	    debug0(DGF, D, "  calling FlushInners() from FlushGalley (a)");
+	    debug0(DGF, DD, "  calling FlushInners() from FlushGalley (a)");
 	    FlushInners(inners, nilobj);
 	    goto RESUME;
 	  }
@@ -250,7 +250,7 @@ void FlushGalley(OBJECT hd)
 	  KillGalley(hd, TRUE);
           if( inners != nilobj )
 	  {
-	    debug0(DGF, D, "  calling FlushInners() from FlushGalley (b)");
+	    debug0(DGF, DD, "  calling FlushInners() from FlushGalley (b)");
 	    FlushInners(inners, nilobj);
 	  }
 	  else ParentFlush(prnt_flush, dest_index, remove_target);
@@ -277,10 +277,10 @@ void FlushGalley(OBJECT hd)
 	    /* ifdebug(DGA, DD, DebugObject(prnt)); */
           }
           else prnt_flush = prnt_flush || blocked(dest_index);
-          debug1(DGF, D, "    force: prnt_flush = %s", bool(prnt_flush));
+          debug1(DGF, DD, "    force: prnt_flush = %s", bool(prnt_flush));
           if( inners != nilobj )
 	  {
-	    debug0(DGF, D, "  calling FlushInners() from FlushGalley (c)");
+	    debug0(DGF, DD, "  calling FlushInners() from FlushGalley (c)");
 	    FlushInners(inners, nilobj);
 	  }
           goto RESUME;
@@ -481,7 +481,7 @@ void FlushGalley(OBJECT hd)
 			  debug2(DOG, D, "FlushGalley(%s) de-optimizing %s",
 			    "(CLOSE problem)", SymName(actual(hd)));
 			}
-			debug1(DGF, D, "  reject (a) %s", EchoObject(y));
+			debug1(DGF, DD, "  reject (a) %s", EchoObject(y));
 			goto REJECT;
 	}
 	break;
@@ -530,6 +530,8 @@ void FlushGalley(OBJECT hd)
       case SINCGRAPHIC:
       case PLAIN_GRAPHIC:
       case GRAPHIC:
+      case LINK_SOURCE:
+      case LINK_DEST:
       case ACAT:
       case HCAT:
       case VCAT:
@@ -572,7 +574,7 @@ void FlushGalley(OBJECT hd)
 	    Parent(dest_encl, NextDown(Up(dest)));
 	    *** */
 	    Parent(dest_encl, Up(dest));
-	    debug4(DGF, D, "  flush dest = %s %s, dest_encl = %s %s",
+	    debug4(DGF, DD, "  flush dest = %s %s, dest_encl = %s %s",
 	      Image(type(dest)), EchoObject(dest),
 	      Image(type(dest_encl)), EchoObject(dest_encl));
 	    assert( (dim==ROWM && type(dest_encl)==VCAT) ||
@@ -591,14 +593,14 @@ void FlushGalley(OBJECT hd)
 	    perp_fwd  = fwd(dest_encl, 1-dim);
 	    Constrained(dest_encl, &dest_par_constr, dim, &why);
 	    Constrained(dest_encl, &dest_perp_constr, 1-dim, &why);
-	    debug1(DGF, D, "  setting dest_perp_constr = %s",
+	    debug1(DGF, DD, "  setting dest_perp_constr = %s",
 	      EchoConstraint(&dest_perp_constr));
 	    frame_size = constrained(dest_par_constr) ? bfc(dest_par_constr) :0;
 	  }
 
 	  if( !is_indefinite(type(y)) )
 	  {
-	    ifdebugcond(DGF, D,  mode(gap(prec_gap)) == NO_MODE,
+	    ifdebugcond(DGF, DD,  mode(gap(prec_gap)) == NO_MODE,
 	      DebugGalley(hd, y, 4));
 
 	    /* calculate parallel effect of adding y to dest */
@@ -606,14 +608,14 @@ void FlushGalley(OBJECT hd)
 		  ActualGap(fwd(prec_def, dim), back(y, dim),
 			fwd(y, dim), &gap(prec_gap), frame_size,
 			dest_back + dest_fwd - fwd(prec_def, dim));
-	    debug5(DGF, D, "  f = %s + %s - %s + %s (prec_gap %s)",
+	    debug5(DGF, DD, "  f = %s + %s - %s + %s (prec_gap %s)",
 	      EchoLength(dest_fwd), EchoLength(fwd(y, dim)),
 	      EchoLength(fwd(prec_def, dim)), EchoLength(
 		  ActualGap(fwd(prec_def, dim), back(y, dim),
 			fwd(y, dim), &gap(prec_gap), frame_size,
 			dest_back + dest_fwd - fwd(prec_def, dim))
 	      ), EchoGap(&gap(prec_gap)));
-	    debug3(DGF, D, "  b,f: %s,%s;   dest_encl: %s",
+	    debug3(DGF, DD, "  b,f: %s,%s;   dest_encl: %s",
 			EchoLength(dest_back), EchoLength(f),
 			EchoConstraint(&dest_par_constr));
 
@@ -661,7 +663,7 @@ void FlushGalley(OBJECT hd)
 		else opt_comps_permitted(hd) = MAX_FILES;  /* a large number */
 		debug1(DOG, D, "  REJECT permitted = %2d", opt_comps_permitted(hd));
 	      }
-	      debug1(DGF, D, "  reject (b) %s", EchoObject(y));
+	      debug1(DGF, DD, "  reject (b) %s", EchoObject(y));
 	      goto REJECT;
 	    }
 
@@ -690,12 +692,12 @@ void FlushGalley(OBJECT hd)
 	      {
 		Error(20, 3, "component too wide for available space",
 		  WARN, &fpos(y));
-		debug6(DGF, D, "  %s,%s [%s,%s] too wide for %s, y = %s",
+		debug6(DGF, DD, "  %s,%s [%s,%s] too wide for %s, y = %s",
 		  EchoLength(pb), EchoLength(pf),
 		  EchoLength(back(y, 1-dim)), EchoLength(fwd(y, 1-dim)),
 		  EchoConstraint(&dest_perp_constr), EchoObject(y));
 	      }
-	      debug1(DGF, D, "  reject (c) %s", EchoObject(y));
+	      debug1(DGF, DD, "  reject (c) %s", EchoObject(y));
 	      goto REJECT;
 	    }
 
@@ -712,7 +714,7 @@ void FlushGalley(OBJECT hd)
 	} /* end if( target_is_internal ) */
 
 	/* accept this component into dest, subject to following nobreaks */
-	debug3(DGF, D, "  t-accept %s %s %s", Image(type(y)), EchoObject(y),
+	debug3(DGF, DD, "  t-accept %s %s %s", Image(type(y)), EchoObject(y),
 	  EchoFilePos(&fpos(y)));
 	prnt_flush = prnt_flush || blocked(dest_index);
 	debug1(DGF, DDD, "    prnt_flush = %s", bool(prnt_flush));
@@ -733,13 +735,14 @@ void FlushGalley(OBJECT hd)
 
 	  if( promotable )
 	  {
+	    debug0(DGS, D, "calling Promote(hd, stop_link) from FlushGalley (ACCEPT)");
 	    Promote(hd, NextDown(link), dest_index, TRUE);
 	    if( need_adjust )
 	    { debug0(DSA, D, "  calling AdjustSize from FlushGalley (ACCEPT)");
 	      AdjustSize(dest_encl, dest_back, dest_fwd, dim);
 	      AdjustSize(dest_encl, perp_back, perp_fwd, 1-dim);
 	    }
-	    debug0(DGF, D, "  calling FlushInners() from FlushGalley (d)");
+	    debug0(DGF, DD, "  calling FlushInners() from FlushGalley (d)");
 	    FlushInners(inners, hd);
 	    goto RESUME;
 	  }
@@ -759,10 +762,12 @@ void FlushGalley(OBJECT hd)
   /* EMPTY: */
 
     /* galley is now completely accepted; clean up and exit */
-    debug0(DGF, D, "  galley empty now");
+    debug0(DGF, DD, "  galley empty now");
     if( inners != nilobj )  DisposeObject(inners);
     if( Down(hd) != hd )
-    { Promote(hd, hd, dest_index, TRUE);
+    {
+      debug0(DGS, D, "calling Promote(hd, hd) from FlushGalley (EMPTY)");
+      Promote(hd, hd, dest_index, TRUE);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (EMPTY)");
 	AdjustSize(dest_encl, dest_back, dest_fwd, dim);
@@ -782,7 +787,7 @@ void FlushGalley(OBJECT hd)
         SymName(actual(hd)), EchoConstraint(&constraint(z)));
     }
     DetachGalley(hd);
-    debug0(DGF, D, "  calling KillGalley from FlushGalley");
+    debug0(DGF, DD, "  calling KillGalley from FlushGalley");
     KillGalley(hd, TRUE);
     ParentFlush(prnt_flush, dest_index, TRUE);
     debug1(DGF,D,"] FlushGalley %s returning (emptied).", SymName(actual(hd)));
@@ -800,7 +805,9 @@ void FlushGalley(OBJECT hd)
     assert(actual(dest) != PrintSym, "FlushGalley: reject print!");
     if( inners != nilobj )  DisposeObject(inners);
     if( stop_link != nilobj )
-    { Promote(hd, stop_link, dest_index, TRUE);
+    {
+      debug0(DGS, D, "calling Promote(hd, stop_link) from FlushGalley (REJECT)");
+      Promote(hd, stop_link, dest_index, TRUE);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (REJECT)");
 	AdjustSize(dest_encl, stop_back, stop_fwd, dim);
@@ -810,16 +817,20 @@ void FlushGalley(OBJECT hd)
 
     /* if headers_seen, handle any headers not already handled by Promote() */
     if( target_is_internal && headers_seen )
-    { OBJECT z, zlink;
+    { OBJECT z, zlink, top_z;
       for( zlink = hd;  NextDown(zlink) != link;  )
       {
 	Child(z, NextDown(zlink));
+	top_z = z;
 	debug2(DGF, D, "FlushGalley(%s)/REJECT header-examining %s",
 	  SymName(actual(hd)), EchoObject(z));
 	if( type(z) == SPLIT )
 	  Child(z, DownDim(z, dim));
 	if( is_header(type(z)) )
-	  HandleHeader(hd, NextDown(zlink), z);
+	{
+	  assert(top_z == z, "FlushGalley: header under SPLIT!");
+	  HandleHeader(hd, z);
+	}
 	else
 	  zlink = NextDown(zlink);
       }
@@ -827,17 +838,22 @@ void FlushGalley(OBJECT hd)
 
     /* now, if there are headers, dump them into the galley */
     if( headers(hd) != nilobj )
-    {
+    { int headers_count;
+
       /* dump new copy of headers into top of galley */
       assert(Down(headers(hd))!=headers(hd), "FlushGalley/REJECT: headers!");
       tmp = Down(hd);
       assert( tmp != hd, "FlushGalley/REJECT: first_link!" );
+      headers_count = 0;
       for( link=Down(headers(hd)); link != headers(hd); link=NextDown(link) )
       { Child(y, link);
-        debug2(DGF, D, "FlushGalley(%s)/REJECT linking %s",
+        debug2(DGS, D, "FlushGalley(%s)/REJECT linking %s",
 	  SymName(actual(hd)), EchoObject(y));
+	assert(type(y)!=COL_THR && type(y)!=ROW_THR, "FlushGalley/REJECT THR!");
 	Link(tmp, y);
+	headers_count++;
       }
+      assert(headers_count % 2 == 0, "FlushGalley/REJECT: headers_count!");
     }
 
     /* now detach and resume */
@@ -854,7 +870,9 @@ void FlushGalley(OBJECT hd)
     debug1(DGF, D, "  suspend %s", EchoIndex(y));
     if( inners != nilobj )  DisposeObject(inners);
     if( stop_link != nilobj )
-    { Promote(hd, stop_link, dest_index, TRUE);
+    {
+      debug0(DGS, D, "calling Promote(hd, stop_link) from FlushGalley/SUSPEND");
+      Promote(hd, stop_link, dest_index, TRUE);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (SUSPEND)");
 	AdjustSize(dest_encl, stop_back, stop_fwd, dim);
@@ -892,7 +910,7 @@ void FlushGalley(OBJECT hd)
       SetTarget(hd2);
       foll_or_prec(hd2) = GALL_FOLL;
       enclose_obj(hd2) = (has_enclose(actual(hd2)) ? BuildEnclose(hd2) : nilobj);
-      headers(hd2) = nilobj;
+      headers(hd2) = dead_headers(hd2) = nilobj;
       Link(Up(y), index2);
 
       /* set up the next ready galley for reading next time */

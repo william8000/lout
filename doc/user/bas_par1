@@ -24,8 +24,8 @@ new line.  If you are using it to create single lines, you need the
 The @Code "@DP" `display paragraph' symbol produces a somewhat larger
 dp. @Index @Code "@DP"
 vertical space, equal to the amount used before and after displays
-(Section {@NumberOf displays}), with no indent.  To get even larger
-vertical spaces, use @Code "@DP" repeatedly.  Another symbol,
+(Section {@NumberOf displays}), with no indent.  To get even more
+space, use @Code "@DP" repeatedly.  Another symbol,
 {@Code "@LOP"}, leaves a paragraph break the size of the gap left
 lop. @Index @Code "@LOP"
 outside (that is, before and after) lists (Section {@NumberOf lists}).  This
@@ -57,7 +57,7 @@ column for a heading and at least two lines of text.  If so, @Code "@CNP"
 does nothing; if not, @Code "@CNP" causes a new page or column to be begun,
 like {@Code "@NP"}.  The recommended arrangement is
 @ID @OneRow @Code {
-"end of previous part."
+# "end of previous part."
 "@DP"
 "@CNP"
 "@Heading { A Heading }"

@@ -75,6 +75,12 @@ pod. @Index { Pod (for Perl) printing }
     C { "@Pod" }
     D { varying }
     E { No }
+@Rowb
+    A { Python }
+    B { python }
+    C { "@Python" }
+    D { varying }
+    E { No }
 }
 C and C++ are handled together since, for formatting purposes, they
 differ only in that C++ has some additional keywords plus an extra

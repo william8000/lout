@@ -1,6 +1,6 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -453,18 +453,18 @@ static void PDF_PrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
 
 /*****************************************************************************/
 /*                                                                           */
-/*  PDF_PrintUnderline(fnum, xstart, xstop, ymk)                             */
+/*  PDF_PrintUnderline(fnum, col, xstart, xstop, ymk)                        */
 /*                                                                           */
-/*  Draw an underline suitable for font fnum, from xstart to xstop at the    */
-/*  appropriate distance below mark ymk.                                     */
+/*  Draw an underline suitable for font fnum, in colour col from xstart to   */
+/*  xstop at the appropriate distance below mark ymk.                        */
 /*                                                                           */
 /*****************************************************************************/
 
-static void PDF_PrintUnderline(FONT_NUM fnum, FULL_LENGTH xstart,
-  FULL_LENGTH xstop, FULL_LENGTH ymk)
+static void PDF_PrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
+  FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
 {
-  debug4(DPF, DD, "PDF_PrintUnderline(fnum %d, xstart %s, xstop %s, ymk %s )",
-    fnum, EchoLength(xstart), EchoLength(xstop), EchoLength(ymk));
+  debug5(DPF, DD, "PDF_PrintUnderline(ft %d, co %d, xstrt %s, xstp %s, ymk %s)",
+    fnum, col, EchoLength(xstart), EchoLength(xstop), EchoLength(ymk));
   PDFPage_PrintUnderline(out_fp,  xstart, xstop,
     ymk - finfo[fnum].underline_pos, finfo[fnum].underline_thick);
   debug0(DPF, DD, "PrintUnderline returning.");
@@ -762,6 +762,68 @@ void PDF_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
 
 /*****************************************************************************/
 /*                                                                           */
+/*  PDF_LinkSource(name, llx, lly, urx, ury)                                 */
+/*                                                                           */
+/*  Print a link source point.                                               */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PDF_LinkSource(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{
+  debug5(DPF, D, "PDF_LinkSource(%s, %d, %d, %d, %d)", EchoObject(name),
+    llx, lly, urx, ury);
+
+  /* still to do */
+
+  debug0(DPF, D, "PDF_LinkSource returning.");
+} /* end PDF_LinkSource */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PDF_LinkDest(name, llx, lly, urx, ury)                                   */
+/*                                                                           */
+/*  Print a link dest point.                                                 */
+/*                                                                           */
+/*  Still to do: check that the name has not been used by a previous         */
+/*  dest point.                                                              */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PDF_LinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{
+  debug5(DPF, D, "PDF_LinkDest(%s, %d, %d, %d, %d)", EchoObject(name),
+    llx, lly, urx, ury);
+
+  /* still to do */
+
+  debug0(DPF, D, "PDF_LinkDest returning.");
+} /* end PDF_LinkDest */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PDF_LinkCheck()                                                          */
+/*                                                                           */
+/*  Called at end of run; will check that for every link source point there  */
+/*  is a link dest point.                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PDF_LinkCheck()
+{
+  debug0(DPF, D, "PDF_LinkCheck()");
+
+  /* still to do */
+
+  debug0(DPF, D, "PDF_LinkCheck returning.");
+} /* end PDF_LinkCheck */
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  PDF_BackEnd                                                              */
 /*                                                                           */
 /*  The record into which all of these functions are packaged.               */
@@ -799,6 +861,9 @@ static struct back_end_rec pdf_back = {
   PDF_DefineGraphicNames,
   PDF_SaveTranslateDefineSave,
   PDF_PrintGraphicInclude,
+  PDF_LinkSource,
+  PDF_LinkDest,
+  PDF_LinkCheck,
 };
 
 BACK_END PDF_BackEnd = &pdf_back;

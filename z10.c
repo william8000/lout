@@ -1,6 +1,6 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -237,31 +237,23 @@ OBJECT GallTargEval(OBJECT sym, FILE_POS *dfpos)
 /*****************************************************************************/
 
 static OBJECT CrossGenTag(OBJECT x)
-{ FULL_CHAR buff[MAX_BUFF], *str1, *str2;
+{ FULL_CHAR buff[MAX_BUFF],  *file_name;
   OBJECT sym, res;  FILE_NUM fnum;
   int seq;
   debug1(DCR, DD, "CrossGenTag( %s )", SymName(actual(x)));
   sym = actual(x);
   if( cross_sym(sym) == nilobj )  CrossInit(sym);
   fnum = file_num(fpos(x));
-  str1 = SymName(sym);
-  str2 = FileName(fnum);
+  file_name = FileName(fnum);
   seq = crtab_getnext(sym, fnum, &crossref_tab);
   debug3(DCR, DDD, "%d = crtab_getnext(%s, %s, S); S =",
-	seq, SymName(sym), FileName(fnum));
+    seq, SymName(sym), FileName(fnum));
   ifdebug(DCR, DDD, crtab_debug(crossref_tab, stderr));
-  if( StringLength(str1) + StringLength(str2) + 10 >= MAX_BUFF )
-    Error(10, 3, "automatically generated tag %s.%s.%d is too long",
-	FATAL, no_fpos, str1, str2, seq);
-  /* *** make shorter, little risk
-  StringCopy(buff, str1);
-  StringCat(buff, AsciiToFull("."));
-  *** */
-  StringCopy(buff, StringInt(line_num(fpos(sym))));
-  StringCat(buff, AsciiToFull("."));
-  StringCat(buff, str2);
-  StringCat(buff, AsciiToFull("."));
-  StringCat(buff, StringInt(seq));
+  if( StringLength(file_name) + 20 >= MAX_BUFF )
+    Error(10, 3, "automatically generated tag is too long (contains %s)",
+      FATAL, &fpos(x), file_name);
+  sprintf( (char *) buff, "%d.%d.%s.%d",
+    file_num(fpos(sym)), line_num(fpos(sym)), file_name, seq);
   res = MakeWord(QWORD, buff, &fpos(x));
   debug2(DCR, DD, "CrossGenTag( %s ) returning %s", SymName(actual(x)), string(res));
   return res;

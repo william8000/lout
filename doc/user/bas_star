@@ -99,15 +99,15 @@ paragraph symbol.  Lout will ordinarily take notice of how many spaces you type
 between words (Section {@NumberOf spaces}), but it will mimic the spacing rules
 of two other systems, troff and @TeX, if you prefer (Section {@NumberOf white}).
 @PP
-When Lout runs, you might see some error messages beginning with
+When Lout runs, you might see some error messages containing the words
 error.messages @Index { error messages }
-`unresolved cross reference' -- not on file @Code "intro" above, but on
-more complicated ones (anything with a footnote, for example).  These
-just mean that you have to run the @Code "lout" command again to finish off
-the complicated things (Section {@NumberOf cross}), and they will gradually
-go away.  Of course, if you see error messages about missing braces, unknown
-symbols, and so on, you need to revise your file.  Lout will tell you the
-line number of the problem, and how far along the line it is.
+`unresolved cross reference' and `no destination point' -- not on file
+@Code "intro" above, but on more complicated ones (anything with a footnote,
+for example).  These just mean that you have to run the @Code "lout" command
+again to finish off the complicated things (Section {@NumberOf cross}), and
+they will gradually go away.  Of course, if you see error messages about
+missing braces, unknown symbols, and so on, you need to revise your file.  Lout
+will tell you the line number of the problem, and how far along the line it is.
 @PP
 @BI { WARNING: }  Lout allows documents to cause arbitrary system commands
 to be executed.  These typically do useful things such as format computer

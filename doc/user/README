@@ -6,10 +6,11 @@ type the command
 
 	lout all > op
 
-in this directory.  This must be done six times to completely
-resolve all cross references, although the PostScript file op is
-printable after the first run.  Auxiliary files with .li and .ld
-suffixes will be created in this directory.
+in this directory.  Owing to some unfortunate page breaks in the
+early runs, this must be done seven times to completely resolve
+all cross references, although the PostScript file op is printable
+after the first run.  Auxiliary files with .li and .ld suffixes
+will be created in this directory.
 
 The first run will produce a large number of error messages,
 nearly all beginning with "unresolved cross reference".  These
@@ -31,7 +32,7 @@ repeated failure to converge, caused by footnotes and floating figures
 close to large unbreakable displays.
 
 A copy of the final PostScript output file (A4 paper size) is
-stored at "ftp://ftp.cs.su.oz.au/jeff/lout/lout-3.19.user.ps.gz".
+stored at "ftp://ftp.cs.su.oz.au/jeff/lout/lout-3.23.user.ps.gz".
 
 Jeffrey H. Kingston
-3 June 2000
+24 June 2000

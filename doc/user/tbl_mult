@@ -122,7 +122,7 @@ on each page.  There is nothing equivalent to running headers
 at the bottom of the page -- nothing that would allow you to
 insert a rule after the last line of each page, but not
 elsewhere.  (However, if you are using the @Code "@Table"
-symbol, its @Code "@Enclose" option can be used to do this.)
+symbol, its @Code "@Format" option can be used to do this.)
 @PP
 To prevent page breaks within a table, precede the @Code "@Tbl"
 symbol by {@Code "@OneRow"}:

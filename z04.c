@@ -1,6 +1,6 @@
 /*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -216,6 +216,8 @@ FULL_CHAR *EchoToken(OBJECT x)
     case SINCGRAPHIC:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     case ACAT:
     case HCAT:
     case VCAT:

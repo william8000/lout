@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.22 (June 2000)")
+#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.23 (June 2000)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -1009,6 +1009,7 @@ typedef union
 /*      back(COLM)      Horizontal position of start of underline            */
 /*      fwd(COLM)       Horizontal position of end of underline              */
 /*      back(ROWM)      [type clash] font determining underline appearance   */
+/*      fwd(ROWM)       [type clash] the colour of the underline             */
 /*                                                                           */
 /*  PAGE_LABEL - a @PageLabel object                                         */
 /*                                                                           */
@@ -1125,6 +1126,13 @@ typedef union
 /*      children        The objects on the mark                              */
 /*      parents         The parents of the children (one-to-one)             */
 /*                                                                           */
+/*  FIXED_COL_THR (FIXED_ROW_THR) - object representing one object that used */
+/*  to be on a thread but has now been fixed and removed from the thread     */
+/*                                                                           */
+/*      SIZED           The horizontal (vertical) size only                  */
+/*      first child     The object that has been fixed                       */
+/*      parent          The sole parent of this object                       */
+/*                                                                           */
 /*  ACAT - a paragraph (sequence of objects separated by & or white space)   */
 /*                                                                           */
 /*      SIZED           The size of the object                               */
@@ -1217,6 +1225,13 @@ typedef union
 /*      children        The two parameters of this symbol                    */
 /*                                                                           */
 /*  GRAPHIC, PLAIN_GRAPHIC - @Graphic, @PlainGraphic symbols                 */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      save_mark       used temporarily by FixAndPrintObject                */
+/*      children        The two parameters of this symbol                    */
+/*                                                                           */
+/*  LINK_SOURCE, LINK_DEST - @LinkSource, @LinkDest symbols                  */
 /*                                                                           */
 /*      TOKEN           While still being parsed                             */
 /*      SIZED           The size of the object                               */
@@ -1514,6 +1529,7 @@ typedef union rec
      union rec *olimiter;
      union rec *oenclose_obj;
      union rec *oheaders;
+     union rec *odead_headers;
      int        oopt_comps_permitted;
   } os2a;
   
@@ -1730,6 +1746,7 @@ typedef union rec
 #define limiter(x)		(x)->os2a.olimiter
 #define enclose_obj(x)		(x)->os2a.oenclose_obj
 #define headers(x)		(x)->os2a.oheaders
+#define dead_headers(x)		(x)->os2a.odead_headers
 #define opt_comps_permitted(x)	(x)->os2a.oopt_comps_permitted
 
 #define	number(x)		(x)->os4.onumber
@@ -1886,8 +1903,8 @@ typedef struct back_end_rec {
   void (*PrintAfterLastPage)(void);
   void (*PrintWord)(OBJECT x, int hpos, int vpos);
   void (*PrintPlainGraphic)(OBJECT x, FULL_LENGTH xmk,FULL_LENGTH ymk,OBJECT z);
-  void (*PrintUnderline)(FONT_NUM fnum, FULL_LENGTH xstart, FULL_LENGTH xstop,
-    FULL_LENGTH ymk);
+  void (*PrintUnderline)(FONT_NUM fnum, COLOUR_NUM col, FULL_LENGTH xstart,
+    FULL_LENGTH xstop, FULL_LENGTH ymk);
   void (*CoordTranslate)(FULL_LENGTH xdist, FULL_LENGTH ydist);
   void (*CoordRotate)(FULL_LENGTH amount);
   void (*CoordScale)(float hfactor, float vfactor);
@@ -1897,6 +1914,11 @@ typedef struct back_end_rec {
   void (*DefineGraphicNames)(OBJECT x);
   void (*SaveTranslateDefineSave)(OBJECT x,FULL_LENGTH xdist,FULL_LENGTH ydist);
   void (*PrintGraphicInclude)(OBJECT x,FULL_LENGTH colmark,FULL_LENGTH rowmark);
+  void (*LinkSource)(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+    FULL_LENGTH urx, FULL_LENGTH ury);
+  void (*LinkDest)(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+    FULL_LENGTH urx, FULL_LENGTH ury);
+  void (*LinkCheck)();
 } *BACK_END;
 
 
@@ -1931,142 +1953,146 @@ typedef struct back_end_rec {
 #define	VSPANNER	    14		/*  o     a vertical spanner         */
 #define	ROW_THR		    15		/*  o     a row thread               */
 #define	COL_THR		    16		/*  o     a column thread            */
-#define	ACAT		    17		/* to s   a sequence of &-ed objs    */
-#define	HCAT		    18		/* to s   a sequence of |-ed objs    */
-#define	VCAT		    19		/* to s   a sequence of /-ed objs    */
-#define	BEGIN_HEADER	    20		/* to s   @BeginHeaderComponent      */
-#define	END_HEADER	    21		/* to s   @EndHeaderComponent        */
-#define	SET_HEADER	    22		/* to s   @SetHeaderComponent        */
-#define	CLEAR_HEADER	    23		/* to s   @ClearHeaderComponent      */
-#define	ONE_COL		    24		/* to s   @OneCol                    */
-#define	ONE_ROW		    25		/* to s   @OneRow                    */
-#define	WIDE		    26		/* to s   @Wide                      */
-#define	HIGH		    27		/* to s   @High                      */
-#define	HSHIFT		    28		/* to s   @HShift                    */
-#define	VSHIFT		    29		/* to s   @VShift                    */
-#define	HSCALE		    30		/* to s   @HScale                    */
-#define	VSCALE		    31		/* to s   @VScale                    */
-#define	HCOVER		    32		/* to s   @HCover                    */
-#define	VCOVER		    33		/* to s   @VCover                    */
-#define	SCALE		    34		/* to s   @Scale                     */
-#define	KERN_SHRINK	    35		/* to s   @KernShrink                */
-#define	HCONTRACT	    36		/* to s   @HContract                 */
-#define	VCONTRACT	    37		/* to s   @VContract                 */
-#define	HLIMITED	    38		/* to s   @HLimited                  */
-#define	VLIMITED	    39		/* to s   @VLimited                  */
-#define	HEXPAND		    40		/* to s   @HExpand                   */
-#define	VEXPAND		    41		/* to s   @VExpand                   */
-#define	START_HSPAN	    42		/* to s   @StartHSpan                */
-#define	START_VSPAN 	    43		/* to s   @StartVSpan                */
-#define	START_HVSPAN 	    44		/* to s   @StartHVSpan               */
-#define	HSPAN  		    45		/* to s   @HSpan                     */
-#define	VSPAN  		    46		/* to s   @VSpan                     */
-#define	PADJUST		    47		/* to s   @PAdjust                   */
-#define	HADJUST		    48		/* to s   @HAdjust                   */
-#define	VADJUST		    49		/* to s   @VAdjust                   */
-#define	ROTATE		    50		/* to s   @Rotate                    */
-#define	BACKGROUND	    51		/* to s   @Background                */
-#define	CASE		    52		/* to s   @Case                      */
-#define	VERBATIM	    53		/* to s   @Verbatim                  */
-#define	RAW_VERBATIM	    54		/* to s   @RawVerbatim               */
-#define	YIELD		    55		/* to s   @Yield                     */
-#define	BACKEND		    56		/* to s   @BackEnd                   */
-#define	FILTERED	    57		/* to s   filtered object (no name)  */
-#define	XCHAR		    58		/* to s   @Char                      */
-#define	FONT		    59		/* to s   @Font                      */
-#define	SPACE		    60		/* to s   @Space                     */
-#define	YUNIT		    61		/* to s   @YUnit                     */
-#define	ZUNIT		    62		/* to s   @ZUnit                     */
-#define	BREAK		    63		/* to s   @Break                     */
-#define	UNDERLINE	    64		/* to s   @Underline                 */
-#define	COLOUR		    65		/* to s   @SetColour and @SetColor   */
-#define	OUTLINE		    66		/* to s   @Outline                   */
-#define	LANGUAGE	    67		/* to s   @Language                  */
-#define	CURR_LANG	    68		/* to s   @CurrLang                  */
-#define	CURR_FAMILY	    69		/* to s   @CurrFamily                */
-#define	CURR_FACE	    70		/* to s   @CurrFace                  */
-#define	CURR_YUNIT	    71		/* to s   @CurrYUnit                 */
-#define	CURR_ZUNIT	    72		/* to s   @CurrZUnit                 */
-#define	COMMON		    73		/* to s   @Common                    */
-#define	RUMP		    74		/* to s   @Rump                      */
-#define	MELD		    75		/* to s   @Meld                      */
-#define	INSERT		    76		/* to s   @Insert                    */
-#define	ONE_OF		    77		/* to s   @OneOf                     */
-#define	NEXT		    78		/* to s   @Next                      */
-#define	PLUS		    79		/* to s   @Plus                      */
-#define	MINUS		    80		/* to s   @Minus                     */
-#define	ENV_OBJ		    81		/* to s   object with envt (no name) */
-#define	ENV		    82		/* to s   @LEnv                      */
-#define	ENVA		    83		/* to s   @LEnvA                     */
-#define	ENVB		    84		/* to s   @LEnvB                     */
-#define	ENVC		    85		/* to s   @LEnvC                     */
-#define	ENVD		    86		/* to s   @LEnvD                     */
-#define	CENV		    87		/* to s   @LCEnv                     */
-#define	CLOS		    88		/* to s   @LClos                     */
-#define	LVIS		    89		/* to s   @LVis                      */
-#define	LUSE		    90		/* to s   @LUse                      */
-#define	LEO 		    91		/* to s   @LEO                       */
-#define	OPEN		    92		/* to s   @Open                      */
-#define	TAGGED		    93		/* to s   @Tagged                    */
-#define	INCGRAPHIC	    94		/* to s   @IncludeGraphic            */
-#define	SINCGRAPHIC	    95		/* to s   @SysIncludeGraphic         */
-#define	PLAIN_GRAPHIC	    96		/* to s   @PlainGraphic              */
-#define	GRAPHIC		    97		/* to s   @Graphic                   */
-#define	TSPACE		    98		/* t      a space token, parser only */
-#define	TJUXTA		    99		/* t      a juxta token, parser only */
-#define	LBR		   100		/* t  s   left brace token           */
-#define	RBR		   101		/* t  s   right brace token          */
-#define	BEGIN		   102		/* t  s   @Begin token               */
-#define	END		   103		/* t  s   @End token                 */
-#define	USE		   104		/* t  s   @Use                       */
-#define	NOT_REVEALED	   105		/* t  s   @NotRevealed               */
-#define	GSTUB_NONE	   106		/* t      a galley stub, no rpar     */
-#define	GSTUB_INT	   107		/* t      galley stub internal rpar  */
-#define	GSTUB_EXT	   108		/* t      galley stub external rpar  */
-#define	UNEXPECTED_EOF	   109		/* t      unexpected end of file     */
-#define	INCLUDE		   110		/*    s   @Include                   */
-#define	SYS_INCLUDE	   111		/*    s   @SysInclude                */
-#define	PREPEND		   112		/*    s   @Prepend                   */
-#define	SYS_PREPEND	   113		/*    s   @SysPrepend                */
-#define	DATABASE	   114		/*    s   @Database                  */
-#define	SYS_DATABASE	   115		/*    s   @SysDatabase               */
-/* #define START	   116	*/	/*    s   \Start                     */
-#define	DEAD		   117		/*   i    a dead galley              */
-#define	UNATTACHED	   118		/*   i    an inner, unsized galley   */
-#define	RECEPTIVE	   119		/*   i    a receptive object index   */
-#define	RECEIVING	   120		/*   i    a receiving object index   */
-#define	RECURSIVE	   121		/*   i    a recursive definite obj.  */
-#define	PRECEDES	   122		/*   i    an ordering constraint     */
-#define	FOLLOWS		   123		/*   i    other end of ordering c.   */
-#define	CROSS_LIT	   124		/*   i    literal word cross-ref     */
-#define	CROSS_FOLL	   125		/*   i    following type cross-ref   */
-#define	CROSS_FOLL_OR_PREC 126		/*   i    follorprec type cross-ref  */
-#define	GALL_FOLL	   127		/*   i    galley with &&following    */
-#define	GALL_FOLL_OR_PREC  128		/*   i    galley with &&following    */
-#define	CROSS_TARG	   129		/*   i    value of cross-ref         */
-#define	GALL_TARG	   130		/*   i    target of these galleys    */
-#define	GALL_PREC	   131		/*   i    galley with &&preceding    */
-#define	CROSS_PREC	   132		/*   i    preceding type cross-ref   */
-#define	PAGE_LABEL_IND	   133		/*   i    index of PAGE_LABEL        */
-#define	SCALE_IND	   134		/*   i    index of auto SCALE        */
-#define	COVER_IND	   135		/*   i    index of HCOVER or VCOVER  */
-#define	EXPAND_IND	   136		/*   i    index of HEXPAND or VEXPD  */
-#define	THREAD		   137		/*        a sequence of threads      */
-#define	CROSS_SYM	   138		/*        cross-ref info             */
-#define	CR_ROOT		   139		/*        RootCross                  */
-#define	MACRO	           140		/*        a macro symbol             */
-#define	LOCAL	           141		/*        a local symbol             */
-#define	LPAR	           142		/*        a left parameter           */
-#define	NPAR	           143		/*        a named parameter          */
-#define	RPAR	           144		/*        a right parameter          */
-#define	EXT_GALL           145		/*        an external galley         */
-#define	CR_LIST	           146		/*        a list of cross references */
-#define	SCOPE_SNAPSHOT     147		/*        a scope snapshot	     */
-#define	DISPOSED           148		/*        a disposed record          */
+#define	FIXED_ROW_THR	    17		/*  o     a fixed row thread         */
+#define	FIXED_COL_THR	    18		/*  o     a fixed column thread      */
+#define	ACAT		    19		/* to s   a sequence of &-ed objs    */
+#define	HCAT		    20		/* to s   a sequence of |-ed objs    */
+#define	VCAT		    21		/* to s   a sequence of /-ed objs    */
+#define	BEGIN_HEADER	    22		/* to s   @BeginHeaderComponent      */
+#define	END_HEADER	    23		/* to s   @EndHeaderComponent        */
+#define	SET_HEADER	    24		/* to s   @SetHeaderComponent        */
+#define	CLEAR_HEADER	    25		/* to s   @ClearHeaderComponent      */
+#define	ONE_COL		    26		/* to s   @OneCol                    */
+#define	ONE_ROW		    27		/* to s   @OneRow                    */
+#define	WIDE		    28		/* to s   @Wide                      */
+#define	HIGH		    29		/* to s   @High                      */
+#define	HSHIFT		    30		/* to s   @HShift                    */
+#define	VSHIFT		    31		/* to s   @VShift                    */
+#define	HSCALE		    32		/* to s   @HScale                    */
+#define	VSCALE		    33		/* to s   @VScale                    */
+#define	HCOVER		    34		/* to s   @HCover                    */
+#define	VCOVER		    35		/* to s   @VCover                    */
+#define	SCALE		    36		/* to s   @Scale                     */
+#define	KERN_SHRINK	    37		/* to s   @KernShrink                */
+#define	HCONTRACT	    38		/* to s   @HContract                 */
+#define	VCONTRACT	    39		/* to s   @VContract                 */
+#define	HLIMITED	    40		/* to s   @HLimited                  */
+#define	VLIMITED	    41		/* to s   @VLimited                  */
+#define	HEXPAND		    42		/* to s   @HExpand                   */
+#define	VEXPAND		    43		/* to s   @VExpand                   */
+#define	START_HSPAN	    44		/* to s   @StartHSpan                */
+#define	START_VSPAN 	    45		/* to s   @StartVSpan                */
+#define	START_HVSPAN 	    46		/* to s   @StartHVSpan               */
+#define	HSPAN  		    47		/* to s   @HSpan                     */
+#define	VSPAN  		    48		/* to s   @VSpan                     */
+#define	PADJUST		    49		/* to s   @PAdjust                   */
+#define	HADJUST		    50		/* to s   @HAdjust                   */
+#define	VADJUST		    51		/* to s   @VAdjust                   */
+#define	ROTATE		    52		/* to s   @Rotate                    */
+#define	BACKGROUND	    53		/* to s   @Background                */
+#define	CASE		    54		/* to s   @Case                      */
+#define	VERBATIM	    55		/* to s   @Verbatim                  */
+#define	RAW_VERBATIM	    56		/* to s   @RawVerbatim               */
+#define	YIELD		    57		/* to s   @Yield                     */
+#define	BACKEND		    58		/* to s   @BackEnd                   */
+#define	FILTERED	    59		/* to s   filtered object (no name)  */
+#define	XCHAR		    60		/* to s   @Char                      */
+#define	FONT		    61		/* to s   @Font                      */
+#define	SPACE		    62		/* to s   @Space                     */
+#define	YUNIT		    63		/* to s   @YUnit                     */
+#define	ZUNIT		    64		/* to s   @ZUnit                     */
+#define	BREAK		    65		/* to s   @Break                     */
+#define	UNDERLINE	    66		/* to s   @Underline                 */
+#define	COLOUR		    67		/* to s   @SetColour and @SetColor   */
+#define	OUTLINE		    68		/* to s   @Outline                   */
+#define	LANGUAGE	    69		/* to s   @Language                  */
+#define	CURR_LANG	    70		/* to s   @CurrLang                  */
+#define	CURR_FAMILY	    71		/* to s   @CurrFamily                */
+#define	CURR_FACE	    72		/* to s   @CurrFace                  */
+#define	CURR_YUNIT	    73		/* to s   @CurrYUnit                 */
+#define	CURR_ZUNIT	    74		/* to s   @CurrZUnit                 */
+#define	COMMON		    75		/* to s   @Common                    */
+#define	RUMP		    76		/* to s   @Rump                      */
+#define	MELD		    77		/* to s   @Meld                      */
+#define	INSERT		    78		/* to s   @Insert                    */
+#define	ONE_OF		    79		/* to s   @OneOf                     */
+#define	NEXT		    80		/* to s   @Next                      */
+#define	PLUS		    81		/* to s   @Plus                      */
+#define	MINUS		    82		/* to s   @Minus                     */
+#define	ENV_OBJ		    83		/* to s   object with envt (no name) */
+#define	ENV		    84		/* to s   @LEnv                      */
+#define	ENVA		    85		/* to s   @LEnvA                     */
+#define	ENVB		    86		/* to s   @LEnvB                     */
+#define	ENVC		    87		/* to s   @LEnvC                     */
+#define	ENVD		    88		/* to s   @LEnvD                     */
+#define	CENV		    89		/* to s   @LCEnv                     */
+#define	CLOS		    90		/* to s   @LClos                     */
+#define	LVIS		    91		/* to s   @LVis                      */
+#define	LUSE		    92		/* to s   @LUse                      */
+#define	LEO 		    93		/* to s   @LEO                       */
+#define	OPEN		    94		/* to s   @Open                      */
+#define	TAGGED		    95		/* to s   @Tagged                    */
+#define	INCGRAPHIC	    96		/* to s   @IncludeGraphic            */
+#define	SINCGRAPHIC	    97		/* to s   @SysIncludeGraphic         */
+#define	PLAIN_GRAPHIC	    98		/* to s   @PlainGraphic              */
+#define	GRAPHIC		    99		/* to s   @Graphic                   */
+#define	LINK_SOURCE	   100		/* to s   @LinkSource                */
+#define	LINK_DEST	   101		/* to s   @LinkDest                  */
+#define	TSPACE		   102		/* t      a space token, parser only */
+#define	TJUXTA		   103		/* t      a juxta token, parser only */
+#define	LBR		   104		/* t  s   left brace token           */
+#define	RBR		   105		/* t  s   right brace token          */
+#define	BEGIN		   106		/* t  s   @Begin token               */
+#define	END		   107		/* t  s   @End token                 */
+#define	USE		   108		/* t  s   @Use                       */
+#define	NOT_REVEALED	   109		/* t  s   @NotRevealed               */
+#define	GSTUB_NONE	   110		/* t      a galley stub, no rpar     */
+#define	GSTUB_INT	   111		/* t      galley stub internal rpar  */
+#define	GSTUB_EXT	   112		/* t      galley stub external rpar  */
+#define	UNEXPECTED_EOF	   113		/* t      unexpected end of file     */
+#define	INCLUDE		   114		/*    s   @Include                   */
+#define	SYS_INCLUDE	   115		/*    s   @SysInclude                */
+#define	PREPEND		   116		/*    s   @Prepend                   */
+#define	SYS_PREPEND	   117		/*    s   @SysPrepend                */
+#define	DATABASE	   118		/*    s   @Database                  */
+#define	SYS_DATABASE	   119		/*    s   @SysDatabase               */
+/* #define START	   120	*/	/*    s   \Start                     */
+#define	DEAD		   121		/*   i    a dead galley              */
+#define	UNATTACHED	   122		/*   i    an inner, unsized galley   */
+#define	RECEPTIVE	   123		/*   i    a receptive object index   */
+#define	RECEIVING	   124		/*   i    a receiving object index   */
+#define	RECURSIVE	   125		/*   i    a recursive definite obj.  */
+#define	PRECEDES	   126		/*   i    an ordering constraint     */
+#define	FOLLOWS		   127		/*   i    other end of ordering c.   */
+#define	CROSS_LIT	   128		/*   i    literal word cross-ref     */
+#define	CROSS_FOLL	   129		/*   i    following type cross-ref   */
+#define	CROSS_FOLL_OR_PREC 130		/*   i    follorprec type cross-ref  */
+#define	GALL_FOLL	   131		/*   i    galley with &&following    */
+#define	GALL_FOLL_OR_PREC  132		/*   i    galley with &&following    */
+#define	CROSS_TARG	   133		/*   i    value of cross-ref         */
+#define	GALL_TARG	   134		/*   i    target of these galleys    */
+#define	GALL_PREC	   135		/*   i    galley with &&preceding    */
+#define	CROSS_PREC	   136		/*   i    preceding type cross-ref   */
+#define	PAGE_LABEL_IND	   137		/*   i    index of PAGE_LABEL        */
+#define	SCALE_IND	   138		/*   i    index of auto SCALE        */
+#define	COVER_IND	   139		/*   i    index of HCOVER or VCOVER  */
+#define	EXPAND_IND	   140		/*   i    index of HEXPAND or VEXPD  */
+#define	THREAD		   141		/*        a sequence of threads      */
+#define	CROSS_SYM	   142		/*        cross-ref info             */
+#define	CR_ROOT		   143		/*        RootCross                  */
+#define	MACRO	           144		/*        a macro symbol             */
+#define	LOCAL	           145		/*        a local symbol             */
+#define	LPAR	           146		/*        a left parameter           */
+#define	NPAR	           147		/*        a named parameter          */
+#define	RPAR	           148		/*        a right parameter          */
+#define	EXT_GALL           149		/*        an external galley         */
+#define	CR_LIST	           150		/*        a list of cross references */
+#define	SCOPE_SNAPSHOT     151		/*        a scope snapshot	     */
+#define	DISPOSED           152		/*        a disposed record          */
 
 #define is_indefinite(x)  ((x) >= CLOSURE && (x) <= HEAD)
 #define is_header(x)  ((x) >= BEGIN_HEADER && (x) <= CLEAR_HEADER)
-#define is_definite(x) 	 ((x) >= SPLIT && (x) <= GRAPHIC)
+#define is_definite(x) 	 ((x) >= SPLIT && (x) <= LINK_DEST)
 #define	is_par(x)	((x) >= LPAR   && (x) <= RPAR)
 #define	is_index(x)	((x) >= DEAD && (x) <= EXPAND_IND)
 #define	is_type(x)	((x) >= LINK && (x) < DISPOSED)
@@ -2128,9 +2154,9 @@ typedef struct back_end_rec {
 #define	SMALL_CAPS_ON	     1		/* small capitals                    */
 
 /* sides of a mark */
-#define	BACK	           149		/* means lies to left of mark        */
-#define	ON	           150		/* means lies on mark                */
-#define	FWD	           151		/* means lies to right of mark       */
+#define	BACK	           153		/* means lies to left of mark        */
+#define	ON	           154		/* means lies on mark                */
+#define	FWD	           155		/* means lies to right of mark       */
 
 /* statuses of thread objects */
 #define	NOTSIZED	 0		/* this thread object is not sized   */
@@ -2138,15 +2164,15 @@ typedef struct back_end_rec {
 #define	FINALSIZE	 2		/* thread object size is now final   */
 
 /* constraint statuses */
-#define	PROMOTE	           152		/* this component may be promoted    */
-#define	CLOSE	           153		/* must close dest before promoting  */
-#define	BLOCK	           154		/* cannot promote this component     */
-#define	CLEAR	           155		/* this constraint is now satisfied  */
+#define	PROMOTE	           156		/* this component may be promoted    */
+#define	CLOSE	           157		/* must close dest before promoting  */
+#define	BLOCK	           158		/* cannot promote this component     */
+#define	CLEAR	           159		/* this constraint is now satisfied  */
 
 /* gap increment types */
-#define	GAP_ABS	           156		/* absolute,  e.g.  3p               */
-#define	GAP_INC	           157		/* increment, e.g. +3p               */
-#define	GAP_DEC	           158		/* decrement, e.g. -3p               */
+#define	GAP_ABS	           160		/* absolute,  e.g.  3p               */
+#define	GAP_INC	           161		/* increment, e.g. +3p               */
+#define	GAP_DEC	           162		/* decrement, e.g. -3p               */
 
 /* file types */
 #define	SOURCE_FILE	 0		/* input file from command line      */
@@ -2326,6 +2352,8 @@ typedef struct back_end_rec {
 #define	KW_INCGRAPHIC		AsciiToFull("@IncludeGraphic")
 #define	KW_SINCGRAPHIC		AsciiToFull("@SysIncludeGraphic")
 #define	KW_GRAPHIC		AsciiToFull("@Graphic")
+#define	KW_LINK_SOURCE		AsciiToFull("@LinkSource")
+#define	KW_LINK_DEST		AsciiToFull("@LinkDest")
 #define	KW_PLAINGRAPHIC		AsciiToFull("@PlainGraphic")
 #define	KW_VERBATIM		AsciiToFull("@Verbatim")
 #define	KW_RAWVERBATIM		AsciiToFull("@RawVerbatim")
@@ -2952,6 +2980,7 @@ extern	OBJECT	  Parse(OBJECT *token, OBJECT encl, BOOLEAN defs_allowed,
 /*****  z07.c	  Object Service	**************************************/
 extern	BOOLEAN	  SplitIsDefinite(OBJECT x);
 extern	int	  DisposeObject(OBJECT x);
+extern	void	  DisposeSplitObject(OBJECT x);
 extern	OBJECT	  MakeWord(unsigned typ, FULL_CHAR *str, FILE_POS *pos);
 extern	OBJECT	  MakeWordTwo(unsigned typ, FULL_CHAR *str1, FULL_CHAR *str2,
 		    FILE_POS *pos);
@@ -3068,7 +3097,7 @@ extern	void	  SizeGalley(OBJECT hd, OBJECT env, BOOLEAN rows,
 extern	void	  Interpose(OBJECT z, int typ, OBJECT x, OBJECT y);
 extern	void	  FlushInners(OBJECT inners, OBJECT hd);
 extern	void	  ExpandRecursives(OBJECT recs);
-extern	void	  HandleHeader(OBJECT hd, OBJECT link, OBJECT header);
+extern	void	  HandleHeader(OBJECT hd, OBJECT header);
 extern	void	  Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index,
 		    BOOLEAN join_after);
 extern	void	  KillGalley(OBJECT hd, BOOLEAN optimize);
@@ -3078,8 +3107,9 @@ extern	void	  SetTarget(OBJECT hd);
 extern	int	  CheckComponentOrder(OBJECT preceder, OBJECT follower);
 
 /*****  z23.c	  Galley Printer	**************************************/
-extern	void	  FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
-		    FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg,int count);
+extern	OBJECT	  FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
+		    FULL_LENGTH xf, int dim, BOOLEAN suppress, FULL_LENGTH pg,
+		    int count, FULL_LENGTH *actual_back, FULL_LENGTH *actual_fwd);
 
 /*****  z24.c	  Print Service         **************************************/
 extern	char	  *EightBitToPrintForm[];

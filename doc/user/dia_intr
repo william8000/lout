@@ -26,9 +26,7 @@ This provides everything you need for making diagrams.
 The result of the @@Diag symbol is an object in the usual way.  A diagram
 is commonly made into a centred display, like this:
 @ID @OneRow @Code {
-"@CentredDisplay @Diag {"
-"    ..."
-"}"
+"@CentredDisplay @Diag { ... }"
 }
 or into a floating figure, like this:
 @ID @OneRow @Code {

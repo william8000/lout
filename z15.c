@@ -1,6 +1,6 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -479,6 +479,8 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
   {
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     case KERN_SHRINK:
     case BEGIN_HEADER:
     case SET_HEADER:
@@ -613,7 +615,7 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
       /* we're saying that a spanner has a fixed constraint that is */
       /* determined just once in its life                           */
       CopyConstraint(*xc, constraint(y));
-      debug2(DSC, DD, "  Constrained(%s) = %s", Image(type(z)), EchoConstraint(xc));
+      debug2(DSC, DD, "  Constrained(%s) = %s", Image(type(y)), EchoConstraint(xc));
       /* SetConstraint(*xc, back(y, dim), size(y, dim), fwd(y, dim)); */
       break;
 
@@ -765,6 +767,8 @@ void DebugConstrained(OBJECT x)
     case SINCGRAPHIC:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     case KERN_SHRINK:
     case WORD:
     case QWORD:

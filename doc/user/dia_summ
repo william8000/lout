@@ -862,10 +862,12 @@ A:: @Circle /0.8c |1.5c B:: @Circle /2f
 Here is the list of abbreviations for the standard paths (note
 that @Code curve and @Code acurve are the same).  Each
 path also has an abbreviation which adds a forward arrow:
-@ID @Tab
-    @Fmta { @Col @Code { path "{" A "}" } ! @Col @Code "@"B ! @Col @Code "@"C }
+@DP
+@Tab
+    @Fmta { @Col { @DisplayIndent @Wide & @Code { path "{" A "}" } } !
+	    @Col @Code "@"B ! @Col @Code "@"C }
 {
-@Rowa
+@FirstRowa
     A { line }
     B { Line }
     C { Arrow }
@@ -942,6 +944,7 @@ path also has an abbreviation which adds a forward arrow:
     B { UWrapCurve }
     C { UWrapCurveArrow }
 }
+@DP
 Here is the complete list of options to the @Code "@Link" symbol.  The
 options related to {@Code xlabel}, {@Code ylabel}, and {@Code zlabel}
 have been omitted where they are the same as the {@Code linklabel} options.

@@ -62,6 +62,7 @@
   # @ListRightIndent	{ 0s			} # right indent of list items
   # @ListLabelWidth	{ 2.00f	@OrIfPlain 5s	} # width allowed for list tags
   # @NumberSeparator	{ .			} # separates nums like 2.3.7
+  # @CrossLinkFormat	{ @Body			} # format of cross links
 }
 
 

@@ -1,6 +1,6 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -90,7 +90,8 @@ void TransferInit(OBJECT InitEnv)
   /* construct destination for root galley */
   New(up_hd, HEAD);
   force_gall(up_hd) = FALSE;
-  actual(up_hd) = enclose_obj(up_hd) = headers(up_hd) = limiter(up_hd) = nilobj;
+  actual(up_hd) = enclose_obj(up_hd) = limiter(up_hd) = nilobj;
+  headers(up_hd) = dead_headers(up_hd) = nilobj;
   opt_components(up_hd) = opt_constraints(up_hd) = nilobj;
   gall_dir(up_hd) = ROWM;
   New(dest_index, RECEIVING);
@@ -108,7 +109,7 @@ void TransferInit(OBJECT InitEnv)
   New(root_galley, HEAD);
   force_gall(root_galley) = FALSE;
   enclose_obj(root_galley) = limiter(root_galley) = nilobj;
-  headers(root_galley) = nilobj;
+  headers(root_galley) = dead_headers(root_galley) = nilobj;
   opt_components(root_galley) = opt_constraints(root_galley) = nilobj;
   gall_dir(root_galley) = ROWM;
   FposCopy(fpos(root_galley), *no_fpos);
@@ -199,7 +200,7 @@ OBJECT TransferBegin(OBJECT x)
   AttachEnv(env, x);
   SetTarget(hd);
   enclose_obj(hd) = (has_enclose(actual(hd)) ? BuildEnclose(hd) : nilobj);
-  headers(hd) = nilobj;
+  headers(hd) = dead_headers(hd) = nilobj;
 
   /* search for destination for hd and release it */
   Link(Up(target), index);
@@ -298,7 +299,7 @@ void TransferComponent(OBJECT x)
   /* make the component into a galley */
   New(hd, HEAD);
   force_gall(hd) = FALSE;
-  enclose_obj(hd) = limiter(hd) = headers(hd) = nilobj;
+  enclose_obj(hd) = limiter(hd) = headers(hd) = dead_headers(hd) = nilobj;
   opt_components(hd) = opt_constraints(hd) = nilobj;
   gall_dir(hd) = ROWM;
   FposCopy(fpos(hd), fpos(x));
@@ -332,6 +333,7 @@ void TransferComponent(OBJECT x)
     }
   );
   AdjustSize(dest, back(hd, COLM), fwd(hd, COLM), COLM);
+  debug0(DGS, D, "calling Promote(hd, hd) from TransferComponent");
   Promote(hd, hd, dest_index, FALSE);
   DeleteNode(hd);
 
@@ -401,7 +403,7 @@ void TransferEnd(OBJECT x)
   /* make the component into a galley */
   New(hd, HEAD);  FposCopy(fpos(hd), fpos(x));
   force_gall(hd) = FALSE;
-  enclose_obj(hd) = limiter(hd) = headers(hd) = nilobj;
+  enclose_obj(hd) = limiter(hd) = headers(hd) = dead_headers(hd) = nilobj;
   opt_components(hd) = opt_constraints(hd) = nilobj;
   gall_dir(hd) = ROWM;
   actual(hd) = whereto(hd) = ready_galls(hd) = nilobj;
@@ -427,6 +429,7 @@ void TransferEnd(OBJECT x)
     AdjustSize(dest, back(z, ROWM), fwd(z, ROWM), ROWM);
     Interpose(dest, VCAT, hd, z);
   }
+  debug0(DGS, D, "calling Promote(hd, hd) from TransferEnd");
   Promote(hd, hd, dest_index, TRUE);  DeleteNode(hd);
 
   /* flush any widowed galleys attached to \Input */

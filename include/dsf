@@ -2149,6 +2149,7 @@ def @DocumentSetup
 
     def @ContentsItem
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2158,17 +2159,24 @@ def @DocumentSetup
     {
 	def @Leaders { @ContentsLeader &@ContentsLeaderGap @Leaders }
 
+	def @OptionalCrossLink right x
+	{
+	    crosstag @Case {
+		""   @Yield x
+		else @Yield { crosstag @CrossLink x }
+	    }
+	}
+
 	def @RightPart
 	{
 	    @ContentsRightWidth @Wide {
-		# &@ContentsLeaderGap @Leaders &@ContentsLeaderGap
-		&1rt { pagenum //0.5vx }
+		&1rt { @OptionalCrossLink pagenum //0.5vx }
 	    }
 	}
 
 	def @Item
 	{
-	    |indent number @ContentsFormat @HExpand {
+	    |indent @OptionalCrossLink number @ContentsFormat @HExpand {
 	        title & @ContentsLeaderGap @Wide &1rt @OneCol {
 		    @Leaders & @RightPart &0io
 	        }
@@ -2178,19 +2186,9 @@ def @DocumentSetup
 
 	//pregap
 	//0.5vx
-	@BackEnd @Case {
-	  { PostScript PlainText } @Yield {
-	    protect @Case {
-	      No    @Yield @Item
-	      Yes   @Yield @Protect @Item
-	    }
-	  }
-	  PDF @Yield {
-	    protect @Case {
-	      No    @Yield { "__link_source=<<"title">>" } @Graphic @Item
-	      Yes   @Yield { "__link_source=<<"title">>" } @Graphic { @Protect @Item }
-	    }
-	  }
+	protect @Case {
+	   No    @Yield @Item
+	   Yes   @Yield @Protect @Item
 	}
 	//postgap
     }
@@ -2220,6 +2218,7 @@ def @DocumentSetup
     def @ContentsEntry
 	left  wanted
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2229,6 +2228,7 @@ def @DocumentSetup
 	@MakeContents.wanted @Case {
 	    Yes.Yes   @Yield { @SendContents @ContentsItem
 				   indent { indent }
+				   crosstag { crosstag }
 				   number { number }
 				   title { title }
 				   pagenum { pagenum }
@@ -2242,6 +2242,7 @@ def @DocumentSetup
     def @FigureContentsEntry
 	left  wanted
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2251,6 +2252,7 @@ def @DocumentSetup
 	@MakeFigureContents.wanted @Case {
 	    Yes.Yes   @Yield { @SendFigureContents @ContentsItem
 				   indent { indent }
+				   crosstag { crosstag }
 				   number { number }
 				   title { title }
 				   pagenum { pagenum }
@@ -2264,6 +2266,7 @@ def @DocumentSetup
     def @TableContentsEntry
 	left  wanted
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2273,6 +2276,7 @@ def @DocumentSetup
 	@MakeTableContents.wanted @Case {
 	    Yes.Yes   @Yield { @SendTableContents @ContentsItem
 				   indent { indent }
+				   crosstag { crosstag }
 				   number { number }
 				   title { title }
 				   pagenum { pagenum }
@@ -2286,6 +2290,7 @@ def @DocumentSetup
     def @MajorContentsEntry
 	left  wanted
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2295,6 +2300,7 @@ def @DocumentSetup
 	@MakeContents.wanted @Case {
 	    Yes.Yes   @Yield { @SendContents @ContentsItem
 				   indent { indent }
+				   crosstag { crosstag }
 				   number { @ContentsFont @Font number }
 				   title { @ContentsFont @Font title }
 				   pagenum { pagenum }
@@ -2367,6 +2373,7 @@ def @DocumentSetup
 
     def @BypassContentsEntry into { @ContentsPlace&&preceding }
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2374,6 +2381,7 @@ def @DocumentSetup
 	@MakeContents @Case {
 	    Bypass @Yield { @ContentsItem
 				indent { indent }
+				crosstag { crosstag }
 				number { number }
 				title { title }
 				pagenum { pagenum }
@@ -2386,6 +2394,7 @@ def @DocumentSetup
 
     def @BypassFigureContentsEntry into { @FigureContentsPlace&&preceding }
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2393,6 +2402,7 @@ def @DocumentSetup
 	@MakeFigureContents @Case {
 	    Bypass @Yield { @ContentsItem
 				indent { indent }
+				crosstag { crosstag }
 				number { number }
 				title { title }
 				pagenum { pagenum }
@@ -2405,6 +2415,7 @@ def @DocumentSetup
 
     def @BypassTableContentsEntry into { @TableContentsPlace&&preceding }
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2412,6 +2423,7 @@ def @DocumentSetup
 	@MakeTableContents @Case {
 	    Bypass @Yield { @ContentsItem
 				indent { indent }
+				crosstag { crosstag }
 				number { number }
 				title { title }
 				pagenum { pagenum }
@@ -2424,6 +2436,7 @@ def @DocumentSetup
 
     def @BypassMajorContentsEntry into { @ContentsPlace&&preceding }
 	named indent { 0f }
+	named crosstag {}
 	named number {}
 	named title {}
 	named pagenum {}
@@ -2431,6 +2444,7 @@ def @DocumentSetup
 	@MakeContents @Case {
 	    Bypass @Yield { @ContentsItem
 				indent { indent }
+				crosstag { crosstag }
 				number { @B number }
 				title { @B title }
 				pagenum { pagenum }
@@ -2641,7 +2655,7 @@ def @DocumentSetup
 	   }
 	}
 
-	{ @PageMark @Tag @TheoremCounterIncrement @Tag } @Insert
+	{ @PageMark @Tag & @TheoremCounterIncrement @Tag } @Insert
 	@TheoremFormat
 	    word { theorem @WordVal @TheoremWord }
 	    number { @TheoremNum @Tag }
@@ -2700,7 +2714,7 @@ def @DocumentSetup
 	   }
 	}
 
-	{ @PageMark @Tag @DefinitionCounterIncrement @Tag } @Insert
+	{ @PageMark @Tag & @DefinitionCounterIncrement @Tag } @Insert
 	@DefinitionFormat
 	    word { definition @WordVal @DefinitionWord }
 	    number { @DefinitionNum @Tag }
@@ -2755,7 +2769,7 @@ def @DocumentSetup
 	   }
 	}
 
-	{ @PageMark @Tag @ClaimCounterIncrement @Tag } @Insert
+	{ @PageMark @Tag & @ClaimCounterIncrement @Tag } @Insert
 	@ClaimFormat
 	    word { claim @WordVal @ClaimWord }
 	    number { @ClaimNum @Tag }
@@ -2810,7 +2824,7 @@ def @DocumentSetup
 	   }
 	}
 
-	{ @PageMark @Tag @PropositionCounterIncrement @Tag } @Insert
+	{ @PageMark @Tag & @PropositionCounterIncrement @Tag } @Insert
 	@PropositionFormat
 	    word { proposition @WordVal @PropositionWord }
 	    number { @PropositionNum @Tag }
@@ -2865,7 +2879,7 @@ def @DocumentSetup
 	   }
 	}
 
-	{ @PageMark @Tag @LemmaCounterIncrement @Tag } @Insert
+	{ @PageMark @Tag & @LemmaCounterIncrement @Tag } @Insert
 	@LemmaFormat
 	    word { lemma @WordVal @LemmaWord }
 	    number { @LemmaNum @Tag }
@@ -2920,7 +2934,7 @@ def @DocumentSetup
 	   }
 	}
 
-	{ @PageMark @Tag @CorollaryCounterIncrement @Tag } @Insert
+	{ @PageMark @Tag & @CorollaryCounterIncrement @Tag } @Insert
 	@CorollaryFormat
 	    word { corollary @WordVal @CorollaryWord }
 	    number { @CorollaryNum @Tag }
@@ -2975,7 +2989,7 @@ def @DocumentSetup
 	   }
 	}
 
-	{ @PageMark @Tag @ExampleCounterIncrement @Tag } @Insert
+	{ @PageMark @Tag & @ExampleCounterIncrement @Tag } @Insert
 	@ExampleFormat
 	    word { example @WordVal @ExampleWord }
 	    number { @ExampleNum @Tag }
@@ -3063,7 +3077,7 @@ def @DocumentSetup
 	left label
 	right tag 
     {
-	@RefCiteLabels
+	tag @CrossLink @RefCiteLabels
 	    @RefNum       { @NumberOf tag				}
 	    @Tag          { tag						}
 	    @Type         { @Reference&&tag @Open { @Type }		}
@@ -3324,34 +3338,8 @@ def @DocumentSetup
 	left label
 	right tag
     {
-#
-# VT: I can't get this to work, so I've put back the original code
-#
-#	@RefListFont @Font @RefListBreak @Break {
-#	  @BackEnd @Case {
-#	    PostScript @Yield {
-#	      @NumberMarker&&preceding @Tagged tag &
-#	      @PageMark tag
-#	      |@RefListIndent {label @ListLabel tag} @RefItem {@RefPrint tag}
-#	      |@RefListRightIndent
-#	    }
-#	    PDF @Yield {
-#	      { "__link_target=<<"tag">>" }
-#	      @Graphic
-#	      {
-#	      @NumberMarker&&preceding @Tagged tag &
-#	      @PageMark tag
-#	      |@RefListIndent {label @ListLabel tag} @RefItem {@RefPrint tag}
-#	      |@RefListRightIndent
-#	      }
-#	    }
-#	  }
-#	}
-# VT: original:
-
 	@RefListFont @Font @RefListBreak @Break {
-	    @NumberMarker&&preceding @Tagged tag &
-	    @PageMark tag
+	    @NumberMarker&&preceding @Tagged tag & @PageMark tag
 	    |@RefListIndent {label @ListLabel tag} @RefItem {@RefPrint tag}
 	    |@RefListRightIndent
 	}
@@ -3470,20 +3458,8 @@ def @DocumentSetup
 	def ";" precedence 90 left x { x";" }
 
 	@MakeReferences @Case {
-#	    Yes  @Yield { @RefCiteStyle cite }
 	    Yes  @Yield {
-	      @BackEnd @Case {
-	        { PlainText PostScript } @Yield { @RefCiteStyle cite }
-	        PDF        @Yield {
-#
-# VT: can't get this to work: need to ask JHK; I want the text following the "$" to be
-# the name of the link that we are trying to create a link to
-#	          { "__link_source=<<"label">>" }
-#	          @Graphic
-			{ @RefCiteStyle cite }
-#	          { blue @Colour @Underline { @RefCiteStyle cite } }
-	        }
-	      }
+	        @RefCiteStyle cite
 	    }
 	    else @Yield @Null
 	}
@@ -3666,6 +3642,7 @@ def @DocumentSetup
 	    {
 		@MakeFigureContents @FigureContentsEntry
 		    indent { 0f }
+		    crosstag { @Tag }
 		    number { @FigureNumber }
 		    title { @InitialLanguage @Language @ContentsCaption }
 		    pagenum { @PageOf @Tag }
@@ -3910,6 +3887,7 @@ def @DocumentSetup
 	    {
 		@MakeTableContents @TableContentsEntry
 		    indent { 0f }
+		    crosstag { @Tag }
 		    number { @TableNumber }
 		    title { @InitialLanguage @Language @ContentsCaption }
 		    pagenum { @PageOf @Tag }
@@ -4030,7 +4008,6 @@ def @DocumentSetup
     {
 	// @IndexBreak @Break @IndexList
 	// @IndexBreak @Break @BypassIndexList
-	# //1vx --- "@Clear"
 	// @ClearHeaderComponent
 	// etc
     }
@@ -4094,7 +4071,7 @@ def @DocumentSetup
 	right y
     {
 	@MakeIndex @Case {
-	    Yes  @Yield { {@PageMark @Tag} x @DoIndex stem { y } indent { indent } y }
+	    Yes  @Yield { @PageMark @Tag & x @DoIndex stem { y } indent { indent } y }
 	    else @Yield @Null
 	}
     }
@@ -4109,16 +4086,21 @@ def @DocumentSetup
 	named to {}
 	right y
     {
-	def pagerange
+	def @PgMk right tag
+	{
+	  tag @CrossLink @PageOf tag
+	}
+
+	def @PgRange
 	{
 	    to @Case
 	    {
-		""    @Yield @PageOf @Tag
+		""    @Yield @PgMk @Tag
 		else  @Yield {
 		    { @PageOf @Tag } @Case
 		    {
-			{ @PageOf to } @Yield { @PageOf @Tag }
-			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+			{ @PageOf to } @Yield { @PgMk @Tag }
+			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
 		    }
 		}
 	    }
@@ -4126,22 +4108,10 @@ def @DocumentSetup
 
 
 	@MakeIndex @Case {
-	    Yes @Yield { @BackEnd @Case {
-
-		{ PostScript PlainText } @Yield {
-		    @PageMark @Tag
-		    x @DoIndex stem { y } indent { indent } { y &"0.03fu" , pagerange }
-		}
-
-		PDF @Yield {
-		    {"__link_target=<<"@Tag">>"} @Graphic {""}
-		    @PageMark @Tag
-		    x @DoIndex stem { y } indent { indent } {
-			y &"0.03fu" , { "__link_source=<<"@Tag">>" }
-			@Graphic { blue @Colour @Underline pagerange }
-		    }
-		}
-	    } }
+	    Yes @Yield {
+	    @PageMark @Tag &
+	    x @DoIndex stem { y } indent { indent } { y &"0.03fu" , @PgRange }
+	    }
 	    else @Yield @Null
 	}
     }
@@ -4214,7 +4184,7 @@ def @DocumentSetup
 	right y
     {
 	@MakeIndexA @Case {
-	    Yes  @Yield { {@PageMark @Tag} x @DoIndexA indent { indent } y }
+	    Yes  @Yield { @PageMark @Tag & x @DoIndexA indent { indent } y }
 	    else @Yield @Null
 	}
     }
@@ -4229,16 +4199,21 @@ def @DocumentSetup
 	named to {}
 	right y
     {
-	def pagerange
+	def @PgMk right tag
+	{
+	  tag @CrossLink @PageOf tag
+	}
+
+	def @PgRange
 	{
 	    to @Case
 	    {
-		""    @Yield @PageOf @Tag
+		""    @Yield @PgMk @Tag
 		else  @Yield {
 		    { @PageOf @Tag } @Case
 		    {
-			{ @PageOf to } @Yield { @PageOf @Tag }
-			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+			{ @PageOf to } @Yield { @PgMk @Tag }
+			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
 		    }
 		}
 	    }
@@ -4246,22 +4221,10 @@ def @DocumentSetup
 
 
 	@MakeIndexA @Case {
-	    Yes @Yield { @BackEnd @Case {
-
-		{ PostScript PlainText } @Yield {
-		    @PageMark @Tag
-		    x @DoIndexA indent { indent } { y &"0.03fu" , pagerange }
-		}
-
-		PDF @Yield {
-		    {"__link_target=<<"@Tag">>"} @Graphic {""}
-		    @PageMark @Tag
-		    x @DoIndexA indent { indent } {
-			y &"0.03fu" , { "__link_source=<<"@Tag">>" }
-			@Graphic { blue @Colour @Underline pagerange }
-		    }
-		}
-	    } }
+	    Yes @Yield {
+	      @PageMark @Tag &
+	      x @DoIndexA indent { indent } { y &"0.03fu" , @PgRange }
+	    }
 	    else @Yield @Null
 	}
     }
@@ -4334,7 +4297,7 @@ def @DocumentSetup
 	right y
     {
 	@MakeIndexB @Case {
-	    Yes  @Yield { {@PageMark @Tag} x @DoIndexB indent { indent } y }
+	    Yes  @Yield { @PageMark @Tag & x @DoIndexB indent { indent } y }
 	    else @Yield @Null
 	}
     }
@@ -4349,16 +4312,21 @@ def @DocumentSetup
 	named to {}
 	right y
     {
-	def pagerange
+	def @PgMk right tag
+	{
+	  tag @CrossLink @PageOf tag
+	}
+
+	def @PgRange
 	{
 	    to @Case
 	    {
-		""    @Yield @PageOf @Tag
+		""    @Yield @PgMk @Tag
 		else  @Yield {
 		    { @PageOf @Tag } @Case
 		    {
-			{ @PageOf to } @Yield { @PageOf @Tag }
-			else	       @Yield { {@PageOf @Tag}--{@PageOf to} }
+			{ @PageOf to } @Yield { @PgMk @Tag }
+			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
 		    }
 		}
 	    }
@@ -4366,22 +4334,10 @@ def @DocumentSetup
 
 
 	@MakeIndexB @Case {
-	    Yes @Yield { @BackEnd @Case {
-
-		{ PostScript PlainText } @Yield {
-		    @PageMark @Tag
-		    x @DoIndexB indent { indent } { y &"0.03fu" , pagerange }
-		}
-
-		PDF @Yield {
-		    {"__link_target=<<"@Tag">>"} @Graphic {""}
-		    @PageMark @Tag
-		    x @DoIndexB indent { indent } {
-			y &"0.03fu" , { "__link_source=<<"@Tag">>" }
-			@Graphic { blue @Colour @Underline pagerange }
-		    }
-		}
-	    } }
+	    Yes @Yield {
+	        @PageMark @Tag &
+	        x @DoIndexB indent { indent } { y &"0.03fu" , @PgRange }
+	    }
 	    else @Yield @Null
 	}
     }
@@ -4537,6 +4493,7 @@ def @DocumentSetup
 		Yes.Minor @Yield {
 			incontents @ContentsEntry
 			    indent { contentsindent }
+			    crosstag { tag }
 			    number { @LongNum }
 			    title { initiallanguage @Language title }
 			    pagenum { @PageOf tag }
@@ -4544,6 +4501,7 @@ def @DocumentSetup
 
 		{ Yes.Major Yes.MajorIntro Yes.ExtraMajor Yes.ExtraMajorIntro } @Yield {
 			incontents @MajorContentsEntry
+			    crosstag { tag }
 			    number { @LongNum }
 			    title { initiallanguage @Language title }
 			    pagenum { @PageOf tag }
@@ -4560,61 +4518,30 @@ def @DocumentSetup
 
 	def @Heading
 	{
-	    def @AttachPDFLink
-	        left title
-	        right x
-	    {
-	        @BackEnd @Case {
-
-                    # VTan: Rats! Cannot use the tag for the name of the link
-	            # because the source link has no access to the tag
-                    #
-                    # using title will work most of the time; it will fail
-	            # with a "problem with left parameter of @Graphic" warning
-	            # message if the title has objects other than text in it.
-	            # Eg, "@Title { My @FancyTitle }"  with
-	            # "def @FancyTitle { @OneCol { @Bold "fancy" "title" }" }
-                    #
-                    # Example: the user manual has a definition for @Tex which
-	            # causes this warning message to appear
-
-		    PDF @Yield {
-		        title @Case {
-			    "" @Yield x
-			    else @Yield {
-			        "__link_target_for_export=<<"title">>"
-			        @Graphic x
-			    }
-		        }
-		    }
-
-		    else @Yield x
-	        }
-	    }
 
 	    type @Case {
 
-		Minor @Yield title @AttachPDFLink {
+		Minor @Yield {
 		    headingfont @Font
 		    headingbreak @Break @Protect {@LongNum headingformat title}
 		    // @PageMark tag
 		}
 
 		{ Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield {
-		    sendheader { title @AttachPDFLink {
+		    sendheader {
 		    //aboveheadinggap
 		    headingfont @Font
 		    headingbreak @Break { @LongNum headingformat title }
 		    // @PageMark tag
-		    } }
+		    }
 		}
 
-		{ VeryMajor } @Yield { sendheader { title @AttachPDFLink {
+		{ VeryMajor } @Yield { sendheader {
 		    //aboveheadinggap
 		    headingfont @Font
 		    headingbreak @Break { bypassnumber headingformat title }
 		    // @PageMark tag
-		    } }
+		    }
 		}
 	    }
 	}
@@ -4643,7 +4570,6 @@ def @DocumentSetup
             //  numbers @Do {
 		  attachnum & @NumberMarker @Tag { tag } @Value { @ShortNum }
 		}
-            # //  @PageMark tag
 	    //  @IfMajor { @FootNoteThrough @Do @BeginFootNoteCounter }
             //  @Run @StartIfMajor
             //  @ContentsStuff

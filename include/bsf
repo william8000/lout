@@ -36,6 +36,58 @@ def @OrIfPlain
     }
 }
 
+    ###########################################################################
+    #                                                                         #
+    #   @Colour, @Color                                                       #
+    #                                                                         #
+    ###########################################################################
+
+    def @ColourCommand right col
+    {
+	def @ColourCoords
+	{
+	    col @Case {
+		darkblue	@Yield	{ 0.0 0.0 0.5 }
+		blue		@Yield	{ 0.0 0.0 1.0 }
+		lightblue	@Yield	{ 0.5 0.5 1.0 }
+		darkgreen	@Yield	{ 0.0 0.5 0.0 }
+		green		@Yield	{ 0.0 1.0 0.0 }
+		lightgreen	@Yield	{ 0.5 1.0 0.5 }
+		darkred		@Yield	{ 0.5 0.0 0.0 }
+		red		@Yield	{ 1.0 0.0 0.0 }
+		lightred	@Yield	{ 1.0 0.5 0.5 }
+		darkcyan	@Yield	{ 0.0 0.5 0.5 }
+		cyan		@Yield	{ 0.0 1.0 1.0 }
+		lightcyan	@Yield	{ 0.5 1.0 1.0 }
+		darkmagenta	@Yield	{ 0.5 0.0 0.5 }
+		magenta		@Yield	{ 1.0 0.0 1.0 }
+		lightmagenta	@Yield	{ 1.0 0.5 1.0 }
+		darkyellow	@Yield	{ 0.5 0.5 0.0 }
+		yellow		@Yield	{ 1.0 1.0 0.0 }
+		lightyellow	@Yield	{ 1.0 1.0 0.5 }
+		darkgray	@Yield	{ 0.2 0.2 0.2 }
+		gray		@Yield	{ 0.5 0.5 0.5 }
+		lightgray	@Yield	{ 0.8 0.8 0.8 }
+		darkgrey	@Yield	{ 0.2 0.2 0.2 }
+		grey		@Yield	{ 0.5 0.5 0.5 }
+		lightgrey	@Yield	{ 0.8 0.8 0.8 }
+		black		@Yield	{ 0.0 0.0 0.0 }
+		white		@Yield	{ 1.0 1.0 1.0 }
+	    }
+	}
+
+	col @Case {
+	    nochange @Yield { nochange }
+	    else @Yield { @BackEnd @Case {
+		PostScript	@Yield { @ColourCoords setrgbcolor }
+		PDF		@Yield { @ColourCoords rg @ColourCoords RG }
+		PlainText	@Yield ""
+	    } }
+	}
+    }
+
+    def @Colour @Color left col right y { {@ColourCommand col} @SetColour y }
+
     export i c p m s v f
     def @LengthUnits
     {
@@ -124,9 +176,9 @@ export
 
     @Date @Time @DateTimeFormat @DropCapTwo @DropCapThree @Centre @Right
     @NoDotSep @NoDotJoin @Join @Sep @DotSep @DotJoin @DashJoin @NumSep
-    @OverStrike @Sup @Sub @Colour @FullWidthRule @LocalWidthRule
+    @OverStrike @Sup @Sub @FullWidthRule @LocalWidthRule
     @Box @CurveBox @ShadowBox @BoundaryMarks @NumberMarker @NumberOf
-    @PageMarker @PageMark @PageOf
+    @PageMarker @PageMark @NoLinkPageMark @PageOf @CrossLink
 
     @BeginDisplayCounter
 
@@ -271,6 +323,9 @@ def @BasicSetup
     named @ListRightIndent{ 0s			} # right indent of list items
     named @ListLabelWidth { 2.0f @OrIfPlain 5s	} # width allowed for list tags
     named @NumberSeparator{ .			} # separates numbers like 2.3.7
+    import @BasicSetup
+    named @CrossLinkFormat
+	right @Body	  { @Body		} # format for cross links
 @Begin
 
     ###########################################################################
@@ -701,55 +756,9 @@ def @BasicSetup
 
     ###########################################################################
     #                                                                         #
-    #   @Colour, @Color, @AddPaint, @LineWidth                                #
+    #   @AddPaint, @LineWidth (obsolete), @StrokeCommand                      #
     #                                                                         #
     ###########################################################################
-
-    def @ColourCommand right col
-    {
-	def @ColourCoords
-	{
-	    col @Case {
-		darkblue	@Yield	{ 0.0 0.0 0.5 }
-		blue		@Yield	{ 0.0 0.0 1.0 }
-		lightblue	@Yield	{ 0.5 0.5 1.0 }
-		darkgreen	@Yield	{ 0.0 0.5 0.0 }
-		green		@Yield	{ 0.0 1.0 0.0 }
-		lightgreen	@Yield	{ 0.5 1.0 0.5 }
-		darkred		@Yield	{ 0.5 0.0 0.0 }
-		red		@Yield	{ 1.0 0.0 0.0 }
-		lightred	@Yield	{ 1.0 0.5 0.5 }
-		darkcyan	@Yield	{ 0.0 0.5 0.5 }
-		cyan		@Yield	{ 0.0 1.0 1.0 }
-		lightcyan	@Yield	{ 0.5 1.0 1.0 }
-		darkmagenta	@Yield	{ 0.5 0.0 0.5 }
-		magenta		@Yield	{ 1.0 0.0 1.0 }
-		lightmagenta	@Yield	{ 1.0 0.5 1.0 }
-		darkyellow	@Yield	{ 0.5 0.5 0.0 }
-		yellow		@Yield	{ 1.0 1.0 0.0 }
-		lightyellow	@Yield	{ 1.0 1.0 0.5 }
-		darkgray	@Yield	{ 0.2 0.2 0.2 }
-		gray		@Yield	{ 0.5 0.5 0.5 }
-		lightgray	@Yield	{ 0.8 0.8 0.8 }
-		darkgrey	@Yield	{ 0.2 0.2 0.2 }
-		grey		@Yield	{ 0.5 0.5 0.5 }
-		lightgrey	@Yield	{ 0.8 0.8 0.8 }
-		black		@Yield	{ 0.0 0.0 0.0 }
-		white		@Yield	{ 1.0 1.0 1.0 }
-	    }
-	}
-
-	col @Case {
-	    nochange @Yield { nochange }
-	    else @Yield { @BackEnd @Case {
-		PostScript	@Yield { @ColourCoords setrgbcolor }
-		PDF		@Yield { @ColourCoords rg @ColourCoords RG }
-		PlainText	@Yield ""
-	    } }
-	}
-    }
-
-    def @Colour @Color left col right y { {@ColourCommand col} @SetColour y }
 
     def @AddPaint right col
     {
@@ -785,6 +794,28 @@ def @BasicSetup
 	    }
 	}
     }
+
+    def @StrokeCommand right linewidth
+    {
+	@BackEnd @Case {
+	    PostScript @Yield {
+		linewidth @Case {
+		    ""   @Yield { "stroke" }
+		    none @Yield { }
+		    else @Yield { linewidth "setlinewidth stroke" }
+		}
+	    }
+	    PDF @Yield {
+		linewidth @Case {
+		    ""   @Yield { "S" }
+		    none @Yield { }
+		    else @Yield { linewidth "w S" }
+		}
+	    }
+	    else @Yield ""
+	}
+    }
+
 
 
     ###########################################################################
@@ -799,11 +830,11 @@ def @BasicSetup
 	@BackEnd @Case {
 
 	    PostScript @Yield @HExpand {
-		{ "LoutRule" @LineWidth linewidth "stroke" } @Graphic { 0.5p @High }
+		{ "LoutRule" @StrokeCommand linewidth } @Graphic { 0.5p @High }
 	    }
 
 	    PDF @Yield @HExpand {
-		{ "0 0 m __xsize 0 l" @LineWidth linewidth "S" } @Graphic { 0.5p @High }
+		{ "0 0 m __xsize 0 l" @StrokeCommand linewidth } @Graphic { 0.5p @High }
 	    }
 
 	    PlainText @Yield { "-" @PlainGraphic 1f @High }
@@ -816,11 +847,11 @@ def @BasicSetup
 	@BackEnd @Case {
 
 	    PostScript @Yield {
-		{ "LoutRule" @LineWidth linewidth "stroke" } @Graphic { 0.5p @High }
+		{ "LoutRule" @StrokeCommand linewidth } @Graphic { 0.5p @High }
 	    }
 
 	    PDF @Yield {
-		{ "0 0 m __xsize 0 l" @LineWidth linewidth "S" } @Graphic { 0.5p @High }
+		{ "0 0 m __xsize 0 l" @StrokeCommand linewidth } @Graphic { 0.5p @High }
 	    }
 
 	    PlainText  @Yield { "-" @PlainGraphic 1f @High }
@@ -836,14 +867,14 @@ def @BasicSetup
 	@BackEnd @Case {
 
 	    PostScript @Yield @VContract @HContract 0c @HShift {
-		{"LoutBox" @AddPaint paint @LineWidth linewidth "stroke"}
+		{"LoutBox" @AddPaint paint @StrokeCommand linewidth }
 		@Graphic
 		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
 	    }
 
 	    PDF @Yield @VContract @HContract 0c @HShift {
 		{ "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"
-		@AddPaint paint @LineWidth linewidth "S" } @Graphic
+		@AddPaint paint @StrokeCommand linewidth } @Graphic
 		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
 	    }
 
@@ -879,13 +910,13 @@ def @BasicSetup
 	    "__div(__mul(11, __xmark), 24) 0"
 	    "__xmark 0 c"
 	    "h"
-	    @AddPaint paint @LineWidth linewidth "S"
+	    @AddPaint paint @StrokeCommand linewidth
 	}
 
 	@VContract @HContract 0c @HShift @BackEnd @Case {
 
 	    PostScript @Yield {
-		{"LoutCurveBox" @AddPaint paint @LineWidth linewidth "stroke"}
+		{"LoutCurveBox" @AddPaint paint @StrokeCommand linewidth }
 		@Graphic
 		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
 	    }
@@ -1013,7 +1044,7 @@ def @BasicSetup
 
     ##########################################################################
     #                                                                        #
-    #   @NumberMarker, @NumberOf, @PageMarker, @PageMark, and @PageOf        #
+    #  @NumberMarker, @NumberOf, @PageMarker, @PageMark, @PageOf, @CrossLink #
     #                                                                        #
     ##########################################################################
 
@@ -1026,9 +1057,9 @@ def @BasicSetup
     }
 
     def @NumberOf
-	right x
+	right tag
     {
-	@NumberMarker&&x @Open { @Value }
+	@NumberMarker&&tag @Open { @Value }
     }
 
 
@@ -1042,15 +1073,31 @@ def @BasicSetup
     }
 
     def @PageMark
-	right x
+	right tag
     {
-	@PageMarker&&preceding @Tagged x
+	@Null & tag @LinkDest & @PageMarker&&preceding @Tagged tag
+    }
+
+    def @NoLinkPageMark
+	right tag
+    {
+	@PageMarker&&preceding @Tagged tag
     }
 
     def @PageOf
-	right x
+	right tag
     {
-	@PageMarker&&x @Open { num }
+	@PageMarker&&tag @Open { num }
+    }
+
+    def @CrossLink
+	left tag
+	named @Format right @Body { @CrossLinkFormat @Body }
+	right obj
+    {
+	@HContract @VContract {
+	    tag @LinkSource @Format obj
+	}
     }
 
 
@@ -1447,8 +1494,8 @@ def @BasicSetup
 	right x
     {
 	   @NumberMarker&&preceding @Tagged @Tag
-	// @PageMark @Tag
 	// x
+	// @PageMark @Tag   # weird placement, but @PageMark is definite now
     }
 
     def droplistitem into { @ItemPlace&&preceding }
@@ -1457,7 +1504,6 @@ def @BasicSetup
     {
 	   @NumberMarker&&preceding @Tagged @Tag
 	// @PageMark @Tag
-	//
 	//1vx x
     }
 

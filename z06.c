@@ -1,6 +1,6 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -460,6 +460,8 @@ static BOOLEAN Reduce(void)
     case SINCGRAPHIC:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     case OPEN:
     case RAW_VERBATIM:
     case VERBATIM:
@@ -1042,6 +1044,8 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case SINCGRAPHIC:
       case PLAIN_GRAPHIC:
       case GRAPHIC:
+      case LINK_SOURCE:
+      case LINK_DEST:
 
 	/* clean up left context of t (these ops are all right associative) */
 	Shift(t, precedence(t), RIGHT_ASSOC,

@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -127,7 +127,7 @@ static BOOLEAN BuildSpanner(OBJECT x)
     }
     for( link = NextDown(UpDim(x,ROWM)); link!=end_link; link = NextDown(link) )
     {
-      /* each of these components becomes @HSpan and is added to vspanner */
+      /* each of these components becomes @HSpan and is added to hspanner */
       Child(y, link);
       New(t, HSPAN);
       FposCopy(fpos(t), fpos(y));
@@ -599,6 +599,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case CLEAR_HEADER:
 
       back(x, dim) = fwd(x, dim) = 0;
+      Child(y, Down(x));
+      back(y, dim) = fwd(y, dim) = 0;
       break;
 
 
@@ -616,6 +618,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     
       Child(y, LastDown(x));
       y = MinSize(y, dim, extras);
@@ -1193,7 +1197,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	b = f = 0;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
-	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
+	  assert( type(y) != GAP_OBJ, "MinSize/ROW_THR: GAP_OBJ!" );
 	  if( type(y) != START_HVSPAN && type(y) != START_VSPAN &&
 	      type(y) != HSPAN        && type(y) != VSPAN )
 	  { y = MinSize(y, dim, extras);
@@ -1214,7 +1218,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	/* these will use back(x, dim) and fwd(x, dim) during sizing */
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
-	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
+	  assert( type(y) != GAP_OBJ, "MinSize/ROW_THR: GAP_OBJ!" );
 	  if( type(y) == START_HVSPAN || type(y) == START_VSPAN ||
 	      type(y) == HSPAN ||        type(y) == VSPAN )
 	  { y = MinSize(y, dim, extras);

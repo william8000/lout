@@ -279,6 +279,14 @@ to the first value again; this is why a single value is applied to all
 segments.  Section {@NumberOf dia_summ} shows how each of the
 standard shapes is divided into segments.
 @PP
+The node symbols of @Code "@Diag" are quite separate symbols from the
+three basic box symbols of Section {@NumberOf boxes}.  Although much
+is the same, one obvious difference between the two is that to get no
+outline in those boxes you use @Code { "linewidth { none }" }, whereas
+to get no outline here you use @Code { "outlinestyle { noline }" }.  The
+basic boxes can only draw the outline solid or not at all, and their
+options have been kept simple to reflect that.
+@PP
 Nodes may be painted any of the colours listed in Section
 {@NumberOf colour}, using the @Code "paint" option:
 @ID @OneRow {

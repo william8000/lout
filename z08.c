@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -77,7 +77,9 @@ static OBJECT insert_split(OBJECT x, OBJECT bthr[2], OBJECT fthr[2])
   ReplaceNode(res, x);
   for( dim = COLM;  dim <= ROWM;  dim++ )
   { if( bthr[dim] || fthr[dim] )
-    { New(new_op, dim == COLM ? COL_THR : ROW_THR);
+    {
+      debug0(DGP, D, "  calling New(thread) from Manifest now");
+      New(new_op, dim == COLM ? COL_THR : ROW_THR);
       thr_state(new_op) = NOTSIZED;
       fwd(new_op, 1-dim) = 0;	/* will hold max frame_size */
       back(new_op, 1-dim) = 0;	/* will hold max frame_origin */
@@ -753,7 +755,7 @@ OBJECT *enclose, BOOLEAN fcr)
     AttachEnv(env, x);
     SetTarget(hd);
     enclose_obj(hd) = (has_enclose(sym) ? BuildEnclose(hd) : nilobj);
-    headers(hd) = nilobj;
+    headers(hd) = dead_headers(hd) = nilobj;
     x = hd;
     threaded(x) = bthr[COLM] != nilobj || fthr[COLM] != nilobj;
     ReplaceWithSplit(x, bthr, fthr);
@@ -1421,6 +1423,17 @@ OBJECT *enclose, BOOLEAN fcr)
 
     case END_HEADER:
     case CLEAR_HEADER:
+
+      /* give these objects a dummy child, just so that threads can attach */
+      /* to it and keep the thread code happy.  Don't use ReplaceWithSplit */
+      /* because we don't want a split above a header                      */
+      y = MakeWord(WORD, STR_EMPTY, &fpos(x));
+      Link(x, y);
+      y = Manifest(y, env, style, bthr, fthr, target, crs, ok, need_expand,
+	enclose, fcr);
+      break;
+
+
     case HSPAN:
     case VSPAN:
 
@@ -1997,6 +2010,20 @@ OBJECT *enclose, BOOLEAN fcr)
       StyleCopy(save_style(x), *style);
       Child(y, Down(x));
       y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
+      ReplaceWithSplit(x, bthr, fthr);
+      break;
+	
+
+    case LINK_SOURCE:
+    case LINK_DEST:
+
+      Child(y, LastDown(x));
+      y = Manifest(y, env, style, nbt, nft, target, crs, ok,FALSE,enclose,fcr);
+      StyleCopy(save_style(x), *style);
+      Child(y, Down(x));
+      y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
+	&nenclose, fcr);
+      y = ReplaceWithTidy(y, TRUE);
       ReplaceWithSplit(x, bthr, fthr);
       break;
 	

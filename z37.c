@@ -1,6 +1,6 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -956,6 +956,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
     Error(37, 38, "EndFontMetrics missing from font file %s",
       FATAL, &fpos(AFMfilename), FileName(fnum));
   fclose(fp);
+  fp = (FILE *) NULL;
 
   /* complete the initialization of first_size */
   font_xheight2(first_size) =
@@ -980,7 +981,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	&fpos(Extrafilename), FileName(extra_fnum));
     lnum = 0;
 
-    while( StringFGets(buff, MAX_BUFF, fp) != (char *) NULL )
+    while( StringFGets(buff, MAX_BUFF, extra_fp) != (char *) NULL )
     {
       debug1(DFT, D, "  Extra: %s", buff);
       lnum++;
@@ -992,17 +993,20 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	  /* get extra character metrics, just like the others */
 	  debug0(DFT, D, "  StartExtraCharMetrics calling ReadCharMetrics");
 	  ReadCharMetrics(face, fixed_pitch, xheight2, lig, &ligtop,
-	    extra_fnum, fnt, &lnum, fp);
+	    extra_fnum, fnt, &lnum, extra_fp);
 	}
 	else if( StringEqual(command, AsciiToFull("StartBuildComposites")) )
 	{ 
 	  /* build composites */
 	  debug0(DFT, D, "  StartBuildComposites");
 	  ReadCompositeMetrics(face, Extrafilename, extra_fnum, &lnum,
-	    composite, cmp, &cmptop, fp);
+	    composite, cmp, &cmptop, extra_fp);
 	}
       }
     }
+
+    fclose(extra_fp);
+    extra_fp = (FILE *) NULL;
   }
 
 
@@ -1262,7 +1266,6 @@ void FontChange(STYLE *style, OBJECT x)
       return;
     }
   }
-
 
   assert( Down(face) != face, "FontChange: no children!" );
   assert( NextDown(Down(face)) != face, "FontChange: 1 child!" );

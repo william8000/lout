@@ -1,6 +1,6 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -704,6 +704,8 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     
       Child(y, LastDown(x));
       y = BreakObject(y, c);

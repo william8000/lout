@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -778,6 +778,8 @@ int main(int argc, char *argv[])
   load(KW_SINCGRAPHIC,  SINCGRAPHIC,    FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_PLAINGRAPHIC, PLAIN_GRAPHIC,  TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_GRAPHIC,      GRAPHIC,        TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_LINK_SOURCE,   LINK_SOURCE,     TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_LINK_DEST,    LINK_DEST,      TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_CROSS,        CROSS,          TRUE,   TRUE,   FALSE, CROSSOP_PREC);
   load(KW_FORCE_CROSS,  FORCE_CROSS,    TRUE,   TRUE,   FALSE, CROSSOP_PREC);
   load(KW_NULL,         NULL_CLOS,      FALSE,  FALSE,  TRUE,  NO_PREC     );
@@ -825,6 +827,7 @@ int main(int argc, char *argv[])
 
   /* close various modules */
   BackEnd->PrintAfterLastPage();
+  BackEnd->LinkCheck();
   CrossClose();
   CloseFiles();
 

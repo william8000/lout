@@ -1,5 +1,5 @@
 @Section
-   @Title { Cross references }
+   @Title { Cross references and links }
    @Tag { cross }
 @Begin
 @PP
@@ -109,4 +109,71 @@ when switching from one document to another, by removing file
 lout.li @Index { @Code lout.li file }
 {@Code "lout.li"}.  You should also remove this file if your document
 changes radically -- from a report to a book, say.
+@PP
+PDF viewers and recent versions of PostScript viewers offer a high-tech
+version of cross references called {@I links}, which allow the user to
+click on, say, the entry for a section in a table of contents and be
+immediately transported to the page on which that section begins.  In
+principle, anything could happen when a link is clicked on, but Lout
+only offers the kind of link that transports the user to some page
+in the current document.
+@PP
+Lout automatically makes a link out of every page number it prints
+in the table of contents and in the index, and every reference
+citation.  You can also insert your own links, using the
+@Code "@CrossLink" symbol like this:
+@ID @Code "See cross @CrossLink { Section @NumberOf cross }"
+The @Code "@CrossLink" symbol consumes two objects, one to its left and the
+other to its right, and we'll explain each of these now.
+@PP
+The object on the right (@Code "Section @NumberOf cross" in our
+example) can be an arbitrary Lout object:  you don't have to have
+@Code "@NumberOf" or @Code "@PageOf" inside it, although in practice
+you often will, since it makes sense to put a low-tech link wherever
+you have a high-tech one, for the benefit of readers of paper
+versions.  This object on the right is what is printed, so the
+overall result in this example is
+@ID { See cross @CrossLink { Section @NumberOf cross } }
+But, beyond this, clicking anywhere on this object on the screen will
+invoke the link, transporting the user to some other page.
+@PP
+The object on the left (@Code cross in our example) must be a tag
+that is acceptable to the @Code "@PageOf" symbol described earlier
+in this section.  The link will transport the user who clicks on
+it to the page that @Code "@PageOf" would point to if given that
+tag.  You can ensure that your tag is acceptable in the usual
+ways:  by using {@Code "@PageMark"}, or by giving the tag as the
+@Code "@Tag" option of a chapter, section, etc. as described earlier
+in this section.
+@PP
+A moment ago we said that the object to the right of @Code "@CrossLink"
+is what is printed by the @Code "@CrossLink" symbol.  This is true by
+default, but there is a @Code "@CrossLinkFormat" option in the setup
+files which allows you to change the appearance of this printed
+object.  (See Section {@NumberOf setup} for a general description
+of setup files and their options.)  The default value of
+@Code "@CrossLinkFormat" is
+@ID @Code "@CrossLinkFormat { @Body }"
+Within the @Code "@CrossLinkFormat" option, the @Code "@Body" symbol
+stands for the object to the right of {@Code "@CrossLink"}.  It is
+actually the value of @Code "@CrossLinkFormat" that is printed, so,
+for example, changing it to
+@ID @Code "@CrossLinkFormat { blue @Colour @Underline @Body }"
+causes all link objects to be printed in blue and underlined.  If
+you want a special format just for one link, there is a @Code "@Format"
+option to @Code "@CrossLink" that overrides {@Code "@CrossLinkFormat"}:
+@ID @Code "cross @CrossLink @Format { @CurveBox @Body } { Section @NumberOf cross }"
+You can also give the formatting you want directly, since the object
+to the right of @Code "@CrossLink" can be an arbitrary Lout object:
+@ID @Code "cross @CrossLink @CurveBox { Section @NumberOf cross }"
+However, in this form the @Code "@CrossLinkFormat" setup file option
+is still applied.
+@PP
+At present, the @Code "@CrossLink" symbol behaves as though a @Code "@OneCol"
+symbol encloses the object on its right.  This means that that object
+is kept together on one line of any enclosing paragraph, and inter-word
+spaces within it are not adjusted along with the inter-word spaces of
+any enclosing paragraph.  This deficiency might be corrected in the
+future, but meanwhile it means that it is best to keep your objects
+on the right short.
 @End @Section

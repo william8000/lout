@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -266,6 +266,24 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	break;
 
 
+    case FIXED_COL_THR:
+
+	aprint("{FC ");
+	CountChild(y, Down(x), count);
+	echo(y, NO_PREC, count);
+	aprint(" FC}");
+	break;
+
+
+    case FIXED_ROW_THR:
+
+	aprint("{FR ");
+	CountChild(y, Down(x), count);
+	echo(y, NO_PREC, count);
+	aprint(" FR}");
+	break;
+
+
     case HSPANNER:
 
 	aprint("{HS ");
@@ -317,6 +335,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case ACAT: op = "&", prec = ACAT_PREC;
 
 	childcount = 0;
+	aprint("[[ ");
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ CountChild(y, link, count);
 	  if( type(y) == GAP_OBJ )
@@ -325,7 +344,9 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	    continue;
 	  }
 	  childcount++;
+	  aprint("[");
 	  echo(y, prec, count);
+	  aprint("]");
 	  /* ***
 	  if( link == Down(x) || link == LastDown(x) )
 	    echo(y, prec, count);
@@ -335,6 +356,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	  }
 	  *** */
 	}
+	aprint(" ]]");
 	break;
 
 
@@ -720,6 +742,8 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case SINCGRAPHIC:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     case ROTATE:
     case BACKGROUND:
     case SCALE:
@@ -987,7 +1011,7 @@ FULL_CHAR *EchoIndex(OBJECT index)
 /*  Print overview of galley hd on stderr; mark pinpoint if found            */
 /*                                                                           */
 /*****************************************************************************/
-#define dprint(a, b, c) fprintf(stderr, "| %-7s %20s %s\n", a, b, c)
+#define eprint(x, a, b, c) fprintf(stderr, "| %d %-7s %20s %s\n", x, a, b, c)
 
 void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
 { OBJECT link, y;  char istr[30];  int i;
@@ -1001,22 +1025,22 @@ void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
     SymName(actual(hd)), SymName(whereto(hd)));
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
   { Child(y, link);
-    if( y == pinpt )
-    { fprintf(stderr, "++ %s ", Image(type(y)));
+    if( y == pinpt || link == pinpt )
+    { fprintf(stderr, "++ %d %s ", (int) y, Image(type(y)));
       DebugObject(y);
     }
     else
     if( type(y) == GAP_OBJ )
-      dprint("gap_obj", Image(type(y)), EchoGap(&gap(y)));
+      eprint((int) y, "gap_obj", Image(type(y)), EchoGap(&gap(y)));
     else if( is_index(type(y)) )
-      dprint("index", Image(type(y)), "");
+      eprint((int) y, "index", Image(type(y)), "");
     else if( is_definite(type(y)) )
-      dprint("def_obj", Image(type(y)), is_word(type(y)) ? string(y):STR_EMPTY);
+      eprint((int) y, "def_obj", Image(type(y)), is_word(type(y)) ? string(y):STR_EMPTY);
     else if( is_indefinite(type(y)) )
-      dprint("indefin", Image(type(y)),
+      eprint((int) y, "indefin", Image(type(y)),
 	type(y) == CLOSURE ? SymName(actual(y)) : STR_EMPTY);
     else
-      dprint("unknown", Image(type(y)), "");
+      eprint((int) y, "unknown", Image(type(y)), "");
   }
 } /* end DebugGalley */
 #endif

@@ -55,6 +55,8 @@
    def @@LInput               { @Code "@LInput"               }
    def @@LUse                 { @Code "@LUse"                 }
    def @@LVis                 { @Code "@LVis"                 }
+   def @@LinkSource           { @Code "@LinkSource"           }
+   def @@LinkDest             { @Code "@LinkDest"             }
    def @@Meld                 { @Code "@Meld"                 }
    def @@Merge                { @Code "@Merge"                }
    def @@Moment               { @Code "@Moment"               }

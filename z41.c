@@ -1,6 +1,6 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -551,6 +551,8 @@ static void WriteObject(OBJECT x, int outer_prec, int *linecount, FILE_NUM fnum)
     case SINCGRAPHIC:	name = KW_SINCGRAPHIC;	goto SETC;
     case PLAIN_GRAPHIC:	name = KW_PLAINGRAPHIC;	goto SETC;
     case GRAPHIC:	name = KW_GRAPHIC;	goto SETC;
+    case LINK_SOURCE:	name = KW_LINK_SOURCE;	goto SETC;
+    case LINK_DEST:	name = KW_LINK_DEST;	goto SETC;
 
       /* print left parameter, if present */
       SETC:

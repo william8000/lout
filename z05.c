@@ -1,6 +1,6 @@
 /*@z05.c:Read Definitions:ReadLangDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -259,6 +259,8 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case SINCGRAPHIC:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     case NOT_REVEALED:
 
       NextToken(t, res);

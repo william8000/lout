@@ -9,9 +9,10 @@ diag. @Index { @@Diag }
 Starting with Version 3.18 of Lout, the @@Diag symbol was enhanced with
 the {@Code "@ANode"}, {@Code "@BNode"}, and {@Code "@CNode"} symbols
 described in Section {@NumberOf dia_node}, and with the symbols for
-syntax diagrams described in Section {@NumberOf dia_synt}.  These
-enhancements are upwardly compatible, unless the user has defined
-symbols with these same names and used them within diagrams.
+syntax diagrams described in Section {@NumberOf dia_synt}.
+#These
+#enhancements are upwardly compatible, unless the user has defined
+#symbols with these same names and used them within diagrams.
 @LP
 Prior to Version 3.09 of Lout, this chapter described a symbol called
 fig. @Index @Code "@Fig"
@@ -35,7 +36,7 @@ diag. @Index @Code "@Diag"
 // @Link from { B } to { D }
 // @Arrow from { E } to { D }
 }
-@@Diag offers nodes and links, arrows, labels, positioning using coordinates,
+@@Diag offers nodes and links, arrows, labels, coordinates,
 tree diagrams, and syntax diagrams.
 @BeginSections
 @Include { dia_intr }

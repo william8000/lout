@@ -545,7 +545,7 @@ def @BookSetup
         def @BookIntro force into { @IntroColPlace&&preceding }
 	    named @Optimize { @OptimizePages }
         {
-		    @PageMark @Tag
+		    @NoLinkPageMark @Tag
 	    //	    @Before
             //1.1b  @TitlePageFont @Font @On
             //1.1b  @After
@@ -605,7 +605,7 @@ def @BookSetup
 	def @BookCombined force into { @ColPlace&&preceding }
 	    named @Optimize { @OptimizePages }
 	{
-		    @PageMark @Tag
+		    @NoLinkPageMark @Tag
 	    //	    @Before
             //1.1b  @TitlePageFont @Font @On
             //1.1b  @After

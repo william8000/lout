@@ -48,7 +48,9 @@ This arrangement is reminiscent of the one for lists, and, as for
 lists, there may be no paragraph or new page symbols before, between,
 or after the sections.  To change the gap between sections, you need
 to change the @Code "@SectionGap" option in the setup file, as explained
-in Chapter {@NumberOf types}.
+in Chapter {@NumberOf types}.  If you just want a new page before one
+section, not all sections, place @Code "@NP" at the very end of the
+previous section, just before its {@Code "@End @Section"}.
 @PP
 The @Code "@Begin ... @End @Section" that brackets the body of each
 section may be abbreviated to {@Code "{ ... }"}.  However, the long

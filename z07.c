@@ -1,6 +1,6 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -54,6 +54,7 @@ BOOLEAN SplitIsDefinite(OBJECT x)
 /*  DisposeObject(x)                                                         */
 /*                                                                           */
 /*  Dispose object x recursively, leaving intact any shared descendants.     */
+/*  We return a useless integer so that we can use this in expresssions.     */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -65,6 +66,53 @@ int DisposeObject(OBJECT x)
   debug0(DOS, DDD, "]DisposeObject returning.");
   return 0;
 } /* end DisposeObject */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  DisposeSplitObject(x)                                                    */
+/*                                                                           */
+/*  Like DisposeObject(x), except that we assume that x is a SPLIT object,   */
+/*  and dispose of it carefully, making sure that any COL_THR and ROW_THR    */
+/*  objects underneath it are not corrupted.  The problem with using just    */
+/*  DisposeObject() is that it will delete the link into the COL_THR or      */
+/*  ROW_THR but not the correspondiong link out of it.                       */
+/*                                                                           */
+/*  We assume that only one of the two possible threads is present, to       */
+/*  simplify the code.                                                       */
+/*                                                                           */
+/*****************************************************************************/
+
+void DisposeSplitObject(OBJECT x)
+{ OBJECT y, col_child, row_child;
+  assert(type(x) == SPLIT, "DisposeSplitObject: type(x) != SPLIT!");
+
+  /* find the row child, if no intervening thread */
+  Child(y, DownDim(x, ROWM));
+  row_child = (type(y) == ROW_THR || type(y) == FIXED_ROW_THR) ? nilobj : y;
+
+  /* find the col child, if no intervening thread */
+  Child(y, DownDim(x, COLM));
+  col_child = (type(y) == COL_THR || type(y) == FIXED_COL_THR) ? nilobj : y;
+
+  /* this routine only works when exactly one of the two threads is present */
+  assert(col_child!=nilobj || row_child!=nilobj, "DisposeSplitObject: both!");
+  assert(col_child==nilobj || row_child==nilobj, "DisposeSplitObject: none!");
+
+  /* do the disposal */
+  if( row_child != nilobj )
+  {
+    assert(Up(row_child) != LastUp(row_child), "DisposeSplitObject row_child!");
+    DeleteLink(UpDim(row_child, COLM));
+    DisposeObject(x);
+  }
+  else if( col_child != nilobj )
+  {
+    assert(Up(col_child) != LastUp(col_child), "DisposeSplitObject col_child!");
+    DeleteLink(UpDim(col_child, ROWM));
+    DisposeObject(x);
+  }
+} /* end DisposeSplitObject */
 
 
 /*@::MakeWord(), MakeWordTwo()@***********************************************/
@@ -243,6 +291,8 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case SINCGRAPHIC:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     case VCAT:
     case HCAT:
     case ACAT:
@@ -391,6 +441,8 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
     case VCOVER:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
     case ROTATE:
     case BACKGROUND:
     case SCALE:

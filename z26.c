@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -156,6 +156,8 @@ FULL_CHAR *Image(unsigned int c)
     case GAP_OBJ:		return  AsciiToFull("gap_obj");
     case ROW_THR:		return  AsciiToFull("row_thr");
     case COL_THR:		return  AsciiToFull("col_thr");
+    case FIXED_ROW_THR:		return  AsciiToFull("fixed_row_thr");
+    case FIXED_COL_THR:		return  AsciiToFull("fixed_col_thr");
     case CLOSURE:		return  AsciiToFull("closure");
     case NULL_CLOS:		return  KW_NULL;
     case PAGE_LABEL:		return  KW_PAGE_LABEL;
@@ -241,6 +243,8 @@ FULL_CHAR *Image(unsigned int c)
     case SINCGRAPHIC:		return  KW_SINCGRAPHIC;
     case PLAIN_GRAPHIC:		return  KW_PLAINGRAPHIC;
     case GRAPHIC:		return  KW_GRAPHIC;
+    case LINK_SOURCE:		return  KW_LINK_SOURCE;
+    case LINK_DEST:		return  KW_LINK_DEST;
     case ACAT:			return  AsciiToFull("acat");
     case HCAT:			return  AsciiToFull("hcat");
     case VCAT:			return  AsciiToFull("vcat");

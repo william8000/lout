@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.22                          #
+#  Make file for installing Basser Lout Version 3.23                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  3 June 2000                                                                #
+#  24 June 2000                                                               #
 #                                                                             #
 #     make prg2lout     Compile a small auxiliary program called prg2lout     #
 #     make lout         Compile the Lout source                               #
@@ -270,8 +270,11 @@ DBFIX   = 0
 USESTAT = 1
 SAFEDFT = 0
 
-DEBUGGING = 1
-TRACING = -g
+DEBUGGING = 0
+TRACING =
+
+# DEBUGGING = 1
+# TRACING = -g
 
 BINDIR	= /export/home/6monthspace/jeff/bin
 LIBDIR	= /export/home/6monthspace/jeff/lout.lib

@@ -48,10 +48,10 @@ is called
 @ID @Code "@RawCentredAlignedNumberedDisplay"
 By leaving out some or all of {@Code Raw}, {@Code Aligned}, and
 {@Code Numbered}, and by changing or leaving out {@Code Centred},
-we get all these combinations.  Here
+we get all these combinations.  The two displays
 numbereddisplay. @Index @Code "@NumberedDisplay"
 aligneddisplay. @Index @Code "@AlignedDisplay"
-then is how the two displays given earlier were made:
+given earlier were made like this:
 @ID @OneRow @Code {
 "... a first example of a numbered display:"
 "@BeginAlignedDisplays"
@@ -89,7 +89,7 @@ Section {@NumberOf displays}, and the recommended solution was to
 use a list.  However, there are no aligned or numbered (in this sense)
 lists.
 @PP
-To solve this problem, each display symbol has a `raw' version, which
+Fortunately, each display symbol has a `raw' version, which
 means that no space is inserted above or below the display.  Instead,
 raw.displays @Index { raw displays }
 you must insert it yourself using paragraph symbols:

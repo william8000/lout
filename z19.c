@@ -1,6 +1,6 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -323,7 +323,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     New(target_galley, HEAD);
     force_gall(target_galley) = FALSE;
     enclose_obj(target_galley) = limiter(target_galley) = nilobj;
-    headers(target_galley) = nilobj;
+    headers(target_galley) = dead_headers(target_galley) = nilobj;
     opt_components(target_galley) = opt_constraints(target_galley) = nilobj;
     gall_dir(target_galley) = external_hor(target) ? COLM : ROWM;
     FposCopy(fpos(target_galley), fpos(target));
@@ -563,6 +563,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	case SINCGRAPHIC:
 	case PLAIN_GRAPHIC:
 	case GRAPHIC:
+	case LINK_SOURCE:
+	case LINK_DEST:
 	case ACAT:
 	case HCAT:
 	case VCAT:
@@ -966,6 +968,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	StyleCopy(save_style(junk), save_style(dest));
 	adjust_cat(junk) = padjust(save_style(junk));
       }
+      debug1(DGS, D, "calling Promote(hd, %s) from AttachGalley/ACCEPT",
+	link == hd ? "hd" : "NextDown(link)");
       Promote(hd, link == hd ? hd : NextDown(link), dest_index, TRUE);
 
       /* move target_galley into target */
@@ -974,6 +978,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       {	Child(z, LastDown(target_galley));
 	Interpose(target, VCAT, z, z);
       }
+      debug0(DGS, D, "calling Promote(target_galley) from AttachGalley/ACCEPT");
       Promote(target_galley, target_galley, target_index, TRUE);
       DeleteNode(target_galley);
       assert(Down(target_index)==target_index, "AttachGalley: target_ind");

@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -206,7 +206,7 @@ void ExpandRecursives(OBJECT recs)
     /* expand body of target, convert to galley, and check size */
     New(hd, HEAD);  actual(hd) = actual(target);  must_expand(hd) = TRUE;
     force_gall(hd) = FALSE;
-    enclose_obj(hd) = limiter(hd) = headers(hd) = nilobj;
+    enclose_obj(hd) = limiter(hd) = headers(hd) = dead_headers(hd) = nilobj;
     opt_components(hd) = opt_constraints(hd) = nilobj;
     gall_dir(hd) = horiz_galley(actual(target));
     whereto(hd) = ready_galls(hd) = nilobj;
@@ -219,10 +219,10 @@ void ExpandRecursives(OBJECT recs)
       &save_style(target), &non_c, nilobj, &n1, &newrecs, &inners, nilobj);
     debug0(DCR, DDD, "    as galley:");
     ifdebug(DCR, DDD, DebugObject(hd));
-    debug1(DGS, D, "[ ExpandRecursives calling Constrained(%s, COLM)",
+    debug1(DGS, DD, "[ ExpandRecursives calling Constrained(%s, COLM)",
       EchoObject(target));
     Constrained(target, &hc, COLM, &why);
-    debug2(DGS, D, "] ExpandRecursives Constrained(%s, COLM) = %s",
+    debug2(DGS, DD, "] ExpandRecursives Constrained(%s, COLM) = %s",
       EchoObject(target), EchoConstraint(&hc));
     debug3(DCR, DD, "    horizontal size: (%s, %s); constraint: %s",
       EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)), EchoConstraint(&hc));
@@ -259,6 +259,7 @@ void ExpandRecursives(OBJECT recs)
       AdjustSize(target, back(z, ROWM), fwd(z, ROWM), ROWM);
       Interpose(target, VCAT, z, z);
     }
+    debug0(DGS, D, "calling Promote(hd, hd) from ExpandRecursives");
     Promote(hd, hd, target_index, TRUE);  DeleteNode(hd);
     DeleteNode(target_index);
     if( inners != nilobj )
@@ -347,6 +348,8 @@ static OBJECT FindSplitInGalley(OBJECT hd)
     case SINCGRAPHIC:
     case PLAIN_GRAPHIC:
     case GRAPHIC:
+    case LINK_SOURCE:
+    case LINK_DEST:
 
       debug0(DGF, D, "FindSplitInGalley(hd) failing, hd =");
       ifdebug(DGF, D, DebugObject(hd));
@@ -365,6 +368,46 @@ static OBJECT FindSplitInGalley(OBJECT hd)
 } /* end FindSplitInGalley */
 
 
+/*****************************************************************************/
+/*                                                                           */
+/*  DisposeOneHeader(OBJECT link)                                            */
+/*                                                                           */
+/*  Dispose one header pointed to by link,  taking care not to disrupt       */
+/*  any thread objects that are tangled with the header.                     */
+/*                                                                           */
+/*****************************************************************************/
+
+static void DisposeOneHeader(OBJECT link)
+{ OBJECT y;
+  Child(y, link);
+  if( type(y) == SPLIT )
+  { DeleteLink(link);
+    DisposeSplitObject(y);
+  }
+  else DisposeChild(link);
+} /* end DisposeOneHeader */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  DisposeHeaders(OBJECT hd)                                                */
+/*                                                                           */
+/*  Dispose the headers of hd.                                               */
+/*                                                                           */
+/*****************************************************************************/
+
+static void DisposeHeaders(OBJECT hd)
+{ if( headers(hd) != nilobj )
+  { assert(type(headers(hd)) == ACAT || type(headers(hd)) == VCAT,
+      "DisposeHeaders: type(headers(hd))!");
+    while( Down(headers(hd)) != headers(hd) )
+    { DisposeOneHeader(Down(headers(hd)));
+    }
+    headers(hd) = nilobj;
+  }
+} /* end DisposeHeaders */
+
+
 /*@::HandleHeader()@**********************************************************/
 /*                                                                           */
 /*  HandleHeader(hd, link, header)                                           */
@@ -376,35 +419,36 @@ static OBJECT FindSplitInGalley(OBJECT hd)
 /*  Link is the link from hd to the header (it may actually link to a        */
 /*  split object which then links to the header, but no matter).             */
 /*                                                                           */
+/*  Actually, we no longer allow a SPLIT object above a header, because      */
+/*  that means there is a COL_THR or ROW_THR above it and when we dispose    */
+/*  the header, Dispose is not able to dispose the appropriate child of the  */
+/*  COL_THR or ROW_THR.  So Manifest() must not insert a SPLIT above a       */
+/*  header, and we check for that.                                           */
+/*                                                                           */
 /*****************************************************************************/
 
-void HandleHeader(OBJECT hd, OBJECT link, OBJECT header)
-{ OBJECT g, y, z;
-  debug3(DGS, D, "HandleHeader(%s, link, %s); headers = %s",
+void HandleHeader(OBJECT hd, OBJECT header)
+{ OBJECT g, z, gaplink;
+  debug3(DGS, D, "[ HandleHeader(%s, %s); headers = %s; galley:",
     SymName(actual(hd)), EchoObject(header), EchoObject(headers(hd)));
+  ifdebug(DGS, D, DebugGalley(hd, nilobj, 2));
   assert(is_header(type(header)), "HandleHeader: type(header)!");
+  assert(Up(header) == LastUp(header) && Up(header) != header,
+    "HandleHeader: header parents!");
   switch( type(header) )
   {
 
     case CLEAR_HEADER:
 
       /* clear out old headers, if any */
-      if( headers(hd) != nilobj )
-      {
-	DisposeObject(headers(hd));
-	headers(hd) = nilobj;
-      }
+      DisposeHeaders(hd);
       break;
 
 
     case SET_HEADER:
 
-      /* clear out old headers, if any */
-      if( headers(hd) != nilobj )
-      {
-	DisposeObject(headers(hd));
-	headers(hd) = nilobj;
-      }
+      /* clear out old headers (not safe to dispose them yet), if any */
+      DisposeHeaders(hd);
       /* NB NO BREAK! */
 
 
@@ -437,9 +481,15 @@ void HandleHeader(OBJECT hd, OBJECT link, OBJECT header)
 	  KW_END_HEADER);
       else
       {
-	DisposeChild(LastDown(headers(hd)));
+	/* dispose last gap */
 	assert(LastDown(headers(hd))!=headers(hd), "Promote/END_HEADER!");
+	Child(g, LastDown(headers(hd)));
+	assert(type(g) == GAP_OBJ, "HandleHeader: END_HEADER/gap!");
 	DisposeChild(LastDown(headers(hd)));
+
+	/* dispose last header object */
+	assert(LastDown(headers(hd))!=headers(hd), "Promote/END_HEADER!");
+	DisposeOneHeader(LastDown(headers(hd)));
 	if( Down(headers(hd)) == headers(hd) )
 	{ DisposeObject(headers(hd));
 	  headers(hd) = nilobj;
@@ -449,14 +499,28 @@ void HandleHeader(OBJECT hd, OBJECT link, OBJECT header)
 	
   }
 
-  /* get rid of header object and following gap now */
-  Child(y, NextDown(link));
-  assert(type(y) == GAP_OBJ, "Promote/HEADER: type(y) != GAP_OBJ!");
-  DisposeChild(NextDown(link));
-  DisposeChild(link);
-  debug2(DGS, D, "HandleHeader returning; headers(%s) now %s",
-    SymName(actual(hd)), EchoObject(headers(hd)));
+  /* dispose header object and following gap object */
+  /* *** old code
+  y = MakeWord(WORD, STR_EMPTY, &fpos(header));
+  back(y, COLM) = fwd(y, COLM) = back(y, ROWM) = fwd(y, ROWM) = 0;
+  ReplaceNode(y, header);
+  *** */
 
+  /* dispose header object (must take care to disentangle safely) */
+  gaplink = NextDown(Up(header));
+  assert(type(gaplink) == LINK, "HandleHeader: type(gaplink)!");
+  if( type(header) == CLEAR_HEADER || type(header) == END_HEADER )
+  {
+    /* first disentangle child properly */
+    assert(Down(header) != header && Down(header) == LastDown(header), "HH!");
+    DisposeOneHeader(Down(header));
+  }
+  DisposeChild(Up(header));
+  DisposeChild(gaplink);
+
+  debug2(DGS, D, "] HandleHeader returning; headers(%s) now %s; galley:",
+    SymName(actual(hd)), EchoObject(headers(hd)));
+  ifdebug(DGS, D, DebugGalley(hd, nilobj, 2));
 } /* end HandleHeader */
 
 
@@ -482,12 +546,14 @@ void HandleHeader(OBJECT hd, OBJECT link, OBJECT header)
 void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 {
   /* these two variables refer to the root galley only */
-  static BOOLEAN first = TRUE;	/* TRUE when the first component not written */
+  static BOOLEAN first = TRUE;		/* TRUE if first component unwritten */
   static OBJECT page_label=nilobj;	/* current page label object         */
 
-  OBJECT dest, link, y, z, tmp1, tmp2, why;  FULL_CHAR *label_string;
+  OBJECT dest, link, y, z, tmp1, tmp2, why, top_y;  FULL_CHAR *label_string;
+  FULL_LENGTH aback, afwd;
   int dim;
-  debug1(DGS, DD, "Promote(%s, stop_link)", SymName(actual(hd)));
+  debug1(DGS, D, "[ Promote(%s, stop_link):", SymName(actual(hd)));
+  ifdebug(DGS, D, DebugGalley(hd, stop_link, 2));
 
   assert( type(hd) == HEAD, "Promote: hd!" );
   assert( type(stop_link) == LINK || stop_link == hd, "Promote: stop_link!" );
@@ -498,6 +564,9 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
   /* insert final gap if galley is ending */
   if( stop_link != hd )
   { Child(y, stop_link);
+    if( type(y) != GAP_OBJ )
+    { ifdebug(DGS, D, DebugGalley(hd, stop_link, 2));
+    }
     assert( type(y) == GAP_OBJ, "Promote: missing GAP_OBJ!" );
     stop_link = NextDown(stop_link);
   }
@@ -769,6 +838,8 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	case SINCGRAPHIC:
 	case PLAIN_GRAPHIC:
 	case GRAPHIC:
+	case LINK_SOURCE:
+	case LINK_DEST:
 	case ACAT:
 	case HCAT:
 	case ROW_THR:
@@ -786,7 +857,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	    /* fix horizontally; work out which fonts needed */
 	    SetLengthDim(COLM);
 	    FixAndPrintObject(y, back(y, COLM), back(y, COLM), fwd(y, COLM),
-	      COLM, FALSE, 0, 0);
+	      COLM, FALSE, 0, 0, &aback, &afwd);
 
 	    /* print prefatory or page separating material, including fonts */
 	    label_string = page_label != nilobj && is_word(type(page_label)) ?
@@ -813,7 +884,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	      EchoLength(back(y,ROWM)), EchoLength(fwd(y, ROWM)));
 	    SetLengthDim(ROWM);
 	    FixAndPrintObject(y, back(y,ROWM), back(y, ROWM), fwd(y, ROWM),
-	      ROWM, FALSE, size(y, ROWM), 0);
+	      ROWM, FALSE, size(y, ROWM), 0, &aback, &afwd);
 
 	  }
 	  DisposeChild(NextDown(link));
@@ -869,11 +940,15 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
     dim = gall_dir(hd);
     for( link = hd;  NextDown(link) != stop_link;  )
     { Child(y, NextDown(link));
-      debug1(DGS, D, "ordinary promote examining %s", EchoObject(y));
+      debug1(DGS, DD, "ordinary promote examining %s", EchoObject(y));
+      top_y = y;
       if( type(y) == SPLIT )
 	Child(y, DownDim(y, dim));
       if( is_header(type(y)) )
-	HandleHeader(hd, NextDown(link), y);
+      {
+	assert(top_y == y, "Promote: header under SPLIT!");
+	HandleHeader(hd, y);
+      }
       else if( is_index(type(y)) )
 	MoveLink(NextDown(link), Up(dest_index), PARENT);
       else link = NextDown(link);
@@ -886,7 +961,8 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
   /* promote components */
   TransferLinks(Down(hd), stop_link, link);
 
-  debug0(DGS, DD, "Promote returning.");
+  debug0(DGS, D, "] Promote returning; galley:");
+  ifdebug(DGS, D, DebugGalley(hd, nilobj, 2));
 } /* end Promote */
 
 

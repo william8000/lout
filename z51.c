@@ -1,6 +1,6 @@
 /*@z51.c:Plain Text Back End:Plain_BackEnd@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.22)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.23)                       */
 /*  COPYRIGHT (C) 1991, 2000 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -335,19 +335,19 @@ static void Plain_PrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
 
 /*****************************************************************************/
 /*                                                                           */
-/*  Plain_PrintUnderline(fnum, xstart, xstop, ymk)                           */
+/*  Plain_PrintUnderline(fnum, col, xstart, xstop, ymk)                      */
 /*                                                                           */
-/*  Draw an underline suitable for font fnum, from xstart to xstop at the    */
-/*  appropriate distance below mark ymk.                                     */
+/*  Draw an underline suitable for font fnum, in colour col, from xstart to  */
+/*  xstop at the appropriate distance below mark ymk.                        */
 /*                                                                           */
 /*****************************************************************************/
 
-static void Plain_PrintUnderline(FONT_NUM fnum, FULL_LENGTH xstart,
-  FULL_LENGTH xstop, FULL_LENGTH ymk)
+static void Plain_PrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
+  FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
 {
 
-  debug4(DPT, DD, "Plain_PrintUnderline(fnum %d, xstart %s, xstop %s, ymk %s )",
-    fnum, EchoLength(xstart), EchoLength(xstop), EchoLength(ymk));
+  debug5(DPT, DD, "Plain_PrintUnderline(fnum %d, col %d, xstart %s, xstop %s, ymk %s )",
+    fnum, col, EchoLength(xstart), EchoLength(xstop), EchoLength(ymk));
 
   /* do nothing */
 
@@ -544,6 +544,62 @@ void Plain_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
 
 /*****************************************************************************/
 /*                                                                           */
+/*  Plain_LinkSource(name, llx, lly, urx, ury)                               */
+/*                                                                           */
+/*  Print a link source point.                                               */
+/*                                                                           */
+/*****************************************************************************/
+
+static void Plain_LinkSource(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{
+  debug5(DPT, D, "Plain_LinkSource(%s, %d, %d, %d, %d)", EchoObject(name),
+    llx, lly, urx, ury);
+  /* do nothing; no links in plain text output */
+  debug0(DPT, D, "Plain_LinkSource returning.");
+} /* end Plain_LinkSource */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Plain_LinkDest(name, llx, lly, urx, ury)                                 */
+/*                                                                           */
+/*  Print a link dest point.                                                 */
+/*                                                                           */
+/*  Still to do: check that the name has not been used by a previous         */
+/*  dest point.                                                              */
+/*                                                                           */
+/*****************************************************************************/
+
+static void Plain_LinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{
+  debug5(DPT, D, "Plain_LinkDest(%s, %d, %d, %d, %d)", EchoObject(name),
+    llx, lly, urx, ury);
+  /* do nothing; no links in plain text output */
+  debug0(DPT, D, "Plain_LinkDest returning.");
+} /* end Plain_LinkDest */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Plain_LinkCheck()                                                        */
+/*                                                                           */
+/*  Called at end of run; will check that for every link source point there  */
+/*  is a link dest point.                                                    */
+/*                                                                           */
+/*****************************************************************************/
+
+static void Plain_LinkCheck()
+{
+  debug0(DPT, D, "Plain_LinkCheck()");
+  /* do nothing; no links in plain text output */
+  debug0(DPT, D, "Plain_LinkCheck returning.");
+} /* end Plain_LinkCheck */
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  Plain_BackEnd                                                            */
 /*                                                                           */
 /*  The record into which all of these functions are packaged.               */
@@ -581,6 +637,9 @@ static struct back_end_rec plain_back = {
   Plain_DefineGraphicNames,
   Plain_SaveTranslateDefineSave,
   Plain_PrintGraphicInclude,
+  Plain_LinkSource,
+  Plain_LinkDest,
+  Plain_LinkCheck,
 };
 
 BACK_END Plain_BackEnd = &plain_back;

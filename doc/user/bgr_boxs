@@ -55,7 +55,9 @@ large everything is:  as far as Lout is concerned, the line always
 has width zero.  If you draw really thick lines you might need a larger
 margin and more space near the box.  The default value of @Code linewidth
 is empty, which means to use whatever width the PostScript interpreter
-in your output device thinks is a good default value.
+in your output device thinks is a good default value.  The special
+value @Code "none" for @Code "linewidth" ensures that no line is drawn
+around the box at all.
 @PP
 There is also a @Code "paint" option which paints a background of the
 nominated colour:

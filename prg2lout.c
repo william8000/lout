@@ -1,13 +1,19 @@
 
 /*****************************************************************************/
 /*                                                                           */
-/*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT (VERSION 2.0)   */
+/*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
 /*  COPYRIGHT (C) 2000 Jeffrey H. Kingston                                   */
+/*                                                                           */
+/*  Version 2.1, 24 June 2000                                                */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
+/*                                                                           */
+/*  C and C++, Eiffel, and Blue by Jeff Kingston                             */
+/*  Perl and Pod by Jeff Kingston and Mark Summerfield                       */
+/*  Python by Mark Summerfield                                               */
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
@@ -589,6 +595,97 @@ TOKEN EiffelCharacterToken = {
 };
 
 
+TOKEN PythonDblStringToken = {
+  "string",		/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  "@PS",			/* Lout command for formatting strings              */
+  "",			/* no alternate command                             */
+  "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { "\"" },		/* strings begin with a " character                 */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintable,		/* inside, any printable is OK		            */
+  "\\",			/* within strings, \\ is the escape character       */
+  AllPrintablePlusNL,	/* after escape char, any printable char or nl OK   */
+  "",			/* strings do not permit "inner escapes"            */
+  "",			/* and so there is no end innner escape either      */
+  "",			/* no bracketing delimiter			    */
+  "\"",			/* strings end with a " character                   */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN PythonSnglStringToken = {
+  "string",		/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  "@PS",			/* Lout command for formatting strings              */
+  "",			/* no alternate command                             */
+  "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { "'" },		/* strings begin with a ' character                 */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintable,		/* inside, any printable is OK		            */
+  "\\",			/* within strings, \\ is the escape character       */
+  AllPrintablePlusNL,	/* after escape char, any printable char or nl OK   */
+  "",			/* strings do not permit "inner escapes"            */
+  "",			/* and so there is no end innner escape either      */
+  "",			/* no bracketing delimiter			    */
+  "'",			/* strings end with a ' character                   */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN PythonTriSnglStringToken = {
+  "string",		/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  "@PS",			/* Lout command for formatting strings              */
+  "",			/* no alternate command                             */
+  "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { "'''" },		/* strings begin with '''                 */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintableTabNL,		/* inside, any printable is OK		            */
+  "\\",			/* within strings, \\ is the escape character       */
+  AllPrintableTabNL,	/* after escape char, any printable char or nl OK   */
+  "",			/* strings do not permit "inner escapes"            */
+  "",			/* and so there is no end innner escape either      */
+  "",			/* no bracketing delimiter			    */
+  "'''",			/* strings end with '''                   */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+TOKEN PythonTriDblStringToken = {
+  "string",		/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  "@PS",			/* Lout command for formatting strings              */
+  "",			/* no alternate command                             */
+  "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { "\"\"\"" },		/* strings begin with """                 */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintableTabNL,		/* inside, any printable is OK		            */
+  "\\",			/* within strings, \\ is the escape character       */
+  AllPrintableTabNL,	/* after escape char, any printable char or nl OK   */
+  "",			/* strings do not permit "inner escapes"            */
+  "",			/* and so there is no end innner escape either      */
+  "",			/* no bracketing delimiter			    */
+  "\"\"\"",			/* strings end with """                    */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
+
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  Identifiers, in the form common to most programming languages.           */
@@ -742,6 +839,28 @@ TOKEN BlueCommentToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
+TOKEN PythonCommentToken = {
+  "comment",		/* used by error messages involving this token      */
+  PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
+  "@PC",		/* Lout command for formatting comments             */
+  "",			/* no alternate command                             */
+  "",			/* no following command                             */
+  FALSE,		/* token allowed anywhere, not just start of line   */
+  { "#" },		/* comments begin with this character pair          */
+  { NULL },		/* no start2 needed				    */
+  { NULL },		/* so no brackets2 either			    */
+  { NULL },		/* so no end2 either				    */
+  AllPrintablePlusTab,	/* inside, any printable char is OK (not NL)        */
+  "",			/* no escape character within comments              */
+  "",			/* so nothing legal after escape char either        */
+  "",			/* C comments do not permit "inner escapes"         */
+  "",			/* and so there is no end innner escape either      */
+  "",			/* no bracketing delimiter			    */
+  "",			/* no end delimiter (end of line will end it)       */
+  FALSE,		/* end delimiter does not have to be at line start  */
+  FALSE,		/* don't need to see end delimiter twice to stop    */
+};
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -841,6 +960,7 @@ TOKEN BlueCommentEscapeToken = {
 };
 
 
+
 /*****************************************************************************/
 /*                                                                           */
 /*  Tokens which are fixed strings, hence simpler than the above.            */
@@ -934,6 +1054,10 @@ TOKEN ImpliesToken		= FixedToken("=>", "implies @A @PO");
 TOKEN StarToken			= NoParameterToken("*",  "{@PA}");
 TOKEN MinusToken		= NoParameterToken("-",  "{@PM}");
 TOKEN EiffelDotToken		= NoParameterToken(".",  "{@PD}");
+TOKEN PythonPowerToken          = FixedToken( "**",  "@PO" ) ;
+TOKEN PythonBitLeftShiftToken   = FixedToken( "<<",  "@PO" ) ;
+TOKEN PythonBitRightShiftToken  = FixedToken( ">>",  "@PO" ) ;
+TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" ) ;
 
 
 /*****************************************************************************/
@@ -2311,6 +2435,83 @@ LANGUAGE CLanguage = {
 };
 
 
+/* Tokens, keywords taken from the on-line documentation supplied with Python
+ * 1.5.1 */
+LANGUAGE PythonLanguage = {
+  { "Python", "python"  },
+  "python", "@Python",
+  NO_MATCH_ERROR,
+  { &BackSlashToken,
+    &PythonDblStringToken, &PythonSnglStringToken, 
+    &PythonTriSnglStringToken, &PythonTriDblStringToken,
+    &PythonCommentToken, &IdentifierToken, &NumberToken,
+    &PlusToken, &MinusToken, &StarToken, &PythonPowerToken,
+    &SlashToken, &PercentToken, &PythonBitLeftShiftToken,
+    &PythonBitRightShiftToken, &AmpersandToken, &BarToken,
+    &HatToken, &CircumToken, &LessToken, &GreaterToken,
+    &LessEqualToken, &GreaterEqualToken, &BlueNotEqualToken,
+    &CNotEqualToken,
+    &LeftParenToken, &RightParenToken, &LeftBraceToken,
+    &RightBraceToken, &LeftBracketToken, &RightBracketToken,
+    &CommaToken, &ColonToken, &DotToken, &PythonBacktickToken,
+    &EqualToken, &SemicolonToken, 
+  },
+
+  { 
+    /* Keywords */
+    "and",       "del",       "for",       "is",        "raise",    
+    "assert",    "elif",      "from",      "lambda",    "return",   
+    "break",     "else",      "global",    "not",       "try",      
+    "class",     "except",    "if",        "or",        "while",    
+    "continue",  "exec",      "import",    "pass",               
+    "def",       "finally",   "in",        "print",
+    /* Built-ins */
+    "None", 
+    /* Built-in Exceptions */
+    "Exception", "StandardError", "ArithmeticError", "LookupError", 
+    "AssertionError", "AttributeError", "EOFError", "FloatingPointError", 
+    "IOError", "ImportError", "IndexError", "KeyError", "KeyboardInterrupt", 
+    "MemoryError", "NameError", "OverflowError", "RuntimeError", "SyntaxError", 
+    "SystemError", "SystemExit", "TypeError", "ValueError", "ZeroDivisionError", 
+    /* Built-in Functions */
+    "__import__",
+    "abs", "apply",
+    "callable", "chr", "cmp", "coerce", "compile", "complex",
+    "delattr", "dir", "divmod",
+    "eval", "execfile",
+    "filter", "float",
+    "getattr", "globals",
+    "hasattr", "hash", "hex",
+    "id", "input", "intern", "int", "isinstance", "issubclass",
+    "len", "list", "locals", "long",
+    "map", "max", "min",
+    "oct", "open", "ord",
+    "pow",
+    "range", "raw_input", "reduce", "reload", "repr", "round",
+    "setattr", "slice", "str",
+    "tuple", "type",
+    "vars",
+    "xrange",
+    /* Built-in Modules */
+    "__builtin__", "__main__", 
+    "al", "array", "audioop", 
+    "binascii", 
+    "cPickle", "cStringIO", "cd", "cmath", "crypt", 
+    "dbm", 
+    "fcntl", "fl", "fm", 
+    "gdbm", "gl", "grp", 
+    "imageop", "imgfile", "imp", 
+    "jpeg", 
+    "marshal", "math", "md5", "mpz", 
+    "operator", 
+    "parser", "posix", "pwd", 
+    "re", "regex", "resource", "rgbimg", "rotor", 
+    "select", "signal", "socket", "struct", "sunaudiodev", "sys", "syslog", 
+    "termios", "thread", "time", 
+    "zlib", 
+  }
+};
+
 /*****************************************************************************/
 /*                                                                           */
 /*  Eiffel and Blue                                                          */
@@ -2557,6 +2758,7 @@ LANGUAGE *languages[] = {
   & EiffelLanguage,
   & PerlLanguage,
   & PodLanguage,
+  & PythonLanguage,
 };
 
 
