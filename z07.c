@@ -1,6 +1,6 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -402,8 +402,10 @@ OBJECT InsertObject(OBJECT x, OBJECT *ins, STYLE *style)
       New(g, GAP_OBJ);
       SetGap(gap(g), FALSE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
       hspace(g) = vspace(g) = 0;
+      underline(g) = UNDER_OFF;
       Link(Down(x), g);
       Link(Down(x), *ins);
+      underline(*ins) = UNDER_OFF;
       *ins = nilobj;
       res = x;
       break;

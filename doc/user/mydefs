@@ -114,7 +114,7 @@
  
    def @Dbl left x right y
    { 1.95i @Wide
-     { 1.2i @Wide { |1rt @Code x } |0.2i @Eq {non y} }
+     { 1.25i @Wide { |1rt @Code x } |0.2i @Eq {non y} }
    }
  
    import @Eq

@@ -1,6 +1,6 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -521,6 +521,8 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs,
   }
   if( fp == null )
   { debug1(DBS, DD, "] DbLoad returning (empty) %s", string(db));
+    db_filep(db) = null;
+    db_lines(db) = (LINE *) NULL;
     ifdebug(DPP, D, ProfileOff("DbLoad"));
     return db;
   }

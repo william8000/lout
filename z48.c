@@ -1,6 +1,6 @@
 /*@z48.c:PDF back end@********************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -2361,6 +2361,7 @@ static void PDFPage_ProcessLinkKeyword(void)
 #if 1
 
   FULL_CHAR* parm = NULL;
+  debug1(DPD, D, "PDFPage_ProcessLinkKeyword(g_link = %s", g_link);
 
   while ((*charPtr != '\0') &&
     !(isspace(charPtr[0]) && (charPtr[1] == '_') && (charPtr[2] == '_')))
@@ -2534,6 +2535,7 @@ static void PDFPage_ProcessLinkKeyword(void)
     } /* switch */
   } /* else */
 
+  debug0(DPD, D, "PDFPage_ProcessLinkKeyword returning");
   /* return charPtr; */
 } /* PDFPage_ProcessLinkKeyword */
 
@@ -2802,6 +2804,7 @@ static FULL_CHAR *PDFPage_CollectExpr(FULL_CHAR* charPtr, BOOLEAN* outHasResult,
 static FULL_CHAR *PDFPage_CollectLink(FULL_CHAR* charPtr
   /*, BOOLEAN* outHasResult, float* outResult*/)
 {
+  debug1(DPD, D, "PDFPage_CollectLink(\"%s\")", charPtr);
   while (*charPtr != 0)
   {
     char ch;
@@ -2835,6 +2838,7 @@ static FULL_CHAR *PDFPage_CollectLink(FULL_CHAR* charPtr
 	g_link[g_link_index++] = *charPtr++;
     }
   }
+  debug0(DPD, D, "PDFPage_CollectLink returning");
   return charPtr;
 }
 

@@ -23,9 +23,11 @@
 /*  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.                */
 /*                                                                           */
 /*****************************************************************************/
+#include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
-#define C2LOUT_VERSION	"c2lout Version 3.11 (December 1996)"
+#define C2LOUT_VERSION	"c2lout Version 3.15 (May 1999)"
 #define	BOOLEAN		unsigned
 #define	FALSE		0
 #define	TRUE		1
@@ -372,7 +374,7 @@ int main(int argc, char *argv[])
   else if( at_least_one_file )
     fprintf(out_fp == NULL ? stdout : out_fp, "@End @Text\n");
 
-  exit(0);
+  return 0;
 } /* end main */
 
 
@@ -442,7 +444,8 @@ void ProcessStandAlone(char *fname, FILE *in_fp, FILE *out_fp)
 		 
 
     /* now print the initial @Use clauses etc.*/
-    fprintf(out_fp, "@SysInclude { cdoc }\n");
+    fprintf(out_fp, "@SysInclude { cprint }\n");
+    fprintf(out_fp, "@SysInclude { doc }\n");
     fprintf(out_fp, "@Use { @CP\n");
     fprintf(out_fp, "    style  { %s }\n", style_str);
     fprintf(out_fp, "    font   { %s }\n", font_str);

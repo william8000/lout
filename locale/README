@@ -8,8 +8,7 @@ where <loc> stands for the current locale, for its error messages.
 
 At present we have
 
-  msgs.english.3.15  The up-to-date messages list, in English
-  msgs.english.3.12  The Version 3.12 messages list, in English
+  msgs.english.3.16  The up-to-date messages list, in English
   old.msgs.fr	     French messages from Version 3.05, out of date
   old.msgs.de	     German messages from Version 3.05, out of date
 
@@ -18,5 +17,4 @@ Someone needs to translate the new errors list into these languages
 do (perhaps ask first) so that I can stop people doing duplicate work.
 
 Jeffrey H. Kingston
-5 February 1999
-9 May 1999
+26 May 1999

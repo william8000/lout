@@ -1,6 +1,6 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -1191,6 +1191,8 @@ void RestoreGraphicState(void)
 void PrintGraphicObject(OBJECT x)
 { OBJECT y, link;
   assert( BackEnd != PLAINTEXT, "PrintGraphicObject: BackEnd!" );
+  debug3(DPS, D, "PrintGraphicObject(%s %s %s)",
+    EchoFilePos(&fpos(x)), Image(type(x)), EchoObject(x));
   switch( type(x) )
   {
     case WORD:
@@ -1246,6 +1248,7 @@ void PrintGraphicObject(OBJECT x)
       break;
 
   }
+  debug0(DPS, D, "PrintGraphicObject returning");
 } /* end PrintGraphicObject */
 
 

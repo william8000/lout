@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -29,16 +29,16 @@
 /*****************************************************************************/
 #include "externs.h"
 #define TOO_TIGHT_BAD	1048576	/* 2^21; badness of a too tight line         */
-#define TOO_LOOSE_BAD	65536	/* 2^16; the max badness of a too loose line */
-#define	TIGHT_BAD	4096	/* 2^12; the max badness of a tight line     */
-#define	LOOSE_BAD	4096	/* 2^12; the max badness of a loose line     */
-#define	HYPH_BAD	128	/* 2^ 7; threshold for calling hyphenation   */
-#define	HYPH_BAD_INCR	 16	/* 2 ^4: the badness of one hyphen           */
-#define	WIDOW_BAD_INCR	128	/* 2 ^7: the badness of one widow word       */
-#define SQRT_TOO_LOOSE	512	/* 2^ 9; sqrt(TOO_LOOSE_BAD) (used to be)    */
-#define	SQRT_TIGHT_BAD	128	/* 2^ 7; sqrt(TIGHT_BAD) (used to be)        */
-#define	SQRT_LOOSE_BAD	128	/* 2^ 7; sqrt(LOOSE_BAD) (used to be)        */
-#define	SQRT_TOO_TIGHT	8192	/* 2^13; sqrt(TOO_TIGHT_BAD) (used to be)    */
+#define TOO_LOOSE_BAD	  65536	/* 2^16; the max badness of a too loose line */
+#define	TIGHT_BAD	   4096	/* 2^12; the max badness of a tight line     */
+#define	LOOSE_BAD	   4096	/* 2^12; the max badness of a loose line     */
+#define	HYPH_BAD	    128	/* 2^ 7; threshold for calling hyphenation   */
+#define	HYPH_BAD_INCR	     16	/* 2 ^4: the badness of one hyphen           */
+#define	WIDOW_BAD_INCR	    128	/* 2 ^7: the badness of one widow word       */
+#define SQRT_TOO_LOOSE	    512	/* 2^ 9; sqrt(TOO_LOOSE_BAD) (used to be)    */
+#define	SQRT_TIGHT_BAD	    128	/* 2^ 7; sqrt(TIGHT_BAD) (used to be)        */
+#define	SQRT_LOOSE_BAD	    128	/* 2^ 7; sqrt(LOOSE_BAD) (used to be)        */
+#define	SQRT_TOO_TIGHT	   8192	/* 2^13; sqrt(TOO_TIGHT_BAD) (used to be)    */
 #define MAX_EXPAND	1
 #define MAX_SHRINK	4
 
@@ -88,6 +88,9 @@ typedef struct {
 #define SetIntervalBadness(I, max_width, etc_width)			\
 { OBJECT g; int badness;						\
   int col_width;							\
+									\
+  /* initialize to  saved badness of left-adjoining interval, if any */	\
+  /* and set width of column                                         */	\
   if( I.llink == x )							\
   { col_width = (I.cwid!=nilobj) ? bfc(constraint(I.cwid)) : max_width;	\
     I.badness = 0;							\
@@ -140,9 +143,13 @@ typedef struct {
   }									\
   else									\
   { I.class = TOO_TIGHT;						\
-    badness = (SQRT_TOO_TIGHT*(col_width - I.nat_width)) / col_width;	\
+    /***								\
+    badness = (SQRT_TOO_TIGHT*(col_width-I.nat_width)) / col_width;	\
     I.badness += badness * badness;					\
+    ***/								\
+    I.badness += TOO_TIGHT_BAD;						\
   }									\
+  assert( I.badness >= 0, "SetIntervalBadness: badness < 0!" );		\
 } /* end macro SetIntervalBadness */
 
 
@@ -159,11 +166,11 @@ typedef struct {
 #define MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word)	\
 { OBJECT newg, foll, tmp;						\
   BOOLEAN jn, unbreakable_at_right = FALSE;				\
-  debug0(DOF, DD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
+  debug0(DOF, DDD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
 									\
   /* search onwards to find newg, the next true breakpoint */		\
   Child(tmp, rlink);							\
-  debug2(DOF, D, "NextDefiniteWithGap(%s, %s)", EchoObject(x),		\
+  debug2(DOF, DDD, "NextDefiniteWithGap(%s, %s)", EchoObject(x),	\
     EchoObject(tmp));							\
   NextDefiniteWithGap(x, rlink, foll, newg, jn);			\
 									\
@@ -172,7 +179,7 @@ typedef struct {
   { 									\
     assert( Up(newg) == LastUp(newg), "MoveRightToGap: newg!" );	\
     /* set save_space(newg) now so that it is OK to forget right */	\
-    debug0(DOF, DD, "  MoveRightToGap setting save_space(newg)");	\
+    debug0(DOF, DDD, "  MoveRightToGap setting save_space(newg)");	\
     if( I.cwid != nilobj )  etc_width = bfc(constraint(I.cwid));	\
     if( mode(gap(newg)) == TAB_MODE )					\
     { save_space(newg) = ActualGap(0, back(foll,COLM), fwd(foll,COLM),	\
@@ -185,15 +192,15 @@ typedef struct {
 	  - back(foll, COLM) - fwd(right, COLM);			\
     }									\
 									\
-    ifdebug(DOF, DD,							\
+    ifdebug(DOF, DDD,							\
       if( Down(newg) != newg )						\
       { OBJECT tmp;							\
 	Child(tmp, Down(newg));						\
-	debug5(DOF, DD, "newg %s: %s %s, gap = %s, save_space = %s",	\
+	debug5(DOF, DDD, "newg %s: %s %s, gap = %s, save_space = %s",	\
 	Image(type(newg)), Image(type(tmp)), EchoObject(tmp),		\
 	EchoGap(&gap(newg)), EchoLength(save_space(newg)));		\
       }									\
-      else debug3(DOF, DD, "newg %s: gap = %s, save_space = %s",	\
+      else debug3(DOF, DDD, "newg %s: gap = %s, save_space = %s",	\
 	Image(type(newg)), EchoGap(&gap(newg)),				\
 	EchoLength(save_space(newg)));					\
     )									\
@@ -208,7 +215,7 @@ typedef struct {
 	 !(string(right)[StringLength(string(right))-1] == CH_HYPHEN) )	\
         {								\
 	  /* make sure hyph_word exists and is of the right font */	\
-	  debug0(DOF, DD, "  MoveRightToGap checking hyph_word");	\
+	  debug0(DOF, DDD, "  MoveRightToGap checking hyph_word");	\
 	  if( hyph_word == nilobj )					\
 	  { hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
 	    word_font(hyph_word) = 0;					\
@@ -224,7 +231,7 @@ typedef struct {
 									\
 	  mode(gap(newg)) = ADD_HYPH;					\
 	  I.nat_width += size(hyph_word, COLM);				\
-	  debug0(DOF, DD, "   adding hyph_word from nat_width");	\
+	  debug0(DOF, DDD, "   adding hyph_word from nat_width");	\
         }								\
       }									\
       else								\
@@ -237,7 +244,7 @@ typedef struct {
       unbreakable_at_right = TRUE;					\
 									\
     I.rlink = Up(newg);							\
-    debug2(DOF, DD, "  MoveRightToGap setting I.rlink to %s %s",	\
+    debug2(DOF, DDD, "  MoveRightToGap setting I.rlink to %s %s",	\
       Image(type(newg)), EchoObject(newg));				\
   }									\
   else I.rlink = x;							\
@@ -245,7 +252,7 @@ typedef struct {
   if( unbreakable_at_right )  I.class = UNBREAKABLE_RIGHT;		\
   else if( I.class == TIGHT && mode(gap(newg)) == TAB_MODE )		\
     I.class = TOO_TIGHT, I.badness = TOO_TIGHT_BAD;			\
-  debug0(DOF, DD, "MoveRightToGap returning.");				\
+  debug0(DOF, DDD, "MoveRightToGap returning.");				\
 }
 
 /*@::IntervalInit(), IntervalShiftRightEnd()@*********************************/
@@ -258,7 +265,7 @@ typedef struct {
 
 #define IntervalInit(I, x, max_width, etc_width, hyph_word)		\
 { OBJECT rlink, right; BOOLEAN jn;					\
-  debug0(DOF, DD, "IntervalInit(I, x, -, -, hyph_word)");		\
+  debug0(DOF, DDD, "IntervalInit(I, x, -, -, hyph_word)");		\
   I.llink = x;								\
 									\
   FirstDefinite(x, rlink, right, jn);					\
@@ -277,7 +284,7 @@ typedef struct {
     /* move to gap, check hyphenation there etc. */			\
     MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word); 	\
   }									\
-  debug0(DOF, DD, "IntervalInit returning.");				\
+  debug0(DOF, DDD, "IntervalInit returning.");				\
 } /* end macro IntervalInit */
 
 
@@ -308,7 +315,7 @@ typedef struct {
     if( mode(gap(g)) == ADD_HYPH )					\
     { I.nat_width -= size(hyph_word,COLM);				\
       save_badness(g) += HYPH_BAD_INCR;					\
-      debug0(DOF, DD, "   subtracting hyph_word from nat_width");	\
+      debug0(DOF, DDD, "   subtracting hyph_word from nat_width");	\
     }									\
 									\
     /* find definite object which must lie just to the right of g */	\
@@ -444,7 +451,7 @@ static FULL_CHAR *IntervalPrint(INTERVAL I, OBJECT x)
   for( link = NextDown(I.llink);  link != I.rlink;  link = NextDown(link) )
   { assert(link != x, "IntervalPrint: link == x!");
     Child(y, link);
-    debug2(DOF, DD, "IntervalPrint at %s %s", Image(type(y)), EchoObject(y));
+    debug2(DOF, DDD, "IntervalPrint at %s %s", Image(type(y)), EchoObject(y));
     assert(y != x, "IntervalPrint: y == x!");
     if( type(y) == GAP_OBJ )
     { g = y;
@@ -515,7 +522,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   BOOLEAN hyph_allowed;	    /* TRUE when hyphenation of words is permitted  */
   assert( type(x) == ACAT, "FillObject: type(x) != ACAT!" );
 
-  debug4(DOF, DD, "FillObject(x, %s, can_hyph = %s, %s); %s",
+  debug4(DOF, D, "FillObject(x, %s, can_hyph = %s, %s); %s",
     EchoConstraint(c), bool(can_hyphenate),
     multi == nilobj ? "nomulti" : "multi", EchoStyle(&save_style(x)));
   ifdebug(DOF, DD, DebugObject(x); fprintf(stderr, "\n\n") );
@@ -603,8 +610,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   IntervalInit(I, x, max_width, etc_width, hyph_word);  BestI = I;
   while( IntervalClass(I) != AT_END )
   {
-    debug0(DOF, DD, "loop:");
-    debug1(DOF, DD, "       %s", IntervalPrint(I, x));
+    debug0(DOF, D, "loop:");
+    debug1(DOF, D, "       %s", IntervalPrint(I, x));
     switch( IntervalClass(I) )
     {
 
@@ -615,7 +622,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	if( IntervalClass(I) == EMPTY_INTERVAL ||
 	    IntervalBadness(BestI) <= IntervalBadness(I) )
 	      I = BestI;
-	debug1(DOF, DD, "BestI: %s\n", IntervalPrint(I, x));
+	debug1(DOF, D, "BestI: %s\n", IntervalPrint(I, x));
 	/* NB no break */
 
 
@@ -888,6 +895,6 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
     }
   }
 
-  debug0(DOF, DD, "FillObject exiting");
+  debug0(DOF, D, "FillObject exiting");
   return res;
 } /* end FillObject */

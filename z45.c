@@ -1,6 +1,6 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.15)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -232,6 +232,7 @@ void SortFile(FULL_CHAR *infile, FULL_CHAR *outfile)
   /* read lines, sort them, and write them out again sorted */
   lines = ReadLines(in_fp, infile, (FULL_CHAR *) NULL, &lines_len);
   SortLines(lines, lines_len);
+  fclose(in_fp);
   WriteLines(out_fp, lines, lines_len);
   fclose(out_fp);
 }

@@ -204,10 +204,15 @@ Changes and new features introduced in Version 3.15 [May 1999]
     @DoubleLine symbol in diagrams for drawing a double line
     -l and -L flags for selecting collation order (see lout -u)
 
+Changes and new features introduced in Version 3.16 [28 May 1999]
+
+    Bug fixes
+    Optimal paragraph breaking weights adjusted yet again (sigh)
+
 Things that ought to be done but haven't been done yet
 
     pdfmark in PostScript output
     Review Uwe's proposal for moving word row marks to the baseline
 
 Jeff Kingston
-16 May 1999
+26 May 1999

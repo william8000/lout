@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-#  Lout @DocumentSetup package (Version 3.13)                                 #
+#  Lout @DocumentSetup package (Version 3.16)                                 #
 #                                                                             #
 #  Version 1.0 by Jeffrey H. Kingston, 17 July 1991.                          #
 #  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
@@ -8,11 +8,11 @@
 #  Version 3.03 by Jeffrey H. Kingston, 6 May 1995.                           #
 #  Versions 3.04 and 3.05 by Jeffrey H. Kingston, 11 June 1995.               #
 #  Version 3.05 by Jeffrey H. Kingston, 25 July 1995.                         #
-#      @RawList modified by JHK Oct 95 to fix problem with lists.             #
 #  Version 3.07 by Jeffrey H. Kingston, February 1996.                        #
 #  Version 3.10 by Jeffrey H. Kingston, September 1996.                       #
 #  Version 3.11 by Jeffrey H. Kingston, December 1996.                        #
 #  Version 3.13 by Jeffrey H. Kingston, October 1998.                         #
+#  Version 3.16 by Jeffrey H. Kingston, May 1999.                             #
 #                                                                             #
 #  This Lout package contains the general definitions used by all types of    #
 #  documents.  It needs to be extended (see docf, reportf, bookf, slidesf,    #
@@ -4548,91 +4548,58 @@ def @DocumentSetup
 
 	def @Heading
 	{
-          @BackEnd @Case {
-	    { PostScript PlainText } @Yield {
-	      type @Case {
+	    def @AttachPDFLink
+	        left title
+	        right x
+	    {
+	        @BackEnd @Case {
 
-		Minor @Yield {
+                    # VTan: Rats! Cannot use the tag for the name of the link
+	            # because the source link has no access to the tag
+                    #
+                    # using title will work most of the time; it will fail
+	            # with a "problem with left parameter of @Graphic" warning
+	            # message if the title has objects other than text in it.
+	            # Eg, "@Title { My @FancyTitle }"  with
+	            # "def @FancyTitle { @OneCol { @Bold "fancy" "title" }" }
+                    #
+                    # Example: the user manual has a definition for @Tex which
+	            # causes this warning message to appear
+
+		    PDF @Yield {
+		        title @Case {
+			    "" @Yield x
+			    else @Yield {
+			        "__link_target_for_export=<<"title">>"
+			        @Graphic x
+			    }
+		        }
+		    }
+
+		    else @Yield x
+	        }
+	    }
+
+	    type @Case {
+
+		Minor @Yield title @AttachPDFLink {
 		    headingfont @Font
 		    headingbreak @Break @Protect {@LongNum headingformat title}
 		}
 
-		{ Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield sendheader {
+		{ Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield {
+		    sendheader { title @AttachPDFLink {
 		    //aboveheadinggap
 		    headingfont @Font
-		    headingbreak @Break { @LongNum headingformat title }
+		    headingbreak @Break { @LongNum headingformat title } } }
 		}
 
-		{ VeryMajor } @Yield sendheader {
+		{ VeryMajor } @Yield { sendheader { title @AttachPDFLink {
 		    //aboveheadinggap
 		    headingfont @Font
-		    headingbreak @Break { bypassnumber headingformat title }
+		    headingbreak @Break { bypassnumber headingformat title } } }
 		}
 	    }
-	  }
-
-	  PDF @Yield {
-
-# Rats! Cannot use the tag for the name of the link because the source
-# link has no access to the tag
-
-# using title will work most of the time; it will fail with a "problem
-# with left parameter of @Graphic" warning message if the title has
-# objects other than text in it. Eg, "@Title { My @FancyTitle }"
-# with "def @FancyTitle { @OneCol { @Bold "fancy" "title" }" }
-#
-# Example: the user manual has a definition for @Tex which causes this
-# warning message to appear
-
-#	  tag @Case {
-#	    "" @Yield {	# no tag specified: use title
-	      {  "__link_target_for_export=<<"title">>"
-	      } @Graphic {
-	        type @Case {
-
-		    Minor @Yield {
-		        headingfont @Font
-		        headingbreak @Break @Protect {@LongNum headingformat title}
-		    }
-
-		    { Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield sendheader {
-		        //aboveheadinggap
-		        headingfont @Font
-		        headingbreak @Break { @LongNum headingformat title }
-		    }
-
-		    { VeryMajor } @Yield sendheader {
-		        //aboveheadinggap
-		        headingfont @Font
-		        headingbreak @Break { bypassnumber headingformat title }
-		    }
-
-	        }	# type @Case
-	      }	# @Graphic
-#	    }
-#
-#	    else @Yield {	# tag specified: use it
-#	      {  "__link_target_for_export=<<"tag">>"
-#	      } @Graphic {
-#	        type @Case {
-#
-#		    Minor @Yield {
-#		        headingfont @Font
-#		        headingbreak @Break @Protect {@LongNum headingformat title}
-#		    }
-#
-#		    { Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield sendheader {
-#		        //aboveheadinggap
-#		        headingfont @Font
-#		        headingbreak @Break { @LongNum headingformat title }
-#		    }
-#
-#	        }	# type @Case
-#	      }	# @Graphic
-#	    }		# non-"" case
-#	  }		# tag @Case
-	  }
-          }
 	}
 
 	def @IfMajor right x
