@@ -130,7 +130,7 @@ space is determined by the @@Wide symbol, whose form is
 }
 and whose result is the given object modified to have exactly the given
 length.  For example, the expression
-@ID  @Code {
+@ID @OneRow  @Code {
 "5i @Wide {"
 "Macbeth was very ambitious.  This led him to wish to become"
 "king of Scotland.  The witches told him that this wish of"

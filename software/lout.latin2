@@ -1,0 +1,19 @@
+LOUT.LATIN2 - LATIN-2 LANGUAGE FORMATTING IN LOUT DOCUMENTS (VERSION 1.2)
+
+This software contains everything you need to format documents containing
+Latin-2 text with Lout, and in particular everything needed for Czech and
+Slovenian.  This package was formerly called lout.slovenian.  There is a
+makefile to assist you with installation (very simple).
+
+Lout.Latin2 is distributed as follows:
+
+   ftp://ftp.cs.su.oz.au/jeff/lout.latin2.1.2.tar.gz
+
+In other words, in a gzipped tar file called "lout.latin2.1.2.tar.gz"
+in the "jeff" subdirectory of the home directory of "ftp ftp.cs.su.oz.au"
+with login name "ftp" or "anonymous" using any non-empty password.
+
+Lout.Latin2 was designed and implemented by Jeffrey H. Kingston
+(jeff@cs.su.oz.au) of the Basser Department of Computer Science at the
+University of Sydney, and was made possible by assistance received from
+Ljupco Taseski (Slovenian) and Pavel Vana (Czech).

@@ -7,7 +7,7 @@ In addition to left and right (or body) parameters, a symbol may have
 any number of {@I {named parameters}}:
 parameter.named @SubIndex { @Code named parameter }
 named.par @Index { @Code named parameter }
-@ID @Code  {
+@ID @OneRow @Code  {
 "def @Chapter"
 "    named @Tag {}"
 "    named @Title {}"
@@ -21,7 +21,7 @@ parameters, and each is followed by a @I {default value} between
 default @Index { Default value of parameter }
 braces.  When @Code "@Chapter" is invoked, its named parameters are
 given values in the following way:
-@ID @Code  {
+@ID @OneRow @Code  {
 "@Chapter"
 "    @Tag { intro }"
 "    @Title { Introduction }"
@@ -40,11 +40,13 @@ tag.par @Index { @Code "@Tag" parameter, default value of }
 does not take its default value from the definition; instead, if a default
 value is needed, Lout invents a simple word which differs from every other
 tag.  This is important, for example, in the production of numbered
-chapters and sections (Section {@NumberOf chapters}).
+chapters and sections (Section {@NumberOf chapters}).  The same thing occurs
+if there is a @Code "@Tag" parameter but its value is the empty object:  the
+value will be replaced by an invented one.
 @PP
 Named parameters may have parameters, {@PageMark strange} as in the
 following definition:
-@ID @Code {
+@ID @OneRow @Code {
 "def @Strange"
 "    named @Format right @Val { [@Val] }"
 "    right x"
@@ -65,7 +67,7 @@ equals @Code "@Format 27" and so has result
 }
 The @Code "@Format" symbol is like a definition with parameters whose
 body can be changed:
-@ID @Code {
+@ID @OneRow @Code {
 "@Strange"
 "    @Format { Slope @Font @Val. }"
 "27"

@@ -1,6 +1,6 @@
 /*@z30.c:Symbol uses:InsertUses()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -40,13 +40,12 @@
 /*                                                                           */
 /*****************************************************************************/
 
-InsertUses(x, y)
-OBJECT x, y;
+void InsertUses(OBJECT x, OBJECT y)
 { OBJECT tmp;
   debug2(DSU, D, "InsertUses( %s, %s )", SymName(x), SymName(y));
   if( type(x) == LOCAL && type(y) == LOCAL && !predefined(y) )
   { tmp = GetMem(USES_SIZE, no_fpos);  item(tmp) = y;
-    if( base_uses(x) == nil )  next(tmp) = tmp;
+    if( base_uses(x) == nilobj )  next(tmp) = tmp;
     else next(tmp) = next(base_uses(x)), next(base_uses(x)) = tmp;
     base_uses(x) = tmp;
   }
@@ -54,7 +53,7 @@ OBJECT x, y;
   { uses_count(y) += (enclosing(y) == x ? 1 : 2);
     if( dirty(y) || uses_count(y) > 1 )  dirty(enclosing(y)) = TRUE;
   }
-  else if( sym_body(y) == nil || dirty(y) )  dirty(x) = TRUE;
+  else if( sym_body(y) == nilobj || dirty(y) )  dirty(x) = TRUE;
   debug5(DSU, D, "InsertUses returning ( %s %s; %s %s, count = %d )",
     SymName(x), (dirty(x) ? "dirty" : "clean"),
     SymName(y), (dirty(y) ? "dirty" : "clean"), uses_count(y));
@@ -71,10 +70,9 @@ OBJECT x, y;
 /*                                                                           */
 /*****************************************************************************/
 
-static GatherUses(x, sym)
-OBJECT x, sym;
+static void GatherUses(OBJECT x, OBJECT sym)
 { OBJECT link, y, tmp;
-  if( base_uses(x) != nil )
+  if( base_uses(x) != nilobj )
   { link = next(base_uses(x));
     do
     { y = item(link);
@@ -82,7 +80,7 @@ OBJECT x, sym;
       {	if( y != sym )
 	{ marker(y) = sym;
 	  tmp = GetMem(USES_SIZE, no_fpos);  item(tmp) = y;
-	  if( uses(sym) == nil )  next(tmp) = tmp;
+	  if( uses(sym) == nilobj )  next(tmp) = tmp;
 	  else next(tmp) = next(uses(sym)), next(uses(sym)) = tmp;
 	  uses(sym) = tmp;
 	  if( indefinite(y) )  indefinite(sym) = TRUE;
@@ -97,8 +95,7 @@ OBJECT x, sym;
 } /* end GatherUses */
 
 
-static GatherAllUses(x)
-OBJECT x;
+static void GatherAllUses(OBJECT x)
 { OBJECT link, y;
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
@@ -117,7 +114,7 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-FlattenUses()
+void FlattenUses(void)
 { GatherAllUses(StartSym);
 } /* end FlattenUses */
 
@@ -130,12 +127,11 @@ FlattenUses()
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN SearchUses(x, y)
-OBJECT x, y;
+BOOLEAN SearchUses(OBJECT x, OBJECT y)
 { OBJECT p;
   debug3(DSU, DD, "SearchUses(%s, %s) uses: %d", SymName(x),SymName(y),uses(x));
   if( x == y )  return TRUE;
-  if( uses(x) != nil )
+  if( uses(x) != nilobj )
   { p = next(uses(x));
     do
     { debug1(DSU, DDD, "  checking %s", SymName(item(p)));
@@ -153,17 +149,16 @@ OBJECT x, y;
 /*  OBJECT NextExternTarget(sym, cont)                                       */
 /*                                                                           */
 /*  Together these two procedures return all symbols which are both used by  */
-/*  sym and a target for at least one external galley.  Return nil at end.   */
+/*  sym and a target for at least one external galley.  Return nilobj at end.*/
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT FirstExternTarget(sym, cont)
-OBJECT sym, *cont;
+OBJECT FirstExternTarget(OBJECT sym, OBJECT *cont)
 { OBJECT res;
   debug1(DSU, D, "FirstExternTarget( %s )", SymName(sym));
-  res = nil;  *cont = nil;
+  res = nilobj;  *cont = nilobj;
   if( is_extern_target(sym) )  res = sym;
-  else if( uses(sym) != nil )
+  else if( uses(sym) != nilobj )
   { *cont = next(uses(sym));
     do
     { if( is_extern_target(item(*cont)) )
@@ -177,12 +172,11 @@ OBJECT sym, *cont;
   return res;
 } /* end FirstExternTarget */
 
-OBJECT NextExternTarget(sym, cont)
-OBJECT sym, *cont;
+OBJECT NextExternTarget(OBJECT sym, OBJECT *cont)
 { OBJECT res;
   debug1(DSU, D, "NextExternTarget( %s )", SymName(sym));
-  res = nil;
-  if( *cont != nil )
+  res = nilobj;
+  if( *cont != nilobj )
   { *cont = next(*cont);
     while( *cont != next(uses(sym)) )
     { if( is_extern_target(item(*cont)) )

@@ -1,0 +1,82 @@
+@Section
+    @Title { Large-scale structure:  chapters, sections, etc. }
+    @RunningTitle { Large-scale structure }
+    @Tag { largescale }
+@Begin
+@PP
+Lout's large-scale structure symbols vary with the type of document
+large.scale. @Index { large-scale structure }
+({@Code "@Chapter"} for books, @Code "@Overhead" for overhead
+transparencies, etc.), but they all work in the same way.  Here is a
+typical example, {@Code "@Section"}, as it would actually be used:
+@ID @OneRow @Code {
+"@Section"
+"    @Title { Allocation of teachers }"
+"@Begin"
+"@PP"
+"Apart from the usual need to avoid clashes, the allocation of teachers must"
+"ensure that no teacher teaches more than seven periods per day, or ..."
+"@End @Section"
+}
+First comes the symbol itself, then any options in the usual way, and
+then the following object, enclosed in @Code "@Begin" and
+{@Code "@End @Section"}.  The following object, also called the body
+of the section, may contain paragraphs, displays, and all the other
+features as usual.  The body should begin with a paragraph symbol,
+which may be @Code "@PP" or @Code "@LP" as you prefer.  The result is
+a section like the present one, automatically numbered, with the
+@Code "@Title" option for its heading, preceded by a conditional new
+title. @Index @Code "@Title"
+page symbol (Section {@NumberOf paragraphs}).
+@PP
+When @Code "@Section" symbols are used within an ordinary document, they
+must be bracketed by @Code "@BeginSections" and @Code "@EndSections"
+symbols, like this:
+@ID @OneRow @Code {
+"@SysInclude { doc }"
+"@Doc @Text @Begin"
+"preceding text"
+"@BeginSections"
+"@Section ... @End @Section"
+"@Section ... @End @Section"
+"..."
+"@Section ... @End @Section"
+"@EndSections"
+"@End @Text"
+}
+This arrangement is reminiscent of the one for lists, and, as for
+lists, there may be no paragraph or new page symbols before, between,
+or after the sections.  To change the gap between sections, you need
+to change the @Code "@SectionGap" option in the setup file, as explained
+in Chapter {@NumberOf types}.
+@PP
+The @Code "@Begin ... @End @Section" that brackets the body of each
+section may be abbreviated to {@Code "{ ... }"}.  However, the long
+form is recommmended because it helps Lout to detect missing or extra
+braces within the body of the section.
+@PP
+All large-scale structure symbols have a @Code "@Tag" option, whose
+use is explained in Section {@NumberOf cross}, and a @Code "@RunningTitle"
+runningtitle. @Index @Code "@RunningTitle"
+option.  If running page headers have been requested, @Code "@RunningTitle"
+will be used if it is given, otherwise @Code "@Title" will be used for the
+running header.  For example, the present section begins like this:
+@ID @OneRow @Code {
+"@Section"
+"    @Title { Large-scale structure:  chapters, sections, etc. }"
+"    @RunningTitle { Large-scale structure }"
+"    @Tag { largescale }"
+"@Begin"
+"..."
+}
+The point is that the section title is rather long for a running
+title, and so we use @Code "@RunningTitle" to get an abbreviated
+version of it.
+@PP
+All large-scale structure symbols also have an @Code "@InitialLanguage"
+option which sets the current language for the duration of that
+symbol.  However, footnotes, endnotes, figures, tables, references,
+and index entries are set in the initial language of the document as
+a whole, unless you change their language explicitly using the
+@Code "@Language" symbol.
+@End @Section

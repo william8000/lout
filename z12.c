@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -44,12 +44,11 @@
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT MinSize(x, dim, extras)
-OBJECT x;  int dim;  OBJECT *extras;
+OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 { OBJECT y, z, link, prev, t, g, full_name;
   int b, f, dble_fwd, llx, lly, urx, ury, status;
   float fllx, flly, furx, fury;
-  BOOLEAN dble_found, found, will_expand, first_line;
+  BOOLEAN dble_found, found, will_expand, first_line, cp;
   FILE *fp;  FULL_CHAR buff[MAX_BUFF];
 
   debug2(DSF, DD, "[ MinSize( %s, %s, extras )", EchoObject(x), dimen(dim));
@@ -69,11 +68,23 @@ OBJECT x;  int dim;  OBJECT *extras;
 
       /* add index to the cross-ref */
       if( dim == ROW )
-      {	z = New(cross_type(x));
+      {	z = New(cross_type(x));	/* CROSS_PREC or CROSS_FOLL */
 	actual(z) = x;
 	Link(z, x);		/* new code to avoid disposal */
 	Link(*extras, z);
-	debug2(DCR, D, "  MinSize index: %d %s", (int) z, EchoObject(z));
+	debug2(DCR, DD, "  MinSize index: %ld %s", (long) z, EchoObject(z));
+      }
+      back(x, dim) = fwd(x, dim) = 0;
+      break;
+
+
+    case PAGE_LABEL:
+    
+      if( dim == ROW )
+      { z = New(PAGE_LABEL_IND);
+	actual(z) = x;
+	Link(z, x);
+	Link(*extras, z);
       }
       back(x, dim) = fwd(x, dim) = 0;
       break;
@@ -98,6 +109,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	{
 	  /* galley is sorted, make insinuated cross-reference */
 	  z = backward(x) ? New(GALL_PREC) : New(GALL_FOLL);
+	  pinpoint(z) = y;
 	  Child(t, Down(x));
 	  actual(z) = CrossMake(whereto(x), t, (int) type(z));
 	  Link(*extras, z);
@@ -108,6 +120,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	{
 	  /* galley is following, make UNATTACHED */
 	  z = New(UNATTACHED);  Link(z, x);
+	  pinpoint(z) = y;
 	  Link(*extras, z);
 	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
 	}
@@ -172,7 +185,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	actual(z) = x;
 	Link(*extras, z);
 	/* Can't do Link(z, x) because Constrained goes up and finds z */
-	debug2(DCR, D, "  MinSize index: %d %s", (int) z, EchoObject(z));
+	debug2(DCR, DD, "  MinSize index: %ld %s", (long) z, EchoObject(z));
       }	
       break;
 
@@ -318,18 +331,18 @@ OBJECT x;  int dim;  OBJECT *extras;
 	/*                                                                  */
 	/*  Calculate sizes parallel to join direction; loop invariant is:  */
 	/*                                                                  */
-	/*     If prev == nil, there are no definite children equal to or   */
-	/*        to the left of Child(link).                               */
-	/*     If prev != nil, prev is the rightmost definite child to the  */
-	/*        left of Child(link), and (b, f) is the total size up to   */
-	/*        the mark of prev i.e. not including fwd(prev).            */
-	/*     g is the most recent gap, or nil if none found yet.          */
+	/*     If prev == nilobj, there are no definite children equal to   */
+	/*        or to the left of Child(link).                            */
+	/*     If prev != nilobj, prev is the rightmost definite child to   */
+	/*        the left of Child(link), and (b, f) is the total size up  */
+	/*        to the mark of prev i.e. not including fwd(prev).         */
+	/*     g is the most recent gap, or nilobj if none found yet.       */
 	/*     will_expand == TRUE when a gap is found that is likely to    */
 	/*        enlarge when ActualGap is called later on.                */
 	/*                                                                  */
 	/********************************************************************/
 
-	prev = g = nil;  will_expand = FALSE;  must_expand(x) = FALSE;
+	prev = g = nilobj;  will_expand = FALSE;  must_expand(x) = FALSE;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
 	{ Child(y, link);
 	  if( is_index(type(y)) )
@@ -360,14 +373,14 @@ OBJECT x;  int dim;  OBJECT *extras;
 	    if( is_indefinite(type(y)) )
 	    {
 	      /* error if preceding gap has mark */
-	      if( g != nil && mark(gap(g)) )
+	      if( g != nilobj && mark(gap(g)) )
 	      {	Error(12, 3, "^ deleted (it may not precede this object)",
 		  WARN, &fpos(y));
 		mark(gap(g)) = FALSE;
 	      }
 
 	      /* error if next unit is used in preceding gap */
-	      if( g != nil && units(gap(g)) == NEXT_UNIT )
+	      if( g != nilobj && units(gap(g)) == NEXT_UNIT )
 	      {	Error(12, 4, "gap replaced by 0i (%c unit not allowed here)",
 		  WARN, &fpos(y), CH_UNIT_WD);
 		units(gap(g)) = FIXED_UNIT;
@@ -377,10 +390,10 @@ OBJECT x;  int dim;  OBJECT *extras;
 	    else
 	    {
 	      /* calculate running total length */
-	      if( prev == nil )  b = back(y, dim), f = 0;
+	      if( prev == nilobj )  b = back(y, dim), f = 0;
 	      else
 	      {
-		assert( g!=nil && mode(gap(g))!=NO_MODE, "MinSize: NO_MODE!" );
+		assert(g!=nilobj && mode(gap(g))!=NO_MODE, "MinSize: NO_MODE!");
 		f += MinGap(fwd(prev, dim), back(y, dim), fwd(y, dim), &gap(g));
 		if( units(gap(g)) == FRAME_UNIT && width(gap(g)) > FR )
 		    will_expand = TRUE;
@@ -392,7 +405,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  }
 	} /* end for */
 
-	if( prev == nil )  b = f = 0;
+	if( prev == nilobj )  b = f = 0;
 	else f += fwd(prev, dim);
 	back(x, dim) = min(MAX_LEN, b);
 	fwd(x, dim)  = min(MAX_LEN, f);
@@ -511,7 +524,7 @@ OBJECT x;  int dim;  OBJECT *extras;
       if( dim == ROW )  break;
       status = IG_LOOKING;
       Child(y, Down(x));
-      fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y));
+      fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y), &cp);
       /* *** fp = OpenFile(fnum = sparec(constraint(x)), FALSE); */
       if( fp == NULL )  status = IG_NOFILE;
       first_line = TRUE;
@@ -560,6 +573,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
 	  sparec(constraint(x)) = TRUE;
 	  fclose(fp);
+	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
 	  break;
 
 	case IG_BADFILE:
@@ -570,6 +584,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  sparec(constraint(x)) = FALSE;
 	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
 	  fclose(fp);
+	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
 	  break;
 	
 	case IG_BADSIZE:
@@ -582,6 +597,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  back(x, COL) = fwd(x, COL) = back(x, ROW) = fwd(x, ROW) = 0;
 	  sparec(constraint(x)) = TRUE;
 	  fclose(fp);
+	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
 	  break;
 
 	case IG_OK:
@@ -597,6 +613,7 @@ OBJECT x;  int dim;  OBJECT *extras;
 	  back(x, ROW) = fwd(x, ROW) = b / 2;
 	  sparec(constraint(x)) = TRUE;
 	  fclose(fp);
+	  if( cp )  StringRemove(AsciiToFull(LOUT_EPS));
 	  break;
 
       }

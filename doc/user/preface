@@ -6,7 +6,7 @@ system.
 @IndexBlanks
 @PP
 There are three other documents describing Lout:  the Expert's Guide
-@Cite { $kingston1994lout.expert }, formerly called `Document Formatting
+@Cite { $kingston1995lout.expert }, formerly called `Document Formatting
 with Lout,' which you need if you want to add new features to Lout; a
 journal paper on the design and implementation of Lout
 @Cite { $kingston1993lout.design }; and a set of overhead transparencies
@@ -15,7 +15,7 @@ as this Guide.  These documents are all distributed with the software.
 @PP
 Lout is distributed free of charge under the GNU Public License.  The
 gnu. @Index { GNU Public License }
-primary source is a gzipped tar file called @Code "lout.3.02.tar.gz"
+primary source is a gzipped tar file called @Code "lout.3.06.tar.gz"
 or similar which is kept in subdirectory @Code jeff of the home directory of
 @Code ftp to {@Code "ftp.cs.su.oz.au"} with login name @Code anonymous
 and any non-empty password.  This is redistributed on the
@@ -25,11 +25,11 @@ documentation, license, and installation instructions.  Distribution by
 uuencoded email is also available, from me.
 @PP
 A mailing list has been set up for discussion of all topics related to
-Lout.  To subscribe, send email to @Code "lout-request@cs.brown.edu"
+Lout.  To subscribe, send email to @Code "lout-request@niif.spb.su"
 containing the word @Code "subscribe" in the Subject line.  To post an
-item, send email to {@Code "lout@cs.brown.edu"}; it will be forwarded to
+item, send email to {@Code "lout@niif.spb.su"}; it will be forwarded to
 all subscribers via email.  To unsubscribe, send email to
-@Code "lout-request@cs.brown.edu" containing the word @Code "unsubscribe"
+@Code "lout-request@niif.spb.su" containing the word @Code "unsubscribe"
 in the Subject line.
 @PP
 Version 2 documents should port to Version 3 almost unchanged.  If you

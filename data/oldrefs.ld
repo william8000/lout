@@ -33,7 +33,7 @@ of Programming Languages (POPL), Las Vegas NV }
      @Author { Strunk, William and White, E. B. }
      @Title { The Elements of Style }
      @Publisher { Macmillan }
-     @Edition { Third }
+     @Edition { Third Edition }
      @Year { 1979 }
 }
 

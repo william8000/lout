@@ -1,6 +1,6 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -38,8 +38,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT Next(x, inc, done)
-OBJECT x; int inc; BOOLEAN *done;
+OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
 { OBJECT y, link;  int l, r, n, len;
   FULL_CHAR buff[MAX_BUFF];
   debug3(DCS, DD, "Next( %s, %d, %s )", EchoObject(x), inc, bool(*done));
@@ -74,6 +73,7 @@ OBJECT x; int inc; BOOLEAN *done;
     case GAP_OBJ:
     case CLOSURE:
     case NULL_CLOS:
+    case PAGE_LABEL:
     case CROSS:
     
       break;
@@ -133,7 +133,7 @@ OBJECT x; int inc; BOOLEAN *done;
 
     default:
     
-      Error(32, 2, "Next: %s", Image(type(x)), INTERN, &fpos(x));
+      Error(32, 2, "Next: %s", INTERN, &fpos(x), Image(type(x)));
       break;
 
   } /* end switch */

@@ -1,6 +1,6 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -43,12 +43,14 @@ static FILE	*last_write_fp  = null;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT ReadFromFile(fnum, pos)
-FILE_NUM fnum; long pos;
-{ OBJECT t, res; int ipos;
+OBJECT ReadFromFile(FILE_NUM fnum, long pos)
+{ OBJECT t, res;
+#if DEBUG_ON
+  int ipos;
+#endif
   ifdebug(DPP, D, ProfileOn("ReadFromFile"));
   ifdebug(DIO, D, ipos = (int) pos);
-  debug2(DIO, D, "ReadFromFile(%s, %d, %s)", FileName(fnum), ipos);
+  debug2(DIO, D, "ReadFromFile(%s, %d)", FileName(fnum), ipos);
   LexPush(fnum, (int) pos, DATABASE_FILE);
   t = LexGetToken();
   if( type(t) != LBR )
@@ -57,8 +59,8 @@ FILE_NUM fnum; long pos;
       FATAL, &fpos(t));
   }
   res = Parse(&t, StartSym, FALSE, FALSE);
-  if( t != nil || type(res) != CLOSURE )
-  { debug1(DIO, D, "  following because of %s", t != nil ? "t" : "type(res)");
+  if( t != nilobj || type(res) != CLOSURE )
+  { debug1(DIO, D, "  following because of %s", t!=nilobj ? "t" : "type(res)");
     Error(41, 2, "syntax error in database file", FATAL, &fpos(res));
   }
   LexPop();
@@ -77,17 +79,15 @@ FILE_NUM fnum; long pos;
 /*  was previously read as a @Use clause, write only @LUse and the name.     */
 /*                                                                           */
 /*****************************************************************************/
-static WriteObject();
+static void WriteObject(OBJECT x, int outer_prec);
 
-static BOOLEAN need_lvis(sym)		/* true if @LVis needed before sym */
-OBJECT sym;
+static BOOLEAN need_lvis(OBJECT sym)	/* true if @LVis needed before sym */
 { return !visible(sym) &&
 	 enclosing(sym) != StartSym &&
 	 type(enclosing(sym)) == LOCAL;
 } /* end need_lvis */
 
-static WriteClosure(x)
-OBJECT x;
+static void WriteClosure(OBJECT x)
 { OBJECT y, link, z, sym;
   BOOLEAN npar_seen, name_printed;
 
@@ -152,7 +152,7 @@ OBJECT x;
 	    name_printed = TRUE;
 	  }
 	  StringFPuts(npar_seen ? STR_NEWLINE : STR_SPACE, last_write_fp);
-	  if( has_body(sym) && filter(sym) == nil )
+	  if( has_body(sym) || filter(sym) != nilobj )
 	  {
 	    StringFPuts(KW_LBR, last_write_fp);
 	    StringFPuts(STR_SPACE, last_write_fp);
@@ -193,8 +193,7 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-static WriteObject(x, outer_prec)
-OBJECT x;  int outer_prec;
+static void WriteObject(OBJECT x, int outer_prec)
 { OBJECT link, y, gap_obj, sym, env;  FULL_CHAR *name;
   int prec, i, last_prec;  BOOLEAN braces_needed;
   switch( type(x) )
@@ -294,17 +293,17 @@ OBJECT x;  int outer_prec;
 
     case CLOSURE:
 
-      sym = actual(x);  env = nil;
+      sym = actual(x);  env = nilobj;
       if( LastDown(x) != x )
       {	Child(y, LastDown(x));
 	if( type(y) == ENV )  env = y;
       }
 
-      braces_needed = env != nil ||
+      braces_needed = env != nilobj ||
 	(precedence(sym) <= outer_prec && (has_lpar(sym) || has_rpar(sym)));
 
       /* print environment */
-      if( env != nil )
+      if( env != nilobj )
       {	StringFPuts(KW_ENV, last_write_fp);
       	StringFPuts(STR_NEWLINE, last_write_fp);
 	WriteObject(env, NO_PREC);
@@ -320,7 +319,7 @@ OBJECT x;  int outer_prec;
       if( braces_needed )  StringFPuts(KW_RBR, last_write_fp);
 
       /* print closing environment if needed */
-      if( env != nil )
+      if( env != nilobj )
       { StringFPuts(STR_NEWLINE, last_write_fp);
 	StringFPuts(KW_CLOS, last_write_fp);
       	StringFPuts(STR_NEWLINE, last_write_fp);
@@ -332,14 +331,17 @@ OBJECT x;  int outer_prec;
 
       Child(y, Down(x));
       assert( type(y) == CLOSURE, "WriteObject/CROSS: type(y) != CLOSURE!" );
+      if( DEFAULT_PREC <= outer_prec )  StringFPuts(KW_LBR, last_write_fp);
       StringFPuts(SymName(actual(y)), last_write_fp);
       StringFPuts(KW_CROSS, last_write_fp);
       Child(y, LastDown(x));
       WriteObject(y, FORCE_PREC);
+      if( DEFAULT_PREC <= outer_prec )  StringFPuts(KW_RBR, last_write_fp);
       break;
 
 
     case NULL_CLOS:	name = KW_NULL;		goto SETC;
+    case PAGE_LABEL:	name = KW_PAGE_LABEL;	goto SETC;
     case ONE_COL:	name = KW_ONE_COL;	goto SETC;
     case ONE_ROW:	name = KW_ONE_ROW;	goto SETC;
     case WIDE:		name = KW_WIDE;		goto SETC;
@@ -364,9 +366,12 @@ OBJECT x;  int outer_prec;
     case FONT:		name = KW_FONT;		goto SETC;
     case SPACE:		name = KW_SPACE;	goto SETC;
     case BREAK:		name = KW_BREAK;	goto SETC;
+    case UNDERLINE:	name = KW_UNDERLINE;	goto SETC;
     case COLOUR:	name = KW_COLOUR;	goto SETC;
     case LANGUAGE:	name = KW_LANGUAGE;	goto SETC;
     case CURR_LANG:	name = KW_CURR_LANG;	goto SETC;
+    case COMMON:	name = KW_COMMON;	goto SETC;
+    case RUMP:		name = KW_RUMP;		goto SETC;
     case NEXT:		name = KW_NEXT;		goto SETC;
     case OPEN:		name = KW_OPEN;		goto SETC;
     case TAGGED:	name = KW_TAGGED;	goto SETC;
@@ -397,8 +402,7 @@ OBJECT x;  int outer_prec;
 	}
 	else WriteObject(y, DEFAULT_PREC);
       }
-      if( DEFAULT_PREC <= outer_prec )
-	StringFPuts(KW_RBR, last_write_fp);
+      if( DEFAULT_PREC <= outer_prec )  StringFPuts(KW_RBR, last_write_fp);
       break;
 
 
@@ -426,10 +430,8 @@ OBJECT x;  int outer_prec;
 /*                                                                           */
 /*****************************************************************************/
 
-AppendToFile(x, fnum, pos)
-OBJECT x;  FILE_NUM fnum;  int *pos;
+void AppendToFile(OBJECT x, FILE_NUM fnum, int *pos)
 { FULL_CHAR buff[MAX_BUFF], *str;
-  OBJECT fname;
   debug2(DIO, D, "AppendToFile( %s, %s )", EchoObject(x), FileName(fnum));
 
   /* open file fnum for writing */
@@ -440,10 +442,11 @@ OBJECT x;  FILE_NUM fnum;  int *pos;
       Error(41, 5, "file name %s%s is too long",
 	FATAL, PosOfFile(fnum), str, NEW_DATA_SUFFIX);
     StringCopy(buff, str);  StringCat(buff, NEW_DATA_SUFFIX);
-    last_write_fp = StringFOpen(buff, "a");
+    last_write_fp = StringFOpen(buff, APPEND_TEXT);
     if( last_write_fp == null )
       Error(41, 6, "cannot append to database file %s", FATAL, no_fpos, buff);
     last_write_fnum = fnum;
+    (void) fseek(last_write_fp, 0L, SEEK_END);
   }
 
   /* write x out and record the fact that fnum has changed */
@@ -466,8 +469,9 @@ OBJECT x;  FILE_NUM fnum;  int *pos;
 /*                                                                           */
 /*****************************************************************************/
 
-CloseFiles()
+void CloseFiles(void)
 { FILE_NUM fnum;  FULL_CHAR oldname[MAX_BUFF], newname[MAX_BUFF];
+  FILE *fp;
   ifdebug(DPP, D, ProfileOn("CloseFiles"));
   debug0(DIO, D, "CloseFiles()");
 
@@ -478,24 +482,37 @@ CloseFiles()
   for( fnum=FirstFile(SOURCE_FILE);  fnum != NO_FILE;  fnum = NextFile(fnum) )
   { StringCopy(oldname, FileName(fnum));
     StringCat(oldname, DATA_SUFFIX);
-    debug1(DIO, D, "unlink(%s)", oldname);
-    StringUnlink(oldname);
+    debug1(DIO, D, "remove(%s)", oldname);
+    StringRemove(oldname);
   }
 
   /* move any new database files to the old names, if updated */
+  /* just to avoid confusion: the "new name" means the ".ldx" */
+  /* temporary file name; the "old name" means the permanent  */
+  /* name, i.e. ".ld".  So we have to move the new name to    */
+  /* the old name.                                            */
+
   for( fnum=FirstFile(DATABASE_FILE); fnum != NO_FILE; fnum = NextFile(fnum) )
   { if( FileTestUpdated(fnum) )
-    { StringCopy(oldname, FileName(fnum));
+    {
+      /* construct new and old file names */
+      StringCopy(oldname, FileName(fnum));
       StringCopy(newname, oldname);
       StringCat(newname, NEW_DATA_SUFFIX);
-      debug1(DIO, D, "unlink(%s)", oldname);
-      StringUnlink(oldname); /* may fail if no old version */
-      debug2(DIO, D, "link(%s, %s)", newname, oldname);
-      if( StringLink(newname, oldname) != 0 )
-        Error(41, 7, "link(%s, %s) failed", INTERN, no_fpos, newname, oldname);
-      debug1(DIO, D, "unlink(%s)", newname);
-      if( StringUnlink(newname) != 0 )
-	Error(41, 8, "unlink(%s) failed", INTERN, no_fpos, newname);
+
+      /* guaranteed portable algorithm for changing the name of file	*/
+      /* "newname" to "oldname": if "oldname" exists already, then	*/
+      /* remove it (avoids removing a non-existent file, which can	*/
+      /* be a problem); then rename "newname" to be "oldname" (avoids	*/
+      /* overwriting an existing file "oldname", another problem)	*/
+
+      if( (fp = StringFOpen(oldname, READ_TEXT)) != NULL )
+      { fclose(fp);
+	StringRemove(oldname);
+      }
+      debug2(DIO, D, "rename(%s, %s)", newname, oldname);
+      if( StringRename(newname, oldname) != 0 )
+	Error(41, 9, "rename(%s, %s) failed", INTERN, no_fpos,newname,oldname);
     }
   }
   debug0(DIO, D, "CloseFiles returning.");

@@ -1,0 +1,47 @@
+@Section
+   @Title { Margins }
+@Begin
+@PP
+@Code "@Tab" places a @I { vertical margin } above and below each row, and a
+margins.tables @SubIndex { in tables }
+@I { horizontal margin } to the left and right of each column.  (If there are
+no side rules, the leftmost and rightmost margins are omitted.)  The size of
+these margins is determined by two options to the @Code "@Tab" symbol:
+@ID @OneRow @Code {
+"@Tab"
+"    hmargin { 0.3c }"
+"    vmargin { 0.2v }"
+"    @Fmta { ... }"
+"..."
+}
+Shown here are the default values, 0.3 centimetres for the horizontal
+margins, and 0.2 times the current inter-line spacing (denoted by the
+letter {@Code v}) for the vertical margins.
+@PP
+The horizontal margin is fixed, but each row may have its own vertical margin:
+@ID @OneRow @Code {
+"@Rowa"
+"    vmargin { 0.5vx }"
+"    A { ... }"
+}
+If omitted, the @Code vmargin value is taken from the @Code "@Tab" option.
+@PP
+The value shown here, {@Code "0.5vx"}, requests a vertical margin of
+half the current inter-line spacing, measured from the baseline of the
+entry rather than from its edge (this is what the @Code x means).  This
+value is a good choice when the entries contain simple words or lines
+of text (i.e. no paragraphs, large equations, figures, etc.):
+@CD {
+@Tab
+    vmargin { 0.5vx }
+    @Fmta { @Col @Heading A  !  @Col @Heading B }
+    @Fmtb { @Col A  !  @Col @CC B }
+{
+    @Rowa A { Course } B { Enrolment }
+    @Rowb A { Software Engineering } B { 174 }
+    @Rowb A { Complexity Theory } B { 37 }
+}
+}
+since the lines of the table will then be separated evenly like
+the lines in paragraphs.
+@End @Section

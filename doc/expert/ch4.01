@@ -17,7 +17,7 @@ trivial, so the implementor can concentrate on fine-tuning; and the
 definitions, being readily available, can be improved, extended, or even
 replaced.
 @PP
-As described in the User's Guide @Cite { $kingston1994lout.user }, an
+As described in the User's Guide @Cite { $kingston1995lout.user }, an
 equation is entered in a format based on the one introduced by the eqn
 language of Kernighan and Cherry @Cite { $kernighan1975eqn }:
 kernighan.b @Index { Kernighan, B. }

@@ -256,8 +256,8 @@ a juxtaposition of simple words:  although
 "{@ChapterList&&@Tag @Open { @Tag }}. &"
 "{@SectionList&&@Tag @Open { @Tag }}"
 }
-is formally equivalent, @Code "&" is not permitted within a
-@Code "@Tag" parameter.
+is formally equivalent, @Code "&" was not permitted within a
+@Code "@Tag" parameter until recently.
 @PP
 The DocumentLayout package also contains definitions for subsections in the
 same style.  They raise the question of whether Lout is capable of

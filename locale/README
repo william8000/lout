@@ -2,12 +2,12 @@ Locale-specific error messages
 
 Lout offers the option of locale-specific error messages.  To
 get them, install with USELOC set to 1 in the make file, as
-described in detail there.  At present the locales supported are:
+described in detail there.  At present the languages supported are:
 
-  fr	French
-  de	German
+  msgs.fr	French
+  msgs.de	German
 
-If the locale you need is not on this list, it probably means that
+If the language you need is not on this list, it probably means that
 no-one has got around to translating Lout's 500 or so error messages
 into your language yet.  If you are willing to do this translation,
 the procedure is as follows:
@@ -26,3 +26,4 @@ the procedure is as follows:
 
 Jeffrey H. Kingston
 11 November 1994
+9 July 1995

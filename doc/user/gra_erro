@@ -1,0 +1,30 @@
+@Section
+   @Title { Errors }
+   @Tag { grerrors }
+@Begin
+@PP
+Lout normally produces an output file that will print without mishap on
+any PostScript device.  However, some of the options of @Code "@Graph"
+and all of the data and labels are passed through Lout to the output
+file without checking.  Any errors in this material will not be detected
+until the file is printed.
+@PP
+The most likely errors are {@I rangecheck @I errors}, for example if
+an attempt is made to divide by zero or take the square root of a
+negative number, and {@I undefined @I errors}, arising from symbols
+misspelt, use of @Code "x" outside an {@Code "xloop"}, etc.  Less commonly,
+everything may be correct but the graph is too large in some
+way:  too much data, expression too deeply nested, etc.  All the data
+is stored in the printer while the graph is being printed, after which
+the data is discarded and all memory consumed by the graph is reclaimed.
+@PP
+When an error is detected, @Code "@Graph" arranges for the offending page
+to be printed up to the point where the error occurred, with a message
+nearby describing the error.  Printing of the document is then
+aborted.  The problem is usually easy to locate since it lies in whatever
+should have been printed next.
+@PP
+Older versions of the popular GhostView previewer have a bug which causes
+exponents in labels to be printed in diminishing sizes.  Recent versions
+no longer have this problem.
+@End @Section

@@ -3,6 +3,7 @@ Format of Lout hyphenation information files
 Jeffrey H. Kingston
 22 December 1992
 21 September 1994
+6 June 1995
 
 Basser Lout Version 3 incorporates automatic hyphenation using the
 method introduced by TeX (see Appendix H of the TeXBook by D. E. Knuth),
@@ -20,7 +21,8 @@ german.lp (see below) is to be used when hyphenating German words.  These
 files are kept in the Lout system hyphenation directory (this directory).  If
 a language is desired but no hyphenation information file is available, the
 space between the braces may be left blank, and then the language will be
-defined but hyphenation in that language will never be attempted.
+defined but hyphenation in that language will never be attempted.  Another
+possibility is to include a placeholder file for the language (see below).
 
 The first time on any run that German hyphenation is required, Lout will
 search the directories of the hyphenation path for a binary file called
@@ -38,12 +40,21 @@ these packed files at setup time, since a subsequent lout run that needs them
 will not have write permission in the Lout system hyphenation directory.
 
 An unpacked Lout hyphenation information (.lh) file mainly contains a
-long list of TeX hyphenation patterns.  It must begin with
+long list of TeX hyphenation patterns.  It must begin with either
 
     Lout hyphenation information
 
-alone on the first line.  Following this comes the "Classes:" heading
-followed by the character classes.  For example:
+or
+    Lout hyphenation placeholder
+
+alone on the first line.  In the second case, it is understood that the
+file is a placeholder (i.e. a stub file which might be overwritten with
+a real file in the future), and Lout does not read any futher; the effect
+is that Lout will not hyphenate this language, but not complain about the
+absence of the file either.
+
+In the non-placeholder case, following the header line comes the "Classes:"
+heading followed by the character classes.  For example:
 
     Classes:
     @!$%^&*()_-+=~`{[}]:;'|<,.>?/0123456789
@@ -58,6 +69,8 @@ The hyphenation process treats the characters in each class as identical
 (so the classes above ensure that the distinction between upper and lower
 case is ignored).  By definition, the characters of the first class are
 "non-letters", and the characters of the remaining classes are "letters".
+Notice that these are actual characters, not character names:  hyphenation
+files are encoding-specific.
 
 Next comes the "Exceptions:" heading followed by the exceptions, which
 are words (composed of letters and "-" only) whose hyphenation is to be

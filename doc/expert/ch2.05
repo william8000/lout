@@ -30,7 +30,7 @@ the symbols are said to be {@I associative}, and we can confidently omit
 the braces.
 @PP
 User-defined symbols may be given a precedence and associativity:
-@ID @Code {
+@ID @OneRow @Code {
 "def @Super"
 "   precedence 50"
 "   associativity right"

@@ -1,0 +1,349 @@
+
+###########################################################################
+#                                                                         #
+#  @OverheadLayout extension to @DocumentLayout.                          #
+#                                                                         #
+#  Jeffrey H. Kingston                                                    #
+#  August 1994                                                            #
+#                                                                         #
+#  This package extends DocumentLayout with definitions for overheads.    #
+#                                                                         #
+###########################################################################
+
+extend @DocumentLayout
+export @OverheadTransparencies @Lecture @Overhead
+def @OverheadLayout
+    named @DateLine		     {  No			}
+    named @FirstOverheadNumber	     {  1			}
+    named @FirstLectureNumber	     {  1			}
+    named @LectureNumbers            {  Arabic			}
+    named @OverheadNumbers           {  Arabic			}
+    named @TitlePageFont             {  Helvetica Base      	}
+    named @LectureHeadingFont        {  Bold 1.20f		}
+    named @OverheadHeadingFont       {  Bold			}
+    named @LectureInContents         {  Yes			}
+    named @OverheadInContents        {  No			}
+    named @ReferencesInContents      {  Yes			}
+@Begin
+
+    #######################################################################
+    #                                                                     #
+    #  Symbols for passing full title to running headers.                 #
+    #                                                                     #
+    #######################################################################
+
+    export @Val
+    def @StoreTitle left @Tag right @Val { @Null }
+
+    def @SaveTitle right x { save @StoreTitle x }
+
+    def @GetTitle { @StoreTitle&&save @Open { @Val } }
+
+
+    #######################################################################
+    #                                                                     #
+    #  Lists of lectures and overheads.                                   #
+    #                                                                     #
+    #######################################################################
+
+    export num
+    def @LectureList named @Tag {} right num
+    {
+		@Galley
+        //1.1b  @LectureList @Next num
+    }
+
+    export num
+    def @OverheadsList named @Tag {} right num
+    {
+		@Galley
+        //1.1b	@OverheadsList @Next num
+    }
+
+    export num
+    def @LecOverheadsList named @Tag {} right num
+    {
+		@Galley
+        //1.1b	@LecOverheadsList @Next num
+    }
+
+
+    #######################################################################
+    #                                                                     #
+    #  @OverheadTransparencies.                                           #
+    #                                                                     #
+    #######################################################################
+
+    def @OverheadTransparencies
+        named @Title {}
+        named @RunningTitle { dft }
+        named @Author {}
+        named @Institution {}
+        named @DateLine { @DateLine }
+        named @InitialFont { @InitialFont }
+        named @InitialBreak { @InitialBreak }
+        named @InitialLanguage { @InitialLanguage }
+        named @PageHeaders { @PageHeaders }
+        named @FirstPageNumber { @FirstPageNumber }
+        named @FirstOverheadNumber { @FirstOverheadNumber }
+        named @FirstLectureNumber { @FirstLectureNumber }
+    {
+
+	def @DatePart
+	{
+	    @DateLine @Case {
+		No	@Yield { @Null		    }
+		Yes	@Yield { |0.5rt @Date     | }
+		else	@Yield { |0.5rt @DateLine | }
+	    }
+	}
+
+	def @TitlePart
+	{
+	    @TitlePageFont @Font @InitialBreak @Break clines @Break {
+		//0.5i	|0.5rt 1.5f @Font @InitialBreak @Break clines @Break @Title |
+		//1i    |0.5rt clines @Break @Author |
+		//0.5i  |0.5rt clines @Break @I @Institution |
+		//0.5i  @DatePart
+	    }
+	}
+
+	def @ContentsPart
+	{
+	    @DP	|0.5rt @LectureHeadingFont @Font @Word&&contents |
+	    @DP	@ContentsSection
+	}
+
+	def @ReferencesPart
+	    named @Tag {}
+	{
+	    @DP	|0.5rt @LectureHeadingFont @Font @RefHeading @RefListTitle |
+	    //  @PageMarker&&preceding @Tagged @Tag
+	    //  @ReferencesInContents @ContentsEntry
+		    title { @RefHeading @RefListTitle }
+		    pagenum { @PageOf @Tag }
+	    //  Start @Runner @MajorTitle { @GetTitle }
+            @DP @ReferencesSection
+	    //  NonStart @Runner @MajorTitle { @GetTitle }
+	}
+
+	def @OverheadsBody force into { @ColPlace&&preceding }
+	{
+		    @Title @Case {
+			""	@Yield @Null
+			else	@Yield @TitlePart
+		    }
+	    //1.1b  @MakeContents @Case {
+			{ Yes Bypass }	@Yield @ContentsPart
+			else		@Yield @Null
+		    }
+	    //      Start @Runner @MajorTitle { @GetTitle }
+	    //1.1b  @OverheadsList @FirstOverheadNumber
+	    //1.1b  @LectureList @FirstLectureNumber
+	    //1.1b  @ReferencesPart
+	}
+
+        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
+	{ @ColourCommand @InitialColour } @SetColour
+        {
+		@SaveTitle {
+		    @InitialLanguage @Language { @RunningTitle @Dft @Title }
+		}
+
+            //	@PageList
+		    @ColumnNumber { 1 }
+		    @PageHeaders { @PageHeaders }
+		    extra { No }
+		    @FirstPageNumber
+            //	@OverheadsBody
+            //	Start @Runner
+        }
+    }
+
+
+    #######################################################################
+    #                                                                     #
+    #  Overheads.                                                         #
+    #                                                                     #
+    #######################################################################
+
+    export @FootNote @LongFootNote @EndNote @LongEndNote
+    def @Overhead force into { @OverheadsList&&preceding }
+	named @Tag {}
+	named @Title {}
+	named @RunningTitle { dft }
+	named @InitialLanguage {}
+	named @BypassNumber { dft }
+	body @Body
+    {
+
+	macro @FootNote { @ColFootNote }
+	macro @LongFootNote { @LongColFootNote }
+	macro @EndNote { @ColEndNote }
+	macro @LongEndNote { @LongColEndNote }
+
+	def @OverheadNum
+	{
+	  @BypassNumber @Dft {
+	    @OverheadNumbers @Num { @OverheadsList&&@Tag @Open { num } }
+	  }
+	}
+
+	@DP { |0.5rt @InitialLanguage @Language @OverheadHeadingFont @Font
+	      clines @Break @Title | }
+        //  Start @Runner
+		@MajorTitle { @GetTitle }
+		@MinorNum { @OverheadNum }
+        //  @NumberMarker @Tag { @Tag } @OverheadNum
+        //  @PageMarker&&preceding @Tagged @Tag
+        //  @OverheadsList&&preceding @Tagged @Tag
+        //  @OverheadInContents @ContentsEntry
+		indent { 0f }
+		number { @OverheadNum }
+		title { @InitialLanguage @Language @Title }
+		pagenum { @PageOf @Tag }
+        @DP @InitialLanguage @Language @Body
+        //  NonStart @Runner
+		@MajorTitle { @GetTitle }
+		@MinorNum { @OverheadNum }
+
+    }
+
+
+    #######################################################################
+    #                                                                     #
+    #  Lectures containing overheads.                                     #
+    #                                                                     #
+    #######################################################################
+
+    export @FootNote @LongFootNote @EndNote @LongEndNote
+	   @BeginOverheads @EndOverheads @Overhead
+    def @Lecture force into { @LectureList&&preceding }
+        named @Tag {}
+        named @Title {}
+        named @RunningTitle { dft }
+	named @InitialLanguage {}
+	named @BypassNumber { dft }
+        body @Body
+    {
+	macro @FootNote { @ColFootNote }
+	macro @LongFootNote { @LongColFootNote }
+	macro @EndNote { @ColEndNote }
+	macro @LongEndNote { @LongColEndNote }
+
+        def @EndOverheadsPlace { @Galley }
+
+        def @EndOverheads force into { @EndOverheadsPlace&&preceding }
+	{}
+
+        macro @BeginOverheads
+	{   @LecOverheadsList { @Title @Case { "" @Yield 1 else @Yield 2 } }
+	    // @EndOverheadsPlace //
+	}
+
+        def @LectureNum
+        {
+	  @BypassNumber @Dft {
+	    @LectureNumbers @Num { @LectureList&&@Tag @Open { num } }
+	  }
+        }
+
+        def @LectureTitle
+	{
+	    @InitialLanguage @Language { @RunningTitle @Dft @Title }
+	}
+
+        def @ER
+        {
+	    NonStart @Runner
+		@MajorTitle { @GetTitle }
+		@MinorTitle { @LectureTitle }
+		@MajorNum { @LectureNum }
+		@MinorNum { @LectureNum }
+        }
+
+        def @Overhead force into { @LecOverheadsList&&preceding }
+            named @Tag {}
+            named @Title {}
+            named @RunningTitle { dft }
+	    named @InitialLanguage { @InitialLanguage }
+	    named @BypassNumber { dft }
+            body @Body
+        {
+
+            def @OverheadNum
+	    {
+	      @BypassNumber @Dft {
+		@OverheadNumbers @Then {
+		    @LectureNum @DotJoin @OverheadNumbers @Num
+		    { @LecOverheadsList&&@Tag @Open { num } }
+		}
+	      }
+	    }
+
+	    @DP	{ |0.5rt @InitialLanguage @Language @OverheadHeadingFont @Font
+		clines @Break @Title | }
+            //  Start @Runner
+	            @MajorTitle { @GetTitle }
+	            @MinorTitle { @LectureTitle }
+	            @MajorNum { @LectureNum }
+	            @MinorNum { @OverheadNum }
+            //  @NumberMarker @Tag { @Tag } @OverheadNum
+            //  @PageMarker&&preceding @Tagged @Tag
+            //  @LecOverheadsList&&preceding @Tagged @Tag
+            //  @OverheadInContents @ContentsEntry
+		    indent { 2f }
+		    number { @OverheadNum }
+		    title { @InitialLanguage @Language @Title }
+		    pagenum { @PageOf @Tag }
+            @DP @InitialLanguage @Language @Body
+            //  NonStart @Runner
+	            @MajorTitle { @GetTitle }
+	            @MinorTitle { @LectureTitle }
+	            @MajorNum { @LectureNum }
+	            @MinorNum { @OverheadNum }
+
+        }
+
+	def @LectureStart
+	{
+            //  Start @Runner
+	            @MajorTitle { @GetTitle }
+	            @MinorTitle { @LectureTitle }
+	            @MajorNum { @LectureNum }
+	            @MinorNum { @LectureNum @DotJoin 1 }
+	    @DP |0.5rt @InitialLanguage @Language @LectureHeadingFont @Font 
+		@InitialBreak @Break clines @Break @Title |
+            //  NonStart @Runner
+	            @MajorTitle { @GetTitle }
+	            @MinorTitle { @LectureTitle }
+	            @MajorNum { @LectureNum }
+	            @MinorNum { @LectureNum @DotJoin 1 }
+	}
+
+	    @Title @Case {
+	        "" 	@Yield @Null
+	        else	@Yield @LectureStart
+	    }
+
+        //  @NumberMarker @Tag { @Tag } @LectureNum
+        //  @PageMarker&&preceding @Tagged @Tag
+        //  @LectureList&&preceding  @Tagged @Tag
+        //  @LectureInContents @ContentsEntry
+		number { @LectureNum }
+		title { @InitialLanguage @Language @Title }
+		pagenum { @PageOf @Tag }
+	//
+        //  @InitialLanguage @Language @BeginFigures	@LectureNum
+        //  @InitialLanguage @Language @BeginTables	@LectureNum
+        //  @InitialLanguage @Language @BeginFootNotes	{}
+	//1.1b
+        //  @InitialLanguage @Language @Body
+        //1.1b @InitialLanguage @Language @EndNoteList 1
+        //  @EndFigures @ER
+        //  @EndTables @ER
+        //  @EndFootNotes @ER
+        //  @ER
+    }
+
+@End @OverheadLayout

@@ -56,14 +56,14 @@ def @Pas
     def "["	{ @R "["			}
     def "]"	{ @R "]"			}
     def "^"	{ @S 0.8f @Font @Char "arrowup"	}
-    def ".."	{ @R ".."			}
+    def ".."	{ @R ".." &0.1f			}
     def "="	{ @S @Char "equal"		}
     def "<"	{ @S @Char "less"		}
     def ">"	{ @S @Char "greater"		}
     def "<>"	{ @S @Char "notequal"		}
     def "<="	{ @S @Char "lessequal"		}
     def ">="	{ @S @Char "greaterequal"	}
-    def ":="	{ :{//0.03fo =}			}
+    def ":="	{ :{//0.03fo &0.1f =}		}
 
     def and		{ @B "and"		}
     def array		{ @B "array"		}

@@ -1,0 +1,27 @@
+@Chapter
+  @Title { C and C++ Programs }
+  @Tag { cprint }
+@Begin
+@LP
+This chapter describes how to typeset C and C++ program text using the
+cp. @Index @Code "@CP"
+c. @Index { C++ }
+@Code "@CP" symbol in conjunction with the @Code c2lout filter.  The
+@Code "@CP" symbol looks after printing keywords in bold, variables
+in italic, and so on, depending on a style you choose.  It does not lay
+out programs in the sense of choosing indenting, it preserves the layout
+you give to the program.  From now on, `C' means `C or C++' wherever
+it occurs.
+@PP
+It is possible to simply print out one or more C files; we call this
+@I { stand-alone mode }.  Alternatively, the C program text may be printed
+as part of a larger Lout document; we call this @I { embedded mode }.
+@BeginSections
+@Include { cpp_lone }
+@Include { cpp_embe }
+@Include { cpp_chan }
+@Include { cpp_comm }
+@Include { cpp_tabs }
+@Include { cpp_eiff }
+@EndSections
+@End @Chapter

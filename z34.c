@@ -1,6 +1,6 @@
 /*@z34.c:Rotation Service:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -53,11 +53,13 @@ rect.y = polar.radius * sin(polar.angle)
 /*                                                                           */
 /*****************************************************************************/
 
-RotateSize(xcb, xcf, xrb, xrf, y, theta)
-LENGTH *xcb, *xcf, *xrb, *xrf;  OBJECT y;  LENGTH theta;
+void RotateSize(LENGTH *xcb, LENGTH *xcf, LENGTH *xrb, LENGTH *xrf,
+OBJECT y, LENGTH theta)
 { rect_coord ycorners[4], xcorner;  polar_coord pol;
   double maxx, maxy, minx, miny, ang;  int i;
+#if DEBUG_ON
   char buff1[20], buff2[20];
+#endif
 
   /* calculate theta in radians */
   ang = (double) theta * 2 * M_PI / (double) (DG * 360);

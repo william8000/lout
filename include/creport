@@ -20,7 +20,7 @@
   @SysInclude { fontdefs }			  # font definitions
   @SysInclude { langdefs }			  # language definitions
   @SysInclude { dl }				  # DocumentLayout package
-  @SysInclude { reportlayout }			  # ReportLayout extension
+  @SysInclude { reportf }			  # ReportLayout extension
 # @SysInclude { tab }				  # @Tab table formatter
 # @SysInclude { eq }				  # @Eq equation formatter
 # @SysInclude { fig }				  # @Fig advanced graphics
@@ -81,6 +81,10 @@
   # @ColumnGap		{ 1.00c			} # column gap
   # @FigureNumbers	{ Arabic		} # method of numbering figures
   # @TableNumbers	{ Arabic		} # method of numbering tables
+  # @CaptionFont        {                       } # figure, table caption font
+  # @CaptionBreak       {                       } # figure, table caption break
+  # @MakeFigureContents { No                    } # list of figures at start
+  # @MakeTableContents  { No                    } # list of tables at start
   # @MakeContents	{ No			} # make contents? Yes or No
   # @ContentsGap	{ 0.20v			} # extra gap above minor entry
   # @ContentsGapAbove	{ 0.80v			} # extra gap above major entry
@@ -90,15 +94,19 @@
   # @ContentsRightWidth	{ 3f			} # page numbers column width
   # @MakeReferences	{ Yes			} # make references? Yes or No
   # @RefCiteStyle	{ [cite]		} # citation style
+  # @RefCiteLabels	{ @RefNum		} # citation items
+  # @RefNumbers		{ Arabic		} # reference numbers
+  # @RefListFormat	{ Labels		} # NoLabels, Labels, etc.
+  # @RefListLabels	{ [@RefNum]		} # ref list label format
   # @RefListTitle	{ references		} # title of reference list
   # @ChapRefListTitle	{ references		} # title of chapter ref list
-  # @RefLabels		{ Arabic		} # reference numbers
-  # @RefListStyle	{ label.		} # style of ref list labels
-  # @RefListGap		{ 1.00v			} # gap between ref list items
   # @RefListIndent	{ 0c			} # indent to left of labels
   # @RefListRightIndent	{ 0c			} # indent to right of items
-  # @RefListLabelWidthA	{ 2.00f			} # numeric labels column width
-  # @RefListLabelWidthB	{ 4.00f			} # other labels column width
+  # @RefListGap		{ 1.00v			} # gap between ref list items
+  # @RefListFont	{        		} # font used in reference list
+  # @RefListBreak	{        		} # break style of ref list
+  # @RefListLabelWidth 	{ 2.00f			} # Labels column width
+  # @RefListSortKey	{ @Tag			} # sorting key
   # @MakeIndex		{ No			} # make index? Yes or No
   # @IndexFont		{			} # index entries font
   # @IndexBreak		{ outdent 1.2fx		} # index entries break
@@ -116,6 +124,11 @@
   # @EndNoteFont	{ 0.80f			} # font of endnotes
   # @EndNoteBreak	{ 1.20fx		} # break for endnotes
   # @EndNoteGap		{ 0.20c			} # gap between endnotes
+  # @MarginNoteFont	{ 0.80f			} # font of margin notes
+  # @MarginNoteBreak	{ ragged 1.10fx		} # break style of margin notes
+  # @MarginNoteHGap	{ 0.5c   		} # horizontal gap to notes
+  # @MarginNoteVGap	{ 1.00v  		} # min vertical gap between
+  # @MarginNoteWidth	{ 1.50c  		} # width of margin notes
   # @PageHeaders	{ Simple		} # None Simple Titles NoTitles
   # @PageNumbers	{ Arabic		} # page numbers
   # @FirstPageNumber	{ 1			} # number of first page 
@@ -254,4 +267,4 @@
 #                                                                             #
 ###############################################################################
 
-@SysDatabase @RefStyle { refstyles }		  # reference printing styles
+@SysDatabase @RefStyle { refstyle }		  # reference printing styles

@@ -26,6 +26,15 @@
 }
 
 { @Reference
+     @Tag { meyer1992eiffel }
+     @Type { Book }
+     @Author { Bertrand Meyer }
+     @Title { Eiffel:  The Language }
+     @Publisher { Prentice-Hall }
+     @Year { 1992 }
+}
+
+{ @Reference
      @Tag { reid1980scribe }
      @Type { InProceedings }
      @Author { Brian K. Reid }
@@ -42,7 +51,7 @@ of Programming Languages (POPL), Las Vegas NV }
      @Author { William Strunk and E. B. White }
      @Title { The Elements of Style }
      @Publisher { Macmillan }
-     @Edition { Third }
+     @Edition { Third Edition }
      @Year { 1979 }
 }
 
@@ -111,12 +120,12 @@ of Programming Languages (POPL), Las Vegas NV }
 }
 
 { @Reference
-     @Tag { kingston1994lout.program }
+     @Tag { kingston1995lout.program }
      @Type { Book }
      @Author { Jeffrey H. Kingston }
      @Title { The Basser Lout Document Formatting System (Version 3) }
      @TitleNote { Computer program }
-     @Year { 1994 }
+     @Year { 1995 }
      @Note { Publicly available in the
 @I jeff subdirectory of the home directory of @I ftp to host
 @I ftp.cs.su.oz.au with login name @I anonymous or @I ftp and any
@@ -126,25 +135,25 @@ mail from the author.  All enquiries to {@I "jeff@cs.su.oz.au" }. }
 }
 
 { @Reference
-     @Tag { kingston1994lout.expert }
+     @Tag { kingston1995lout.expert }
      @Type { Book }
      @Author { Jeffrey H. Kingston }
      @Title { An Expert's Guide to the Lout Document Formatting
 System (Version 3) }
      @Institution { Basser Department of Computer Science }
      @Address { University of Sydney }
-     @Year { 1994 }
+     @Year { 1995 }
 }
 
 { @Reference
-     @Tag { kingston1994lout.user }
+     @Tag { kingston1995lout.user }
      @Type { Book }
      @Author { Jeffrey H. Kingston }
      @Title { A User's Guide to the Lout Document Formatting
 System (Version 3) }
      @Institution { Basser Department of Computer Science }
      @Address { University of Sydney }
-     @Year { 1994 }
+     @Year { 1995 }
 }
 
 { @Reference
@@ -219,7 +228,7 @@ concepts, and issues }
      @Author { Mary-Claire van Leunen }
      @Title { A Handbook for Scholars }
      @Publisher { Oxford }
-     @Edition { Revised }
+     @Edition { Revised Edition }
      @Year { 1992 }
 }
 
@@ -234,7 +243,7 @@ concepts, and issues }
      @Page { 102 }
      @Publisher { Penguin Books }
      @Address { Harmondsworth, Middlesex }
-     @Edition { Penguin Classics }
+     @Edition { Penguin Classics Edition }
      @Month { August }
      @Year { 1942 }
      @Note { The date of composition is unknown, but

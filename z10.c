@@ -1,6 +1,6 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -35,7 +35,7 @@
 #define	WRITTEN_TARGET	2
 #define INIT_CROSSREF_NUM	100
 
-static OBJECT RootCross = nil;			/* header for all crs        */
+static OBJECT RootCross = nilobj;		/* header for all crs        */
 
 /*****************************************************************************/
 /*                                                                           */
@@ -67,12 +67,13 @@ typedef struct
 #define	crtab_chain(S,i) (S)->tab_chains[i]
 
 #define hash(pos, sym, fnum, S)						\
-{ pos = ( ((int) sym) + fnum ) % crtab_size(S);				\
+{ pos = ( ((long) sym) + fnum ) % crtab_size(S);				\
 }
 
-static CROSSREF_TABLE crtab_new(newsize)
-int newsize;
+static CROSSREF_TABLE crtab_new(int newsize)
 { CROSSREF_TABLE S;  int i;
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_CROSSREF, 1,
+    2*sizeof(int) + newsize*sizeof(CROSSREF_ENTRY)));
   S = (CROSSREF_TABLE)
     malloc(2*sizeof(int) + newsize*sizeof(CROSSREF_ENTRY));
   if( S == (CROSSREF_TABLE) NULL )
@@ -80,13 +81,12 @@ int newsize;
   crtab_size(S) = newsize;
   crtab_count(S) = 0;
   for( i = 0;  i < newsize;  i++ )
-    crtab_chain(S, i) = (CROSSREF_ENTRY) nil;
+    crtab_chain(S, i) = (CROSSREF_ENTRY) nilobj;
   return S;
 } /* end crtab_new */
 
-static CROSSREF_TABLE crtab_rehash(S, newsize)
-CROSSREF_TABLE S;  int newsize;
-{ CROSSREF_TABLE NewS;  int i, newpos;  CROSSREF_ENTRY p, q;
+static CROSSREF_TABLE crtab_rehash(CROSSREF_TABLE S, int newsize)
+{ CROSSREF_TABLE NewS;  int i;  long newpos;  CROSSREF_ENTRY p, q;
   NewS = crtab_new(newsize);
   for( i = 0;  i < crtab_size(S);  i++ )
   { p = crtab_chain(S, i);
@@ -99,13 +99,14 @@ CROSSREF_TABLE S;  int newsize;
       p = q;
     }
   }
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_CROSSREF, -1,
+   -(2*sizeof(int) + crtab_size(S)*sizeof(CROSSREF_ENTRY))));
   free(S);
   return NewS;
 } /* end crtab_rehash */
 
-static int crtab_getnext(sym, fnum, S)
-OBJECT sym;  FILE_NUM fnum;  CROSSREF_TABLE *S;
-{ CROSSREF_ENTRY x;  int pos;
+static int crtab_getnext(OBJECT sym, FILE_NUM fnum, CROSSREF_TABLE *S)
+{ CROSSREF_ENTRY x;  long pos;
 
   /* if S is NULL, create a new table */
   if( *S == NULL )  *S = crtab_new(INIT_CROSSREF_NUM);
@@ -135,8 +136,7 @@ OBJECT sym;  FILE_NUM fnum;  CROSSREF_TABLE *S;
 } /* end crtab_getnext */
 
 #if DEBUG_ON
-static crtab_debug(S, fp)
-CROSSREF_TABLE S;  FILE *fp;
+static void crtab_debug(CROSSREF_TABLE S, FILE *fp)
 { int i;  CROSSREF_ENTRY x;
   if( S == NULL )
   { fprintf(fp, "  null table\n");
@@ -164,15 +164,14 @@ static CROSSREF_TABLE crossref_tab = NULL;
 /*                                                                           */
 /*****************************************************************************/
 
-CrossInit(sym)
-OBJECT sym;
-{ int i; OBJECT cs = New(CROSS_SYM);
+void CrossInit(OBJECT sym)
+{ OBJECT cs = New(CROSS_SYM);
   target_state(cs) = NO_TARGET;  target_seq(cs) = 0;
   cr_file(cs) = NO_FILE;
-  gall_seq(cs) = 0;  gall_tag(cs) = nil;
+  gall_seq(cs) = 0;  gall_tag(cs) = nilobj;
   gall_tfile(cs) = NO_FILE;
   symb(cs) = sym;  cross_sym(sym) = cs;
-  if( RootCross == nil )  RootCross = New(CR_ROOT);  Link(RootCross, cs);
+  if( RootCross == nilobj )  RootCross = New(CR_ROOT);  Link(RootCross, cs);
 }
 
 
@@ -184,8 +183,7 @@ OBJECT sym;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT CrossMake(sym, val, ctype)
-OBJECT sym, val;  int ctype;
+OBJECT CrossMake(OBJECT sym, OBJECT val, int ctype)
 { OBJECT v1, res;
   debug3(DCR, DD, "CrossMake(%s, %s, %s)", SymName(sym),
     EchoObject(val), Image(ctype));
@@ -204,12 +202,11 @@ OBJECT sym, val;  int ctype;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT GallTargEval(sym, dfpos)
-OBJECT sym; FILE_POS *dfpos;
+OBJECT GallTargEval(OBJECT sym, FILE_POS *dfpos)
 { OBJECT cs, res;
   FULL_CHAR buff[MAX_BUFF], *str;
   debug2(DCR, DD, "GallTargEval( %s,%s )", SymName(sym), EchoFilePos(dfpos));
-  if( cross_sym(sym) == nil )  CrossInit(sym);
+  if( cross_sym(sym) == nilobj )  CrossInit(sym);
   cs = cross_sym(sym);
   if( file_num(*dfpos) != gall_tfile(cs) )
   { gall_tfile(cs) = file_num(*dfpos);
@@ -238,22 +235,20 @@ OBJECT sym; FILE_POS *dfpos;
 /*                                                                           */
 /*****************************************************************************/
 
-static OBJECT CrossGenTag(x)
-OBJECT x;
+static OBJECT CrossGenTag(OBJECT x)
 { FULL_CHAR buff[MAX_BUFF], *str1, *str2;
-  OBJECT sym, cs, res;  FILE_NUM fnum;
+  OBJECT sym, res;  FILE_NUM fnum;
   int seq;
-  debug1(DCR, D, "CrossGenTag( %s )", SymName(actual(x)));
+  debug1(DCR, DD, "CrossGenTag( %s )", SymName(actual(x)));
   sym = actual(x);
-  if( cross_sym(sym) == nil )  CrossInit(sym);
-  cs = cross_sym(sym);
+  if( cross_sym(sym) == nilobj )  CrossInit(sym);
   fnum = file_num(fpos(x));
   str1 = SymName(sym);
   str2 = FileName(fnum);
   seq = crtab_getnext(sym, fnum, &crossref_tab);
-  debug3(DCR, D, "%d = crtab_getnext(%s, %s, S); S =",
+  debug3(DCR, DDD, "%d = crtab_getnext(%s, %s, S); S =",
 	seq, SymName(sym), FileName(fnum));
-  ifdebug(DCR, DD, crtab_debug(crossref_tab, stderr));
+  ifdebug(DCR, DDD, crtab_debug(crossref_tab, stderr));
   if( StringLength(str1) + StringLength(str2) + 10 >= MAX_BUFF )
     Error(10, 3, "automatically generated tag %s.%s.%d is too long",
 	FATAL, no_fpos, str1, str2, seq);
@@ -280,20 +275,28 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-CrossAddTag(x)
-OBJECT x;
+void CrossAddTag(OBJECT x)
 { OBJECT link, par, ppar, y;
-  debug1(DCR, D, "CrossAddTag( %s )", EchoObject(x));
+  debug1(DCR, DD, "CrossAddTag( %s )", EchoObject(x));
 
   /* search the parameter list of x for a @Tag parameter */
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(par, link);
-    if( type(par) == PAR && is_tag(actual(par)) )  break;
+    if( type(par) == PAR && is_tag(actual(par)) )
+    {
+      /* has tag, but if value is empty object, delete it */
+      Child(y, Down(par));
+      if( is_word(type(y)) && StringEqual(string(y), STR_EMPTY) )
+      { DisposeChild(link);
+	link = x;
+      }
+      break;
+    }
   }
   if( link == x )
   { 
       /* search the definition of x for name of its @Tag parameter */
-      ppar = nil;
+      ppar = nilobj;
       for( link=Down(actual(x));  link != actual(x);  link = NextDown(link) )
       {	Child(y, link);
 	if( is_par(type(y)) && is_tag(y) )
@@ -301,7 +304,7 @@ OBJECT x;
 	  break;
 	}
       }
-      if( ppar != nil ) /* should always hold */
+      if( ppar != nilobj ) /* should always hold */
       {
 	/* prepare new PAR containing generated tag */
 	par = New(PAR);
@@ -332,37 +335,40 @@ OBJECT x;
 	Link(link, par);
       }
   }
-  debug1(DCR, D, "CrossAddTag returning %s", EchoObject(x));
+  debug1(DCR, DD, "CrossAddTag returning %s", EchoObject(x));
 } /* end CrossAddTag */
 
 
 /*@::CrossExpand()@***********************************************************/
 /*                                                                           */
-/*  OBJECT CrossExpand(x, env, style, crs_wanted, crs, res_env)              */
+/*  OBJECT CrossExpand(x, env, style, crs, res_env)                          */
 /*                                                                           */
-/*  Return the value of cross-reference x, with environment *res_env.  If x  */
-/*  has a non-literal tag, it must be tracked, so an object is added to *crs */
-/*  for this purpose if crs_wanted.  Result replaces x, which is disposed.   */
+/*  Return the value of cross-reference x, with environment *res_env.  If    */
+/*  x has a non-literal tag, it must be tracked, so an object is added to    */
+/*  *crs for this purpose.  The result replaces x, which is disposed.        */
 /*                                                                           */
 /*****************************************************************************/
-static OBJECT nbt[2] = { nil, nil };
-static OBJECT nft[2] = { nil, nil };
-static OBJECT ntarget = nil;
+static OBJECT nbt[2] = { nilobj, nilobj };
+static OBJECT nft[2] = { nilobj, nilobj };
+static OBJECT ntarget = nilobj;
 
-OBJECT CrossExpand(x, env, style, crs_wanted, crs, res_env)
-OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
+OBJECT CrossExpand(OBJECT x, OBJECT env, STYLE *style,
+OBJECT *crs, OBJECT *res_env)
 { OBJECT sym, res, tag, y, cs, link, db, tmp, index;
   int ctype, count, i;  FULL_CHAR buff[MAX_BUFF], seq[MAX_BUFF], *str;
   FILE_NUM fnum, dfnum;  BOOLEAN tagerror = FALSE;
   long cont, dfpos;
   assert( type(x) == CROSS, "CrossExpand: x!" );
-  debug2(DCR, DD, "CrossExpand( %s, %s )", EchoObject(x), EchoObject(*crs));
+  debug2(DCR, D, "[ CrossExpand( %s, env, style, %s, res_env )",
+    EchoObject(x), EchoObject(*crs));
   assert( NextDown(Down(x)) == LastDown(x), "CrossExpand: #args!" );
 
   /* manifest and tidy the right parameter */
   Child(tag, LastDown(x));
+  debug0(DOM, D, "  [ calling Manifest from CrossExpand");
   tag = Manifest(tag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE);
-  tag = ReplaceWithTidy(tag, FALSE);
+  debug0(DOM, D, "  ] returning from Manifest");
+  tag = ReplaceWithTidy(tag, TRUE);   /* && */
 
   /* extract sym (the symbol name) and tag (the tag value) from x */
   Child(y, Down(x));
@@ -373,7 +379,7 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
 	  StringEqual(string(tag), KW_PRECEDING) ? CROSS_PREC :
 	  StringEqual(string(tag), KW_FOLLOWING) ? CROSS_FOLL : CROSS_LIT;
 
-  res = nil;
+  res = nilobj;
   switch( ctype )
   {
 
@@ -393,7 +399,7 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
 
     case CROSS_LIT:
     
-      if( cross_sym(sym) == nil )  CrossInit(sym);
+      if( cross_sym(sym) == nilobj )  CrossInit(sym);
       cs = cross_sym(sym);
       if( sym == MomentSym && StringEqual(string(tag), KW_NOW) )
       {	/* this is a request for the current time */
@@ -409,12 +415,12 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
         { Parent(db, link);
 	  assert( is_word(type(db)), "CrossExpand: db!" );
 	  if( DbRetrieve(db, FALSE, sym, string(tag),seq,&dfnum,&dfpos,&cont) )
-	  { SwitchScope(nil);
+	  { SwitchScope(nilobj);
 	    count = 0;
 	    SetScope(env, &count);
 	    res = ReadFromFile(dfnum, dfpos);
 	    for( i = 1;  i <= count;  i++ )  PopScope();
-	    UnSwitchScope(nil);
+	    UnSwitchScope(nilobj);
 	    if( db != OldCrossDb )  AttachEnv(env, res);
 	    break;
 	  }
@@ -427,10 +433,12 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
     case CROSS_FOLL:
     
       if( has_tag(sym) )
-      { if( cross_sym(sym) == nil )  CrossInit(sym);
+      { if( cross_sym(sym) == nilobj )  CrossInit(sym);
         cs = cross_sym(sym);
-        assert( cs != nil, "CrossExpand/CROSS_FOLL: cs == nil!" );
+        assert( cs != nilobj, "CrossExpand/CROSS_FOLL: cs == nilobj!" );
         assert( type(cs) == CROSS_SYM, "CrossExpand/CROSS_FOLL: type(cs)!" );
+
+	/* generate literal tag buff, used to track this cross reference */
         fnum = file_num(fpos(tag));
         if( fnum != cr_file(cs) )
         { cr_file(cs) = fnum;
@@ -444,22 +452,31 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
         StringCopy(buff, str);
         StringCat(buff, AsciiToFull("_"));
         StringCat(buff, StringInt(cr_seq(cs)));
+
+	/* generate tracking cross reference and index, and add to *crs */
         tmp = CrossMake(sym, MakeWord(WORD, buff, &fpos(tag)), ctype);
         index = New(ctype);
         actual(index) = tmp;
         Link(index, tmp);
+        if( *crs == nilobj )  *crs = New(CR_LIST);
+	link = Link(*crs, index);
+
+	/* *** old
         if( crs_wanted )
-        { if( *crs == nil )  *crs = New(CR_LIST);
+        { if( *crs == nilobj )  *crs = New(CR_LIST);
 	  link = Link(*crs, index);
         }
         else Error(10, 9, "%s or %s tag not allowed here",
 	  FATAL, &fpos(x), KW_PRECEDING, KW_FOLLOWING);
+	*** */
+
+	/* read tracking cross ref from previous run from cross-ref database */
         if( AllowCrossDb &&
 	    DbRetrieve(OldCrossDb, FALSE, sym, buff, seq,&dfnum,&dfpos,&cont) )
 	{
-	  SwitchScope(nil);
+	  SwitchScope(nilobj);
 	  res = ReadFromFile(dfnum, dfpos);
-	  UnSwitchScope(nil);
+	  UnSwitchScope(nilobj);
 	}
       }
       else
@@ -477,11 +494,17 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
 
 
   } /* end switch */
-  if( res == nil )
+  if( res == nilobj )
   { OBJECT envt;
+    /* *** reporting this now whether or not crs_wanted
+    if( ctype > 1 && !tagerror && crs_wanted )
+    *** */
     if( ctype > 1 && !tagerror )
+    { debug3(DCR, D, "  reporting unresolved cross reference %s%s%s",
+	SymName(sym), KW_CROSS, string(tag));
       Error(10, 12, "unresolved cross reference %s%s%s",
 	WARN, &fpos(x), SymName(sym), KW_CROSS, string(tag));
+    }
 
     /* build dummy result with environment attached */
     /* nb at present we are not adding dummy import closures to this! */
@@ -491,8 +514,8 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
     while( enclosing(actual(y)) != StartSym )
     { tmp = New(CLOSURE);
       actual(tmp) = enclosing(actual(y));
-      debug0(DCR, DD, "  calling SetEnv from CrossExpand (a)");
-      envt = SetEnv(tmp, nil);
+      debug0(DCR, DDD, "  calling SetEnv from CrossExpand (a)");
+      envt = SetEnv(tmp, nilobj);
       AttachEnv(envt, y);
       y = tmp;
       debug1(DCR, DD, "Later y = %s", SymName(actual(y)));
@@ -506,7 +529,7 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
   DisposeObject(x);
   assert( type(res) == CLOSURE, "CrossExpand: type(res) != CLOSURE!" );
   assert( actual(res) == sym, "CrossExpand: actual(res) != sym!" );
-  debug1(DCR, DD, "CrossExpand returning %s", EchoObject(res));
+  debug1(DCR, D, "] CrossExpand returning %s", EchoObject(res));
   debug1(DCR, DD, "  *crs = %s", EchoObject(*crs));
   debug1(DCR, DD, "  *res_env = %s", EchoObject(*res_env));
   return res;
@@ -522,10 +545,9 @@ OBJECT x, env;  STYLE *style;  BOOLEAN crs_wanted; OBJECT *crs, *res_env;
 /*                                                                           */
 /*****************************************************************************/
 
-CrossSequence(x)
-OBJECT x;
-{ OBJECT sym, tag, val, tmp, cs, par, key, link, y;
-  unsigned ctype;  FULL_CHAR buff[MAX_BUFF], *str, *seq;
+void CrossSequence(OBJECT x)
+{ OBJECT sym, tag, val, tmp, cs, par, key, hold_key, link, y, env, hold_env;
+  unsigned ctype;  FULL_CHAR buff[MAX_BUFF], *seq;
   FILE_NUM dfnum;  int dfpos;
 
   /* if suppressing cross-referencing, dispose x and quit */
@@ -543,12 +565,12 @@ OBJECT x;
   Child(tmp, Down(x));
   assert( type(tmp) == CLOSURE, "CrossSequence: type(tmp)!" );
   sym = actual(tmp);
-  if( cross_sym(sym) == nil )  CrossInit(sym);
+  if( cross_sym(sym) == nilobj )  CrossInit(sym);
   cs = cross_sym(sym);
   assert( type(cs) == CROSS_SYM, "CrossSequence: cs!" );
 
   /* debug output */
-  debug2(DCR, D, "CrossSequence %s %s", Image(ctype), SymName(sym));
+  debug2(DCR, D, "CrossSequence %s %s", Image(ctype), EchoObject(x));
   debug1(DCR, DD, "  x = %s", EchoObject(x));
   ifdebug(DCR, DD, DebugObject(cs));
 
@@ -563,32 +585,70 @@ OBJECT x;
     case GALL_PREC:
 
       /* find key of the galley, if any */
-      val = tag;  key = nil;
+      /* *** this code is obsolete; or rather, it was always bizarrely naive
+      val = tag;  key = nilobj;
       for( link = Down(val);  link != val;  link = NextDown(link) )
       {	Child(par, link);
 	if( type(par) == PAR && (is_key(actual(par)) || is_tag(actual(par))) )
 	{ assert( Down(par) != par, "CrossSequence: PAR child!" );
 	  Child(key, Down(par));
-	  key = ReplaceWithTidy(key, FALSE);
+	  key = ReplaceWithTidy(key, TRUE);
+	}
+      }
+      *** */
+
+      /* find the value of key of the galley, if any */
+      val = tag;  key = hold_key = nilobj;
+      assert( type(val) == CLOSURE, "CrossSequence/GALL_FOLL: type(val)!" );
+      if( has_key(actual(val)) )
+      { for( link=Down(actual(val)); link != actual(val); link=NextDown(link) )
+	{ Child(y, link);
+	  if( is_key(y) )
+	  { OBJECT nbt[2], nft[2], crs, ntarget;
+	    nbt[COL] = nft[COL] = nbt[ROW] = nft[ROW] = crs = ntarget = nilobj;
+	    key = New(CLOSURE);
+	    actual(key) = y;
+	    hold_key = New(ACAT);
+	    Link(hold_key, key);
+	    env = New(ENV);
+	    Link(env, val);
+	    hold_env = New(ACAT);
+	    Link(hold_env, env);
+	    debug0(DOM, D, "  [ calling Manifest from CrossSequence");
+	    key = Manifest(key, env, &save_style(val), nbt, nft,
+	      &ntarget, &crs, FALSE, TRUE);
+	    debug0(DOM, D, "  ] returning from Manifest");
+	    key = ReplaceWithTidy(key, TRUE);
+	    DeleteLink(Down(env));
+	    DisposeObject(hold_env);
+	  }
 	}
       }
 
       /* write out the galley */
+      dfnum = DatabaseFileNum(&fpos(val));
+      /* ***
       str = FileName(file_num(fpos(val)));
-      dfnum = FileNum(str, DATA_SUFFIX);
-      if( dfnum == NO_FILE )
-	dfnum = DefineFile(str, DATA_SUFFIX, &fpos(val),
-	  DATABASE_FILE, SOURCE_PATH);
+      if( StringEndsWith(str, DATA_SUFFIX) )
+	dfnum = file_num(fpos(val));
+      else
+      { dfnum = FileNum(str, DATA_SUFFIX);
+        if( dfnum == NO_FILE )
+	  dfnum = DefineFile(str, DATA_SUFFIX, &fpos(val),
+	    DATABASE_FILE, SOURCE_PATH);
+      }
+      *** */
       AppendToFile(val, dfnum, &dfpos);
 
       /* determine the sequence number or string of this galley */
-      if( key == nil )
+      if( key == nilobj )
       {	++gall_seq(cs);
 	StringCopy(buff, StringFiveInt(gall_seq(cs)));
 	seq = buff;
       }
       else if( !is_word(type(key)) )
       {	Error(10, 13, "%s parameter is not a word", WARN, &fpos(key), KW_KEY);
+	debug1(DCR, D, "key = %s", EchoObject(key));
 	seq = STR_BADKEY;
       }
       else if( StringEqual(string(key), STR_EMPTY) )
@@ -599,7 +659,7 @@ OBJECT x;
 
       /* either write out the index immediately or store it for later */
       if( ctype == GALL_PREC )
-      {	if( gall_tag(cs) == nil )
+      {	if( gall_tag(cs) == nilobj )
 	{ Error(10, 15, "no %s precedes this %s%s%s", WARN, &fpos(val),
 	    SymName(sym), SymName(sym), KW_CROSS, KW_PRECEDING);
 	  debug0(DCR, DD, "  ... so substituting \"none\"");
@@ -608,7 +668,7 @@ OBJECT x;
 	assert( is_word(type(gall_tag(cs))) &&
 		!StringEqual(string(gall_tag(cs)), STR_EMPTY),
 			"CrossSequence: gall_tag!" );
-	debug3(DCR, D, "  inserting galley (prec) %s&%s %s", SymName(sym),
+	debug3(DCR, DD, "  inserting galley (prec) %s&%s %s", SymName(sym),
 	  string(gall_tag(cs)), seq);
 	DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos, seq,
 			dfnum, (long) dfpos, FALSE);
@@ -619,15 +679,16 @@ OBJECT x;
 	file_num(fpos(tmp)) = dfnum;
 	gall_pos(tmp) = dfpos;
 	Link(cs, tmp);
-	debug2(DCR, D, "  saving galley (foll) %s&? %s", SymName(sym), seq);
+	debug2(DCR, DD, "  saving galley (foll) %s&? %s", SymName(sym), seq);
       }
       DisposeObject(val);
+      if( hold_key != nilobj )  DisposeObject(hold_key);
       break;
 
 
     case GALL_TARG:
 
-      if( gall_tag(cs) != nil )  DisposeObject(gall_tag(cs));
+      if( gall_tag(cs) != nilobj )  DisposeObject(gall_tag(cs));
       if( !is_word(type(tag)) || StringEqual(string(tag), STR_EMPTY) )
       {
 	debug2(DCR, DD, "  GALL_TARG %s put none for %s",
@@ -636,7 +697,7 @@ OBJECT x;
 	gall_tag(cs) = MakeWord(WORD, STR_NONE, no_fpos);
       }
       else gall_tag(cs) = tag;
-      debug2(DCR, D, "  have new %s gall_targ %s", SymName(sym),
+      debug2(DCR, DD, "  have new %s gall_targ %s", SymName(sym),
 	  EchoObject(gall_tag(cs)));
       for( link = Down(cs);  link != cs;  link = NextDown(link) )
       {	Child(y, link);
@@ -644,7 +705,7 @@ OBJECT x;
 				"CrossSequence: GALL_TARG y!" );
 	if( gall_rec(y) )
 	{
-	  debug3(DCR, D, "  inserting galley (foll) %s&%s %s", SymName(sym),
+	  debug3(DCR, DD, "  inserting galley (foll) %s&%s %s", SymName(sym),
 	    string(gall_tag(cs)), string(y));
 	  DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos,
 	    string(y), file_num(fpos(y)), (long) gall_pos(y), FALSE);
@@ -664,11 +725,11 @@ OBJECT x;
       }
       if( target_state(cs) == SEEN_TARGET )
       {
-	debug2(DCR, D, "  inserting %s cross_targ %s",
+	debug2(DCR, DD, "  inserting %s cross_targ %s",
 	  SymName(sym), target_val(cs));
 	AppendToFile(target_val(cs), target_file(cs), &target_pos(cs));
 	DisposeObject(target_val(cs));
-	target_val(cs) = nil;
+	target_val(cs) = nilobj;
 	target_state(cs) = WRITTEN_TARGET;
       }
       if( !is_word(type(tag)) || StringEqual(string(tag), STR_EMPTY) )
@@ -678,7 +739,7 @@ OBJECT x;
 	DisposeObject(tag);
 	tag = MakeWord(WORD, STR_NONE, no_fpos);
       }
-      debug3(DCR, D, "  inserting cross (prec) %s&%s %s", SymName(sym),
+      debug3(DCR, DD, "  inserting cross (prec) %s&%s %s", SymName(sym),
 	    string(tag), "0");
       DbInsert(NewCrossDb, FALSE, sym, string(tag), &fpos(tag), STR_ZERO,
 	target_file(cs), (long) target_pos(cs), TRUE);
@@ -695,12 +756,12 @@ OBJECT x;
       }
       else if( StringEqual(string(tag), STR_EMPTY) )
       {
-        debug1(DCR, D, "  ignoring cross (foll) %s (empty tag)", SymName(sym));
+        debug1(DCR, DD, "  ignoring cross (foll) %s (empty tag)", SymName(sym));
       }
       else
       { Link(cs, tag);
 	gall_rec(tag) = FALSE;
-        debug3(DCR, D, "  storing cross (foll) %s&%s %s", SymName(sym),
+        debug3(DCR, DD, "  storing cross (foll) %s&%s %s", SymName(sym),
 	    string(tag), "?");
       }
       break;
@@ -719,15 +780,23 @@ OBJECT x;
 	EchoObject(tag));
       target_val(cs) = tag;
       assert( Up(tag) == tag, "CrossSeq: Up(tag)!" );
+
+      target_file(cs) = DatabaseFileNum(&fpos(tag));
+      /* ***
       str = FileName(file_num(fpos(tag)));
-      target_file(cs) = FileNum(str, DATA_SUFFIX);
-      if( target_file(cs) == NO_FILE )
-	target_file(cs) = DefineFile(str, DATA_SUFFIX, &fpos(tag),
+      if( StringEndsWith(str, DATA_SUFFIX) )
+	target_file(cs) = file_num(fpos(tag));
+      else
+      { target_file(cs) = FileNum(str, DATA_SUFFIX);
+        if( target_file(cs) == NO_FILE )
+	  target_file(cs) = DefineFile(str, DATA_SUFFIX, &fpos(tag),
 					DATABASE_FILE, SOURCE_PATH);
+      }
+      *** */
       target_state(cs) = SEEN_TARGET;
 
       /* store tag of the galley, if any */
-      tag = nil;
+      tag = nilobj;
       assert( type(target_val(cs)) == CLOSURE, "CrossSequence: target_val!" );
       link = Down(target_val(cs));
       for( ;  link != target_val(cs);  link = NextDown(link) )
@@ -735,7 +804,7 @@ OBJECT x;
 	if( type(par) == PAR && is_tag(actual(par)) )
 	{ assert( Down(par) != par, "CrossSequence: Down(PAR)!" );
 	  Child(tag, Down(par));
-	  tag = ReplaceWithTidy(tag, FALSE);
+	  tag = ReplaceWithTidy(tag, TRUE);  /* && */
 	  if( !is_word(type(tag)) )
 	  { Error(10, 18, "tag of %s is not a simple word",
 	      WARN, &fpos(tag), SymName(actual(target_val(cs))));
@@ -743,13 +812,13 @@ OBJECT x;
 	  }
 	  else if( StringEqual(string(tag), STR_EMPTY) )
 	  {
-            debug1(DCR, D, "  ignoring cross (own tag) %s (empty tag)",
+            debug1(DCR, DD, "  ignoring cross (own tag) %s (empty tag)",
 		SymName(sym));
 	  }
 	  else
 	  { Link(cs, tag);
 	    gall_rec(tag) = FALSE;
-            debug3(DCR, D, "  storing cross (own tag) %s&%s %s", SymName(sym),
+            debug3(DCR, DD, "  storing cross (own tag) %s&%s %s", SymName(sym),
 		string(tag), "?");
 	  }
 	  break;
@@ -769,7 +838,7 @@ OBJECT x;
 			"CrossSeq: non-WORD or empty tag!" );
 	  if( !gall_rec(tag) )
 	  {
-	    debug3(DCR, D, "  inserting cross (foll) %s&%s %s", SymName(sym),
+	    debug3(DCR, DD, "  inserting cross (foll) %s&%s %s", SymName(sym),
 	      string(tag), "0");
 	    DbInsert(NewCrossDb, FALSE, sym, string(tag), &fpos(tag), 
 	      STR_ZERO, target_file(cs), (long) target_pos(cs), TRUE);
@@ -803,12 +872,12 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-CrossClose()
+void CrossClose(void)
 { OBJECT link, cs, ylink, y, sym;  BOOLEAN g;  int len, count;
   FILE_NUM dfnum;  long dfpos, cont;
   FULL_CHAR buff[MAX_BUFF], seq[MAX_BUFF], tag[MAX_BUFF];
   debug0(DCR, D, "CrossClose()");
-  ifdebug(DCR, DD, if( RootCross != nil ) DebugObject(RootCross));
+  ifdebug(DCR, DD, if( RootCross != nilobj ) DebugObject(RootCross));
 
   /* if suppressing cross referencing, return */
   if( !AllowCrossDb )
@@ -817,7 +886,7 @@ CrossClose()
   }
 
   /* check for dangling forward references and dispose cross ref structures */
-  if( RootCross != nil )
+  if( RootCross != nilobj )
   { for( link = Down(RootCross);  link != RootCross;  link = NextDown(link) )
     { Child(cs, link);
       assert( type(cs) == CROSS_SYM, "CrossClose: type(cs)!" );
@@ -838,7 +907,7 @@ CrossClose()
 	  SymName(symb(cs)), KW_CROSS, KW_FOLLOWING);
       ifdebug(ANY, D,
 	if( target_state(cs) == SEEN_TARGET )  DisposeObject(target_val(cs));
-	if( gall_tag(cs) != nil )  DisposeObject(gall_tag(cs));
+	if( gall_tag(cs) != nilobj )  DisposeObject(gall_tag(cs));
       );
     }
     ifdebug(ANY, D, DisposeObject(RootCross); );
@@ -862,5 +931,5 @@ CrossClose()
   DbConvert(NewCrossDb, TRUE);
 
   debug0(DCR, D, "CrossClose returning.");
-  ifdebug(DCR, D, crtab_debug(crossref_tab, stderr));
+  ifdebug(DCR, DD, crtab_debug(crossref_tab, stderr));
 } /* end CrossClose */

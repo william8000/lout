@@ -13,7 +13,7 @@
 #                                                                             #
 ###############################################################################
 
-@SysPrependGraphic { tab_prepend }
+@SysPrependGraphic { "tab.lpg" }
 
 export	@CC @RR @Rule @DoubleRule @Line @DoubleLine @NP
 	@Rowa @Rowb @Rowc @Rowd @Rowe @Rowf @Rowg @Rowh @Rowi @Rowj

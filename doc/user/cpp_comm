@@ -1,0 +1,20 @@
+@Section
+   @Title { Lout inside C comments }
+   @Tag { cpcomm }
+@Begin
+@PP
+It is possible to embed Lout text inside C and C++ comments, by
+starting off the comment with an @Code "@" character.  The entire
+comment after the @Code "@" character should be Lout text.  For
+example, to force Lout to start a new page at some point within a C
+program, place
+@ID @Code "/*@ @NP */"
+at that point.  Or you could make a heading like this:
+@ID @Code "/*@ @Display @Heading { treeprint() } */"
+Other possible uses for this feature include index entries and margin
+notes.  Incredible as it may seem, you can even write
+@ID @Code "/*@ @CD @Heading { Function @CP { treeprint() } } */"
+with a @Code "@CP" symbol and some C code inside the Lout code
+inside the C code.  You probably can't go further, however, since
+that would require a C comment inside a C comment.
+@End @Section

@@ -1,0 +1,34 @@
+LOUT.EIFFEL - EIFFEL PROGRAM PRINTING IN LOUT DOCUMENTS (VERSION 1.1)
+
+This software allows you to print programs and program fragments
+from the Eiffel programming language with Lout.  The typeset output
+conforms with the style guidelines in the standard reference (Eiffel:
+The Language, by Bertrand Meyer).
+
+When installed, the only change you have to make is to replace the
+@SysInclude { doc } at the top of the document by @SysInclude { edoc },
+then enclose your Eiffel parts in @Eiffel { ... }.
+
+Lout.eiffel is distributed as follows:
+
+   ftp://ftp.cs.su.oz.au/jeff/lout.eiffel.1.1.tar.gz
+
+In other words, in a gzipped tar file called "lout.eiffel.1.1.tar.gz"
+in the "jeff" subdirectory of the home directory of "ftp ftp.cs.su.oz.au"
+with login name "ftp" or "anonymous" using any non-empty password.
+The distribution contains
+
+  *  Source code for the eif2lout program
+
+  *  A manual entry for the eif2lout program
+
+  *  Six Lout library files (edoc, etc.)
+
+  *  A makefile and installation instructions (very easy)
+
+User documentation is contained in the Lout User's Guide distributed
+with Lout itself.
+
+Lout.eiffel was designed and implemented by Jeffrey H. Kingston
+(jeff@cs.su.oz.au) of the Basser Department of Computer Science at the
+University of Sydney.

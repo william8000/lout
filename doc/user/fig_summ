@@ -1,0 +1,498 @@
+@Section
+   @Title { Summary }
+   @Tag { figsummary }
+@Begin
+@PP
+The options to the @Code "@Fig" symbol, and their default values, are as
+follows.  The complete range of options is shown at right:
+@ID @Tab
+  hmargin { 1s }
+  vmargin { 0.5vx }
+  @Fmth { @Col @Code A ! @Col @Code " " ! @Col @Code B ! @Col @Code " " !
+	  @Col 1.0c @Wide ! @Col C }
+  @Fmta { @Col @Code A ! @Col @Code "{" ! @Col @Code B ! @Col @Code "}" !
+	  @Col 1.0c @Wide ! @Col C }
+{
+@Rowh
+  A { "@Fig" }
+@Rowa
+  A { "   maxlabels" }
+  B { 200 }
+  C { any whole number }
+@Rowa
+  A { "   linestyle" }
+  B { solid }
+  C { @Code "solid dashed cdashed dotted noline" }
+@Rowa
+  A { "   linewidth" }
+  B { 0.5 pt }
+  C { any Fig length (see below) }
+@Rowa
+  A { "   linecap"   }
+  B { round  }
+  C { @Code "butt round project" }
+@Rowa
+  A { "   dashlength"}
+  B { 0.15 cm }
+  C { any Fig length }
+@Rowa
+  A { "   paint"     }
+  B { nopaint }
+  C { @Code nopaint or any colour from Section {@NumberOf colour} }
+@Rowa
+  A { "   margin"    }
+  B { 0.4c }
+  C { any Lout length }
+@Rowa
+  A { "   arrow"     }
+  B { noarrow }
+  C { @Code "noarrow forward back both" }
+@Rowa
+  A { "   headstyle" }
+  B { open }
+  C { @Code "open halfopen closed" }
+@Rowa
+  A { "   headwidth" }
+  B { 0.05 cm }
+  C { any Fig length }
+@Rowa
+  A { "   headlength"}
+  B { 0.15 cm }
+  C { any Fig length }
+}
+The @Code "linecap" option determines the shape of the ends of
+lines:  @Code "round" puts a round cap on them, which is the most
+useful with {@Code "@Fig"};  @Code "butt" is a square end; and
+@Code "project" is a square end projecting half a line width past the
+end of the line; it is useful for getting sharp corners on rectangles
+and square dots in dotted lines.
+@FootNote {
+The line joining options of PostScript are not reflected in @Code "@Fig"
+options because @Code "@Fig" strokes paths segment by segment, not all
+at once, and so there are no line joins in the PostScript sense.  This
+was done to improve the appearance of dashed and dotted lines.
+}
+@PP
+The following standard shapes take the same options as {@Code "@Fig"},
+except that they do not have @Code "maxlabels" or the last four
+(arrow-drawing) options, and occasionally they have other options.  In
+most cases the default values of these options are taken from the
+enclosing {@Code "@Fig"}.  Where there are extra options, or where a
+different default value is used, the option and its default value are
+shown.  The list also shows the shape's labels, and how it is
+superimposed on its right parameter (shown as a grey rectangle).  A
+larger margin will enlarge the right parameter and hence the shape as
+well (with {@Code "@CurveBox"}, the margin also determines the curvature at
+the corners).  Squares, polygons and circles have a diameter equal to the
+larger of @Code xsize and {@Code ysize}.
+@LP
+@ID {
+5c @Wide @Code "@Box"
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Box margin { 0c }
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@LP
+@ID {
+5c @Wide @Code "@CurveBox"
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@CurveBox margin { 0.4c }
+{ 1.2c @Wide 0.2c @High }
+// @ShowLabels
+}
+}
+
+@LP
+@ID {
+5c @Wide @Code {
+"@ShadowBox"
+"   shadow { 0.2f }"
+}
+||7ct
+@Fig {
+# @Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+# linestyle { noline }  margin { 0c }
+@ShadowBox margin { 0c } paint { lightgrey }
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@LP
+@ID {
+5c @Wide @Code "@Square"
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Square margin { 0c }
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+@LP
+
+@ID {
+5c @Wide @Code "@Diamond"
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Diamond margin { 0c }
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@LP
+@ID {
+5c @Wide @Code {
+"@Polygon"
+"   sides { 3 }"
+"   angle { 180/sides }"
+}
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Polygon margin { 0c }
+{ 2c @Wide 1c @High }
+|| @ShowLabels ||0.5c ... ||0.5c
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Polygon sides { 12 } margin { 0c }
+{ 2c @Wide 1c @High }
+||1c ...
+// @ShowLabels
+}
+}
+
+@ID {
+5c @Wide @Code "@Ellipse"
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Ellipse margin { 0c }
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@LP
+@ID {
+5c @Wide @Code "@Circle"
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Circle margin { 0c }
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+@LP
+
+The following standard shapes have the same options as {@Code "@Fig"},
+including the four arrow-drawing options, and occasionally they have
+others.  In each case the only difference between the line and arrow
+symbols is the default value of {@Code "arrow"}, which lines take from
+{@Code "@Fig"} and arrows set to {@Code "forward"}.  The first four draw
+a line along the mark of the right parameter, which is not necessarily
+the same as its left or top edge.
+@LP
+@ID {
+5c @Wide @Code {
+"@HLine"
+"   margin { 0c }"
+}
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@HLine
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@ID {
+5c @Wide @Code {
+"@HArrow"
+"   margin { 0c }"
+"   arrow { forward }"
+}
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@HArrow
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@ID {
+5c @Wide @Code {
+"@VLine"
+"   margin { 0c }"
+}
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@VLine
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@ID {
+5c @Wide @Code {
+"@VArrow"
+"   margin { 0c }"
+"   arrow { forward }"
+}
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@VArrow
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@ID {
+5c @Wide @Code {
+"@Line"
+"   from { 0 ysize }"
+"   to { xsize 0 }"
+"   margin { 0c }"
+}
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Line
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@ID {
+5c @Wide @Code {
+"@Arrow"
+"   from { 0 ysize }"
+"   to { xsize 0 }"
+"   margin { 0c }"
+"   arrow { forward }"
+}
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Arrow
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+@ID {
+5c @Wide @Code {
+"@Arc"
+"   from { 0 ysize }"
+"   to { xsize 0 }"
+"   ctr { 0 0 }"
+"   direction { clockwise }"
+"   margin { 0c }"
+}
+||7ct
+@Fig {
+@Figure shape { 0 0 xsize 0 xsize ysize 0 ysize 0 0 } paint { lightgrey }
+linestyle { noline }  margin { 0c }
+@Arc
+{ 2c @Wide 1c @High }
+// @ShowLabels
+}
+}
+
+More generally, the @Code "@Figure" symbol takes all the options of
+@Code "@Fig" except {@Code "maxlabels"}, together with a @Code shape
+option containing a sequence of points, and it connects each pair of
+points by a line or curve as specified by the following:
+@ID @Tab
+   vmargin { 0.5vx }
+   @Fmta { @Col A ! @Col B }
+{
+@Rowa
+  A { @I { point  point } }
+  B { Straight line }
+@Rowa
+  A { @I { point } @Code "[" &0.5s @Code "]" @I { point } }
+  B { Draw nothing }
+@Rowa
+  A { @I { point } @Code "[" @I point @Code "]" @I { point } }
+  B { Anticlockwise circular or elliptical arc }
+@Rowa
+  A { @I { point } @Code "[" @I point @Code "clockwise ]" @I { point } }
+  B { Clockwise circular or elliptical arc }
+@Rowa
+  A { @I { point } @Code "[" @I {point point} @Code "]" @I { point } }
+  B { Bezier curve with two control points }
+}
+The remaining symbols do not draw shapes.  They are
+@ID {
+@I point  @Code "@Label"  @I label
+}
+Within a shape, makes @I label stand for the point on the page denoted
+by {@I point}, which is not made part of the shape.  The label applies
+from here onwards until some other point is given this label, a
+relabelling occurs, or the figure ends.
+@ID {
+@I label  @Code "::"  @I object
+}
+Relabel every labelled point in the right parameter (which may be an
+arbitrary Lout object), by adding {@I label}{@Code "@"} to the front of
+each label.
+@ID {
+@Code "@Frame"  @I object
+}
+Equivalent to @Code "@Figure shape {xsize 0 @Label X 0 ysize @Label Y}"
+@I object & .
+@ID {
+@I point  @Code "@BaseOf"  @I object
+}
+Translate @I object so that its bottom left-hand corner appears at
+{@I point}.  Lout thinks that the result is an empty object.
+@ID {
+@I point  @Code "@MarkOf"  @I object
+}
+Translate @I object so that the point where its marks cross appears at
+{@I point}.  Lout thinks that the result is an empty object.
+@ID {
+@Code "@ShowLabels"
+}
+Display all the labels of the figure created up to this point.
+@PP
+The following lists define all the ways to specify lengths, angles and
+points.
+@FootNote {
+A length is represented in PostScript by a single number on the operand
+stack; so is an angle.  A point is represented by two numbers on the
+stack.  Those familiar with PostScript and willing to sacrifice portability
+and increase their risk of error can therefore write, for example,
+@OneCol {@I length @Code "sqrt"} within a shape, to obtain a length which
+is the square root of another length, or @OneCol { @I point @Code "exch" }
+to obtain the reflection of a point about the main diagonal, and so on.
+}
+Brief explanations appear to the right, with the symbols' precedences in
+parentheses where appropriate.
+@DP
+@OneCol @Tab
+  vmargin { 0.5vx }
+  @Fmth { @Col { &@DisplayIndent     A } ! @Col   }
+  @Fmta { @Col { &@DisplayIndent &2s A } ! @Col B }
+{
+@Rowh A { @I length } vmargin { 0.2vx }
+@Rowh
+@Rowa
+  A { 0 }
+  B { zero }
+@Rowa
+  A { @Code xmark }
+  B { distance to column mark }
+@Rowa
+  A { @Code ymark }
+  B { distance to row mark }
+@Rowa
+  A { @Code xsize }
+  B { distance to right boundary }
+@Rowa
+  A { @Code ysize }
+  B { distance to top boundary }
+@Rowa
+  A { @I number @Code in }
+  B { @I number inches (39) }
+@Rowa
+  A { @I number @Code cm }
+  B { @I number centimetres (39) }
+@Rowa
+  A { @I number @Code pt }
+  B { @I number points (39) }
+@Rowa
+  A { @I number @Code em }
+  B { @I number ems (39) }
+@Rowa
+  A { @I number @Code sp }
+  B { 1 sp is the current width of a space (39) }
+@Rowa
+  A { @I number @Code vs }
+  B { 1 vs is the current inter-line space (39) }
+@Rowa
+  A { @I number @Code ft }
+  B { 1 ft is the size of the current font (39) }
+@Rowa
+  A { @I point @Code "@Distance" @I point }
+  B { distance between two points (35) }
+@Rowa
+  A { @I point @Code "@XDistance" @I point }
+  B { horizontal distance between two points (35) }
+@Rowa
+  A { @I point @Code "@YDistance" @I point }
+  B { vertical distance between two points (35) }
+@Rowh
+@Rowh
+@Rowh A { @I angle } vmargin { 0.2vx }
+@Rowh
+@Rowa
+  A { @I number @Code dg }
+  B { @I number degrees (39) }
+@Rowa
+  A { @I number }
+  B { @I number degrees (@Code dg is optional) }
+@Rowa
+  A { @I point @Code "@Angle" @I point }
+  B { angle from first point to second (35) }
+@Rowh
+@Rowh
+@Rowh A { @I point } vmargin { 0.2vx }
+@Rowh
+@Rowa
+  A { @I {length  length} }
+  B { @I x and @I y distance from origin (5) }
+@Rowa
+  A { @I length  @Code "<<"  @I angle }
+  B { distance and angle from origin (38) }
+@Rowa
+  A { @I point  @Code "++"  @I point }
+  B { vector sum of two points (36) }
+@Rowa
+  A { @I point  @Code "--"  @I point }
+  B { vector difference of two points (36) }
+@Rowa
+  A { @I point  @Code "@Max"  @I point }
+  B { vector maximum of two points (36) }
+@Rowa
+  A { @I point  @Code "@Min"  @I point }
+  B { vector minimum of two points (36) }
+@Rowa
+  A { @I point  @Code "**"  @I number }
+  B { multiplication of point by number (37) }
+@Rowa
+  A { @I label }
+  B {  a previously defined label }
+@Rowa
+  A { @Code "@Prev"	 }
+  B {  the previous point in a shape }
+}
+@End @Section

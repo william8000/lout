@@ -1,6 +1,6 @@
 /*@z05.c:Read Definitions:ReadFontDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -50,8 +50,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-static ReadFontDef(encl)
-OBJECT encl;
+static void ReadFontDef(OBJECT encl)
 { OBJECT t, family, face, inside;
   
   SuppressScope();
@@ -84,9 +83,8 @@ OBJECT encl;
 /*                                                                           */
 /*****************************************************************************/
 
-static ReadLangDef(encl)
-OBJECT encl;
-{ OBJECT t, names, family, face, inside;
+static void ReadLangDef(OBJECT encl)
+{ OBJECT t, names, inside;
   
   names = New(ACAT);
   t = LexGetToken();
@@ -114,9 +112,8 @@ OBJECT encl;
 /*                                                                           */
 /*****************************************************************************/
 
-ReadPrependDef(typ, encl)
-unsigned typ;  OBJECT encl;
-{ OBJECT t, fname;  FILE_NUM fnum;
+void ReadPrependDef(unsigned typ, OBJECT encl)
+{ OBJECT t, fname;
   t = LexGetToken();
   if( type(t) != LBR )
   { Error(5, 5, "left brace expected here in %s declaration",
@@ -131,7 +128,7 @@ unsigned typ;  OBJECT encl;
     DisposeObject(fname);
     return;
   }
-  fnum = DefineFile(string(fname), STR_EMPTY, &fpos(fname), PREPEND_FILE,
+  (void) DefineFile(string(fname), STR_EMPTY, &fpos(fname), PREPEND_FILE,
 	   typ == PREPEND ? INCLUDE_PATH : SYSINCLUDE_PATH);
 
 } /* end ReadPrependDef */
@@ -145,9 +142,8 @@ unsigned typ;  OBJECT encl;
 /*                                                                           */
 /*****************************************************************************/
 
-ReadDatabaseDef(typ, encl)
-unsigned typ;  OBJECT encl;
-{ OBJECT symbs, t, db, fname;
+void ReadDatabaseDef(unsigned typ, OBJECT encl)
+{ OBJECT symbs, t, fname;
   symbs = New(ACAT);
   t = LexGetToken();
   while( type(t)==CLOSURE || (type(t)==WORD && string(t)[0]==CH_SYMSTART) )
@@ -176,7 +172,7 @@ unsigned typ;  OBJECT encl;
     return;
   }
   if( Down(symbs) != symbs )
-    db = DbLoad(fname, typ == DATABASE ? DATABASE_PATH : SYSDATABASE_PATH,
+    (void) DbLoad(fname, typ == DATABASE ? DATABASE_PATH : SYSDATABASE_PATH,
       TRUE, symbs);
 } /* end ReadDatabaseDef */
 
@@ -194,8 +190,7 @@ unsigned typ;  OBJECT encl;
 #define NextToken(t, res)						\
   t = LexGetToken(); sym_body(res) = Append(sym_body(res), t, PARENT);
 
-static ReadTokenList(token, res)
-OBJECT token, res;
+static void ReadTokenList(OBJECT token, OBJECT res)
 { OBJECT t, xsym, new_par;
   NextToken(t, res);
   for(;;) switch(type(t))
@@ -219,6 +214,7 @@ OBJECT token, res;
     case ACAT:
     case CROSS:
     case NULL_CLOS:
+    case PAGE_LABEL:
     case ONE_COL:
     case ONE_ROW:
     case WIDE:
@@ -243,9 +239,12 @@ OBJECT token, res;
     case FONT:
     case SPACE:
     case BREAK:
+    case UNDERLINE:
     case COLOUR:
     case LANGUAGE:
     case CURR_LANG:
+    case COMMON:
+    case RUMP:
     case NEXT:
     case TAGGED:
     case INCGRAPHIC:
@@ -390,15 +389,14 @@ OBJECT token, res;
 /*                                                                           */
 /*  Read a macro from input and insert into symbol table.                    */
 /*  Token *token contains the "macro" keyword.  Input is read up to and      */
-/*  including the closing right brace, and nil is returned in *token if OK.  */
+/*  including the closing right brace, and nilobj returned in *token if OK.  */
 /*  The proper scope for reading the macro body is open at entry and exit.   */
-/*  ReadMacro returns the new symbol table entry if successful, else nil.    */
+/*  ReadMacro returns the new symbol table entry if successful, else nilobj. */
 /*                                                                           */
 /*****************************************************************************/
 
-static OBJECT ReadMacro(token, encl)
-OBJECT *token, encl;
-{ OBJECT t, tmp, res;
+static OBJECT ReadMacro(OBJECT *token, OBJECT encl)
+{ OBJECT t, res;
 
   /* find macro name and insert into symbol table */
   SuppressScope();
@@ -408,9 +406,9 @@ OBJECT *token, encl;
     debug1(ANY, D, "offending type is %s", Image(type(t)));
     UnSuppressScope();
     *token = t;
-    return nil;
+    return nilobj;
   }
-  res = InsertSym(string(t), MACRO, &fpos(t), 0, FALSE, TRUE, 0, encl, nil);
+  res = InsertSym(string(t), MACRO, &fpos(t), 0, FALSE, TRUE, 0, encl, nilobj);
   UnSuppressScope();
 
   /* find opening left brace */
@@ -419,7 +417,7 @@ OBJECT *token, encl;
   { Error(5, 24, "%s ignored (opening %s is missing)",
       WARN, &fpos(t), KW_MACRO, KW_LBR);
     *token = t;
-    return nil;
+    return nilobj;
   }
   
   /* read macro body */
@@ -429,7 +427,7 @@ OBJECT *token, encl;
   /* clean up (kill final RBR, dispose macro name) and exit */
   sym_body(res) = DeleteAndDispose(pred(sym_body(res), PARENT), PARENT);
   recursive(res) = FALSE;
-  *token = nil;
+  *token = nilobj;
   return res;
 } /* end ReadMacro */
 
@@ -446,8 +444,7 @@ OBJECT *token, encl;
 /*                                                                           */
 /*****************************************************************************/
 
-ReadDefinitions(token, encl, res_type)
-OBJECT *token, encl;  unsigned char res_type;
+void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
 { OBJECT t, res, res_target, export_list, import_list, link, y, z;
   OBJECT curr_encl;
   t = *token;
@@ -578,7 +575,7 @@ OBJECT *token, encl;  unsigned char res_type;
 	return;
       }
       res = InsertSym(string(t), res_type, &fpos(t), DEFAULT_PREC,
-		FALSE, FALSE, 0, curr_encl, nil);
+		FALSE, FALSE, 0, curr_encl, nilobj);
       if( curr_encl != encl )  visible(res) = TRUE;
       t = LexGetToken();
 
@@ -591,7 +588,7 @@ OBJECT *token, encl;  unsigned char res_type;
       }
 	
       /* find into clause, if any */
-      res_target = nil;
+      res_target = nilobj;
       if( is_string(t, KW_INTO) )
       { UnSuppressScope();
 	Dispose(t);  t = LexGetToken();
@@ -604,7 +601,7 @@ OBJECT *token, encl;  unsigned char res_type;
 	}
 	res_target = Parse(&t, curr_encl, FALSE, FALSE);
 	SuppressScope();
-	if( t == nil )  t = LexGetToken();
+	if( t == nilobj )  t = LexGetToken();
       }
 
       /* find precedence clause, if any */
@@ -651,7 +648,7 @@ OBJECT *token, encl;  unsigned char res_type;
 	  return;
 	}
 	InsertSym(string(t), LPAR, &fpos(t), DEFAULT_PREC, 
-	  FALSE, FALSE, 0, res, nil);
+	  FALSE, FALSE, 0, res, nilobj);
 	Dispose(t);  t = LexGetToken();
       }
 
@@ -672,13 +669,13 @@ OBJECT *token, encl;  unsigned char res_type;
 	  return;
 	}
 	InsertSym(string(t), RPAR, &fpos(t), DEFAULT_PREC,
-	  FALSE, FALSE, 0, res, nil);
+	  FALSE, FALSE, 0, res, nilobj);
 	UnSuppressScope();
 	Dispose(t);  t = LexGetToken();
       }
 
       /* read local definitions and body */
-      if( res_target != nil )
+      if( res_target != nilobj )
 	InsertSym(KW_TARGET, LOCAL, &fpos(res_target), DEFAULT_PREC,
 			FALSE, FALSE, 0, res, res_target);
       if( type(t) == WORD && StringEqual(string(t), KW_LBR) )
@@ -703,7 +700,7 @@ OBJECT *token, encl;  unsigned char res_type;
       for( link=Down(export_list);  link != export_list;  link=NextDown(link) )
       {	Child(y, link);
 	z = SearchSym(string(y), StringLength(string(y)));
-	if( z == nil || enclosing(z) != res )
+	if( z == nilobj || enclosing(z) != res )
 	  Error(5, 41, "exported symbol %s is not defined in %s",
 	    WARN, &fpos(y), string(y), SymName(res));
 	else if( has_body(res) && type(z) == RPAR )
@@ -724,12 +721,12 @@ OBJECT *token, encl;  unsigned char res_type;
       PopScope();
     if( Down(import_list) == import_list || curr_encl != encl )
     { DisposeObject(import_list);
-      import_list = nil;
+      import_list = nilobj;
     }
     else imports(res) = import_list;
 
     BodyParAllowed();
-    if( t == nil ) t = LexGetToken();
+    if( t == nilobj ) t = LexGetToken();
 
   } /* end while */
 

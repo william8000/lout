@@ -26,4 +26,5 @@
 @Use { @DocumentLayout }
 
 @SysDatabase @Reference { loutrefs }		  # references about Lout
-@SysDatabase @RefStyle { refstyles }		  # reference printing styles
+@SysDatabase @Reference { oldrefs }		  # old references about Lout
+@SysDatabase @RefStyle { refstyle }		  # reference printing styles

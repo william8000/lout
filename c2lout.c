@@ -92,14 +92,14 @@ static BOOLEAN	Scan();
 main(argc, argv)
 int argc; char *argv[];
 { FILE *in_fp, *out_fp = stdout;
-  BOOLEAN at_least_one_file, stdin_seen, raw_seen;  int i;
-  char *infilename, *outfilename, *errfilename, *arg, *tab, *str;
+  BOOLEAN at_least_one_file, raw_seen;  int i;
+  char *infilename, *outfilename, *errfilename, *str;
 
   /* read command line */
   in_fp = out_fp = NULL;
   err_fp = stderr;
   line_num = 0;
-  stdin_seen = raw_seen = FALSE;
+  raw_seen = FALSE;
   tab_by_spacing = TRUE;
   style_option = NO_STYLE;
   tab_in = 8;
@@ -516,7 +516,6 @@ FILE *out_fp;
 static BOOLEAN Scan(in_fp, out_fp)
 FILE *in_fp, *out_fp;
 { int state, ch;
-  char word[MAX_LINE];
   state = C_REGULAR;
   while( (ch = getc(in_fp)) != EOF )
   {
@@ -616,7 +615,9 @@ FILE *in_fp, *out_fp;
       case C_COMMENT:		/* inside a C comment */
 
 	if( ch == '\t' )
-	{ EmitTab(out_fp);
+	{ fputs("\"}", out_fp);
+	  EmitTab(out_fp);
+	  fputs("{@C \"", out_fp);
 	}
 	else if( ch == '\n' )
 	{ int nextch = getc(in_fp);
@@ -645,7 +646,9 @@ FILE *in_fp, *out_fp;
       case CPP_COMMENT:		/* inside a C++ comment */
 
 	if( ch == '\t' )
-	{ EmitTab(out_fp);
+	{ fputs("\"}", out_fp);
+	  EmitTab(out_fp);
+	  fputs("{@C \"", out_fp);
 	}
 	else if( ch == '\n' )
 	{ fputs("\"}\n", out_fp);
@@ -712,7 +715,9 @@ FILE *in_fp, *out_fp;
 	{ putc(ch, out_fp);
 	}
 	else if( ch == '\t' )
-	{ EmitTab(out_fp);
+	{ fputs("\"}", out_fp);
+	  EmitTab(out_fp);
+	  fputs("{@C \"", out_fp);
 	  state = C_COMMENT;
 	}
 	else if( ch == '\n' )

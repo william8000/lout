@@ -1,0 +1,241 @@
+
+###############################################################################
+#                                                                             #
+#  cillustration                                                              #
+#                                                                             #
+#  Lout setup file for illustrations, with C and C++ printing.                #
+#                                                                             #
+#  Jeffrey H. Kingston                                                        #
+#  12 September 1994                                                          #
+#                                                                             #
+###############################################################################
+
+
+###############################################################################
+#                                                                             #
+#  @SysInclude commands for standard packages.                                #
+#                                                                             #
+###############################################################################
+
+  @SysInclude { fontdefs }			  # font definitions
+  @SysInclude { langdefs }			  # language definitions
+  @SysInclude { dl }				  # DocumentLayout package
+  @SysInclude { picturef }			  # IllustrationLayout extend
+# @SysInclude { tab }				  # @Tab table formatter
+# @SysInclude { eq }				  # @Eq equation formatter
+# @SysInclude { fig }				  # @Fig advanced graphics
+# @SysInclude { graph }				  # @Graph graph drawing
+  @SysInclude { cprint }			  # @CPrint C and C++ programs
+# @SysInclude { pas }				  # @Pas Pascal programs
+
+
+###############################################################################
+#                                                                             #
+#  @Include command for reading personal definitions from current directory.  #
+#                                                                             #
+###############################################################################
+
+  @Include { mydefs }
+
+
+###############################################################################
+#                                                                             #
+#  The @DocumentLayout @Use clause - overall document format options.         #
+#                                                                             #
+#  Many of these (e.g. the page ones) have no effect on illustrations.        #
+#                                                                             #
+###############################################################################
+
+@Use { @DocumentLayout
+  # @InitialFont	{ Times Base 12p	} # initial font
+  # @InitialBreak	{ adjust 1.20fx hyphen	} # initial break
+  # @InitialLanguage	{ English		} # initial language
+  # @InitialColour	{ black			} # initial colour
+  # @HeadingFont	{ Bold			} # font for @Heading
+  # @ParaGap		{ 1.30vx		} # gap between paragraphs
+  # @ParaIndent		{ 2.00f			} # first-line indent for @PP
+  # @DisplayGap		{ 1.00v			} # gap above, below displays
+  # @DisplayIndent	{ 2.00f			} # @IndentedDisplay indent
+  # @DefaultIndent	{ 0.5rt			} # @Display indent
+  # @WideIndent		{ 4.00f			} # @WideTaggedList indent
+  # @VeryWideIndent	{ 8.00f			} # @VeryWideTaggedList indent
+  # @ListGap		{ 1.00v			} # gap between list items
+  # @ListIndent		{ 0c			} # indent of list items
+  # @ListRightIndent	{ 0c			} # right indent of list items
+  # @ListLabelWidth	{ 2.00f			} # width allowed for list tags
+  # @PageType		{ A4			} # page type (width, height)
+  # @PageWidth		{			} # page width if type Other
+  # @PageHeight		{			} # page height if type Other
+  # @PageOrientation	{ Portrait		} # Portrait, Landscape, etc.
+  # @PageBackground	{  			} # background of each page
+  # @TopMargin		{ 2.50c			} # top margin of all pages
+  # @FootMargin		{ 2.50c			} # bottom margin of all pages
+  # @OddLeftMargin	{ 2.50c			} # left margin of odd pages
+  # @OddRightMargin	{ 2.50c			} # right margin of odd pages
+  # @EvenLeftMargin	{ 2.50c			} # left margin of even pages
+  # @EvenRightMargin	{ 2.50c			} # right margin of even pages
+  # @PageBoxType	{ None			} # None Box CurveBox ShadowBox
+  # @PageBoxMargin	{ 1.00c			} # page box margin
+  # @PageBoxLineWidth	{			} # page box line thickness
+  # @PageBoxPaint	{ none			} # page box paint
+  # @PageBoxShadow	{ 0.60c			} # shadow margin if ShadowBox
+  # @ColumnNumber	{ 1			} # number of columns (1 to 10)
+  # @ColumnGap		{ 1.00c			} # column gap
+  # @FigureNumbers	{ Arabic		} # method of numbering figures
+  # @TableNumbers	{ Arabic		} # method of numbering tables
+  # @CaptionFont        {                       } # figure, table caption font
+  # @CaptionBreak       {                       } # figure, table caption break
+  # @MakeFigureContents { No                    } # list of figures at start
+  # @MakeTableContents  { No                    } # list of tables at start
+  # @MakeContents	{ No			} # make contents? Yes or No
+  # @ContentsGap	{ 0.20v			} # extra gap above minor entry
+  # @ContentsGapAbove	{ 0.80v			} # extra gap above major entry
+  # @ContentsGapBelow	{ 0.00v			} # extra gap below major entry
+  # @ContentsLeader	{ ..			} # leader symbol in contents
+  # @ContentsLeaderGap	{ 4s			} # gap between leaders
+  # @ContentsRightWidth	{ 3f			} # page numbers column width
+  # @MakeReferences	{ Yes			} # make references? Yes or No
+  # @RefCiteStyle	{ [cite]		} # citation style
+  # @RefCiteLabels	{ @RefNum		} # citation items
+  # @RefNumbers		{ Arabic		} # reference numbers
+  # @RefListFormat	{ Labels		} # NoLabels, Labels, etc.
+  # @RefListLabels	{ [@RefNum]		} # ref list label format
+  # @RefListTitle	{ references		} # title of reference list
+  # @ChapRefListTitle	{ references		} # title of chapter ref list
+  # @RefListIndent	{ 0c			} # indent to left of labels
+  # @RefListRightIndent	{ 0c			} # indent to right of items
+  # @RefListGap		{ 1.00v			} # gap between ref list items
+  # @RefListFont	{        		} # font used in reference list
+  # @RefListBreak	{        		} # break style of ref list
+  # @RefListLabelWidth 	{ 2.00f			} # Labels column width
+  # @RefListSortKey	{ @Tag			} # sorting key
+  # @MakeIndex		{ No			} # make index? Yes or No
+  # @IndexFont		{			} # index entries font
+  # @IndexBreak		{ outdent 1.2fx		} # index entries break
+  # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
+  # @IndexColumnGap	{ 1.00c			} # index column gap
+  # @TopGap		{ 0.75c			} # gap between figures
+  # @MidGap		{ 0.75c			} # gap above/below body text
+  # @FootNoteNumbers	{ Arabic		} # footnote numbers
+  # @FootNoteThrough	{ No			} # numbered through chapter?
+  # @FootNoteFont	{ 0.80f			} # font for footnotes
+  # @FootNoteBreak	{ 1.20fx		} # break for footnotes
+  # @FootLen		{ 2.00c			} # length of footnote line
+  # @FootGap		{ 0.20c			} # gap between footnotes
+  # @EndNoteNumbers	{ Arabic		} # endnote numbers
+  # @EndNoteFont	{ 0.80f			} # font of endnotes
+  # @EndNoteBreak	{ 1.20fx		} # break for endnotes
+  # @EndNoteGap		{ 0.20c			} # gap between endnotes
+  # @MarginNoteFont	{ 0.80f			} # font of margin notes
+  # @MarginNoteBreak	{ ragged 1.10fx		} # break style of margin notes
+  # @MarginNoteHGap	{ 0.5c   		} # horizontal gap to notes
+  # @MarginNoteVGap	{ 1.00v  		} # min vertical gap between
+  # @MarginNoteWidth	{ 1.50c  		} # width of margin notes
+  # @PageHeaders	{ Simple		} # None Simple Titles NoTitles
+  # @PageNumbers	{ Arabic		} # page numbers
+  # @FirstPageNumber	{ 1			} # number of first page 
+  # @IntroPageNumbers	{ Roman			} # intro page numbers
+  # @IntroFirstPageNumber{ 1			} # number of first intro page 
+
+  # @OddTop		{ @Centre{- @PageNum -}	} # Simple page headers
+  # @OddFoot		{ @Null			}
+  # @EvenTop		{ @Centre{- @PageNum -}	}
+  # @EvenFoot		{ @Null			}
+  # @StartOddTop	{ @Null			}
+  # @StartOddFoot	{ @Null			}
+  # @StartEvenTop	{ @Null			}
+  # @StartEvenFoot	{ @Null			}
+  # @IntroOddTop	{ @Null			}
+  # @IntroOddFoot	{ @Null			}
+  # @IntroEvenTop	{ @Null			}
+  # @IntroEvenFoot	{ @Null			}
+  # @IntroStartOddTop	{ @Null			}
+  # @IntroStartOddFoot	{ @Null			}
+  # @IntroStartEvenTop	{ @Null			}
+  # @IntroStartEvenFoot	{ @Null			}
+
+						  # Titles, NoTitles headers
+  # @RunningOddTop  { @I {@MinorNum @DotSep @MinorTitle} @Right @B @PageNum }
+  # @RunningOddFoot		{ @Null					}
+  # @RunningEvenTop { @B @PageNum @Right @I {@MajorNum @DotSep @MajorTitle} }
+  # @RunningEvenFoot		{ @Null					}
+  # @RunningStartOddTop 	{ @Null					}
+  # @RunningStartOddFoot	{ @Centre { Bold 0.8f } @Font @PageNum	}
+  # @RunningStartEvenTop	{ @Null					}
+  # @RunningStartEvenFoot	{ @Centre { Bold 0.8f } @Font @PageNum	}
+  # @RunningIntroOddTop		{ @Null					}
+  # @RunningIntroOddFoot	{ @Right @PageNum			}
+  # @RunningIntroEvenTop	{ @Null					}
+  # @RunningIntroEvenFoot	{ @PageNum				}
+  # @RunningIntroStartOddTop	{ @Null					}
+  # @RunningIntroStartOddFoot	{ @Null					}
+  # @RunningIntroStartEvenTop	{ @Null					}
+  # @RunningIntroStartEvenFoot	{ @Null					}
+}
+
+
+###############################################################################
+#                                                                             #
+#  The @IllustrationLayout @Use clause.                                       #
+#                                                                             #
+#  There are no options specific to illustrations.                            #
+#                                                                             #
+###############################################################################
+
+@Use { @IllustrationLayout }
+
+
+###############################################################################
+#                                                                             #
+#  The @CPrint @Use clause - options specific to C and C++ program printing.  #
+#                                                                             #
+###############################################################################
+
+@Use { @CPrint
+  # style		{ fixed			} # fixed, varying, or symbol
+
+  # fixedfont		{ Courier		} # font family if fixed
+  # fixedstrings	{ Base			} # string face if fixed
+  # fixedidentifiers	{ Base			} # identifier face if fixed
+  # fixedcomments	{ Base			} # comment face if fixed
+  # fixedkeywords	{ Base			} # keyword face if fixed
+  # fixednumbers	{ Base			} # number face if fixed
+  # fixedoperators	{ Base			} # operator face if fixed
+  # fixedsize		{ -1.0p			} # font size if fixed
+  # fixedline		{ 1.0vx			} # line-space if fixed
+  # fixedtabin		{ 8			} # tab interval if fixed
+  # fixedtabout		{ 8s			} # tab width if fixed
+
+  # varyingfont		{			} # font family if varying
+  # varyingstrings	{ Slope			} # string face if varying
+  # varyingidentifiers	{ Slope			} # identifier face if varying
+  # varyingcomments	{ Base			} # comment face if varying
+  # varyingkeywords	{ Bold			} # keyword face if varying
+  # varyingnumbers	{ Base			} # number face if varying
+  # varyingoperators	{ Base			} # operator face if varying
+  # varyingsize		{ 1.0f			} # font size if varying
+  # varyingline		{ 1.0vx			} # line-space if varying
+  # varyingtabin	{ 8			} # tab interval if varying
+  # varyingtabout	{ 3f			} # tab width if varying
+
+  # symbolfont		{			} # font family if symbol
+  # symbolstrings	{ Slope			} # string face if symbol
+  # symbolidentifiers	{ Slope			} # identifier face if symbol
+  # symbolcomments	{ Base			} # comment face if symbol
+  # symbolkeywords	{ Bold			} # keyword face if symbol
+  # symbolnumbers	{ Base			} # number face if symbol
+  # symboloperators	{ Base			} # operator face if symbol
+  # symbolsize		{ 1.0f			} # font size if symbol
+  # symbolline		{ 1.0vx			} # line-space if symbol
+  # symboltabin		{ 8			} # tab interval if symbol
+  # symboltabout	{ 3f			} # tab width if symbol
+}
+
+
+###############################################################################
+#                                                                             #
+#  @Database (and @SysDatabase) clauses go here.                              #
+#                                                                             #
+###############################################################################
+
+@SysDatabase @RefStyle { refstyle }		  # reference printing styles

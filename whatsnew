@@ -1,0 +1,44 @@
+New features introduced in Version 3.04
+
+    Bug fixes
+    Underlining
+    Small capitals now work properly
+    More flexible reference formatting setup file options
+    List items and displays now break across page boundaries
+    Quick reference guide (Appendix A, User's Guide)
+    Version of @Eq that uses TeX's fonts
+    Numbered list items can be tagged and referred to using @NumberOf
+    Multi-paragraph figure captions and multi-page figures
+    Various micro changes to @Eq to improve appearance
+    Merged index entries, and better guidance on how to make an index
+    DOS portability (I hope), still working on Mac portability
+    Eiffel programming language printing
+    Multi-word tags and sorting keys permitted
+    Margin notes
+    `Bypass' symbols (fewer passes for computer-generated Lout source)
+    Arbitrary chapter heading and part heading layouts
+    Viewers like GhostView now show real page numbers
+    @Sup and @Sub symbols (similar to sup and sub in equations)
+    Slovenian language
+    ANSI C (getting closer and closer...)
+    @IncludeGraphic will now accept a compressed file e.g. filename.eps.gz
+    @Verbatim { ... } like in LaTeX.
+ 
+New features introduced in Version 3.05
+
+    Bug fixes
+    ANSI C (getting very very close...)
+    Removed call to system("sort"), which was causing porting problems
+    Optional list of tables and list of figures in books
+    More options and setup file options for fine-tuning tables and figures
+    Package for printing bar codes (see software directory)
+    Moved initialization of non-English error message files into makefile
+
+New features introduced in Version 3.06
+
+    Bug fixes
+    Czech
+    Plain text manual pages for people without troff
+
+Jeff Kingston
+25 July 1995

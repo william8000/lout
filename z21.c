@@ -1,6 +1,6 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -44,22 +44,21 @@
 /*    trig        TRUE if indefinites of hd may trigger external galleys     */
 /*    *style      The initial style                                          */
 /*    *c          the width constraint hd should conform to                  */
-/*    target      if non-nil, expand indefinite objects to reveal a          */
+/*    target      if non-nilobj, expand indefinite objects to reveal a       */
 /*                @Galley within this symbol                                 */
 /*                                                                           */
 /*  The output parameters, in addition to the converted hd, are:             */
 /*                                                                           */
 /*    dest_index  the index of the @Galley found within target, if any       */
-/*    recs        list of all RECURSIVE indexes found (or nil if none)       */
-/*    inners      list of all UNATTACHED indexes found (or nil if none),     */
+/*    recs        list of all RECURSIVE indexes found (or nilobj if none)    */
+/*    inners      list of all UNATTACHED indexes found (or nilobj if none),  */
 /*                not including any that come after the target or InputSym.  */
 /*                                                                           */
 /*****************************************************************************/
 
-SizeGalley(hd, env, rows, joined, nonblock, trig, style, c, target,
-						dest_index, recs, inners)
-OBJECT hd, env;  BOOLEAN rows, joined, nonblock, trig;  STYLE *style;
-CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
+void SizeGalley(OBJECT hd, OBJECT env, BOOLEAN rows, BOOLEAN joined,
+BOOLEAN nonblock, BOOLEAN trig, STYLE *style, CONSTRAINT *c, OBJECT target,
+OBJECT *dest_index, OBJECT *recs, OBJECT *inners)
 { OBJECT y, link, z, crs, t, tlink, zlink, tmp;
   OBJECT extras, tmp1, tmp2, bt[2], ft[2], hold_env;
   BOOLEAN after_target;
@@ -75,9 +74,10 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
   /* manifest the child of hd, making sure it is simply joined if required */
   tmp1 = target;
   Child(y, Down(hd));
-  crs = nil;
-  bt[COL] = ft[COL] = bt[ROW] = ft[ROW] = nil;
+  crs = nilobj;
+  bt[COL] = ft[COL] = bt[ROW] = ft[ROW] = nilobj;
   hold_env = New(ACAT);  Link(hold_env, env);
+  debug0(DOM, D, "  [ calling Manifest from SizeGalley");
   if( joined )
   { bt[COL] = New(THREAD);  ft[COL] = New(THREAD);
     debug0(DGM, D, "  SizeGalley calling Manifest (joined)");
@@ -95,6 +95,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
   { debug0(DGM, D, "  SizeGalley calling Manifest (not joined)");
     y = Manifest(y, env, style, bt, ft, &tmp1, &crs, TRUE, must_expand(hd));
   }
+  debug0(DOM, D, "  ] returning from Manifest in SizeGalley");
   DisposeObject(hold_env);
 
   /* horizontally size and break hd */
@@ -119,7 +120,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
   /* get the rows of hd to the top level, if required */
   seen_nojoin(hd) = FALSE;
   if( rows )
-  { /* OBJECT prev_gap = nil; */
+  { /* OBJECT prev_gap = nilobj; */
     debug0(DGM, DD, "SizeGalley cleaning up rows of hd:");
     for( link = hd;  NextDown(link) != hd;  link = NextDown(link) )
     { Child(y, NextDown(link));
@@ -264,7 +265,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
   debug0(DGM, D, "  SizeGalley calling MinSize(ROW):");
   debug0(DGM, DD, "SizeGalley sizing rows of hd =");
   ifdebug(DGM, DD, DebugObject(hd));
-  *recs = *inners = *dest_index = nil;
+  *recs = *inners = *dest_index = nilobj;
   after_target = FALSE;
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
   { Child(y, link);
@@ -302,7 +303,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
 
 	case RECURSIVE:
 
-	  if( *recs == nil )  *recs = New(ACAT);
+	  if( *recs == nilobj )  *recs = New(ACAT);
 	  Link(*recs, z);
 	  break;
 
@@ -310,7 +311,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
 	case UNATTACHED:
 
 	  if( !after_target )	/* *** new semantics *** */
-	  { if( *inners == nil )  *inners = New(ACAT);
+	  { if( *inners == nilobj )  *inners = New(ACAT);
 	    Link(*inners, z);
 	  }
 	  break;
@@ -324,6 +325,7 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
 	case CROSS_PREC:
 	case CROSS_FOLL:
 	case CROSS_TARG:
+	case PAGE_LABEL_IND:
 
 	  debug1(DCR, DD, "  SizeGalley: %s", EchoObject(z));
 	  break;
@@ -342,15 +344,15 @@ CONSTRAINT *c;  OBJECT target, *dest_index, *recs, *inners;
   }
   
   /* insinuate cross references */
-  if( crs != nil )
+  if( crs != nilobj )
   { 
-    debug1(DCR, D, "SizeGalley insinuating %s", crs);
+    debug1(DCR, D, "SizeGalley insinuating %s", EchoObject(crs));
     TransferLinks(Down(crs), crs, Down(hd));
     DisposeObject(crs);
   }
 
   /* check that *dest_index was found if it was required, and exit */
-  if( target != nil && *dest_index == nil )
+  if( target != nilobj && *dest_index == nilobj )
     Error(21, 8, "unexpected absence of %s from the body of %s",
       FATAL, &fpos(hd), SymName(target), SymName(actual(hd)));
   debug3(DGM, D, "SizeGalley returning %s,%s  %s;  hd =",

@@ -1,6 +1,6 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -45,7 +45,7 @@
   else { y = -x; putc(CH_MINUS, fp); }					\
   i = 0;								\
   do { buff[i++] = numtodigitchar(y % 10);				\
-     } while( y = y / 10 );						\
+     } while( (y = (y / 10)) > 0 );					\
   do { --i; putc(buff[i], fp);						\
      } while( i );							\
 }
@@ -78,8 +78,7 @@ static OBJECT		supplied;	/* Resources supplied by this file   */
 /*                                                                           */
 /*****************************************************************************/
 
-PrintInit(file_ptr)
-FILE *file_ptr;
+void PrintInit(FILE *file_ptr)
 { debug0(DGP, D, "PrintInit()");
   out_fp = file_ptr;  prologue_done = FALSE;
   currentfont = NO_FONT;
@@ -94,10 +93,11 @@ FILE *file_ptr;
 
 /*@::PrintBeforeFirst@********************************************************/
 /*                                                                           */
-/*  PrintBeforeFirst(h, v)                                                   */
+/*  PrintBeforeFirst(h, v, label)                                            */
 /*                                                                           */
 /*  This procedure is called just before starting to print the first         */
-/*  component of the output.  Its size is h, v.                              */
+/*  component of the output.  Its size is h, v, and label is the page        */
+/*  label to attach to the %%Page comment.                                   */
 /*                                                                           */
 /*  If BackEnd is PLAINTEXT, this procedure obtains a two-dimensional array  */
 /*  of characters large enough to hold the first component, and clears it.   */
@@ -127,8 +127,7 @@ FILE *file_ptr;
 /*                                                                           */
 /*****************************************************************************/
 
-PrintBeforeFirst(h, v)
-LENGTH h, v;
+void PrintBeforeFirst(LENGTH h, LENGTH v, FULL_CHAR *label)
 { FILE_NUM fnum;  int i, j;
   debug2(DGP, DD, "PrintBeforeFirst(%d, %d)", h, v);
 
@@ -141,6 +140,8 @@ LENGTH h, v;
       vsize = ceiling(v, PlainCharHeight);
       debug2(DGP, DD, "  PlainCharWidth: %d;  PlainCharHeight: %d",
 	PlainCharWidth, PlainCharHeight);
+      ifdebug(DMA, D, DebugRegisterUsage(MEM_PAGES, 1,
+	hsize * vsize * sizeof(FULL_CHAR)));
       debug2(DGP, DD, "  PrintBeforeFirst allocating %d by %d", hsize, vsize);
       page = (FULL_CHAR *) malloc(hsize * vsize * sizeof(FULL_CHAR));
       for( i = 0;  i < vsize;  i++ )
@@ -171,6 +172,8 @@ LENGTH h, v;
       fprintf(out_fp, "/m { 3 1 roll moveto show } bind def\n");
       fprintf(out_fp, "/s { exch currentpoint exch pop moveto show } bind def\n");
       fprintf(out_fp, "/k { exch neg 0 rmoveto show } bind def\n");
+      fprintf(out_fp, "/ul { gsave setlinewidth dup 3 1 roll\n");
+      fprintf(out_fp, "      moveto lineto stroke grestore } bind def\n");
       fprintf(out_fp, "/in { %d mul } def\n", IN);
       fprintf(out_fp, "/cm { %d mul } def\n", CM);
       fprintf(out_fp, "/pt { %d mul } def\n", PT);
@@ -261,6 +264,7 @@ LENGTH h, v;
           while( StringFGets(buff, MAX_BUFF, fp) != NULL )
 	    StringFPuts(buff, out_fp);
 	  fprintf(out_fp, "\n");
+	  fclose(fp);
         }
       }
 
@@ -268,7 +272,7 @@ LENGTH h, v;
       fputs("%%BeginSetup\n", out_fp);
       FontPrintPageSetup(out_fp);
       fputs("%%EndSetup\n\n", out_fp);
-      fprintf(out_fp, "%%%%Page: ? %d\n", ++pagecount);
+      fprintf(out_fp, "%%%%Page: %s %d\n", label, ++pagecount);
       fprintf(out_fp, "%%%%BeginPageSetup\n");
       FontPrintPageResources(out_fp);
       FontAdvanceCurrentPage();
@@ -284,15 +288,15 @@ LENGTH h, v;
 
 /*@::PrintBetween(), EightBitsToPrintForm[]@**********************************/
 /*                                                                           */
-/*  PrintBetween(h, v)                                                       */
+/*  PrintBetween(h, v, label)                                                */
 /*                                                                           */
-/*  Start a new output component, of size h by v.                            */
+/*  Start a new output component, of size h by v; label is the page label    */
+/*  to attach to the %%Page comment.                                         */
 /*                                                                           */
 /*****************************************************************************/
 
-PrintBetween(h, v)
-LENGTH h, v;
-{ int new_hsize, new_vsize, i, j;
+void PrintBetween(LENGTH h, LENGTH v, FULL_CHAR *label)
+{ int new_hsize, new_vsize, i, j, jmax;
   debug2(DGP, DD, "PrintBetween(%d, %d)", h, v);
 
   switch( BackEnd )
@@ -308,7 +312,9 @@ LENGTH h, v;
       );
       for( i = vsize - 1;  i >= 0;  i-- )
       { ifdebug(DGP, D, putc('|', out_fp));
-	for( j = 0;  j < hsize;  j++ )
+	for( jmax = hsize-1;  jmax >= 0 && page[i*hsize+jmax] == ' ';  jmax--);
+	ifdebug(DGP, D, jmax = hsize - 1);
+	for( j = 0;  j <= jmax;  j++ )
 	  putc(page[i*hsize + j], out_fp);
         ifdebug(DGP, D, putc('|', out_fp));
 	putc('\n', out_fp);
@@ -327,10 +333,15 @@ LENGTH h, v;
       new_hsize = ceiling(h, PlainCharWidth);
       new_vsize = ceiling(v, PlainCharHeight);
       if( new_hsize != hsize || new_vsize != vsize )
-      { free(page);
+      {
+        ifdebug(DMA, D, DebugRegisterUsage(MEM_PAGES, -1,
+	  -hsize * vsize * sizeof(FULL_CHAR)));
+	free(page);
 	hsize = new_hsize;
 	vsize = new_vsize;
         debug2(DGP, DD, "  PrintBetween allocating %d by %d", hsize, vsize);
+        ifdebug(DMA, D, DebugRegisterUsage(MEM_PAGES, 1,
+	  hsize * vsize * sizeof(FULL_CHAR)));
         page = (FULL_CHAR *) malloc(hsize * vsize * sizeof(FULL_CHAR));
       }
 
@@ -352,7 +363,7 @@ LENGTH h, v;
         Error(24, 4, "truncating -EPS document at end of first page",
 	  FATAL, no_fpos);
       }
-      fprintf(out_fp, "\n%%%%Page: ? %d\n", ++pagecount);
+      fprintf(out_fp, "\n%%%%Page: %s %d\n", label, ++pagecount);
       fprintf(out_fp, "%%%%BeginPageSetup\n");
       FontPrintPageResources(out_fp);
       fprintf(out_fp, "/pgsave save def\n");
@@ -479,13 +490,13 @@ If you are trying to compile this you have the wrong CHAR_OUT value!
 /*                                                                           */
 /*  PrintWord(x, hpos, vpos)                                                 */
 /*                                                                           */
-/*  Print word x; its marks cross at the point (hpos, vpos).                 */
+/*  Print non-empty word x; its marks cross at the point (hpos, vpos).       */
 /*                                                                           */
 /*****************************************************************************/
 
-PrintWord(x, hpos, vpos)
-OBJECT x;  int hpos, vpos;
-{ FULL_CHAR *p;  int i, h, v, ksize;  char command;
+void PrintWord(OBJECT x, int hpos, int vpos)
+{ FULL_CHAR *p, *q, *a, *b, *lig;
+  int i, h, v, ksize;  char command;
 
   debug5(DGP, DD, "PrintWord( %s, %d, %d ) font %d colour %d", string(x),
 	hpos, vpos, word_font(x), word_colour(x));
@@ -494,8 +505,12 @@ OBJECT x;  int hpos, vpos;
   {
     case PLAINTEXT:
 
+      /* *** now rounding ***
       h = hpos / PlainCharWidth;
       v = vpos / PlainCharHeight;
+      *** */
+      h = ((float) hpos / PlainCharWidth) + 0.5;
+      v = ((float) vpos / PlainCharHeight) + 0.5;
       p = &page[v*hsize + h];
       for( i = 0;  string(x)[i] != '\0';  i++ )
 	*p++ = string(x)[i];
@@ -546,11 +561,40 @@ OBJECT x;  int hpos, vpos;
         cpexists = TRUE;
       }
 
+      /* convert ligature sequences into ligature characters */
+      lig = finfo[word_font(x)].lig_table;
+      p = q = string(x);
+      do
+      { 
+        /* check for missing glyph (lig[] == 1) or ligatures (lig[] > 1) */
+        if( lig[*q++ = *p++] )
+        {
+          if( lig[*(q-1)] == 1 ) continue;
+          else
+          { a = &lig[ lig[*(p-1)] + MAX_CHARS ];
+            while( *a++ == *(p-1) )
+            { b = p;
+              while( *a == *b && *(a+1) != '\0' && *b != '\0' )  a++, b++;
+              if( *(a+1) == '\0' )
+              { *(q-1) = *a;
+                p = b;
+                break;
+              }
+              else
+              { while( *++a );
+                a++;
+              }
+            }
+          }
+        }
+      } while( *p );
+      *q = '\0';
+
       /* show string(x) */
       fputs("(", out_fp);
       p = string(x);
       fputs(EightBitToPrintForm[*p], out_fp);
-      for( p++; *p;  p++ )
+      for( p++;  *p;  p++ )
       { KernLength(word_font(x), *(p-1), *p, ksize);
         if( ksize != 0 )
         { fprintf(out_fp, ")%c %d(", command, -ksize);
@@ -571,6 +615,40 @@ OBJECT x;  int hpos, vpos;
 } /* end PrintWord */
 
 
+/*****************************************************************************/
+/*                                                                           */
+/*  PrintUnderline(fnum, xstart, xstop, ymk)                                 */
+/*                                                                           */
+/*  Draw an underline suitable for font fnum, from xstart to xstop at the    */
+/*  appropriate distance below mark ymk.                                     */
+/*                                                                           */
+/*****************************************************************************/
+
+void PrintUnderline(FONT_NUM fnum, LENGTH xstart, LENGTH xstop, LENGTH ymk)
+{
+
+  debug4(DGP, DD, "PrintUnderline(fnum %d, xstart %s, xstop %s, ymk %s )",
+    fnum, EchoLength(xstart), EchoLength(xstop), EchoLength(ymk));
+
+  switch( BackEnd )
+  {
+    case PLAINTEXT:
+
+      /* do nothing */
+      break;
+
+
+    case POSTSCRIPT:
+
+      fprintf(out_fp, "%d %d %d %d ul\n", xstart, xstop,
+	ymk - finfo[fnum].underline_pos, finfo[fnum].underline_thick);
+      break;
+
+  }
+  debug0(DGP, DD, "PrintUnderline returning.");
+} /* end PrintUnderline */
+
+
 /*@::PrintAfterLast(), CoordTranslate()@**************************************/
 /*                                                                           */
 /*  PrintAfterLast()                                                         */
@@ -579,8 +657,8 @@ OBJECT x;  int hpos, vpos;
 /*                                                                           */
 /*****************************************************************************/
 
-PrintAfterLast()
-{ OBJECT x, link;  BOOLEAN first_need;  int i, j;
+void PrintAfterLast(void)
+{ OBJECT x, link;  BOOLEAN first_need;  int i, j, jmax;
   if( prologue_done )
   { 
     switch( BackEnd )
@@ -596,7 +674,9 @@ PrintAfterLast()
 	);
         for( i = vsize - 1;  i >= 0;  i-- )
         { ifdebug(DGP, D, putc('|', out_fp));
-	  for( j = 0;  j < hsize;  j++ )
+	  for( jmax = hsize-1;  jmax >= 0 && page[i*hsize+jmax] == ' ';  jmax--);
+	  ifdebug(DGP, D, jmax = hsize - 1);
+	  for( j = 0;  j <= jmax;  j++ )
 	    putc(page[i*hsize + j], out_fp);
           ifdebug(DGP, D, putc('|', out_fp));
 	  putc('\n', out_fp);
@@ -653,8 +733,7 @@ PrintAfterLast()
 /*                                                                           */
 /*****************************************************************************/
 
-CoordTranslate(xdist, ydist)
-LENGTH xdist, ydist;
+void CoordTranslate(LENGTH xdist, LENGTH ydist)
 { debug2(DRS,D,"CoordTranslate(%s, %s)",
     EchoLength(xdist), EchoLength(ydist));
   assert( BackEnd == POSTSCRIPT, "CoordTranslate: BackEnd!" );
@@ -673,8 +752,7 @@ LENGTH xdist, ydist;
 /*                                                                           */
 /*****************************************************************************/
 
-CoordRotate(amount)
-LENGTH amount;
+void CoordRotate(LENGTH amount)
 { debug1(DRS, D, "CoordRotate(%.1f degrees)", (float) amount / DG);
   assert( BackEnd == POSTSCRIPT, "CoordRotate: BackEnd!" );
   fprintf(out_fp, "%.4f rotate\n", (float) amount / DG);
@@ -693,9 +771,11 @@ LENGTH amount;
 /*                                                                           */
 /*****************************************************************************/
 
-CoordScale(hfactor, vfactor)
-float hfactor, vfactor;
-{ char buff[20];
+void CoordScale(float hfactor, float vfactor)
+{
+#if DEBUG_ON
+  char buff[20];
+#endif
   assert( BackEnd == POSTSCRIPT, "CoordScale: BackEnd!" );
   ifdebug(DRS, D, sprintf(buff, "%.3f, %.3f", hfactor, vfactor));
   debug1(DRS, D, "CoordScale(%s)", buff);
@@ -715,7 +795,7 @@ float hfactor, vfactor;
 /*                                                                           */
 /*****************************************************************************/
 
-SaveGraphicState()
+void SaveGraphicState(void)
 { debug0(DRS, D, "SaveGraphicState()");
   assert( BackEnd == POSTSCRIPT, "SaveGraphicState: BackEnd!" );
   fprintf(out_fp, "gsave\n");
@@ -734,7 +814,7 @@ SaveGraphicState()
 /*                                                                           */
 /*****************************************************************************/
 
-RestoreGraphicState()
+void RestoreGraphicState(void)
 { debug0(DRS, D, "RestoreGraphicState()");
   assert( BackEnd == POSTSCRIPT, "RestoreGraphicState: BackEnd!" );
   fprintf(out_fp, "\ngrestore\n");
@@ -753,8 +833,7 @@ RestoreGraphicState()
 /*                                                                           */
 /*****************************************************************************/
 
-PrintGraphicObject(x)
-OBJECT x;
+void PrintGraphicObject(OBJECT x)
 { OBJECT y, link;
   assert( BackEnd == POSTSCRIPT, "PrintGraphicObject: BackEnd!" );
   switch( type(x) )
@@ -804,8 +883,7 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-DefineGraphicNames(x)
-OBJECT x;
+void DefineGraphicNames(OBJECT x)
 { assert( type(x) == GRAPHIC, "PrintGraphic: type(x) != GRAPHIC!" );
   assert( BackEnd == POSTSCRIPT, "DefineGraphicNames: BackEnd!" );
   debug1(DRS, D, "DefineGraphicNames( %s )", EchoObject(x));
@@ -861,17 +939,15 @@ OBJECT x;
 #define	READING_DNR	1
 #define FINISHED	2
 
-static BOOLEAN strip_out(buff)
-FULL_CHAR *buff;
+static BOOLEAN strip_out(FULL_CHAR *buff)
 { if( StringBeginsWith(buff, AsciiToFull("%%EOF"))     )  return TRUE;
   if( StringBeginsWith(buff, AsciiToFull("%%Trailer")) )  return TRUE;
   return FALSE;
 } /* end strip_out */
 
-PrintGraphicInclude(x, colmark, rowmark)
-OBJECT x; LENGTH colmark, rowmark;
+void PrintGraphicInclude(OBJECT x, LENGTH colmark, LENGTH rowmark)
 { OBJECT y, full_name;  FULL_CHAR buff[MAX_BUFF];
-  FILE *fp;  int state;
+  FILE *fp;  int state;  BOOLEAN compressed;
   debug0(DRS, D, "PrintGraphicInclude(x)");
   assert( BackEnd == POSTSCRIPT, "PrintGraphicInclude: BackEnd!" );
   assert(type(x)==INCGRAPHIC || type(x)==SINCGRAPHIC, "PrintGraphicInclude!");
@@ -879,7 +955,7 @@ OBJECT x; LENGTH colmark, rowmark;
 
   /* open the include file and get its full path name */
   Child(y, Down(x));
-  fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y));
+  fp = OpenIncGraphicFile(string(y), type(x), &full_name,&fpos(y),&compressed);
   assert( fp != NULL, "PrintGraphicInclude: fp!" );
 
   /* if font is different to previous word then print change */
@@ -913,9 +989,9 @@ OBJECT x; LENGTH colmark, rowmark;
 
       if( StringBeginsWith(buff, AsciiToFull("%%DocumentNeededResources:")) &&
 	  !StringContains(buff, AsciiToFull("(atend)")) )
-      { x = MakeWord(WORD, &buff[StringLength("%%DocumentNeededResources:")],
+      { y = MakeWord(WORD, &buff[StringLength("%%DocumentNeededResources:")],
 	      no_fpos);
-        Link(needs, x);
+        Link(needs, y);
 	state = (StringFGets(buff,MAX_BUFF,fp)==NULL) ? FINISHED : READING_DNR;
       }
       else
@@ -947,6 +1023,7 @@ OBJECT x; LENGTH colmark, rowmark;
   /* wrapup */
   DisposeObject(full_name);
   fclose(fp);
+  if( compressed )  StringRemove(AsciiToFull(LOUT_EPS));
   fprintf(out_fp, "%%%%EndDocument\nEndEPSF\n");
   wordcount = 0;
   debug0(DRS, D, "PrintGraphicInclude returning.");

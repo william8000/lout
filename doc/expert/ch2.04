@@ -9,7 +9,7 @@ we will use the Unix @Code sort command:
 @ID @Code "sort  -o outfile  infile"
 This causes file @Code outfile to contain a sorted copy of file
 {@Code infile}.  We incorporate this into a Lout definition as follows:
-@ID @Code {
+@ID @OneRow @Code {
 "def @Sort"
 "    named @Options {}"
 "    right x"
@@ -47,7 +47,7 @@ It is a fatal error for the system command to return a non-zero status.
 @PP
 Now the @Code sort command has options @Code -u for deleting duplicate
 lines, and @Code -r for reversing the sorting order.  So the result of
-@ID @Code {
+@ID @OneRow @Code {
 "@Sort"
 "    @Options { -r -u }"
 "{"
@@ -61,7 +61,7 @@ lines, and @Code -r for reversing the sorting order.  So the result of
 "}"
 }
 is
-@ID lines @Break
+@ID @OneRow lines @Break
 {
 Hardy, Thomas
 Eliot, George
@@ -88,7 +88,7 @@ may not contain {@Code "@End"}.
 If an actual filtered parameter contains @@Include, this is taken to
 begin a Lout @@Include directive in the usual form (Section
 {@NumberOf include}):
-@ID @Code {
+@ID @OneRow @Code {
 "@Sort {"
 "Austen, Jane"
 "@Include { authors }"

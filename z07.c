@@ -1,6 +1,6 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -25,7 +25,7 @@
 /*  FILE:         z07.c                                                      */
 /*  MODULE:       Object Service                                             */
 /*  EXTERNS:      MakeWord(), MakeWordTwo(), DisposeObject(), CopyObject(),  */
-/*                SplitIsDefinite()                                          */
+/*                SplitIsDefinite(), SmallCaps()                             */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -39,8 +39,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN SplitIsDefinite(x)
-OBJECT x;
+BOOLEAN SplitIsDefinite(OBJECT x)
 { OBJECT y1, y2;
   assert( type(x) == SPLIT, "SplitIsDefinite: x not a SPLIT!" );
   Child(y1, DownDim(x, COL));
@@ -57,13 +56,13 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-DisposeObject(x)
-OBJECT x;
-{ debug2(DOS,D,"[DisposeObject( %d ), type = %s, x =", (int) x, Image(type(x)));
+int DisposeObject(OBJECT x)
+{ debug2(DOS,DD,"[DisposeObject( %ld ), type = %s, x =", (long) x, Image(type(x)));
   ifdebug(DOS, DD, DebugObject(x));
   assert( Up(x) == x, "DisposeObject: x has a parent!" );
   while( Down(x) != x )  DisposeChild(Down(x));   Dispose(x);
-  debug0(DOS, D, "]DisposeObject returning.");
+  debug0(DOS, DD, "]DisposeObject returning.");
+  return 0;
 } /* end DisposeObject */
 
 
@@ -75,8 +74,7 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT MakeWord(typ, str, pos)
-unsigned typ;  FULL_CHAR *str;  FILE_POS *pos;
+OBJECT MakeWord(unsigned typ, FULL_CHAR *str, FILE_POS *pos)
 { OBJECT res = NewWord(typ, StringLength(str), pos);
   StringCopy(string(res), str);
   FposCopy(fpos(res), *pos);
@@ -94,8 +92,7 @@ unsigned typ;  FULL_CHAR *str;  FILE_POS *pos;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT MakeWordTwo(typ, str1, str2, pos)
-unsigned typ;  FULL_CHAR *str1, *str2;  FILE_POS *pos;
+OBJECT MakeWordTwo(unsigned typ, FULL_CHAR *str1, FULL_CHAR *str2, FILE_POS *pos)
 { int len1 = StringLength(str1);
   int len2 = StringLength(str2);
   OBJECT res = NewWord(typ, len1 + len2, pos);
@@ -116,8 +113,7 @@ unsigned typ;  FULL_CHAR *str1, *str2;  FILE_POS *pos;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT CopyObject(x, pos)
-OBJECT x;  FILE_POS *pos;
+OBJECT CopyObject(OBJECT x, FILE_POS *pos)
 { OBJECT y, link, res, tmp;
 
   debug2(DOS, DD, "CopyObject(%s, %s)", EchoObject(x), EchoFilePos(pos));
@@ -151,6 +147,7 @@ OBJECT x;  FILE_POS *pos;
 
     /* case HEAD: */
     case NULL_CLOS:
+    case PAGE_LABEL:
     case CROSS:
     case ONE_COL:
     case ONE_ROW:
@@ -176,9 +173,12 @@ OBJECT x;  FILE_POS *pos;
     case FONT:
     case SPACE:
     case BREAK:
+    case UNDERLINE:
     case COLOUR:
     case LANGUAGE:
     case CURR_LANG:
+    case COMMON:
+    case RUMP:
     case NEXT:
     case OPEN:
     case TAGGED:
@@ -188,6 +188,7 @@ OBJECT x;  FILE_POS *pos;
     case VCAT:
     case HCAT:
     case ACAT:
+    case ENV_OBJ:
     
       res = New(type(x));
       for( link = Down(x);  link != x;  link = NextDown(link) )

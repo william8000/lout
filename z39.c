@@ -1,6 +1,6 @@
 /*@z39.c:String Handler:AsciiToFull(), StringEqual(), etc.@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -27,7 +27,7 @@
 /*  EXTERNS:      AsciiToFull(), StringEqual(), StringLessEqual(),           */
 /*                StringCat(), StringCopy(), StringLength(),                 */
 /*                StringFOpen(), StringFPuts(), StringFGets(),               */
-/*                StringUnlink(), StringLink(), StringBeginsWith(),          */
+/*                StringRemove(), StringRename(), StringBeginsWith(),        */
 /*                StringContains(), StringInt(), StringFiveInt(),            */
 /*                StringQuotedWord()                                         */
 /*                                                                           */
@@ -46,8 +46,8 @@
 /*          StringFOpen(str, mode)    Equivalent to fopen(str, mode)         */
 /*          StringFPuts(str, fp)      Equivalent to fputs(str, fp)           */
 /*          StringFGets(str, n, fp)   Equivalent to fgets(str, n, fp)        */
-/*          StringUnlink(a)           Equivalent to unlink(a)                */
-/*          StringLink(a, b)          Equivalent to link(a, b)               */
+/*          StringRemove(a)           Equivalent to remove(a)                */
+/*          StringRename(a, b)        Equivalent to rename(a, b)             */
 /*                                                                           */
 /*  These procedures are defined as macros in file externs.                  */
 /*                                                                           */
@@ -57,15 +57,28 @@
 /*@::StringBeginsWith(), StringContains(), StringInt(), StringFiveInt()@******/
 /*                                                                           */
 /*  BOOLEAN StringBeginsWith(str, pattern)                                   */
+/*  BOOLEAN StringEndsWith(str, pattern)                                     */
 /*                                                                           */
-/*  Check whether str begins with pattern.                                   */
+/*  Check whether str begins with or ends with pattern.                      */
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN StringBeginsWith(str, pattern)
-FULL_CHAR *str, *pattern;
+BOOLEAN StringBeginsWith(FULL_CHAR *str, FULL_CHAR *pattern)
 { FULL_CHAR *sp, *pp;
   sp = str;  pp = pattern;
+  while( *sp != '\0' && *pp != '\0' )
+  { if( *sp++ != *pp++ )  return FALSE;
+  }
+  return (*pp == '\0');
+} /* end StringBeginsWith */
+
+
+BOOLEAN StringEndsWith(FULL_CHAR *str, FULL_CHAR *pattern)
+{ FULL_CHAR *sp, *pp; int slen, plen;
+  slen = StringLength(str);
+  plen = StringLength(pattern);
+  if( slen < plen )  return FALSE;
+  sp = &str[slen - plen];  pp = pattern;
   while( *sp != '\0' && *pp != '\0' )
   { if( *sp++ != *pp++ )  return FALSE;
   }
@@ -81,8 +94,7 @@ FULL_CHAR *str, *pattern;
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN StringContains(str, pattern)
-FULL_CHAR *str, *pattern;
+BOOLEAN StringContains(FULL_CHAR *str, FULL_CHAR *pattern)
 { FULL_CHAR *sp;
   for( sp = str;  *sp != '\0';  sp++ )
   { if( StringBeginsWith(sp, pattern) )  return TRUE;
@@ -100,15 +112,13 @@ FULL_CHAR *str, *pattern;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *StringInt(i)
-int i;
+FULL_CHAR *StringInt(int i)
 { static FULL_CHAR buff[20];
   sprintf( (char *) buff, "%d", i);
   return buff;
 } /* end StringInt */
 
-FULL_CHAR *StringFiveInt(i)
-int i;
+FULL_CHAR *StringFiveInt(int i)
 { static FULL_CHAR buff[20];
   sprintf( (char *) buff, "%.5d", i);
   return buff;
@@ -174,8 +184,7 @@ static char *quoted_string[] = {
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *StringQuotedWord(x)
-OBJECT x;
+FULL_CHAR *StringQuotedWord(OBJECT x)
 { FULL_CHAR *p, *q, *r;
   static FULL_CHAR buff[MAX_BUFF];
   assert( type(x) == QWORD, "StringQuotedWord: type(x) != QWORD!" );

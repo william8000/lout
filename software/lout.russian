@@ -1,0 +1,14 @@
+LOUT.RUSSIAN - RUSSIAN LANGUAGE FORMATTING IN LOUT DOCUMENTS
+
+This software contains everything you need to format documents containing
+Russian text with Lout, using the koi8r encoding.  There is a makefile
+to assist you with installation (very simple).
+
+Lout.Russian was designed and implemented by Jeffrey H. Kingston
+(jeff@cs.su.oz.au) of the Basser Department of Computer Science at the
+University of Sydney, and was made possible by assistance received from
+Valeriy Ushakov.
+
+Lout.Russian was formerly kept in the Lout ftp directory but it is
+now being maintained by Valeriy Ushakov (uwe@niif.spb.su).  His ftp
+site is ftp.niif.spb.su.

@@ -1,6 +1,6 @@
 /*@z38.c:Encoding Vectors:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -61,9 +61,8 @@ static	int	evtop = 0;		/* first free slot in ev_table[]     */
 /*                                                                           */
 /*****************************************************************************/
 
-ENCODING EvLoad(file_name, must_print)
-OBJECT file_name;  BOOLEAN must_print;
-{ int i;  FILE *fp;  EVEC ev;  char *malloc();
+ENCODING EvLoad(OBJECT file_name, BOOLEAN must_print)
+{ int i;  FILE *fp;  EVEC ev;
   FULL_CHAR buff[30], enc; unsigned int code, pos;
   debug2(DEV, D, "EvLoad(%s, %s)", EchoObject(file_name), bool(must_print));
   enc = 0;
@@ -81,13 +80,14 @@ OBJECT file_name;  BOOLEAN must_print;
     /* initialize new slot in ev_table[] for a new encoding vector */
     if( evtop++ == MAX_EV )
       Error(38, 1, "too many encoding vectors", FATAL, &fpos(file_name));
+    ifdebug(DMA, D, DebugRegisterUsage(MEM_EVECS, 1, sizeof(struct evec)));
     ev_table[enc] = ev = (EVEC) malloc( sizeof(struct evec) );
     if( ev == (EVEC) NULL )
       Error(38, 2, "run out of memory when loading encoding vector",
 	FATAL, &fpos(file_name));
     ev->must_print = must_print;
     ev->file_name  = file_name;
-    for( i = 0;  i < MAX_CHAR; i++ )  ev->vector[i] = nil;
+    for( i = 0;  i < MAX_CHAR; i++ )  ev->vector[i] = nilobj;
     for( i = 0;  i < MAX_HASH; i++ )  ev->hash_table[i] = 0;
 
     /* define and open the file */
@@ -124,6 +124,7 @@ OBJECT file_name;  BOOLEAN must_print;
     if( code != MAX_CHAR )
       Error(38, 5, "too few character names in encoding vector file %s",
 	FATAL, PosOfFile(ev->fnum), FileName(ev->fnum));
+    fclose(fp);
   }
   debug1(DEV, D, "EvLoad returning %d", enc);
   return enc;
@@ -139,8 +140,7 @@ OBJECT file_name;  BOOLEAN must_print;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR EvRetrieve(str, enc)
-FULL_CHAR *str;  ENCODING enc;
+FULL_CHAR EvRetrieve(FULL_CHAR *str, ENCODING enc)
 { unsigned int pos;  FULL_CHAR code;  EVEC ev;
   ev = ev_table[enc];
   hash(str, pos);
@@ -160,8 +160,7 @@ FULL_CHAR *str;  ENCODING enc;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *EvName(enc)
-ENCODING enc;
+FULL_CHAR *EvName(ENCODING enc)
 { assert( enc < evtop, "EvName: enc out of range!" );
   return string(ev_table[enc]->name);
 } /* end EvName */
@@ -175,8 +174,7 @@ ENCODING enc;
 /*                                                                           */
 /*****************************************************************************/
 
-EvPrintEncodings(fp)
-FILE *fp;
+void EvPrintEncodings(FILE *fp)
 { ENCODING enc;  EVEC ev;  int i;
   for( enc = 0;  enc < evtop;  enc++ )  if( ev_table[enc]->must_print )
   { ev = ev_table[enc];
@@ -198,9 +196,8 @@ FILE *fp;
 /*                                                                           */
 /*****************************************************************************/
 
-EvPrintResources(fp)
-FILE *fp;
-{ ENCODING enc;  EVEC ev;  int i;
+void EvPrintResources(FILE *fp)
+{ ENCODING enc;  EVEC ev;
   for( enc = 0;  enc < evtop;  enc++ )  if( ev_table[enc]->must_print )
   { ev = ev_table[enc];
     fprintf(fp, "%%%%+ encoding %s\n", string(ev->name));

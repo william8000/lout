@@ -25,12 +25,12 @@ be enclosed by arbitrary Lout objects (text, equations, tables, other
 graphical objects, etc.) without restriction.  A convenient algebra of
 points and a method of labelling points assist positioning.
 @BeginSections
-@Include { fig.figintro }
-@Include { fig.shapes }
-@Include { fig.newshapes }
-@Include { fig.figlengths }
-@Include { fig.together }
-@Include { fig.figerrors }
-@Include { fig.figsummary }
+@Include { fig_intr }
+@Include { fig_shap }
+@Include { fig_news }
+@Include { fig_leng }
+@Include { fig_toge }
+@Include { fig_erro }
+@Include { fig_summ }
 @EndSections
 @End @Chapter

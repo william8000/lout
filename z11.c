@@ -1,6 +1,6 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -39,14 +39,13 @@
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *EchoStyle(style)
-STYLE *style;
-{ FULL_CHAR buff1[100], buff2[100], buff3[100], buff4[100];
-  static FULL_CHAR res[100];
+FULL_CHAR *EchoStyle(STYLE *style)
+{ static FULL_CHAR res[100];
   static char *hyphwords[] = { "hyph_undef", "hyph_off", "hyph_on" };
   static char *fillwords[] = { "fill_undef", "fill_off", "fill_on" };
   static char *displaywords[] = { "undef", "adjust", "outdent", "left",
 			     "centre", "right", "do" };
+  static char *capswords[] = { "nosmallcaps", "smallcaps" };
 
   StringCopy(res, AsciiToFull("["));
   StringCat(res, EchoCatOp(VCAT,mark(line_gap(*style)),join(line_gap(*style))));
@@ -65,6 +64,9 @@ STYLE *style;
   StringCat(res, AsciiToFull(":"));
   StringCat(res, AsciiToFull(display_style(*style) < 7 ?
 		    displaywords[display_style(*style)] : "?"));
+  StringCat(res, AsciiToFull(":"));
+  StringCat(res, AsciiToFull(small_caps(*style) < 2 ?
+		    capswords[small_caps(*style)] : "?"));
   StringCat(res, AsciiToFull("]"));
   return res;
 } /* end EchoStyle */
@@ -79,8 +81,7 @@ STYLE *style;
 /*                                                                           */
 /*****************************************************************************/
 
-SpaceChange(style, x)
-STYLE *style;  OBJECT x;
+void SpaceChange(STYLE *style, OBJECT x)
 { GAP res_gap;  unsigned gap_inc;
   debug2(DSS, D, "SpaceChange(%s, %s)", EchoStyle(style), EchoObject(x));
   if( !is_word(type(x)) )
@@ -112,8 +113,7 @@ STYLE *style;  OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-static changebreak(style, x)
-STYLE *style;  OBJECT x;
+static void changebreak(STYLE *style, OBJECT x)
 { GAP res_gap;  unsigned gap_inc;
   if( beginsbreakstyle(string(x)[0]) )
   {
@@ -156,8 +156,7 @@ STYLE *style;  OBJECT x;
   }
 } /* end changebreak */
 
-BreakChange(style, x)
-STYLE *style;  OBJECT x;
+void BreakChange(STYLE *style, OBJECT x)
 { OBJECT link, y;
   debug2(DSS, D, "BreakChange(%s, %s)", EchoStyle(style), EchoObject(x));
   switch( type(x) )

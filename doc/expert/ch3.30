@@ -1,47 +1,20 @@
 @Section
-   @Tag { backend }
-   @Title { "@BackEnd" and the PlainText back end }
+   @Tag { include }
+   @Title { "@Include and @SysInclude" }
 @Begin
 @PP
-backend.sym @Index { @@BackEnd symbol }
-The @@BackEnd symbol, which takes no parameters, has for its result a
-string naming the back end currently in use.  Two back ends are available,
-PostScript and PlainText.  The symbol is generally used like this:
+include.sym @Index { @@Include symbol }
+sysinclude.sym @Index { @@SysInclude symbol }
+These symbols instruct Lout to temporarily switch to reading another
+file, whose name appears in braces following the symbol.  For example,
 @ID @Code {
-"@BackEnd @Case {"
-"    PlainText @Yield { ... }"
-"    PostScript @Yield { ... }"
-"}"
+"@Include { \"/usr/lout/fontdefs\" }"
 }
-to obtain different objects depending on the back end.  No @Code else
-is required since these are the only two possible values.
-@PP
-The PlainText back end differs from the PostScript one in two main
-respects.  First, there is effectively just one font:  although all
-the font commands work exactly as usual, they don't actually change
-anything.  Each character in this font is taken to be one tenth
-of one inch wide and 20 points high.  Second, the output is an
-ordinary text file, not a PostScript file.
-@PP
-Clearly, with ordinary text output the possibility of advanced graphics
-features such as rotation and scaling is curtailed.  Nevertheless, all
-symbols have well-defined (possibly null) effects in the PlainText
-back end, so there is no additional danger of crashing the system or
-obtaining grossly unreasonable output by a change to PlainText.
-@PP
-The PlainText back end is obtained by the @Code "-p" option to Basser
-Lout.  The character size can be changed by adding two lengths to
-the @Code "-p" option, like this:
-@ID @Code "lout -p0.1i12p ..."
-which invokes the PlainText back end with each character being 0.1
-inches wide and 12 points high.  Actually experience suggests that
-the best approach is to define all horizontal lengths as multiples of
-the @Code "s" unit (the width of a space, hence the width of all
-characters) and to define all vertical lengths as multiples of the
-@Code "f" unit (the font size, equal to the height of every character),
-and not to change the character size in the command line.
-@PP
-There is a @Code "-P" option which is identical with the @Code "-p"
-option except that it inserts a form-feed character between each two
-components of the output, but not before the first or after the last.
+will cause the contents of file "/usr/lout/fontdefs" to be read at the
+point it occurs.  After that file is read, the current file is resumed.  The
+included file may contain arbitrary Lout text, including other
+@@Include commands.  The file is searched for first in the current
+directory, then in a sequence of standard places which are not necessarily the
+same places that databases are searched for.  @@SysInclude searches the
+standard places only.
 @End @Section

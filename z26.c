@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -47,7 +47,7 @@ static	BOOLEAN	instring = FALSE;	/* TRUE while making a string        */
 /*                                                                           */
 /*****************************************************************************/
 
-BeginString()
+void BeginString(void)
 { if( instring )
     Error(26, 1, "BeginString: currently in string", INTERN, no_fpos);
   instring = TRUE;  curr = (curr + 1) % MULTI;
@@ -64,9 +64,7 @@ BeginString()
 /*                                                                           */
 /*****************************************************************************/
 
-/*VARARGS1*/
-AppendString(str, p1, p2, p3, p4, p5, p6)
-FULL_CHAR *str;  int p1, p2, p3, p4, p5, p6;
+void AppendString(FULL_CHAR *str)
 { int len;
   if( !instring )
     Error(26, 2, "AppendString: no current string", INTERN, no_fpos);
@@ -79,7 +77,7 @@ FULL_CHAR *str;  int p1, p2, p3, p4, p5, p6;
     bp = MAX_BUFF;
   }
   else
-  { sprintf( (char *) &buff[curr][bp], str, p1, p2, p3, p4, p5, p6 );
+  { StringCopy(&buff[curr][bp], str);
     while( buff[curr][bp] != '\0' )  bp++;
     if( bp >= MAX_BUFF )  Error(26, 3, "AppendString abort", INTERN, no_fpos);
   }
@@ -94,7 +92,7 @@ FULL_CHAR *str;  int p1, p2, p3, p4, p5, p6;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *EndString()
+FULL_CHAR *EndString(void)
 { if( !instring )  Error(26, 4, "EndString: no string", INTERN, no_fpos);
   assert( 0 <= curr && curr < MULTI, "BeginString: curr!" );
   instring = FALSE;
@@ -111,12 +109,23 @@ FULL_CHAR *EndString()
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *EchoLength(len)
-int len;
+FULL_CHAR *EchoLength(int len)
 { static FULL_CHAR buff[6][20];
   static int i = 0;
   i = (i + 1) % 6;
-  sprintf( (char *) buff[i], "%.3fc", (float) len/CM);
+  switch( BackEnd )
+  {
+    case POSTSCRIPT:
+
+      sprintf( (char *) buff[i], "%.3fc", (float) len/CM);
+      break;
+
+    case PLAINTEXT:
+
+      sprintf( (char *) buff[i], "%.1fs", (float) len/PlainCharWidth);
+      break;
+
+  }
   return buff[i];
 } /* end EchoLength */
 
@@ -129,8 +138,7 @@ int len;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *Image(c)
-unsigned int c;
+FULL_CHAR *Image(unsigned int c)
 { static FULL_CHAR b[20];
   switch(c)
   {
@@ -147,6 +155,7 @@ unsigned int c;
     case COL_THR:	return  AsciiToFull("col_thr");
     case CLOSURE:	return  AsciiToFull("closure");
     case NULL_CLOS:	return  KW_NULL;
+    case PAGE_LABEL:	return  KW_PAGE_LABEL;
     case CROSS:		return  KW_CROSS;
     case ONE_COL:	return  KW_ONE_COL;
     case ONE_ROW:	return  KW_ONE_ROW;
@@ -173,10 +182,14 @@ unsigned int c;
     case FONT:		return  KW_FONT;
     case SPACE:		return  KW_SPACE;
     case BREAK:		return  KW_BREAK;
+    case UNDERLINE:	return  KW_UNDERLINE;
     case COLOUR:	return  KW_COLOUR;
     case LANGUAGE:	return  KW_LANGUAGE;
     case CURR_LANG:	return  KW_CURR_LANG;
+    case COMMON:	return  KW_COMMON;
+    case RUMP:		return  KW_RUMP;
     case NEXT:		return  KW_NEXT;
+    case ENV_OBJ:	return  AsciiToFull("env_obj");
     case ENV:		return  KW_ENV;
     case CLOS:		return  KW_CLOS;
     case LVIS:		return  KW_LVIS;
@@ -222,6 +235,7 @@ unsigned int c;
     case GALL_TARG:	return  AsciiToFull("gall_targ");
     case GALL_PREC:	return  AsciiToFull("gall_prec");
     case CROSS_PREC:	return  AsciiToFull("cross_prec");
+    case PAGE_LABEL_IND:return  AsciiToFull("page_label_ind");
     case SCALE_IND:	return  AsciiToFull("scale_ind");
     case EXPAND_IND:	return  AsciiToFull("expand_ind");
     case THREAD:	return  AsciiToFull("thread");
@@ -249,7 +263,7 @@ unsigned int c;
     case GAP_INC:	return  AsciiToFull("inc");
     case GAP_DEC:	return  AsciiToFull("dec");
 
-    default:		sprintf( (char *) b, "??(%d)", c);
+    default:		sprintf( (char *) b, "?? (%d)", c);
 			return b;
   } /* end switch */
 } /* end Image */

@@ -3,7 +3,8 @@ Directory lout/data
 This directory contains Lout database files:
 
     loutrefs.ld		References used in the Lout documentation
-    refstyles.ld	Standard reference printing styles
+    oldrefs.ld		More references used in the Lout documentation
+    refstyle.ld		Standard reference printing styles
     standard.ld		Roman numerals, months, etc.
 
 Corresponding .li files will be created during the initializing
@@ -11,3 +12,4 @@ Corresponding .li files will be created during the initializing
 
 Jeffrey H. Kingston
 21 September 1994
+8 May 1995

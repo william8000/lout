@@ -1,0 +1,81 @@
+@Section
+   @Title { Margin notes }
+   @Tag { marginnotes }
+@Begin
+@PP
+A note can be placed in the left margin by typing
+leftnote. @Index @Code "@LeftNote"
+marginnote. @Index { margin notes }
+@ID {
+@Code "@LeftNote { A left note. }"
+@LeftNote { A left note. }
+}
+after the word that the note refers to.  The note will appear in the
+margin at the same height on the page as that word, unless that would
+cause it to overlap a previous margin note, in which case it will be
+shifted downwards (but never onto the next page).  The note may be an
+arbitrary Lout object; for example, you might type
+@ID {
+@Code "@LeftNote @I { A left note. }"
+@LeftNote @I { A left note. }
+}
+to make your note come out in italics.
+@PP
+You can get a note in the right margin by using @Code "@RightNote"
+@RightNote { A right note. }
+rightnote. @Index @Code "@RightNote"
+instead of {@Code "@LeftNote"}.  To get a note in the outer margin
+(left on even pages, right on odd pages), use {@Code "@OuterNote"};
+@OuterNote { An outer note. }
+outernote. @Index @Code "@OuterNote"
+and for the opposite, use {@Code "@InnerNote"}.
+@InnerNote { An inner note. }
+@PP
+By default, Lout produces margins that are 2.5 centimetres wide, which
+is not really enough to accommodate reasonable margin notes.  To
+change these margins, you need to change options in the setup file, as
+explained in Section {@NumberOf margins}.
+@PP
+The appearance of the margin notes themselves is also determined by
+options in the setup file (for a general introduction to setup files
+and their options, consult Section {@NumberOf setup}).  Here are
+the options and their default values:
+@ID @OneRow @Code {
+"@MarginNoteFont { 0.80f }"
+"@MarginNoteBreak { ragged 1.10fx }"
+"@MarginNoteHGap { 0.5c }"
+"@MarginNoteVGap { 1.00v }"
+"@MarginNoteWidth { 1.50c }"
+}
+@Code "@MarginNoteFont" determines the font used; the default value
+produces the current font scaled to 0.8 times the current size; you
+could write @Code "Slope 0.80f" to get italic notes, and so
+on.  @Code "@MarginNoteBreak" is the paragraph breaking style to
+use, similar to the @Code "@InitialBreak" setup file option.
+@PP
+@Code "@MarginNoteHGap" determines how far away from the
+adjacent text column the margin note will appear; the default
+value is 0.5 centimetres.  @Code "@MarginNoteVGap" is the minimum
+vertical separation between margin notes (i.e. it determines how
+far downwards a note will be shifted to avoid the previous
+one).  @Code "@MarginNoteWidth" determines the width of the column
+in which margin notes (both left and right) are set; the default
+value of 1.5 centimetres is suited to the 2.5 centimetre page margins
+that are the default, but if you widen the page margins you will be
+able to increase @Code "@MarginNoteWidth" too.
+@PP
+Left notes extend into the left margin a total distance of
+@Code "@MarginNoteHGap" plus {@Code "@MarginNoteWidth"}, and it is
+up to you to make sure that this does not put them off
+the page.  Similar remarks apply to right notes.  And since notes
+are never shifted to the next page, only downwards, there is also
+a risk that a note will be shifted off the bottom of the page, if
+it is very long or if preceding notes obstruct it.  Again, it is
+up to you to avoid this problem by keeping your notes small and not
+too close together.
+@PP
+Margin notes inside footnotes, figures and tables work well.  Margin
+notes in multi-column documents are disastrous unless used very
+sparingly.  Margin notes do not appear in plain text output
+(Section {@NumberOf plain}).
+@End @Section

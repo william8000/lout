@@ -1,6 +1,6 @@
 /*@externs:External Declarations:Directories and file conventions@************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -27,7 +27,9 @@
 /*                                                                           */
 /*****************************************************************************/
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #if LOCALE_ON
 #include <locale.h>
@@ -85,23 +87,91 @@ extern nl_catd MsgCat;
 /*  HYPH_SUFFIX         The suffix of unpacked hyphenation files             */
 /*  HYPH_PACKED_SUFFIX  The suffix of packed hyphenation files               */
 /*  FILTER_IN           The prefix of the name of the input file to filters  */
-/*  FILTER_OUT          The name of the output file to filters               */
+/*  FILTER_OUT          The prefix of the name of the output file to filters */
 /*  FILTER_ERR          The name of the error file to filters                */
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION	AsciiToFull("Basser Lout Version 3.02 (November 1994)")
+#define	LOUT_VERSION	   AsciiToFull("Basser Lout Version 3.06 (July 1995)")
 #define	CROSS_DB	   AsciiToFull("lout")
-#define	SOURCE_SUFFIX	   AsciiToFull(".lout")
+#define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
 #define	NEW_INDEX_SUFFIX   AsciiToFull(".lix")
 #define	DATA_SUFFIX	   AsciiToFull(".ld")
 #define	NEW_DATA_SUFFIX	   AsciiToFull("x")
 #define	HYPH_SUFFIX	   AsciiToFull(".lh")
 #define	HYPH_PACKED_SUFFIX AsciiToFull(".lp")
-#define	FILTER_IN	   AsciiToFull("lout.in")
-#define	FILTER_OUT	   AsciiToFull("lout.out")
+#define	FILTER_IN	   AsciiToFull("louti")
+#define	FILTER_OUT	   AsciiToFull("lout")
 #define	FILTER_ERR	   AsciiToFull("lout.err")
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Operating system dependent things                                        */
+/*                                                                           */
+/*  (1) File read and write modes for binary files, and directory character  */
+/*                                                                           */
+/*  MS-DOS text file line endings differ from Unix line endings.  This is    */
+/*  usually ignorable but causes problems with binary files and files where  */
+/*  you do arithmetic on fseek() values.  In Lout the problematic files are  */
+/*  compressed trie and hyphenation files, and database index files.  So     */
+/*  we must read and write these files in "binary mode" in MS-DOS.  For      */
+/*  completeness we have included synonyms for all file modes used by Lout:  */
+/*                                                                           */
+/*  READ_BINARY       Mode passed to fopen() when reading a "binary file"    */
+/*  WRITE_BINARY      Mode passed to fopen() when writing a "binary file"    */
+/*  READ_TEXT         Mode passed to fopen() when reading a "text file"      */
+/*  APPEND_TEXT       Mode passed to fopen() when appending to "text file"   */
+/*  WRITE_TEXT        Mode passed to fopen() when writing a "text file"      */
+/*  STR_DIRECTORY     Directory character used in file path names            */
+/*                                                                           */
+/*  (2) System command and file name for uncompressing EPS files             */
+/*                                                                           */
+/*  UNCOMPRESS_COM    System command for uncompressing compressed EPS file   */
+/*  LOUT_EPS          Name of temporary uncompressed EPS file                */
+/*                                                                           */
+/*  There is one further call to system() in the Lout source code:  the one  */
+/*  that implements filtered parameters such as c2lout.  The strings passed  */
+/*  to this call to system() are the values of @Filter symbols within Lout   */
+/*  definitions.                                                             */
+/*                                                                           */
+/*****************************************************************************/
+
+#if OS_UNIX
+#define	READ_BINARY	"r"
+#define	WRITE_BINARY	"w"
+#define	READ_TEXT	"r"
+#define	APPEND_TEXT	"a"
+#define	WRITE_TEXT	"w"
+#define	STR_DIRECTORY	AsciiToFull("/")
+#define	UNCOMPRESS_COM	"gunzip -c %s > %s"
+#define	LOUT_EPS	"lout.eps"
+#else
+#if OS_DOS
+#define	READ_BINARY	"rb"
+#define	WRITE_BINARY	"wb"
+#define	READ_TEXT	"rt"
+#define	APPEND_TEXT	"at"
+#define	WRITE_TEXT	"wt"
+#define	STR_DIRECTORY	AsciiToFull("/")
+#define	UNCOMPRESS_COM	"gunzip -c %s > %s"
+#define	LOUT_EPS	"lout.eps"
+#else
+#if OS_MAC
+#define	READ_BINARY	"r"
+#define	WRITE_BINARY	"w"
+#define	READ_TEXT	"r"
+#define	APPEND_TEXT	"a"
+#define	WRITE_TEXT	"w"
+#define	STR_DIRECTORY	AsciiToFull(":")
+#define	UNCOMPRESS_COM	"gunzip -c %s > %s"
+#define	LOUT_EPS	"lout.eps"
+#else
+If you're compiling this, you've got the wrong settings in the makefile!
+#endif
+#endif
+#endif
 
 /*@::Significant limits@******************************************************/
 /*                                                                           */
@@ -153,6 +223,9 @@ extern nl_catd MsgCat;
 /*  MAX_LEX_STACK       The maximum depth of @Includes and @Databases.  This */
 /*                      can be increased immediately by any small amount.    */
 /*                                                                           */
+/*  MAX_CHARS		The maximimum number of characters in a font.  This  */
+/*                      cannot be increased easily.                          */
+/*                                                                           */
 /*****************************************************************************/
 
 #define	MAX_LEN		32767
@@ -165,6 +238,7 @@ extern nl_catd MsgCat;
 #define MAX_COLOUR	4096
 #define	MAX_LANGUAGE	256
 #define	MAX_LEX_STACK	7
+#define	MAX_CHARS	256
 
 /*****************************************************************************/
 /*                                                                           */
@@ -181,7 +255,7 @@ extern nl_catd MsgCat;
 #define	COL		0
 #define	ROW		1
 #define	dimen(x)	(x == COL ? AsciiToFull("COL") : AsciiToFull("ROW") )
-#define	nil		( (OBJECT) NULL )
+#define	nilobj		( (OBJECT) NULL )
 #define	null		( (FILE *) NULL )
 
 #define max(a, b)	((a) < (b) ? (b) : (a))
@@ -240,7 +314,16 @@ typedef unsigned LANGUAGE_NUM;
 /*                                                                           */
 /*****************************************************************************/
 
-typedef unsigned char ENCODING;
+typedef unsigned ENCODING;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  MAPPING - internal name for a character mapping vector.                  */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef unsigned MAPPING;
 
 
 /*****************************************************************************/
@@ -264,6 +347,14 @@ typedef unsigned char ENCODING;
 /*****************************************************************************/
 
 typedef unsigned char FULL_CHAR;
+
+/*****************************************************************************/
+/*                                                                           */
+/*  typedef POINTER- name for type of generic pointer                        */
+/*                                                                           */
+/*****************************************************************************/
+
+typedef void *POINTER;
 
 
 /*@::Character literals@******************************************************/
@@ -298,6 +389,7 @@ typedef unsigned char FULL_CHAR;
 #define	CH_SPACE		' '	/* space character                   */
 #define	CH_NEWLINE		'\n'	/* the newline character             */
 #define	CH_SYMSTART		'@'	/* extra letter symbols may have     */
+#define	CH_UNDERSCORE		'_'	/* extra letter symbols may have     */
 #define	CH_QUOTE		'"'	/* the quote character		     */
 #define	CH_ZERO			'0'	/* the first digit character, zero   */
 #define	CH_EIGHT		'8'	/* the last even digit character     */
@@ -354,6 +446,7 @@ typedef unsigned char FULL_CHAR;
 #define	STR_LETTERS_LOWER	AsciiToFull("abcdefghijklmnopqrstuvwxyz")
 #define	STR_LETTERS_UPPER	AsciiToFull("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 #define	STR_LETTERS_SYMSTART	AsciiToFull("@")
+#define	STR_LETTERS_UNDERSCORE	AsciiToFull("_")
 
 #if CHAR_IN==0
 #define	STR_LETTERS_EXTRA0	AsciiToFull("")
@@ -399,6 +492,9 @@ typedef unsigned char FULL_CHAR;
 #define	STR_BREAK_LINES		AsciiToFull("lines")
 #define	STR_BREAK_CLINES	AsciiToFull("clines")
 #define	STR_BREAK_RLINES	AsciiToFull("rlines")
+
+#define	STR_SMALL_CAPS_ON	AsciiToFull("smallcaps")
+#define	STR_SMALL_CAPS_OFF	AsciiToFull("nosmallcaps")
 
 #define	STR_GAP_RJUSTIFY	AsciiToFull("1rt")
 #define	STR_GAP_ZERO_HYPH	AsciiToFull("0ch")
@@ -447,16 +543,17 @@ typedef struct
 typedef struct
 { GAP		oline_gap;		/* separation between lines          */
   union {
-    GAP		ospace_gap;		/* separation indiced by white space */
+    GAP		ospace_gap;		/* separation induced by white space */
     struct {
       unsigned	ohyph_style    : 2;	/* hyphenation off or on             */
       unsigned	ofill_style    : 2;	/* fill lines with text off/on       */
       unsigned	odisplay_style : 3;	/* display lines adjusted, ragged... */
+      unsigned	osmall_caps    : 1;	/* small capitals                    */
     } oss;
   } osu;
   FONT_NUM	ofont      : 12;	/* current font                      */
   COLOUR_NUM	ocolour    : 12;	/* current colour		     */
-  LANGUAGE_NUM	olanguage  : 7;		/* current language		     */
+  LANGUAGE_NUM	olanguage  : 6;		/* current language		     */
 } STYLE;
 
 #define	line_gap(x)	(x).oline_gap
@@ -464,6 +561,7 @@ typedef struct
 #define	hyph_style(x)	(x).osu.oss.ohyph_style
 #define	fill_style(x)	(x).osu.oss.ofill_style
 #define	display_style(x)(x).osu.oss.odisplay_style
+#define	small_caps(x)	(x).osu.oss.osmall_caps
 #define	font(x)		(x).ofont
 #define	colour(x)	(x).ocolour
 #define	language(x)	(x).olanguage
@@ -473,10 +571,11 @@ typedef struct
   hyph_style(x) = hyph_style(y),					\
   fill_style(x) = fill_style(y),					\
   display_style(x) = display_style(y),					\
+  small_caps(x) = small_caps(y),					\
   GapCopy(space_gap(x), space_gap(y)),					\
   font(x) = font(y),							\
   colour(x) = colour(y),						\
-  language(x) = language(y)						\
+  language(x) = language(y) 						\
 )
 
 
@@ -585,10 +684,12 @@ typedef union
 	unsigned char	ohspace, ovspace;
   } os21;
 
-  struct /* used by WORD objects only */
+  struct /* used by WORD objects only, except underline used by all */
+	 /* objects, including GAP_OBJ                                  */
   {	FONT_NUM	oword_font     : 12;
 	COLOUR_NUM	oword_colour   : 12;
-	LANGUAGE_NUM	oword_language : 7;
+	LANGUAGE_NUM	oword_language : 6;
+	unsigned	ounderline     : 1;
 	unsigned	oword_hyph     : 1;
   } os22;
 
@@ -631,6 +732,8 @@ typedef union
 	BOOLEAN		ois_extern_target    : 1;
 	BOOLEAN		ois_key		     : 1;
 	BOOLEAN		ohas_key	     : 1;
+	BOOLEAN		ois_merge	     : 1;
+	BOOLEAN		ohas_merge	     : 1;
 	BOOLEAN		odirty               : 1;
 	BOOLEAN		ovisible	     : 1;
 	BOOLEAN		ohas_mark	     : 1;
@@ -666,9 +769,10 @@ typedef union
   {	LENGTH	ofont_size;
 	LENGTH	ofont_xheight2;
 	LENGTH	ofont_spacewidth;
-	ENCODING ofont_encoding;
-	BOOLEAN	ofont_recoded:  1;
-	BOOLEAN	ofont_firstpage:  1;
+	ENCODING ofont_encoding	: 7;
+	MAPPING ofont_mapping	: 7;
+	BOOLEAN	ofont_recoded	: 1;
+	BOOLEAN	ofont_firstpage	: 1;
   } os32;
 
   struct
@@ -720,6 +824,7 @@ typedef union rec
      union rec		*oactual;
      union
      { union rec *owhereto;
+       union rec *opinpoint;
        LENGTH    osave_mark;
      } oux;
      union rec *oready_galls;
@@ -823,6 +928,7 @@ typedef union rec
 #define	word_font(x)		(x)->os1.ou2.os22.oword_font
 #define	word_colour(x)		(x)->os1.ou2.os22.oword_colour
 #define	word_language(x)	(x)->os1.ou2.os22.oword_language
+#define	underline(x)		(x)->os1.ou2.os22.ounderline
 #define	word_hyph(x)		(x)->os1.ou2.os22.oword_hyph
 #define	filter_use_begin(x)	(x)->os1.ou2.os22.oword_colour
 
@@ -857,6 +963,8 @@ typedef union rec
 #define	is_extern_target(x)	(x)->os1.ou2.os26.ois_extern_target
 #define	is_key(x)		(x)->os1.ou2.os26.ois_key
 #define	has_key(x)		(x)->os1.ou2.os26.ohas_key
+#define	is_merge(x)		(x)->os1.ou2.os26.ois_merge
+#define	has_merge(x)		(x)->os1.ou2.os26.ohas_merge
 #define	dirty(x)		(x)->os1.ou2.os26.odirty
 #define	visible(x)		(x)->os1.ou2.os26.ovisible
 #define	has_mark(x)		(x)->os1.ou2.os26.ohas_mark
@@ -886,6 +994,7 @@ typedef union rec
 
 #define actual(x)		(x)->os2.oactual
 #define whereto(x)		(x)->os2.oux.owhereto
+#define pinpoint(x)		whereto(x)
 #define save_mark(x)		(x)->os2.oux.osave_mark
 #define ready_galls(x)		(x)->os2.oready_galls
 
@@ -936,6 +1045,7 @@ typedef union rec
 #define	font_xheight2(x)	(x)->os1.ou3.os32.ofont_xheight2
 #define	font_spacewidth(x)	(x)->os1.ou3.os32.ofont_spacewidth
 #define	font_encoding(x)	(x)->os1.ou3.os32.ofont_encoding
+#define	font_mapping(x)		(x)->os1.ou3.os32.ofont_mapping
 #define	font_recoded(x)		(x)->os1.ou3.os32.ofont_recoded
 #define	font_firstpage(x)	(x)->os1.ou3.os32.ofont_firstpage
 
@@ -952,6 +1062,7 @@ struct metrics {
   LENGTH down;
   LENGTH left;
   LENGTH right;
+  LENGTH last_adjust;
 };
 
 typedef struct font_rec {
@@ -959,6 +1070,8 @@ typedef struct font_rec {
   FULL_CHAR		*lig_table;		/* ligatures                 */
   OBJECT		font_table;		/* record of sized fonts     */
   OBJECT		original_font;		/* font rec before resizing  */
+  LENGTH		underline_pos;		/* position of underline     */
+  LENGTH		underline_thick;	/* thickness of underline    */
   unsigned short	*kern_table;		/* first kerning chars       */
   FULL_CHAR		*kern_chars;		/* second kerning chars      */
   unsigned char		*kern_value;		/* points into kern_lengths  */
@@ -983,102 +1096,109 @@ typedef struct font_rec {
 #define	LINK		 0		/*        a link between objects     */
 #define	GAP_OBJ		 1		/*  o     a gap object               */
 #define	CLOSURE		 2		/* to  n  a closure of a symbol      */
-#define	NULL_CLOS	 3		/* to sn  @Null                      */
-#define	CROSS		 4		/* to sn  && (a cross reference obj) */
-#define	HEAD		 5		/*  o  n  a galley header            */
-#define	SPLIT		 6		/*  o     @Split                     */
-#define	PAR		 7		/*  o     a parameter of a closure   */
-#define	WORD		 8		/*  o     a word                     */
-#define	QWORD		 9		/*  o     a word (was quoted in i/p) */
-#define	ROW_THR		10		/*  o     a row thread               */
-#define	COL_THR		11		/*  o     a column thread            */
-#define	ACAT		12		/* to s   a sequence of &-ed objs    */
-#define	HCAT		13		/* to s   a sequence of |-ed objs    */
-#define	VCAT		14		/* to s   a sequence of /-ed objs    */
-#define	ONE_COL		15		/* to s   @OneCol                    */
-#define	ONE_ROW		16		/* to s   @OneRow                    */
-#define	WIDE		17		/* to s   @Wide                      */
-#define	HIGH		18		/* to s   @High                      */
-#define	HSHIFT		19		/* to s   @HShift                    */
-#define	VSHIFT		20		/* to s   @VShift                    */
-#define	HSCALE		21		/* to s   @HScale                    */
-#define	VSCALE		22		/* to s   @HScale                    */
-#define	SCALE		23		/* to s   @Scale                     */
-#define	HCONTRACT	24		/* to s   @HContract                 */
-#define	VCONTRACT	25		/* to s   @VContract                 */
-#define	HEXPAND		26		/* to s   @HExpand                   */
-#define	VEXPAND		27		/* to s   @VExpand                   */
-#define	PADJUST		28		/* to s   @PAdjust                   */
-#define	HADJUST		29		/* to s   @HAdjust                   */
-#define	VADJUST		30		/* to s   @VAdjust                   */
-#define	ROTATE		31		/* to s   @Rotate                    */
-#define	CASE		32		/* to s   @Case                      */
-#define	YIELD		33		/* to s   @Yield                     */
-#define	BACKEND		34		/* to s   @BackEnd                   */
-#define	FILTERED	35		/* to s   filtered object (no name)  */
-#define	XCHAR		36		/* to s   @Char                      */
-#define	FONT		37		/* to s   @Font                      */
-#define	SPACE		38		/* to s   @Space                     */
-#define	BREAK		39		/* to s   @Break                     */
-#define	COLOUR		40		/* to s   @SetColour and @SetColor   */
-#define	LANGUAGE	41		/* to s   @Language                  */
-#define	CURR_LANG	42		/* to s   @CurrLang                  */
-#define	NEXT		43		/* to s   @Next                      */
-#define	ENV		44		/* to s   @LEnv                      */
-#define	CLOS		45		/* to s   @LClos                     */
-#define	LVIS		46		/* to s   @LVis                      */
-#define	LUSE		47		/* to s   @LVis                      */
-#define	OPEN		48		/* to s   @Open                      */
-#define	TAGGED		49		/* to s   @Tagged                    */
-#define	INCGRAPHIC	50		/* to s   @IncludeGraphic            */
-#define	SINCGRAPHIC	51		/* to s   @SysIncludeGraphic         */
-#define	GRAPHIC		52		/* to s   @Graphic                   */
+#define	UNDER_REC	 3              /*  o  n  record of underlining      */
+#define	PAGE_LABEL	 4		/* to sn  @PageLabel                 */
+#define	NULL_CLOS	 5		/* to sn  @Null                      */
+#define	CROSS		 6		/* to sn  && (a cross reference obj) */
+#define	HEAD		 7		/*  o  n  a galley header            */
+#define	SPLIT		 8		/*  o     @Split                     */
+#define	PAR		 9		/*  o     a parameter of a closure   */
+#define	WORD		10		/*  o     a word                     */
+#define	QWORD		11		/*  o     a word (was quoted in i/p) */
+#define	ROW_THR		12		/*  o     a row thread               */
+#define	COL_THR		13		/*  o     a column thread            */
+#define	ACAT		14		/* to s   a sequence of &-ed objs    */
+#define	HCAT		15		/* to s   a sequence of |-ed objs    */
+#define	VCAT		16		/* to s   a sequence of /-ed objs    */
+#define	ONE_COL		17		/* to s   @OneCol                    */
+#define	ONE_ROW		18		/* to s   @OneRow                    */
+#define	WIDE		19		/* to s   @Wide                      */
+#define	HIGH		20		/* to s   @High                      */
+#define	HSHIFT		21		/* to s   @HShift                    */
+#define	VSHIFT		22		/* to s   @VShift                    */
+#define	HSCALE		23		/* to s   @HScale                    */
+#define	VSCALE		24		/* to s   @HScale                    */
+#define	SCALE		25		/* to s   @Scale                     */
+#define	HCONTRACT	26		/* to s   @HContract                 */
+#define	VCONTRACT	27		/* to s   @VContract                 */
+#define	HEXPAND		28		/* to s   @HExpand                   */
+#define	VEXPAND		29		/* to s   @VExpand                   */
+#define	PADJUST		30		/* to s   @PAdjust                   */
+#define	HADJUST		31		/* to s   @HAdjust                   */
+#define	VADJUST		32		/* to s   @VAdjust                   */
+#define	ROTATE		33		/* to s   @Rotate                    */
+#define	CASE		34		/* to s   @Case                      */
+#define	YIELD		35		/* to s   @Yield                     */
+#define	BACKEND		36		/* to s   @BackEnd                   */
+#define	FILTERED	37		/* to s   filtered object (no name)  */
+#define	XCHAR		38		/* to s   @Char                      */
+#define	FONT		39		/* to s   @Font                      */
+#define	SPACE		40		/* to s   @Space                     */
+#define	BREAK		41		/* to s   @Break                     */
+#define	UNDERLINE	42		/* to s   @Underline                 */
+#define	COLOUR		43		/* to s   @SetColour and @SetColor   */
+#define	LANGUAGE	44		/* to s   @Language                  */
+#define	CURR_LANG	45		/* to s   @CurrLang                  */
+#define	COMMON		46		/* to s   @Common                    */
+#define	RUMP		47		/* to s   @Rump                      */
+#define	NEXT		48		/* to s   @Next                      */
+#define	ENV_OBJ		49		/* to s   object with envt (no name) */
+#define	ENV		50		/* to s   @LEnv                      */
+#define	CLOS		51		/* to s   @LClos                     */
+#define	LVIS		52		/* to s   @LVis                      */
+#define	LUSE		53		/* to s   @LVis                      */
+#define	OPEN		54		/* to s   @Open                      */
+#define	TAGGED		55		/* to s   @Tagged                    */
+#define	INCGRAPHIC	56		/* to s   @IncludeGraphic            */
+#define	SINCGRAPHIC	57		/* to s   @SysIncludeGraphic         */
+#define	GRAPHIC		58		/* to s   @Graphic                   */
 
-#define	TSPACE		53		/* t      a space token, parser only */
-#define	TJUXTA		54		/* t      a juxta token, parser only */
-#define	LBR		55		/* t  s   left brace token           */
-#define	RBR		56		/* t  s   right brace token          */
-#define	BEGIN		57		/* t  s   @Begin token               */
-#define	END		58		/* t  s   @End token                 */
-#define	USE		59		/* t  s   @Use                       */
-#define	GSTUB_NONE	60		/* t      a galley stub, no rpar     */
-#define	GSTUB_INT	61		/* t      galley stub internal rpar  */
-#define	GSTUB_EXT	62		/* t      galley stub external rpar  */
-#define	UNEXPECTED_EOF	63		/* t      unexpected end of file     */
-#define	INCLUDE		64		/*    s   @Include                   */
-#define	SYS_INCLUDE	65		/*    s   @SysInclude                */
-#define	PREPEND		66		/*    s   @Prepend                   */
-#define	SYS_PREPEND	67		/*    s   @SysPrepend                */
-#define	DATABASE	68		/*    s   @Database                  */
-#define	SYS_DATABASE	69		/*    s   @SysDatabase               */
-#define	START		70		/*    s   \Start                     */
+#define	TSPACE		59		/* t      a space token, parser only */
+#define	TJUXTA		60		/* t      a juxta token, parser only */
+#define	LBR		61		/* t  s   left brace token           */
+#define	RBR		62		/* t  s   right brace token          */
+#define	BEGIN		63		/* t  s   @Begin token               */
+#define	END		64		/* t  s   @End token                 */
+#define	USE		65		/* t  s   @Use                       */
+#define	GSTUB_NONE	66		/* t      a galley stub, no rpar     */
+#define	GSTUB_INT	67		/* t      galley stub internal rpar  */
+#define	GSTUB_EXT	68		/* t      galley stub external rpar  */
+#define	UNEXPECTED_EOF	69		/* t      unexpected end of file     */
+#define	INCLUDE		70		/*    s   @Include                   */
+#define	SYS_INCLUDE	71		/*    s   @SysInclude                */
+#define	PREPEND		72		/*    s   @Prepend                   */
+#define	SYS_PREPEND	73		/*    s   @SysPrepend                */
+#define	DATABASE	74		/*    s   @Database                  */
+#define	SYS_DATABASE	75		/*    s   @SysDatabase               */
+#define	START		76		/*    s   \Start                     */
 
-#define	DEAD		71		/*   i    a dead galley              */
-#define	UNATTACHED	72		/*   i    an inner, unsized galley   */
-#define	RECEPTIVE	73		/*   i    a receptive object index   */
-#define	RECEIVING	74		/*   i    a receiving object index   */
-#define	RECURSIVE	75		/*   i    a recursive definite obj.  */
-#define	PRECEDES	76		/*   i    an ordering constraint     */
-#define	FOLLOWS		77		/*   i    other end of ordering c.   */
-#define	CROSS_FOLL	78		/*   i    following type cross-ref   */
-#define	GALL_FOLL	79		/*   i    galley with &&following    */
-#define	CROSS_TARG	80		/*   i    value of cross-ref         */
-#define	GALL_TARG	81		/*   i    target of these galleys    */
-#define	GALL_PREC	82		/*   i    galley with &&preceding    */
-#define	CROSS_PREC	83		/*   i    preceding type cross-ref   */
-#define	SCALE_IND	84		/*   i    index of auto SCALE        */
-#define	EXPAND_IND	85		/*   i    index of HEXPAND or VEXPD  */
-#define	THREAD		86		/*        a sequence of threads      */
-#define	CROSS_SYM	87		/*        cross-ref info             */
-#define	CR_ROOT		88		/*        RootCross                  */
-#define	MACRO		89		/*        a macro symbol             */
-#define	LOCAL		90		/*        a local symbol             */
-#define	LPAR		91		/*        a left parameter           */
-#define	NPAR		92		/*        a named parameter          */
-#define	RPAR		93		/*        a right parameter          */
-#define	EXT_GALL	94		/*        an external galley         */
-#define	CR_LIST		95		/*        a list of cross references */
-#define	DISPOSED	96		/*        a disposed record          */
+#define	DEAD		77		/*   i    a dead galley              */
+#define	UNATTACHED	78		/*   i    an inner, unsized galley   */
+#define	RECEPTIVE	79		/*   i    a receptive object index   */
+#define	RECEIVING	80		/*   i    a receiving object index   */
+#define	RECURSIVE	81		/*   i    a recursive definite obj.  */
+#define	PRECEDES	82		/*   i    an ordering constraint     */
+#define	FOLLOWS		83		/*   i    other end of ordering c.   */
+#define	CROSS_FOLL	84		/*   i    following type cross-ref   */
+#define	GALL_FOLL	85		/*   i    galley with &&following    */
+#define	CROSS_TARG	86		/*   i    value of cross-ref         */
+#define	GALL_TARG	87		/*   i    target of these galleys    */
+#define	GALL_PREC	88		/*   i    galley with &&preceding    */
+#define	CROSS_PREC	89		/*   i    preceding type cross-ref   */
+#define	PAGE_LABEL_IND	90		/*   i    index of PAGE_LABEL        */
+#define	SCALE_IND	91		/*   i    index of auto SCALE        */
+#define	EXPAND_IND	92		/*   i    index of HEXPAND or VEXPD  */
+#define	THREAD		93		/*        a sequence of threads      */
+#define	CROSS_SYM	94		/*        cross-ref info             */
+#define	CR_ROOT		95		/*        RootCross                  */
+#define	MACRO		96		/*        a macro symbol             */
+#define	LOCAL		97		/*        a local symbol             */
+#define	LPAR		98		/*        a left parameter           */
+#define	NPAR		99		/*        a named parameter          */
+#define	RPAR	       100		/*        a right parameter          */
+#define	EXT_GALL       101		/*        an external galley         */
+#define	CR_LIST	       102		/*        a list of cross references */
+#define	DISPOSED       103		/*        a disposed record          */
 
 #define is_indefinite(x)  ((x) >= CLOSURE && (x) <= HEAD)
 #define is_definite(x) 	 ((x) >= SPLIT && (x) <= GRAPHIC)
@@ -1124,10 +1244,14 @@ typedef struct font_rec {
 #define	DISPLAY_RIGHT	5		/* right-justify lines, no adjust    */
 #define	DO_ADJUST	6		/* placed in ACATs when adjust need  */
 
+/* small_caps(style) options                                                 */
+#define	SMALL_CAPS_OFF	 0		/* don't want small capitals         */
+#define	SMALL_CAPS_ON	 1		/* small capitals                    */
+
 /* sides of a mark */
-#define	BACK		97		/* means lies to left of mark        */
-#define	ON		98		/* means lies on mark                */
-#define	FWD		99		/* means lies to right of mark       */
+#define	BACK	       104		/* means lies to left of mark        */
+#define	ON	       105		/* means lies on mark                */
+#define	FWD	       106		/* means lies to right of mark       */
 
 /* statuses of thread objects */
 #define	NOTSIZED	 0		/* this thread object is not sized   */
@@ -1135,15 +1259,15 @@ typedef struct font_rec {
 #define	FINALSIZE	 2		/* thread object size is now final   */
 
 /* constraint statuses */
-#define	PROMOTE	       100		/* this component may be promoted    */
-#define	CLOSE	       101		/* must close dest before promoting  */
-#define	BLOCK	       102		/* cannot promote this component     */
-#define	CLEAR	       103		/* this constraint is now satisfied  */
+#define	PROMOTE	       107		/* this component may be promoted    */
+#define	CLOSE	       108		/* must close dest before promoting  */
+#define	BLOCK	       109		/* cannot promote this component     */
+#define	CLEAR	       110		/* this constraint is now satisfied  */
 
 /* gap increment types */
-#define	GAP_ABS	       104		/* absolute,  e.g.  3p               */
-#define	GAP_INC	       105		/* increment, e.g. +3p               */
-#define	GAP_DEC	       106		/* decrement, e.g. -3p               */
+#define	GAP_ABS	       111		/* absolute,  e.g.  3p               */
+#define	GAP_INC	       112		/* increment, e.g. +3p               */
+#define	GAP_DEC	       113		/* decrement, e.g. -3p               */
 
 /* file types */
 #define	SOURCE_FILE	 0		/* input file from command line      */
@@ -1156,7 +1280,8 @@ typedef struct font_rec {
 #define	HYPH_FILE	 7		/* hyphenation file                  */
 #define	HYPH_PACKED_FILE 8		/* packed hyphenation file           */
 #define	ENCODING_FILE	 9		/* encoding vector file              */
-#define	FILTER_FILE	10		/* filter output file                */
+#define	MAPPING_FILE	10		/* character mapping file            */
+#define	FILTER_FILE	11		/* filter output file                */
 
 /* path types (i.e. sequences of directories for file searching) */
 #define	SOURCE_PATH	 0		/* path to search for source files   */
@@ -1223,6 +1348,22 @@ typedef struct font_rec {
 #define	ATTACH_NULL	 4
 #define	ATTACH_ACCEPT	 5
 
+/* types of memory usage, used to debug memory consumption */
+#define	MEM_BINARY	 0		/* the executable binary	     */
+#define	MEM_OBJECTS	 1		/* objects currently in free list    */
+#define	MEM_FONTS	 2		/* fonts                             */
+#define	MEM_LEX		 3		/* lexical analyser file buffers     */
+#define	MEM_FILES	 4		/* table of file names               */
+#define	MEM_CROSSREF	 5		/* table of file names               */
+#define	MEM_PAGES	 6		/* page grids (-p only)              */
+#define	MEM_DBCHECK	 7		/* page grids (-p only)              */
+#define	MEM_HYPH_PATS	 8		/* hyphenation patterns              */
+#define	MEM_EVECS	 9		/* encoding vectors                  */
+#define	MEM_CMAPS	10		/* character maps                    */
+#define	MEM_COLOUR_TAB	11		/* colour table                      */
+#define	MEM_LANG_TAB	12		/* language table                    */
+#define	MEM_USAGE_MAX	13		/* number of memory usage types      */
+
 /*@::Keywords@****************************************************************/
 /*                                                                           */
 /*  Keywords.                                                                */
@@ -1250,6 +1391,8 @@ typedef struct font_rec {
 #define	KW_FILTERERR		AsciiToFull("@FilterErr")
 #define	KW_MACRO		AsciiToFull("macro")
 #define	KW_NAMED		AsciiToFull("named")
+#define	KW_COMMON		AsciiToFull("@Common")
+#define	KW_RUMP			AsciiToFull("@Rump")
 #define	KW_NEXT			AsciiToFull("@Next")
 #define	KW_WIDE			AsciiToFull("@Wide")
 #define	KW_HIGH			AsciiToFull("@High")
@@ -1278,6 +1421,7 @@ typedef struct font_rec {
 #define	KW_FONT			AsciiToFull("@Font")
 #define	KW_SPACE		AsciiToFull("@Space")
 #define	KW_BREAK		AsciiToFull("@Break")
+#define	KW_UNDERLINE		AsciiToFull("@Underline")
 #define	KW_COLOUR		AsciiToFull("@SetColour")
 #define	KW_COLOR		AsciiToFull("@SetColor")
 #define	KW_LANGUAGE		AsciiToFull("@Language")
@@ -1300,11 +1444,13 @@ typedef struct font_rec {
 #define	KW_PRECEDING		AsciiToFull("preceding")
 #define	KW_NOW			AsciiToFull("now")
 #define	KW_NULL			AsciiToFull("@Null")
+#define	KW_PAGE_LABEL		AsciiToFull("@PageLabel")
 #define	KW_GALLEY		AsciiToFull("@Galley")
 #define	KW_INPUT		AsciiToFull("@LInput")
 #define	KW_SPLIT		AsciiToFull("@Split")
 #define	KW_TAG			AsciiToFull("@Tag")
 #define	KW_KEY			AsciiToFull("@Key")
+#define	KW_MERGE		AsciiToFull("@Merge")
 #define	KW_CROSS		AsciiToFull("&&")
 #define	KW_LBR			AsciiToFull("{")
 #define	KW_RBR			AsciiToFull("}")
@@ -1351,15 +1497,17 @@ typedef struct font_rec {
 
 #if DEBUG_ON
 #define newcount zz_newcount++,
+#define freecount zz_listcount--,
 #else
 #define newcount
+#define freecount
 #endif
 
 #define	GetMem(siz, pos)						\
 ( newcount (zz_size=(siz))>=MAX_OBJECT_REC ?				\
       (OBJECT) Error(1, 1, "word is too long", FATAL, pos)		\
-  : zz_free[zz_size] == nil ? zz_hold = GetMemory(zz_size, pos)		\
-  : (zz_hold = zz_free[zz_size],					\
+  : zz_free[zz_size] == nilobj ? zz_hold = GetMemory(zz_size, pos)	\
+  : (zz_hold = zz_free[zz_size], freecount				\
 	zz_free[zz_size] = pred(zz_hold, CHILD), zz_hold)		\
 )
 
@@ -1370,8 +1518,8 @@ typedef struct font_rec {
   zz_lengths[typ] == 0 ?						\
     Error(1, 3, "New: zero length!", INTERN, no_fpos) : 0,
 #define checkmem(z, typ)						\
-  (MemCheck != 0) && ( (int) z == MemCheck) ?				\
-      fprintf(stderr, "%d = New(%s)\n", z, Image(type(z))) : 0,
+  (MemCheck != 0) && ( (POINTER) z == MemCheck) ?			\
+      fprintf(stderr, "%ld = New(%s)\n", (long) z, Image(type(z))) : 0,
 #else
 #define checknew(typ)
 #define checkmem(z, typ)
@@ -1394,25 +1542,27 @@ typedef struct font_rec {
 )
 
 #if DEBUG_ON
-#define disposecount zz_disposecount++,
-#define	setdisposed  , (MemCheck != 0) && ((int) zz_hold==MemCheck) ?	\
-  fprintf(stderr, "Dispose(%d, %s)\n",zz_hold,Image(type(zz_hold))) :	\
-  0, type(zz_hold) = DISPOSED
+#define disposecount zz_disposecount++, zz_listcount++,
+
+#define disposecheck							\
+  ( zz_size < 0 || zz_size >= MAX_OBJECT_REC ) ?			\
+    Error(1, 28, "Dispose: length %d @%d",INTERN,no_fpos,zz_size,zz_hold) : 0,
+  
+#define	setdisposed  , (MemCheck != 0) && ((POINTER) zz_hold==MemCheck) ?	\
+  fprintf(stderr, "Dispose(%ld, %s)\n", (long) zz_hold,			\
+  Image(type(zz_hold))) : 0, type(zz_hold) = DISPOSED
 #else
 #define disposecount
+#define disposecheck
 #define	setdisposed
 #endif
 
 #define PutMem(x, siz)							\
-( disposecount zz_hold = (x), zz_size = (siz),				\
+( disposecount zz_hold = (x), zz_size = (siz), disposecheck		\
   pred(zz_hold, CHILD) = zz_free[zz_size], zz_free[zz_size] = zz_hold )
 
 #define Dispose(x)							\
 ( zz_hold = (x),							\
-  assert( pred(zz_hold, CHILD)  == zz_hold, "Dispose: pred(CHILD)!"  ),	\
-  assert( succ(zz_hold, CHILD)  == zz_hold, "Dispose: succ(CHILD)!"  ),	\
-  assert( pred(zz_hold, PARENT) == zz_hold, "Dispose: pred(PARENT)!" ),	\
-  assert( succ(zz_hold, PARENT) == zz_hold, "Dispose: succ(PARENT)!" ),	\
   PutMem(zz_hold, is_word(type(zz_hold)) ? rec_size(zz_hold)		\
 			  : zz_lengths[type(zz_hold)]) setdisposed  )
 
@@ -1426,8 +1576,8 @@ typedef struct font_rec {
 
 #define	Append(x, y, dir)						\
 ( zz_res = (x),	zz_hold = (y),						\
-  zz_hold == nil ? zz_res  :						\
-  zz_res  == nil ? zz_hold :						\
+  zz_hold == nilobj ? zz_res  :						\
+  zz_res  == nilobj ? zz_hold :						\
   ( zz_tmp = pred(zz_hold, dir),					\
     pred(zz_hold, dir) = pred(zz_res, dir),				\
     succ(pred(zz_res, dir), dir) = zz_hold,				\
@@ -1441,13 +1591,13 @@ typedef struct font_rec {
 /*                                                                           */
 /*  OBJECT Delete(x, dir)                                                    */
 /*                                                                           */
-/*  Delete x from its dir list, and return succ(x, dir) or nil if none.      */
+/*  Delete x from its dir list, and return succ(x, dir) or nilobj if none.   */
 /*                                                                           */
 /*****************************************************************************/
 
 #define Delete(x, dir)							\
 ( zz_hold = (x),							\
-  succ(zz_hold, dir) == zz_hold ? nil :					\
+  succ(zz_hold, dir) == zz_hold ? nilobj :				\
   ( zz_res = succ(zz_hold, dir),					\
     pred(zz_res, dir) = pred(zz_hold, dir),				\
     succ(pred(zz_hold, dir), dir) = zz_res,				\
@@ -1460,13 +1610,13 @@ typedef struct font_rec {
 /*                                                                           */
 /*  OBJECT DeleteAndDispose(x, dir)                                          */
 /*                                                                           */
-/*  Delete x as above, dispose it, and return succ(x, dir) or nil if none.   */
+/*  Delete x as above, dispose it, and return succ(x, dir) or nilobj if none.*/
 /*                                                                           */
 /*****************************************************************************/
 
 #define DeleteAndDispose(x, dir)					\
 ( zz_hold = (x),							\
-  zz_res  = succ(zz_hold, dir) == zz_hold ? nil :			\
+  zz_res  = succ(zz_hold, dir) == zz_hold ? nilobj :			\
 	    ( pred(succ(zz_hold, dir), dir) = pred(zz_hold, dir),	\
 	      succ(pred(zz_hold, dir), dir) = succ(zz_hold, dir) ),	\
   pred(zz_hold, dir) = succ(zz_hold, dir) = zz_hold,			\
@@ -1635,12 +1785,13 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 
 /*@::FirstDefinite(), NextDefinite(), etc.@***********************************/
 /*                                                                           */
-/*  FirstDefinite(x, link, y)                                                */
+/*  FirstDefinite(x, link, y, jn)                                            */
 /*                                                                           */
 /*  On input, x is an object and link and y are undefined.  On output there  */
 /*  are two cases:                                                           */
 /*                                                                           */
-/*  link != x.  Then y is first definite child of x and link is its link.    */
+/*  link != x.  Then y is first definite child of x and link is its link;    */
+/*              jn is TRUE iff all gaps on the way to link were joined.      */
 /*                                                                           */
 /*  link == x.  Then x has no definite child and y is undefined.             */
 /*                                                                           */
@@ -1649,11 +1800,13 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 /*                                                                           */
 /*****************************************************************************/
 
-#define FirstDefinite(x, link, y)					\
-{ for( link = Down(x);  link != x;  link = NextDown(link) )		\
+#define FirstDefinite(x, link, y, jn)					\
+{ jn = TRUE;								\
+  for( link = Down(x);  link != x;  link = NextDown(link) )		\
   { Child(y, link);							\
-    if( type(y) == SPLIT ? SplitIsDefinite(y) : is_definite(type(y)) )	\
-	break;								\
+    if( type(y) == GAP_OBJ )  jn = jn && join(gap(y));			\
+    else if( type(y)==SPLIT ? SplitIsDefinite(y) : is_definite(type(y)))\
+      break;								\
   }									\
 } /* end FirstDefinite */
 
@@ -1684,7 +1837,7 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 
 /*****************************************************************************/
 /*                                                                           */
-/*  NextDefiniteWithGap(x, link, y, g)                                       */
+/*  NextDefiniteWithGap(x, link, y, g, jn)                                   */
 /*                                                                           */
 /*  On input, x is an object and link is a link to one of its children; y    */
 /*  and g are undefined.  On output there are two cases:                     */
@@ -1692,20 +1845,21 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 /*  link != x.  Then y is the first definite child of x following link, and  */
 /*              link is changed to be the link of y.  Also, g is defined     */
 /*              to be the gap just before y; this must exist and is tested   */
-/*              by an assert test.                                           */
+/*              by an assert test; and jn is true iff all of the gaps on     */
+/*              the way from old link to new link are join gaps.             */
 /*                                                                           */
 /*  link == x.  Then x has no definite child following link, and y and g     */
 /*              remain undefined.                                            */
 /*                                                                           */
 /*****************************************************************************/
 
-#define NextDefiniteWithGap(x, link, y, g)				\
-{ g = nil;								\
+#define NextDefiniteWithGap(x, link, y, g, jn)				\
+{ g = nilobj;  jn = TRUE;						\
   for( link = NextDown(link);  link != x;  link = NextDown(link) )	\
   { Child(y, link);							\
-    if( type(y) == GAP_OBJ )  g = y;					\
+    if( type(y) == GAP_OBJ )  g = y, jn = jn && join(gap(y));		\
     else if( type(y)==SPLIT ? SplitIsDefinite(y):is_definite(type(y)) )	\
-    { assert( g != nil, "NextDefinite: g == nil!" );			\
+    { assert( g != nilobj, "NextDefinite: g == nilobj!" );		\
       break;								\
     }									\
   }									\
@@ -1766,346 +1920,401 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 /*                                                                           */
 /*****************************************************************************/
 
-/*****  z01.c		Supervise		******************************/
-extern			main();			/* main program              */
-extern	int		MemCheck;		/* check this memory location*/
-extern	OBJECT		StartSym;		/* sym tab entry for \Start  */
-extern	OBJECT		GalleySym;		/* sym tab entry for @Galley */
-extern	OBJECT		InputSym;		/* sym tab entry for \Input  */
-extern	OBJECT		PrintSym;		/* sym tab entry for \Print  */
-extern	OBJECT		FilterInSym;		/* sym tab for @FilterIn     */
-extern	OBJECT		FilterOutSym;		/* sym tab for @FilterOut    */
-extern	OBJECT		FilterErrSym;		/* sym tab for @FilterErr    */
-extern	BOOLEAN		AllowCrossDb;		/* true when -s flag absent  */
-extern	BOOLEAN		Encapsulated;		/* true when eps wanted      */
-extern	BOOLEAN		Kern;			/* true when kerning wanted  */
-extern	int		BackEnd;		/* POSTSCRIPT or PLAINTEXT   */
-extern	LENGTH		PlainCharWidth;		/* char width if PLAINTEXT   */
-extern	LENGTH		PlainCharHeight;	/* char height if PLAINTEXT  */
-extern	BOOLEAN		PlainFormFeed;		/* TRUE if use form feed     */
-extern	BOOLEAN		InitializeAll;		/* TRUE if initializing run  */
+/*****  z01.c	  Supervise		**************************************/
+extern		  main(int argc, char *argv[]);
+extern	POINTER	  MemCheck;
+extern	OBJECT	  StartSym;
+extern	OBJECT	  GalleySym;
+extern	OBJECT	  InputSym;
+extern	OBJECT	  PrintSym;
+extern	OBJECT	  FilterInSym;
+extern	OBJECT	  FilterOutSym;
+extern	OBJECT	  FilterErrSym;
+extern	BOOLEAN	  AllowCrossDb;
+extern	BOOLEAN	  Encapsulated;
+extern	BOOLEAN	  Kern;
+extern	int	  BackEnd;
+extern	LENGTH	  PlainCharWidth;
+extern	LENGTH	  PlainCharHeight;
+extern	BOOLEAN	  PlainFormFeed;
+extern	BOOLEAN	  InitializeAll;
 #if LOCALE_ON
-extern	nl_catd		MsgCat;			/* error message catalogue   */
+extern	nl_catd	  MsgCat;
 #endif
 
-/*****  z02.c		Lexical Analyser	******************************/
-extern			LexInit();		/* initialise lex. analyser  */
-extern			LexPush();		/* switch to new file list   */
-extern			LexPop();		/* return to prev. file list */
-extern	BOOLEAN		LexLegalName();		/* check identifier format   */
-extern	OBJECT		LexGetToken();		/* get next token from input */
-extern			LexScanFilter();	/* scan filter input         */
-extern	long		LexNextTokenPos();	/* like ftell() on curr file */
+/*****  z02.c	  Lexical Analyser	**************************************/
+extern	BOOLEAN	  LexLegalName(FULL_CHAR *str);
+extern	void	  LexInit(void);
+extern	void	  LexPush(FILE_NUM x, int offs, int ftyp);
+extern	void	  LexPop(void);
+extern	long	  LexNextTokenPos(void);
+extern	OBJECT	  LexGetToken(void);
+extern	void	  LexScanFilter(FILE *fp, BOOLEAN end_stop, FILE_POS *err_pos);
 
-/*****  z03.c		File Service	        ******************************/
-extern	FILE_POS	*no_fpos;		/* a null filepos            */
-extern			InitFiles();		/* initialize this module    */
-extern			AddToPath();		/* add directory to path     */
-extern	FILE_NUM	DefineFile();		/* declare input file        */
-extern	FILE_NUM	FirstFile();		/* first file of given type  */
-extern	FILE_NUM	NextFile();		/* next file of given type   */
-extern	FILE_NUM	FileNum();		/* file with given name      */
-extern	FULL_CHAR	*FileName();		/* file name of file         */
-extern	FULL_CHAR	*EchoFilePos();		/* string value of FILE_POS  */
-extern	FULL_CHAR	*EchoFileSource();	/* string value of FILE_POS  */
-extern	FULL_CHAR	*EchoFileLine();	/* string value of FILE_POS  */
-extern	FILE_POS	*PosOfFile();		/* string of file FILE_POS   */
-extern	FILE		*OpenFile();		/* open file for reading     */
-extern	FILE		*OpenIncGraphicFile();	/* open @IncludeGraphic file */
-extern			FileSetUpdated();	/* declare file updated      */
-extern	BOOLEAN		FileTestUpdated();	/* TRUE file file updated    */
+/*****  z03.c	  File Service	        **************************************/
+extern	FILE_POS  *no_fpos;
+extern	void	  InitFiles(void);
+extern	void	  AddToPath(int fpath, FULL_CHAR *dirname);
+extern	FILE_NUM  DefineFile(FULL_CHAR *str, FULL_CHAR *suffix,
+		    FILE_POS *xfpos, int ftype, int fpath);
+extern	FILE_NUM  FirstFile(int ftype);
+extern	FILE_NUM  NextFile(FILE_NUM i);
+extern	FILE_NUM  FileNum(FULL_CHAR *str, FULL_CHAR *suffix);
+extern	FILE_NUM  DatabaseFileNum(FILE_POS *xfpos);
+extern	FULL_CHAR *FileName(FILE_NUM fnum);
+extern	FULL_CHAR *EchoFilePos(FILE_POS *pos);
+extern	FULL_CHAR *EchoFileSource(FILE_NUM fnum);
+extern	FULL_CHAR *EchoFileLine(FILE_POS *pos);
+extern	FILE_POS  *PosOfFile(FILE_NUM fnum);
+extern	FILE	  *OpenFile(FILE_NUM fnum, BOOLEAN check_ld, BOOLEAN check_lt);
+extern	FILE	  *OpenIncGraphicFile(FULL_CHAR *str, unsigned char typ,
+		    OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed);
+extern	void	  FileSetUpdated(FILE_NUM fnum);
+extern	BOOLEAN	  FileTestUpdated(FILE_NUM fnum);
 
-/*****  z04.c		Token Service	        ******************************/
-extern	OBJECT		NewToken();		/* get a new token           */
-extern	OBJECT		CopyTokenList();	/* copy a list of tokens     */
-extern	FULL_CHAR	*EchoCatOp();		/* string value of CAT op    */
-extern	FULL_CHAR	*EchoToken();		/* returns image of token    */
+/*****  z04.c	  Token Service	        **************************************/
+extern	OBJECT	  NewToken(unsigned char xtype, FILE_POS *xfpos,
+		    unsigned char xvspace, unsigned char xhspace,
+		    unsigned char xprec, OBJECT xactual);
+extern	OBJECT	  CopyTokenList(OBJECT x, FILE_POS *pos);
+extern	FULL_CHAR *EchoCatOp(unsigned xtype, BOOLEAN xmark, BOOLEAN xjoin);
+extern	FULL_CHAR *EchoToken(OBJECT x);
 
-/*****  z05.c		Read Definitions  	******************************/
-extern			ReadPrependDef();	/* read @Prepend ...         */
-extern			ReadDatabaseDef();	/* read @Database ...        */
-extern			ReadDefinitions();	/* read definitions          */
+/*****  z05.c	  Read Definitions  	**************************************/
+extern	void	  ReadPrependDef(unsigned typ, OBJECT encl);
+extern	void	  ReadDatabaseDef(unsigned typ, OBJECT encl);
+extern	void	  ReadDefinitions(OBJECT *token, OBJECT encl,
+		    unsigned char res_type);
 
-/*****  z06.c		Object Parser	        ******************************/
-extern			InitParser();		/* initialise parser         */
-extern			SetScope();		/* set scope for env         */
-extern	OBJECT		Parse();		/* parser                    */
+/*****  z06.c	  Object Parser	        **************************************/
+extern	void	  SetScope(OBJECT env, int *count);
+extern	void	  InitParser(FULL_CHAR *cross_db);
+extern	OBJECT	  Parse(OBJECT *token, OBJECT encl, BOOLEAN defs_allowed,
+		    BOOLEAN transfer_allowed);
 
-/*****  z07.c		Object Service	        ******************************/
-extern	OBJECT		MakeWord();		/* a new WORD or QWORD       */
-extern	OBJECT		MakeWordTwo();		/* a new WORD from 2 strings */
-extern	OBJECT		CopyObject();		/* make a copy of an object  */
-extern			DisposeObject();	/* dispose an object         */
-extern	BOOLEAN		SplitIsDefinite();	/* TRUE if SPLIT is definite */
+/*****  z07.c	  Object Service	**************************************/
+extern	BOOLEAN	  SplitIsDefinite(OBJECT x);
+extern	int	  DisposeObject(OBJECT x);
+extern	OBJECT	  MakeWord(unsigned typ, FULL_CHAR *str, FILE_POS *pos);
+extern	OBJECT	  MakeWordTwo(unsigned typ, FULL_CHAR *str1, FULL_CHAR *str2,
+		    FILE_POS *pos);
+extern	OBJECT	  CopyObject(OBJECT x, FILE_POS *pos);
 
-/*****  z08.c		Object Manifest	        ******************************/
-extern	OBJECT		ReplaceWithTidy();	/* tidy up an object         */
-extern	OBJECT		Manifest();		/* manifest an object        */
+/*****  z08.c	  Object Manifest	**************************************/
+extern	OBJECT	  ReplaceWithTidy(OBJECT x, BOOLEAN one_word);
+extern	OBJECT	  Manifest(OBJECT x, OBJECT env, STYLE *style, OBJECT bthr[2],
+		    OBJECT fthr[2], OBJECT *target, OBJECT *crs, BOOLEAN ok,
+		    BOOLEAN need_expand);
 
-/*****  z09.c		Closure Expansion	******************************/
-extern	OBJECT		SetEnv();		/* build up environment      */
-extern			AttachEnv();		/* attach env. to object     */
-extern	OBJECT		SearchEnv();		/* search environment        */
-extern	OBJECT		GetEnv();		/* retrieve env. from object */
-extern	OBJECT		DetachEnv();		/* retrieve and detach env.  */
-extern	OBJECT		ClosureExpand();	/* expand a user-def CLOSURE */
-extern	OBJECT		ParameterCheck();	/* check expansion of pars   */
+/*****  z09.c	  Closure Expansion	**************************************/
+extern	OBJECT	  SearchEnv(OBJECT env, OBJECT sym);
+extern	OBJECT	  SetEnv(OBJECT x, OBJECT y);
+extern	void	  AttachEnv(OBJECT env, OBJECT x);
+extern	OBJECT	  GetEnv(OBJECT x);
+extern	OBJECT	  DetachEnv(OBJECT x);
+extern	OBJECT	  ClosureExpand(OBJECT x, OBJECT env, BOOLEAN crs_wanted,
+		    OBJECT *crs, OBJECT *res_env);
+extern	OBJECT	  ParameterCheck(OBJECT x, OBJECT env);
 
-/*****  z10.c		Cross References	******************************/
-extern			CrossInit();		/* initialize cr record      */
-extern			CrossAddTag();		/* add auto tag to closure   */
-extern	OBJECT		CrossMake();		/* returns a cross-reference */
-extern	OBJECT		GallTargEval();		/* returns the value of a cr */
-extern	OBJECT		CrossExpand();		/* returns the value of a cr */
-extern			CrossSequence();	/* record cr off root galley */
-extern			CrossClose();		/* close down this module    */
+/*****  z10.c	  Cross References	**************************************/
+extern	void	  CrossInit(OBJECT sym);
+extern	OBJECT	  CrossMake(OBJECT sym, OBJECT val, int ctype);
+extern	OBJECT	  GallTargEval(OBJECT sym, FILE_POS *dfpos);
+extern	void	  CrossAddTag(OBJECT x);
+extern	OBJECT	  CrossExpand(OBJECT x, OBJECT env, STYLE *style,
+		    OBJECT *crs, OBJECT *res_env);
+extern	void	  CrossSequence(OBJECT x);
+extern	void	  CrossClose(void);
 
-/*****  z11.c		Style Service		******************************/
-extern			BreakChange();		/* change line spacing       */
-extern			SpaceChange();		/* change word spacing       */
-extern	FULL_CHAR	*EchoStyle();		/* string value of a style   */
+/*****  z11.c	  Style Service		**************************************/
+extern	FULL_CHAR *EchoStyle(STYLE *style);
+extern	void	  SpaceChange(STYLE *style, OBJECT x);
+extern	void	  BreakChange(STYLE *style, OBJECT x);
 
-/*****  z12.c		Size Finder		******************************/
-extern	OBJECT		MinSize();		/* min. possible size of obj */
+/*****  z12.c	  Size Finder		**************************************/
+extern	OBJECT	  MinSize(OBJECT x, int dim, OBJECT *extras);
 
-/*****  z13.c		Object Breaking		******************************/
-extern	OBJECT		BreakObject();		/* break object to fit width */
+/*****  z13.c	  Object Breaking	**************************************/
+extern	OBJECT	  BreakObject(OBJECT x, CONSTRAINT *c);
 
-/*****  z14.c		Object Filling	        ******************************/
-extern	OBJECT		FillObject();		/* optimal paragraph breaker */
-extern	OBJECT		SimpleFillObject();	/* simple paragraph breaker  */
+/*****  z14.c	  Object Filling        **************************************/
+extern	OBJECT	  FillObject(OBJECT x, CONSTRAINT *c);
 
-/*****  z15.c		Size Constraints	******************************/
-extern	FULL_CHAR	*EchoConstraint();	/* string value of a constr. */
-extern			MinConstraint();	/* take minimum of two const */
-extern			EnlargeToConstraint();	/* enlarge obj to constraint */
-extern			RotateConstraint();	/* rotate constraints        */
-extern			InvScaleConstraint();	/* inverse scale a constr.   */
-extern			Constrained();		/* finds size constraint     */
-extern			DebugConstrained();	/* debug constraint code     */
+/*****  z15.c	  Size Constraints	**************************************/
+extern	void	  MinConstraint(CONSTRAINT *xc, CONSTRAINT *yc);
+extern	void	  EnlargeToConstraint(LENGTH *b, LENGTH *f, CONSTRAINT *c);
+extern	int	  ScaleToConstraint(LENGTH b, LENGTH f, CONSTRAINT *c);
+extern	void	  InvScaleConstraint(CONSTRAINT *yc, LENGTH sf, CONSTRAINT*xc);
+extern	void	  RotateConstraint(CONSTRAINT *c, OBJECT y, LENGTH angle,
+		    CONSTRAINT *hc, CONSTRAINT *vc, int dim);
+extern	void	  Constrained(OBJECT x, CONSTRAINT *xc, int dim);
+extern	FULL_CHAR *EchoConstraint(CONSTRAINT *c);
+extern	void	  DebugConstrained(OBJECT x);
 
-/*****  z16.c		Size Adjustments	******************************/
-extern	LENGTH		FindShift();		/* shift of @HShift, @VShift */
-extern			SetNeighbours();	/* locate definite neighbours*/
-extern			AdjustSize();		/* updates sizes if changed  */
+/*****  z16.c	  Size Adjustments	**************************************/
+extern	LENGTH	  FindShift(OBJECT x, OBJECT y, int dim);
+extern	void	  SetNeighbours(OBJECT link, BOOLEAN ratm, OBJECT *pg,
+		    OBJECT *pdef, OBJECT *sg, OBJECT *sdef, int *side);
+extern	void	  AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim);
 
-/*****  z17.c		Gap Widths		******************************/
-extern			GetGap();		/* convert string gap to num */
-extern	LENGTH		MinGap();		/* min. possible gap width   */
-extern	LENGTH		ExtraGap();		/* extra available gap width */
-extern	LENGTH		ActualGap();		/* gap width for output      */
-extern	FULL_CHAR	*EchoGap();		/* echo gap (cat. operator)  */
+/*****  z17.c	  Gap Widths		**************************************/
+extern	void	  GetGap(OBJECT x, STYLE *style, GAP *res_gap,
+		    unsigned *res_inc);
+extern	LENGTH	  MinGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap);
+extern	LENGTH	  ExtraGap(LENGTH a, LENGTH b, GAP *xgap, int dir);
+extern	LENGTH	  ActualGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap,
+		    LENGTH f, LENGTH mk);
+extern	FULL_CHAR *EchoGap(GAP *xgap);
 
-/*****  z18.c		Galley Transfer		******************************/
-extern			TransferInit();		/* initialise this module    */
-extern	OBJECT		TransferBegin();	/* begin transfer of galley  */
-extern			TransferComponent();	/* transfer one component    */
-extern			TransferEnd();		/* end galley transfer       */
-extern			TransferClose();	/* close this module         */
+/*****  z18.c	  Galley Transfer	**************************************/
+extern	void	  TransferInit(OBJECT InitEnv);
+extern	OBJECT	  TransferBegin(OBJECT x);
+extern	void	  TransferComponent(OBJECT x);
+extern	void	  TransferEnd(OBJECT x);
+extern	void	  TransferClose(void);
 
-/*****  z19.c		Galley Attaching	******************************/
-extern	OBJECT		SearchGalley();		/* search galley for target  */
-extern	int		AttachGalley();		/* start off a galley        */
-extern			DetachGalley();		/* detach a galley           */
+/*****  z19.c	  Galley Attaching	**************************************/
+extern	void	  DetachGalley(OBJECT hd);
+extern	OBJECT	  SearchGalley(OBJECT start, OBJECT sym, BOOLEAN forwards,
+		    BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input);
+extern	int	  AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt);
 
-/*****  z20.c		Galley Flushing		******************************/
-extern	FULL_CHAR	*DebugInnersNames();	/* debug names of inners     */
-extern			FlushGalley();		/* flush out a galley        */
+/*****  z20.c	  Galley Flushing	**************************************/
+extern	FULL_CHAR *DebugInnersNames(OBJECT inners);
+extern	void	  FlushGalley(OBJECT hd);
 
-/***    z21.c		Galley Maker		******************************/
-extern			SizeGalley();		/* convert object to galley  */
+/***    z21.c	  Galley Maker		**************************************/
+extern	void	  SizeGalley(OBJECT hd, OBJECT env, BOOLEAN rows,
+		    BOOLEAN joined, BOOLEAN nonblock, BOOLEAN trig,
+		    STYLE *style, CONSTRAINT *c, OBJECT target,
+		    OBJECT *dest_index, OBJECT *recs, OBJECT *inners);
 
-/***    z22.c		Galley Service		******************************/
-extern			FlushInners();		/* flush a list of galleys.  */
-extern			ExpandRecursives();	/* expand recursive definite */
-extern			Promote();		/* promote components        */
-extern			KillGalley();		/* destroy a galley          */
-extern			FreeGalley();		/* free a galley to flush    */
-extern			Interpose();		/* interpose a VCAT          */
-extern	BOOLEAN		TargetSymbol();		/* find target of galley     */
-extern	int		CheckConstraint();	/* check ordering constraint */
+/***    z22.c	  Galley Service	**************************************/
+extern	void	  Interpose(OBJECT z, int typ, OBJECT x, OBJECT y);
+extern	void	  FlushInners(OBJECT inners, OBJECT hd);
+extern	void	  ExpandRecursives(OBJECT recs);
+extern	void	  Promote(OBJECT x, OBJECT stop_link, OBJECT dest_index);
+extern	void	  KillGalley(OBJECT hd);
+extern	void	  FreeGalley(OBJECT hd, OBJECT stop_link, OBJECT *inners,
+		    OBJECT relocate_link, OBJECT sym);
+extern	BOOLEAN	  TargetSymbol(OBJECT x, OBJECT *sym);
+extern	int	  CheckComponentOrder(OBJECT preceder, OBJECT follower);
 
-/*****  z23.c		Galley Printer		******************************/
-extern			FixAndPrintObject();	/* fix and print component   */
+/*****  z23.c	  Galley Printer	**************************************/
+extern	void	  FixAndPrintObject(OBJECT x, LENGTH xmk, LENGTH xb,
+		    LENGTH xf, int dim, int adjust, BOOLEAN suppress,
+		    int padj, LENGTH pg, int count);
 
-/*****  z24.c		Print Service           ******************************/
-extern			PrintInit();		/* initialise this module    */
-extern			PrintBeforeFirst();	/* called before first comp. */
-extern			PrintBetween();		/* called between components */
-extern			PrintAfterLast();	/* called after last comp.   */
-extern			PrintWord();		/* print word at given pos   */
-extern			CoordTranslate();	/* translate coord system    */
-extern			CoordRotate();		/* rotate coord system       */
-extern			CoordScale();		/* scale coord system        */
-extern			SaveGraphicState();	/* save coord system etc.    */
-extern			RestoreGraphicState();	/* restore coord system etc. */
-extern			DefineGraphicNames();	/* define xsize, ysize, etc. */
-extern			PrintGraphicObject();	/* print PostScript object   */
-extern			PrintGraphicInclude();	/* include PostScript file   */
+/*****  z24.c	  Print Service         **************************************/
+extern	void	  PrintInit(FILE *file_ptr);
+extern	void	  PrintBeforeFirst(LENGTH h, LENGTH v, FULL_CHAR *label);
+extern	void	  PrintBetween(LENGTH h, LENGTH v, FULL_CHAR *label);
+extern	void	  PrintWord(OBJECT x, int hpos, int vpos);
+extern	void	  PrintUnderline(FONT_NUM fnum, LENGTH xstart, LENGTH xstop,
+		    LENGTH ymk);
+extern	void	  PrintAfterLast(void);
+extern	void	  CoordTranslate(LENGTH xdist, LENGTH ydist);
+extern	void	  CoordRotate(LENGTH amount);
+extern	void	  CoordScale(float hfactor, float vfactor);
+extern	void	  SaveGraphicState(void);
+extern	void	  RestoreGraphicState(void);
+extern	void	  PrintGraphicObject(OBJECT x);
+extern	void	  DefineGraphicNames(OBJECT x);
+extern	void	  PrintGraphicInclude(OBJECT x, LENGTH colmark,LENGTH rowmark);
 
-/*****  z25.c		Object Echo	        ******************************/
-extern	FULL_CHAR	*EchoObject();		/* return object as string   */
-extern			DebugObject();		/* print object on stderr    */
-extern	FULL_CHAR	*EchoIndex();		/* echo galley index         */
-extern			DebugGalley();		/* print overview of galley  */
+/*****  z25.c	  Object Echo	        **************************************/
+extern	FULL_CHAR *EchoObject(OBJECT x);
+extern	void	  DebugObject(OBJECT x);
+extern	FULL_CHAR *EchoIndex(OBJECT index);
+extern	void	  DebugGalley(OBJECT hd, OBJECT pinpt, int indent);
 
-/*****  z26.c		Echo Service	        ******************************/
-extern			BeginString();		/* begin string accumulator  */
-extern			AppendString();		/* append to current string  */
-extern	FULL_CHAR	*EndString();		/* return current string     */
-extern	FULL_CHAR	*EchoLength();		/* echo a length             */
-extern	FULL_CHAR	*Image();		/* string value of type(x)   */
+/*****  z26.c	  Echo Service	        **************************************/
+extern	void	  BeginString(void);
+extern	void	  AppendString(FULL_CHAR *str);
+extern	FULL_CHAR *EndString(void);
+extern	FULL_CHAR *EchoLength(int len);
+extern	FULL_CHAR *Image(unsigned int c);
 
-/*****	z27.c		Debug Service		******************************/
-extern			DebugInit();		/* set debug flag            */
-extern			Debug();		/* print debug o/p on stderr */
-extern			ProfileOn();		/* start profiling           */
-extern			ProfileOff();		/* stop profiling            */
-extern			ProfilePrint();		/* print profiling results   */
+/*****	z27.c	  Debug Service		**************************************/
+#if DEBUG_ON
+extern	void	  DebugInit(FULL_CHAR *str);
+extern	void	  Debug(int category, int urgency, char *str, ...);
+extern	void	  ProfileOn(char *str);
+extern	void	  ProfileOff(char *str);
+extern	void	  ProfilePrint(void);
+#endif
 
-/*****	z28.c		Error Service		******************************/
-extern			ErrorInit();		/* initialise log file       */
-extern			Error();		/* print error message       */
-extern	BOOLEAN		ErrorSeen();		/* TRUE after first error    */
-extern			EnterErrorBlock();	/* new error message block   */
-extern			LeaveErrorBlock();	/* commit or discard block   */
+/*****	z28.c	  Error Service		**************************************/
+extern	void	  ErrorInit(FULL_CHAR *str);
+extern	BOOLEAN	  ErrorSeen(void);
+extern	void	  EnterErrorBlock(BOOLEAN ok_to_print);
+extern	void	  LeaveErrorBlock(BOOLEAN commit);
+extern	void	  CheckErrorBlocks(void);
+extern	POINTER	  Error(int set_num, int msg_num, char *str, int etype,
+		    FILE_POS *pos, ...);
 
-/*****  z29.c		Symbol Table		******************************/
-extern			InitSym();		/* initialize table to empty */
-extern			PushScope();		/* push a new scope on stack */
-extern			PopScope();		/* pop a scope from stack    */
-extern			SuppressVisible();	/* suppress visible flag     */
-extern			UnSuppressVisible();	/* unsuppress visible flag   */
-extern			SuppressScope();	/* suppress all scoping      */
-extern			UnSuppressScope();	/* unsuppress scoping        */
-extern			SwitchScope();		/* switch to a saved scope   */
-extern			UnSwitchScope();	/* switch back from saved s. */
-extern			BodyParAllowed();	/* body par is invokable     */
-extern			BodyParNotAllowed();	/* body par is not invokable */
-extern	OBJECT		SearchSym();		/* search table for symbol   */
-extern	OBJECT		InsertSym();		/* insert a new symbol       */
-extern			DeleteEverySym();	/* dispose all symbols       */
-extern	FULL_CHAR	*SymName();		/* string name of a symbol   */
-extern	FULL_CHAR	*FullSymName();		/* full path name of symbol  */
-extern	OBJECT		ChildSym();		/* return a child of a sym   */
-extern			CheckSymSpread();	/* check hash table spread   */
+/*****  z29.c	  Symbol Table		**************************************/
+extern	void	  InitSym(void);
+extern	void	  PushScope(OBJECT x, BOOLEAN npars, BOOLEAN vis);
+extern	void	  PopScope(void);
+extern	void	  SuppressVisible(void);
+extern	void	  UnSuppressVisible(void);
+extern	void	  SuppressScope(void);
+extern	void	  UnSuppressScope(void);
+extern	void	  SwitchScope(OBJECT sym);
+extern	void	  UnSwitchScope(OBJECT sym);
+extern	void	  BodyParAllowed(void);
+extern	void	  BodyParNotAllowed(void);
+extern	OBJECT	  InsertSym(FULL_CHAR *str, unsigned char xtype,
+		    FILE_POS *xfpos, unsigned char xprecedence,
+		    BOOLEAN xindefinite, BOOLEAN xrecursive,
+		    unsigned xpredefined, OBJECT xenclosing, OBJECT xbody);
+extern	OBJECT	  SearchSym(FULL_CHAR *str, int len);
+extern	FULL_CHAR *SymName(OBJECT s);
+extern	FULL_CHAR *FullSymName(OBJECT x, FULL_CHAR *str);
+extern	OBJECT	  ChildSym(OBJECT s, unsigned typ);
+extern	void	  CheckSymSpread(void);
+extern	void	  DeleteEverySym(void);
 
-/*****  z30.c		Symbol Uses		******************************/
-extern			InsertUses();		/* record symbol x uses y    */
-extern			FlattenUses();		/* massage uses relation     */
-extern	BOOLEAN		SearchUses();		/* retrieve uses info        */
-extern	OBJECT		FirstExternTarget();	/* together these return all */
-extern	OBJECT		NextExternTarget();	/*   targets of extern galls */
+/*****  z30.c	  Symbol Uses		**************************************/
+extern	void	  InsertUses(OBJECT x, OBJECT y);
+extern	void	  FlattenUses(void);
+extern	BOOLEAN	  SearchUses(OBJECT x, OBJECT y);
+extern	OBJECT	  FirstExternTarget(OBJECT sym, OBJECT *cont);
+extern	OBJECT	  NextExternTarget(OBJECT sym, OBJECT *cont);
 
-/*****  z31.c		Memory Allocator	******************************/
-extern			MemInit();		/* initialise mem. allocator */
-extern	OBJECT		GetMemory();		/* get some fresh memory     */
-extern			DebugMemory();		/* print memory usage        */
-extern	OBJECT		zz_free[];		/* array of free lists       */
-extern	unsigned char	zz_lengths[];		/* array of record lengths   */
-extern	int		zz_newcount;		/* debug count of News       */
-extern	int		zz_disposecount;	/* debug count of Disposes   */
-extern	OBJECT		zz_hold;		/* temporary variable only   */
-extern	OBJECT		zz_tmp;			/* temporary variable only   */
-extern	OBJECT		zz_res;			/* temporary variable only   */
-extern	int		zz_size;		/* temporary variable only   */
-extern	OBJECT		xx_link, xx_tmp;	/* temporary variable only   */
-extern	OBJECT		xx_hold, xx_res;	/* temporary variable only   */
+/*****  z31.c	  Memory Allocator	**************************************/
+extern	void	  DebugRegisterUsage(int typ, int delta_num, int delta_size);
+extern	void	  DebugMemory(void);
+extern	void	  MemInit(void);
+extern	OBJECT	  GetMemory(int siz, FILE_POS *pos);
+extern	OBJECT	  zz_free[];
+extern	unsigned char	zz_lengths[];
+extern	int	  zz_newcount;
+extern	int	  zz_disposecount;
+extern	int	  zz_listcount;
+extern	OBJECT	  zz_hold;
+extern	OBJECT	  zz_tmp;
+extern	OBJECT	  zz_res;
+extern	int	  zz_size;
+extern	OBJECT	  xx_link, xx_tmp;
+extern	OBJECT	  xx_hold, xx_res;
 
-/*****  z32.c		Counter Service		******************************/
-extern	OBJECT		Next();			/* increment argument by one */
+/*****  z32.c	  Counter Service           **********************************/
+extern	OBJECT	  Next(OBJECT x, int inc, BOOLEAN *done);
 
-/*****  z33.c		Database Service	******************************/
-extern	OBJECT		OldCrossDb;		/* cross refs from last run  */
-extern	OBJECT		NewCrossDb;		/* cross refs from this run  */
-extern	OBJECT		DbCreate();		/* create writable database  */
-extern			DbInsert();		/* insert into database      */
-extern			DbConvert();		/* con. writable to readable */
-extern	OBJECT		DbLoad();		/* open readable database    */
-extern	BOOLEAN		DbRetrieve();		/* retrieve from database    */
-extern	BOOLEAN		DbRetrieveNext();	/* next entry from database  */
-extern			DbClose();		/* close a readable database */
+/*****  z33.c	  Database Service	**************************************/
+extern	OBJECT	  OldCrossDb;
+extern	OBJECT	  NewCrossDb;
+extern	OBJECT	  DbCreate(OBJECT x);
+extern	void	  DbInsert(OBJECT db, BOOLEAN gall, OBJECT sym, FULL_CHAR *tag,
+		    FILE_POS *tagfpos, FULL_CHAR *seq, FILE_NUM dfnum,
+		    long dfpos, BOOLEAN check);
+extern	void	  DbConvert(OBJECT db, BOOLEAN full_name);
+extern	void	  DbClose(OBJECT db);
+extern	OBJECT	  DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs);
+extern	BOOLEAN	  DbRetrieve(OBJECT db, BOOLEAN gall, OBJECT sym,
+		    FULL_CHAR *tag, FULL_CHAR *seq, FILE_NUM *dfnum,
+		    long *dfpos, long *cont);
+extern	BOOLEAN	  DbRetrieveNext(OBJECT db, BOOLEAN *gall, OBJECT *sym,
+		    FULL_CHAR *tag, FULL_CHAR *seq, FILE_NUM *dfnum,
+		    long *dfpos, long *cont);
 
-/*****  z34.c		Rotation Service    	******************************/
-extern			RotateSize();		/* calculate rotated size    */
+/*****  z34.c	  Rotation Service    	**************************************/
+extern	void	  RotateSize(LENGTH *xcb, LENGTH *xcf, LENGTH *xrb,
+		    LENGTH *xrf, OBJECT y, LENGTH theta);
 
-/*****  z35.c		Time Keeper     	******************************/
-extern	OBJECT		MomentSym;		/* the @Moment symbol        */
-extern			InitTime();		/* initialize this module    */
-extern	OBJECT		StartMoment();		/* a copy of the init time   */
-extern	FULL_CHAR	*TimeString();		/* a string containing time  */
+/*****  z35.c	  Time Keeper     	**************************************/
+extern	FULL_CHAR *TimeString(void);
+extern	void	  InitTime(void);
+extern	OBJECT	  MomentSym;
+extern	OBJECT	  StartMoment(void);
 
-/*****  z36.c		Hyphenation     	******************************/
-extern	BOOLEAN		ReadHyphTable();	/* read one hyphenation tab  */
-extern	OBJECT		Hyphenate();		/* hyphenate a paragraph     */
+/*****  z36.c	  Hyphenation     	**************************************/
+extern	BOOLEAN	  ReadHyphTable(LANGUAGE_NUM lnum);
+extern	OBJECT	  Hyphenate(OBJECT x);
 
-/*****  z37.c		Font Service             *****************************/
-extern	FONT_INFO	*finfo;			/* font metrics information  */
-extern	int		font_curr_page;		/* current page number       */
-extern			FontInit();		/* intialize this module     */
-extern			FontDefine();		/* define a font             */
-extern			FontChange();		/* change current font       */
-extern			FontWordSize();		/* set sizes of a word       */
-extern	LENGTH		FontSize();		/* size of a font            */
-extern	LENGTH		FontHalfXHeight();	/* xheight/2 of a font       */
-extern	ENCODING	FontEncoding();		/* encoding vector of a font */
-extern	FULL_CHAR	*FontName();		/* output name of a font     */
-extern	FULL_CHAR	*FontFamilyAndFace();	/* Lout name of a font       */
-extern			FontPrintAll();		/* print all font needs      */
-extern			FontPrintPageSetup();	/* print all font page setup */
-extern			FontPrintPageResources();/* print font page resource */
-extern			FontAdvanceCurrentPage();/* advance current page     */
-extern	BOOLEAN		FontNeeded();		/* writes out font needs     */
+/*****  z37.c	  Font Service           *************************************/
+extern	FONT_INFO *finfo;
+extern	int	  font_curr_page;
+extern	void	  FontInit(void);
+extern	void	  FontDefine(OBJECT family, OBJECT face, OBJECT inside);
+extern	void	  FontChange(STYLE *style, OBJECT x);
+extern	void	  FontWordSize(OBJECT x);
+extern	LENGTH	  FontSize(FONT_NUM fnum, OBJECT x);
+extern	LENGTH	  FontHalfXHeight(FONT_NUM fnum);
+extern	ENCODING  FontEncoding(FONT_NUM fnum);
+extern	MAPPING	  FontMapping(FONT_NUM fnum);
+extern	FULL_CHAR *FontName(FONT_NUM fnum);
+extern	FULL_CHAR *FontFamilyAndFace(FONT_NUM fnum);
+extern	void	  FontPrintAll(FILE *fp);
+extern	void	  FontPrintPageSetup(FILE *fp);
+extern	void	  FontPrintPageResources(FILE *fp);
+extern	void	  FontAdvanceCurrentPage(void);
+extern	void	  FontPageUsed(OBJECT face);
+extern	BOOLEAN	  FontNeeded(FILE *fp);
 
-/*****  z38.c		Encoding Vectors	******************************/
-extern	ENCODING	EvLoad();		/* load one encoding vector  */
-extern	FULL_CHAR	EvRetrieve();		/* convert char name to code */
-extern	FULL_CHAR	*EvName();		/* name of encoding vector   */
-extern			EvPrintEncodings();	/* print encoding vectors    */
-extern			EvPrintResources();	/* print ev resource names   */
+/*****  z38.c	  Encoding Vectors	**************************************/
+extern	ENCODING  EvLoad(OBJECT file_name, BOOLEAN must_print);
+extern	FULL_CHAR EvRetrieve(FULL_CHAR *str, ENCODING enc);
+extern	FULL_CHAR *EvName(ENCODING enc);
+extern	void	  EvPrintEncodings(FILE *fp);
+extern	void	  EvPrintResources(FILE *fp);
 
-/*****  z39.c		String Handler          ******************************/
-#define			AsciiToFull(x)		( (FULL_CHAR *) (x) )
-#define			StringEqual(a, b) (strcmp((char *)(a), (char *)(b))==0)
-#define			StringLessEqual(a, b) (strcmp((char*)(a),(char*)(b))<=0)
-#define			StringCat(a, b)		strcat((char *)(a),(char *)(b))
-#define			StringCopy(a, b)	strcpy((char *)(a),(char *)(b))
-#define			StringLength(a)		strlen((char *)(a))
-#define			StringFOpen(a, b)	fopen( (char *) (a), (b) )
-#define			StringFPuts(a, b)	fputs( (char *) (a), (b) )
-#define			StringFGets(a, b, c)	fgets( (char *) (a), (b), (c) )
-#define			StringUnlink(a)		unlink((char *)(a))
-#define			StringLink(a, b)	link((char *)(a),(char *)(b))
-extern	BOOLEAN		StringBeginsWith();	/* string compare            */
-extern	BOOLEAN		StringContains();	/* string search             */
-extern	FULL_CHAR	*StringInt();		/* returns integer as string */
-extern	FULL_CHAR	*StringFiveInt();	/* returns integer as string */
-extern	FULL_CHAR	*StringQuotedWord();	/* returns string in Lout    */
+/*****  z39.c	  String Handler        **************************************/
+#define		  AsciiToFull(x)	( (FULL_CHAR *) (x) )
+#define		  StringEqual(a, b)	(strcmp((char *)(a), (char *)(b))==0)
+#define		  StringLessEqual(a, b) (strcmp((char*)(a),(char*)(b))<=0)
+#define		  StringCat(a, b)	strcat((char *)(a),(char *)(b))
+#define		  StringCopy(a, b)	strcpy((char *)(a),(char *)(b))
+#define		  StringLength(a)	strlen((char *)(a))
+#define		  StringFOpen(a, b)	fopen( (char *) (a), (b) )
+#define		  StringFPuts(a, b)	fputs( (char *) (a), (b) )
+#define		  StringFGets(a, b, c)	fgets( (char *) (a), (b), (c) )
+#define		  StringRemove(a)	remove((char *)(a))
+#define		  StringRename(a, b)	rename((char *)(a),(char *)(b))
+extern	BOOLEAN	  StringBeginsWith(FULL_CHAR *str, FULL_CHAR *pattern);
+extern	BOOLEAN	  StringEndsWith(FULL_CHAR *str, FULL_CHAR *pattern);
+extern	BOOLEAN	  StringContains(FULL_CHAR *str, FULL_CHAR *pattern);
+extern	FULL_CHAR *StringInt(int i);
+extern	FULL_CHAR *StringFiveInt(int i);
+extern	FULL_CHAR *StringQuotedWord(OBJECT x);
 
-/*****  z40.c		Filter Handler          ******************************/
-extern			FilterInit();		/* initialize this module    */
-extern	OBJECT		FilterCreate();		/* create a FILTERED object  */
-extern			FilterSetFileNames();	/* set @FilterIn etc.        */
-extern	OBJECT		FilterExecute();	/* run filter command        */
-extern			FilterWrite();		/* write out a filter object */
-extern			FilterScavenge();	/* remove used filter files  */
+/*****  z40.c	  Filter Handler        **************************************/
+extern	void	  FilterInit(void);
+extern	OBJECT	  FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos);
+extern	void	  FilterSetFileNames(OBJECT x);
+extern	OBJECT	  FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env);
+extern	void	  FilterWrite(OBJECT x, FILE *fp);
+extern	void	  FilterScavenge(BOOLEAN all);
 
-/*****  z41.c		Object Input-Output     ******************************/
-extern	OBJECT		ReadFromFile();		/* read object from file     */
-extern			AppendToFile();		/* append object to file     */
-extern			CloseFiles();		/* close database files      */
+/*****  z41.c	  Object Input-Output   **************************************/
+extern	OBJECT	  ReadFromFile(FILE_NUM fnum, long pos);
+extern	void	  AppendToFile(OBJECT x, FILE_NUM fnum, int *pos);
+extern	void	  CloseFiles(void);
 
-/*****  z42.c		Colour Service          ******************************/
-extern			ColourInit();		/* initialize colour module  */
-extern			ColourChange();		/* change style colour       */
-extern	FULL_CHAR	*ColourCommand();	/* command for making colour */
+/*****  z42.c	  Colour Service        **************************************/
+extern	void	  ColourInit(void);
+extern	void	  ColourChange(STYLE *style, OBJECT x);
+extern	FULL_CHAR *ColourCommand(COLOUR_NUM cnum);
 
-/*****  z43.c		Language Service        ******************************/
-extern			LanguageInit();		/* initialize language module*/
-extern			LanguageDefine();	/* declare a language        */
-extern			LanguageChange();	/* change style language     */
-extern	FULL_CHAR	*LanguageString();	/* string value of language  */
-extern	OBJECT		LanguageHyph();		/* hyphenation file name     */
+/*****  z43.c	  Language Service      **************************************/
+extern	void	  LanguageInit(void);
+extern	void	  LanguageDefine(OBJECT names, OBJECT hyph_file);
+extern	void	  LanguageChange(STYLE *style, OBJECT x);
+extern	FULL_CHAR *LanguageString(LANGUAGE_NUM lnum);
+extern	OBJECT	  LanguageHyph(LANGUAGE_NUM lnum);
+
+/*****  z44.c	  Vertical Hyphenation  **************************************/
+extern	BOOLEAN	  VerticalHyphenate(OBJECT y);
+extern	OBJECT	  ConvertGalleyList(OBJECT x);
+
+/*****  z45.c	  Character Mapping     **************************************/
+extern	MAPPING	  LoadMapping(OBJECT filename, ENCODING enc);
+extern	OBJECT	  SmallCaps(OBJECT x, STYLE *style);
+
+/*****  z46.c	  External Sort         **************************************/
+extern	void	  SortFile(char *infile, char *outfile);
 
 
 /*@::assert(), debug(), debug flags@******************************************/
@@ -2116,9 +2325,9 @@ extern	OBJECT		LanguageHyph();		/* hyphenation file name     */
 
 #if ASSERT_ON
 #define assert(c, m)							\
-   ( (c) ? 0 : Error(1, 4, "assert failed in %s", INTERN, no_fpos, m) )
+   { if( !(c) )  Error(1, 4, "assert failed in %s", INTERN, no_fpos, m); }
 #else
-#define assert(c, m)	0
+#define assert(c, m)
 #endif
 
 #if DEBUG_ON
@@ -2131,40 +2340,40 @@ extern	struct dbs 	dbg[];
 
 /* debug routines */
 #define debug0(cat, urg, str)                				\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str); }
 #define debug1(cat, urg, str, p1)					\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1); }
 #define debug2(cat, urg, str, p1, p2)					\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2); }
 #define debug3(cat, urg, str, p1, p2, p3)				\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3); }
 #define debug4(cat, urg, str, p1, p2, p3, p4)				\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4); }
 #define debug5(cat, urg, str, p1, p2, p3, p4, p5)			\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5); }
 #define debug6(cat, urg, str, p1, p2, p3, p4, p5, p6)			\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5, p6); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5, p6); }
 #define debug7(cat, urg, str, p1, p2, p3, p4, p5, p6, p7)		\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5,p6,p7); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2, p3, p4, p5,p6,p7); }
 #define debug8(cat, urg, str, p1, p2, p3, p4, p5, p6, p7, p8)		\
-    if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2,p3,p4,p5,p6,p7,p8); else
+    { if( dbg[cat].on[urg] ) Debug(cat, urg, str, p1, p2,p3,p4,p5,p6,p7,p8); }
 #define	ifdebug(cat, urg, x)						\
-    if( dbg[cat].on[urg] ) { x; } else 
+    { if( dbg[cat].on[urg] ) { x; } }
 
 #define debugcond0(cat, urg, cond, str)                			\
-    if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str); else
+    { if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str); }
 #define debugcond1(cat, urg, cond, str, p1)				\
-    if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1); else
+    { if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1); }
 #define debugcond2(cat, urg, cond, str, p1, p2)				\
-    if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1, p2); else
+    { if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1, p2); }
 #define debugcond3(cat, urg, cond, str, p1, p2, p3)			\
-    if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1, p2, p3); else
+    { if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1, p2, p3); }
 #define debugcond4(cat, urg, cond, str, p1, p2, p3, p4)			\
-    if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1, p2, p3, p4); else
+    { if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1, p2, p3, p4); }
 #define debugcond5(cat, urg, cond, str, p1, p2, p3, p4, p5)		\
-    if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1, p2, p3, p4, p5); else
+    { if( dbg[cat].on[urg] && cond ) Debug(cat, urg, str, p1, p2, p3, p4, p5);}
 #define	ifdebugcond(cat, urg, cond, x)					\
-    if( dbg[cat].on[urg] && cond ) { x; } else 
+    { if( dbg[cat].on[urg] && cond ) { x; } }
 #define	debug_init(str)							\
     DebugInit(str)
 
@@ -2217,8 +2426,11 @@ extern	struct dbs 	dbg[];
 #define	DIO	41		/*  z41.c   -dio   Object Input-Output       */
 #define	DCO	42		/*  z42.c   -dco   Colour Service            */
 #define	DLS	43		/*  z43.c   -dls   Language Service          */
-#define	DPP	44		/*          -dpp   Profiling                 */
-#define	ANY	45		/*          -d     any                       */
+#define	DVH	44		/*  z44.c   -dvh   Vertical Hyphenation      */
+#define	DCM	45		/*  z45.c   -dvh   Character Mapping         */
+#define	DEX	46		/*  z46.c   -dex   External Sort             */
+#define	DPP	47		/*          -dpp   Profiling                 */
+#define	ANY	48		/*          -d     any                       */
 
 #else
 #define ifdebug(cat, urg, x)

@@ -55,7 +55,7 @@ can verify.  But this time we would like to be able to write
 so that @Code { a "@Super" 2 } would come out as {a @Super 2}, and so
 on, for in this way the usefulness of the definition is greatly
 increased.  Here is how it is done:
-@ID @Code {
+@ID @OneRow @Code {
 "def @Super"
 "   left x"
 "   right y"
@@ -135,7 +135,7 @@ page.layout @RawIndex { Page layout }
 page.layout.basic @SubIndex { principles of }
 of a document.  To begin with,
 we can define a page like this:
-@ID @Code {
+@ID @OneRow @Code {
 "def @Page"
 "{"
 "    //1i  ||1i"
@@ -157,7 +157,7 @@ with the invoked symbol appearing to the left of the arrow, and its body to
 the right.
 @PP
 The definition of a vertical list of pages should come as no surprise:
-@ID @Code {
+@ID @OneRow @Code {
 "def @PageList"
 "{"
 "    @Page"
@@ -190,7 +190,7 @@ A definition for @Code "@TextPlace" is beyond us at present, since
 of the document on different pages.  We can,
 however, define @Code "@FootSect" to be a small space followed by a
 horizontal line followed by a list of places where footnotes are to go:
-@ID @Code {
+@ID @OneRow @Code {
 "def @FootList         "
 "{                     "
 "   @FootPlace         "

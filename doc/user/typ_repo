@@ -1,0 +1,283 @@
+@Section
+   @Title { Technical reports }
+   @Tag { reports }
+@Begin
+@PP
+To make a technical report, start off with the @Code "report" setup
+reports. @Index { reports }
+technical.reports. @Index { technical reports }
+report. @Index @Code "@Report"
+file and the @Code "@Report" symbol:
+@ID @OneRow @Code {
+"@SysInclude { report }"
+"@Report"
+"    @Title {}"
+"    @Author {}"
+"    @Institution {}"
+"    @DateLine { No }"
+"    @CoverSheet { Yes }"
+"    @InitialFont { Times Base 12p }"
+"    @InitialBreak { hyphen adjust 1.2fx }"
+"    @InitialLanguage { English }"
+"    @PageHeaders { Simple }"
+"    @FirstPageNumber { 1 }"
+"    @ColumnNumber { 1 }"
+"//"
+}
+This shows all the options of {@Code "@Report"} with their default
+values.  As usual with options, they may be given in any order, and
+only the ones whose values need to be changed need be given at all.  The
+meaning of the @Code "//" symbol after the last option is beyond our
+scope, but disaster will ensue if it is forgotten.
+@PP
+The @Code "@Title" option holds the title of the report.  It will be
+printed using the @Code clines paragraph breaking style (Section
+{@NumberOf paras}), which centres each line, so it makes sense
+to have multi-line titles:
+@ID @OneRow @Code {
+"@Report"
+"    @Title {"
+"The solution of real instances of"
+"the timetabling problem"
+"}"
+"    ..."
+}
+With a multi-line title, each line after the first should begin
+at the left margin, not indented.  It doesn't matter where the first
+line begins, because space following an open brace is ignored.
+@PP
+The @Code "@Author" and @Code "@Institution" options hold the author's
+name and institution or address, and will also be printed using the
+@Code clines style.  If there are several authors but only one
+institution, list all the authors in the @Code "@Author" option:
+@ID @Code "@Author { Tim B. Cooper and Jeffrey H. Kingston }"
+With more authors, or with more than one institution, it is best to
+ignore the @Code "@Institution" option and place all the information
+within the @Code "@Author" option, enclosing institution information
+in @Code "@I" symbols.  In extreme cases, a table with columns of
+authors might be necessary (Chapter {@NumberOf tables}).
+@PP
+@Code "@DateLine" may be set to {@Code No}, meaning no dateline,
+{@Code Yes}, meaning print the current date, or anything else, which is
+taken to be a date and printed:
+@ID @Code "@DateLine { 4 July, 1776 }"
+A good plan is to start off with @Code "@DateLine { Yes }" and
+introduce a final date when the report is finalized.
+@PP
+The remaining options are a selection of setup file options (Section
+{@NumberOf setup}) that frequently need to be changed.  If your changes
+to the overall formatting are confined to these options, you can change
+them here and avoid having your own setup file.  If you already have
+your own setup file, change them in either place and omit them in
+the other.
+@PP
+If the @Code "@CoverSheet" option is {@Code Yes}, an unnumbered cover
+cover.sheet. @Index @Code "@CoverSheet"
+sheet will be produced containing the title, author, institution,
+abstract, and dateline.  Otherwise these things will appear on the
+first page.
+@PP
+@Code "@InitialFont" is the font in which the bulk of the report will be
+set, and should contain a family, a face, and a size.  The default
+value selects the Times family, the Base face, and the 12 point size.
+@PP
+@Code "@InitialBreak" controls the behaviour of paragraph breaking in
+the bulk of the report.  It should have three parts:  a paragraph
+breaking style ({@Code adjust}, {@Code ragged}, etc.), an inter-line
+spacing ({@Code "1.2fx"} for single spacing, {@Code "2.4fx"} for
+double spacing, and so on), and either @Code "hyphen" or
+@Code "nohyphen" for turning hyphenation on or off.
+@PP
+@Code "@InitialLanguage" determines the language of the bulk of the
+report.
+@PP
+@Code "@PageHeaders" determines the appearance of page headers and
+footers throughout the report.  Its value may be {@Code None},
+{@Code Simple}, {@Code Titles}, or {@Code NoTitles}.  Section
+{@NumberOf headers} has the details, but just briefly, {@Code None}
+produces no page headers, {@Code Simple} produces a centred page number
+between hyphens on every page except the cover sheet and the first
+page, @Code Titles produces full running titles as in the present
+document, and @Code "NoTitles" is like @Code "Titles" with the running
+titles omitted, leaving just the page numbers.
+@PP
+@Code "@FirstPageNumber" is the page number given to the first page.
+@PP
+@Code "@ColumnNumber" is the number of columns per page in the bulk of
+the report, and may be anything from {@Code 1} (the default value) to
+{@Code 10}.  However, there is nothing analogous to the @Code "@FullWidth"
+symbol of ordinary documents.  Instead, the cover sheet, title material,
+and all figures and tables will be printed full width, and the rest will
+be set in columns.  There is a separate @Code "@IndexColumnNumber" option
+in the setup file which determines the number of columns in the index
+(Section {@NumberOf indexes}).
+@PP
+After the compulsory {@Code "//"} comes an optional abstract:
+abstract. @Index @Code "@Abstract"
+@ID @OneRow @Code {
+"@Abstract"
+"    @Title { Abstract }"
+"@Begin"
+"@LP"
+"..."
+"@End @Abstract"
+}
+This will be printed either on the cover sheet or on the first page,
+depending on the @Code "@CoverSheet" option of @Code "@Report" (see
+above).  The default value of @Code "@Title" is `Abstract' in the
+current language, so you can usually omit {@Code "@Title"}.
+@PP
+Next comes the body of the report in the form of a sequence of
+sections:
+section.reports @SubIndex { in reports }
+@ID @OneRow @Code {
+"@Section"
+"    @Title { Introduction }"
+"@Begin"
+"@PP"
+"..."
+"@End @Section"
+}
+No @Code "@BeginSections" or @Code "@EndSections" symbols are needed.  The
+beginsections.reports @SubIndex { in reports }
+endsections.reports @SubIndex { in reports }
+general rule is that you need these bracketing symbols when you are
+inside something else, but not when you aren't.  Sections lie inside
+@Code "@Text" in ordinary documents, but they don't lie inside anything
+else in technical reports.
+@PP
+Each section may contain subsections, bracketed by
+subsection.reports @SubIndex { in reports }
+beginsubsections.reports @SubIndex { in reports }
+endsubsections.reports @SubIndex { in reports }
+@Code "@BeginSubSections" and {@Code "@EndSubSections"}:
+@ID @OneRow @Code {
+"preceding text"
+"@BeginSubSections"
+"@SubSection ... @End @SubSection"
+"@SubSection ... @End @SubSection"
+"..."
+"@SubSection ... @End @SubSection"
+"@EndSubSections"
+}
+Within each subsection there may be sub-subsections, each introduced
+by {@Code "@SubSubSection"}, with the whole sequence bracketed by
+subsubsection.reports @SubIndex { in reports }
+beginsubsubsections.reports @SubIndex { in reports }
+endsubsubsections.reports @SubIndex { in reports }
+@Code "@BeginSubSubSections" and {@Code "@EndSubSubSections"}:
+@ID @OneRow @Code {
+"preceding text"
+"@BeginSubSubSections"
+"@SubSubSection ... @End @SubSubSection"
+"@SubSubSection ... @End @SubSubSection"
+"..."
+"@SubSubSection ... @End @SubSubSection"
+"@EndSubSubSections"
+}
+There are no sub-sub-subsections.
+@PP
+After the sections comes an optional sequence of appendices, each
+introduced by @Code "@Appendix" in the usual way:
+appendix.reports @SubIndex { in technical reports }
+@ID @OneRow @Code {
+"@Appendix"
+"    @Title { Derivation of the renewal formula }"
+"@Begin"
+"@PP"
+"..."
+"@End @Appendix"
+}
+No @Code "@BeginAppendices" or @Code "@EndAppendices" symbols are needed,
+beginappendices.reports @SubIndex { in reports }
+endappendices.reports @SubIndex { in reports }
+because (like the sections above) these appendices do not lie inside
+any other large-scale structure symbol.  The appendices are numbered
+A, B, C, etc., as is conventional for them.  Within each appendix
+there may be a sequence of subappendices, obtained with the
+@Code "@SubAppendix" symbol and bracketed by @Code "@BeginSubAppendices"
+subappendix.reports @SubIndex { in reports }
+beginsubappendices.reports @SubIndex { in reports }
+endsubappendices.reports @SubIndex { in reports }
+and {@Code "@EndSubAppendices"}:
+@ID @OneRow @Code {
+"preceding text"
+"@BeginSubAppendices"
+"@SubAppendix ... @End @SubAppendix"
+"@SubAppendix ... @End @SubAppendix"
+"..."
+"@SubAppendix ... @End @SubAppendix"
+"@EndSubAppendices"
+}
+There are sub-subappendices following the same pattern, but no
+subsubappendix.reports @SubIndex { in reports }
+beginsubsubappendices.reports @SubIndex { in reports }
+endsubsubappendices.reports @SubIndex { in reports }
+sub-sub-subappendices.
+@PP
+The report ends with the last section or appendix; any reference list or
+index will be appended automatically.  Although we have described how to
+create reports as though everything was in one large file, in practice it
+is much better to divide the report into multiple files, following the
+method given in Section {@NumberOf organizing}.
+@PP
+In addition to the {@Code "@Title"} option, each large-scale structure
+symbol ({@Code "@Abstract"}, {@Code "@Section"}, {@Code "@SubSection"},
+{@Code "@SubSubSection"}, {@Code "@Appendix"}, {@Code "@SubAppendix"},
+and {@Code "@SubSubAppendix"}) has a @Code "@Tag" option for cross
+referencing (Section {@NumberOf cross}), an @Code "@InitialLanguage"
+option for changing the language of that part of the document, and a
+@Code "@RunningTitle" option which will be used in place of @Code "@Title"
+in running headers if given.  This last is useful when the full title is
+rather long.
+@PP
+The features described in other chapters are all available within
+technical reports.  To get a table of contents, change the @Code
+"@MakeContents" option in the setup file to {@Code Yes}; the rest is
+automatic, and you don't need the @Code "@ContentsGoesHere" symbol from
+ordinary documents.  To get an index, again you need only change the
+@Code "@MakeIndex" setup file option to {@Code Yes}.  Endnotes and
+references appear at the end of the report.  Figures and tables are
+numbered 1, 2, 3, etc.
+@PP
+Within the @Code "report" setup file there is a @Code "@ReportLayout"
+symbol whose options control the appearance of features specific to
+report.layout @Index @Code "@ReportLayout"
+reports (in other words, the features described in this section).  Section
+{@NumberOf setup} explains setup files and their options in general; here
+is a representative sample of these options, showing their default values:
+@ID @OneRow @Code {
+"@Use { @ReportLayout"
+"    # @CoverSheet { Yes }"
+"    # @DateLine { No }"
+"    # @SectionNumbers { Arabic }"
+"    # @SectionHeadingFont { Bold }"
+"    # @SectionGap { 2.00v }"
+"    # @SectionInContents { Yes }"
+"}"
+}
+@Code "@CoverSheet" and @Code "@DateLine" are as for {@Code "@Report"};
+you can set them in either place as you prefer.  The other four options
+control the appearance of sections, and there are similar options for
+controlling the other large-scale structure symbols.
+@PP
+@Code "@SectionNumbers" determines how sections will be numbered, and may
+be @Code { None }, @Code { Arabic }, @Code { Roman }, @Code { UCRoman },
+@Code { Alpha }, or @Code { UCAlpha }.  The default value is @Code Arabic
+for sections, and also for all large-scale structure symbols except
+appendices, for which it is {@Code UCAlpha}.  This produces the appendices
+numbered in upper-case letters (A, B, C, etc.) that were mentioned earlier.
+@PP
+@Code "@SectionHeadingFont" is the font used for section headings.  The
+default value shown above produces the bold face from the family of the
+initial font.  A family name and size is acceptable here as well:
+@ID @Code "@SectionHeadingFont { Helvetica Base +2p }"
+produces section headings in the Helvetica font, two points larger
+than the initial font size.
+@PP
+@Code "@SectionGap" determines how much space is left blank between
+sections; the default value is twice the initial inter-line
+spacing.  @Code "@SectionInContents" determines whether or not an
+entry is made in the table of contents for each section; it may be
+@Code Yes or {@Code No}.
+@End @Section

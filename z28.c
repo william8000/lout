@@ -1,6 +1,6 @@
 /*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -50,11 +50,10 @@ static int	mess_top = 0;			/* first free error message  */
 /*                                                                           */
 /*****************************************************************************/
 
-ErrorInit(str)
-FULL_CHAR *str;
+void ErrorInit(FULL_CHAR *str)
 { if( fp != NULL )
     Error(28, 1, "-e argument appears twice in command line", FATAL, no_fpos);
-  fp = StringFOpen(str, "w");
+  fp = StringFOpen(str, WRITE_TEXT);
   if( fp == NULL )
     Error(28, 2, "cannot open error file %s", FATAL, no_fpos, str);
 } /* end ErrorInit */
@@ -68,7 +67,7 @@ FULL_CHAR *str;
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN ErrorSeen()
+BOOLEAN ErrorSeen(void)
 { return error_seen;
 } /* end ErrorSeen */
 
@@ -82,8 +81,7 @@ BOOLEAN ErrorSeen()
 /*                                                                           */
 /*****************************************************************************/
 
-PrintFileBanner(fnum)
-int fnum;
+static void PrintFileBanner(int fnum)
 { static int CurrentFileNum = -1;
   if( fnum != CurrentFileNum )
   { fprintf(fp, "lout%s:\n", EchoFileSource(fnum));
@@ -101,8 +99,7 @@ int fnum;
 /*                                                                           */
 /*****************************************************************************/
 
-EnterErrorBlock(ok_to_print)
-BOOLEAN ok_to_print;
+void EnterErrorBlock(BOOLEAN ok_to_print)
 { if( block_top < MAX_BLOCKS )
   { print_block[block_top] = ok_to_print;
     start_block[block_top] = mess_top;
@@ -116,14 +113,14 @@ BOOLEAN ok_to_print;
 /*                                                                           */
 /*  LeaveErrorBlock(commit)                                                  */
 /*                                                                           */
-/*  Finish off a block or error messages.  If commit is true, print them,    */
+/*  Finish off a block of error messages.  If commit is true, print them,    */
 /*  otherwise discard them.                                                  */
 /*                                                                           */
 /*****************************************************************************/
 
-LeaveErrorBlock(commit)
-BOOLEAN commit;
+void LeaveErrorBlock(BOOLEAN commit)
 { int i;
+  debug0(DYY, D, "  leaving error block");
   assert( block_top > 0, "LeaveErrorBlock: no matching EnterErrorBlock!" );
   assert( commit || !print_block[block_top - 1], "LeaveErrorBlock: commit!" );
   if( fp == NULL )  fp = stderr;
@@ -138,23 +135,38 @@ BOOLEAN commit;
 } /* end LeaveErrorBlock */
 
 
+/*****************************************************************************/
+/*                                                                           */
+/*  CheckErrorBlocks()                                                       */
+/*                                                                           */
+/*  Check (at end of run) that all error blocks have been unstacked.         */
+/*                                                                           */
+/*****************************************************************************/
+
+void CheckErrorBlocks(void)
+{ assert( block_top == 0, "CheckErrorBlocks: block_top != 0!" );
+} /* end CheckErrorBlocks */
+
+
 /*@::Error()@*****************************************************************/
 /*                                                                           */
-/*  Error**(etype, pos, str, p1, p2, p3, p4, p5, p6)                         */
+/*  Error(etype, pos, str, p1, p2, p3, p4, p5, p6)                           */
 /*                                                                           */
 /*  Report error of type etype at position *pos in input.                    */
 /*  The error message is str with parameters p1 - p6.                        */
 /*                                                                           */
 /*****************************************************************************/
 
-/*VARARGS3*/
-Error(set_num, msg_num, str, etype, pos, p1, p2, p3, p4, p5, p6)
+POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...)
+/* ***
 int set_num, msg_num; char *str; int etype;  FILE_POS *pos;
 char *p1, *p2, *p3, *p4, *p5, *p6;
+*** */
 {
+  va_list ap;
   char val[MAX_BUFF];
-  sprintf(val, condcatgets(MsgCat, set_num, msg_num, str),
-    p1, p2, p3, p4, p5, p6);
+  va_start(ap, pos);
+  vsprintf(val, condcatgets(MsgCat, set_num, msg_num, str), ap);
   if( fp == NULL )  fp = stderr;
   switch( etype )
   {
@@ -208,4 +220,6 @@ char *p1, *p2, *p3, *p4, *p5, *p6;
       break;
 
   }
+  va_end(ap);
+  return 0;
 } /* end Error */

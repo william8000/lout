@@ -6,19 +6,19 @@
 #  Version 1.0 by Jeffrey H. Kingston, October 1991.                          #
 #  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
 #  Symbol names changed by JHK 5 March 1993 to avoid clashes with EPS files.  #
+#  @CurveBox and @ShadowBox added by JHK April 1995.                          #
 #                                                                             #
 #  See "Fig - a Lout package for drawing figures" for user information.       #
 #                                                                             #
 ###############################################################################
 
-@SysPrependGraphic { "fig_prepend" }
+@SysPrependGraphic { "fig.lpg" }
 
 export in cm pt em sp vs ft dg
        "<<" "**" "++" "--" @Max @Min
        @Distance @XDistance @YDistance @Angle
-       @Prev "::" @Label @BaseOf @MarkOf @ShowLabels
-       @Colour @Color @RGBColour @RGBColor @HSBColour @HSBColor
-       @Figure @Frame @Box @Square @Diamond @Polygon @Ellipse
+       @Prev "::" @Label @BaseOf @MarkOf @ShowLabels @Figure
+       @Frame @Box @CurveBox @ShadowBox @Square @Diamond @Polygon @Ellipse
        @Circle @HLine @VLine @Line @HArrow @VArrow @Arrow @Arc
 
 def @Fig                  
@@ -184,58 +184,6 @@ def @Fig
 	"lfigshowlabels" @Graphic
     }
 
-    def @Colour
-	left col
-	right x
-    {
-	{
-	    col @Case
-	    {
-		black @Yield "0.00 0.0 0.0"
-		grey  @Yield "0.00 0.0 0.9"
-		white @Yield "0.00 0.0 1.0"
-		red   @Yield "0.00 1.0 1.0"
-		green @Yield "0.33 1.0 1.0"
-		blue  @Yield "0.66 1.0 1.0"
-	    } sethsbcolor
-	} @InnerGraphic x
-    }
-
-    def @Color
-	left col
-	right x
-    {
-	col @Colour x
-    }
-
-    def @RGBColour
-	left col
-	right x
-    {
-	{ col setrgbcolor } @InnerGraphic x
-    }
-
-    def @RGBColor
-	left col
-	right x
-    {
-	col @RGBColour x
-    }
-
-    def @HSBColour
-	left col
-	right x
-    {
-	{ col sethsbcolor } @InnerGraphic x
-    }
-
-    def @HSBColor
-	left col
-	right x
-    {
-	col @HSBColour x
-    }
-
     def @Figure
 	named shape      {            }
 	named linestyle  { linestyle  }
@@ -330,6 +278,57 @@ def @Fig
 	    paint      { paint      }
 	    margin     { margin     }
 	x
+    }
+
+
+    def @CurveBox
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	right x
+    {
+	@Figure
+	    shape {
+		lfigcurvebox
+	    }
+	    linestyle  { linestyle }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	{ 0c @HShift x }
+    }
+
+    def @ShadowBox
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	named shadow     { 0.2f       }
+	right x
+    {
+	@VContract @HContract 0c @HShift "lfigshadow" @Graphic
+	{
+	  ^/shadow ^|shadow 0c @HShift
+	  @Figure
+	    shape {
+		lfigbox
+	    }
+	    linestyle  { linestyle }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	  0c @HShift x
+	  |shadow /shadow
+	}
     }
 
     def @Square

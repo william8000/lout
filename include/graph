@@ -6,11 +6,11 @@
 #  Version 1.0 by Jeffrey H. Kingston, December 1993.                         #
 #                                                                             #
 #  This package draws graphs, the statistical kind not the graph-theoretical  #
-#  kind.  See "Graph -- a Lout package for plotting graphs" for user info.    #
+#  kind.  See the User's Guide (Advanced Graphics) for user info.             #
 #                                                                             #
 ###############################################################################
 
-@SysPrependGraphic { "graph_prepend" }
+@SysPrependGraphic { "graph.lpg" }
 
 def @GraphObj
     left p

@@ -1,6 +1,6 @@
 /*@z42.c:Colour Service:ColourChange, ColourCommand@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -69,9 +69,10 @@ typedef struct
   pos = pos % ctab_size(S);						\
 }
 
-static COLOUR_TABLE ctab_new(newsize)
-int newsize;
+static COLOUR_TABLE ctab_new(int newsize)
 { COLOUR_TABLE S;  int i;
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_COLOUR_TAB, 1,
+    2*sizeof(int) + newsize * sizeof(struct coltab_rec)));
   S = (COLOUR_TABLE) malloc(2*sizeof(int) + newsize * sizeof(struct coltab_rec));
   if( S == (COLOUR_TABLE) NULL )
     Error(42, 1, "ran out of memory when enlarging colour table",
@@ -79,26 +80,28 @@ int newsize;
   ctab_size(S) = newsize;
   ctab_count(S) = 0;
   for( i = 0;  i < newsize;  i++ )
-  { ctab_num(S, i) = ctab_name(S, i) = nil;
+  { ctab_num(S, i) = ctab_name(S, i) = nilobj;
   }
   return S;
 } /* end ctab_new */
 
-static COLOUR_TABLE ctab_rehash(S, newsize)
-COLOUR_TABLE S;  int newsize;
+static void ctab_insert(OBJECT x, COLOUR_TABLE *S);
+
+static COLOUR_TABLE ctab_rehash(COLOUR_TABLE S, int newsize)
 { COLOUR_TABLE NewS;  int i;
   NewS = ctab_new(newsize);
   for( i = 1;  i <= ctab_count(S);  i++ )
      ctab_insert(ctab_num(S, i), &NewS);
   for( i = 0;  i < ctab_size(S);  i++ )
-  { if( ctab_name(S, i) != nil )  DisposeObject(ctab_name(S, i));
+  { if( ctab_name(S, i) != nilobj )  DisposeObject(ctab_name(S, i));
   }
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_COLOUR_TAB, -1,
+    -(2*sizeof(int) + ctab_size(S) * sizeof(struct coltab_rec))));
   free(S);
   return NewS;
 } /* end ctab_rehash */
 
-static ctab_insert(x, S)
-OBJECT x;  COLOUR_TABLE *S;
+static void ctab_insert(OBJECT x, COLOUR_TABLE *S)
 { int pos, num;					
   if( ctab_count(*S) == ctab_size(*S) - 1 )	/* one less since 0 unused */
     *S = ctab_rehash(*S, 2*ctab_size(*S));
@@ -107,43 +110,41 @@ OBJECT x;  COLOUR_TABLE *S;
     Error(42, 2, "too many colours (maximum is %d)",
       FATAL, &fpos(x), MAX_COLOUR);
   hash(pos, string(x), *S);
-  if( ctab_name(*S, pos) == nil )  ctab_name(*S, pos) = New(ACAT);
+  if( ctab_name(*S, pos) == nilobj )  ctab_name(*S, pos) = New(ACAT);
   Link(ctab_name(*S, pos), x);
   word_colour(x) = num;
   ctab_num(*S, num) = x;
 } /* end ctab_insert */
 
-static OBJECT ctab_retrieve(str, S)
-FULL_CHAR *str;  COLOUR_TABLE S;
+static OBJECT ctab_retrieve(FULL_CHAR *str, COLOUR_TABLE S)
 { OBJECT x, link, y;  int pos;
   hash(pos, str, S);
   x = ctab_name(S, pos);
-  if( x == nil )  return nil;
+  if( x == nilobj )  return nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
     if( StringEqual(str, string(y)) )  return y;
   }
-  return nil;
+  return nilobj;
 } /* end ctab_retrieve */
 
 #if DEBUG_ON
-static ctab_debug(S, fp)
-COLOUR_TABLE S;  FILE *fp;
+static void ctab_debug(COLOUR_TABLE S, FILE *fp)
 { int i;  OBJECT x, link, y;
   fprintf(fp, "  table size: %d;  current number of colours: %d\n",
     ctab_size(S), ctab_count(S));
   for( i = 0;  i < ctab_size(S);  i++ )
   { x = ctab_num(S, i);
     fprintf(fp, "  ctab_num(S, %d) = %s\n", i,
-      x == nil ? AsciiToFull("<nil>") :
+      x == nilobj ? AsciiToFull("<nilobj>") :
       is_word(type(x)) ? string(x) : AsciiToFull("not WORD!"));
   }
   fprintf(fp, "\n");
   for( i = 0;  i < ctab_size(S);  i++ )
   { x = ctab_name(S, i);
     fprintf(fp, "ctab_name(S, %d) =", i);
-    if( x == nil )
-      fprintf(fp, " <nil>");
+    if( x == nilobj )
+      fprintf(fp, " <nilobj>");
     else if( type(x) != ACAT )
       fprintf(fp, " not ACAT!");
     else for( link = Down(x);  link != x;  link = NextDown(link) )
@@ -167,9 +168,8 @@ static COLOUR_TABLE col_tab;
 /*                                                                           */
 /*****************************************************************************/
 
-ColourInit()
-{ OBJECT cname;
-  col_tab = ctab_new(INIT_COLOUR_NUM);
+void ColourInit(void)
+{ col_tab = ctab_new(INIT_COLOUR_NUM);
 } /* end ColourInit */
 
 
@@ -181,8 +181,7 @@ ColourInit()
 /*                                                                           */
 /*****************************************************************************/
 
-ColourChange(style, x)
-STYLE *style;  OBJECT x;
+void ColourChange(STYLE *style, OBJECT x)
 { OBJECT cname;
   debug2(DCO, D, "ColourChange(%s, %s)", EchoStyle(style), EchoObject(x));
 
@@ -210,7 +209,7 @@ STYLE *style;  OBJECT x;
 
   /* retrieve colour command if present, else insert it */
   { cname = ctab_retrieve(string(x), col_tab);
-    if( cname == nil )
+    if( cname == nilobj )
     { cname = MakeWord(type(x), string(x), &fpos(x));
       ctab_insert(cname, &col_tab);
       colour(*style) = word_colour(cname);
@@ -231,8 +230,7 @@ STYLE *style;  OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *ColourCommand(cnum)
-COLOUR_NUM cnum;
+FULL_CHAR *ColourCommand(COLOUR_NUM cnum)
 { FULL_CHAR *res;
   debug1(DCO, D, "ColourCommand(%d)", cnum);
   assert( cnum > 0 && cnum <= ctab_count(col_tab), "ColourCommand: number" );

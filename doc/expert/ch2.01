@@ -17,18 +17,19 @@ other @Index { Other character }
 quote @Index { Quote character }
 escape @Index { Escape character }
 comment.char @Index { Comment character }
+underscore.char @Index { Underscore character }
 @ID @Tab
     vmargin { 0.5vx }
     @Fmta { @Col A ! @Col B }
 {
-@Rowa A { letter      } B { @Code "@ab-zAB-Z" }
+@Rowa A { letter      } B { @Code "@ab-zAB-Z_" }
 @Rowa A { white space } B { @I { space  formfeed  tab  newline } }
 @Rowa A { quote       } B { @Code "\"" }
 @Rowa A { escape      } B { @Code "\\" }
 @Rowa A { comment     } B { @Code "#" }
-@Rowa A { other       } B { @Code "!$%&'()*+,-./0123456789:;<=>?[]^_`{|}~" }
+@Rowa A { other       } B { @Code "!$%&'()*+,-./0123456789:;<=>?[]^`{|}~" }
 }
-Notice that @Code "@" is classed as a letter.  Basser
+Notice that @Code "@" and @Code "_" are classed as letters.  Basser
 Lout accepts the accented letters of the ISO-LATIN-1 character set
 (depending on how it is installed), and these are also classed as
 letters.  The ten digits are classed as `other' characters, and in
@@ -48,13 +49,15 @@ symbol.  It is conventional but not essential to begin identifiers with
 {@Code "@"};  Basser Lout will print a warning message if it finds an
 unquoted literal word (see below) beginning with {@Code "@"}, since such
 words are usually misspelt identifiers.  The ten digits are not letters
-and may not appear in identifiers.  The complete list of predefined
-identifiers is
-@ID @Code {
+and may not appear in identifiers; and although the underscore character
+is a letter and may be used in identifiers, it is not conventional to
+do so.  The complete list of predefined identifiers is
+@ID @OneRow @Code {
 {     "@BackEnd"
   @JL "@Begin"
   @JL "@Break"
   @JL "@Case"
+  @JL "@Common"
   @JL "@Char"
   @JL "@Database"
   @JL "@End"
@@ -80,6 +83,7 @@ identifiers is
   @JL "@LInput"
   @JL "@LVis"
   @JL "@LUse"
+  @JL "@Merge"
   @JL "@Moment"
   @JL "@Next"
   @JL "@Null"
@@ -87,10 +91,12 @@ identifiers is
   @JL "@OneRow"
   @JL "@Open"
   @JL "@PAdjust"
+  @JL "@PageLabel"
   @JL "@PrependGraphic"
   @JL "@Rotate"
 } |4.4cx {
-      "@Scale"
+      "@Rump"
+  @JL "@Scale"
   @JL "@SetColor"
   @JL "@SetColour"
   @JL "@Space"
@@ -100,6 +106,7 @@ identifiers is
   @JL "@SysPrependGraphic"
   @JL "@Tag"
   @JL "@Tagged"
+  @JL "@Underline"
   @JL "@Use"
   @JL "@VAdjust"
   @JL "@VContract"
@@ -131,7 +138,7 @@ but quotes are not used when the delimiter is invoked.  A delimiter may
 have delimiters and any other characters adjacent, whereas identifiers
 may not be adjacent to letters or other identifiers.  The complete list
 of predefined delimiters is
-@ID @Code {
+@ID @OneRow @Code {
 {
       "/"
   @JL "//"
@@ -180,7 +187,7 @@ comment @Index { Comment }
 @Code "#" is encountered, everything from
 that point to the end of the line is ignored.  This is useful for
 including reminders to oneself, like this:
-@ID @Code {
+@ID @OneRow @Code {
 "# Lout user manual"
 "# J. Kingston, June 1989"
 }

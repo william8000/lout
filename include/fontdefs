@@ -1,155 +1,165 @@
-##################################################################################################################################
-#                                                                                                                                #
-#  Font definitions.  Use a very wide window to see them clearly.                                                                #
-#                                                                                                                                #
-#       Lout font       Lout font         PostScript                    PostScript font metrics         Lout encoding   Recode/  #
-#       family name     face name         font name                     (formerly .AFM) file name       file name       NoRecode #
-#                                                                                                                                #
-##################################################################################################################################
+###############################################################################################################################
+#                                                                                                                             #
+#  Font definitions.  Use a very wide window to see them clearly.                                                             #
+#                                                                                                                             #
+#       Lout font       Lout font         PostScript         PostScript font metrics    Lout encoding   Recode/  Mapping for  #
+#       family name     face name         font name          (formerly .AFM) file name  file name      NoRecode  small caps   #
+#                                                                                                                             #
+###############################################################################################################################
 
 
-fontdef	AvantGarde	Base		{ AvantGarde-Medium		AvantGarde-Medium		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	Slope		{ AvantGarde-MediumObl		AvantGarde-MediumObl		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	Bold		{ AvantGarde-Bold		AvantGarde-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	BoldSlope	{ AvantGarde-BoldObl		AvantGarde-BoldObl		LoutLatin1.CEV	Recode	 }
+fontdef	AvantGarde	Base		{ AvantGarde-Medium		AG-Md		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	Slope		{ AvantGarde-MediumObl		AG-MdO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	Bold		{ AvantGarde-Bold		AG-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	BoldSlope	{ AvantGarde-BoldObl		AG-BdO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
-fontdef	AvantGarde	Bold		{ AvantGarde-Bold		AvantGarde-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	BoldObl		{ AvantGarde-BoldObl		AvantGarde-BoldObl		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	Book		{ AvantGarde-Book		AvantGarde-Book			LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	BookOblique	{ AvantGarde-BookOblique	AvantGarde-BookOblique		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	CondBold	{ AvantGarde-CondBold		AvantGarde-CondBold		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	CondBook	{ AvantGarde-CondBook		AvantGarde-CondBook		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	CondDemi	{ AvantGarde-CondDemi		AvantGarde-CondDemi		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	CondMedium	{ AvantGarde-CondMedium		AvantGarde-CondMedium		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	Demi		{ AvantGarde-Demi		AvantGarde-Demi			LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	DemiOblique	{ AvantGarde-DemiOblique	AvantGarde-DemiOblique		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	ExtraLight	{ AvantGarde-ExtraLight		AvantGarde-ExtraLight		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	ExtraLightObl	{ AvantGarde-ExtraLightObl	AvantGarde-ExtraLightObl	LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	Medium		{ AvantGarde-Medium		AvantGarde-Medium		LoutLatin1.CEV	Recode	 }
-fontdef	AvantGarde	MediumObl	{ AvantGarde-MediumObl		AvantGarde-MediumObl		LoutLatin1.CEV	Recode	 }
-
-
-fontdef	Bookman		Base		{ Bookman-Medium		Bookman-Medium			LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		Slope		{ Bookman-MediumItalic		Bookman-MediumItalic		LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		Bold		{ Bookman-Bold			Bookman-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		BoldSlope	{ Bookman-BoldItalic		Bookman-BoldItalic		LoutLatin1.CEV	Recode	 }
-
-fontdef	Bookman		Bold		{ Bookman-Bold			Bookman-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		BoldItalic	{ Bookman-BoldItalic		Bookman-BoldItalic		LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		Demi		{ Bookman-Demi			Bookman-Demi			LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		DemiItalic	{ Bookman-DemiItalic		Bookman-DemiItalic		LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		Light		{ Bookman-Light			Bookman-Light			LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		LightItalic	{ Bookman-LightItalic		Bookman-LightItalic		LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		Medium		{ Bookman-Medium		Bookman-Medium			LoutLatin1.CEV	Recode	 }
-fontdef	Bookman		MediumItalic	{ Bookman-MediumItalic		Bookman-MediumItalic		LoutLatin1.CEV	Recode	 }
+fontdef	AvantGarde	Bold		{ AvantGarde-Bold		AG-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	BoldObl		{ AvantGarde-BoldObl		AG-BdO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	Book		{ AvantGarde-Book		AG-Bk		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	BookOblique	{ AvantGarde-BookOblique	AG-BkO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	CondBold	{ AvantGarde-CondBold		AG-CnBd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	CondBook	{ AvantGarde-CondBook		AG-CnBk		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	CondDemi	{ AvantGarde-CondDemi		AG-CnDm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	CondMedium	{ AvantGarde-CondMedium		AG-CnMd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	Demi		{ AvantGarde-Demi		AG-Dm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	DemiOblique	{ AvantGarde-DemiOblique	AG-DmO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	ExtraLight	{ AvantGarde-ExtraLight		AG-ExLt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	ExtraLightObl	{ AvantGarde-ExtraLightObl	AG-ExLtO	LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	Medium		{ AvantGarde-Medium		AG-Md		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	AvantGarde	MediumObl	{ AvantGarde-MediumObl		AG-MdO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
 
-fontdef	Courier		Base		{ Courier			Courier				LoutLatin1.CEV	Recode	 }
-fontdef	Courier		Slope		{ Courier-Oblique		Courier-Oblique			LoutLatin1.CEV	Recode	 }
-fontdef	Courier		Bold		{ Courier-Bold			Courier-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Courier		BoldSlope	{ Courier-BoldOblique		Courier-BoldOblique		LoutLatin1.CEV	Recode	 }
+fontdef	Bookman		Base		{ Bookman-Medium		Bk-Md		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		Slope		{ Bookman-MediumItalic		Bk-MdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		Bold		{ Bookman-Bold			Bk-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		BoldSlope	{ Bookman-BoldItalic		Bk-BdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
-fontdef	Courier		Base		{ Courier			Courier				LoutLatin1.CEV	Recode	 }
-fontdef	Courier		Bold		{ Courier-Bold			Courier-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Courier		BoldOblique	{ Courier-BoldOblique		Courier-BoldOblique		LoutLatin1.CEV	Recode	 }
-fontdef	Courier		Oblique		{ Courier-Oblique		Courier-Oblique			LoutLatin1.CEV	Recode	 }
-
-
-fontdef	Helvetica	Base		{ Helvetica			Helvetica			LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Slope		{ Helvetica-Oblique		Helvetica-Oblique		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Bold		{ Helvetica-Bold		Helvetica-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	BoldSlope	{ Helvetica-BoldOblique		Helvetica-BoldOblique		LoutLatin1.CEV	Recode	 }
-
-fontdef	Helvetica	Base		{ Helvetica			Helvetica			LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Black		{ Helvetica-Black		Helvetica-Black			LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	BlackOblique	{ Helvetica-BlackOblique	Helvetica-BlackOblique		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Bold		{ Helvetica-Bold		Helvetica-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	BoldOblique	{ Helvetica-BoldOblique		Helvetica-BoldOblique		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Compressed	{ Helvetica-Compressed		Helvetica-Compressed		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Cond		{ Helvetica-Condensed		Helvetica-Condensed		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	CondBlack	{ Helvetica-Condensed-Black	Helvetica-Condensed-Black	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	CondBlackObl	{ Helvetica-Condensed-BlackObl	Helvetica-Condensed-BlackObl	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	CondBold	{ Helvetica-Condensed-Bold	Helvetica-Condensed-Bold	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	CondBoldObl	{ Helvetica-Condensed-BoldObl	Helvetica-Condensed-BoldObl	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	CondLight	{ Helvetica-Condensed-Light	Helvetica-Condensed-Light	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	CondLightObl	{ Helvetica-Condensed-LightObl	Helvetica-Condensed-LightObl	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	CondOblique	{ Helvetica-Condensed-Oblique	Helvetica-Condensed-Oblique	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	ExtraCompressed	{ Helvetica-ExtraCompressed	Helvetica-ExtraCompressed	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Light		{ Helvetica-Light		Helvetica-Light			LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	LightOblique	{ Helvetica-LightOblique	Helvetica-LightOblique		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Narrow		{ Helvetica-Narrow		Helvetica-Narrow		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	NarrowBold	{ Helvetica-Narrow-Bold		Helvetica-Narrow-Bold		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	NarrowBoldObl	{ Helvetica-Narrow-BoldOblique	Helvetica-Narrow-BoldOblique	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	NarrowObl	{ Helvetica-Narrow-Oblique	Helvetica-Narrow-Oblique	LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	Oblique		{ Helvetica-Oblique		Helvetica-Oblique		LoutLatin1.CEV	Recode	 }
-fontdef	Helvetica	UltraCompressed	{ Helvetica-UltraCompressed	Helvetica-UltraCompressed	LoutLatin1.CEV	Recode	 }
+fontdef	Bookman		Bold		{ Bookman-Bold			Bk-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		BoldItalic	{ Bookman-BoldItalic		Bk-BdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		Demi		{ Bookman-Demi			Bk-Dm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		DemiItalic	{ Bookman-DemiItalic		Bk-DmIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		Light		{ Bookman-Light			Bk-Lt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		LightItalic	{ Bookman-LightItalic		Bk-LtIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		Medium		{ Bookman-Medium		Bk-Md		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Bookman		MediumItalic	{ Bookman-MediumItalic		Bk-MdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
 
-fontdef	Schoolbook	Base		{ NewCenturySchlbk-Roman	NewCenturySchlbk-Roman		LoutLatin1.CEV	Recode	 }
-fontdef	Schoolbook	Slope		{ NewCenturySchlbk-Italic	NewCenturySchlbk-Italic		LoutLatin1.CEV	Recode	 }
-fontdef	Schoolbook	Bold		{ NewCenturySchlbk-Bold		NewCenturySchlbk-Bold		LoutLatin1.CEV	Recode	 }
-fontdef	Schoolbook	BoldSlope	{ NewCenturySchlbk-BoldItalic	NewCenturySchlbk-BoldItalic	LoutLatin1.CEV	Recode	 }
+fontdef	Courier		Base		{ Courier			Cr		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Courier		Slope		{ Courier-Oblique		Cr-O		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Courier		Bold		{ Courier-Bold			Cr-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Courier		BoldSlope	{ Courier-BoldOblique		Cr-BdO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
-fontdef	Schoolbook	Bold		{ NewCenturySchlbk-Bold		NewCenturySchlbk-Bold		LoutLatin1.CEV	Recode	 }
-fontdef	Schoolbook	BoldItalic	{ NewCenturySchlbk-BoldItalic	NewCenturySchlbk-BoldItalic	LoutLatin1.CEV	Recode	 }
-fontdef	Schoolbook	Italic		{ NewCenturySchlbk-Italic	NewCenturySchlbk-Italic		LoutLatin1.CEV	Recode	 }
-fontdef	Schoolbook	Roman		{ NewCenturySchlbk-Roman	NewCenturySchlbk-Roman		LoutLatin1.CEV	Recode	 }
-
-
-fontdef	Palatino	Base		{ Palatino-Roman		Palatino-Roman			LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	Slope		{ Palatino-Italic		Palatino-Italic			LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	Bold		{ Palatino-Bold			Palatino-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	BoldSlope	{ Palatino-BoldItalic		Palatino-BoldItalic		LoutLatin1.CEV	Recode	 }
-
-fontdef	Palatino	Bold		{ Palatino-Bold			Palatino-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	BoldItalic	{ Palatino-BoldItalic		Palatino-BoldItalic		LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	BoldItalicOsF	{ Palatino-BoldItalicOsF	Palatino-BoldItalicOsF		LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	BoldOsF		{ Palatino-BoldOsF		Palatino-BoldOsF		LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	Italic		{ Palatino-Italic		Palatino-Italic			LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	ItalicOsF	{ Palatino-ItalicOsF		Palatino-ItalicOsF		LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	Roman		{ Palatino-Roman		Palatino-Roman			LoutLatin1.CEV	Recode	 }
-fontdef	Palatino	SC		{ Palatino-SC			Palatino-SC			LoutLatin1.CEV	Recode	 }
+fontdef	Courier		Base		{ Courier			Cr		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Courier		Bold		{ Courier-Bold			Cr-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Courier		BoldOblique	{ Courier-BoldOblique		Cr-BdO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Courier		Oblique		{ Courier-Oblique		Cr-O		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
 
-fontdef	Symbol		Base		{ Symbol			Symbol				Symb.CEV	NoRecode }
-fontdef	Symbol		Slope		{ Symbol			Symbol				Symb.CEV	NoRecode }
-fontdef	Symbol		Bold		{ Symbol			Symbol				Symb.CEV	NoRecode }
-fontdef	Symbol		BoldSlope	{ Symbol			Symbol				Symb.CEV	NoRecode }
+fontdef	Helvetica	Base		{ Helvetica			He		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Slope		{ Helvetica-Oblique		He-O		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Bold		{ Helvetica-Bold		He-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	BoldSlope	{ Helvetica-BoldOblique		He-BdO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+
+fontdef	Helvetica	Base		{ Helvetica			He		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Black		{ Helvetica-Black		He-Bl		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	BlackOblique	{ Helvetica-BlackOblique	He-BlO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Bold		{ Helvetica-Bold		He-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	BoldOblique	{ Helvetica-BoldOblique		He-BdO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Compressed	{ Helvetica-Compressed		He-Cm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Cond		{ Helvetica-Condensed		He-Cn		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	CondBlack	{ Helvetica-Condensed-Black	He-CnBl		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	CondBlackObl	{ Helvetica-Condensed-BlackObl	He-CnBlO	LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	CondBold	{ Helvetica-Condensed-Bold	He-CnBd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	CondBoldObl	{ Helvetica-Condensed-BoldObl	He-CnBdO	LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	CondLight	{ Helvetica-Condensed-Light	He-CnLi		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	CondLightObl	{ Helvetica-Condensed-LightObl	He-CnLiO	LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	CondOblique	{ Helvetica-Condensed-Oblique	He-CnO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	ExtraCompressed	{ Helvetica-ExtraCompressed	He-ExtC		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Light		{ Helvetica-Light		He-Lt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	LightOblique	{ Helvetica-LightOblique	He-LtO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Narrow		{ Helvetica-Narrow		He-Nr		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	NarrowBold	{ Helvetica-Narrow-Bold		He-NrBd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	NarrowBoldObl	{ Helvetica-Narrow-BoldOblique	He-NrBdO	LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	NarrowObl	{ Helvetica-Narrow-Oblique	He-NrO		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	Oblique		{ Helvetica-Oblique		He-O		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Helvetica	UltraCompressed	{ Helvetica-UltraCompressed	He-UlCm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
 
-fontdef	Times		Base		{ Times-Roman			Times-Roman			LoutLatin1.CEV	Recode	 }
-fontdef	Times		Slope		{ Times-Italic			Times-Italic			LoutLatin1.CEV	Recode	 }
-fontdef	Times		Bold		{ Times-Bold			Times-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Times		BoldSlope	{ Times-BoldItalic		Times-BoldItalic		LoutLatin1.CEV	Recode	 }
+fontdef	Schoolbook	Base		{ NewCenturySchlbk-Roman	NCS-Rm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Schoolbook	Slope		{ NewCenturySchlbk-Italic	NCS-It		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Schoolbook	Bold		{ NewCenturySchlbk-Bold		NCS-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Schoolbook	BoldSlope	{ NewCenturySchlbk-BoldItalic	NCS-BdIt	LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
-fontdef	Times		Bold		{ Times-Bold			Times-Bold			LoutLatin1.CEV	Recode	 }
-fontdef	Times		BoldItalic	{ Times-BoldItalic		Times-BoldItalic		LoutLatin1.CEV	Recode	 }
-fontdef	Times		BoldItalicOsF	{ Times-BoldItalicOsF		Times-BoldItalicOsF		LoutLatin1.CEV	Recode	 }
-fontdef	Times		BoldSC		{ Times-BoldSC			Times-BoldSC			LoutLatin1.CEV	Recode	 }
-fontdef	Times		ExtraBold	{ Times-ExtraBold		Times-ExtraBold			LoutLatin1.CEV	Recode	 }
-fontdef	Times		Italic		{ Times-Italic			Times-Italic			LoutLatin1.CEV	Recode	 }
-fontdef	Times		ItalicOsF	{ Times-ItalicOsF		Times-ItalicOsF			LoutLatin1.CEV	Recode	 }
-fontdef	Times		Roman		{ Times-Roman			Times-Roman			LoutLatin1.CEV	Recode	 }
-fontdef	Times		RomanSC		{ Times-RomanSC			Times-RomanSC			LoutLatin1.CEV	Recode	 }
-fontdef	Times		Semibold	{ Times-Semibold		Times-Semibold			LoutLatin1.CEV	Recode	 }
-fontdef	Times		SemiboldItalic	{ Times-SemiboldItalic		Times-SemiboldItalic		LoutLatin1.CEV	Recode	 }
+fontdef	Schoolbook	Bold		{ NewCenturySchlbk-Bold		NCS-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Schoolbook	BoldItalic	{ NewCenturySchlbk-BoldItalic	NCS-BdIt	LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Schoolbook	Italic		{ NewCenturySchlbk-Italic	NCS-It		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Schoolbook	Roman		{ NewCenturySchlbk-Roman	NCS-Rm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
 
-fontdef	Dingbats	Base		{ ZapfDingbats			ZapfDingbats			Ding.CEV	NoRecode }
-fontdef	Dingbats	Slope		{ ZapfDingbats			ZapfDingbats			Ding.CEV	NoRecode }
-fontdef	Dingbats	Bold		{ ZapfDingbats			ZapfDingbats			Ding.CEV	NoRecode }
-fontdef	Dingbats	BoldSlope	{ ZapfDingbats			ZapfDingbats			Ding.CEV	NoRecode }
+fontdef	Palatino	Base		{ Palatino-Roman		Pa-Rm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	Slope		{ Palatino-Italic		Pa-It		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	Bold		{ Palatino-Bold			Pa-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	BoldSlope	{ Palatino-BoldItalic		Pa-BdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+
+fontdef	Palatino	Bold		{ Palatino-Bold			Pa-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	BoldItalic	{ Palatino-BoldItalic		Pa-BdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	BoldItalicOsF	{ Palatino-BoldItalicOsF	Pa-BdItF	LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	BoldOsF		{ Palatino-BoldOsF		Pa-BdF		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	Italic		{ Palatino-Italic		Pa-It		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	ItalicOsF	{ Palatino-ItalicOsF		Pa-ItF		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	Roman		{ Palatino-Roman		Pa-Rm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Palatino	SC		{ Palatino-SC			Pa-SC		LtLatin1.CEV	Recode	 LtLatin1.CMA }
 
 
-fontdef	Chancery	Base		{ ZapfChancery-Roman		ZapfChancery-Roman		LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	Slope		{ ZapfChancery-Italic		ZapfChancery-Italic		LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	Bold		{ ZapfChancery-Bold		ZapfChancery-Bold		LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	BoldSlope	{ ZapfChancery-MediumItalic	ZapfChancery-MediumItalic	LoutLatin1.CEV	Recode	 }
+fontdef	Symbol		Base		{ Symbol			Symbol		Symb.CEV	NoRecode -            }
+fontdef	Symbol		Slope		{ Symbol			Symbol		Symb.CEV	NoRecode -            }
+fontdef	Symbol		Bold		{ Symbol			Symbol		Symb.CEV	NoRecode -            }
+fontdef	Symbol		BoldSlope	{ Symbol			Symbol		Symb.CEV	NoRecode -            }
 
-fontdef	Chancery	Roman		{ ZapfChancery-Roman		ZapfChancery-Roman		LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	Bold		{ ZapfChancery-Bold		ZapfChancery-Bold		LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	Italic		{ ZapfChancery-Italic		ZapfChancery-Italic		LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	Light		{ ZapfChancery-Light		ZapfChancery-Light		LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	Demi		{ ZapfChancery-Demi		ZapfChancery-Demi		LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	LightItalic	{ ZapfChancery-LightItalic	ZapfChancery-LightItalic	LoutLatin1.CEV	Recode	 }
-fontdef	Chancery	MediumItalic	{ ZapfChancery-MediumItalic	ZapfChancery-MediumItalic	LoutLatin1.CEV	Recode	 }
+
+fontdef	Times		Base		{ Times-Roman			Ti-Rm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		Slope		{ Times-Italic			Ti-It		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		Bold		{ Times-Bold			Ti-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		BoldSlope	{ Times-BoldItalic		Ti-BdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+
+fontdef	Times		Bold		{ Times-Bold			Ti-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		BoldItalic	{ Times-BoldItalic		Ti-BdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		BoldItalicOsF	{ Times-BoldItalicOsF		Ti-BdItF	LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		BoldSC		{ Times-BoldSC			Ti-BdSC		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		ExtraBold	{ Times-ExtraBold		Ti-ExBd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		Italic		{ Times-Italic			Ti-It		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		ItalicOsF	{ Times-ItalicOsF		Ti-ItF		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		Roman		{ Times-Roman			Ti-Rm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		RomanSC		{ Times-RomanSC			Ti-RmSC		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		Semibold	{ Times-Semibold		Ti-Sm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Times		SemiboldItalic	{ Times-SemiboldItalic		Ti-SmIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+
+
+fontdef	Dingbats	Base		{ ZapfDingbats			ZD		Ding.CEV	NoRecode -            }
+fontdef	Dingbats	Slope		{ ZapfDingbats			ZD		Ding.CEV	NoRecode -            }
+fontdef	Dingbats	Bold		{ ZapfDingbats			ZD		Ding.CEV	NoRecode -            }
+fontdef	Dingbats	BoldSlope	{ ZapfDingbats			ZD		Ding.CEV	NoRecode -            }
+
+
+fontdef	Chancery	Base		{ ZapfChancery-Roman		ZC-Rm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	Slope		{ ZapfChancery-Italic		ZC-It		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	Bold		{ ZapfChancery-Bold		ZC-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	BoldSlope	{ ZapfChancery-MediumItalic	ZC-MdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+
+fontdef	Chancery	Roman		{ ZapfChancery-Roman		ZC-Rm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	Bold		{ ZapfChancery-Bold		ZC-Bd		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	Italic		{ ZapfChancery-Italic		ZC-It		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	Light		{ ZapfChancery-Light		ZC-Lt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	Demi		{ ZapfChancery-Demi		ZC-Dm		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	LightItalic	{ ZapfChancery-LightItalic	ZC-LtIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+fontdef	Chancery	MediumItalic	{ ZapfChancery-MediumItalic	ZC-MdIt		LtLatin1.CEV	Recode	 LtLatin1.CMA }
+
+
+###############################################################################################################################
+#                                                                                                                             #
+#  Non-Latin1 fonts (available in separate distributions; placeholder files replace them in the basic distribution).          #
+#                                                                                                                             #
+###############################################################################################################################
+
+@SysInclude { russian.fd }
+@SysInclude { latin2.fd }

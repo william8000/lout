@@ -5,45 +5,51 @@ packages and setup files:
 
 The DocumentLayout package and its extensions to various document types
 
-    dl			The DocumentLayout package
-    ordinarylayout	The OrdinaryLayout package
-    reportlayout	The ReportLayout package
-    booklayout		The BookLayout package
-    overheadslayout	The OverheadsLayout package
-    illustrationlayout	The IllustrationLayout package
+    dl                  The DocumentLayout package
+    dl.lpg              A PostScript prepend file needed by DocumentLayout
+    docf                The OrdinaryLayout package
+    reportf             The ReportLayout package
+    bookf               The BookLayout package
+    slidesf             The OverheadsLayout package
+    picturef            The IllustrationLayout package
 
 Setup files for all document types, with and without C and C++ printing
 
-    doc			Setup file for ordinary documents
-    cdoc		Setup file for ordinary documents with C and C++
-    report		Setup file for technical reports
-    creport		Setup file for technical reports with C and C++
-    book		Setup file for books
-    cbook		Setup file for books with C and C++
-    overheads		Setup file for overheads
-    coverheads		Setup file for overheads with C and C++
-    illustration	Setup file for illustrations
-    cillustration	Setup file for illustrations with C and C++
-    pdoc		Setup file for ordinary documents (plain text)
+    doc                 Setup file for ordinary documents
+    cdoc                Setup file for ordinary documents with C and C++
+    report              Setup file for technical reports
+    creport             Setup file for technical reports with C and C++
+    book                Setup file for books
+    cbook               Setup file for books with C and C++
+    slides              Setup file for overheads
+    cslides             Setup file for overheads with C and C++
+    picture             Setup file for illustrations
+    cpicture            Setup file for illustrations with C and C++
+    pdoc                Setup file for ordinary documents (plain text)
 
-Special-purpose packages and associated prepend files
+Special-purpose packages
 
-    tab			The Tab table formatting package
-    tab_prepend		A PostScript prepend file needed by Tab
-    eq			The Eq equation formatting package
-    fig			The Fig advanced graphics package
-    fig_prepend		A PostScript prepend file needed by Fig
-    graph		The Graph graph drawing package
-    graph_prepend	A PostScript prepend file needed by Graph
-    cprint		The cprint C and C++ program printing package
-    pas			The Pas Pascal progam printing package
+    tab                 The Tab table formatting package
+    tab.lpg             A PostScript prepend file needed by Tab
+    eq                  The Eq equation formatting package
+    fig                 The Fig advanced graphics package
+    fig.lpg             A PostScript prepend file needed by Fig
+    graph               The Graph graph drawing package
+    graph.lpg           A PostScript prepend file needed by Graph
+    cprint              The cprint C and C++ program printing package
+    pas                 The Pas Pascal progam printing package
 
 Miscellaneous
 
-    fontdefs		Standard font definitions file
-    langdefs		Standard language definitions file
-    mydefs		Empty file for if the user doesn't have one
-    tl			The ToyLayout package (a introductory example)
+    fontdefs            Standard font definitions file
+    latin2.fd           Latin2 font definitions file (placeholder file)
+    russian.fd          Russian font definitions file (placeholder file)
+    langdefs            Standard language definitions file
+    mydefs              Empty file for if the user doesn't have one
+    tl                  The ToyLayout package (a introductory example)
+    init                A Lout source file used during installation (lout -x)
 
 Jeffrey H. Kingston
 12 September 1994
+10 April 1995 (names changed for DOS compatibility)
+11 June 1995

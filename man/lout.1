@@ -11,7 +11,7 @@ stdin is used instead.  The special file name - may be used to denote
 standard input.  There may be white space between flags like -i and
 their associated <filename> or <dirname> values.
 .P
-An optional .lout suffix may be used for Lout source and include
+An optional .lt suffix may be used for Lout source and include
 files.  When invoking files ending in this suffix the suffix may be
 omitted.
 .SH OPTIONS
@@ -39,7 +39,7 @@ Direct PostScript output to <filename> instead of to stdout.
 .TP
 -i<filename>  
 Search the directories of the include file path (see below) for
-<filename> or <filename>.lout and include it.  There may be
+<filename> or <filename>.lt and include it.  There may be
 multiple -i options.
 .TP
 -I<dirname>
@@ -52,15 +52,15 @@ current directory.
 .TP
 -C<dirname>
 Add <dirname> to the list of directories searched for character
-encoding (.CEV) files.  There may be multiple -C options; the directories
-are searched in the order given, and finally the default encoding
-vectors directory is searched (see below).
+encoding (.CEV) and character mapping (.CMA) files.  There may be
+multiple -C options; the directories are searched in the order given,
+and finally the default encoding vectors directory is searched (see below).
 .TP
 -F<dirname>
 Add <dirname> to the list of directories searched for font metrics
-(.AFM) files.  There may be multiple -F options; the directories are
-searched in the order given, and finally the default font metrics
-directory is searched (see below).
+(formerly .AFM) files.  There may be multiple -F options; the
+directories are searched in the order given, and finally the default
+font metrics directory is searched (see below).
 .TP
 -H<dirname>
 Add <dirname> to the list of directories searched for hyphenation
@@ -80,9 +80,7 @@ Initializing run, not for ordinary use: read and check all font files
 mentioned in font definitions, read and check all hyphenation files
 mentioned in language definitions and build compressed versions, read
 and check all database files mentioned in database clauses and build
-index files.  If using locales, read a colon-separated list of locales
-following the -x flag (e.g. -xfr:en) and build error message catalogues
-for those locales.
+index files.
 .TP
 -u
 Print usage information on stderr.
@@ -104,15 +102,13 @@ Lout documentation directory:   <DOCDIR>
 c2lout(1), lpr(1), ghostview(1)
 .SH MAILING LIST
 .P
-A public mailing list for discussion of Lout exists.  To
-subscribe, mail lout-request@cs.brown.edu with the word
-subscribe in the Subject line, then wait one working day.
-To post an item, mail it to lout@cs.brown.edu.
+A public mailing list for discussion of Lout exists.  To subscribe, mail
+lout-request@niif.spb.su with the word subscribe in the Subject line,
+then wait one working day.  To post an item, mail it to lout@niif.spb.su.
 .SH REFERENCES
 .P
-Jeffrey H. Kingston, "A User's Guide to the Lout Document
-Formatting System," and "An Expert's Guide to the Lout
-Document Formatting System."
+Jeffrey H. Kingston, "A User's Guide to the Lout Document Formatting
+System," and "An Expert's Guide to the Lout Document Formatting System."
 .SH AUTHOR
 .P
 Jeffrey H. Kingston

@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -45,8 +45,7 @@ for( y=pred(link, PARENT), i=1; type(y)==LINK;  y = pred(y, PARENT), i++ )
 /*                                                                           */
 /*****************************************************************************/
 
-static float ScaleFactor(avail_size, inner_size)
-LENGTH avail_size, inner_size;
+static float ScaleFactor(LENGTH avail_size, LENGTH inner_size)
 { float scale_factor;
   scale_factor = avail_size <= 0 ? 0 :
 		 inner_size <= 0 ? 0 : (float) avail_size / inner_size;
@@ -63,19 +62,18 @@ LENGTH avail_size, inner_size;
 /*                                                                           */
 /*****************************************************************************/
 
-static LENGTH FindAdjustIncrement(x, frame_size, dim)
-OBJECT x;  LENGTH frame_size;  int dim;
+static LENGTH FindAdjustIncrement(OBJECT x, LENGTH frame_size, int dim)
 { OBJECT y, link, prev, g;
-  int adjustable_gaps;
+  int adjustable_gaps;  BOOLEAN jn;
   LENGTH inc, mk, actual_size;
 
   debug2(DGP, D, "FindAdjustIncrement(x, %s, %s)",
 	EchoLength(frame_size), dimen(dim));
-  FirstDefinite(x, link, prev);
+  FirstDefinite(x, link, prev, jn);
   if( link != x )
   { adjustable_gaps = 0;
     mk = back(prev, dim);
-    NextDefiniteWithGap(x, link, y, g);
+    NextDefiniteWithGap(x, link, y, g, jn);
     while( link != x )
     { if ( mode(gap(g)) == TAB_MODE || units(gap(g)) == AVAIL_UNIT
 				    || units(gap(g)) == FRAME_UNIT )
@@ -86,7 +84,7 @@ OBJECT x;  LENGTH frame_size;  int dim;
 		frame_size, mk);
       prev = y;
       adjustable_gaps++;
-      NextDefiniteWithGap(x, link, y, g);
+      NextDefiniteWithGap(x, link, y, g, jn);
     }
     actual_size = mk + fwd(prev, dim);
     debug2(DGP, DD, "  actual_size = %s, adjustable_gaps = %d",
@@ -143,12 +141,11 @@ OBJECT x;  LENGTH frame_size;  int dim;
 /*                                                                           */
 /*****************************************************************************/
 
-FixAndPrintObject(x, xmk, xb, xf, dim, adjust, suppress, padj, pg, count)
-OBJECT x;  LENGTH xmk, xb, xf; int dim, adjust;  BOOLEAN suppress;
-int padj;  LENGTH pg;  int count;
+void FixAndPrintObject(OBJECT x, LENGTH xmk, LENGTH xb, LENGTH xf, int dim,
+int adjust, BOOLEAN suppress, int padj, LENGTH pg, int count)
 { OBJECT y, link, prev, g, uplink, z, face;
   LENGTH mk, ymk, frame_size, back_edge, yb, yf, inc, f;
-  int i; float scale_factor;
+  int i; float scale_factor;  BOOLEAN jn;
   debug8(DGP, D, "[ FixAndPrintObject(%s, %s, %s,%s, %s, %s, %s, %s, pg )",
     Image(type(x)), EchoLength(xmk), EchoLength(xb), EchoLength(xf), dimen(dim),
     (adjust == LAST_ADJUST ? "last_adjust" : "all_adjust"),
@@ -163,6 +160,7 @@ int padj;  LENGTH pg;  int count;
 
     case CLOSURE:
     case NULL_CLOS:
+    case PAGE_LABEL:
     case CROSS:
     
       back(x, dim) = xb;  fwd(x, dim) = xf;
@@ -188,7 +186,14 @@ int padj;  LENGTH pg;  int count;
 	}
       }
       else
-      { if( string(x)[0] != '\0' )  PrintWord(x, word_save_mark(x), pg-xmk);
+      { if( string(x)[0] != '\0' )
+	{ PrintWord(x, word_save_mark(x), pg - xmk);
+	  if( underline(x) )
+	  { FontWordSize(x);  /* to restore fwd(x, COL) */
+	    PrintUnderline(word_font(x), word_save_mark(x),
+	      word_save_mark(x) + fwd(x, COL), pg - xmk);
+	  }
+	}
       }
       back(x, dim) = xb;  fwd(x, dim) = xf;
       break;
@@ -497,7 +502,7 @@ int padj;  LENGTH pg;  int count;
             { Child(pre, Down(tmp));
               Child(post, LastDown(tmp));
             }
-            else pre = tmp, post = nil;
+            else pre = tmp, post = nilobj;
 	    back(x, dim) = xb;
 	    fwd(x, dim)  = xf;
             SaveGraphicState();
@@ -511,7 +516,7 @@ int padj;  LENGTH pg;  int count;
             RestoreGraphicState();
             FixAndPrintObject(y, xb, xb, xf, dim, LAST_ADJUST,
 		    NO_SUPPRESS, padj, xb + xf, count);
-            if( post != nil )  PrintGraphicObject(post);
+            if( post != nilobj )  PrintGraphicObject(post);
             RestoreGraphicState();
           }
 	  break;
@@ -573,11 +578,11 @@ int padj;  LENGTH pg;  int count;
 	  inc = FindAdjustIncrement(x, frame_size, dim);
 	else inc = 0;
 
-	FirstDefinite(x, link, prev);
+	FirstDefinite(x, link, prev, jn);
 	if( link != x )
 	{ back_edge = xmk - back(x, dim);
 	  mk = back_edge + back(prev, dim);
-	  NextDefiniteWithGap(x, link, y, g);
+	  NextDefiniteWithGap(x, link, y, g, jn);
 	  while( link != x )
 	  {
 	    FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
@@ -586,7 +591,7 @@ int padj;  LENGTH pg;  int count;
 	    mk += ActualGap(fwd(prev, dim), back(y, dim), fwd(y, dim), &gap(g),
 		    frame_size, mk - back_edge);
 	    prev = y;
-	    NextDefiniteWithGap(x, link, y, g);
+	    NextDefiniteWithGap(x, link, y, g, jn);
 	  }
 	  if( suppress )
 	    FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
@@ -602,59 +607,66 @@ int padj;  LENGTH pg;  int count;
       }
       else
       { OBJECT start_group, zlink, m;  BOOLEAN dble_found;  LENGTH b, f, dlen;
-	start_group = nil;  dble_found = FALSE;  dlen = 0;
+	start_group = nilobj;  dble_found = FALSE;  dlen = 0;
 	debug0(DGP, DD, "  groups beginning.");
-	for( link = Down(x);  link != x;  link = NextDown(link) )
+	FirstDefinite(x, link, y, jn);
+	if( link != x )
 	{
-	  Child(y, link);
-	  debug1(DGP, DD, "  examining %s", EchoObject(y));
-	  if( is_index(type(y)) )  continue;
-	  if( type(y) == GAP_OBJ )
-	  { 
-	    assert( start_group != nil, "FAPO: start_group!" );
-	    if( !join(gap(y)) )
-	    { 
-	      /* finish off and fix this group */
+	  /* start first group, with or without join */
+	  b = back(y, dim);
+	  f = fwd(y, dim);
+	  m = y;
+	  start_group = link;
+	  dble_found = !jn;
+	  debug2(DGP, DD, "  starting first group: b = %s, f = %s",
+	    EchoLength(b), EchoLength(f));
+	
+	  NextDefiniteWithGap(x, link, y, g, jn);
+	  while( link != x )
+	  {
+	    if( !jn )
+	    {
+	      /* finish off and fix the group ending just before g */
 	      debug2(DGP, DD, "  finishing group: b = %s, f = %s",
-	        EchoLength(b), EchoLength(f));
+		EchoLength(b), EchoLength(f));
 	      FixAndPrintObject(m, xmk+b, b, xf-b, dim, adjust,
-		      NO_SUPPRESS, padj, pg, count);
+		NO_SUPPRESS, padj, pg, count);
 	      b = back(m, dim);  f = fwd(m, dim);
 	      for( zlink = start_group;  zlink != link;  zlink=NextDown(zlink) )
-	      {	CountChild(z, zlink, count);
+	      { CountChild(z, zlink, count);
 		if( !is_definite(type(z)) || z == m )  continue;
 		FixAndPrintObject(z, xmk + b, b, xf - b, dim,
-		      adjust, SUPPRESS, padj, pg, count);
+		  adjust, SUPPRESS, padj, pg, count);
 		b = max(b, back(z, dim));  f = max(f, fwd(z, dim));
 	      }
 	      dlen = max(dlen, b + f);
 	      dble_found = TRUE;
-	      start_group = nil;
+	      start_group = nilobj;
+
+	      /* start new group */
+	      b = back(y, dim);
+	      f = fwd(y, dim);
+	      m = y;
+	      start_group = link;
+	      debug2(DGP, DD, "  starting group: b = %s, f = %s",
+		EchoLength(b), EchoLength(f));
 	    }
-	  }
-	  else if( start_group == nil )
-	  {
-	    /* start new group */
-	    b = back(y, dim);
-	    f = fwd(y, dim);
-	    m = y;
-	    start_group = link;
-	    debug2(DGP, DD, "  starting group: b = %s, f = %s",
-	      EchoLength(b), EchoLength(f));
-	  }
-	  else
-	  {
-	    /* continue with current group */
-	    b = max(b, back(y, dim));
-	    f = max(f, fwd(y, dim));
-	    if( fwd(y, dim) > fwd(m, dim) )  m = y;
-	    debug2(DGP, DD, "  continuing group: b = %s, f = %s",
-	      EchoLength(b), EchoLength(f));
+	    else
+	    {
+	      /* continue with current group */
+	      b = max(b, back(y, dim));
+	      f = max(f, fwd(y, dim));
+	      if( fwd(y, dim) > fwd(m, dim) )  m = y;
+	      debug2(DGP, DD, "  continuing group: b = %s, f = %s",
+		EchoLength(b), EchoLength(f));
+	    }
+
+	    NextDefiniteWithGap(x, link, y, g, jn);
 	  }
 	}
-	assert( start_group != nil, "FAPO: final start_group!" );
+	assert( start_group != nilobj, "FAPO: final start_group!" );
 
-	if( dble_found )
+	if( dble_found || !jn )
 	{
 	  /* finish off and fix this last group */
 	  debug2(DGP, DD, "  finishing last group: b = %s, f = %s",
@@ -662,7 +674,7 @@ int padj;  LENGTH pg;  int count;
 	  FixAndPrintObject(m, xmk + b, b, xf - b, dim, adjust,
 		NO_SUPPRESS, padj, pg, count);
 	  b = back(m, dim);  f = fwd(m, dim);
-	  for( zlink = start_group;  zlink != link;  zlink = NextDown(zlink) )
+	  for( zlink = start_group;  zlink != x;  zlink = NextDown(zlink) )
 	  { CountChild(z, zlink, count);
 	    if( !is_definite(type(z)) || z == m )  continue;
 	    FixAndPrintObject(z, xmk + b, b, xf - b, dim, adjust,
@@ -680,7 +692,7 @@ int padj;  LENGTH pg;  int count;
 	  FixAndPrintObject(m, xmk, xb, xf, dim, adjust,
 		 NO_SUPPRESS, padj, pg, count);
 	  b = back(m, dim);  f = fwd(m, dim);
-	  for( zlink = start_group;  zlink != link;  zlink = NextDown(zlink) )
+	  for( zlink = start_group;  zlink != x;  zlink = NextDown(zlink) )
 	  { CountChild(z, zlink, count);
 	    if( !is_definite(type(z)) || z == m )  continue;
 	    FixAndPrintObject(z, xmk, xb, xf, dim, adjust,
@@ -696,10 +708,12 @@ int padj;  LENGTH pg;  int count;
     case ACAT:
 
       if( dim == COL )
-      { BOOLEAN bad_gap;
+      { BOOLEAN bad_gap, adjusting;
 	LENGTH actual_size,
-	adjust_indent, frame_size, back_edge, adjust_inc, inc;
-	int adjustable_gaps;
+	adjust_indent, frame_size, back_edge, adjust_inc, inc, adjust_sofar;
+	int adjustable_gaps, gaps_sofar;
+	BOOLEAN underlining; int underline_xstart; FONT_NUM underline_font;
+	OBJECT urec;
       
 
 	/*********************************************************************/
@@ -718,7 +732,7 @@ int padj;  LENGTH pg;  int count;
 	/*                                                                   */
 	/*********************************************************************/
 
-	FirstDefinite(x, link, y);
+	FirstDefinite(x, link, y, jn);
 	if( link == x )  break;  /* no definite children, nothing to print */
 	bad_gap = FALSE;
 	adjustable_gaps = 0;
@@ -726,7 +740,7 @@ int padj;  LENGTH pg;  int count;
 	mk = back_edge + back(y, dim);
 	frame_size = xb + xf;
 	prev = y;
-	NextDefiniteWithGap(x, link, y, g);
+	NextDefiniteWithGap(x, link, y, g, jn);
 	while( link != x )
 	{
 	  save_actual_gap(g) = ActualGap(fwd(prev, dim), back(y, dim),
@@ -738,7 +752,7 @@ int padj;  LENGTH pg;  int count;
 	  }
 	  else if( width(gap(g)) > 0 )  adjustable_gaps += 1;
 	  prev = y;
-	  NextDefiniteWithGap(x, link, y, g);
+	  NextDefiniteWithGap(x, link, y, g, jn);
 	}
 	actual_size = mk + fwd(prev, dim) - back_edge;
 
@@ -746,6 +760,8 @@ int padj;  LENGTH pg;  int count;
 	/*                                                                   */
 	/*  The second step is to work out whether adjusting is required     */
 	/*  or not, and if so by how much, using the following variables:    */
+	/*                                                                   */
+	/*    adjusting        TRUE iff we are adjusting                     */
 	/*                                                                   */
 	/*    adjust_inc       The amount of adjustment to apply initially.  */
 	/*                                                                   */
@@ -780,10 +796,16 @@ int padj;  LENGTH pg;  int count;
 	}
 
 	if( padj == ALL_ADJUST && adjustable_gaps > 0 && !bad_gap )
-	{ adjust_inc = (frame_size - actual_size) / adjustable_gaps;
+	{ adjusting = TRUE;
+	  adjust_inc = (frame_size - actual_size) / adjustable_gaps;
 	  inc = max(adjust_inc, 0);
+	  gaps_sofar = 0;	/* number of gaps adjusted so far */
+	  adjust_sofar = 0;	/* total width of adjustments so far */
 	}
-	else adjust_inc = inc = 0;
+	else
+	{ adjusting = FALSE;
+	  adjust_inc = inc = 0;
+	}
 
 	debug2(DGP, DD, "ACAT %s %s",
 	  EchoStyle(&save_style(x)), EchoObject(x));
@@ -791,6 +813,8 @@ int padj;  LENGTH pg;  int count;
 	  EchoLength(frame_size), EchoLength(actual_size), adjustable_gaps);
 	debug2(DGP,DD,"bad_gap = %s, adjust_inc = %s",
 	  bool(bad_gap), EchoLength(adjust_inc));
+	debug3(DGP, DD, "frame_size = %d, actual_size = %d, adjust_inc = %d",
+	  frame_size, actual_size, adjust_inc);
 
 	/*********************************************************************/
 	/*                                                                   */
@@ -798,37 +822,90 @@ int padj;  LENGTH pg;  int count;
 	/*                                                                   */
 	/*********************************************************************/
 
-	FirstDefinite(x, link, y);
+	underlining = FALSE;
+	FirstDefinite(x, link, y, jn);
 	prev = y;
 	mk = xmk - back(x, dim) + back(y, dim) + adjust_indent;
-	NextDefiniteWithGap(x, link, y, g);
+	NextDefiniteWithGap(x, link, y, g, jn);
 	while( link != x )
 	{
-	  /* fix previous definite now we know it is not the last one  */
-	  if( width(gap(g)) > 0 )
-	  { FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim) + inc,
-	      dim, adjust, NO_SUPPRESS, LAST_ADJUST, pg, count);
-	    mk += save_actual_gap(g) + adjust_inc;
-	  }
-	  else
-	  { FixAndPrintObject(prev, mk, back(prev, dim), fwd(prev, dim),
-	      dim, adjust, NO_SUPPRESS, LAST_ADJUST, pg, count);
-	    mk += save_actual_gap(g);
+	  /* check for underlining */
+	  if( underline(prev) )
+	  { underline(prev) = FALSE;
+	    if( !underlining )
+	    {
+	      /* underlining begins here */
+	      underlining = TRUE;
+	      underline_font = is_word(type(prev)) ? word_font(prev) :
+		  font(save_style(x));
+	      underline_xstart = mk - back(prev, dim);
+	    }
+	    if( !underline(g) )
+	    {
+	      /* underlining ends here */
+	      urec = New(UNDER_REC);
+	      back(urec, COL) = underline_xstart;
+	      fwd(urec, COL) = mk + fwd(prev, dim);
+	      back(urec, ROW) = underline_font;
+	      underlining = FALSE;
+	      Link(Up(prev), urec);
+	    }
 	  }
 
+	  /* fix previous definite now we know it is not the last one  */
+	  FixAndPrintObject(prev, mk, back(prev, dim),
+	      fwd(prev, dim) + (width(gap(g)) > 0 ? inc : 0),
+	      dim, adjust, NO_SUPPRESS, LAST_ADJUST, pg, count);
+
 	  /* move on to next subobject */
+	  if( adjusting && width(gap(g)) > 0 )
+	  { int tmp;
+	    gaps_sofar++;
+	    tmp = ((frame_size - actual_size) * gaps_sofar) / adjustable_gaps;
+	    mk += save_actual_gap(g) + (tmp - adjust_sofar);
+	    adjust_sofar = tmp;
+	  }
+	  else
+	    mk += save_actual_gap(g);
 	  prev = y;
-	  NextDefiniteWithGap(x, link, y, g);
+	  NextDefiniteWithGap(x, link, y, g, jn);
+	}
+
+	/* check for underlining */
+	if( underline(prev) )
+	{ underline(prev) = FALSE;
+	  if( !underlining )
+	  {
+	    /* underlining begins here */
+	    underlining = TRUE;
+	    underline_font = is_word(type(prev)) ? word_font(prev) :
+		  font(save_style(x));
+	    underline_xstart = mk - back(prev, dim);
+	  }
+
+	  /* underlining must end here */
+	  urec = New(UNDER_REC);
+	  back(urec, COL) = underline_xstart;
+	  fwd(urec, COL) = mk + fwd(prev, dim);
+	  back(urec, ROW) = underline_font;
+	  underlining = FALSE;
+	  Link(Up(prev), urec);
 	}
 
 	/* fix the last definite subobject, prev, which must exist */
 	FixAndPrintObject(prev, mk, back(prev, dim),
 	  frame_size - (mk - xmk) - back(x, dim),
 	  dim, adjust, NO_SUPPRESS, LAST_ADJUST, pg, count);
+
       }
       else for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
-	if( !is_definite(type(y)) )  continue;
+	if( !is_definite(type(y)) )
+	{
+	  if( type(y) == UNDER_REC )   /* generate an underline now */
+	    PrintUnderline(back(y, ROW), back(y, COL), fwd(y, COL), pg - xmk);
+	  continue;
+	}
 	FixAndPrintObject(y, xmk, xb, xf, dim, adjust, NO_SUPPRESS,
 		padj,pg,count);
       }

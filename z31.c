@@ -1,6 +1,6 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -34,8 +34,54 @@
 
 #if DEBUG_ON
 static	int	no_of_calls	= 0;	/* number of calls to calloc()       */
+static  int     recs_created    = 0;	/* number of records created         */
+static  int     bytes_created   = 0;	/* number of bytes in created recs   */
 	int	zz_newcount	= 0;	/* number of calls to New()          */
 	int	zz_disposecount	= 0;	/* number of calls to Dispose()      */
+	int	zz_listcount	= 0;	/* number of elements in zz_free[]   */
+
+static	int	usage_nums[MEM_USAGE_MAX] = { 0 };
+static	int	usage_bytes[MEM_USAGE_MAX] = { 0 };
+static	int	max_usage_bytes[MEM_USAGE_MAX] = { 0 };
+static	int	curr_total_bytes, max_total_bytes = 0;
+static	char	*usage_strings[] = {
+			"lout binary",
+			"object memory chunks",
+			"font tables",
+			"lex buffers",
+			"file tables",
+			"cross reference tables",
+			"plain text output grids",
+			"database check tables",
+			"hyphenation pattern tables",
+			"encoding vectors",
+			"character mappingss",
+			"colour tables",
+			"language tables",
+};
+
+/*****************************************************************************/
+/*                                                                           */
+/*  DebugRegisterUsage(typ, delta_num, delta_size)                           */
+/*                                                                           */
+/*  Register a change in the number of things of type typ that               */
+/*  have been allocated memory, and the change in the number of bytes.       */
+/*                                                                           */
+/*****************************************************************************/
+
+void DebugRegisterUsage(int typ, int delta_num, int delta_size)
+{ int i;
+  assert(0 <= typ && typ < MEM_USAGE_MAX, "DebugRegisterUsage!");
+  usage_nums[typ] += delta_num;
+  usage_bytes[typ] += delta_size;
+  curr_total_bytes += delta_size;
+  if( curr_total_bytes > max_total_bytes )
+  { max_total_bytes = curr_total_bytes;
+    for( i = 0; i < MEM_USAGE_MAX;  i++ )
+      max_usage_bytes[i] = usage_bytes[i];
+  }
+} /* end DebugRegisterUsage */
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -45,19 +91,49 @@ static	int	no_of_calls	= 0;	/* number of calls to calloc()       */
 /*                                                                           */
 /*****************************************************************************/
 
-DebugMemory()
-{ int i, j;  OBJECT p;
-  debug2(DMA, D, "calloc called %d times (%d bytes total)",
-    no_of_calls, no_of_calls * MEM_CHUNK * sizeof(ALIGN));
-  debug2(DMA, D, "New() called %d times;  Dispose() called %d times",
-    zz_newcount, zz_disposecount);
+void DebugMemory(void)
+{ int i, j;  OBJECT p;  int recs_free, bytes_free;
+
+  recs_free = bytes_free = 0;
   for( i = 0;  i < MAX_OBJECT_REC;  i++ )
-  { if( zz_free[i] != nil )
+  { if( zz_free[i] != nilobj )
     { j = 0;
-      for( p = zz_free[i];  p != nil;  p = pred(p, CHILD) )  j++;
-      debug2(DMA, DD, "zz_free[%2d]: %3d", i, j);
+      for( p = zz_free[i];  p != nilobj;  p = pred(p, CHILD) )  j++;
+      debug3(DMA, DD, "zz_free[%2d]: %5d (%d bytes)", i, j,
+	i * j * sizeof(ALIGN));
+      recs_free += j;
+      bytes_free += i* j * sizeof(ALIGN);
     }
   }
+
+  debug4(DMA, D, "%-35s %8s %8s %8s",
+    "Summary of malloc() memory usage", "Quantity", "Bytes", "At max.");
+
+  for( i = 1;  i < MEM_USAGE_MAX;  i++ )
+  {
+    debug4(DMA, D, "%-35s %8d %8d %8d", usage_strings[i], usage_nums[i],
+      usage_bytes[i], max_usage_bytes[i]);
+  }
+  debug4(DMA, D, "%-35s %8s %8s %8s", "", "", "--------", "--------");
+  debug4(DMA, D, "%-35s %8s %8d %8d", "","",curr_total_bytes,max_total_bytes);
+
+
+  /***
+  debug3(DMA, D, "%-12s %8s %8s", "", "records", "bytes");
+  debug4(DMA, D, "%-12s %8s %8d (%d calls)", "calloc", "-",
+    no_of_calls * MEM_CHUNK * sizeof(ALIGN), no_of_calls);
+  debug3(DMA, D, "%-12s %8d %8d", "created", recs_created, bytes_created);
+  debug3(DMA, D, "%-12s %8d %8d", "free (count)",    recs_free,    bytes_free);
+  debug3(DMA, D, "%-12s %8d %8s", "free (var)",      zz_listcount, "-");
+  debug3(DMA, D, "%-12s %8d %8s", "new-dispose",
+    zz_newcount - zz_disposecount, "-");
+  debug3(DMA, D, "%-12s %8d %8s", "created-free",
+    recs_created - recs_free, "-");
+  debug2(DMA, D, "newcount %d, disposecount %d", zz_newcount, zz_disposecount);
+  *** */
+
+  debug0(DMA, D, "");
+
 } /* end DebugMemory */
 #endif
 
@@ -89,15 +165,17 @@ OBJECT 		xx_link, xx_tmp, xx_res, xx_hold;
 /*                                                                           */
 /*****************************************************************************/
 
-MemInit()
+void MemInit(void)
 {
   zz_lengths[ WORD        ] = 0;
   zz_lengths[ QWORD       ] = 0;
-  zz_lengths[ LINK        ] = ceiling( sizeof(struct link_type), sizeof(ALIGN));
+  zz_lengths[ LINK        ] = ceiling(sizeof(struct link_type), sizeof(ALIGN));
 
   /* object types, except closure NB have actual() field in token phase! */
   zz_lengths[ CLOSURE     ] =
   zz_lengths[ NULL_CLOS   ] =
+  zz_lengths[ PAGE_LABEL  ] =
+  zz_lengths[ UNDER_REC   ] =
   zz_lengths[ CROSS       ] =
   zz_lengths[ HEAD        ] =
   zz_lengths[ SPLIT       ] =
@@ -132,10 +210,14 @@ MemInit()
   zz_lengths[ FONT        ] =
   zz_lengths[ SPACE       ] =
   zz_lengths[ BREAK       ] =
+  zz_lengths[ UNDERLINE   ] =
   zz_lengths[ COLOUR      ] =
   zz_lengths[ LANGUAGE    ] =
   zz_lengths[ CURR_LANG   ] =
+  zz_lengths[ COMMON      ] =
+  zz_lengths[ RUMP        ] =
   zz_lengths[ NEXT        ] =
+  zz_lengths[ ENV_OBJ     ] =
   zz_lengths[ ENV         ] =
   zz_lengths[ CLOS        ] =
   zz_lengths[ LVIS        ] =
@@ -173,6 +255,7 @@ MemInit()
   zz_lengths[ GALL_TARG   ] =
   zz_lengths[ GALL_PREC   ] =
   zz_lengths[ CROSS_PREC  ] =
+  zz_lengths[ PAGE_LABEL_IND] =
   zz_lengths[ SCALE_IND   ] =
   zz_lengths[ EXPAND_IND  ] =
   zz_lengths[ THREAD      ] =
@@ -211,29 +294,34 @@ MemInit()
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT GetMemory(siz, pos)
-int siz;  FILE_POS *pos;
-{ static ALIGN *next_free = (ALIGN *) nil;
-  static ALIGN *top_free  = (ALIGN *) nil;
+OBJECT GetMemory(int siz, FILE_POS *pos)
+{ static ALIGN *next_free = (ALIGN *) nilobj;
+  static ALIGN *top_free  = (ALIGN *) nilobj;
   OBJECT res;
-  char *calloc();
 
   debug1(DMA, DDD, "GetMemory( %d )", siz);
 
   /* get memory from operating system, if not enough left here */
   if( &next_free[siz] > top_free )
-  { next_free = (ALIGN *) calloc(MEM_CHUNK, sizeof(ALIGN));
+  {
+#if DEBUG_ON
+    DebugRegisterUsage(MEM_OBJECTS, 1, MEM_CHUNK * sizeof(ALIGN));
+#endif
+    next_free = (ALIGN *) calloc(MEM_CHUNK, sizeof(ALIGN));
     ifdebug(DMA, D, no_of_calls++; )
     if( next_free == NULL )
       Error(31, 1, "exiting now (run out of memory)", FATAL, pos);
     top_free = &next_free[MEM_CHUNK];
-    debug2(DMA, D, "GetMemory: calloc returned %d - %d",
-      (int) next_free, (int) top_free);
+    debug2(DMA, DD, "GetMemory: calloc returned %ld - %ld",
+      (long) next_free, (long) top_free);
   }
 
   res = (OBJECT) next_free;
   next_free = &next_free[siz];
-  debug3(DMA, DDD, "GetMemory returning @%d (next_free = @%d, top_free = @%d",
-    (int) res, (int) next_free, (int) top_free);
+#if DEBUG_ON
+  recs_created++; bytes_created += siz * sizeof(ALIGN);
+#endif
+  debug3(DMA, DDD, "GetMemory returning @%ld (next_free = @%ld, top_free = @%ld",
+    (long) res, (long) next_free, (long) top_free);
   return res;
 } /* end GetMemory */

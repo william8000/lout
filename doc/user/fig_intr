@@ -1,0 +1,39 @@
+@Section
+   @Title { Introduction }
+@Begin
+@PP
+The Lout definitions for the @Code "@Fig" symbol are kept in a file called
+{@Code "fig"}, which you must include at the start of your document if
+fig.file @Index { @Code "fig" file }
+you want advanced graphics, like this:
+@ID @OneRow @Code {
+"@SysInclude { fig }"
+"@SysInclude { doc }"
+"@Doc @Text @Begin"
+"..."
+"@End @Text"
+}
+Files of definitions, like {@Code "fig"}, must be included before the
+setup file.  Alternatively, if you are using your own setup file, you may
+place the include commands within it; the place to put them is clearly
+marked in all the standard setup files.
+@PP
+Throughout this chapter we will show the Lout text on the left and the
+corresponding result on the right, like this:
+@ID {
+@Code {
+"@Fig {"
+"   @Square"
+"   //0.5c"
+"   @Circle"
+"}"
+}
+||7ct
+@Fig {
+   @Square
+   //0.5c
+   @Circle
+}
+}
+Subsequent examples will omit the enclosing {@Code "@Fig"}.
+@End @Section

@@ -1,6 +1,6 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -119,19 +119,19 @@ static BOOLEAN	TriedFile[MAX_LANGUAGE]  = { FALSE };
 
 /*****************************************************************************/
 /*                                                                           */
-/*  ClassConvert(in, out, T)                                                 */
+/*  ClassConvert(in, out, T, hline_num)                                      */
 /*                                                                           */
 /*  Set out[i] to the character class of in[i] in T, for all i.              */
 /*                                                                           */
 /*****************************************************************************/
 
-#define ClassConvert(in, out, T)					\
+#define ClassConvert(in, out, T, hline_num)				\
 { int i;								\
   for( i = 0;  in[i] != '\0';  i++ )					\
     if( T->class[in[i]] != 0 )  out[i] = T->class[in[i]];		\
     else								\
-      Error(36, 1, "in hyphenation file: '%c' is not in any class",	\
-	FATAL, no_fpos, in);						\
+      Error(36, 1, "in hyphenation file, line %d: character (octal %o) is not in any class",	\
+	FATAL, no_fpos, hline_num, in[i]);				\
   out[i] = '\0';							\
 } /* end ClassConvert */
 
@@ -143,12 +143,12 @@ static BOOLEAN	TriedFile[MAX_LANGUAGE]  = { FALSE };
 /*****************************************************************************/
 #if DEBUG_ON
 
-static FULL_CHAR findrep(i, T)
-int i;  TRIE T;
+static FULL_CHAR findrep(int i, TRIE T)
 { int ch;
   for( ch = 0;  ch < MAX_CHAR;  ch++ )
     if( T->class[ch] == i ) return (FULL_CHAR) ch;
   Error(36, 2, "DoTriePrint: findrep failed", INTERN, no_fpos);
+  return (FULL_CHAR) ch;  /* never reached, but gcc doesn't know that */
 } /* end findrep */
 
 
@@ -157,14 +157,14 @@ int i;  TRIE T;
 /*  static FULL_CHAR *TrieRetrieve(key, T)                                   */
 /*                                                                           */
 /*  Retrieve the value associated with key in T, or NULL if not present.     */
+/*  This procedure is not presently in use.                                  */
 /*                                                                           */
 /*****************************************************************************/
 
-static FULL_CHAR *TrieRetrieve(key, T)
-FULL_CHAR *key;  TRIE T;
+static FULL_CHAR *TrieRetrieve(FULL_CHAR *key, TRIE T)
 { FULL_CHAR str[MAX_BUFF];  int i, curr_node, next_node, pos;
   debug1(DHY, DD, "TrieRetrieve(%s, T)", key);
-  ClassConvert(key, str, T);
+  ClassConvert(key, str, T, 0);
 
   /* invariant: curr_node is an existing node of T with prefix str[0..i-1] */
   curr_node = i = 0;
@@ -199,8 +199,8 @@ FULL_CHAR *key;  TRIE T;
 /*                                                                           */
 /*****************************************************************************/
 
-static ShowRate(key, start, stop, rate, fp)
-FULL_CHAR *key;  int start, stop;  FULL_CHAR *rate;  FILE *fp;
+static void ShowRate(FULL_CHAR *key, int start, int stop, FULL_CHAR *rate,
+FILE *fp)
 { int i;
   fprintf(fp, "key:    ");
   for( i = start;  i < stop;  i++ )  fprintf(fp, " %c", key[i]);
@@ -221,8 +221,7 @@ FULL_CHAR *key;  int start, stop;  FULL_CHAR *rate;  FILE *fp;
 
 static FULL_CHAR prefix[MAX_BUFF];
 
-static DoTriePrint(T, node, len, fp)
-TRIE T; int node, len; FILE *fp;
+static void DoTriePrint(TRIE T, int node, int len, FILE *fp)
 { int i, next_node, pos;  FULL_CHAR str[20];
   for( i = 0;  i < T->class_count;  i++ )
   {
@@ -265,9 +264,8 @@ TRIE T; int node, len; FILE *fp;
 /*                                                                           */
 /*****************************************************************************/
 
-static TriePrint(T, fp)
-TRIE T;  FILE *fp;
-{ int i, j, ch;
+static void TriePrint(TRIE T, FILE *fp)
+{ int i, ch;
   assert( T-> magic == TRIE_MAGIC, "TriePrint: magic!" );
   fprintf(fp, "Classes:");
   for( i = 1;  i < T->class_count;  i++ )
@@ -293,10 +291,11 @@ TRIE T;  FILE *fp;
 /*                                                                           */
 /*****************************************************************************/
 
-static TRIE NewTrie(node_lim, string_lim)
-unsigned node_lim, string_lim;
-{ TRIE T;  int i;  char *malloc();
+static TRIE NewTrie(unsigned node_lim, unsigned string_lim)
+{ TRIE T;  int i;
   debug2(DHY, D, "NewTrie(%d, %d)", node_lim, string_lim);
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_HYPH_PATS, 1,
+    sizeof(struct trie_rec) + node_lim*sizeof(short)+string_lim*sizeof(char)));
   T = (TRIE) malloc( sizeof(struct trie_rec)
 		     + node_lim*sizeof(short) + string_lim*sizeof(char));
   if( T == (TRIE) NULL )
@@ -321,8 +320,7 @@ unsigned node_lim, string_lim;
 /*                                                                           */
 /*****************************************************************************/
 
-static short NewTrieString(str, T)
-FULL_CHAR *str;  TRIE T;
+static short NewTrieString(FULL_CHAR *str, TRIE T)
 { short res = T->string_first - StringLength(str) - 1;
   if( res < 0 )
     Error(36, 4, "hyphenation trie string limit exceeded", INTERN, no_fpos);
@@ -339,8 +337,7 @@ FULL_CHAR *str;  TRIE T;
 /*                                                                           */
 /*****************************************************************************/
 
-static int NewTrieNode(T)
-TRIE T;
+static int NewTrieNode(TRIE T)
 { int i;  int res;
   if( T->node_free + T->class_count > T->node_lim )
     Error(36, 5, "hyphenation trie node limit exceeded", INTERN, no_fpos);
@@ -359,8 +356,7 @@ TRIE T;
 /*                                                                           */
 /*****************************************************************************/
 
-static AddClassToTrie(str, T)
-FULL_CHAR *str; TRIE T;
+static void AddClassToTrie(FULL_CHAR *str, TRIE T)
 { int i;
   assert( T->string_first == T->string_lim, "AddClassToTrie: after insertion");
   for( i = 0;  str[i] != '\0';  i++ )
@@ -373,14 +369,13 @@ FULL_CHAR *str; TRIE T;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  static TrieInsert(key, value, T)                                         */
+/*  static TrieInsert(key, value, T, hline_num)                              */
 /*                                                                           */
-/*  Insert a new key and value into trie T.                                  */
+/*  Insert a new key and value into trie T (originating on line hline_num).  */
 /*                                                                           */
 /*****************************************************************************/
 
-static TrieInsert(key, value, T)
-FULL_CHAR *key, *value;  TRIE T;
+static void TrieInsert(FULL_CHAR *key, FULL_CHAR *value, TRIE T, int hline_num)
 { FULL_CHAR str[MAX_BUFF], compressed_value[MAX_BUFF];
   int i, curr_node, next_node, pos, ch;
   debug2(DHY, D, "TrieInsert(%s, %s, T)", key, value);
@@ -394,7 +389,7 @@ FULL_CHAR *key, *value;  TRIE T;
   CompressValue(compressed_value, value);
 
   /* invariant: curr_node is an existing node of T with prefix str[0..i-1] */
-  ClassConvert(key, str, T);
+  ClassConvert(key, str, T, hline_num);
   curr_node = i = 0;
   for(;;)
   {
@@ -466,8 +461,7 @@ FULL_CHAR *key, *value;  TRIE T;
 #define BePutShort(fp, v)						\
 ( putc((v >> 8) & 0xFF, fp), putc(v & 0xFF, fp), 0 )
 
-int BeGetInt(fp, pv)
-FILE *fp; int *pv;
+static int BeGetInt(FILE *fp, int *pv)
 { int c;
   if ((c = getc(fp)) == EOF) return -1;
   *pv = (c & 0xFF) << 24;
@@ -480,8 +474,7 @@ FILE *fp; int *pv;
   return 0;
 }
 
-int BePutInt(fp, v)
-FILE *fp; int v;
+static int BePutInt(FILE *fp, int v)
 {
   putc((v >> 24) & 0xFF, fp);
   putc((v >> 16) & 0xFF, fp);
@@ -499,8 +492,7 @@ FILE *fp; int v;
 /*                                                                           */
 /*****************************************************************************/
 
-static CompressTrie(T)
-TRIE T;
+static void CompressTrie(TRIE T)
 { FULL_CHAR *p, *q;  int len, i;
   debug0(DHY, D, "CompressTrie(T), T =");
   debug2(DHY, D, "Node space: %d capacity, %d used\n",
@@ -528,10 +520,14 @@ TRIE T;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  static TRIE TrieRead(lnum)                                               */
+/*  static TRIE TrieRead(lnum, success)                                      */
 /*                                                                           */
 /*  Read in a packed trie if possible, otherwise pack an unpacked one.       */
 /*  The trie is to be for language lnum.                                     */
+/*                                                                           */
+/*  Boolean success is set to true if no errors were encountered.  If the    */
+/*  file read was a placeholder, success will be true but still a null       */
+/*  TRIE will be returned.                                                   */
 /*                                                                           */
 /*****************************************************************************/
 #define START_STATE		0
@@ -539,19 +535,23 @@ TRIE T;
 #define EXCEPTIONS_STATE	2
 #define PATTERNS_STATE		3
 
-static TRIE TrieRead(lnum)
-LANGUAGE_NUM lnum;
+static TRIE TrieRead(LANGUAGE_NUM lnum, BOOLEAN *success)
 { TRIE T;  FILE_NUM unpacked_fnum, packed_fnum;  OBJECT fname;
   FILE *unpacked_fp, *packed_fp;  unsigned len; int prev, i, j, c, state;
+  int hline_num;
+#if DEBUG_ON
   int icount = 0;
-  char *malloc();
+#endif
   debug2(DHY, D, "TrieRead(%d %s)", lnum,
     lnum == 0 ? STR_NONE : LanguageString(lnum));
 
   /* get hyphenation file name from language module */
   fname = LanguageHyph(lnum);
-  assert( fname == nil || is_word(type(fname)), "TrieRead: fname!" );
-  if( fname == nil ) return (TRIE) NULL;
+  assert( fname == nilobj || is_word(type(fname)), "TrieRead: fname!" );
+  if( fname == nilobj )
+  { *success = FALSE;
+    return (TRIE) NULL;
+  }
 
   /* define and open packed file */
   packed_fnum = DefineFile(string(fname), HYPH_PACKED_SUFFIX,
@@ -568,20 +568,31 @@ LANGUAGE_NUM lnum;
     if( unpacked_fp == NULL )
     { Error(36, 8, "cannot open hyphenation file %s",
 	WARN, no_fpos, FileName(unpacked_fnum));
+      *success = FALSE;
       return (TRIE) NULL;
     }
+    hline_num = 1;
 
-    /* check that first line contains magic header */
+    /* check that first line contains magic header or stub */
     if( StringFGets(str, MAX_BUFF, unpacked_fp) == NULL ||
-        !StringEqual(str, AsciiToFull("Lout hyphenation information\n")) )
+        ( !StringEqual(str, AsciiToFull("Lout hyphenation information\n")) &&
+	  !StringEqual(str, AsciiToFull("Lout hyphenation placeholder\n")) )
+      )
       Error(36, 9, "header line of hyphenation file %s missing",
 	FATAL, no_fpos, FileName(unpacked_fnum));
+
+    /* if file is just a placeholder, exit silently with success */
+    if( !StringEqual(str, AsciiToFull("Lout hyphenation information\n")) )
+    { *success = TRUE;
+      return (TRIE) NULL;
+    }
 
     /* read the classes, exceptions, and patterns from the unpacked file */
     T = NewTrie( (unsigned) 120000,  (unsigned) 32767);
     state = START_STATE;
     while( fscanf(unpacked_fp, "%s", str) == 1 )
     {
+      hline_num++;
       if( str[0] == '%' ) /* comment to end of line */
       {	StringFGets(str, MAX_BUFF, unpacked_fp);
 	continue;
@@ -627,7 +638,7 @@ LANGUAGE_NUM lnum;
 	    }
 	    key[j] = '.', value[j++] = prev, prev = CH_EIGHT;
 	    key[j] = '\0';  value[j] = prev;  value[j+1] = '\0';
-	    TrieInsert(key, value, T);
+	    TrieInsert(key, value, T, hline_num);
 	  }
 	  break;
 
@@ -641,7 +652,7 @@ LANGUAGE_NUM lnum;
 	  }
 	  key[j] = '\0';  value[j] = prev;  value[j+1] = '\0';
 	  debug3(DHY, D, "TrieInsert(%s, %s, T) [%d]", key, value, ++icount);
-	  TrieInsert(key, value, T);
+	  TrieInsert(key, value, T, hline_num);
 	  break;
 
 
@@ -664,21 +675,26 @@ LANGUAGE_NUM lnum;
     StringCopy(buff, FileName(unpacked_fnum));
     StringCopy(&buff[StringLength(buff) - StringLength(HYPH_SUFFIX)],
       HYPH_PACKED_SUFFIX);
-    packed_fp = StringFOpen(buff, "w");
+    packed_fp = StringFOpen(buff, WRITE_BINARY);
     if( packed_fp == NULL )
       Error(36, 13, "cannot write to hyphenation file %s", FATAL,no_fpos,buff);
     BePutInt(packed_fp, T->magic);
     BePutInt(packed_fp, T->class_count);
     for( i = 0; i < MAX_CHAR; i++ )  BePutChar(packed_fp, T->class[i]);
-    BePutInt(packed_fp, 0);  /* placeholder for node_mem */
+    /* BePutInt(packed_fp, 0); */ /* placeholder for node_mem now omitted */
     BePutInt(packed_fp, T->node_lim);
     BePutInt(packed_fp, T->node_free);
-    BePutInt(packed_fp, 0);  /* placeholder for string_mem */
+    /* BePutInt(packed_fp, 0); */  /* placeholder for string_mem now omitted */
     BePutInt(packed_fp, T->string_lim);
     BePutInt(packed_fp, T->string_first);
     for( i=0; i < T->node_free; i++ )  BePutShort(packed_fp, T->node_mem[i]);
     for( i=0; i < T->string_lim; i++)  BePutChar(packed_fp, T->string_mem[i]);
     fclose(packed_fp);
+
+    /* free T */
+    ifdebug(DMA, D, DebugRegisterUsage(MEM_HYPH_PATS, 1,
+      sizeof(struct trie_rec) + 120000*sizeof(short)+32767*sizeof(char)));
+    free(T);
 
     /* now try again to open packed_fnum, the file just written */
     packed_fp = OpenFile(packed_fnum, FALSE, FALSE);
@@ -689,7 +705,9 @@ LANGUAGE_NUM lnum;
 
   /* now packed hyphenation file is open, read it in */
   fseek(packed_fp,0L,2); len = (unsigned) ftell(packed_fp); rewind(packed_fp);
-  T = (TRIE) malloc(len);
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_HYPH_PATS, 1, len));
+  /* the 2*sizeof(void*) is for the sizes of node_mem and string_mem */
+  T = (TRIE) malloc(len + 2*sizeof(void*));
   if( T == (TRIE) NULL )
     Error(36, 15, "run out of memory while reading hyphenation table",
       FATAL, no_fpos);
@@ -701,19 +719,21 @@ LANGUAGE_NUM lnum;
       FATAL, no_fpos, FileName(packed_fnum));
   BeGetInt(packed_fp, &T->class_count);
   for( i = 0; i < MAX_CHAR; i++ )  BeGetChar(packed_fp, &T->class[i]);
-  BeGetInt(packed_fp, &i);  /* placeholder for node_mem */
+  /* BeGetInt(packed_fp, &i); */  /* placeholder for node_mem now omitted */
   BeGetInt(packed_fp, &T->node_lim);
   BeGetInt(packed_fp, &T->node_free);
-  BeGetInt(packed_fp, &i);  /* placeholder for string_mem */
+  /* BeGetInt(packed_fp, &i); */ /* placeholder for string_mem now omitted */
   BeGetInt(packed_fp, &T->string_lim);
   BeGetInt(packed_fp, &T->string_first);
   T->node_mem = (short *) ( (char *) T + sizeof(struct trie_rec) );
   T->string_mem = (FULL_CHAR *) &(T->node_mem[T->node_lim]);
   for( i = 0; i < T->node_free; i++ )  BeGetShort(packed_fp, &T->node_mem[i]);
   for( i = 0; i < T->string_lim; i++ ) BeGetChar(packed_fp, &T->string_mem[i]);
+  fclose(packed_fp);
 
   /* debug and exit */
   debug0(DHY, D, "TrieRead returning, T =");
+  *success = TRUE;
   ifdebug(DHY, DD, TriePrint(T, stderr));
   return T;
 } /* end TrieRead */
@@ -744,15 +764,13 @@ LANGUAGE_NUM lnum;
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN ReadHyphTable(lnum)
-LANGUAGE_NUM lnum;
+BOOLEAN ReadHyphTable(LANGUAGE_NUM lnum)
 { BOOLEAN res;
   debug1(DHY, D, "ReadHyphTable(%d)", lnum);
   assert(lnum > 0, "ReadHyphTable: lnum <= 0!");
-  assert(HyphTables[lnum] == (TRIE) NULL && !TriedFile[lnum], "ReadHyphTable!");
-  HyphTables[lnum] = TrieRead(lnum);
+  assert(HyphTables[lnum]==(TRIE) NULL && !TriedFile[lnum], "ReadHyphTable!");
+  HyphTables[lnum] = TrieRead(lnum, &res);
   TriedFile[lnum] = TRUE;
-  res = (HyphTables[lnum] != (TRIE) NULL);
   debug2(DHY, D, "ReadHyphTable(%d) returning %s", lnum, bool(res));
   return res;
 } /* end ReadHyphTable */
@@ -765,15 +783,13 @@ LANGUAGE_NUM lnum;
 /*  Hyphenate ACAT object x, returning the hyphenated result.                */
 /*                                                                           */
 /*****************************************************************************/
-static ShowRate();
 
-OBJECT Hyphenate(x)
-OBJECT x;
+OBJECT Hyphenate(OBJECT x)
 { OBJECT link, y, z, next_link;  TRIE T;  LANGUAGE_NUM lnum;
   FULL_CHAR str[MAX_WORD+2], rate[MAX_WORD+3], val[MAX_WORD+3],
-    *class, *key, *ss, *s, *p, *rem;
+    *class, *key, *ss, *s, *p, *rem, *lig, *a, *b;
   int start, stop, i, curr_node, next_node, pos;
-  BOOLEAN hyphenated;
+  BOOLEAN hyphenated, success;
   assert( type(x) == ACAT, "Hyphenate: type(x) != ACAT!" );
   debug1(DHY, DD, "Hyphenate(%s)", EchoObject(x));
 
@@ -794,7 +810,7 @@ OBJECT x;
     /* if no trie is present, try to get it from a file */
     if( T == (TRIE) NULL )
     { if( !TriedFile[lnum] )
-      { T = HyphTables[lnum] = TrieRead(lnum);
+      { T = HyphTables[lnum] = TrieRead(lnum, &success);
         TriedFile[lnum] = TRUE;
       }
       if( T == (TRIE) NULL )
@@ -816,10 +832,12 @@ OBJECT x;
       word_colour(z) = word_colour(y);
       word_language(z) = word_language(y);
       word_hyph(z) = word_hyph(y);
+      underline(z) = underline(y);
       FontWordSize(z);
       Link(NextDown(link), z);
       z = New(GAP_OBJ);
       SetGap(gap(z), FALSE, TRUE, FIXED_UNIT, HYPH_MODE, 0);
+      underline(z) = underline(y);
       Link(NextDown(link), z);
       Link(z, MakeWord(WORD, STR_GAP_ZERO_HYPH, &fpos(y)));
       key[stop + 1] = '\0';
@@ -892,6 +910,27 @@ OBJECT x;
     } while( *(++ss + 1) != PUNCT_CLASS );
     ifdebug(DHY, DD, ShowRate(key, start, stop, rate, stderr));
 
+    /* set rate[i] to CH_ZERO whenever key[start+i-1] lies within a ligature */
+    lig = finfo[word_font(y)].lig_table;
+    for( p = key, i = 2;  *p != '\0';  p++, i++ )
+    { if( lig[*p] > 1 )
+      { a = &lig[ lig[*p] + MAX_CHARS ];
+        while( *a++ == *p )
+        { b = p+1;
+          while( *a == *b && *(a+1) != '\0' && *b != '\0' )  a++, b++;
+          if( *(a+1) == '\0' )
+          { rate[i] = CH_ZERO;
+            break;
+          }
+          else
+          { while( *++a );
+            a++;
+          }
+        }
+      }
+    }
+    ifdebug(DHY, DD, ShowRate(key, start, stop, rate, stderr));
+
     /* now rate[] has accumulated ratings; use it to perform hyphenations */
     hyphenated = FALSE;
     next_link = NextDown(link);
@@ -904,10 +943,12 @@ OBJECT x;
 	word_colour(z) = word_colour(y);
 	word_language(z) = word_language(y);
 	word_hyph(z) = word_hyph(y);
+	underline(z) = underline(y);
 	FontWordSize(z);
 	Link(NextDown(link), z);
 	z = New(GAP_OBJ);
 	SetGap(gap(z), FALSE, TRUE, FIXED_UNIT, HYPH_MODE, 0);
+	underline(z) = underline(y);
 	Link(NextDown(link), z);
 	Link(z, MakeWord(WORD, STR_GAP_ZERO_HYPH, &fpos(y)));
 	key[start + i - 1] = '\0';

@@ -1,6 +1,6 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -81,7 +81,7 @@ static	int		sym_count = 0;			/* symbol count      */
 /*                                                                           */
 /*****************************************************************************/
 
-InitSym()
+void InitSym(void)
 { int i;
   scope_top = 0;
   suppress_scope = FALSE;
@@ -103,13 +103,13 @@ InitSym()
 /*                                                                           */
 /*****************************************************************************/
 
-PushScope(x, npars, vis)
-OBJECT x;  BOOLEAN npars, vis;
+void PushScope(OBJECT x, BOOLEAN npars, BOOLEAN vis)
 { debug2(DST, DD, "[ PushScope( %s, %s )", SymName(x), bool(npars));
   assert( suppress_scope == FALSE, "PushScope: suppress_scope!" );
   if( scope_top >= MAX_STACK )
-  { int i;
+  {
 #if DEBUG_ON
+    int i;
     for( i = 0; i < scope_top; i++ )
       Error(29, 1, "  scope[%2d] = %s", WARN, &fpos(x), i, SymName(scope[i]));
 #endif
@@ -122,7 +122,7 @@ OBJECT x;  BOOLEAN npars, vis;
   scope_top++;
 } /* end PushScope */
 
-PopScope()
+void PopScope(void)
 { debug0(DST, DD, "] PopScope()");
   assert( scope_top > 0, "PopScope: tried to pop empty scope stack");
   assert( suppress_scope == FALSE, "PopScope: suppress_scope!" );
@@ -139,12 +139,12 @@ PopScope()
 /*                                                                           */
 /*****************************************************************************/
 
-SuppressVisible()
+void SuppressVisible(void)
 { debug0(DST, DD, "[ SuppressVisible()");
   suppress_visible = TRUE;
 } /* end SuppressVisible */
 
-UnSuppressVisible()
+void UnSuppressVisible(void)
 { debug0(DST, DD, "] UnSuppressVisible()");
   suppress_visible = FALSE;
 } /* end UnSuppressVisible */
@@ -160,12 +160,12 @@ UnSuppressVisible()
 /*****************************************************************************/
 
 
-SuppressScope()
+void SuppressScope(void)
 { debug0(DST, DD, "[ SuppressScope()");
   suppress_scope = TRUE;
 } /* end SuppressScope */
 
-UnSuppressScope()
+void UnSuppressScope(void)
 { debug0(DST, DD, "] UnSuppressScope()");
   suppress_scope = FALSE;
 } /* end UnSuppressScope */
@@ -176,15 +176,14 @@ UnSuppressScope()
 /*  SwitchScope(sym)                                                         */
 /*  UnSwitchScope(sym)                                                       */
 /*                                                                           */
-/*  Switch to the scope of sym (if nil, StartSym); and switch back again.    */
+/*  Switch to the scope of sym (if nilobj, StartSym); and switch back again. */
 /*                                                                           */
 /*****************************************************************************/
 
-SwitchScope(sym)
-OBJECT sym;
+void SwitchScope(OBJECT sym)
 { int i;
   OBJECT new_scopes[MAX_STACK];
-  if( sym == nil )  PushScope(StartSym, FALSE, FALSE);
+  if( sym == nilobj )  PushScope(StartSym, FALSE, FALSE);
   else
   { i = 0;
     while( sym != StartSym )
@@ -195,9 +194,8 @@ OBJECT sym;
   }
 }
 
-UnSwitchScope(sym)
-OBJECT sym;
-{ if( sym == nil )  PopScope();
+void UnSwitchScope(OBJECT sym)
+{ if( sym == nilobj )  PopScope();
   else
   { while( sym != StartSym )
     { PopScope();
@@ -216,12 +214,12 @@ OBJECT sym;
 /*                                                                           */
 /*****************************************************************************/
 
-BodyParAllowed()
+void BodyParAllowed(void)
 { debug0(DST, DD, "BodyParAllowed()");
   body_ok[scope_top-1] = TRUE;
 } /* end BodyParAllowed */
 
-BodyParNotAllowed()
+void BodyParNotAllowed(void)
 { debug0(DST, DD, "BodyParNotAllowed()");
   body_ok[scope_top-1] = FALSE;
 } /* end BodyParNotAllowed */
@@ -240,12 +238,9 @@ BodyParNotAllowed()
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT InsertSym(str, xtype, xfpos, xprecedence, xindefinite, xrecursive,
-					     xpredefined, xenclosing, xbody)
-FULL_CHAR *str;  unsigned char xtype;
-FILE_POS *xfpos; unsigned char xprecedence;
-BOOLEAN xindefinite, xrecursive;  unsigned xpredefined;
-OBJECT xenclosing, xbody;
+OBJECT InsertSym(FULL_CHAR *str, unsigned char xtype, FILE_POS *xfpos,
+unsigned char xprecedence, BOOLEAN xindefinite, BOOLEAN xrecursive,
+unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
 { register int sum, rlen;
   register unsigned char *x;
   OBJECT p, q, s, link, entry, plink;  int len;
@@ -258,8 +253,8 @@ OBJECT xenclosing, xbody;
   s = New(xtype);
   FposCopy(fpos(s), *xfpos);
   has_body(s)          = FALSE;
-  filter(s)            = nil;
-  use_invocation(s)    = nil;
+  filter(s)            = nilobj;
+  use_invocation(s)    = nilobj;
   right_assoc(s)       = TRUE;
   precedence(s)        = xprecedence;
   indefinite(s)        = xindefinite;
@@ -267,10 +262,10 @@ OBJECT xenclosing, xbody;
   predefined(s)        = xpredefined;
   enclosing(s)         = xenclosing;
   sym_body(s)          = xbody;
-  base_uses(s)         = nil;
-  uses(s)              = nil;
-  marker(s)            = nil;
-  cross_sym(s)         = nil;
+  base_uses(s)         = nilobj;
+  uses(s)              = nilobj;
+  marker(s)            = nilobj;
+  cross_sym(s)         = nilobj;
   is_extern_target(s)  = FALSE;
   uses_extern_target(s)= FALSE;
   visible(s)           = FALSE;
@@ -278,7 +273,7 @@ OBJECT xenclosing, xbody;
 
   uses_count(s)  = 0;
   dirty(s)       = FALSE;
-  if( enclosing(s) != nil && type(enclosing(s)) == NPAR )
+  if( enclosing(s) != nilobj && type(enclosing(s)) == NPAR )
     dirty(enclosing(s)) = TRUE;
 
   has_par(s)     = FALSE;
@@ -293,7 +288,9 @@ OBJECT xenclosing, xbody;
   if( !StringEqual(str, KW_TARGET) ) is_target(s) = FALSE;
   else
   { is_target(s) = has_target(enclosing(s)) = TRUE;
-    if( has_key(enclosing(s)) && xbody != nil && type(xbody) == CROSS )
+
+    /* if @Target is found after @Key, take note of external target */
+    if( has_key(enclosing(s)) && xbody != nilobj && type(xbody) == CROSS )
     { if( LastDown(xbody) != Down(xbody) )
       { OBJECT sym;
 	Child(sym, Down(xbody));
@@ -305,13 +302,34 @@ OBJECT xenclosing, xbody;
     }
   }
 
-  has_tag(s)  = FALSE;
-  if( !StringEqual(str, KW_TAG) ) is_tag(s) = FALSE;
-  else is_tag(s) = has_tag(enclosing(s)) = dirty(enclosing(s)) = TRUE;
+  has_tag(s) = is_tag(s) = FALSE;
+  has_key(s) = is_key(s) = FALSE;
+  has_merge(s) = is_merge(s) = FALSE;
+  if( enclosing(s) != nilobj && type(enclosing(s)) == LOCAL )
+  {
+    if( StringEqual(str, KW_TAG) )
+      is_tag(s) = has_tag(enclosing(s)) = dirty(enclosing(s)) = TRUE;
 
-  has_key(s)  = FALSE;
-  if( !StringEqual(str, KW_KEY) ) is_key(s) = FALSE;
-  else is_key(s) = has_key(enclosing(s)) = TRUE;
+    if( StringEqual(str, KW_KEY) )
+    { is_key(s) = has_key(enclosing(s)) = dirty(enclosing(s)) = TRUE;
+
+      /* if @Key is found after @Target, take note of external target */
+      for( link=Down(enclosing(s));  link!=enclosing(s);  link=NextDown(link) )
+      { Child(p, link);
+	if( is_target(p) && sym_body(p) != nilobj && type(sym_body(p))==CROSS )
+	{ OBJECT sym;
+	  Child(sym, Down(sym_body(p)));
+	  if( type(sym) == CLOSURE )
+	  { is_extern_target(actual(sym)) = TRUE;
+	    uses_extern_target(actual(sym)) = TRUE;
+	  }
+	}
+      }
+    } 
+
+    if( StringEqual(str, KW_MERGE) )
+      is_merge(s) = has_merge(enclosing(s)) = TRUE;
+  }
 
   if( StringEqual(str, KW_FILTER) )
   { if( type(s) != LOCAL || enclosing(s) == StartSym )
@@ -354,7 +372,7 @@ OBJECT xenclosing, xbody;
 
  wrapup:
   Link(p, s);
-  if( enclosing(s) != nil ) Link(enclosing(s), s);
+  if( enclosing(s) != nilobj ) Link(enclosing(s), s);
   debug2(DST, DD, "InsertSym Link(%s, %s) and returning.",
 		SymName(enclosing(s)), SymName(s));
   return s;
@@ -366,12 +384,11 @@ OBJECT xenclosing, xbody;
 /*  OBJECT SearchSym(str, len)                                               */
 /*                                                                           */
 /*  Search the symbol table for str, with length len, and return an          */
-/*  OBJECT referencing the entry if found.  Otherwise return nil.            */
+/*  OBJECT referencing the entry if found.  Otherwise return nilobj.         */
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT SearchSym(str, len)
-FULL_CHAR *str;  int len;
+OBJECT SearchSym(FULL_CHAR *str, int len)
 { register int rlen, sum;
   register FULL_CHAR *x, *y;
   OBJECT p, q, link, plink, entry;
@@ -407,8 +424,8 @@ FULL_CHAR *str;  int len;
     }
     rlen = len;
   }
-  debug0(DST, DDD, "SearchSym returning <nil>");
-  return nil;
+  debug0(DST, DDD, "SearchSym returning <nilobj>");
+  return nilobj;
 } /* end SearchSym */
 
 
@@ -420,10 +437,9 @@ FULL_CHAR *str;  int len;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *SymName(s)
-OBJECT s;
+FULL_CHAR *SymName(OBJECT s)
 { OBJECT p;
-  if( s == nil )  return AsciiToFull("<nil>");
+  if( s == nilobj )  return AsciiToFull("<nilobj>");
   Parent(p, Up(s));
   assert( is_word(type(p)), "SymName: !is_word(type(p))!" );
   return string(p);
@@ -438,13 +454,12 @@ OBJECT s;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *FullSymName(x, str)
-OBJECT x;  FULL_CHAR *str;
+FULL_CHAR *FullSymName(OBJECT x, FULL_CHAR *str)
 { OBJECT stack[20];  int i;
   static FULL_CHAR buff[MAX_BUFF], *sname;
-  if( x == nil )  return AsciiToFull("<nil>");
-  assert( enclosing(x) != nil, "FullSymName: enclosing(x) == nil!" );
-  for( i = 0;  enclosing(x) != nil && i < 20;  i++ )
+  if( x == nilobj )  return AsciiToFull("<nilobj>");
+  assert( enclosing(x) != nilobj, "FullSymName: enclosing(x) == nilobj!" );
+  for( i = 0;  enclosing(x) != nilobj && i < 20;  i++ )
   { stack[i] = x;
     x = enclosing(x);
   }
@@ -472,16 +487,15 @@ OBJECT x;  FULL_CHAR *str;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT ChildSym(s, typ)
-OBJECT s;  unsigned typ;
+OBJECT ChildSym(OBJECT s, unsigned typ)
 { OBJECT link, y;
   for( link = Down(s);  link != s;  link = NextDown(link) )
   { Child(y, link);
     if( type(y) == typ && enclosing(y) == s )  return y;
   }
-  Error(29, 10, "symbol %s has missing %s", INTERN, &fpos(s),
+  Error(29, 10, "symbol %s has missing %s", FATAL, &fpos(s),
     SymName(s), Image(typ));
-  return nil;
+  return nilobj;
 } /* end ChildSym */
 
 
@@ -494,7 +508,7 @@ OBJECT s;  unsigned typ;
 /*****************************************************************************/
 #if DEBUG_ON
 
-CheckSymSpread()
+void CheckSymSpread(void)
 { int i, j, sum, usum;  OBJECT entry, plink;
   debug2(DST, D, "Symbol table spread (table size = %d, symbols = %d):",
     MAX_TAB, sym_count);
@@ -527,19 +541,18 @@ CheckSymSpread()
 /*                                                                           */
 /*****************************************************************************/
 
-static DeleteSymBody(s)
-OBJECT s;
+static void DeleteSymBody(OBJECT s)
 { debug1(DST, DDD, "DeleteSymBody( %s )", SymName(s));
   switch( type(s) )
   {
-    case MACRO:	while( sym_body(s) != nil )
+    case MACRO:	while( sym_body(s) != nilobj )
 		  sym_body(s) = DeleteAndDispose(sym_body(s), PARENT);
 		break;
 	
     case LPAR:
     case NPAR:
     case RPAR:
-    case LOCAL:	if( sym_body(s) != nil ) DisposeObject(sym_body(s));
+    case LOCAL:	if( sym_body(s) != nilobj ) DisposeObject(sym_body(s));
 		break;
 
     default:	Error(29, 11, "DeleteSymBody: %s", INTERN,no_fpos,Image(type(s)));
@@ -561,7 +574,7 @@ OBJECT s;
 /*                                                                           */
 /*****************************************************************************/
 
-DeleteEverySym()
+void DeleteEverySym(void)
 { int i, j, load, cost;  OBJECT p, plink, link, x, entry;
   debug0(DST, D, "DeleteEverySym()");
 
@@ -573,11 +586,11 @@ DeleteEverySym()
       for( link = Down(p);  link != p;  link = NextDown(link) )
       {	Child(x, link);  DeleteSymBody(x);
 	/* *** will not work now
-	while( base_uses(x) != nil )
+	while( base_uses(x) != nilobj )
 	{ tmp = base_uses(x);  base_uses(x) = next(tmp);
 	  PutMem(tmp, USES_SIZE);
 	}
-	while( uses(x) != nil )
+	while( uses(x) != nilobj )
 	{ tmp = uses(x);  uses(x) = next(tmp);
 	  PutMem(tmp, USES_SIZE);
 	}
@@ -595,9 +608,13 @@ DeleteEverySym()
       DisposeChild(Down(entry));
     }
   }
-  if( load > 0 ) debug4(DST, D, "size = %d, items = %d (%d%%), probes = %.1f",
-    MAX_TAB, load, (100*load)/MAX_TAB, (float) cost/load);
-  else debug1(DST, D, "table size = %d, no entries in table", MAX_TAB);
+  if( load > 0 )
+  { debug4(DST, D, "size = %d, items = %d (%d%%), probes = %.1f",
+      MAX_TAB, load, (100*load)/MAX_TAB, (float) cost/load);
+  }
+  else
+  { debug1(DST, D, "table size = %d, no entries in table", MAX_TAB);
+  }
   debug0(DST, D, "DeleteEverySym returning.");
 } /* end DeleteEverySym */
 #endif

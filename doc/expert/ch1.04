@@ -110,7 +110,7 @@ To create a galley, first define a symbol with a
 special @Code into
 into @Index { @Code into clause }
 clause, like this:
-@ID @Code {
+@ID @OneRow @Code {
 "def @FootNote into { @FootPlace&&following }"
 "   right x"
 "{"
@@ -279,27 +279,6 @@ sometimes prevents Lout from choosing the nearest target).  Only the
 root galley contains receptive symbols in our running example, but in
 fact any galley may contain them, without restriction.
 @PP
-When footnotes are placed at the bottom of a page, they appear there in
-first come, first served order.  To make galleys appear in sorted order, as
-sorted.galley @Index { Sorted galleys }
-is needed in bibliographies and indexes, a parameter or nested definition
-with the special name @@Key
-key. @Index { @@Key parameter }
-is added to the galley definition, like this:
-@ID @Code {
-"def @IndexEntry into { @IndexPlace&&following }"
-"   left @Key"
-"   right x"
-"{ x }"
-}
-Like @@Tag, @@Key must be set to a simple word when the galley is invoked:
-@ID @Code {
-"cities @IndexEntry { cities, comparison of, 27 }"
-}
-and this key is used to sort the galleys.  If several sorted galleys
-with the same key are sent to the same place, only one of them is
-printed, since the others are probably unwanted duplicates.
-@PP
 The discussion of galleys is continued at a more detailed level in
-Section {@NumberOf targets}.
+Sections {@NumberOf targets} and {@NumberOf sorted}.
 @End @Section

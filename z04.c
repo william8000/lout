@@ -1,6 +1,6 @@
 /*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -38,9 +38,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT NewToken(xtype, xfpos, xvspace, xhspace, xprec, xactual)
-unsigned char xtype;  FILE_POS *xfpos;  unsigned char xvspace, xhspace;
-unsigned char xprec;  OBJECT xactual;
+OBJECT NewToken(unsigned char xtype, FILE_POS *xfpos, unsigned char xvspace,
+unsigned char xhspace, unsigned char xprec, OBJECT xactual)
 { OBJECT res;
   debug1(DTS, DDD, "NewToken(%s, ...)", Image(xtype));
   res = New(xtype);  FposCopy(fpos(res), *xfpos);
@@ -60,11 +59,10 @@ unsigned char xprec;  OBJECT xactual;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT CopyTokenList(x, pos)
-OBJECT x;  FILE_POS *pos;
+OBJECT CopyTokenList(OBJECT x, FILE_POS *pos)
 { OBJECT y, z, res;
-  res = nil;  y = x;
-  if( x != nil ) do
+  res = nilobj;  y = x;
+  if( x != nilobj ) do
   { if( is_word(type(y)) )
     { z = MakeWord(type(y), string(y), pos);
       vspace(z) = vspace(y);  hspace(z) = hspace(y);
@@ -84,8 +82,7 @@ OBJECT x;  FILE_POS *pos;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *EchoCatOp(xtype, xmark, xjoin)
-unsigned xtype;  BOOLEAN xmark, xjoin;
+FULL_CHAR *EchoCatOp(unsigned xtype, BOOLEAN xmark, BOOLEAN xjoin)
 { switch( xtype )
   {
     case VCAT:	return	(xmark ? xjoin ? KW_VCAT_MJ : KW_VCAT_MN
@@ -113,20 +110,17 @@ unsigned xtype;  BOOLEAN xmark, xjoin;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *EchoToken(x)
-OBJECT x;
+FULL_CHAR *EchoToken(OBJECT x)
 { switch( type(x) )
   {
     case WORD:
     
       return string(x);
-      break;
 
 
     case QWORD:
     
       return StringQuotedWord(x);
-      break;
 
 
     case TSPACE:
@@ -137,7 +131,6 @@ OBJECT x;
     case GSTUB_NONE:
     
       return Image(type(x));
-      break;
 
 
     case UNEXPECTED_EOF:
@@ -148,6 +141,7 @@ OBJECT x;
     case LBR:
     case RBR:
     case NULL_CLOS:
+    case PAGE_LABEL:
     case CROSS:
     case ONE_COL:
     case ONE_ROW:
@@ -173,9 +167,12 @@ OBJECT x;
     case FONT:
     case SPACE:
     case BREAK:
+    case UNDERLINE:
     case COLOUR:
     case LANGUAGE:
     case CURR_LANG:
+    case COMMON:
+    case RUMP:
     case NEXT:
     case OPEN:
     case TAGGED:
@@ -193,15 +190,13 @@ OBJECT x;
     case LUSE:
     case LVIS:
     
-      return actual(x) != nil ? SymName(actual(x)) : Image(type(x));
-      break;
+      return actual(x) != nilobj ? SymName(actual(x)) : Image(type(x));
 
 
     default:
     
       Error(4, 2, "EchoToken: %s", INTERN, &fpos(x), Image(type(x)));
       return STR_EMPTY;
-      break;
   }
 } /* end EchoToken */
 #endif

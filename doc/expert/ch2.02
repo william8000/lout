@@ -6,7 +6,7 @@
 A definition may contain
 nested.def @Index { Nested definitions }
 other definitions at the beginning of its body:
-@ID @Code {
+@ID @OneRow @Code {
 "def @NineSquare"
 "   right x"
 "{"
@@ -38,9 +38,9 @@ is the {@I {body parameter}},
 parameter.body @SubIndex { @Code body parameter }
 body.par @Index { @Code body parameter }
 an alternative form of right parameter.  The Eq equation formatting
-package @Cite { $kingston1994lout.user, Chapter 7 } is a classic example
+package @Cite { $kingston1995lout.user, Chapter 7 } is a classic example
 of the use of a body parameter.  In outline, it looks like this:
-@ID @Code {
+@ID @OneRow @Code {
 "export \"+\" sup over"
 ""
 "def @Eq"
@@ -86,7 +86,7 @@ Finally, exported nested symbols and parameters may be made visible within
 a subsequent definition or macro by preceding it with an @Code import
 import @Index { @Code import clause }
 clause, like this:
-@ID @Code {
+@ID @OneRow @Code {
 "import @Eq"
 "def pythag { sqrt { x sup 2 + y sup 2 } }"
 }
@@ -98,7 +98,7 @@ a {@Code "@Use { @Eq ... }"}.  There may be several symbols in the
 @PP
 In a similar way to {@Code "import"}, a definition may be preceded
 by {@Code "extend"} followed by a symbol name:
-@ID @Code {
+@ID @OneRow @Code {
 "extend @Eq"
 "def pythag { sqrt { x sup 2 + y sup 2 } }"
 }
@@ -114,7 +114,7 @@ just the exported ones, and only one symbol may follow the
 @PP
 Actually, more than one symbol may follow {@Code extend}, but this
 usage indicates a `path name' of the symbol.  For example,
-@ID @Code {
+@ID @OneRow @Code {
 "extend @DocumentLayout @ReportLayout"
 "def @Keywords ..."
 }

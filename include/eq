@@ -82,11 +82,12 @@ export	"`" "``" "```" bin rel punct non vctr big
 	arccos arcsin arctan arg cos cosh cot coth csc deg det dim exp
 	gcd hom inf ker lg lim liminf limsup ln log max min Pr sec sin
 	sinh supr tan tanh mod ldots cdots vdots ddots del grad
-	"..." "'" empty
+	"..." ",...," "'" empty
 	
-	sup sub supp on frac half third over from to widefrom wideto
+	sup sub tsub supp on ton frac half third over from to widefrom wideto
 	dot dotdot hat tilde vec dyad overbar underbar sqrt root above
-	labove cabove rabove mabove nextcol matrix
+	labove cabove rabove mabove nextcol
+	matrix pmatrix bmatrix brmatrix fmatrix cmatrix amatrix
 
 def @Eq                  
    body @Body
@@ -136,6 +137,11 @@ def @Eq
      #     }
 
      0.5w @VShift x
+   }
+
+   def @Strut right x
+   {
+     @OneCol { "1.0 1.0 1.0 setrgbcolor" @SetColour { &0io "9" &0io } | x }
    }
 
    ###################################################################
@@ -376,7 +382,7 @@ def @Eq
    def Im           { Ifraktur					}
    def partial      { partialdiff				}
    def infty        { infinity					}
-   def prime        {  minute        				}
+   def prime        { minute        				}
   #def emptyset     { defined above				}
    def nabla        { gradient					}
    def surd         { radical					}
@@ -624,18 +630,18 @@ def @Eq
    #                                                                 #
    ###################################################################
 
-   def lpar	{ parenleft		}
-   def rpar	{ parenright		}
-   def lbrack	{ bracketleft		}
-   def rbrack	{ bracketright		}
-   def lbrace	{ braceleft		}
-   def rbrace	{ braceright		}
-   def lfloor	{ bracketleftbt		}
-   def rfloor	{ bracketrightbt	}
-   def lceil	{ bracketlefttp		}
-   def rceil	{ bracketrighttp	}
-   def langle	{ angleleft		}
-   def rangle	{ angleright		}
+   def lpar	{ parenleft				}
+   def rpar	{ parenright				}
+   def lbrack	{ bracketleft				}
+   def rbrack	{ bracketright				}
+   def lbrace	{ braceleft				}
+   def rbrace	{ braceright				}
+   def lfloor	{ ` "-0.15f" @VShift bracketleftbt	}
+   def rfloor	{   "-0.15f" @VShift bracketrightbt `	}
+   def lceil	{ ` "-0.1f"  @VShift bracketlefttp	}
+   def rceil	{   "-0.1f"  @VShift bracketrighttp `	}
+   def langle	{ angleleft				}
+   def rangle	{ angleright				}
 
    def blpar	{ @OneRow {parenlefttp    ^/ parenleftex    / parenleftbt   } }
    def brpar	{ @OneRow {parenrighttp   ^/ parenrightex   / parenrightbt  } }
@@ -799,6 +805,19 @@ def @Eq
       }
    }
 
+   def tsub
+      precedence 60
+      associativity left
+      left x
+      named gap { @SupGap }
+      right y
+   {  @HContract @VContract
+      {
+	      x
+	 /gap    |  &0io 0.3f @HShift @Smaller y
+      }
+   }
+
    def supp
       precedence 60
       associativity left
@@ -806,7 +825,7 @@ def @Eq
       named gap { @SupGap }
       right y
    {  @HContract @VContract
-      { { ^/gap x /gap } |  @Smaller y
+      { { ^/gap x /gap } |  y
       }
    }
 
@@ -816,17 +835,27 @@ def @Eq
       left x
       named gap { @SupGap }
       right y
-   {  x ^/  / y 
+   {  @Smaller x ^/  / @Smaller y 
+   }
+
+   def ton
+      precedence 61
+      associativity left
+      left x
+      named gap { @SupGap }
+      right y
+   {  @Smaller x ^/  / &0io 0.3f @HShift @Smaller y
    }
 
    def frac
       precedence 54
       associativity left
       left x
-      named gap { 0ik }
+      named gap { 0.2f }
       right y
    {  @HContract @VContract @Smaller
-      { x ^/gap | fraction /gap | | y }
+      { 1w @VShift { x /gap } | fraction &0io | 0w @VShift { |gap y }
+      }
    }
 
    def half { 1 frac 2 }
@@ -842,7 +871,7 @@ def @Eq
       @HContract @VContract
       {          |0.5rt @OneCol x
 	^//gap   @HLine
-	 //gap   |0.5rt @OneCol y
+	 //gap   |0.5rt @OneCol @Strut y
       }
    }
 
@@ -962,7 +991,7 @@ def @Eq
       @HContract @VContract
       { @VScale surd | @OneRow
 	{ @HLine line { "0.03 ft setlinewidth 2 setlinecap" }
-	  ^//gap  |gap  x //gap
+	  ^//gap  |gap  @Strut x //gap
 	}
       }
    }
@@ -1034,6 +1063,13 @@ def @Eq
 	@VScale atright
      }
    }
+
+   macro pmatrix  { matrix atleft { (       } atright { )       } }
+   macro bmatrix  { matrix atleft { blbrack } atright { brbrack } }
+   macro brmatrix { matrix atleft { blbrace } atright { brbrace } }
+   macro fmatrix  { matrix atleft { blfloor } atright { brfloor } }
+   macro cmatrix  { matrix atleft { blceil  } atright { brceil  } }
+   macro amatrix  { matrix atleft { blangle } atright { brangle } }
 
    Slope @Font 1.2f @Break 0c @Space @Body
 

@@ -4,14 +4,14 @@
 @SysInclude { pas }
 @SysInclude { graph }
 @SysInclude { cprint }
-@SysInclude { overheads }
+@SysInclude { slides }
 @SysDatabase @Reference { loutrefs }
 @OverheadTransparencies
-    @Title { A Practical
-Introduction to the
+    @Title { A Practical Introduction to the
+
 Lout
-Document Formatting
-System
+
+Document Formatting System
 }
     @RunningTitle { lout }
     @Author { Jeffrey H. Kingston }
@@ -229,7 +229,7 @@ Section 10.6 on page 245.
 "@Database @Reference { myrefs }"
 "..."
 "For the details, consult the User's"
-"Guide @Cite { $kingston1994lout.user }."
+"Guide @Cite { $kingston1995lout.user }."
 }
 @End @Overhead
 
@@ -242,7 +242,7 @@ Guide [1].
 @LP
 @Heading { References }
 @NumberedList
-@LI @RefPrint kingston1994lout.user
+@LI @RefPrint kingston1995lout.user
 @LI ...
 @EndList
 }
@@ -253,7 +253,7 @@ Guide [1].
 @Begin
 @ID @Code {
 "{ @Reference"
-"     @Tag { kingston1994lout.user }"
+"     @Tag { kingston1995lout.user }"
 "     @Type { Book }"
 "     @Author { Jeffrey H. Kingston }"
 "     @Title { A User's Guide to the Lout"

@@ -25,7 +25,7 @@ and extended this scheme.
 @PP
 In Lout, automatic cross referencing works in the following way.  First
 define a symbol with a parameter with the special name @Code "@Tag":
-@ID @Code {
+@ID @OneRow @Code {
 "def @Table"
 "   left @Tag"
 "   right @Value"
@@ -35,18 +35,19 @@ define a symbol with a parameter with the special name @Code "@Tag":
 }
 When this symbol is invoked, the value given to @Code "@Tag" should be a
 simple word like {@Code "cities"}, or several simple words juxtaposed
-like {@Code "cities.compare"}; it serves to name the invocation:
-@ID @Code {
-"cities @Table"
+like {@Code "cities compare"}; it serves to name the invocation:
+@ID @OneRow @Code {
+"{ cities compare } @Table"
 "{"
 "    Washington  |0.5i  Canberra"
 "}"
 }
 We may now refer to this invocation elsewhere in the document, using the
-@I {cross reference} @Code "@Table&&cities".  Here @Code "&&" is the
-{@I {cross reference symbol}}; its left parameter is a symbol and its right
-parameter is the value of the @Code "@Tag" parameter of some invocation
-of that symbol.
+@I {cross reference} @Code "@Table&&{ cities compare }".  Here @Code "&&"
+is the {@I {cross reference symbol}}; its left parameter is a symbol and
+its right parameter is the value of the @Code "@Tag" parameter of some
+invocation of that symbol.  Of course it's simplest if you use just a
+one-word tag; then no braces are needed.
 @PP
 A cross reference is not an object; the reader should think of it as
 an arrow in the final printed document, beginning at the cross reference

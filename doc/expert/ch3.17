@@ -1,17 +1,27 @@
 @Section
-   @Title { "@Next" }
-   @Tag { next }
+   @Title { "@Common" and "@Rump" }
+   @Tag { rump }
 @Begin
 @PP
-next.sym @Index { @@Next symbol }
-The symbol @@Next returns its parameter
-plus one.  It is rather clever at working this out:  it hunts through
-the parameter from right to left, looking for a number to increment:
-@ID @Code {
-"@Next (3.99)"
-}
-has result {@Next (3.99)}.  If @@Next cannot find a digit inside
-its parameter, it is an error.  Roman numerals are handled by storing
-them in a database, as explained in Section {@NumberOf paras};
-@@Next will not increment a Roman numeral.
+common.sym @Index { @@Common symbol }
+rump.sym @Index { @@Rump symbol }
+The @@Common and @@Rump symbols compare two paragraph objects:
+@ID @Code "{ Aardvark, 29 } @Common { Aardvark, 359 }"
+If either parameter is not a paragraph object, it is converted into
+a single-object paragraph first.  The result of @@Common is the
+common prefix of the two paragraphs; that is, those initial objects
+which are equal in the two paragraphs.  In the example above, the
+result is {@Code "Aardvark,"}.  The result of @@Rump is that part of
+the second object which is not included in @@Common; the result of
+@ID @Code "{ Aardvark, 29 } @Rump { Aardvark, 359 }"
+is {@Code "359"}.
+@PP
+If the two objects have nothing in common, the result of @@Common will
+be an empty object and the result of @@Rump will be the second
+object.  If the two objects are identical, the result of @@Common will
+be the first object, and the result of @@Rump will be an empty object.
+@PP
+The only known use for @@Rump is to implement merged index entries
+(Section {@NumberOf sorted}), and @@Common, although included for
+completeness, has no known use at all.
 @End @Section

@@ -1,6 +1,6 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -29,13 +29,12 @@
 /*****************************************************************************/
 #include "externs"
 
-#ifdef DEBUG_ON
-FULL_CHAR *DebugInnersNames(inners)
-OBJECT inners;
+#if DEBUG_ON
+FULL_CHAR *DebugInnersNames(OBJECT inners)
 { static FULL_CHAR buff[MAX_BUFF];
   OBJECT link, y, z;
   StringCopy(buff, STR_EMPTY);
-  if( inners != nil )
+  if( inners != nilobj )
   { for( link = Down(inners);  link != inners;  link = NextDown(link) )
     { Child(y, link);
       if( link != Down(inners) )  StringCat(buff, STR_SPACE);
@@ -80,8 +79,7 @@ OBJECT inners;
 /*                                                                           */
 /*****************************************************************************/
 
-ParentFlush(prnt_flush, dest_index, kill)
-BOOLEAN prnt_flush;  OBJECT dest_index;  BOOLEAN kill;
+static void ParentFlush(BOOLEAN prnt_flush, OBJECT dest_index, BOOLEAN kill)
 { OBJECT prnt;
   debug3(DGF, D, "ParentFlush(%s, %s, %s)",
     bool(prnt_flush), EchoIndex(dest_index), bool(kill));
@@ -104,8 +102,7 @@ BOOLEAN prnt_flush;  OBJECT dest_index;  BOOLEAN kill;
 /*                                                                           */
 /*****************************************************************************/
 
-FlushGalley(hd)
-OBJECT hd;
+void FlushGalley(OBJECT hd)
 { OBJECT dest;			/* the target galley hd empties into         */
   OBJECT dest_index;		/* the index of dest                         */
   OBJECT inners;		/* list of galleys and PRECEDES to flush     */
@@ -115,13 +112,13 @@ OBJECT hd;
   int f;			/* candidate replacement value for dest_fwd  */
 
   OBJECT dest_encl;		/* the VCAT enclosing dest, if any           */
-  int    dest_side;		/* if dest_encl != nil, the side dest is on  */
+  int    dest_side;		/* if dest_encl != nilobj, side dest is on   */
   BOOLEAN need_adjust;		/* TRUE as soon as dest_encl needs adjusting */
   LENGTH dest_back, dest_fwd;	/* the current size of dest_encl or dest     */
   LENGTH frame_size;		/* the total constraint of dest_encl         */
-  OBJECT prec_gap;		/* the gap preceding dest, if any, else nil  */
+  OBJECT prec_gap;		/* the gap preceding dest if any else nilobj */
   OBJECT prec_def;		/* the component preceding dest, if any      */
-  OBJECT succ_gap;		/* the gap following dest, if any, else nil  */
+  OBJECT succ_gap;		/* the gap following dest if any else nilobj */
   OBJECT succ_def;		/* the component following dest, if any      */
   OBJECT stop_link;		/* most recently seen gap link of hd         */
   BOOLEAN prnt_flush;		/* TRUE when the parent of hd needs a flush  */
@@ -133,7 +130,7 @@ OBJECT hd;
   RESUME:
   assert( type(hd) == HEAD, "FlushGalley: type(hd) != HEAD!" );
   debug1(DGF, D, "  resuming FlushGalley %s, hd =", SymName(actual(hd)));
-  ifdebugcond(DGF, D, actual(hd) == nil, DebugGalley(hd, 4));
+  ifdebugcond(DGF, D, actual(hd) == nilobj, DebugGalley(hd, nilobj, 4));
   assert( Up(hd) != hd, "FlushGalley: resume found no parent to hd!" );
 
 
@@ -172,59 +169,55 @@ OBJECT hd;
 
 	case ATTACH_KILLED:
 
-	  assert( inners==nil, "FlushGalley/ATTACH_KILLED: inners != nil!" );
+	  assert(inners==nilobj, "FlushGalley/ATTACH_KILLED: inners!=nilobj!");
 	  debug1(DGF, D, "] FlushGalley %s returning (ATTACH_KILLED)",
 	    SymName(actual(hd)));
 	  debug1(DGF, D, "    prnt_flush = %s", bool(prnt_flush));
 	  return;
-	  break;
 
 
 	case ATTACH_INPUT:
 
 	  ParentFlush(prnt_flush, dest_index, FALSE);
-	  assert( inners==nil, "FlushGalley/ATTACH_INPUT: inners != nil!" );
+	  assert(inners==nilobj, "FlushGalley/ATTACH_INPUT: inners!=nilobj!");
 	  debug1(DGF, D, "] FlushGalley %s returning (ATTACH_INPUT)",
 	    SymName(actual(hd)));
 	  return;
-	  break;
 
 
 	case ATTACH_NOTARGET:
 
 	  ParentFlush(prnt_flush, dest_index, FALSE);
-	  assert( inners==nil, "FlushGalley/ATTACH_NOTARGET: inners != nil!" );
+	  assert(inners==nilobj, "FlushGalley/ATTACH_NOTARG: inners!=nilobj!");
 	  debug1(DGF, D, "] FlushGalley %s returning (ATTACH_NOTARGET)",
 	    SymName(actual(hd)));
 	  return;
-	  break;
 
 
 	case ATTACH_SUSPEND:
 
 	  /* ***
 	  ParentFlush(prnt_flush, dest_index, FALSE);
-	  if( inners != nil )  FlushInners(inners, nil);
+	  if( inners != nilobj )  FlushInners(inners, nilobj);
 	  debug1(DGF, D, "] FlushGalley %s returning (ATTACH_SUSPEND)",
 	    SymName(actual(hd)));
 	  return;
 	  *** */
 	  /* AttachGalley only returns inners here if they really need to */
 	  /* be flushed; in particular the galley must be unsized before  */
-	  if( inners != nil )
-	  { FlushInners(inners, nil);
+	  if( inners != nilobj )
+	  { FlushInners(inners, nilobj);
 	    goto RESUME;
 	  }
-	  stop_link = nil;
+	  stop_link = nilobj;
 	  goto SUSPEND;	/* nb y will be set by AttachGalley in this case */
-	  break;
 
 
 	case ATTACH_NULL:
 
 	  /* hd will be linked to the unexpanded target in this case */
 	  remove_target = (actual(actual(dest_index)) == whereto(hd));
-          if( actual(hd) != nil && force_target(actual(hd)) )
+          if( actual(hd) != nilobj && force_target(actual(hd)) )
           {
             /* if hd is a forcing galley, close all predecessors */
 	    debug1(DGA, D, "  forcing ATTACH_NULL case for %s",
@@ -247,17 +240,16 @@ OBJECT hd;
 	  }
 	  DetachGalley(hd);
 	  KillGalley(hd);
-          if( inners != nil ) FlushInners(inners, nil);
+          if( inners != nilobj ) FlushInners(inners, nilobj);
 	  else ParentFlush(prnt_flush, dest_index, remove_target);
 	  debug0(DGF, D, "] FlushGalley returning ATTACH_NULL");
 	  return;
-	  break;
 
 
 	case ATTACH_ACCEPT:
 
           /* if hd is a forcing galley, close all predecessors */
-          if( actual(hd) != nil && force_target(actual(hd)) )
+          if( actual(hd) != nilobj && force_target(actual(hd)) )
           { Parent(prnt, Up(dest_index));
 	    debug1(DGA, D, "  forcing ATTACH_ACCEPT case for %s",
 	      SymName(actual(hd)));
@@ -273,9 +265,8 @@ OBJECT hd;
           }
           else prnt_flush = prnt_flush || blocked(dest_index);
           debug1(DGF, D, "    force: prnt_flush = %s", bool(prnt_flush));
-          if( inners != nil ) FlushInners(inners, nil);
+          if( inners != nilobj ) FlushInners(inners, nilobj);
           goto RESUME;
-	  break;
 
 
 	default:
@@ -325,7 +316,7 @@ OBJECT hd;
   /*                                                                         */
   /***************************************************************************/
 
-  stop_link = dest_encl = inners = nil;
+  stop_link = dest_encl = inners = nilobj;
   need_adjust = FALSE;
 
   /***************************************************************************/
@@ -336,9 +327,9 @@ OBJECT hd;
   /*  examined and pronounced to be promotable.                              */
   /*                                                                         */
   /*  stop_link is the link of the most recently encountered gap object of   */
-  /*  hd, or nil if no gap object has been encountered yet.                  */
+  /*  hd, or nilobj if no gap object has been encountered yet.               */
   /*                                                                         */
-  /*  if dest_encl is non-nil, then the destination is not external,         */
+  /*  if dest_encl is non-nilobj, then the destination is not external,      */
   /*  dest_encl is its parent, and the following variables are defined:      */
   /*                                                                         */
   /*    prec_gap         gap object preceding dest (which must exist)        */
@@ -349,7 +340,7 @@ OBJECT hd;
   /*    dest_constraint  the size constraint on dest                         */
   /*    frame_size       size of frame enclosing dest_encl                   */
   /*                                                                         */
-  /*  if dest_encl is nil, these variables are not defined.                  */
+  /*  if dest_encl is nilobj, these variables are not defined.               */
   /*                                                                         */
   /*  need_adjust is true if at least one definite component has been        */
   /*  accepted for promotion and the destination is internal; hence,         */
@@ -383,6 +374,7 @@ OBJECT hd;
       case CROSS_PREC:
       case CROSS_FOLL:
       case CROSS_TARG:
+      case PAGE_LABEL_IND:
 
 	break;
 
@@ -390,7 +382,7 @@ OBJECT hd;
       case PRECEDES:
       case UNATTACHED:
 	  
-	if( inners == nil )  inners = New(ACAT);
+	if( inners == nilobj )  inners = New(ACAT);
 	Link(inners, y);
 	break;
 
@@ -411,7 +403,7 @@ OBJECT hd;
 	}
 	Parent(tmp, Up(tmp));
 	assert(type(tmp) == PRECEDES, "Flush: PRECEDES!");
-	switch( CheckConstraint(tmp, dest_index) )
+	switch( CheckComponentOrder(tmp, dest_index) )
 	{
 	  case CLEAR:	DeleteNode(tmp);
 			link = PrevDown(link);
@@ -428,6 +420,7 @@ OBJECT hd;
 
 
       case NULL_CLOS:
+      case PAGE_LABEL:
       case WORD:
       case QWORD:
       case ONE_COL:
@@ -464,7 +457,6 @@ OBJECT hd;
 	    case RECEPTIVE:
 	    case RECEIVING:	y = z;
 				goto SUSPEND;
-				break;
 
 	    case GAP_OBJ:	if( !join(gap(z)) )  zlink = PrevDown(hd);
 				break;
@@ -473,19 +465,22 @@ OBJECT hd;
 	  }
 	}
 
+	/* try vertical hyphenation before anything else */
+	if( type(y) == HCAT )  VerticalHyphenate(y);
+
 	/* check size constraint */
 	if( !external(dest) )
 	{
 	  /* initialise dest_encl etc if not done yet */
-	  if( dest_encl == nil )
+	  if( dest_encl == nilobj )
 	  { assert( UpDim(dest,COL) == UpDim(dest,ROW), "FlushG: UpDims!" );
 	    Parent(dest_encl, NextDown(Up(dest)));
 	    assert( type(dest_encl) == VCAT, "FlushGalley: dest != VCAT!" );
 	    SetNeighbours(Up(dest), FALSE, &prec_gap, &prec_def,
 	      &succ_gap, &succ_def, &dest_side);
-	    assert(prec_gap != nil || is_indefinite(type(y)),
-	      "FlushGalley: prec_gap == nil && !is_indefinite(type(y))!" );
-	    assert(succ_gap == nil, "FlushGalley: succ_gap != nil!" );
+	    assert(prec_gap != nilobj || is_indefinite(type(y)),
+	      "FlushGalley: prec_gap == nilobj && !is_indefinite(type(y))!" );
+	    assert(succ_gap == nilobj, "FlushGalley: succ_gap != nilobj!" );
 	    assert(dest_side == FWD || is_indefinite(type(y)),
 	      "FlushGalley: dest_side != FWD || !is_indefinite(type(y))!");
 	    dest_back = back(dest_encl, ROW);
@@ -505,12 +500,41 @@ OBJECT hd;
 			EchoConstraint(&dest_constraint));
 
 	    /* check new size against constraint */
-	    if( !FitsConstraint(dest_back,f,dest_constraint) )
-	      goto REJECT;
 	    if( units(gap(prec_gap))==FRAME_UNIT && width(gap(prec_gap)) > FR )
 	      goto REJECT;
+	    if( !FitsConstraint(dest_back, f, dest_constraint) )
+	    { /* *** CONSTRAINT yc;  LENGTH size_to_ymark, fconstr; *** */
 
-	    /* accept component */
+	      goto REJECT;
+
+	      /* if vertical hyphenation is not suitable, reject */
+	      /* ***
+	      if( type(y) != HCAT || size(y, ROW) == 0 )
+		goto REJECT;
+	      *** */
+
+	      /* work out constraint on y and try vertical hyphenation */
+	      /* ***
+	      size_to_ymark = f - fwd(y, ROW);
+	      fconstr = min(fc(dest_constraint) - size_to_ymark,
+		bfc(dest_constraint) - size_to_ymark - dest_back);
+	      SetConstraint(yc, back(y, ROW), back(y, ROW) + fconstr, fconstr);
+	      if( !VerticalHyphenate(y, &yc) )
+		goto REJECT;
+	      *** */
+	
+	      /* vertical hyphenation claims to work, so recalculate f */
+	      /* ***
+	      f = dest_fwd  + fwd(y, ROW) - fwd(prec_def, ROW) +
+		      ActualGap(fwd(prec_def, ROW), back(y, ROW),
+			fwd(y, ROW), &gap(prec_gap), frame_size,
+			dest_back + dest_fwd - fwd(prec_def, ROW));
+	      if( !FitsConstraint(dest_back, f, dest_constraint) )
+		goto REJECT;
+	      *** */
+	    }
+
+	    /* accept component, possibly after vertical hyphenation */
 	    dest_fwd = f;  prec_def = y;
 	    need_adjust = TRUE;
 	  }
@@ -518,11 +542,11 @@ OBJECT hd;
 	} /* end if( !external(dest) ) */
 
 	/* accept this component into dest */
-	debug1(DGF, DD, "  accept %s", EchoIndex(y));
+	debug1(DGF, D, "  accept %s", EchoObject(y));
 	prnt_flush = prnt_flush || blocked(dest_index);
 	debug1(DGF, DDD, "    prnt_flush = %s", bool(prnt_flush));
 	debug1(DGF, DDD, "    inners = %s", DebugInnersNames(inners));
-	if( inners != nil )
+	if( inners != nilobj )
 	{ Promote(hd, NextDown(link), dest_index);
 	  if( need_adjust )
 	  { debug0(DSA, D, "  calling AdjustSize from FlushGalley (ACCEPT)");
@@ -548,7 +572,7 @@ OBJECT hd;
 
     /* galley is now completely accepted; clean up and exit */
     debug0(DGF, D, "  galley empty now");
-    if( inners != nil )  DisposeObject(inners);
+    if( inners != nilobj )  DisposeObject(inners);
     if( Down(hd) != hd )
     { Promote(hd, hd, dest_index);
       if( need_adjust )
@@ -569,8 +593,8 @@ OBJECT hd;
     /* reject this component and move to a new dest */
     debug1(DGF, D, "  reject %s", EchoObject(y));
     assert(actual(dest) != PrintSym, "FlushGalley: reject print!");
-    if( inners != nil )  DisposeObject(inners);
-    if( stop_link != nil )
+    if( inners != nilobj )  DisposeObject(inners);
+    if( stop_link != nilobj )
     { Promote(hd, stop_link, dest_index);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (REJECT)");
@@ -588,8 +612,8 @@ OBJECT hd;
   
     /* suspend this component */
     debug1(DGF, D, "  suspend %s", EchoIndex(y));
-    if( inners != nil )  DisposeObject(inners);
-    if( stop_link != nil )
+    if( inners != nilobj )  DisposeObject(inners);
+    if( stop_link != nilobj )
     { Promote(hd, stop_link, dest_index);
       if( need_adjust )
       { debug0(DSA, D, "  calling AdjustSize from FlushGalley (SUSPEND)");
@@ -598,26 +622,27 @@ OBJECT hd;
     }
 
     /* check whether external galleys can remove the blockage */
-    if( type(y) == RECEPTIVE && ready_galls(hd) != nil && AllowCrossDb )
+    if( type(y) == RECEPTIVE && ready_galls(hd) != nilobj && AllowCrossDb )
     { OBJECT eg, val, index2, hd2, tag, seq, newsym;
       BOOLEAN found, gall;  FULL_CHAR newtag[MAX_BUFF], newseq[MAX_BUFF];
 
       /* get first ready galley in from cross reference database */
       Child(eg, Down(ready_galls(hd)));
-      SwitchScope(nil);
+      SwitchScope(nilobj);
       val = ReadFromFile(eg_fnum(eg), eg_fpos(eg));
-      UnSwitchScope(nil);
-      if( val == nil )
+      UnSwitchScope(nilobj);
+      if( val == nilobj )
 	Error(20, 5, "error in database file %s",
 	  FATAL, &fpos(y), FileName(eg_fnum(eg)));
       assert( type(val) == CLOSURE, "AttachG: db CLOSURE!" );
       index2 = New(UNATTACHED);
+      pinpoint(index2) = nilobj;
       hd2 = New(HEAD);
       FposCopy(fpos(hd2), fpos(val));
       actual(hd2) = actual(val);
       backward(hd2) = TargetSymbol(val, &whereto(hd2));
       backward(hd2) = sized(hd2) = FALSE;
-      ready_galls(hd2) = nil;
+      ready_galls(hd2) = nilobj;
       must_expand(hd2) = TRUE;
       Link(index2, hd2);
       Link(hd2, val);
@@ -638,6 +663,29 @@ OBJECT hd;
 			newseq, string(seq));
 	if( found )  found = gall && newsym == eg_symbol(eg) &&
 			StringEqual(newtag, string(tag));
+
+	/* *** new code for merging galleys whose seq strings are equal *** */
+	if( found && StringEqual(newseq, string(seq)) )
+	{ SwitchScope(nilobj);
+	  val = ReadFromFile(eg_fnum(eg), eg_fpos(eg));
+	  UnSwitchScope(nilobj);
+	  if( val == nilobj )
+	    Error(20, 5, "error in database file %s",
+	      FATAL, &fpos(y), FileName(eg_fnum(eg)));
+	  assert( type(val) == CLOSURE, "AttachG: db CLOSURE!" );
+	  if( !has_merge(actual(val)) )  DisposeObject(val);
+	  else /* add val to hd2 */
+	  { if( type(hd2) != ACAT )
+	    { OBJECT tmp = hd2;
+	      hd2 = New(ACAT);
+	      MoveLink(Up(tmp), hd2, CHILD);
+	      Link(hd2, tmp);
+	    }
+	    Link(hd2, val);
+	  }
+	}
+	/* *** */
+
       } while( found && StringEqual(newseq, string(seq)) );
       if( found )
       {	DisposeChild(Up(tag));
@@ -652,7 +700,7 @@ OBJECT hd;
 	debug1(DGF, DD, "  last ext gall into ", SymName(eg_symbol(eg)));
 	if( Down(ready_galls(hd)) == ready_galls(hd) )
 	{ Dispose(ready_galls(hd));
-	  ready_galls(hd) = nil;
+	  ready_galls(hd) = nilobj;
 	  debug0(DGF, DD, "  all ext galls exhausted");
 	}
       }
@@ -661,6 +709,8 @@ OBJECT hd;
       debug2(DGF, DD, "  ext gall FlushGalley (%s into %s)",
 	SymName(actual(hd2)), SymName(whereto(hd2)));
       debug0(DGF, DD, "  calling FlushGalley from FlushGalley/SUSPEND");
+      if( type(hd2) == ACAT )
+	hd2 = ConvertGalleyList(hd2);
       FlushGalley(hd2);
       goto RESUME;
     }
@@ -669,7 +719,7 @@ OBJECT hd;
       FULL_CHAR newseq[MAX_BUFF];  FILE_NUM tfnum;  long tfpos, tcont;
       debug1(DGF, DD, "  ext gall target %s", SymName(actual(actual(y))));
       for( sym = FirstExternTarget(actual(actual(y)), &cnt);
-	     sym != nil;  sym = NextExternTarget(actual(actual(y)), &cnt) )
+	     sym != nilobj;  sym = NextExternTarget(actual(actual(y)), &cnt) )
       {
 	debug1(DGF, DD, "  ext gall gall_targ %s", SymName(sym));
 	cr = GallTargEval(sym, &fpos(actual(y)));
@@ -681,7 +731,7 @@ OBJECT hd;
 	found = DbRetrieve(OldCrossDb, TRUE, sym, string(tag),
 		newseq, &tfnum, &tfpos, &tcont);
 	if( found )
-	{ if( ready_galls(hd) == nil )  ready_galls(hd) = New(ACAT);
+	{ if( ready_galls(hd) == nilobj )  ready_galls(hd) = New(ACAT);
 	  eg = New(EXT_GALL);
 	  debug1(DGF, DD, "  ext gall retrieved: into %s", SymName(sym));
 	  eg_fnum(eg) = tfnum;
@@ -696,7 +746,7 @@ OBJECT hd;
 	}
       }
       trigger_externs(y) = FALSE;
-      if( ready_galls(hd) != nil )  goto RESUME;
+      if( ready_galls(hd) != nilobj )  goto RESUME;
     } /* end if external galleys */
 
     /* if non-blocking, delete the index and resume */

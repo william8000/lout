@@ -18,26 +18,30 @@
    def @@Begin             { @Code "@Begin"             }
    def @@Break             { @Code "@Break"             }
    def @@Case              { @Code "@Case"              }
+   def @@Char              { @Code "@Char"              }
+   def @@Common            { @Code "@Common"            }
+   def @@CurrLang          { @Code "@CurrLang"          }
    def @@Database          { @Code "@Database"          }
    def @@End               { @Code "@End"               }
    def @@Font              { @Code "@Font"              }
-   def @@Char              { @Code "@Char"              }
    def @@Galley            { @Code "@Galley"            }
    def @@Graphic           { @Code "@Graphic"           }
    def @@HAdjust           { @Code "@HAdjust"           }
    def @@HContract         { @Code "@HContract"         }
    def @@HExpand           { @Code "@HExpand"           }
-   def @@HScale            { @Code "@HScale"            }
    def @@High              { @Code "@High"              }
+   def @@HScale            { @Code "@HScale"            }
    def @@HShift            { @Code "@HShift"            }
    def @@Include           { @Code "@Include"           }
    def @@IncludeGraphic    { @Code "@IncludeGraphic"    }
    def @@Key               { @Code "@Key"               }
+   def @@Language          { @Code "@Language"          }
    def @@LClos             { @Code "@LClos"             }
    def @@LEnv              { @Code "@LEnv"              }
    def @@LInput            { @Code "@LInput"            }
-   def @@LVis              { @Code "@LVis"              }
    def @@LUse              { @Code "@LUse"              }
+   def @@LVis              { @Code "@LVis"              }
+   def @@Merge             { @Code "@Merge"             }
    def @@Moment            { @Code "@Moment"            }
    def @@Next              { @Code "@Next"              }
    def @@Null              { @Code "@Null"              }
@@ -45,13 +49,13 @@
    def @@OneRow            { @Code "@OneRow"            }
    def @@Open              { @Code "@Open"              }
    def @@PAdjust           { @Code "@PAdjust"           }
+   def @@PageLabel         { @Code "@PageLabel"         }
    def @@PrependGraphic    { @Code "@PrependGraphic"    }
    def @@Rotate            { @Code "@Rotate"            }
+   def @@Rump              { @Code "@Rump"              }
    def @@Scale             { @Code "@Scale"             }
    def @@SetColor          { @Code "@SetColor"          }
    def @@SetColour         { @Code "@SetColour"         }
-   def @@Language          { @Code "@Language"          }
-   def @@CurrLang          { @Code "@CurrLang"          }
    def @@Space             { @Code "@Space"             }
    def @@SysDatabase       { @Code "@SysDatabase"       }
    def @@SysInclude        { @Code "@SysInclude"        }
@@ -59,6 +63,7 @@
    def @@SysPrependGraphic { @Code "@SysPrependGraphic" }
    def @@Tag               { @Code "@Tag"               }
    def @@Tagged            { @Code "@Tagged"            }
+   def @@Underline         { @Code "@Underline"         }
    def @@Use               { @Code "@Use"               }
    def @@VAdjust           { @Code "@VAdjust"           }
    def @@VContract         { @Code "@VContract"         }
@@ -75,7 +80,10 @@
    #                                                 #
    ###################################################
 
-   def @TeX { T{ /0.2fo E}X }
+
+   def @TeX
+   { @OneCol { T &0.4fo {-0.2f @VShift E} &0.45fo X }
+   }
 
    export sp sb
    def @Equation

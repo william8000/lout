@@ -1,6 +1,6 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -46,8 +46,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-MinConstraint(xc, yc)
-CONSTRAINT *xc, *yc;
+void MinConstraint(CONSTRAINT *xc, CONSTRAINT *yc)
 { bc(*xc)  = min(bc(*xc),  bc(*yc));
   bfc(*xc) = min(bfc(*xc), bfc(*yc));
   fc(*xc)  = min(fc(*xc),  fc(*yc));
@@ -62,11 +61,33 @@ CONSTRAINT *xc, *yc;
 /*                                                                           */
 /*****************************************************************************/
 
-EnlargeToConstraint(b, f, c)
-LENGTH *b, *f;  CONSTRAINT *c;
+void EnlargeToConstraint(LENGTH *b, LENGTH *f, CONSTRAINT *c)
 {
   *f = min(bfc(*c) - *b, fc(*c));
 } /* end EnlargeToConstraint */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  float ScaleToConstraint(b, f, c)                                         */
+/*                                                                           */
+/*  Return the scale factor needed to scale object of size b, f down so it   */
+/*  has a size which fits tightly into constraint c.                         */
+/*                                                                           */
+/*****************************************************************************/
+
+int ScaleToConstraint(LENGTH b, LENGTH f, CONSTRAINT *c)
+{ float scale_factor;  int res;
+  debug3(DSC, DD, "ScaleToConstraint(%s, %s, %s)", EchoLength(b),
+    EchoLength(f), EchoConstraint(c));
+  scale_factor = 1.0;
+  if( b     > 0 )  scale_factor = min(scale_factor, (float) bc(*c)/b       );
+  if( b + f > 0 )  scale_factor = min(scale_factor, (float) bfc(*c)/(b + f));
+  if(     f > 0 )  scale_factor = min(scale_factor, (float) fc(*c)/f       );
+  res = scale_factor * SF;
+  debug2(DSC, DD, "ScaleToConstraint returning %.2f (%d)", scale_factor, res);
+  return res;
+} /* end ScaleToConstraint */
 
 
 /*@::InvScaleConstraint(), ReflectConstraint(), etc.@*************************/
@@ -77,16 +98,18 @@ LENGTH *b, *f;  CONSTRAINT *c;
 /*                                                                           */
 /*****************************************************************************/
 
-InvScaleConstraint(yc, sf, xc)
-CONSTRAINT *yc;  LENGTH sf;  CONSTRAINT *xc;
-{ char buff[10];
-  ifdebug(DSC, D, sprintf(buff, "%.3f", (float) sf / SF));
-  debug2(DSC, D, "InvScaleConstraint(yc, %s, %s)", buff, EchoConstraint(xc));
+void InvScaleConstraint(CONSTRAINT *yc, LENGTH sf, CONSTRAINT *xc)
+{
+#if DEBUG_ON
+  char buff[10];
+#endif
+  ifdebug(DSC, DD, sprintf(buff, "%.3f", (float) sf / SF));
+  debug2(DSC, DD, "InvScaleConstraint(yc, %s, %s)", buff, EchoConstraint(xc));
   assert( sf > 0, "InvScaleConstraint: sf <= 0!" );
   bc(*yc)  = bc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, bc(*xc)  * SF / sf);
   bfc(*yc) = bfc(*xc) == MAX_LEN ? MAX_LEN : min(MAX_LEN, bfc(*xc) * SF / sf);
   fc(*yc)  = fc(*xc)  == MAX_LEN ? MAX_LEN : min(MAX_LEN, fc(*xc)  * SF / sf);
-  debug1(DSC, D, "InvScaleConstraint returning %s", EchoConstraint(yc));
+  debug1(DSC, DD, "InvScaleConstraint returning %s", EchoConstraint(yc));
 } /* end InvScaleConstraint */
 
 
@@ -109,11 +132,14 @@ CONSTRAINT *yc;  LENGTH sf;  CONSTRAINT *xc;
 /*                                                                           */
 /*****************************************************************************/
 
-static SemiRotateConstraint(xc, u, v, angle, yc)
-CONSTRAINT *xc;  LENGTH u, v;  float angle; CONSTRAINT *yc;
-{ float cs, sn;  char buff[20];
-  ifdebug(DSC, D, sprintf(buff, "%.1f", angle * 360.0 / (2 * M_PI)));
-  debug4(DSC, D, "SemiRotateConstraint(xc, %s, %s, %sd, %s",
+static void SemiRotateConstraint(CONSTRAINT *xc, LENGTH u, LENGTH v,
+float angle, CONSTRAINT *yc)
+{ float cs, sn;
+#if DEBUG_ON
+  char buff[20];
+#endif
+  ifdebug(DSC, DD, sprintf(buff, "%.1f", angle * 360.0 / (2 * M_PI)));
+  debug4(DSC, DD, "SemiRotateConstraint(xc, %s, %s, %sd, %s",
     EchoLength(u), EchoLength(v), buff, EchoConstraint(yc));
   cs = cos(angle);  sn = sin(angle);
   if( fabs(cs) < 1e-6 )
@@ -123,7 +149,7 @@ CONSTRAINT *xc;  LENGTH u, v;  float angle; CONSTRAINT *yc;
       min(MAX_LEN, (bc(*yc) - u * sn) / cs),
       min(MAX_LEN, (bfc(*yc) - u * sn - v * sn) / cs),
       min(MAX_LEN, (fc(*yc) - v * sn) / cs) );
-  debug1(DSC, D, "SemiRotateConstraint returning %s", EchoConstraint(xc));
+  debug1(DSC, DD, "SemiRotateConstraint returning %s", EchoConstraint(xc));
 } /* end SemiRotateConstraint */
 
 
@@ -140,12 +166,14 @@ CONSTRAINT *xc;  LENGTH u, v;  float angle; CONSTRAINT *yc;
 /*                                                                           */
 /*****************************************************************************/
 
-RotateConstraint(c, y, angle, hc, vc, dim)
-CONSTRAINT *c;  OBJECT y;  LENGTH angle;  CONSTRAINT *hc, *vc;  int dim;
+void RotateConstraint(CONSTRAINT *c, OBJECT y, LENGTH angle,
+CONSTRAINT *hc, CONSTRAINT *vc, int dim)
 { CONSTRAINT c1, c2, c3, dc;  float theta, psi;
+#if DEBUG_ON
   char buff[20];
-  ifdebug(DSC, D, sprintf(buff, "%.1f", (float) angle / DG ));
-  debug4(DSC, D, "RotateConstraint(c, y, %sd, %s, %s, %s)",
+#endif
+  ifdebug(DSC, DD, sprintf(buff, "%.1f", (float) angle / DG ));
+  debug4(DSC, DD, "RotateConstraint(c, y, %sd, %s, %s, %s)",
 	buff, EchoConstraint(hc), EchoConstraint(vc), dimen(dim));
 
   /* work out angle in radians between 0 and 2*PI */
@@ -176,7 +204,7 @@ CONSTRAINT *c;  OBJECT y;  LENGTH angle;  CONSTRAINT *hc, *vc;  int dim;
     ReflectConstraint(c2, *hc);
   }
   psi = M_PI / 2.0 - theta;
-  debug2(DSC, D, "  c1: %s;  c2: %s", EchoConstraint(&c1), EchoConstraint(&c2));
+  debug2(DSC, DD, "  c1: %s;  c2: %s", EchoConstraint(&c1), EchoConstraint(&c2));
 
   /* return the minimum of the two constraints, rotated */
   if( dim == COL )
@@ -191,7 +219,7 @@ CONSTRAINT *c;  OBJECT y;  LENGTH angle;  CONSTRAINT *hc, *vc;  int dim;
     MinConstraint(c, &dc);
   }
 
-  debug1(DSC, D, "RotateConstraint returning %s", EchoConstraint(c));
+  debug1(DSC, DD, "RotateConstraint returning %s", EchoConstraint(c));
 } /* end RotateConstraint */
 
 
@@ -220,8 +248,8 @@ CONSTRAINT *c;  OBJECT y;  LENGTH angle;  CONSTRAINT *hc, *vc;  int dim;
 /*                                                                           */
 /*****************************************************************************/
 
-static CatConstrained(x, xc, ratm, y, dim)
-OBJECT x;  CONSTRAINT *xc; BOOLEAN ratm;  OBJECT y;  int dim;
+static void CatConstrained(OBJECT x, CONSTRAINT *xc, BOOLEAN ratm,
+OBJECT y, int dim)
 { int side;			/* the size of y that x is on: BACK, ON, FWD */
   CONSTRAINT yc;		/* constraints on y                          */
   LENGTH backy, fwdy;		/* back(y), fwd(y) would be if x was (0, 0)  */
@@ -240,17 +268,17 @@ OBJECT x;  CONSTRAINT *xc; BOOLEAN ratm;  OBJECT y;  int dim;
     SetNeighbours(link, ratm, &pg, &prec_def, &sg, &sd, &side);
 
     /* amount of space available at x without changing the size of y */
-    be = pg == nil ? 0 : ExtraGap(fwd(prec_def, dim), 0, &gap(pg), BACK);
-    fe = sg == nil ? 0 : ExtraGap(0, back(sd, dim),      &gap(sg), FWD);
+    be = pg == nilobj ? 0 : ExtraGap(fwd(prec_def, dim), 0, &gap(pg), BACK);
+    fe = sg == nilobj ? 0 : ExtraGap(0, back(sd, dim),      &gap(sg), FWD);
 
     if( is_indefinite(type(x)) )
     {
       /* insert two lengths and delete one */
-      beffect = pg == nil ? 0 : MinGap(fwd(prec_def, dim), 0, 0, &gap(pg));
-      feffect = sg == nil ? 0 : MinGap(0, back(sd,dim), fwd(sd,dim), &gap(sg));
-      seffect = pg == nil ?
-	  sg == nil ? 0 : back(sd, dim) :
-	  sg == nil ? fwd(prec_def, dim) :
+      beffect = pg==nilobj ? 0 : MinGap(fwd(prec_def, dim), 0, 0, &gap(pg));
+      feffect = sg==nilobj ? 0 : MinGap(0, back(sd,dim), fwd(sd,dim), &gap(sg));
+      seffect = pg==nilobj ?
+	  sg == nilobj ? 0 : back(sd, dim) :
+	  sg == nilobj ? fwd(prec_def, dim) :
 	    MinGap(fwd(prec_def, dim), back(sd, dim), fwd(sd, dim), &gap(sg));
 
       switch( side )
@@ -272,11 +300,11 @@ OBJECT x;  CONSTRAINT *xc; BOOLEAN ratm;  OBJECT y;  int dim;
 
     else /* x is definite */
 
-    { beffect = pg == nil ? back(x, dim) :
+    { beffect = pg == nilobj ? back(x, dim) :
 	MinGap(fwd(prec_def, dim), back(x,dim), fwd(x,dim), &gap(pg)) -
 	MinGap(fwd(prec_def, dim), 0,           0,          &gap(pg));
 
-      feffect = sg == nil ? fwd(x, dim) :
+      feffect = sg == nilobj ? fwd(x, dim) :
 	MinGap(fwd(x, dim), back(sd, dim), fwd(sd, dim), &gap(sg)) -
 	MinGap(0,           back(sd, dim), fwd(sd, dim), &gap(sg));
 
@@ -356,8 +384,7 @@ OBJECT x;  CONSTRAINT *xc; BOOLEAN ratm;  OBJECT y;  int dim;
 /*                                                                           */
 /*****************************************************************************/
 
-Constrained(x, xc, dim)
-OBJECT x;  CONSTRAINT *xc;  int dim;
+void Constrained(OBJECT x, CONSTRAINT *xc, int dim)
 { OBJECT y, link, lp, rp, z, tlink, g;  CONSTRAINT yc, hc, vc;
   BOOLEAN ratm;  LENGTH xback, xfwd;  int tb, tf, tbf, tbc, tfc;
   debug2(DSC, DD, "[ Constrained( %s, xc, %s )", EchoObject(x), dimen(dim));
@@ -528,18 +555,37 @@ OBJECT x;  CONSTRAINT *xc;  int dim;
 /*****************************************************************************/
 #if DEBUG_ON
 
-FULL_CHAR *EchoConstraint(c)
-CONSTRAINT *c;
+FULL_CHAR *EchoConstraint(CONSTRAINT *c)
 { static char str[2][40];
   static int i = 0;
   i = (i+1) % 2;
   sprintf(str[i], "<");
-  if( bc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
-  else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bc(*c)/CM);
-  if( bfc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
-  else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bfc(*c)/CM);
-  if( fc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF>");
-  else sprintf(&str[i][strlen(str[i])], "%.3fc>", (float) fc(*c)/CM);
+  switch( BackEnd )
+  {
+    case POSTSCRIPT:
+
+      if( bc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
+      else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bc(*c)/CM);
+      if( bfc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
+      else sprintf(&str[i][strlen(str[i])], "%.3fc, ", (float) bfc(*c)/CM);
+      if( fc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF>");
+      else sprintf(&str[i][strlen(str[i])], "%.3fc>", (float) fc(*c)/CM);
+      break;
+
+    case PLAINTEXT:
+
+      if( bc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
+      else sprintf(&str[i][strlen(str[i])], "%.1fs, ",
+	(float) bc(*c)/PlainCharWidth);
+      if( bfc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF, ");
+      else sprintf(&str[i][strlen(str[i])], "%.1fs, ",
+	(float) bfc(*c)/PlainCharWidth);
+      if( fc(*c)==MAX_LEN )  sprintf(&str[i][strlen(str[i])], "INF>");
+      else sprintf(&str[i][strlen(str[i])], "%.1fs>",
+	(float) fc(*c)/PlainCharWidth);
+      break;
+
+  }
   return AsciiToFull(str[i]);
 } /* end EchoConstraint */
 
@@ -553,8 +599,7 @@ CONSTRAINT *c;
 /*                                                                           */
 /*****************************************************************************/
 
-DebugConstrained(x)
-OBJECT x;
+void DebugConstrained(OBJECT x)
 { OBJECT y, link;
   CONSTRAINT c;
   debug1(DSC, DDD, "DebugConstrained( %s )", EchoObject(x) );
@@ -575,10 +620,10 @@ OBJECT x;
     case CLOSURE:
     
       Constrained(x, &c, COL);
-      debug2(DSC, D, "Constrained( %s, &c, COL ) = %s",
+      debug2(DSC, DD, "Constrained( %s, &c, COL ) = %s",
 	EchoObject(x), EchoConstraint(&c));
       Constrained(x, &c, ROW);
-      debug2(DSC, D, "Constrained( %s, &c, ROW ) = %s",
+      debug2(DSC, DD, "Constrained( %s, &c, ROW ) = %s",
 	EchoObject(x), EchoConstraint(&c));
       break;
 

@@ -1,9 +1,12 @@
-langdef Danish Dansk			{ danish	}
-langdef Dutch Nederlands		{ dutch		}
-langdef English				{ english	}
-langdef Finnish Suomi			{ finnish	}
-langdef French Francais Français	{        	}
-langdef German Deutsch			{ german	}
-langdef Norwegian Norsk			{ norwegian	}
-langdef Spanish	Español		{ spanish	}
-langdef Swedish	Svenska			{ swedish	}
+langdef Czech Cesky Cestina			{ czech		}
+langdef Danish Dansk				{ danish	}
+langdef Dutch Nederlands			{ dutch		}
+langdef English					{ english	}
+langdef Finnish Suomi				{ finnish	}
+langdef French Francais "Fran\347ais"		{        	}
+langdef German Deutsch				{ german	}
+langdef Norwegian Norsk				{ norweg	}
+langdef Russian "\362\325\323\323\313\311\312"  { russian       }
+langdef Slovenian Slovenia Slovenija		{ slovenia	}
+langdef Spanish	"Espa\361ol"			{ spanish	}
+langdef Swedish	Svenska				{ swedish	}

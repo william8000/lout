@@ -16,17 +16,15 @@ of the final outfile.ps is included.
 
 Jeffrey H. Kingston
 23 December 1992
-27 July 1993
-18 September 1994
-
+8 May 1995
 
 ps The first few runs will generate a large number
 of benign error messages, mostly beginning with
 "unresolved cross reference".  The error message
 output of the fourth run should look like this:
 
-lout file "ch3.00" (from "all" line 36):
-     1,1: this component of @BeginFigures did not fit into its nearest target
+lout file "ch3.02" (from "all" line 39):
+     147,1: this component of @BeginFigures did not fit into its nearest target
 
 This just says that a figure within Chapter 3 could
 not be placed on the first available page, which is

@@ -1,6 +1,6 @@
 /*@z43.c:Language Service:LanguageChange, LanguageString@*********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -63,38 +63,39 @@ typedef struct
   pos = pos % ltab_size(S);						\
 }
 
-static LANGUAGE_TABLE ltab_new(newsize)
-int newsize;
+static LANGUAGE_TABLE ltab_new(int newsize)
 { LANGUAGE_TABLE S;  int i;
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_LANG_TAB, 1,
+    2*sizeof(int) + newsize * sizeof(OBJECT)));
   S = (LANGUAGE_TABLE)
 	  malloc(2*sizeof(int) + newsize * sizeof(OBJECT));
   if( S == (LANGUAGE_TABLE) NULL )
     Error(43, 1, "run out of memory enlarging language table", FATAL, no_fpos);
   ltab_size(S) = newsize;
   ltab_count(S) = 0;
-  for( i = 0;  i < newsize;  i++ )  ltab_item(S, i) = nil;
+  for( i = 0;  i < newsize;  i++ )  ltab_item(S, i) = nilobj;
   return S;
 } /* end ltab_new */
 
-static LANGUAGE_TABLE ltab_rehash(S, newsize)
-LANGUAGE_TABLE S;  int newsize;
+static void ltab_insert(OBJECT x, LANGUAGE_TABLE *S);
+
+static LANGUAGE_TABLE ltab_rehash(LANGUAGE_TABLE S, int newsize)
 { LANGUAGE_TABLE NewS;  int i;
   NewS = ltab_new(newsize);
   for( i = 1;  i <= ltab_size(S);  i++ )
-  { if( ltab_item(S, i) != nil )
+  { if( ltab_item(S, i) != nilobj )
       ltab_insert(ltab_item(S, i), &NewS);
   }
   free(S);
   return NewS;
 } /* end ltab_rehash */
 
-static ltab_insert(x, S)
-OBJECT x;  LANGUAGE_TABLE *S;
-{ int pos, num;  OBJECT z, link, y;
+static void ltab_insert(OBJECT x, LANGUAGE_TABLE *S)
+{ int pos;  OBJECT z, link, y;
   if( ltab_count(*S) == ltab_size(*S) - 1 )	/* one less since 0 unused */
     *S = ltab_rehash(*S, 2*ltab_size(*S));
   hash(pos, string(x), *S);
-  if( ltab_item(*S, pos) == nil )  ltab_item(*S, pos) = New(ACAT);
+  if( ltab_item(*S, pos) == nilobj )  ltab_item(*S, pos) = New(ACAT);
   z = ltab_item(*S, pos);
   for( link = Down(z);  link != z;  link = NextDown(link) )
   { Child(y, link);
@@ -106,30 +107,28 @@ OBJECT x;  LANGUAGE_TABLE *S;
   Link(ltab_item(*S, pos), x);
 } /* end ltab_insert */
 
-static OBJECT ltab_retrieve(str, S)
-FULL_CHAR *str;  LANGUAGE_TABLE S;
+static OBJECT ltab_retrieve(FULL_CHAR *str, LANGUAGE_TABLE S)
 { OBJECT x, link, y;  int pos;
   hash(pos, str, S);
   x = ltab_item(S, pos);
-  if( x == nil )  return nil;
+  if( x == nilobj )  return nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
     if( StringEqual(str, string(y)) )  return y;
   }
-  return nil;
+  return nilobj;
 } /* end ltab_retrieve */
 
 #if DEBUG_ON
-static ltab_debug(S, fp)
-LANGUAGE_TABLE S;  FILE *fp;
+static void ltab_debug(LANGUAGE_TABLE S, FILE *fp)
 { int i;  OBJECT x, link, y;
   fprintf(fp, "  table size: %d;  current number of keys: %d\n",
     ltab_size(S), ltab_count(S));
   for( i = 0;  i < ltab_size(S);  i++ )
   { x = ltab_item(S, i);
     fprintf(fp, "ltab_item(S, %d) =", i);
-    if( x == nil )
-      fprintf(fp, " <nil>");
+    if( x == nilobj )
+      fprintf(fp, " <nilobj>");
     else if( type(x) != ACAT )
       fprintf(fp, " not ACAT!");
     else for( link = Down(x);  link != x;  link = NextDown(link) )
@@ -158,12 +157,16 @@ static int		lang_count;		/* number of languages       */
 /*                                                                           */
 /*****************************************************************************/
 
-LanguageInit()
+void LanguageInit(void)
 { debug0(DLS, D, "LanguageInit()");
   names_tab = ltab_new(INIT_LANGUAGE_NUM);
   lang_count = 0;
   lang_tabsize = INIT_LANGUAGE_NUM;
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_LANG_TAB, 0,
+    INIT_LANGUAGE_NUM * sizeof(OBJECT)));
   hyph_tab = (OBJECT *) malloc(INIT_LANGUAGE_NUM * sizeof(OBJECT));
+  ifdebug(DMA, D, DebugRegisterUsage(MEM_LANG_TAB, 0,
+    INIT_LANGUAGE_NUM * sizeof(OBJECT)));
   canonical_tab = (OBJECT *) malloc(INIT_LANGUAGE_NUM * sizeof(OBJECT));
   debug0(DLS, D, "LanguageInit returning.");
 } /* end LanguageInit */
@@ -178,25 +181,33 @@ LanguageInit()
 /*                                                                           */
 /*****************************************************************************/
 
-LanguageDefine(names, hyph_file)
-OBJECT names, hyph_file;
+void LanguageDefine(OBJECT names, OBJECT hyph_file)
 { OBJECT link, y;
-  assert( names != nil && type(names) == ACAT, "LanguageDefine: names!");
+  assert( names != nilobj && type(names) == ACAT, "LanguageDefine: names!");
   assert( Down(names) != names, "LanguageDefine: names is empty!");
   debug2(DLS, D, "LanguageDefine(%s, %s)",
-    DebugObject(names), DebugObject(hyph_file));
+    EchoObject(names), EchoObject(hyph_file));
 
   /* double table size if overflow */
   if( ++lang_count >= lang_tabsize )
-  { lang_tabsize *= 2;
-    hyph_tab = (OBJECT *) realloc(hyph_tab, lang_tabsize);
-    canonical_tab = (OBJECT *) realloc(canonical_tab, lang_tabsize);
+  {
+    ifdebug(DMA, D, DebugRegisterUsage(MEM_LANG_TAB, 0,
+      -lang_tabsize * sizeof(OBJECT)));
+    ifdebug(DMA, D, DebugRegisterUsage(MEM_LANG_TAB, 0,
+      -lang_tabsize * sizeof(OBJECT)));
+    lang_tabsize *= 2;
+    ifdebug(DMA, D, DebugRegisterUsage(MEM_LANG_TAB, 0,
+      lang_tabsize * sizeof(OBJECT)));
+    ifdebug(DMA, D, DebugRegisterUsage(MEM_LANG_TAB, 0,
+      lang_tabsize * sizeof(OBJECT)));
+    hyph_tab = (OBJECT *) realloc(hyph_tab, lang_tabsize * sizeof(OBJECT) );
+    canonical_tab = (OBJECT *) realloc(canonical_tab, lang_tabsize * sizeof(OBJECT) );
   }
 
   /* insert each language name into names_tab */
   for( link = Down(names);  link != names;  link = NextDown(link) )
   { Child(y, link);
-    assert( type(y) == WORD, "LanguageDefine: type(y) != WORD!" );
+    assert( is_word(type(y)), "LanguageDefine: type(y) != WORD!" );
     word_language(y) = lang_count;
     ltab_insert(y, &names_tab);
   }
@@ -207,7 +218,7 @@ OBJECT names, hyph_file;
       FATAL, &fpos(hyph_file));
   if( StringEqual(string(hyph_file), STR_EMPTY) )
   { Dispose(hyph_file);
-    hyph_tab[lang_count] = nil;
+    hyph_tab[lang_count] = nilobj;
   }
   else hyph_tab[lang_count] = hyph_file;
 
@@ -217,7 +228,7 @@ OBJECT names, hyph_file;
 
   /* if initializing run, initialize the hyphenation table */
   if( InitializeAll )
-  { if( hyph_tab[lang_count] != nil && !ReadHyphTable(lang_count) )
+  { if( hyph_tab[lang_count] != nilobj && !ReadHyphTable(lang_count) )
       fprintf(stderr,
 	"lout -x: hyphenation initialization failed for language %s\n",
 	string(canonical_tab[lang_count]));
@@ -235,8 +246,7 @@ OBJECT names, hyph_file;
 /*                                                                           */
 /*****************************************************************************/
 
-LanguageChange(style, x)
-STYLE *style;  OBJECT x;
+void LanguageChange(STYLE *style, OBJECT x)
 { OBJECT lname;
   debug2(DLS, D, "LanguageChange(%s, %s)", EchoStyle(style), EchoObject(x));
 
@@ -256,7 +266,7 @@ STYLE *style;  OBJECT x;
 
   /* retrieve language record if present, else leave style unchanged */
   lname = ltab_retrieve(string(x), names_tab);
-  if( lname == nil )
+  if( lname == nilobj )
     Error(43, 5, "%s ignored (unknown language %s)", WARN, &fpos(x),
       KW_LANGUAGE, string(x));
   else language(*style) = word_language(lname);
@@ -274,8 +284,7 @@ STYLE *style;  OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *LanguageString(lnum)
-LANGUAGE_NUM lnum;
+FULL_CHAR *LanguageString(LANGUAGE_NUM lnum)
 { FULL_CHAR *res;
   debug1(DLS, D, "LanguageString(%d)", lnum);
   assert( lnum > 0 && lnum <= lang_count, "LanguageString: unknown number" );
@@ -295,14 +304,13 @@ LANGUAGE_NUM lnum;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT LanguageHyph(lnum)
-LANGUAGE_NUM lnum;
+OBJECT LanguageHyph(LANGUAGE_NUM lnum)
 { OBJECT res;
   debug1(DLS, D, "LanguageHyph(%d)", lnum);
   assert( lnum > 0 && lnum <= lang_count, "LanguageHyph: unknown number" );
 
   res = hyph_tab[lnum];
 
-  debug1(DLS, D, "LanguageHyph returning %s", DebugObject(res));
+  debug1(DLS, D, "LanguageHyph returning %s", EchoObject(res));
   return res;
 } /* end LanguageHyph */

@@ -1,6 +1,6 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -41,15 +41,13 @@
 /*                                                                           */
 /*****************************************************************************/
 
-static BreakJoinedGroup(start, stop, m, c, res_back, res_fwd)
-OBJECT start, stop, m;  CONSTRAINT *c;  LENGTH *res_back, *res_fwd;
-{ OBJECT y, link, z;  LENGTH b, f;  CONSTRAINT yc;
-  ifdebug(DOB, DD, Child(y, start));
-  ifdebug(DOB, DD, Child(z, stop));
+static void BreakJoinedGroup(OBJECT start, OBJECT stop, OBJECT m,
+CONSTRAINT *c, LENGTH *res_back, LENGTH *res_fwd)
+{ OBJECT y, link;  LENGTH b, f;  CONSTRAINT yc;
   debug1(DOB, DD, "BreakJoinedGroup(start, stop, m, %s, -, -)",
-	EchoConstraint(c));
+    EchoConstraint(c));
   CopyConstraint(yc, *c);
-  if( m != nil )
+  if( m != nilobj )
   { m = BreakObject(m, &yc);
     b = back(m, COL);
     f = fwd(m, COL);
@@ -63,6 +61,10 @@ OBJECT start, stop, m;  CONSTRAINT *c;  LENGTH *res_back, *res_fwd;
     b = max(b, back(y, COL));
     f = max(f, fwd(y, COL));
     SetConstraint(yc, min(bc(yc), bfc(yc)-f), bfc(yc), min(fc(yc), bfc(yc)-b));
+  }
+  if( !FitsConstraint(b, f, *c) )
+  { debug3(DOB, D, "  in BreakJoinedGroup: !FitsConstraint(%s, %s, %s)",
+      EchoLength(b), EchoLength(f), EchoConstraint(c));
   }
   assert( FitsConstraint(b, f, *c), "BreakJoinedGroup: result does not fit!" );
   *res_back = b;  *res_fwd = f;
@@ -80,20 +82,19 @@ OBJECT start, stop, m;  CONSTRAINT *c;  LENGTH *res_back, *res_fwd;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT BreakVcat(x, c)
-OBJECT x;  CONSTRAINT *c;
+static OBJECT BreakVcat(OBJECT x, CONSTRAINT *c)
 { OBJECT y, link, start_group, m;  LENGTH b, f; int dble_fwd;  CONSTRAINT tc;
   BOOLEAN dble_found;
   debug1(DOB, DD, "[ BreakVcat(x, %s)", EchoConstraint(c));
   assert(Down(x) != x, "BreakVcat: Down(x) == x!" );
   SetConstraint(tc, MAX_LEN, min(bfc(*c), fc(*c)), MAX_LEN);
   
-  dble_found = FALSE;  dble_fwd = 0;  start_group = nil;
+  dble_found = FALSE;  dble_fwd = 0;  start_group = nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
     if( is_index(type(y)) )  continue;
     if( type(y) == GAP_OBJ )
-    { assert( start_group != nil, "BreakVcat: start_group == nil!" );
+    { assert( start_group != nilobj, "BreakVcat: start_group == nilobj!" );
       if( !join(gap(y)) )
       {
 	/* finish off and break this group */
@@ -101,11 +102,11 @@ OBJECT x;  CONSTRAINT *c;
 	  BreakJoinedGroup(start_group, link, m, &tc, &b, &f);
 	dble_found = TRUE;
 	dble_fwd = max(dble_fwd, b + f);
-	start_group = nil;
+	start_group = nilobj;
 	debug1(DOB, DD, "  end group, dble_fwd: %s", EchoLength(dble_fwd));
       }
     }
-    else if( start_group == nil )
+    else if( start_group == nilobj )
     {	
       /* start new group */
       b = back(y, COL);  f = fwd(y, COL);
@@ -125,7 +126,7 @@ OBJECT x;  CONSTRAINT *c;
       ifdebug(DOB, DD, DebugObject(y));
     }
   }
-  assert( start_group != nil, "BreakVcat: start_group == nil (2)!" );
+  assert( start_group != nilobj, "BreakVcat: start_group == nilobj (2)!" );
 
   if( dble_found )
   {	
@@ -182,8 +183,7 @@ OBJECT x;  CONSTRAINT *c;
 /*                                                                           */
 /*****************************************************************************/
 
-static OBJECT BreakTable(x, c)
-OBJECT x;  CONSTRAINT *c;
+static OBJECT BreakTable(OBJECT x, CONSTRAINT *c)
 { LENGTH bwidth, fwidth;	/* running back(x) and fwd(x)		     */
   int    bcount, fcount;	/* running no. of components		     */
   OBJECT mlink, my;		/* minimum-width unbroken component	     */
@@ -207,7 +207,7 @@ OBJECT x;  CONSTRAINT *c;
   debug1(DOB, D, "[ BreakTable( x, %s )", EchoConstraint(c));
 
   /* Initialise csize, bcount, fcount, bwidth, fwidth and broken(y) */
-  bcount = fcount = 0;  bwidth = fwidth = 0;  prev = nil;
+  bcount = fcount = 0;  bwidth = fwidth = 0;  prev = nilobj;
   prev_col_size = 0;
   Child(y, Down(x));
   assert( type(y) != GAP_OBJ, "BreakTable: GAP_OBJ!" );
@@ -227,7 +227,7 @@ OBJECT x;  CONSTRAINT *c;
     assert( !is_index(type(y)), "BreakTable: index!" );
     broken(y) = is_indefinite(type(y));
     if( !broken(y) )
-    { if( prev == nil )  fcount = 1;
+    { if( prev == nilobj )  fcount = 1;
       else if( mark(gap(g)) )
       {	bcount += fcount;
 	bwidth += fwidth + MinGap(0, 0, 0, &gap(g));
@@ -264,11 +264,11 @@ OBJECT x;  CONSTRAINT *c;
     debug2(DOB, DD, "fcount: %d;  fwidth: %s", fcount, EchoLength(fwidth));
 
     /* find a minimal-width unbroken component my */
-    my = nil;  msize = size(x, COL);       /* an upper bound for size(y) */
+    my = nilobj;  msize = size(x, COL);       /* an upper bound for size(y) */
     for( link = Down(x);  ;  link = NextDown(link) )
     { Child(y, link);
       assert( type(y) != GAP_OBJ, "BreakTable: type(y) == GAP_OBJ!" );
-      if( !broken(y) && (size(y, COL) < msize || my == nil) )
+      if( !broken(y) && (size(y, COL) < msize || my == nilobj) )
       {	msize = size(y, COL);
 	my = y;  mlink = link;
 	ratm = FALSE;
@@ -285,9 +285,9 @@ OBJECT x;  CONSTRAINT *c;
     /* find neighbouring definite objects and resulting pd_extra and sd_extra */
     SetNeighbours(mlink, ratm, &pg, &prec_def, &sg, &succ_def, &mside);
     debug2(DOB, DD, "my (%s): %s", Image(mside), EchoObject(my));
-    pd_extra = pg == nil ? 0 :
+    pd_extra = pg == nilobj ? 0 :
       ExtraGap(broken(prec_def) ? fwd(prec_def,COL) : 0, 0, &gap(pg), BACK);
-    sd_extra = sg == nil ? 0 :
+    sd_extra = sg == nilobj ? 0 :
       ExtraGap(0, broken(succ_def) ? back(succ_def,COL) : 0, &gap(sg), FWD);
     debug2(DOB, DD, "pd_extra:   %s;  sd_extra:      %s",
 		EchoLength(pd_extra), EchoLength(sd_extra) );
@@ -305,8 +305,10 @@ OBJECT x;  CONSTRAINT *c;
 	col_size = (back_max - bwidth) / bcount;
 	if( col_size > prev_col_size && col_size - prev_col_size < PT )
 	  col_size = prev_col_size;
-	SetConstraint(mc, col_size + pd_extra, col_size + pd_extra + sd_extra,
-			col_size + sd_extra );
+	SetConstraint(mc,
+	  min(MAX_LEN, col_size + pd_extra),
+	  min(MAX_LEN, col_size + pd_extra + sd_extra),
+	  min(MAX_LEN, col_size + sd_extra));
 	break;
 
 
@@ -316,8 +318,10 @@ OBJECT x;  CONSTRAINT *c;
 	col_size = (fwd_max - fwidth) / fcount;
 	if( col_size > prev_col_size && col_size - prev_col_size < PT )
 	  col_size = prev_col_size;
-	tmp = min(MAX_LEN, pd_extra + back(my, COL) + col_size + sd_extra);
-	SetConstraint(mc, pd_extra + back(my, COL), tmp, col_size + sd_extra);
+	SetConstraint(mc,
+	  min(MAX_LEN, pd_extra + back(my, COL)),
+	  min(MAX_LEN, pd_extra + back(my, COL) + col_size + sd_extra),
+	  min(MAX_LEN, col_size + sd_extra));
 	break;
 
 
@@ -327,8 +331,10 @@ OBJECT x;  CONSTRAINT *c;
 	col_size = (fwd_max - fwidth) / fcount;
 	if( col_size > prev_col_size && col_size - prev_col_size < PT )
 	  col_size = prev_col_size;
-	SetConstraint(mc, col_size + pd_extra, col_size + pd_extra + sd_extra,
-			col_size + sd_extra );
+	SetConstraint(mc,
+	  min(MAX_LEN, col_size + pd_extra),
+	  min(MAX_LEN, col_size + pd_extra + sd_extra),
+	  min(MAX_LEN, col_size + sd_extra));
 	break;
 
 
@@ -344,14 +350,14 @@ OBJECT x;  CONSTRAINT *c;
     my = BreakObject(my, &mc);  broken(my) = TRUE;
 
     /* calculate the effect of accepting my on bwidth and fwidth */
-    if( pg != nil )
+    if( pg != nilobj )
     { tmp = broken(prec_def) ? fwd(prec_def, COL) : 0;
       beffect = MinGap(tmp, back(my, COL), fwd(my, COL), &gap(pg)) -
 	        MinGap(tmp, 0,             0,            &gap(pg));
     }
     else beffect = back(my, COL);
 
-    if( sg != nil )
+    if( sg != nilobj )
     { tmp = broken(succ_def) ? back(succ_def, COL) : 0;
       tmp2 = broken(succ_def) ? fwd(succ_def, COL) : 0;
       feffect = MinGap(fwd(my, COL), tmp, tmp2, &gap(sg)) -
@@ -397,12 +403,12 @@ OBJECT x;  CONSTRAINT *c;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT BreakObject(x, c)
-OBJECT x;  CONSTRAINT *c;
+OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 { OBJECT link, y;  CONSTRAINT yc;  LENGTH f;
   debug3(DOB, DD,  "[ BreakObject(x (%s,%s),  %s), x =",
 	EchoLength(back(x, COL)), EchoLength(fwd(x, COL)), EchoConstraint(c));
   ifdebug(DOB, DD, DebugObject(x));
+  assert( bc(*c)>=0 && bfc(*c)>=0 && fc(*c)>=0, "BreakObject: neg constraint");
 
   if( FitsConstraint(back(x, COL), fwd(x, COL), *c) )
   { debug0(DOB, DD, "] BreakObject returning (fits).");
@@ -436,7 +442,7 @@ OBJECT x;  CONSTRAINT *c;
     case WORD:
     case QWORD:
     
-      Error(13, 5, "word %s deleted (too wide)", WARN, &fpos(x), string(x));
+      Error(13, 5, "word \"%s\" deleted (too wide)", WARN,&fpos(x),string(x));
       y = MakeWord(WORD, STR_EMPTY, &fpos(x));
       back(y, COL) = fwd(y, COL) = 0;
       ReplaceNode(y, x);
@@ -540,22 +546,27 @@ OBJECT x;  CONSTRAINT *c;
     case ACAT:
     
       if( back(x, COL) > 0 )
-      { int sz;
+      { int sz;  OBJECT rpos;
 	/* shift the column mark of x to the left edge */
 	sz = size(x, COL);
 	fwd(x, COL) = min(sz, MAX_LEN);
 	back(x, COL) = 0;
+	rpos = x;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{  Child(y, link);
-	   if( type(y) == GAP_OBJ )  mark(gap(y)) = FALSE;
+	{ Child(y, link);
+	  if( type(y) == GAP_OBJ && mark(gap(y)) )
+	  { mark(gap(y)) = FALSE;
+	    rpos = y;
+	  }
 	}
 	if( FitsConstraint(back(x, COL), fwd(x, COL), *c) )
 	{ Error(13, 8, "column mark of unbroken paragraph moved left",
-	    WARN, &fpos(x));
+	    WARN, &fpos(rpos));
 	  break;
 	}
 	Error(13, 9, "column mark of paragraph moved left before breaking",
-	  WARN, &fpos(x));
+	  WARN, &fpos(rpos));
+	ifdebug(DOB, D, DebugObject(x));
       }
       x = FillObject(x, c);
       break;
@@ -569,7 +580,8 @@ OBJECT x;  CONSTRAINT *c;
 
     case COL_THR:
     
-      BreakJoinedGroup(Down(x), LastDown(x), nil, c, &back(x,COL), &fwd(x,COL));
+      BreakJoinedGroup(Down(x), LastDown(x), nilobj, c,
+	&back(x,COL), &fwd(x,COL));
       break;
 
 

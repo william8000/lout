@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -136,9 +136,9 @@ typedef struct {
 /*                                                                           */
 /*****************************************************************************/
 
-static CorrectOversizeProblem(x, link, y, etc_width, hyph_allowed)
-OBJECT x, link, y;  int etc_width;  BOOLEAN hyph_allowed;
-{ OBJECT tmp, g, prevlink, nextlink;  BOOLEAN done = FALSE;
+static void CorrectOversizeProblem(OBJECT x, OBJECT link, OBJECT y,
+int etc_width, BOOLEAN hyph_allowed)
+{ OBJECT tmp, g;
 
   if( PrevDown(link) != x )
   {
@@ -190,11 +190,11 @@ OBJECT x, link, y;  int etc_width;  BOOLEAN hyph_allowed;
 
 #define MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word)	\
 { OBJECT newg, foll;							\
-  BOOLEAN zero_at_right = FALSE;					\
+  BOOLEAN jn, zero_at_right = FALSE;					\
   debug0(DOF, DD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
 									\
   /* search onwards to find newg, the next true breakpoint */		\
-  NextDefiniteWithGap(x, rlink, foll, newg);				\
+  NextDefiniteWithGap(x, rlink, foll, newg, jn);			\
 									\
   /* set right link and calculate badness of the new interval */	\
   if( rlink != x )							\
@@ -221,7 +221,7 @@ OBJECT x, link, y;  int etc_width;  BOOLEAN hyph_allowed;
       {									\
 	/* make sure hyph_word exists and is of the right font */	\
 	debug0(DOF, DD, "  MoveRightToGap checking hyph_word");		\
-	if( hyph_word == nil )						\
+	if( hyph_word == nilobj )					\
 	{ hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
 	  word_font(hyph_word) = 0;					\
 	  word_colour(hyph_word) = colour(save_style(x));		\
@@ -261,12 +261,12 @@ OBJECT x, link, y;  int etc_width;  BOOLEAN hyph_allowed;
 /*****************************************************************************/
 
 #define IntervalInit(I, x, max_width, etc_width, hyph_word)		\
-{ OBJECT rlink, right;							\
+{ OBJECT rlink, right; BOOLEAN jn;					\
   debug2(DOF, DD, "IntervalInit(I, x, %s, %s, hyph_word)",		\
       EchoLength(max_width), EchoLength(etc_width));			\
   I.llink = x;								\
 									\
-  FirstDefinite(x, rlink, right);					\
+  FirstDefinite(x, rlink, right, jn);					\
   if( rlink == x )  I.class = AT_END, I.rlink = x;			\
   else									\
   { 									\
@@ -341,7 +341,7 @@ OBJECT x, link, y;  int etc_width;  BOOLEAN hyph_allowed;
 /*****************************************************************************/
 
 #define IntervalShiftLeftEnd(I, x, max_width, etc_width)		\
-{ OBJECT llink, left, lgap, y;						\
+{ OBJECT llink, left, lgap, y;  BOOLEAN jn;				\
   debug1(DOF, DDD, "IntervalShiftLeftEnd(%s)", IntervalPrint(I, x));	\
   assert( I.class != AT_END, "IntervalShiftLeftEnd: AT_END!" );		\
 									\
@@ -351,7 +351,7 @@ OBJECT x, link, y;  int etc_width;  BOOLEAN hyph_allowed;
   assert( llink != x, "IntervalShiftLeftEnd: llink == x!" );		\
 									\
   /* find lgap, the first true breakpoint following left */		\
-  NextDefiniteWithGap(x, llink, y, lgap);				\
+  NextDefiniteWithGap(x, llink, y, lgap, jn);				\
   assert( llink != x, "IntervalShiftLeftEnd: llink == x!" );		\
 									\
   /* calculate width and badness of interval minus left and lgap */	\
@@ -412,16 +412,15 @@ OBJECT x, link, y;  int etc_width;  BOOLEAN hyph_allowed;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *IntervalPrint(I, x)
-INTERVAL I;  OBJECT x;
+static FULL_CHAR *IntervalPrint(INTERVAL I, OBJECT x)
 { static char *class_name[] =
     { "TOO_LOOSE", "LOOSE", "TIGHT", "TOO_TIGHT", "TAB_OVERLAP", "AT_END",
       "ZERO_AT_LEFT", "ZERO_AT_RIGHT" };
+  OBJECT link, y, g, z; int i;
   static FULL_CHAR res[300];
-  OBJECT link, y, g, prev, z; int i;
   if( I.llink == I.rlink )  return AsciiToFull("[]");
   StringCopy(res, AsciiToFull("["));
-  g = nil;
+  g = nilobj;
   for( link = NextDown(I.llink);  link != I.rlink;  link = NextDown(link) )
   { assert(link != x, "IntervalPrint: link == x!");
     Child(y, link);
@@ -473,11 +472,10 @@ INTERVAL I;  OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT FillObject(x, c)
-OBJECT x;  CONSTRAINT *c;
+OBJECT FillObject(OBJECT x, CONSTRAINT *c)
 { INTERVAL I, BestI;  OBJECT res, gp, tmp, z, y, link, prev;
-  int max_width, etc_width, outdent_margin, f;
-  static OBJECT hyph_word = nil;
+  int max_width, etc_width, outdent_margin, f;  BOOLEAN jn;
+  static OBJECT hyph_word = nilobj;
   BOOLEAN can_hyphenate;    /* TRUE when it is possible to call Hyphenate() */
   BOOLEAN hyph_allowed;	    /* TRUE when hyphenation of words is permitted  */
   assert( type(x) == ACAT, "FillObject: type(x) != ACAT!" );
@@ -582,7 +580,6 @@ OBJECT x;  CONSTRAINT *c;
 	}
 	else CorrectOversizeProblem(x, I.llink, y, etc_width, hyph_allowed);
 	goto RESTART;
-	break;
 
 
       default:
@@ -663,16 +660,27 @@ OBJECT x;  CONSTRAINT *c;
       /* add hyphen to end of previous line, if lgap is ADD_HYPH */
       Child(lgap, llink);
       if( mode(gap(lgap)) == ADD_HYPH )
-      { OBJECT z = New(GAP_OBJ);
+      { OBJECT z;  BOOLEAN under;
+
+	/* work out whether the hyphen needs to be underlined */
+	Child(z, LastDown(x));
+	under = underline(z);
+
+	/* add zero-width gap object */
+        z = New(GAP_OBJ);
 	debug0(DOF, DD, "   adding hyphen\n");
 	hspace(z) = vspace(z) = 0;
+	underline(z) = under;
 	SetGap(gap(z), FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
 	Link(x, z);
+
+	/* add hyphen */
 	z = MakeWord(WORD, STR_HYPHEN, &fpos(y));
 	word_font(z) = font(save_style(x));
 	word_colour(z) = colour(save_style(x));
 	word_language(z) = language(save_style(x));
 	word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
+	underline(z) = under;
 	FontWordSize(z);
 	Link(x, z);
       }
@@ -718,15 +726,15 @@ OBJECT x;  CONSTRAINT *c;
     /* recalculate the width of the last line, since it may now be smaller */
     assert( LastDown(res) != res, "FillObject: empty paragraph!" );
     Child(y, LastDown(res));
-    FirstDefinite(y, link, z);
+    FirstDefinite(y, link, z, jn);
     assert( link != y, "FillObject: last line is empty!" );
     f = back(z, COL);  prev = z;
-    NextDefiniteWithGap(y, link, z, gp);
+    NextDefiniteWithGap(y, link, z, gp, jn);
     while( link != y )
     {
       f += MinGap(fwd(prev, COL), back(y, COL), fwd(y, COL), &gap(gp));
       prev = z;
-      NextDefiniteWithGap(y, link, z, gp);
+      NextDefiniteWithGap(y, link, z, gp, jn);
     }
     fwd(y, COL) = min(MAX_LEN, f + fwd(prev, COL));
 

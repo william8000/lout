@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -48,15 +48,13 @@ static	FILE	*fp;			/* current output file               */
 /*                                                                           */
 /*****************************************************************************/
 
-static cprint(x)
-FULL_CHAR *x;
+static void cprint(FULL_CHAR *x)
 { col += StringLength(x);
   if( fp == null ) AppendString(x);
   else StringFPuts(x, fp);
 } /* end print */
 
-static aprint(x)
-char *x;
+static void aprint(char *x)
 { cprint(AsciiToFull(x));
 } /* end aprint */
 
@@ -69,8 +67,7 @@ char *x;
 /*                                                                           */
 /*****************************************************************************/
 
-static printnum(x)
-int x;
+static void printnum(int x)
 { cprint(StringInt(x));
 } /* end printnum */
 
@@ -83,8 +80,7 @@ int x;
 /*                                                                           */
 /*****************************************************************************/
 
-static tab(x)
-int x;
+static void tab(int x)
 {  do
      aprint(" ");
    while( col < x );
@@ -100,7 +96,7 @@ int x;
 /*                                                                           */
 /*****************************************************************************/
 
-static newline()
+static void newline(void)
 { if( fp == null )  AppendString(STR_SPACE);
   else
   { fputs("\n", fp);
@@ -108,28 +104,6 @@ static newline()
     for( col = 0;  col < indent;  col++ )  fputs(" ", fp);
   }
 } /* end newline */
-
-
-/*****************************************************************************/
-/*                                                                           */
-/*  static space(n)                                                          */
-/*                                                                           */
-/*  Echo n spaces to the appropriate output.                                 */
-/*  Correct indenting and right limits are maintained, if possible.          */
-/*                                                                           */
-/*****************************************************************************/
-
-static space(n)
-int n;
-{ int i;
-  if( fp == null )
-    for( i = 0;  i < n;  i++ )  AppendString(STR_SPACE);
-  else if( col + n > limit )
-  { fputs("\n", fp);
-    for( col = 0;  col < n-1;  col++ )  fputs(" ", fp);
-  }
-  else for( i = 0;  i < n;  col++, i++ )  fputs(" ", fp);
-} /* end space */
 
 
 /*@::echo()@******************************************************************/
@@ -142,8 +116,7 @@ int n;
 /*                                                                           */
 /*****************************************************************************/
 
-static echo(x, outer_prec)
-OBJECT x;  unsigned outer_prec;
+static void echo(OBJECT x, unsigned outer_prec)
 { OBJECT link, y, tmp, sym;
   char *op;  int prec, i;
   BOOLEAN npar_seen, name_printed, lbr_printed, braces_needed;
@@ -179,6 +152,7 @@ OBJECT x;  unsigned outer_prec;
     case CROSS_FOLL:
     case CROSS_TARG:
     case RECURSIVE:
+    case PAGE_LABEL_IND:
     
 	aprint("#"); cprint(Image(type(x))); aprint(" ");
 	echo(actual(x), NO_PREC);
@@ -310,7 +284,11 @@ OBJECT x;  unsigned outer_prec;
     
 	if( StringLength(string(x)) == 0 )
 	  aprint("{}");
-	else cprint( string(x) );
+	else
+	{ aprint("\"");
+	  cprint( string(x) );
+	  aprint("\"");
+	}
 	break;
 
 
@@ -380,6 +358,8 @@ OBJECT x;  unsigned outer_prec;
 
 	     case NPAR:	if( !name_printed )
 			{ cprint(SymName(sym));
+			  aprint("%");
+			  cprint(SymName(enclosing(sym)));
 			  /* ***
 			  if( external(x) || threaded(x) )
 			  { aprint(" #");
@@ -401,6 +381,8 @@ OBJECT x;  unsigned outer_prec;
 
 	     case RPAR:	if( !name_printed )
 			{ cprint(SymName(sym));
+			  aprint("%");
+			  cprint(SymName(enclosing(sym)));
 			  /* ***
 			  if( external(x) || threaded(x) )
 			  { aprint(" #");
@@ -431,6 +413,8 @@ OBJECT x;  unsigned outer_prec;
 	}
 	if( !name_printed )
 	{ cprint( SymName(sym) );
+	  aprint("%");
+	  cprint(SymName(enclosing(sym)));
 	  /* ***
 	  if( external(x) || threaded(x) )
 	  { aprint(" #");
@@ -451,7 +435,11 @@ OBJECT x;  unsigned outer_prec;
 	/* this should occur only in debug output case */
 	cprint(KW_SPLIT);  moveright();
 	Child(y, DownDim(x, COL));
-	aprint(" ");
+	aprint(" COL:");
+	echo(y, FORCE_PREC);
+	newline();
+	Child(y, DownDim(x, ROW));
+	aprint(" ROW:");
 	echo(y, FORCE_PREC);
 	moveleft();
 	break;
@@ -480,7 +468,7 @@ OBJECT x;  unsigned outer_prec;
     
 	newline();  cprint(KW_MACRO);
 	aprint(" ");  cprint(SymName(x));
-	if( sym_body(x) != nil )
+	if( sym_body(x) != nilobj )
 	{ newline();  cprint(KW_LBR);
 	  y = sym_body(x);
 	  do
@@ -489,7 +477,7 @@ OBJECT x;  unsigned outer_prec;
 	    cprint(EchoToken(y));
 	    y = succ(y, PARENT);
 	  } while( y != sym_body(x) );
-	  newline();  aprint(KW_RBR);
+	  newline();  cprint(KW_RBR);
 	}
 	else aprint(" {}");
 	if( visible(x) )  aprint(" # (visible)");
@@ -500,7 +488,7 @@ OBJECT x;  unsigned outer_prec;
     case LOCAL:
     
 	/* print predefined operators in abbreviated form */
-	if( sym_body(x) == nil && enclosing(x) != nil )
+	if( sym_body(x) == nilobj && enclosing(x) != nilobj )
 	{ tab(3); aprint("# sys ");
 	  cprint(SymName(x));
 	  break;
@@ -522,11 +510,11 @@ OBJECT x;  unsigned outer_prec;
 	}
 
 	/* print uses list, if necessary */
-	if( uses(x) != nil || dirty(x) )
+	if( uses(x) != nilobj || dirty(x) )
 	{ newline();  aprint("   # ");
 	  if( dirty(x) ) aprint("dirty, ");
 	  aprint("uses");
-	  if( uses(x) != nil )
+	  if( uses(x) != nilobj )
 	  { tmp = next(uses(x));
 	    do
 	    { aprint(" "), cprint( SymName(item(tmp)) );
@@ -534,7 +522,7 @@ OBJECT x;  unsigned outer_prec;
 	    } while( tmp != next(uses(x)) );
 	  }
 	  /* ***
-	  for( tmp = uses(x);  tmp != nil;  tmp = next(tmp) )
+	  for( tmp = uses(x);  tmp != nilobj;  tmp = next(tmp) )
 	  { aprint(" "), cprint( SymName(item(tmp)) );
 	  }
 	  *** */
@@ -603,12 +591,13 @@ OBJECT x;  unsigned outer_prec;
 
 	/* print body */
 	moveright();
-	if( sym_body(x) != nil )  echo(sym_body(x), NO_PREC);
+	if( sym_body(x) != nilobj )  echo(sym_body(x), NO_PREC);
 	moveleft();  if( type(x) == LOCAL ) newline();
 	cprint(KW_RBR);
 	break;
 
 
+    case PAGE_LABEL:
     case ONE_COL:
     case ONE_ROW:
     case HCONTRACT:
@@ -620,6 +609,8 @@ OBJECT x;  unsigned outer_prec;
     case VADJUST:
     case HSCALE:
     case VSCALE:
+    case COMMON:
+    case RUMP:
     case NEXT:
     case WIDE:
     case HIGH:
@@ -636,10 +627,12 @@ OBJECT x;  unsigned outer_prec;
     case FONT:
     case SPACE:
     case BREAK:
+    case UNDERLINE:
     case COLOUR:
     case LANGUAGE:
     case OPEN:
     case TAGGED:
+    case ENV_OBJ:
 
     
 	/* print enclosing left brace if needed */
@@ -754,8 +747,7 @@ OBJECT x;  unsigned outer_prec;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *EchoObject(x)
-OBJECT x;
+FULL_CHAR *EchoObject(OBJECT x)
 { debug0(DOE, D, "EchoObject()");
   fp = null;
   col = 0;
@@ -763,7 +755,7 @@ OBJECT x;
   limit  = 60;
   if( fp == null )
   BeginString();
-  if( x == nil )  AppendString(AsciiToFull("<nil>"));
+  if( x == nilobj )  AppendString(AsciiToFull("<nilobj>"));
   else echo(x, type(x) == GAP_OBJ ? VCAT : 0);
   debug0(DOE, D, "EchoObject returning");
   return EndString();
@@ -778,14 +770,13 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-DebugObject(x)
-OBJECT x;
+void DebugObject(OBJECT x)
 { debug0(DOE, D, "DebugObject()");
   fp = stderr;
   col = 0;
   indent = 0;
   limit  = 60;
-  if( x == nil )  fprintf(stderr, "<nil>");
+  if( x == nilobj )  fprintf(stderr, "<nilobj>");
   else echo(x, type(x) == GAP_OBJ ? VCAT : 0);
   fprintf(stderr, "\n");
   debug0(DOE, D, "DebugObject returning");
@@ -800,11 +791,10 @@ OBJECT x;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *EchoIndex(index)
-OBJECT index;
-{ static FULL_CHAR buff[MAX_BUFF];  OBJECT z;
-  if( index == nil )
-  { sprintf(buff, "<nil>");
+FULL_CHAR *EchoIndex(OBJECT index)
+{ static char buff[MAX_BUFF];  OBJECT z;
+  if( index == nilobj )
+  { sprintf(buff, "<nilobj>");
   }
   else switch( type(index) )
   {
@@ -827,9 +817,9 @@ OBJECT index;
       if( Down(index) != index )
       { Child(z, Down(index));
       }
-      else z = nil;
+      else z = nilobj;
       sprintf(buff, "unattached %s",
-	z == nil ? AsciiToFull("<nil>") : SymName(actual(z)));
+	z == nilobj ? AsciiToFull("<nilobj>") : SymName(actual(z)));
       break;
 
 
@@ -845,20 +835,19 @@ OBJECT index;
       sprintf(buff, "%s", Image(type(index)));
       break;
   }
-  return buff;
+  return AsciiToFull(buff);
 } /* end EchoIndex */
 
 
 /*@::DebugGalley()@***********************************************************/
 /*                                                                           */
-/*  DebugGalley(hd, indent)                                                  */
+/*  DebugGalley(hd, pinpt, indent)                                           */
 /*                                                                           */
-/*  Print overview of galley hd on stderr.                                   */
+/*  Print overview of galley hd on stderr; mark pinpoint if found            */
 /*                                                                           */
 /*****************************************************************************/
 
-DebugGalley(hd, indent)
-OBJECT hd;  int indent;
+void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
 { OBJECT link, y, z;  char istr[30];  int i;
   for( i = 0;  i < indent;  i++ )  istr[i] = ' ';
   istr[i] = '\0';
@@ -870,6 +859,7 @@ OBJECT hd;  int indent;
     SymName(actual(hd)), SymName(whereto(hd)));
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
   { Child(y, link);
+    if( y == pinpt ) fprintf(stderr, "++");
     switch( type(y) )
     {
       case GAP_OBJ:
@@ -880,14 +870,26 @@ OBJECT hd;  int indent;
 
       case CROSS_PREC:
 
-	fprintf(stderr, "%s%d cross_prec %d %s\n", istr, (int) y,
-	  (int) actual(y), EchoObject(actual(y)));
+	fprintf(stderr, "%scross_prec %s\n", istr, EchoObject(y));
+	break;
+
+
+      case PAGE_LABEL_IND:
+
+	fprintf(stderr, "%spage_label_ind %s\n", istr, EchoObject(y));
+	break;
+
+
+      case CROSS_TARG:
+
+	fprintf(stderr, "%scross_targ %s\n", istr, EchoObject(y));
 	break;
 
 
       case EXPAND_IND:
 
-	fprintf(stderr, "%s%d expand_ind %s\n", istr, (int) y, Image(type(actual(y))));
+	fprintf(stderr, "%s%ld expand_ind %s\n", istr, (long) y,
+	  Image(type(actual(y))));
 	break;
 
 
@@ -897,7 +899,7 @@ OBJECT hd;  int indent;
 	  SymName(actual(actual(y))) : Image(type(actual(y))));
 	if( Down(y) != y )
 	{ Child(z, Down(y));
-	  DebugGalley(z, indent+4);
+	  DebugGalley(z, nilobj, indent+4);
 	}
 	break;
 
@@ -908,7 +910,7 @@ OBJECT hd;  int indent;
 	  SymName(actual(actual(y))) : Image(type(actual(y))));
 	if( Down(y) != y )
 	{ Child(z, Down(y));
-	  DebugGalley(z, indent+4);
+	  DebugGalley(z, nilobj, indent+4);
 	}
 	break;
 
@@ -918,7 +920,7 @@ OBJECT hd;  int indent;
 	fprintf(stderr, "%sunattached\n", istr);
 	if( Down(y) != y )
 	{ Child(z, Down(y));
-	  DebugGalley(z, indent+4);
+	  DebugGalley(z, nilobj, indent+4);
 	}
 	break;
 

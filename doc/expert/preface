@@ -18,14 +18,14 @@ components, and a complete description of each predefined symbol.  The
 final chapter presents a collection of advanced examples.
 @PP
 This manual presents Version 3 of Basser Lout, publicly released in
-September 1994 @Cite { $kingston1994lout.program }.  Those familiar
+September 1994 @Cite { $kingston1995lout.program }.  Those familiar
 with Version 2 will notice several enhancements, including support
 for multilingual document formatting and several new symbols.
 @PP
 This manual was rendered into PostScript
 postscript @Index { PostScript }
-by Version 3.02 of the Basser Lout interpreter, using the symbols
-described in the User's Guide @Cite { $kingston1994lout.user }.
+by Version 3.06 of the Basser Lout interpreter, using the symbols
+described in the User's Guide @Cite { $kingston1995lout.user }.
 @DP
 @Heading { Acknowledgment. }  Version 3 has benefited from hundreds of
 comments received since the release of Version 1 in October 1991.  Not

@@ -1,6 +1,6 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -52,8 +52,7 @@
 /*****************************************************************************/
 #define setwidths(x, y) w = x; units(*res_gap) = y;  break;
 
-GetGap(x, style, res_gap, res_inc)
-OBJECT x;  STYLE *style;  GAP *res_gap;  unsigned *res_inc;
+void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
 { int w;  float num; 
   FULL_CHAR *str;
 
@@ -165,8 +164,7 @@ OBJECT x;  STYLE *style;  GAP *res_gap;  unsigned *res_inc;
 /*                                                                           */
 /*****************************************************************************/
 
-LENGTH MinGap(a, b, c, xgap)
-LENGTH a, b, c;  GAP *xgap;
+LENGTH MinGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap)
 { LENGTH res;  int w;
   switch( units(*xgap) )
   {
@@ -233,8 +231,7 @@ LENGTH a, b, c;  GAP *xgap;
 /*                                                                           */
 /*****************************************************************************/
 
-LENGTH ExtraGap(a, b, xgap, dir)
-LENGTH a, b; GAP *xgap;  int dir;
+LENGTH ExtraGap(LENGTH a, LENGTH b, GAP *xgap, int dir)
 { LENGTH tmp, res;
   LENGTH w = units(*xgap) == FIXED_UNIT ? width(*xgap) : 0;
   switch( mode(*xgap) )
@@ -283,8 +280,7 @@ LENGTH a, b; GAP *xgap;  int dir;
 /*                                                                           */
 /*****************************************************************************/
 
-LENGTH ActualGap(a, b, c, xgap, f, mk)
-LENGTH a, b, c;  GAP *xgap;  LENGTH f, mk;
+LENGTH ActualGap(LENGTH a, LENGTH b, LENGTH c, GAP *xgap, LENGTH f, LENGTH mk)
 { LENGTH res;  int w, w2;
   switch( units(*xgap) )
   {
@@ -351,8 +347,7 @@ LENGTH a, b, c;  GAP *xgap;  LENGTH f, mk;
 /*****************************************************************************/
 #if DEBUG_ON
 
-FULL_CHAR *EchoGap(xgap)
-GAP *xgap;
+FULL_CHAR *EchoGap(GAP *xgap)
 { char *letter = "?ehxokt";  char c;
   static char buff[20];
   assert( mode(*xgap) <= 6, "EchoGap: mode(*xgap)" );

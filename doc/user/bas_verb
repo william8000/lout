@@ -1,0 +1,38 @@
+@Section
+   @Title { Verbatim text }
+   @Tag { verbatim }
+@Begin
+@PP
+The @Code "@Verbatim" symbol prints the following object exactly as
+it appears in the input file.  All special meanings for characters,
+symbols, etc. are turned off; there is one result line for each
+input line.  For example,
+@ID @Code {
+"@IndentedDisplay @Verbatim {"
+"A line of \"verbatim\" text"
+"Another line, with a \\ character"
+"}"
+}
+has result
+@IndentedDisplay lines @Break {
+"A line of \"verbatim\" text"
+"Another line, with a \\ character"
+}
+Use @Code "{ Courier Base } @Font @Verbatim { ... }" to get the result
+in a fixed-width font.
+@PP
+If the verbatim text contains @Code "{" or @Code "}" characters, then
+they should either be balanced or else you need to use the alternative
+form
+@ID @Code {
+"@Verbatim @Begin"
+"..."
+"@End @Verbatim"
+}
+so that there is no doubt about where the verbatim text ends.
+@PP
+The @Code "@Verbatim" symbol relies on the @Code "sed" command, which
+exists on Unix systems but not necessarily on others.  To ensure that
+this manual can be formatted on any system, the result above was
+simulated (i.e. not actually produced by the @Code "@Verbatim" symbol).
+@End @Section

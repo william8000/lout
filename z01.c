@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, Encapsulated, etc.@****************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -37,7 +37,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-int MemCheck = 0;
+POINTER MemCheck = 0;
 
 /*****************************************************************************/
 /*                                                                           */
@@ -96,15 +96,15 @@ nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-static OBJECT load(xstr, xpre, xleft, xright, xindef, xprec)
-FULL_CHAR *xstr;  unsigned  xpre;  BOOLEAN xleft, xright, xindef;
-unsigned char xprec;
+static OBJECT load(FULL_CHAR *xstr, unsigned xpre,
+BOOLEAN xleft, BOOLEAN xright, BOOLEAN xindef, unsigned char xprec)
 { OBJECT s;
-  s = InsertSym(xstr, LOCAL, no_fpos, xprec, xindef, FALSE, xpre, StartSym,nil);
+  s = InsertSym(xstr, LOCAL, no_fpos, xprec, xindef, FALSE, xpre,
+	StartSym, nilobj);
   if( xleft )  InsertSym( AsciiToFull("pa"), LPAR, no_fpos, DEFAULT_PREC,
-    FALSE, FALSE, 0, s, nil);
+    FALSE, FALSE, 0, s, nilobj);
   if( xright )  InsertSym( AsciiToFull("pb"), RPAR, no_fpos, DEFAULT_PREC,
-    FALSE, FALSE, 0, s, nil);
+    FALSE, FALSE, 0, s, nilobj);
   if( xleft && xright )  right_assoc(s) = TRUE;
   return s;
 } /* end load */
@@ -119,8 +119,7 @@ unsigned char xprec;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *GetArg(argv, argc, i)
-char *argv[]; int argc, *i;
+static FULL_CHAR *GetArg(char *argv[], int argc, int *i)
 { if( !StringEqual(AsciiToFull(argv[*i]+2), STR_EMPTY) )
     return AsciiToFull(argv[*i]+2);
   else if( *i < argc-1 && *argv[*i + 1] != CH_HYPHEN )
@@ -139,8 +138,7 @@ char *argv[]; int argc, *i;
 /*                                                                           */
 /*****************************************************************************/
 
-main(argc, argv)
-int argc; char *argv[];
+int main(int argc, char *argv[])
 { int i, len;  FULL_CHAR *arg;
   OBJECT t, res, s;			/* current token, parser output      */
   BOOLEAN stdin_seen;			/* TRUE when stdin file seen         */
@@ -148,6 +146,7 @@ int argc; char *argv[];
   FULL_CHAR *cross_db;			/* name of cross reference database  */
   FULL_CHAR *outfile;			/* name of output file               */
   FILE *out_fp;
+  long MemCheckLong;
 
   /* set locale if that's what we are doing */
 #if LOCALE_ON
@@ -170,9 +169,9 @@ int argc; char *argv[];
   AllowCrossDb = TRUE;
   Encapsulated = FALSE;
   Kern = TRUE;
+  MemInit();
   InitSym();
   LexInit();
-  MemInit();
   InitFiles();
   AddToPath(SOURCE_PATH,   STR_EMPTY);
   AddToPath(DATABASE_PATH, STR_EMPTY);
@@ -184,7 +183,8 @@ int argc; char *argv[];
   outfile = STR_STDOUT;
   source_file_count = 0;
   for( i = 1;  i < argc;  i++ )
-  { if( *argv[i] == CH_HYPHEN ) switch( *(argv[i]+1) )
+  {
+    if( *argv[i] == CH_HYPHEN ) switch( *(argv[i]+1) )
     {
       case CH_FLAG_OUTFILE:
      
@@ -360,24 +360,6 @@ int argc; char *argv[];
 
 	InitializeAll = TRUE;
 	AllowCrossDb = FALSE;
-#if LOCALE_ON
-	{ char *p, buff[MAX_BUFF], dir[MAX_BUFF], com[MAX_BUFF];  int j;
-	  p = argv[i]+2;
-	  debug1(DHY, D, "starting -x%s", p);
-	  if( *p != '\0' )
-	  { do
-	    { j = 0;
-	      while( *p != '\0' && *p != ':' )
-	        buff[j++] = *p++;
-	      buff[j] = '\0';
-	      sprintf(dir, "%s/%s/LC_MESSAGES", LOCALE_DIR, buff);
-	      sprintf(com, "gencat %s/errors.%s %s/msgs.%s", dir, buff, dir, buff);
-	      debug1(DHY, D, "-x calling system(\"%s\")", com);
-	      system(com);
-	    } while( *p++ != '\0' );
-	  }
-	}
-#endif
 	break;
 
 
@@ -390,14 +372,15 @@ int argc; char *argv[];
 
       case CH_FLAG_DEBUG:
      
-	debug_init(argv[i]);
+	debug_init(AsciiToFull(argv[i]));
 	break;
 
 
       case 'M':
 
-	sscanf(argv[i], "-M%d", &MemCheck);
-	fprintf(stderr, "checking memory location %d\n", MemCheck);
+	sscanf(argv[i], "-M%ld", &MemCheckLong);
+	MemCheck = (POINTER) MemCheckLong;
+	fprintf(stderr, "checking memory location %ld\n", (long) MemCheck);
 	break;
 
       case '\0':
@@ -433,8 +416,8 @@ int argc; char *argv[];
 
   /* open output file, or stdout if none specified, and initialize printer */
   if( StringEqual(outfile, STR_STDOUT) )  out_fp = stdout;
-  else if( (out_fp = StringFOpen(outfile, "w")) == null )
-    Error(1, 27, "cannot open output file %s", outfile, FATAL, no_fpos);
+  else if( (out_fp = StringFOpen(outfile, WRITE_TEXT)) == null )
+    Error(1, 27, "cannot open output file %s", FATAL, no_fpos, outfile);
   FontInit();
   ColourInit();
   LanguageInit();
@@ -454,7 +437,7 @@ int argc; char *argv[];
     DefineFile(STR_STDIN, STR_EMPTY, no_fpos, SOURCE_FILE, SOURCE_PATH);
 
   /* load predefined symbols into symbol table */
-  StartSym     = nil;  /* Not a mistake */
+  StartSym     = nilobj;  /* Not a mistake */
   StartSym     = load(KW_START,     0, FALSE,  FALSE,  TRUE,  NO_PREC     );
   GalleySym    = load(KW_GALLEY,    0, FALSE,  FALSE,  TRUE,  NO_PREC     );
   InputSym     = load(KW_INPUT,     0, FALSE,  FALSE,  TRUE,  NO_PREC     );
@@ -486,10 +469,13 @@ int argc; char *argv[];
   load(KW_FONT,        FONT,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_SPACE,       SPACE,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_BREAK,       BREAK,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_UNDERLINE,   UNDERLINE,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_COLOUR,      COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_COLOR,       COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_LANGUAGE,    LANGUAGE,       TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_CURR_LANG,   CURR_LANG,      FALSE,  FALSE,  FALSE, DEFAULT_PREC);
+  load(KW_COMMON,      COMMON,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_RUMP,        RUMP,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_NEXT,        NEXT,           FALSE,  TRUE,   FALSE, DEFAULT_PREC);
   load(KW_OPEN,        OPEN,           TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_TAGGED,      TAGGED,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
@@ -515,6 +501,7 @@ int argc; char *argv[];
   load(KW_GRAPHIC,     GRAPHIC,        TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_CROSS,       CROSS,          TRUE,   TRUE,   FALSE, CROSSOP_PREC);
   load(KW_NULL,        NULL_CLOS,      FALSE,  FALSE,  TRUE,  NO_PREC     );
+  load(KW_PAGE_LABEL,  PAGE_LABEL,     FALSE,  TRUE,   TRUE,  DEFAULT_PREC);
 
 #define setcat(s, mk, jn)  has_mark(s)=mk, has_join(s)=jn
 
@@ -549,7 +536,7 @@ int argc; char *argv[];
   TransferEnd(res);
   TransferClose();
 
-  /* close various  modules */
+  /* close various modules */
   PrintAfterLast();
   CrossClose();
   CloseFiles();
@@ -557,10 +544,13 @@ int argc; char *argv[];
   /* remove any leftover filter temporary files */
   FilterScavenge(TRUE);
 
+  /* check for unbalanced error blocks */
+  CheckErrorBlocks();
+
   /* wrapup */
   ifdebug(DST, D, CheckSymSpread() );
-  debug0(ANY, D, "commencing deletes");
   ifdebug(ANY, D, DeleteEverySym() );
+  debug0(DMA, D, "at end of run:");
   ifdebug(DMA, D, DebugMemory() );
   ifdebug(DPP, D, ProfileOff("main"));
   ifdebug(DPP, D, ProfilePrint());

@@ -1,50 +1,51 @@
 @Section
-   @Title { "@Moment" }
-   @Tag { moment }
+   @Title { "@Case" }
+   @Tag { case }
 @Begin
 @PP
-The predefined symbol @@Moment
-moment.sym @Index { @@Moment symbol }
-has the following definition:
+case.sym @Index { @@Case symbol }
+yield.sym @Index { @@Yield symbol }
+The @@Case symbol selects its result from a list of alternatives,
+depending on a tag:
 @ID @Code {
-"def @Moment"
-"   named @Tag {}"
-"   named @Second {}"
-"   named @Minute {}"
-"   named @Hour {}"
-"   named @Day {}"
-"   named @Month {}"
-"   named @Year {}"
-"   named @Century {}"
-"   named @WeekDay {}"
-"   named @YearDay {}"
-"   named @DaylightSaving {}"
-"{}"
+"@Day @Case {"
+"    { 1 21 31 }  @Yield  st"
+"    { 2 22 }  @Yield  nd"
+"    { 3 23 }  @Yield  rd"
+"    else  @Yield th"
+"}"
 }
-It may be used like any other symbol.  Lout provides an invocation of
-@@Moment with tag {@Code now}, whose other parameters are numbers
-encoding the current date and time:
-@ID {
-@JP @Code "@Second"  |0.5i the current second, usually between 00 and 59
-@JP @Code "@Minute"  | the current minute, between 00 and 59
-@JP @Code "@Hour"    | the current hour, between 00 and 23
-@JP @Code "@Day"     | the current day of the month, between 1 and 31
-@JP @Code "@Month"   | the current month, between 1 (January) and 12 (December)
-@JP @Code "@Year"    | the current year of the century, between 00 and 99
-@JP @Code "@Century" | the current century, e.g. 19 or 20
-@JP @Code "@WeekDay" | the current day of the week, between 1 (Sunday) and 7 (Saturday)
-@JP @Code "@YearDay" | the current day of the year, between 0 and 365
-@JP @Code "@DaylightSaving" | an implementation-dependent number that
-may encode the daylight saving currently in effect
-}
-date @Index { Date, printing of current }
-Unix manual entries state that @Code "@Second" can be as high as 61, to
-allow for leap seconds.  Judicious use of databases can convert these
-numbers into useful dates.  For example,
+In this example the result will be st if @Code "@Day" is 1, 21, or 31,
+and nd if @Code "@Day" is 2 or 22, etc.  The effect is similar to
+accessing a database, though in a more compact form.  The right parameter
+is a sequence of @@Yield symbols, each with a left parameter whose value is
+a sequence of one or more juxtapositions of simple words, and a right
+parameter which may be any object.
+@PP
+We first describe the behaviour when the value of the left parameter of
+@@Case is a juxtaposition of one or more simple words.  Then the result of
+the @@Case is the right parameter of the first @@Yield whose left parameter
+contains either the value of the left parameter of the @@Case, or the special
+value {@Code else}.  If there is no such @@Yield it is an error.
+@PP
+When the left parameter of @@Case is not a juxtaposition of simple
+words, the result is the right parameter of the first @@Yield whose
+left parameter is {@Code else}, or an error otherwise.  This permits
+examples like
 @ID @Code {
-"@Moment&&now @Open { @Day {@Months&&@Month}, @Century{@Year} }"
+"@RunningTitle @Case {"
+"    dft @Yield @Title"
+"    else @Yield @RunningTitle"
+"}"
 }
-produces something like
-@Moment&&now @Open { @Day {@Months&&@Month}, @Century{@Year} }
-given a suitable database of months.
+where a running title is returned unless it has the value {@Code dft}
+(which presumably means that no running title was supplied), in which
+case an ordinary title is returned instead.
+@PP
+When a receptive symbol is placed within a @@Case, it should be included
+in each alternative, since otherwise Basser Lout may become confused when
+trying to predict whether the symbol will be a part of the result or
+not.  Alternatively, if it can be guaranteed that the receptive symbol
+will never be searched for when the cases that it does not lie within
+are selected, that is all right too.
 @End @Section

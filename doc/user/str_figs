@@ -1,0 +1,121 @@
+@Section
+   @Title { Figures and tables }
+   @Tag { figures }
+@Begin
+@PP
+Figures are created in a similar way to footnotes:
+figures. @Index { figures }
+@ID @OneRow @Code {
+"@Figure"
+"    @Caption { Basser Lout }"
+"@Fig {"
+"    { @Box Lout }{ @HArrow { 2c @Wide } }{ @Box PostScript }"
+"}"
+}
+The @Code "@Figure" symbol places the figure (which in this example is
+figure. @Index @Code "@Figure"
+created using the advanced graphics features of Chapter {@NumberOf fig})
+at the top of the following column or page,
+@Figure
+    @Tag { figex }
+    @Caption { Basser Lout }
+@Fig {
+    { @Box Lout }{ @HArrow { 2c @Wide } }{ @Box PostScript }
+}
+labelled by the @Code "@Caption" option and automatically numbered.  You
+captions. @RawIndex { captions }
+captions.figures @SubIndex { in @Code "@Figure" and @Code "@Table" }
+can see this example at the top of page {@PageOf figex}.  Tables are
+table. @Index @Code "@Table"
+obtained in the same way using {@Code "@Table"} instead of {@Code "@Figure"}.
+@PP
+The @Code "@Caption" options of @Code "@Figure" and @Code "@Table"
+suffer from the same problem as @Code "@FootNote" and {@Code "@EndNote"},
+in being restricted to one paragraph, not an arbitrary object.  If you
+want a longer caption, the solution is the same:
+@ID @Code {
+"@Figure"
+"    @LongCaption { @FigureNum  This is a long caption ... }"
+}
+The corresponding symbol to use inside the @Code "@LongCaption" of
+@Code "@Table" is {@Code "@TableNum"}.  You should leave two spaces
+between @Code "@FigureNum" and what follows.  These symbols include
+the word `Figure' or `Table' in the current language, and contain the
+appropriate font changes, etc.
+@PP
+@Code "@Figure" and @Code "@Table" each have an @Code "@InitialLanguage"
+option which determines the language of the figure or table.  If this is
+omitted, the language of the document as a whole will be used (or of the
+chapter in books), not the language where the figure or table occurs.
+@PP
+If your document contains many figures, large figures, or multi-page
+figures, you are likely to encounter cases where Lout's assignment of
+figures to pages is not pleasing.  In that case, you can improve things
+by moving the figures around within the body text, and by using the
+following options.
+@PP
+@Code "@Figure" and @Code "@Table" each have a @Code "@OnePage" option,
+whose value may be @Code "Yes" or {@Code No}, with default value
+{@Code No}.  Setting @Code "@OnePage" to @Code Yes causes the figure or
+table and its caption to be kept together on one page.  You need to be
+certain that the whole assembly will fit on one page when using this option.
+@PP
+@Code "@Figure" and @Code "@Table" also have a @Code "@FullPage" option,
+whose value may again be either @Code Yes or {@Code No}, with default
+value {@Code No}.  Setting this option to @Code "Yes" causes the figure
+or table to occupy the full page (quite a different thing from being kept
+together on one page), by adding white space below the caption.  This is
+mainly useful when the figure or table occupies nearly all of one or more
+pages, with one or two silly-looking lines of body text at the bottom.  To
+be precise, this option does not prevent the figure or table from appearing
+on a page which already contains a figure or part of a footnote; rather, it
+ensures that nothing more will be placed on the page after the figure or
+table is.  The only way to ensure that a figure or table starts on a fresh
+page is to make sure that there are no other figures and tables (other than
+full-page ones) closely preceding it in the document.
+@PP
+By default, the body of the figure will be centred, and this usually looks
+best, at least for small figures.  @Code "@Figure" and @Code "@Table" each
+have a @Code "@Format" option which controls this format:
+@ID @Code {
+"@Figure"
+"    @Format { @CurveBox @HExpand { @CentredDisplay @Body } }"
+}
+Within the @Code "@Format" option, the @Code "@Body" symbol stands
+for the body of the figure or table.  This example centres the figure
+inside a @Code "@CurveBox" which is horizontally expanded (by the
+@Code "@HExpand" symbol) to occupy the full width of the page, rather
+than fitting snugly around the figure.  Actually the most useful format
+is probably just
+@ID @Code {
+"@Figure"
+"    @Format { @Body }"
+}
+which turns off the default centring.  This is the most practical format
+for multi-page figures, for example.
+@PP
+There are setup file options called @Code "@FigureNumbers" and
+figurenumbers. @Index @Code "@FigureNumbers"
+tablenumbers. @Index @Code "@TableNumbers"
+@Code "@TableNumbers" that determine whether figures and tables are
+numbered automatically or not.  Your choices for these options are
+{@Code "None"}, {@Code "Arabic"}, {@Code "Roman"}, {@Code "UCRoman"},
+{@Code "Alpha"}, and {@Code "UCAlpha"}.  Depending on the document
+type and where the figure or table occurs, the number might include
+a chapter number as well.
+@PP
+There are also setup file options called @Code "@CaptionFont" and
+@Code "@CaptionBreak" which determine the font and paragraph breaking
+style used in the captions of figures and tables.  Their default
+values are empty, meaning to use the initial font and break styles;
+but, for example, you could have
+@ID @Code "@CaptionFont { -2p }"
+in your setup file to get a smaller font size in your captions.
+@PP
+You can get a list of figures at the start of your document by setting
+the @Code "@MakeFigureContents" setup file option to {@Code Yes}.  There
+is also a @Code "@MakeTableContents" setup file option for making a
+separate list of tables.  The format of these lists will follow the
+format of tables of contents.  These lists are only available in books
+(Section {@NumberOf books}).
+@End @Section

@@ -37,7 +37,7 @@ breaking as required, and discard all redundant braces.  Then view the
 galley as a sequence of one or more objects separated by vertical
 concatenation symbols; these are the components and split points.  For
 example, given the definition
-@ID @Code {
+@ID @OneRow @Code {
 "def @Section into { @SectionPlace&&preceding }"
 "    named @Title {}"
 "    right @Body"
@@ -48,14 +48,14 @@ example, given the definition
 "}"
 }
 the galley
-@ID @Code {
+@ID @OneRow @Code {
 "@Section"
 "    @Title { Introduction }"
 "{ This is a subject that really"
 "needs no introduction. }"
 }
 becomes
-@ID @Code {
+@ID @OneRow @Code {
 "Introduction"
 "//0.7f"
 "{}"
@@ -66,7 +66,7 @@ becomes
 }
 with four components.  If @Code "@Body" was preceded by @Code "|1.0c" in
 the definition, the result would be
-@ID @Code {
+@ID @OneRow @Code {
 "Introduction"
 "//0.7f"
 "{}"
@@ -74,9 +74,24 @@ the definition, the result would be
 "|1.0c { This is a subject that really needs //1vx no introduction. }"
 }
 and now @Code "//1vx" is buried within one component and is not a
-potential split point.  In fact, in this case the broken paragraph as
-a whole is enclosed in @@OneRow.  This highlights a deficiency of
-Basser Lout:  an indented paragraph cannot be split.
+potential split point.
+@PP
+Version 3.03 has liberalized this somewhat in the following way.  When
+a component consists of a horizontal sequence of two or more objects
+@Eq { A sub 1 ,..., A sub n } separated by @Code "|" (not {@Code "||"},
+not {@Code "&"}), Lout will investigate the component to see whether
+it can be broken up.  It looks at each @Eq { A sub i } to see whether it
+is a vertical concatenation of objects @Eq { A sub i1 ,..., A sub im }; if
+two or more of the @Eq { A sub i } satisfy this condition, the component
+will not be broken up.  So now suppose we have just one @Eq { A sub i }
+which is a vertical concatenation.  Lout will break the component into
+one component for each of the @Eq { A sub i1 ,..., A sub im }, provided
+that they are separated by @Code "//" symbols (not {@Code "/"}), and
+provided this can be done without introducing any apparent change into
+the appearance of the component (this second rule will be satisfied if
+the other @Eq { A sub j } are not very large).  The example above
+satisfies all these rules and will be broken up into two components,
+so the @Code "//1vx" becomes a potential split point after all.
 @PP
 The lines of a paragraph become separate components if the paragraph
 occupies an entire component before breaking; otherwise they are
@@ -149,7 +164,7 @@ the fragments are placed into similar contexts.
 @PP
 In this connection we must also consider the special case of a @@Galley
 symbol which shares its column mark with some other object:
-@ID @Code {
+@ID @OneRow @Code {
 "@Galley"
 "/0.2c"
 "@SomethingList"
@@ -167,7 +182,7 @@ The root galley, where everything collects immediately prior to output,
 root.galley.in.detail @SubIndex { in detail }
 is created automatically, not by a definition.  Its target is the output
 file, and its object is the entire input, which typically looks like this:
-@ID @Code {
+@ID @OneRow @Code {
 "@PageList"
 "//"
 "@Text {"
@@ -177,7 +192,7 @@ file, and its object is the entire input, which typically looks like this:
 where @Code "@PageList" expands to a sequence of pages containing
 @Code "@TextPlace" symbols (see Section {@NumberOf definitions}), and
 @Code "@Text" is a galley:
-@ID @Code {
+@ID @OneRow @Code {
 "def @TextPlace { @Galley }"
 ""
 "def @Text into { @TextPlace&&preceding }"
@@ -217,7 +232,7 @@ and it cannot afford to wait forever for non-existent footnotes.  A variant
 of the galley concept, called a {@I {forcing galley}},
 forcing.galley @Index { Forcing galley } {@PageMark forcing}
 is introduced to solve this problem.  A forcing galley is defined like this:
-@ID @Code {
+@ID @OneRow @Code {
 "def @Text force into { @TextPlace&&preceding }"
 "   ..."
 }
@@ -243,7 +258,7 @@ following component of the same galley as its invocation point.  This is
 a deficiency of Basser Lout, which occurs if the target has not been
 read from input at the time the galley tries to find it.  A workaround
 is to use a @Code "preceding" galley instead, defined like this:
-@ID @Code {
+@ID @OneRow @Code {
 "def @AGalley into { @AGalleyPlace&&preceding }"
 "    right @Body"
 "{"
@@ -252,7 +267,7 @@ is to use a @Code "preceding" galley instead, defined like this:
 "}"
 }
 and invoked like this:
-@ID @Code {
+@ID @OneRow @Code {
 "@AGalleyPlace | @AGalley { content of galley }"
 "//"
 "..."

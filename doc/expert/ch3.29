@@ -1,20 +1,24 @@
 @Section
-   @Tag { include }
-   @Title { "@Include and @SysInclude" }
+   @Tag { prependgraphic }
+   @Title { "@PrependGraphic and @SysPrependGraphic" }
 @Begin
 @PP
-include.sym @Index { @@Include symbol }
-sysinclude.sym @Index { @@SysInclude symbol }
-These symbols instruct Lout to temporarily switch to reading another
-file, whose name appears in braces following the symbol.  For example,
+prependgraphic.sym @Index { @@PrependGraphic symbol }
+sysprependgraphic.sym @Index { @@SysPrependGraphic symbol }
+postscript.prependgraphic @SubIndex { used by @@PrependGraphic }
+These symbols, which may appear anywhere that a definition or @@Use
+symbol may appear, tell Lout to include the contents of a file in the
+preamble of its output.  For Basser Lout this means that the file must
+contain PostScript (and ideally it would begin and end with the
+@Code "%%BeginResource" and @Code "%%EndResource" comments of
+DSC 3.0).  For example,
 @ID @Code {
-"@Include { \"/usr/lout/fontdefs\" }"
+"@SysPrependGraphic { fig.lpg }"
 }
-will cause the contents of file "/usr/lout/fontdefs" to be read at the
-point it occurs.  After that file is read, the current file is resumed.  The
-included file may contain arbitrary Lout text, including other
-@@Include commands.  The file is searched for first in the current
-directory, then in a sequence of standard places which are not necessarily the
-same places that databases are searched for.  @@SysInclude searches the
-standard places only.
+appears at the start of the Fig package; the file @Code fig.lpg
+contains a number of PostScript definitions used by Fig for drawing
+diagrams.  It saves a lot of space to include them just once at the
+start like this, rather than with every diagram.  @@PrependGraphic and
+@@SysPrependGraphic search for the file in the same places as @@Include and
+@@SysInclude respectively.
 @End @Section

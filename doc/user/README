@@ -1,46 +1,48 @@
 Directory lout/doc/user
 
-This directory contains the Lout source files for the
-User's Guide to the Lout Document Formatting System.
-To produce the Guide, type the command
+This directory contains the Lout source files for the User's Guide
+to the Lout Document Formatting System.  To produce the Guide,
+type the command
 
-	lout user > op
+	lout all > op
 
-in this directory.  This must be done four times to
-completely resolve all cross references, although
-the PostScript file op is printable after the first
-run.  Auxiliary files with .li and .ld suffixes will
-be created in this directory.  A copy of the final
-PostScript output file is included (outfile.ps).
+in this directory.  This must be done five times to completely
+resolve all cross references, although the PostScript file op is
+printable after the first run.  Auxiliary files with .li and .ld
+suffixes will be created in this directory.
+
+A copy of the final PostScript output file (A4 paper size) is
+distributed separately in
+
+    ftp://ftp.cs.su.oz.au/jeff/lout.<version>.user.ps
+
+where <version> is the current version number.
 
 Jeffrey H. Kingston
 21 September 1994
+25 July 1995
 
 
 
-ps The first run will produce a large number of error
-messages, nearly all beginning with "unresolved cross
-reference".  These should gradually go away on later
-runs.  The following shows the error message output
-on the fourth run for Letter size printing:
+ps The first run will produce a large number of error messages,
+nearly all beginning with "unresolved cross reference".  These
+should gradually go away on later runs.  The following shows the
+error message output on the fifth run for Letter size printing:
 
-lout file "basics.characters" (from "basics" line 16, from "user" line 26):
+lout file "bas_char" (from "bas" line 16, from "all" line 26):
     12,1: this component of @FootNote did not fit into its nearest target
-lout file "structure.footnotes" (from "structure" line 8, from "user" line 27):
-    11,1: this component of @FootNote did not fit into its nearest target
-lout file "equations.spacing" (from "equations" line 21, from "user" line 32):
-    18,1: this component of @FootNote did not fit into its nearest target
-lout file "graphs.grsummary" (from "graphs" line 43, from "user" line 35):
+lout file "gra_summ" (from "gra" line 44, from "all" line 35):
      8,1: 22.4c object too high for 21.8c space; @VScale inserted
-lout file "cprint.tabs" (from "cprint" line 23, from "user" line 36):
+lout file "cpp_tabs" (from "cpp" line 24, from "all" line 36):
    53,23: c2lout: C text ended inside a comment
    55,35: c2lout: C text ended inside a comment
+lout file "ap_qck" (from "all" line 38):
+  153,25: 22.9c object too high for 21.8c space; @VScale inserted
 
-All these errors are benign; the first three just say
-that footnotes were split across two pages, the fourth
-means that a large display had to be vertically shrunk
-a bit to fit on the page (it fits on an A4 page but
-not on a Letter page), and the last two come from the
-c2lout filter and say (correctly) that the C text
-passed to c2lout ended inside a comment.  The error
-messages for A4 printing are a subset of these ones.
+The errors when the paper size is A4 are similar to these.  All these
+errors are benign; they point to a footnote that appeared on the page
+following the page containing the point it referred to, owing to
+lack of space on the preceding page; objects that proved to be too
+tall to fit on a Letter page, so had to be squashed a bit; and two
+points where the c2lout program was asked to format a C program that
+ended inside a comment.

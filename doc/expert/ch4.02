@@ -7,7 +7,7 @@ The remaining sections of this chapter are all based on Version 2 of
 the DocumentLayout package.  Version 3, which is similar but more elaborate,
 is described from the user's perspective in the
 document.layout @Index { DocumentLayout package }
-User's Guide @Cite { $kingston1994lout.user }.  In 26 pages of Lout, the
+User's Guide @Cite { $kingston1995lout.user }.  In 26 pages of Lout, the
 DocumentLaytout package defines many features required in the formatting
 of simple documents, technical reports, and books, including displays,
 lists, page layout, cross references, tables of contents, footnotes,

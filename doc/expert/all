@@ -10,10 +10,10 @@ Lout
 
 Document Formatting System  }
    @Author { Jeffrey H. Kingston }
-   @Edition { Version 3
-18 September, 1994 }
-   @Publisher { @I { @CopyRight Copyright 1991 and 1994, Jeffrey H. Kingston,
-Basser Department of Computer Science, The University
+   @Edition { Version 3.06
+25 July, 1995}
+   @Publisher { @I { @CopyRight Copyright 1991, 1994, 1995, Jeffrey
+H. Kingston, Basser Department of Computer Science, The University
 of Sydney 2006, Australia.} }
 //
 
@@ -32,6 +32,7 @@ of Sydney 2006, Australia.} }
 @Include { ch2.05 }
 @Include { ch2.06 }
 @Include { ch2.07 }
+@Include { ch2.08 }
 @Include { ch2.99 }
 @Include { ch3.00 }
 @Include { ch3.01 }
@@ -64,6 +65,9 @@ of Sydney 2006, Australia.} }
 @Include { ch3.28 }
 @Include { ch3.29 }
 @Include { ch3.30 }
+@Include { ch3.31 }
+@Include { ch3.32 }
+@Include { ch3.33 }
 @Include { ch3.99 }
 @Include { ch4.00 }
 @Include { ch4.01 }

@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -26,7 +26,7 @@
 /*  MODULE:       Galley Service                                             */
 /*  EXTERNS:      Interpose(), FlushInners(), ExpandRecursives(),            */
 /*                Promote(), KillGalley(), FreeGalley(),                     */
-/*                TargetSymbol(), CheckConstraint()                          */
+/*                TargetSymbol(), CheckComponentOrder()                      */
 /*                                                                           */
 /*****************************************************************************/
 #include "externs"
@@ -43,8 +43,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-Interpose(z, typ, x, y)
-OBJECT z;  int typ;  OBJECT x, y;
+void Interpose(OBJECT z, int typ, OBJECT x, OBJECT y)
 { OBJECT encl = New(typ);
   FposCopy(fpos(encl), fpos(y));
   ReplaceNode(encl, z);  Link(encl, z);
@@ -65,12 +64,11 @@ OBJECT z;  int typ;  OBJECT x, y;
 /*                                                                           */
 /*****************************************************************************/
 
-FlushInners(inners, hd)
-OBJECT inners, hd;
+void FlushInners(OBJECT inners, OBJECT hd)
 { OBJECT y, z, tmp, dest_index;
 
   /* check for root galley case */
-  if( hd != nil )
+  if( hd != nilobj )
   { assert( Up(hd) != hd, "FlushInners: Up(hd)!" );
     Parent(dest_index, Up(hd));
     if( actual(actual(dest_index)) == PrintSym )
@@ -97,7 +95,7 @@ OBJECT inners, hd;
 	{ assert( Down(y) != y, "FlushInners: UNATTACHED!");
 	  Child(z, Down(y));
 	  debug0(DGF, D, "  calling FlushGalley from FlushInners (a)");
-	  if( whereto(z) == nil || !uses_extern_target(whereto(z)) ) /* &&& */
+	  if( whereto(z)==nilobj || !uses_extern_target(whereto(z)) ) /* &&& */
 	    FlushGalley(z);
 	}
 	break;
@@ -113,7 +111,7 @@ OBJECT inners, hd;
 	  { blocked(tmp) = FALSE;
 	    Parent(z, Up(tmp));
 	    debug0(DGF, D, "  calling FlushGalley from FlushInners (b)");
-	    if( whereto(z)==nil || !uses_extern_target(whereto(z)) ) /* &&& */
+	    if( whereto(z)==nilobj || !uses_extern_target(whereto(z)) )/* &&& */
 	      FlushGalley(z);
 	  }
 	}
@@ -144,13 +142,12 @@ OBJECT inners, hd;
 /*                                                                           */
 /*****************************************************************************/
 
-ExpandRecursives(recs)
-OBJECT recs;
+void ExpandRecursives(OBJECT recs)
 { CONSTRAINT non_c, hc, vc;
   OBJECT target_index, target, z, n1, inners, newrecs, hd, tmp, env;
   debug0(DCR, D, "ExpandRecursives(recs)");
-  SetConstraint(non_c, MAX_LEN, MAX_LEN, MAX_LEN);  n1 = nil;
-  assert(recs != nil, "ExpandRecursives: recs == nil!");
+  SetConstraint(non_c, MAX_LEN, MAX_LEN, MAX_LEN);  n1 = nilobj;
+  assert(recs != nilobj, "ExpandRecursives: recs == nilobj!");
   while( Down(recs) != recs )
   { Child(target_index, Down(recs));  DeleteLink( Down(recs) );
     assert( type(target_index) == RECURSIVE, "ExpandRecursives: index!" );
@@ -160,37 +157,37 @@ OBJECT recs;
 
     /* expand body of target, convert to galley, and check size */
     hd = New(HEAD);  actual(hd) = actual(target);  must_expand(hd) = TRUE;
-    whereto(hd) = ready_galls(hd) = nil;  backward(hd) = sized(hd) = FALSE;
+    whereto(hd) = ready_galls(hd) = nilobj;  backward(hd) = sized(hd) = FALSE;
     tmp =  CopyObject(target, &fpos(target));  env = DetachEnv(tmp);
     Link(hd, tmp);  Link(target_index, hd);
     SizeGalley(hd, env, external(target), threaded(target), FALSE, FALSE,
-      &save_style(target), &non_c, nil, &n1, &newrecs, &inners);
+      &save_style(target), &non_c, nilobj, &n1, &newrecs, &inners);
     debug0(DCR, DDD, "    as galley:");
     ifdebug(DCR, DDD, DebugObject(hd));
     Constrained(target, &hc, COL);
-    debug2(DSC, D, "Constrained( %s, COL ) = %s",
+    debug2(DSC, DD, "Constrained( %s, COL ) = %s",
       EchoObject(target), EchoConstraint(&hc));
     debug3(DCR, DD, "    horizontal size: (%s, %s); constraint: %s",
       EchoLength(back(hd, COL)), EchoLength(fwd(hd, COL)), EchoConstraint(&hc));
     if( !FitsConstraint(back(hd, COL), fwd(hd, COL), hc) )
     { DisposeChild(Up(hd));
-      if( inners != nil ) DisposeObject(inners);
-      if( newrecs != nil ) DisposeObject(newrecs);
+      if( inners != nilobj ) DisposeObject(inners);
+      if( newrecs != nilobj ) DisposeObject(newrecs);
       DeleteNode(target_index);
       debug0(DCR, DD, "    rejecting (too wide)");
       continue;
     }
     if( !external(target) )
     { Constrained(target, &vc, ROW);
-      debug2(DSC, D, "Constrained( %s, ROW ) = %s",
+      debug2(DSC, DD, "Constrained( %s, ROW ) = %s",
 	EchoObject(target), EchoConstraint(&vc));
       Child(z, LastDown(hd));
       debug3(DCR, DD, "    vsize: (%s, %s); constraint: %s",
 	EchoLength(back(z, ROW)), EchoLength(fwd(z, ROW)), EchoConstraint(&vc));
       if( !FitsConstraint(back(z, ROW), fwd(z, ROW), vc) )
       {	DisposeChild(Up(hd));
-	if( inners != nil ) DisposeObject(inners);
-	if( newrecs != nil ) DisposeObject(newrecs);
+	if( inners != nilobj ) DisposeObject(inners);
+	if( newrecs != nilobj ) DisposeObject(newrecs);
 	DeleteNode(target_index);
 	debug0(DCR, DD, "    rejecting (too high)");
 	continue;
@@ -207,8 +204,8 @@ OBJECT recs;
     }
     Promote(hd, hd, target_index);  DeleteNode(hd);
     DeleteNode(target_index);
-    if( inners != nil )  FlushInners(inners, nil);
-    if( newrecs != nil )  MergeNode(recs, newrecs);
+    if( inners != nilobj )  FlushInners(inners, nilobj);
+    if( newrecs != nilobj )  MergeNode(recs, newrecs);
   } /* end while */
   Dispose(recs);
   debug0(DCR, D, "ExpandRecursives returning.");
@@ -222,8 +219,7 @@ OBJECT recs;
 /*                                                                           */
 /*****************************************************************************/
 
-static OBJECT FindSplitInGalley(hd)
-OBJECT hd;
+static OBJECT FindSplitInGalley(OBJECT hd)
 { OBJECT link, y;
   debug0(DGF, D, "FindSplitInGalley(hd)");
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
@@ -254,6 +250,7 @@ OBJECT hd;
 
     case CLOSURE:
     case NULL_CLOS:
+    case PAGE_LABEL:
     case HCAT:
     case WORD:
     case QWORD:
@@ -299,16 +296,13 @@ OBJECT hd;
 /*                                                                           */
 /*****************************************************************************/
 
-Promote(x, stop_link, dest_index)
-OBJECT x, stop_link, dest_index;
+void Promote(OBJECT x, OBJECT stop_link, OBJECT dest_index)
 {
-  /* these four variables refer to the root galley only */
+  /* these two variables refer to the root galley only */
   static BOOLEAN first = TRUE;	/* TRUE when the first component not written */
-  static int	prec_back;	/* back value of preceding component         */
-  static int	prec_fwd;	/* fwd value of preceding component          */
-  static GAP	prec_gap;	/* preceding gap                             */
+  static OBJECT page_label=nilobj;	/* current page label object         */
 
-  OBJECT dest, link, y, z, tmp1, tmp2;
+  OBJECT dest, link, y, z, tmp1, tmp2;  FULL_CHAR *label_string;
   int dim;
   debug1(DGS, D, "Promote(%s, stop_link)", SymName(actual(x)));
 
@@ -328,7 +322,10 @@ OBJECT x, stop_link, dest_index;
   { y = New(GAP_OBJ);
     FposCopy(fpos(y), fpos(x));
     hspace(y) = 0;  vspace(y) = 1;
-    ClearGap(gap(y));
+    /* SetGap(gap(y), FALSE, seen_nojoin(x), FIXED_UNIT, NO_MODE, 0); */
+    SetGap(gap(y), FALSE, TRUE, FIXED_UNIT, NO_MODE, 0);
+    /* SetGap(gap(y), FALSE, threaded(dest), FIXED_UNIT, NO_MODE, 0); */
+    /* ClearGap(gap(y)); */
     Link(stop_link, y);
   }
 
@@ -336,7 +333,26 @@ OBJECT x, stop_link, dest_index;
   if( seen_nojoin(x) && threaded(dest) )
     Error(22, 5, "galley %s must have a single column mark",
       FATAL, &fpos(x), SymName(actual(x)));
-  if( seen_nojoin(x) )  join(gap(y)) = FALSE; /* to make nojoin status clear */
+
+  /* make nojoin status clear by adding an extra gap at start if needed */
+  if( !external(dest) && seen_nojoin(x) && join(gap(y)) )
+  { OBJECT prnt, extra_null, extra_gap;
+
+    /* add nojoin gap at start */
+    Parent(prnt, Up(dest));  /* can't be threaded */
+    assert( type(prnt) == VCAT, "Promote: nojoin case, can't find VCAT" );
+    extra_null = New(NULL_CLOS);
+    back(extra_null, COL) = fwd(extra_null, COL) = 0;
+    back(extra_null, ROW) = fwd(extra_null, ROW) = 0;
+    extra_gap = New(GAP_OBJ);
+    hspace(extra_gap) = vspace(extra_gap) = 0;
+    SetGap(gap(extra_gap), FALSE, FALSE, FIXED_UNIT, EDGE_MODE, 0);
+    Link(Down(prnt), extra_gap);
+    Link(Down(prnt), extra_null);
+    debug0(DGS, D, "  Promote adding extra nojoin gap");
+    /* join(gap(y)) = FALSE; */
+  }
+
 
   /* if promoting out of root galley, do special things */
   if( actual(dest) == PrintSym )
@@ -371,6 +387,7 @@ OBJECT x, stop_link, dest_index;
 	    /* galley is preceding, send to CrossSequence */
 	    OBJECT t;
 	    type(y) = GALL_PREC;
+	    pinpoint(y) = nilobj;
 	    Child(t, Down(z));
 	    actual(y) = CrossMake(whereto(z), t, GALL_PREC);
 	    DisposeChild(Down(y));
@@ -402,6 +419,23 @@ OBJECT x, stop_link, dest_index;
 	    debug1(DSA, D, "Promote %s AdjustSize", Image(type(actual(y))));
 	    AdjustSize(actual(y), b, f, dim);
 	  }
+	  DisposeChild(NextDown(link));
+	  break;
+
+
+	case PAGE_LABEL_IND:
+
+	  if( page_label != nilobj )
+	  { DisposeObject(page_label);
+	    page_label = nilobj;
+	  }
+	  Child(z, Down(y));
+	  assert( type(z) == PAGE_LABEL, "Promote: type(z) != PAGE_LABEL!" );
+	  assert( Down(z) != z, "Promote: PAGE_LABEL Down(z) == z!" );
+	  Child(page_label, Down(z));
+	  DeleteLink(Up(page_label));
+	  debug2(DGP, D, " new page label %s %s", Image(type(page_label)),
+	    EchoObject(page_label));
 	  DisposeChild(NextDown(link));
 	  break;
 
@@ -446,6 +480,7 @@ OBJECT x, stop_link, dest_index;
 
 	case CLOSURE:
 	case NULL_CLOS:
+	case PAGE_LABEL:
 	case CROSS:
 
 	  /* print this component */
@@ -461,17 +496,22 @@ OBJECT x, stop_link, dest_index;
 	      COL, LAST_ADJUST, FALSE, LAST_ADJUST, 0, 0);
 
 	    /* print prefatory or page separating material, including fonts */
+	    label_string = page_label != nilobj && is_word(type(page_label)) ?
+	      string(page_label) : AsciiToFull("?");
 	    if( first )
-	    { PrintBeforeFirst(size(x, COL), size(y, ROW));
+	    { PrintBeforeFirst(size(x, COL), size(y, ROW), label_string);
 	      first = FALSE;
 	    }
-	    else PrintBetween(size(x, COL), size(y, ROW));
+	    else PrintBetween(size(x, COL), size(y, ROW), label_string);
+	    if( page_label != nilobj )
+	    { DisposeObject(page_label);
+	      page_label = nilobj;
+	    }
 
 	    /* fix and print vertically */
 	    debug1(DGF,D, "  Promote calling FixAndPrint %s", Image(type(y)));
 	    FixAndPrintObject(y, back(y,ROW), back(y, ROW), fwd(y, ROW),
 	      ROW, LAST_ADJUST, FALSE, LAST_ADJUST, size(y,ROW), 0);
-	    prec_back = back(y, ROW);  prec_fwd = fwd(y, ROW);
 
 	  }
 	  DisposeChild(NextDown(link));
@@ -483,7 +523,6 @@ OBJECT x, stop_link, dest_index;
 
 	case GAP_OBJ:
 
-	  GapCopy(prec_gap, gap(y));
 	  DisposeChild(NextDown(link));
 	  break;
 
@@ -546,13 +585,12 @@ OBJECT x, stop_link, dest_index;
 /*                                                                           */
 /*****************************************************************************/
 
-static MakeDead(y)
-OBJECT y;
+static void MakeDead(OBJECT y)
 { static int	dead_count = 0;		/* number of DEAD objects seen       */
-  static OBJECT	dead_store = nil;	/* where DEAD objects are kept       */
+  static OBJECT	dead_store = nilobj;	/* where DEAD objects are kept       */
 
   debug1(DGS, DDD, "MakeDead( %s )", Image(type(y)));
-  if( dead_store == nil )  dead_store = New(ACAT);
+  if( dead_store == nilobj )  dead_store = New(ACAT);
   type(y) = DEAD;
   MoveLink(Up(y), dead_store, PARENT);
   if( dead_count >= 150 )  DisposeChild(Down(dead_store));
@@ -570,8 +608,7 @@ OBJECT y;
 /*                                                                           */
 /*****************************************************************************/
 
-KillGalley(hd)
-OBJECT hd;
+void KillGalley(OBJECT hd)
 { OBJECT prnt, link, y, z;
   debug2(DGF, D, "[ KillGalley(Galley %s into %s)",
 	SymName(actual(hd)), SymName(whereto(hd)));
@@ -580,9 +617,9 @@ OBJECT hd;
   assert( type(prnt) == UNATTACHED, "KillGalley: UNATTACHED precondition!" );
   assert( Up(prnt) != prnt, "KillGalley: prnt!" );
 
-  if( ready_galls(hd) != nil )
+  if( ready_galls(hd) != nilobj )
   { DisposeObject(ready_galls(hd));
-    ready_galls(hd) = nil;
+    ready_galls(hd) = nilobj;
   }
   for( link = hd; NextDown(link) != hd; )
   { Child(y, NextDown(link));
@@ -622,27 +659,28 @@ OBJECT hd;
 /*  FreeGalley(hd, stop_link, inners, relocate_link, sym)                    */
 /*                                                                           */
 /*  Free galley hd up to but not including stop_link.  *Inners is well-      */
-/*  defined, either nil or an ACAT of galleys to be flushed.                 */
+/*  defined, either nilobj or an ACAT of galleys to be flushed.              */
 /*                                                                           */
 /*  Relocate_link defines what to do any galley attached to one of the       */
-/*  freed targets.  If it is non-nil, galley hd is searched onwards from     */
+/*  freed targets.  If it is non-nilobj, galley hd is searched onwards from  */
 /*  it to see if a target can be found there.  If so, the galley is          */
 /*  relocated to just before that point.  If not, or if relocate_link is     */
-/*  nil, the galley is freed and added to *inners for flushing.  If the      */
+/*  nilobj, the galley is freed and added to *inners for flushing.  If the   */
 /*  whereto() of such galley is sym, it is freed, not relocated, because the */
 /*  cause of this call to FreeGalley is also targeted to sym, and it will    */
 /*  consume all possible targets of sym.                                     */
 /*                                                                           */
 /*****************************************************************************/
 
-FreeGalley(hd, stop_link, inners, relocate_link, sym)
-OBJECT hd, stop_link, *inners, relocate_link, sym;
+void FreeGalley(OBJECT hd, OBJECT stop_link, OBJECT *inners,
+OBJECT relocate_link, OBJECT sym)
 { OBJECT link, y, z, zlink, srch, index;
   assert( type(hd) == HEAD && sized(hd), "FreeGalley: pre!");
   assert( Up(hd) != hd, "FreeGalley: Up(hd)!" );
-  assert( *inners == nil || type(*inners) == ACAT, "FreeGalley: ACAT!" );
-  debug3(DGA, D, "[ FreeGalley(Galley %s into %s); rl %s nil",
-    SymName(actual(hd)), SymName(whereto(hd)), relocate_link==nil ? "==":"!=");
+  assert( *inners == nilobj || type(*inners) == ACAT, "FreeGalley: ACAT!" );
+  debug3(DGA, D, "[ FreeGalley(Galley %s into %s); rl %s nilobj",
+    SymName(actual(hd)), SymName(whereto(hd)),
+    relocate_link == nilobj ? "==" : "!=");
 
   /* close targets and move or flush any inner galleys */
   for( link = Down(hd);  link != stop_link;  link = NextDown(link) )
@@ -657,17 +695,17 @@ OBJECT hd, stop_link, *inners, relocate_link, sym;
 	zlink = NextDown(zlink);
 	assert( type(z) == HEAD, "FreeGalley/RECEIVING: type(z) != HEAD!" );
 	debug1(DGA, D, "FreeGalley examining galley %s", SymName(actual(z)));
-	if( relocate_link != nil && whereto(z) != sym &&
+	if( relocate_link != nilobj && whereto(z) != sym &&
 	    (srch = SearchGalley(relocate_link, whereto(z), TRUE,
-	    FALSE, TRUE, FALSE)) != nil )
+	    FALSE, TRUE, FALSE)) != nilobj )
 	{ DetachGalley(z);
 	  Parent(index, Up(z));
 	  MoveLink(Up(index), Up(srch), PARENT);  /* just before new dest */
 	}
 	else
 	{ debug0(DGA, D, "  calling FreeGalley from FreeGalley");
-	  FreeGalley(z, z, inners, nil, sym);
-	  if( *inners == nil )  *inners = New(ACAT);
+	  FreeGalley(z, z, inners, nilobj, sym);
+	  if( *inners == nilobj )  *inners = New(ACAT);
 	  Link(*inners, y);
 	}
       }
@@ -688,15 +726,14 @@ OBJECT hd, stop_link, *inners, relocate_link, sym;
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN TargetSymbol(x, sym)
-OBJECT x, *sym;
+BOOLEAN TargetSymbol(OBJECT x, OBJECT *sym)
 { OBJECT y, link, cr, lpar, rpar;
   debug1(DGS, D, "TargetSymbol( %s )", EchoObject(x));
   assert( type(x) == CLOSURE, "TargetSymbol: type(x) != CLOSURE!" );
   assert( has_target(actual(x)), "TargetSymbol: x has no target!" );
 
   /* search the free variable list of x for @Target */
-  cr = nil;
+  cr = nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
     if( type(y) == PAR && is_target(actual(y)) )
@@ -707,7 +744,7 @@ OBJECT x, *sym;
   }
 
   /* search the children list of actual(x) for a default value of @Target */
-  if( cr == nil )
+  if( cr == nilobj )
   for( link = Down(actual(x));  link != actual(x);  link = NextDown(link) )
   { Child(y, link);
     if( is_target(y) )
@@ -716,7 +753,7 @@ OBJECT x, *sym;
     }
   }
   
-  if( cr != nil )
+  if( cr != nilobj )
   {
     /* check that cr is indeed a cross-reference object */
     debug1(DGS, DD, "TargetSymbol examining %s", EchoObject(cr));
@@ -734,8 +771,9 @@ OBJECT x, *sym;
 
     /* extract direction from the right parameter */
     Child(rpar, NextDown(Down(cr)));
-    if( !is_word(type(rpar)) || !StringEqual(string(rpar), KW_PRECEDING) &&
-	!StringEqual(string(rpar), KW_FOLLOWING) )
+    if( !is_word(type(rpar)) ||
+	( !StringEqual(string(rpar), KW_PRECEDING) &&
+	  !StringEqual(string(rpar), KW_FOLLOWING) ) )
       Error(22, 12, "replacing %s%s? by %s%s%s",
 	WARN, &fpos(rpar), SymName(actual(lpar)), KW_CROSS,
 	SymName(actual(lpar)), KW_CROSS, KW_FOLLOWING);
@@ -748,9 +786,9 @@ OBJECT x, *sym;
 } /* end TargetSymbol */
 
 
-/*@::CheckConstraint()@*******************************************************/
+/*@::CheckComponentOrder()@***************************************************/
 /*                                                                           */
-/*  int CheckConstraint(preceder, follower)                                  */
+/*  int CheckComponentOrder(preceder, follower)                              */
 /*                                                                           */
 /*  Check the ordering relation between components preceder and follower,    */
 /*  and return its current status:                                           */
@@ -762,10 +800,9 @@ OBJECT x, *sym;
 /*                                                                           */
 /*****************************************************************************/
 
-int CheckConstraint(preceder, follower)
-OBJECT preceder, follower;
+int CheckComponentOrder(OBJECT preceder, OBJECT follower)
 { OBJECT prec_galley, foll_galley, z;  int res;
-  debug2(DGS, D, "CheckConstraint( %s, %s )",
+  debug2(DGS, D, "CheckComponentOrder( %s, %s )",
     EchoObject(preceder), EchoObject(follower));
   Parent(prec_galley, Up(preceder));
   Parent(foll_galley, Up(follower));
@@ -788,6 +825,6 @@ OBJECT preceder, follower;
       }
     }
   }
-  debug1(DGS, D, "CheckConstraint returning %s", Image(res));
+  debug1(DGS, D, "CheckComponentOrder returning %s", Image(res));
   return res;
-} /* end CheckConstraint */
+} /* end CheckComponentOrder */

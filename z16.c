@@ -1,6 +1,6 @@
 /*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -40,8 +40,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-LENGTH FindShift(x, y, dim)
-OBJECT x, y;  int dim;
+LENGTH FindShift(OBJECT x, OBJECT y, int dim)
 { LENGTH len, res;
   debug3(DSF, D, "FindShift(%s, %s, %s)", Image(type(x)),
     EchoObject(y), dimen(dim));
@@ -92,24 +91,23 @@ OBJECT x, y;  int dim;
 /*  ratm is TRUE if there is a marked component to the right of link, set    */
 /*                                                                           */
 /*     pg    to the gap separating link from the first definite object       */
-/*           to the left, or nil if none.  If pg != nil, set pdef to         */
+/*           to the left, or nilobj if none.  If pg != nilobj, set pdef to   */
 /*           the preceding definite object;  else pdef is undefined.         */
 /*                                                                           */
 /*     sg    to the gap separating link from the first definite object       */
-/*           to the right, or nil if none.  if sg != nil, set sdef to        */
+/*           to the right, or nilobj if none.  if sg != nilobj, set sdef to  */
 /*           the succeeding definite object;  else sdef is undefined.        */
 /*                                                                           */
 /*     side  to the side of the mark link is on; either BACK, ON or FWD.     */
 /*                                                                           */
 /*****************************************************************************/
 
-SetNeighbours(link, ratm, pg, pdef, sg, sdef, side)
-OBJECT link;  BOOLEAN ratm;
-OBJECT *pg, *pdef, *sg, *sdef;  int *side;
+void SetNeighbours(OBJECT link, BOOLEAN ratm, OBJECT *pg, OBJECT *pdef,
+OBJECT *sg, OBJECT *sdef, int *side)
 { OBJECT plink, slink;
 
   /* find preceding definite; if it exists, set *pg */
-  *pg = nil;
+  *pg = nilobj;
   for( plink = PrevDown(link);  type(plink) == LINK;  plink = PrevDown(plink) )
   { Child(*pdef, plink);
     if( type(*pdef) == SPLIT ? SplitIsDefinite(*pdef) : is_definite(type(*pdef)) )
@@ -124,7 +122,7 @@ OBJECT *pg, *pdef, *sg, *sdef;  int *side;
   }
 
   /* find succeeding definite; if it exists, set *sg */
-  *sg = nil;
+  *sg = nilobj;
   for( slink = NextDown(link);  type(slink) == LINK;  slink = NextDown(slink) )
   { Child(*sdef, slink);
     if( type(*sdef) == SPLIT ? SplitIsDefinite(*sdef) : is_definite(type(*sdef)) )
@@ -138,10 +136,11 @@ OBJECT *pg, *pdef, *sg, *sdef;  int *side;
     }
   }
 
-  *side = ratm ? BACK : *pg == nil || mark(gap(*pg)) ? ON : FWD;
-  debug4(DSA,DD, "SetNeighbours: ratm == %s, pg %s nil, sg %s nil, side == %s",
-	bool(ratm), *pg == nil ? "==" : "!=", *sg == nil ? "==" : "!=", 
-	*side == BACK ? "BACK" : *side == ON ? "ON" : "FWD");
+  *side = ratm ? BACK : *pg == nilobj || mark(gap(*pg)) ? ON : FWD;
+  debug4(DSA, DD,
+    "SetNeighbours: ratm == %s, pg %s nilobj, sg %s nilobj, side == %s",
+    bool(ratm), *pg == nilobj ? "==" : "!=", *sg == nilobj ? "==" : "!=", 
+    *side == BACK ? "BACK" : *side == ON ? "ON" : "FWD");
 } /* end SetNeighbours */
 
 
@@ -155,8 +154,8 @@ OBJECT *pg, *pdef, *sg, *sdef;  int *side;
 /*                                                                           */
 /*****************************************************************************/
 
-static CatAdjustSize(x, b, f, ratm, y, dim)
-OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
+static void CatAdjustSize(OBJECT x, LENGTH *b, LENGTH *f, BOOLEAN ratm,
+OBJECT y, int dim)
 { OBJECT link;
   OBJECT pg, prec_def, sg, sd;
   LENGTH beffect, feffect, seffect;  int side;
@@ -180,12 +179,12 @@ OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
   link = UpDim(x, dim);
   SetNeighbours(link, ratm, &pg, &prec_def, &sg, &sd, &side);
   { ifdebug(DSA, D,
-    if( pg != nil && mode(gap(pg)) == NO_MODE )
+    if( pg != nilobj && mode(gap(pg)) == NO_MODE )
     { debug1(DSA, D, "NO_MODE gap pg, is_indefinite(x) == %s, y =",
 	bool(is_indefinite(type(x))) );
       ifdebug(DSA, D, DebugObject(y));
     }
-    if( sg != nil && mode(gap(sg)) == NO_MODE )
+    if( sg != nilobj && mode(gap(sg)) == NO_MODE )
     { debug1(DSA, D, "NO_MODE gap sg, is_indefinite(x) == %s, y =",
 	bool(is_indefinite(type(x))) );
       ifdebug(DSA, D, DebugObject(y));
@@ -193,23 +192,23 @@ OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
   ); }
   if( is_indefinite(type(x)) )
   {
-    beffect = pg == nil ? *b :
+    beffect = pg == nilobj ? *b :
       MinGap(fwd(prec_def, dim), *b, *f, &gap(pg));
 
-    feffect = sg == nil ? *f :
+    feffect = sg == nilobj ? *f :
       MinGap(*f, back(sd, dim), fwd(sd, dim), &gap(sg));
 
-    seffect = pg == nil ? sg == nil ? 0 : back(sd, dim) :
-      sg == nil ? fwd(prec_def, dim) :
+    seffect = pg == nilobj ? sg == nilobj ? 0 : back(sd, dim) :
+      sg == nilobj ? fwd(prec_def, dim) :
       MinGap(fwd(prec_def, dim), back(sd,dim), fwd(sd,dim), &gap(sg));
   }
   else /* !is_indefinite(type(x)) */
   {
-    beffect = pg == nil ?  *b - back(x, dim) :
+    beffect = pg == nilobj ?  *b - back(x, dim) :
       MinGap(fwd(prec_def, dim), *b,           *f,          &gap(pg)) -
       MinGap(fwd(prec_def, dim), back(x, dim), fwd(x, dim), &gap(pg));
 
-    feffect = sg == nil ? *f - fwd(x, dim) :
+    feffect = sg == nilobj ? *f - fwd(x, dim) :
       MinGap(*f,          back(sd, dim), fwd(sd, dim), &gap(sg)) -
       MinGap(fwd(x, dim), back(sd, dim), fwd(sd, dim), &gap(sg));
 	
@@ -254,8 +253,7 @@ OBJECT x;  LENGTH *b, *f;  BOOLEAN ratm;  OBJECT y;  int dim;
 /*                                                                           */
 /*****************************************************************************/
 
-AdjustSize(x, b, f, dim)
-OBJECT x;  LENGTH b, f;  int dim;
+void AdjustSize(OBJECT x, LENGTH b, LENGTH f, int dim)
 { OBJECT y, link, tlink, lp, rp, z, index;
   BOOLEAN ratm;  LENGTH tb, tf, cby, cfy, rby, rfy;
 
@@ -360,7 +358,7 @@ OBJECT x;  LENGTH b, f;  int dim;
 	    debug1(DSA,D, "] AdjustSize ret. at HEAD (%s)", Image(type(index)));
 	    return;
 	  }
-	  assert( actual(index) != nil, "AdjustSize: actual(index) == nil!" );
+	  assert(actual(index)!=nilobj, "AdjustSize: actual(index)==nilobj!" );
 	  assert( type(actual(index)) == CLOSURE, "AdjustSize: index non-C!" );
 	  if( actual(actual(index)) != GalleySym )
 	  {
@@ -368,8 +366,8 @@ OBJECT x;  LENGTH b, f;  int dim;
 	    return;
 	  }
 	  y = actual(index);
-	  debug3(DSA, DD, "AdjustSize jumping to y = %s of size %s,%s", Image(type(y)),
-	     EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
+	  debug3(DSA, DD, "AdjustSize jumping to y = %s of size %s,%s",
+	    Image(type(y)), EchoLength(back(y, dim)), EchoLength(fwd(y, dim)));
 	}
 	break;
 
@@ -514,6 +512,7 @@ OBJECT x;  LENGTH b, f;  int dim;
       case QWORD:
       case CLOSURE:
       case NULL_CLOS:
+      case PAGE_LABEL:
       case CROSS:
       default:
       

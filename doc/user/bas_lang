@@ -1,0 +1,71 @@
+@Section
+   @Title { Languages other than English }
+   @Tag { languages }
+@Begin
+@PP
+When part of a document is written in a language other than English,
+languages. @Index { languages other than English }
+Lout should be informed of this using the @Code "@Language" symbol:
+language. @Index @Code "@Language"
+@ID @OneRow @Code {
+"... the garter, he said:  French @Language { `Honi soit qui mal y"
+"pense' }, and this saying ..."
+}
+Changing language is quite analogous to changing font using the
+@Code "@Font" symbol.
+@PP
+Since accented characters (Section {@NumberOf characters}) are always
+available irrespective of the language, at first sight it might seem
+that there is no need to bother informing Lout what language you are
+writing in.  However, words are hyphenated differently depending on the
+hyphenation.languages @SubIndex { in languages other than English }
+language, and some symbols have different results in different
+languages.  For example,
+@ID @Code "Danish @Language @Date"
+produces
+@ID { Danish @Language @Date }
+date.languages @SubIndex { in languages other than English }
+time.languages @SubIndex { in languages other than English }
+lists.languages @SubIndex { in languages other than English }
+and the alphabetic list symbols of Section {@NumberOf lists} also
+vary with the current language.  So it's worth doing for the sake of
+knowing that non-English parts will appear as they should.
+@PP
+At the time of writing, the following languages were available:
+@ID @OneRow @Code {
+Czech Cesky Cestina
+Danish Dansk
+Dutch Nederlands
+English
+Finnish Suomi
+French Francais Fran{@Char ccedilla}ais
+German Deutsch
+Norwegian Norsk
+Russian
+Slovenian Slovenia Slovenija
+Spanish Espa{@Char ntilde}ol
+Swedish Svenska
+}
+As shown, most languages have alternative names, all equally acceptable
+to the @Code "@Language" symbol.  Russian also has an alternative name,
+but since it is written using Cyrillic characters, we can't show it
+here.  For other languages, the only course is to turn hyphenation off
+and avoid language-specific symbols such as @Code "@Date" and the
+alphabetic lists.
+@PP
+If your entire document is in a language other than English, you need
+to change the @Code "@InitialLanguage" option:
+initiallanguage. @Index @Code "@InitialLanguage"
+@ID @Code "@InitialLanguage { Deutsch }"
+If you are using your own setup file (Section {@NumberOf setup}), you
+can change it there.  If not, you can change it at the start of your
+document, as explained in Section {@NumberOf ordinary}.
+@PP
+The fonts listed in Section {@NumberOf fonts} cannot be used with
+Czech, Russian and Slovenian, because they do not contain all of the
+characters used in those languages.  Consult files @Code "russian.fd" and
+@Code "latin2.fd" in the Lout system include directory for the family
+and face names of fonts available for use with these languages.  These
+fonts, and other material needed for these languages, are distributed
+separately from the main Lout distribution.
+@End @Section

@@ -1,6 +1,6 @@
 /*@z35.c:Time Keeper: MomentSym(), TimeString()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.02)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.06)                       */
 /*  COPYRIGHT (C) 1994 Jeffrey H. Kingston                                   */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
@@ -42,7 +42,7 @@
   tmp = MakeWord(WORD, buff, no_fpos);					\
   Link(par, tmp);
 
-static OBJECT current_moment = nil;
+static OBJECT current_moment = nilobj;
 static FULL_CHAR time_string[30] = { '\0' };
 
 
@@ -54,7 +54,7 @@ static FULL_CHAR time_string[30] = { '\0' };
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT MomentSym = nil;
+OBJECT MomentSym = nilobj;
 
 
 /*****************************************************************************/
@@ -65,7 +65,7 @@ OBJECT MomentSym = nil;
 /*                                                                           */
 /*****************************************************************************/
 
-FULL_CHAR *TimeString()
+FULL_CHAR *TimeString(void)
 { return time_string;
 } /* end TimeString */
 
@@ -79,8 +79,8 @@ FULL_CHAR *TimeString()
 /*                                                                           */
 /*****************************************************************************/
 
-InitTime()
-{ long raw_time; struct tm *now;
+void InitTime(void)
+{ time_t raw_time; struct tm *now;
   FULL_CHAR buff[20]; OBJECT par, tmp, sym, env;
   OBJECT tag, second, minute, hour, weekday,
 	monthday, yearday, month, year, century, dst;
@@ -140,10 +140,10 @@ InitTime()
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT StartMoment()
+OBJECT StartMoment(void)
 { OBJECT res;
   debug0(DTK, D, "StartMoment()");
-  assert(current_moment != nil, "StartMoment: current_moment == nil!");
+  assert(current_moment != nilobj, "StartMoment: current_moment == nilobj!");
   res = CopyObject(current_moment, no_fpos);
   debug0(DTK, D, "StartMoment returning");
   ifdebug(DTK, D, DebugObject(res));

@@ -1,0 +1,137 @@
+@Section
+   @Title { Rules, boxes, multi-page tables, etc. }
+@Begin
+@PP
+@Code "@Tab" draws four kinds of rules.  @I {Above rules} go across the
+rules. @Index { rules in tables }
+table above a specified row; @I {below rules} go across the table below a
+row.  @I {Between rules} go down the table between any two columns, but
+not before the first or after the last; and @I { side rules } go down
+the two sides:
+@ID @OneRow @Code {
+"@Tab"
+"    above { no }"
+"    below { yes }"
+"    between { single }"
+"    side { double }"
+"    @Fmta { ... }"
+"..."
+}
+Each option may have the value @Code no (no rules), @Code yes or
+@Code single (draw single rules), or @Code double (draw double
+rules).  Omitting an option is equivalent to giving it the value
+{@Code no}.  A rule below one row exactly overstrikes a rule above the
+next, unless a page break intervenes.
+@PP
+These options to @Code "@Tab" will draw all possible rules of the given
+type.  If only some are wanted, there are {@Code above} and
+{@Code below} options (but no {@Code side} option) for each row symbol:
+@ID @OneRow @Code {
+"@Rowf"
+"    above { yes }"
+"    below { double }"
+"    ..."
+}
+and there is a @Code between option for the @Code "!" symbol that
+separates columns in the format options:
+@ID @Code "@Col A  ! between { double }  @Col B"
+The symbols @Code "!!" and @Code "!!!" are abbreviations for
+@Code "! between { single }" and {@Code "! between { double }"}.  All
+these options override the corresponding @Code "@Tab" options when they
+are present; when they are absent, the @Code "@Tab" options hold sway.
+@PP
+It is not hard to assemble a single box around a table, using side
+boxes.tables @Index { boxes around tables }
+rules, a rule above the first row, and a rule below the last:
+@ID @OneRow @Code {
+"@Tab"
+"    side { single }"
+"{"
+"    @Rowa above { single } ..."
+"    ..."
+"    @Rowj below { single } ..."
+"}"
+}
+Double boxes around a table should be assembled using the following recipe:
+@ID @OneRow @Code {
+"@Tab"
+"    side { double }"
+"{"
+"    @Rowa above { doubleboxabove } ..."
+"    ..."
+"    @Rowj below { doubleboxbelow } ..."
+"}"
+}
+This is a little tedious, but the result is good.
+@PP
+The symbols @Code "@Line" and @Code "@DoubleLine" produce horizontal
+lines.tables @Index { lines in tables }
+single and double lines of the width of the column.  Two other symbols,
+@Code "@Rule" and {@Code "@DoubleRule"}, produce lines which extend into
+the adjacent margins as well.  For example,
+@CD {
+@Tab
+    @Fmta { @Col A }
+{
+    @Rowa A { 5^.46 }
+    @Rowa A { 3^.4159 }
+    @Rowa A { 5772^ }
+    @Rowa A { @Line } vmargin { 0i }
+    @Rowa A { 5909^.0759 }
+}
+}
+is produced by
+@ID @OneRow @Code {
+"@Tab"
+"    @Fmta { @Col A }"
+"{"
+"    @Rowa A { 5^.46 }"
+"    @Rowa A { 3^.4159 }"
+"    @Rowa A { 5772^ }"
+"    @Rowa A { @Line } vmargin { 0i }"
+"    @Rowa A { 5909^.0759 }"
+"}"
+}
+Owing to problems behind the scenes, @Code "@Rule" and @Code "@DoubleRule"
+fail in aligned columns.
+@PP
+The @Code "@Tab" symbol has a @Code "linewidth" option which determines
+the thickness of all the lines:
+@ID @OneRow @Code {
+"@Tab"
+"    linewidth { 0.5p }"
+}
+shows the default value, 0.5 points.  This cannot be overridden within
+the table.  Double rules are drawn with their centres three line widths
+apart.  Tab thinks that rules and double rules occupy no space, so thick
+rules may require larger margins.
+@PP
+The tables produced by @Code "@Tab" permit page breaks between any two
+rows.  The choice of page breaks can either be left to Lout, or it can be
+forced by placing the new page symbol @Code "@NP" between two rows.  To
+ensure that each part of a multi-page table is boxed, the rows preceding
+multi.page.tables @Index { multi-page tables }
+the page breaks must have @Code below rules, and the rows following them
+must have @Code above rules.  It works best to display a multi-page
+table at the left margin by preceding and following it with
+{@Code "@DP"}.  To prevent page breaks within a small table, use
+@Code "@OneRow @Tab ...".
+@PP
+The @Code "@HAdjust" symbol from raw Lout can be used to widen a
+table's columns until it occupies the full column width.  The
+recommended arrangement is
+@ID @OneRow @Code {
+"@DP"
+"@HAdjust @Tab"
+"   ..."
+"@DP"
+}
+since @Code "@HAdjust" is not effective within displays.
+@PP
+Expert users might occasionally find a use for the @Code "@MarkRow"
+mark.row @Index { @Code "@MarkRow" symbols }
+symbols.  There is one of them for each @Code "@Row" symbol
+({@Code "@MarkRowa"} for {@Code "@Rowa"}, etc.).  A @Code "@MarkRow"
+symbol causes the principal mark of the table to pass through its row,
+permitting alignment with that row.
+@End @Section
