@@ -1,6 +1,6 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -168,7 +168,7 @@ void CrossInit(OBJECT sym)
 { OBJECT cs;
   New(cs, CROSS_SYM);
   target_state(cs) = NO_TARGET;  target_seq(cs) = 0;
-  cr_file(cs) = NO_FILE;
+  /* cr_file(cs) = NO_FILE; unused */
   gall_seq(cs) = 0;  gall_tag(cs) = nilobj;
   gall_tfile(cs) = NO_FILE;
   symb(cs) = sym;  cross_sym(sym) = cs;

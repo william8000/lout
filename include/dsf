@@ -13,6 +13,7 @@
 #  Version 3.11 by Jeffrey H. Kingston, December 1996.                        #
 #  Version 3.13 by Jeffrey H. Kingston, October 1998.                         #
 #  Version 3.16 by Jeffrey H. Kingston, May 1999.                             #
+#  Version 3.17 by Jeffrey H. Kingston, September 1999.                       #
 #                                                                             #
 #  This Lout package contains the general definitions used by all types of    #
 #  documents.  It needs to be extended (see docf, reportf, bookf, slidesf,    #
@@ -1488,6 +1489,28 @@ def @DocumentSetup
 	}
     }
 
+    def @ChooseColList right colnum
+    {
+	@OneOf
+	{
+	    @ColList colnum
+	    @IndexAColList @IndexAColumnNumber
+	    @IndexBColList @IndexBColumnNumber
+	    @IndexColList  @IndexColumnNumber
+	}
+    }
+
+    def @ChooseIntroColList right colnum
+    {
+	@OneOf
+	{
+	    @IntroColList colnum
+	    @IndexAColList @IndexAColumnNumber
+	    @IndexBColList @IndexBColumnNumber
+	    @IndexColList  @IndexColumnNumber
+	}
+    }
+
     def @SimplePageList
 	named @ColumnNumber {}
 	named @PageHeaders {}
@@ -1503,10 +1526,7 @@ def @DocumentSetup
 		    { @PageNumbers @Num @PageNum }
 		//@MidGap @AtTop
 		//@MidGap @PageOddTopSection @Orient
-		//@MidGap @ColList @ColumnNumber
-		//@MidGap @IndexAColList @IndexAColumnNumber
-		//@MidGap @IndexBColList @IndexBColumnNumber
-		//@MidGap @IndexColList  @IndexColumnNumber
+		//@MidGap @ChooseColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
 		   //@MidGap {@PageHeaders.{@SStart @PageNum}} @OddFootHeader
@@ -1537,10 +1557,7 @@ def @DocumentSetup
 		@PageHeaders.NonStart @EvenTopHeader
 		    { @PageNumbers @Num @PageNum }
 		//@MidGap @PageEvenTopSection @Orient
-		//@MidGap @ColList @ColumnNumber
-		//@MidGap @IndexAColList @IndexAColumnNumber
-		//@MidGap @IndexBColList @IndexBColumnNumber
-		//@MidGap @IndexColList  @IndexColumnNumber
+		//@MidGap @ChooseColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @EvenFootHeader
@@ -1606,10 +1623,7 @@ def @DocumentSetup
 		    { @IntroPageNumbers @Num @PageNum }
 		//@MidGap @AtTop
 		//@MidGap @PageIntroOddTopSection @Orient
-		//@MidGap @IntroColList @ColumnNumber
-		//@MidGap @IndexAColList @IndexAColumnNumber
-		//@MidGap @IndexBColList @IndexBColumnNumber
-		//@MidGap @IndexColList  @IndexColumnNumber
+		//@MidGap @ChooseIntroColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
 		   //@MidGap
@@ -1626,10 +1640,7 @@ def @DocumentSetup
 	    {
 		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @Next @PageNum }
 		//@MidGap @PageIntroEvenTopSection @Orient
-		//@MidGap @IntroColList @ColumnNumber
-		//@MidGap @IndexAColList @IndexAColumnNumber
-		//@MidGap @IndexBColList @IndexBColumnNumber
-		//@MidGap @IndexColList  @IndexColumnNumber
+		//@MidGap @ChooseIntroColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @IntroEvenFootHeader
@@ -1670,10 +1681,7 @@ def @DocumentSetup
 	    {
 		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @PageNum }
 		//@MidGap @PageIntroEvenTopSection @Orient
-		//@MidGap @IntroColList @ColumnNumber
-		//@MidGap @IndexAColList @IndexAColumnNumber
-		//@MidGap @IndexBColList @IndexBColumnNumber
-		//@MidGap @IndexColList  @IndexColumnNumber
+		//@MidGap @ChooseIntroColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @IntroEvenFootHeader
@@ -1696,10 +1704,7 @@ def @DocumentSetup
 		    { @IntroPageNumbers @Num @PageNum }
 		//@MidGap @AtTop
 		//@MidGap @PageIntroOddTopSection @Orient
-		//@MidGap @IntroColList @ColumnNumber
-		//@MidGap @IndexAColList @IndexAColumnNumber
-		//@MidGap @IndexBColList @IndexBColumnNumber
-		//@MidGap @IndexColList  @IndexColumnNumber
+		//@MidGap @ChooseIntroColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
 		   //@MidGap
@@ -1746,10 +1751,7 @@ def @DocumentSetup
 		    }
 		//@MidGap @AtTop
 		//@MidGap @PageOddTopSection @Orient
-		//@MidGap @ColList @ColumnNumber
-		//@MidGap @IndexAColList @IndexAColumnNumber
-		//@MidGap @IndexBColList @IndexBColumnNumber
-		//@MidGap @IndexColList  @IndexColumnNumber
+		//@MidGap @ChooseColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
 		   //@MidGap @PageHeaders.@Start @RunningOddFootHeader
@@ -1833,10 +1835,7 @@ def @DocumentSetup
 				owner   { @Owner }
 			}
 		    //@MidGap @PageEvenTopSection @Orient
-		    //@MidGap @ColList @ColumnNumber
-		    //@MidGap @IndexAColList @IndexAColumnNumber
-		    //@MidGap @IndexBColList @IndexBColumnNumber
-		    //@MidGap @IndexColList  @IndexColumnNumber
+		    //@MidGap @ChooseColList @ColumnNumber
 		    // //1rt @OneRow
 		    {  //        @PageFootSection
 		       //@MidGap @PageHeaders.@Start @RunningEvenFootHeader
@@ -1982,10 +1981,7 @@ def @DocumentSetup
 				owner   { @Owner }
 			}
 		//@MidGap @PageIntroEvenTopSection @Orient
-		//@MidGap @IntroColList @ColumnNumber
-		//@MidGap @IndexAColList @IndexAColumnNumber
-		//@MidGap @IndexBColList @IndexBColumnNumber
-		//@MidGap @IndexColList  @IndexColumnNumber
+		//@MidGap @ChooseIntroColList @ColumnNumber
 		// //1rt @OneRow
 		{  //        @PageFootSection
 		   //@MidGap @PageHeaders.@Start @RunningIntroEvenFootHeader
@@ -3978,7 +3974,7 @@ def @DocumentSetup
 	    {x @Rump y} @Case
 	    {
 	        ""      @Yield  x
-		else    @Yield  { { x &0.03fu , } @Meld y }
+		else    @Yield  { { x &"0.03fu" , } @Meld y }
 	    }
 
 ################################ obsolete ###################################
@@ -3988,8 +3984,8 @@ def @DocumentSetup
 #		else	@Yield	{
 #				 { {x @Rump y} @Common "," } @Case
 #				 {
-#				   ","	@Yield { x &0.03fu x @Rump y }
-#				   else	@Yield { x &0.03fu , x @Rump y }
+#				   ","	@Yield { x &"0.03fu" x @Rump y }
+#				   else	@Yield { x &"0.03fu" , x @Rump y }
 #				 }
 #				}
 #	    }
@@ -4011,8 +4007,8 @@ def @DocumentSetup
 	}
     }
 
-    macro @RawSubIndex    { @RawIndex indent { 1f } }
-    macro @RawSubSubIndex { @RawIndex indent { 2f } }
+    macro @RawSubIndex    { @RawIndex indent { "1f" } }
+    macro @RawSubSubIndex { @RawIndex indent { "2f" } }
 
     def @Index
 	left x
@@ -4076,24 +4072,24 @@ def @DocumentSetup
 		     @BackEnd @Case {
 			 { PostScript PlainText } @Yield {
 			   @PageMark @Tag
-			   x @DoIndex indent { indent } { y &0.03fu , numval }
+			   x @DoIndex indent { indent } { y &"0.03fu" , numval }
 			 }
 			 PDF @Yield {
 			   {"__link_target=<<"@Tag">>"} @Graphic {""}
 			   @PageMark @Tag
-			   x @DoIndex indent { indent } { y &0.03fu , numval }
+			   x @DoIndex indent { indent } { y &"0.03fu" , numval }
 			 }
 		     }
 		   }
 #	    Yes  @Yield { @PageMark @Tag
-#			  x @DoIndex indent { indent } { y &0.03fu , numval }
+#			  x @DoIndex indent { indent } { y &"0.03fu" , numval }
 #			}
 	    else @Yield @Null
 	}
     }
 
-    macro @SubIndex { @Index indent { 1f } }
-    macro @SubSubIndex { @Index indent { 2f } }
+    macro @SubIndex { @Index indent { "1f" } }
+    macro @SubSubIndex { @Index indent { "2f" } }
 
     def @IndexBlanks
     {
@@ -4146,7 +4142,7 @@ def @DocumentSetup
 	    {x @Rump y} @Case
 	    {
 	        ""      @Yield  x
-		else    @Yield  { { x &0.03fu , } @Meld y }
+		else    @Yield  { { x &"0.03fu" , } @Meld y }
 	    }
 	}
 
@@ -4165,8 +4161,8 @@ def @DocumentSetup
 	}
     }
 
-    macro @RawSubIndexA    { @RawIndexA indent { 1f } }
-    macro @RawSubSubIndexA { @RawIndexA indent { 2f } }
+    macro @RawSubIndexA    { @RawIndexA indent { "1f" } }
+    macro @RawSubSubIndexA { @RawIndexA indent { "2f" } }
 
     def @IndexA
 	left x
@@ -4227,14 +4223,14 @@ def @DocumentSetup
 
 	@MakeIndexA @Case {
 	    Yes  @Yield { @PageMark @Tag
-			  x @DoIndexA indent { indent } { y &0.03f , numval }
+			  x @DoIndexA indent { indent } { y &"0.03fu" , numval }
 			}
 	    else @Yield @Null
 	}
     }
 
-    macro @SubIndexA { @IndexA indent { 1f } }
-    macro @SubSubIndexA { @IndexA indent { 2f } }
+    macro @SubIndexA { @IndexA indent { "1f" } }
+    macro @SubSubIndexA { @IndexA indent { "2f" } }
 
     def @IndexABlanks
     {
@@ -4287,7 +4283,7 @@ def @DocumentSetup
 	    {x @Rump y} @Case
 	    {
 	        ""      @Yield  x
-		else    @Yield  { { x &0.03fu , } @Meld y }
+		else    @Yield  { { x &"0.03fu" , } @Meld y }
 	    }
 	}
 
@@ -4306,8 +4302,8 @@ def @DocumentSetup
 	}
     }
 
-    macro @RawSubIndexB    { @RawIndexB indent { 1f } }
-    macro @RawSubSubIndexB { @RawIndexB indent { 2f } }
+    macro @RawSubIndexB    { @RawIndexB indent { "1f" } }
+    macro @RawSubSubIndexB { @RawIndexB indent { "2f" } }
 
     def @IndexB
 	left x
@@ -4368,14 +4364,14 @@ def @DocumentSetup
 
 	@MakeIndexB @Case {
 	    Yes  @Yield { @PageMark @Tag
-			  x @DoIndexB indent { indent } { y &0.03f , numval }
+			  x @DoIndexB indent { indent } { y &"0.03fu" , numval }
 			}
 	    else @Yield @Null
 	}
     }
 
-    macro @SubIndexB { @IndexB indent { 1f } }
-    macro @SubSubIndexB { @IndexB indent { 2f } }
+    macro @SubIndexB { @IndexB indent { "1f" } }
+    macro @SubSubIndexB { @IndexB indent { "2f" } }
 
     def @IndexBBlanks
     {
@@ -4585,19 +4581,24 @@ def @DocumentSetup
 		Minor @Yield title @AttachPDFLink {
 		    headingfont @Font
 		    headingbreak @Break @Protect {@LongNum headingformat title}
+		    // @PageMark tag
 		}
 
 		{ Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield {
 		    sendheader { title @AttachPDFLink {
 		    //aboveheadinggap
 		    headingfont @Font
-		    headingbreak @Break { @LongNum headingformat title } } }
+		    headingbreak @Break { @LongNum headingformat title }
+		    // @PageMark tag
+		    } }
 		}
 
 		{ VeryMajor } @Yield { sendheader { title @AttachPDFLink {
 		    //aboveheadinggap
 		    headingfont @Font
-		    headingbreak @Break { bypassnumber headingformat title } } }
+		    headingbreak @Break { bypassnumber headingformat title }
+		    // @PageMark tag
+		    } }
 		}
 	    }
 	}
@@ -4626,7 +4627,7 @@ def @DocumentSetup
             //  numbers @Do {
 		  attachnum & @NumberMarker @Tag { tag } @Value { @ShortNum }
 		}
-            //  @PageMark tag
+            # //  @PageMark tag
 	    //  @IfMajor { @FootNoteThrough @Do @BeginFootNoteCounter }
             //  @Run @StartIfMajor
             //  @ContentsStuff
@@ -4634,7 +4635,7 @@ def @DocumentSetup
             //  indisplays @BeginDisplayCounter @ShortNum
             //  infigures @BeginFigureCounter @ShortNum
             //  intables @BeginTableCounter @ShortNum
-            //  initiallanguage @Language @Body
+            //  @Body
 	    //innergap  @IfMajor endifmajor innergap
             //  @Run NonStart
 	}

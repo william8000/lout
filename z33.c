@@ -1,6 +1,6 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -670,9 +670,10 @@ FULL_CHAR *str, FULL_CHAR *line)
 /*                                                                           */
 /*  static BOOLEAN SearchLines(LINE *lines, int left, int right, str, lnum)  */
 /*                                                                           */
-/*  File fp is a text file.  left is the beginning of a line, right is the   */
-/*  end of a line.   Search the file by binary search for a line beginning   */
-/*  with str.  If found, return its number in lnum, else return FALSE.       */
+/*  Search the sorted array of LINE arrays lines[left..right] for a line     */
+/*  beginning with str, and return TRUE if found else FALSE.                 */
+/*                                                                           */
+/*  If TRUE is returned then the number of the line is in *lnum.             */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -681,7 +682,7 @@ static BOOLEAN SearchLines(LINE *lines, int left, int right, FULL_CHAR *str,
 { int l, r, mid;  FULL_CHAR buff[MAX_BUFF];
   BOOLEAN res;
   debug3(DBS, D, "SearchLines(lines, %d, %d, %s, lnum)", left, right, str);
-  if( right <= left )
+  if( right < left )
   {
     debug0(DBS, D, "SearchLines returning FALSE (empty lines)");
     return FALSE;

@@ -209,10 +209,18 @@ Changes and new features introduced in Version 3.16 [28 May 1999]
     Bug fixes
     Optimal paragraph breaking weights adjusted yet again (sigh)
 
+Changes and new features introduced in Version 3.17 [13 September 1999]
+
+    Bug fixes
+    @AtEnd option for @Book and @Report (unnumbered back cover page)
+    @Abbreviations symbol in books (like @Introduction but for abbreviations)
+    @Euro symbol added for getting a European Currency symbol
+    Document OBJECT struct declaration in externs.h (for gurus only)
+
 Things that ought to be done but haven't been done yet
 
     pdfmark in PostScript output
     Review Uwe's proposal for moving word row marks to the baseline
 
 Jeff Kingston
-26 May 1999
+17 September 1999

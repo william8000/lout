@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.16                          #
+#  Make file for installing Basser Lout Version 3.17                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  28 May 1999                                                                #
+#  17 September 1999                                                          #
 #                                                                             #
 #     make lout         Compile the Lout source                               #
 #     make c2lout       Compile a small auxiliary program called c2lout       #

@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -945,7 +945,12 @@ void FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    OBJECT prnt;
 	    Parent(prnt, Up(x));
 	    Child(y, Down(x));
-	    if( Down(x) == LastDown(x) && is_word(type(y)) )
+	    if( actual_size - frame_size < 1 * PT )
+	    {
+	      /* the correction is probably due to roundoff error, and */
+	      /* anyway is too small to print an error message about   */
+	    }
+	    else if( Down(x) == LastDown(x) && is_word(type(y)) )
 	    {
 	      Error(23, 3, "word %s horizontally scaled by factor %.2f (too wide for %s paragraph)",
 		WARN, &fpos(y), string(y), (float) bc(constraint(prnt)) / SF,

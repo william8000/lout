@@ -1,6 +1,6 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -124,7 +124,7 @@ void DetachGalley(OBJECT hd)
 OBJECT SearchGalley(OBJECT start, OBJECT sym, BOOLEAN forwards,
 BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
 { OBJECT y, res, z, zlink, link;
-  debug5(DGA, DDD, "[ SearchGalley(start, %s, %s, %s, %s, %s)", SymName(sym),
+  debug5(DGA, DD, "[ SearchGalley(start, %s, %s, %s, %s, %s)", SymName(sym),
 	forwards ? "fwd" : "back", subgalleys ? "subgalleys" : "nosubgalleys",
 	closures ? "closures" : "noclosures", input ? "input" : "noinput");
   assert( type(start) == LINK || type(start) == HEAD, "SearchGalley: start!" );
@@ -138,20 +138,21 @@ BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
       case UNATTACHED:
       case RECEIVING:
 	
-        debug1(DGA, DDD, "  examining %s", EchoIndex(y));
+        debug1(DGA, DD, "  examining %s", EchoIndex(y));
 	if( subgalleys )
 	for( zlink = Down(y); zlink!=y && res==nilobj; zlink=NextDown(zlink) )
 	{ Child(z, zlink);
 	  res = SearchGalley(z, sym, TRUE, TRUE, TRUE, input);
 	}
-	if( !res && input && type(y)==RECEIVING && actual(actual(y))==InputSym )
+	if( res == nilobj && input && type(y) == RECEIVING &&
+	    actual(actual(y)) == InputSym )
 	  res = y;
 	break;
 
 
       case RECEPTIVE:
 	
-        debug1(DGA, DDD, "  examining %s", EchoIndex(y));
+        debug1(DGA, DD, "  examining %s", EchoIndex(y));
 	if( closures && type(actual(y)) == CLOSURE
 		     && SearchUses(actual(actual(y)), sym) )  res = y;
 	else if( input && actual(actual(y)) == InputSym )  res = y;
@@ -165,7 +166,7 @@ BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
     }
     link = forwards ? NextDown(link) : PrevDown(link);
   }
-  debug1(DGA, DDD, "] SearchGalley returning %s", EchoIndex(res));
+  debug1(DGA, DD, "] SearchGalley returning %s", EchoIndex(res));
   return res;
 } /* end SearchGalley */
 

@@ -4,6 +4,7 @@
 @Begin
 @PP
 As explained in Section {@NumberOf targets}, the components of a galley
+optimal.gall @Index { Optimal galley breaking }
 are promoted one by one into a target.  When space runs out there, the
 galley searches for a new target and promotion resumes.
 @PP
@@ -21,6 +22,7 @@ unbreakable displays, sometimes quite dramatically.
 Optimal galley breaking is applied to each galley, horizontal or
 vertical, that possesses a parameter or nested symbol called
 @Code "@Optimize" whose value is {@Code Yes}.  Like cross referencing,
+optimize.sym @Index { @Code "@Optimize" symbol }
 it takes two runs to have effect.  On the first run, Lout records the
 sizes of the galley's components and gaps, and also the space available
 at each of its targets.  At end of run this information is used to find
@@ -31,5 +33,7 @@ Considering that this process must cope with floating figures,
 new page and conditional new page symbols, breaks for new chapters, and
 evolving documents, it is surprisingly robust.  If it does go badly
 wrong, removing file @Code "lout.li" then running Lout twice without
-changing the document may solve the problem.
+changing the document may solve the problem.  However, cases are known
+where the optimization never converges.  These are usually related to
+figures and footnotes whose anchor points fall near page boundaries.
 @End @Section

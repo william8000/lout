@@ -4,14 +4,14 @@
 #  @BookSetup extension to @DocumentSetup.                                #
 #                                                                         #
 #  Jeffrey H. Kingston                                                    #
-#  5 February 1999                                                        #
+#  17 September 1999                                                      #
 #                                                                         #
 #  This package extends DocumentSetup with definitions for books.         #
 #                                                                         #
 ###########################################################################
 
 extend @BasicSetup @DocumentSetup
-export @Book @Preface @Introduction @Chapter @Appendix
+export @Book @Preface @Abbreviations @Introduction @Chapter @Appendix
 def @BookSetup
     named @TitlePageFont		{  Helvetica Base		}
     named @SeparateIntroNumbering	{  Yes				}
@@ -24,6 +24,7 @@ def @BookSetup
     named @FigureListWord		{  figurelist			}
     named @TableListWord		{  tablelist			}
     named @IntroductionWord		{  introduction			}
+    named @AbbreviationsWord		{  abbreviations		}
     named @ChapterWord			{  chapter			}
     named @AppendixWord			{  appendix			}
     named @IndexWord			{  index			}
@@ -94,6 +95,7 @@ def @BookSetup
     named @SubSubAppendixGap		{  1.5v  @OrIfPlain 2f		}
 
     named @PrefaceInContents		{  No 				}
+    named @AbbreviationsInContents	{  Yes				}
     named @IntroductionInContents	{  Yes				}
     named @PartInContents		{  Yes				}
     named @ChapterInContents		{  Yes				}
@@ -151,6 +153,7 @@ def @BookSetup
     named @ContentsPrefix		{				}
     named @FigureContentsPrefix		{				}
     named @TableContentsPrefix		{				}
+    named @AbbreviationsPrefix		{				}
     named @IntroductionPrefix		{				}
     named @ChapterPrefix		{				}
     named @AppendixPrefix		{				}
@@ -217,6 +220,7 @@ def @BookSetup
     }
 
     def @PrefacePlace { @Galley }
+    def @AbbreviationsPlace { @Galley }
     def @IntroductionPlace { @Galley }
 
 
@@ -231,6 +235,26 @@ def @BookSetup
 	def @Any  force into { @FullPlace&&following     } right x { x }
 	def @Odd  force into { @OddFullPlace&&following  } right x { x }
 	def @Even force into { @EvenFullPlace&&following } right x { x }
+
+	@ChapterStartPages @Case {
+	    Any  @Yield @Any  x
+	    Odd  @Yield @Odd  x
+	    Even @Yield @Even x
+	}
+    }
+
+
+    #######################################################################
+    #                                                                     #
+    #  @NoForceFull - this sends text to a full-width place.              #
+    #                                                                     #
+    #######################################################################
+
+    def @NoForceFull right x
+    {
+	def @Any  into { @FullPlace&&following     } right x { x }
+	def @Odd  into { @OddFullPlace&&following  } right x { x }
+	def @Even into { @EvenFullPlace&&following } right x { x }
 
 	@ChapterStartPages @Case {
 	    Any  @Yield @Any  x
@@ -290,6 +314,8 @@ def @BookSetup
         named @BeforeTitlePage {}
         named @OnTitlePage {}
         named @AfterTitlePage {}
+        named @AtEnd { dft }
+        named @AtAfter { dft }
         named @InitialFont { @InitialFont }
         named @InitialBreak { @InitialBreak }
         named @InitialSpace { @InitialSpace }
@@ -350,7 +376,6 @@ def @BookSetup
 		sendheader { @ChooseFull @Body }
 		innergap { @SectionGap }
 		@ContentsSection
-
 	}
 
 	def @FigureContentsPart
@@ -546,12 +571,13 @@ def @BookSetup
 	    # @PrefacePlace etc. too soon, producing a "no @PrefacePlace
 	    # precedes this @PrefacePLace&&preceding" error message.
 
-	        @IntroductionPlace
+	        @AbbreviationsPlace
+	    //  @IntroductionPlace
 	    //	@ChapterList @FirstChapterNumber
 	    //	@ReferencesBeforeAppendices @Do {
 		    @MakeReferences @Do @ReferencesPart
 		}
-           //	@AppendixList @FirstAppendixNumber
+            //	@AppendixList @FirstAppendixNumber
 	    //	@ReferencesBeforeAppendices @NoDo {
 		    @MakeReferences @Do @ReferencesPart
 		}
@@ -594,6 +620,7 @@ def @BookSetup
 			else		@Yield @Null
 		    }
             //1.1b  @PrefaceAfterContents @Do @PrefacePlace
+	    //  @AbbreviationsPlace
 	    //  @IntroductionPlace
 	    //	@ChapterList @FirstChapterNumber
 	    //	@ReferencesBeforeAppendices @Do {
@@ -638,6 +665,11 @@ def @BookSetup
 			    @FirstPageNumber
 		    //	@BookCombined
 		    //	NonStart @Runner @Owner { @Tag }
+		    //  @AtEnd @Case {
+			    dft @Yield @Null
+			    else @Yield
+				 @EvenPage @Orient { @PageOrientation } @AtEnd
+			}
 		}
 
 		Yes @Yield {
@@ -660,6 +692,11 @@ def @BookSetup
 		    //	@BookIntro
 		    //	@BookBody
 		    //	NonStart @Runner @Owner { @Tag }
+		    //  @AtEnd @Case {
+			    dft @Yield @Null
+			    else @Yield
+				 @EvenPage @Orient { @PageOrientation } @AtEnd
+			}
 		}
 	    }
         }
@@ -693,6 +730,40 @@ def @BookSetup
 	    incontents { @PrefaceInContents }
 	    pnprefix { @PrefacePrefix }
 	    sendheader { @ChooseFull @Body }
+	    innergap { @SectionGap }
+	    inrunners { Yes }
+	    @Body
+
+    }
+
+
+    #######################################################################
+    #                                                                     #
+    #  Abbreviations.                                                     #
+    #                                                                     #
+    #######################################################################
+
+    def @Abbreviations force into { @AbbreviationsPlace&&preceding }
+        named @Tag {}
+        named @Title { abbreviations @WordVal @AbbreviationsWord }
+        named @RunningTitle { dft }
+	named @InitialLanguage {}
+        body @Body
+    {
+
+	@LargeScaleStructure
+	    tag { @Tag }
+	    type { Major }
+	    initiallanguage { @InitialLanguage }
+	    title { @Title }
+	    runningtitle { @RunningTitle }
+	    aboveheadinggap { @AboveChapterGap }
+	    headingfont { @ChapterHeadingFont }
+	    headingbreak { @ChapterHeadingBreak }
+	    headingformat { @Num @ChapterHeadingFormat @Body }
+	    incontents { @AbbreviationsInContents }
+	    pnprefix { @AbbreviationsPrefix }
+	    sendheader { @Full @Body }
 	    innergap { @SectionGap }
 	    inrunners { Yes }
 	    @Body
@@ -1187,5 +1258,6 @@ def @BookSetup
 	    @Body
 
     }
+
 
 @End @BookSetup

@@ -1,6 +1,6 @@
 /*@z24.c:Print Service:PrintInit()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -1507,7 +1507,7 @@ void PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
   DisposeObject(full_name);
   fclose(fp);
   if( compressed )  StringRemove(AsciiToFull(LOUT_EPS));
-  fprintf(out_fp, "%%%%EndDocument\nEndEPSF\n");
+  fprintf(out_fp, "\n%%%%EndDocument\nEndEPSF\n");
   wordcount = 0;
   debug0(DRS, D, "PrintGraphicInclude returning.");
 } /* end PrintGraphicInclude */

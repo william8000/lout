@@ -120,7 +120,7 @@ export
 
     @Bullet @ParSym @SectSym @Dagger @DaggerDbl @CDot @Sterling @Yen @Florin
     @Star @Degree @Minute @Second @Multiply @Divide @Lozenge @Register
-    @CopyRight @TradeMark
+    @CopyRight @TradeMark @Euro
 
     @Date @Time @DateTimeFormat @DropCapTwo @DropCapThree @Centre @Right
     @NoDotSep @NoDotJoin @Join @Sep @DotSep @DotJoin @DashJoin @NumSep
@@ -326,6 +326,23 @@ def @BasicSetup
     def @Register  { @Sym  "registersans"	@OrIfPlain "R"	}
     def @CopyRight { @Sym  "copyrightsans"	@OrIfPlain "C"	}
     def @TradeMark { @Sym  "trademarksans"	@OrIfPlain "TM"	}
+
+    def @Euro
+    {
+	@BackEnd @Case {
+
+	    PostScript @Yield {
+		0.65w @VShift @VContract @HContract
+		"xsize ysize ysize 0.07 mul louteuro" @Graphic {
+		    0.7f @High 0.735f @Wide
+		}
+	    }
+
+	    PDF @Yield { EUR }
+
+	    PlainText @Yield { EUR }
+	}
+    }
 
 
     ###########################################################################
@@ -1323,38 +1340,38 @@ def @BasicSetup
     macro	 @RightAlignedNumberedDisplay	{ @DP @RG  @AX  |1rt @NN  @DP // @MY }
 
 
-    macro @RD	 @RawDisplay			{     @G   @DX  |         @DY }
-    macro @RLD	 @RawLeftDisplay		{     @LG  @DX  |         @DY }
-    macro @RID	 @RawIndentedDisplay		{     @IG  @DX  |         @DY }
-    macro @RQD	 @RawQuotedDisplay		{     @IG  @DX  @IG |     @DY }
+    macro @RD	 @RawDisplay			{     @G   @DX  |         // @DY }
+    macro @RLD	 @RawLeftDisplay		{     @LG  @DX  |         // @DY }
+    macro @RID	 @RawIndentedDisplay		{     @IG  @DX  |         // @DY }
+    macro @RQD	 @RawQuotedDisplay		{     @IG  @DX  @IG |     // @DY }
     macro @RCD	 @RawCentredDisplay
-		 @RawCenteredDisplay		{     @CG  @DX  | |       @DY }
-    macro @RRD	 @RawRightDisplay		{     @RG  @DX  |         @DY }
+		 @RawCenteredDisplay		{     @CG  @DX  | |       // @DY }
+    macro @RRD	 @RawRightDisplay		{     @RG  @DX  |         // @DY }
 
 
-    macro @RAD	 @RawAlignedDisplay		{     @G   @AX  |         @AY }
-    macro @RLAD	 @RawLeftAlignedDisplay		{     @LG  @AX  |         @AY }
-    macro @RIAD	 @RawIndentedAlignedDisplay	{     @IG  @AX  |         @AY }
-    macro @RQAD	 @RawQuotedAlignedDisplay	{     @IG  @AX  @IG |     @AY }
+    macro @RAD	 @RawAlignedDisplay		{     @G   @AX  |         // @AY }
+    macro @RLAD	 @RawLeftAlignedDisplay		{     @LG  @AX  |         // @AY }
+    macro @RIAD	 @RawIndentedAlignedDisplay	{     @IG  @AX  |         // @AY }
+    macro @RQAD	 @RawQuotedAlignedDisplay	{     @IG  @AX  @IG |     // @AY }
     macro @RCAD	 @RawCentredAlignedDisplay
-		 @RawCenteredAlignedDisplay	{     @CG  @AX  |         @AY }
-    macro @RRAD  @RawRightAlignedDisplay	{     @RG  @AX  |         @AY }
+		 @RawCenteredAlignedDisplay	{     @CG  @AX  |         // @AY }
+    macro @RRAD  @RawRightAlignedDisplay	{     @RG  @AX  |         // @AY }
 
-    macro @RND	 @RawNumberedDisplay		{     @G   @DX  |1rt @NN  @NY }
-    macro @RLND	 @RawLeftNumberedDisplay	{     @LG  @DX  |1rt @NN  @NY }
-    macro @RIND	 @RawIndentedNumberedDisplay	{     @IG  @DX  |1rt @NN  @NY }
-    macro @RQND	 @RawQuotedNumberedDisplay	{     @IG  @DX  |1rt @QR  @NY }
+    macro @RND	 @RawNumberedDisplay		{     @G   @DX  |1rt @NN  // @NY }
+    macro @RLND	 @RawLeftNumberedDisplay	{     @LG  @DX  |1rt @NN  // @NY }
+    macro @RIND	 @RawIndentedNumberedDisplay	{     @IG  @DX  |1rt @NN  // @NY }
+    macro @RQND	 @RawQuotedNumberedDisplay	{     @IG  @DX  |1rt @QR  // @NY }
     macro @RCND	 @RawCentredNumberedDisplay
-		 @RawCenteredNumberedDisplay	{     @CG  @DX  |1rt @NN  @NY }
-    macro @RRND	 @RawRightNumberedDisplay	{     @RG  @DX  |1rt @NN  @NY }
+		 @RawCenteredNumberedDisplay	{     @CG  @DX  |1rt @NN  // @NY }
+    macro @RRND	 @RawRightNumberedDisplay	{     @RG  @DX  |1rt @NN  // @NY }
 
-    macro @RAND	 @RawAlignedNumberedDisplay	{     @G   @AX  |1rt @NN  @MY }
-    macro @RLAND @RawLeftAlignedNumberedDisplay {     @LG  @AX  |1rt @NN  @MY }
-    macro @RIAND @RawIndentedAlignedNumberedDisplay { @IG  @AX  |1rt @NN  @MY }
-    macro @RQAND @RawQuotedAlignedNumberedDisplay {   @IG  @AX  |1rt @QR  @MY }
+    macro @RAND	 @RawAlignedNumberedDisplay	{     @G   @AX  |1rt @NN  // @MY }
+    macro @RLAND @RawLeftAlignedNumberedDisplay {     @LG  @AX  |1rt @NN  // @MY }
+    macro @RIAND @RawIndentedAlignedNumberedDisplay { @IG  @AX  |1rt @NN  // @MY }
+    macro @RQAND @RawQuotedAlignedNumberedDisplay {   @IG  @AX  |1rt @QR  // @MY }
     macro @RCAND @RawCentredAlignedNumberedDisplay
-		 @RawCenteredAlignedNumberedDisplay { @CG  @AX  |1rt @NN  @MY }
-    macro @RRAND @RawRightAlignedNumberedDisplay{     @RG  @AX  |1rt @NN  @MY }
+		 @RawCenteredAlignedNumberedDisplay { @CG  @AX  |1rt @NN  // @MY }
+    macro @RRAND @RawRightAlignedNumberedDisplay{     @RG  @AX  |1rt @NN  // @MY }
 
 
     ###########################################################################

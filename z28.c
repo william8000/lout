@@ -1,6 +1,6 @@
 /*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -202,17 +202,17 @@ POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
       if( AltErrorFormat )
       {
-        fprintf(fp, condcatgets(MsgCat, 28, 8, "%s fatal error: %s\n"),
+        fprintf(fp, condcatgets(MsgCat, 28, 8, "%s: fatal error: %s\n"),
 	  EchoAltFilePos(pos), val);
       }
       else
       {
         PrintFileBanner(file_num(*pos));
-        fprintf(fp, condcatgets(MsgCat, 28, 5, "  %6s fatal error: %s\n"),
+        fprintf(fp, condcatgets(MsgCat, 28, 5, "  %6s: fatal error: %s\n"),
 	  EchoFileLine(pos), val);
       }
-      /* for estrip's benefit: Error(28, 5, "  %6s fatal error: %s\n") */
-      /* for estrip's benefit: Error(28, 8, "%s fatal error: %s\n") */
+      /* for estrip's benefit: Error(28, 5, "  %6s: fatal error: %s\n") */
+      /* for estrip's benefit: Error(28, 8, "%s: fatal error: %s\n") */
       exit(1);
       break;
 

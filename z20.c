@@ -1,6 +1,6 @@
 /*@z20.c:Galley Flushing:DebugInnersNames()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -219,7 +219,7 @@ void FlushGalley(OBJECT hd)
 
 	case ATTACH_NULL:
 
-	  /* hd will be linked to the unexpanded target in this case */
+	  /* hd will have been linked to the unexpanded target in this case */
 	  remove_target = (actual(actual(dest_index)) == whereto(hd));
           if( force_gall(hd) )
           {

@@ -17,6 +17,7 @@ book. @Index @Code "@Book"
 "    @BeforeTitlePage {}"
 "    @OnTitlePage {}"
 "    @AfterTitlePage {}"
+"    @AtEnd {}"
 "    @InitialFont { Times Base 12p }"
 "    @InitialBreak { adjust 1.2fx hyphen }"
 "    @InitialSpace { lout }"
@@ -53,6 +54,13 @@ The {@Code "@AfterTitlePage"} option will come out on the page
 traditionally put copyright notices, information about production,
 and cataloguing-in-publication data.  If this option is empty or
 omitted, there will be no such pages.
+@PP
+The {@Code "@AtEnd"} option will come out on a single unnumbered page
+with no page headers or footers, and using the same margins as for even
+pages, after the very last page of the book; even after the index if
+there is one.  It is intended to make it possible to include a back
+cover, so @Code "@PageOf last.page" (Section {@NumberOf cross}) does
+not take account of any @Code "@AtEnd" page.
 @PP
 The remaining options are a selection of setup file options (Section
 {@NumberOf setup}) that frequently need to be changed.  If your changes
@@ -141,6 +149,13 @@ numerals; subsequent pages will be numbered in Arabic starting from
 the @Code "@FirstPageNumber" option of {@Code "@Book"}.  There is
 a setup file option for changing this to a single numbering sequence
 (see below).
+@PP
+Next comes an optional abbreviations sections, exactly like the
+preface except that its name is @Code "@Abbreviations" and the
+abbreviations. @Index @Code "@Abbreviations"
+default title in English is Abbreviation.  There is no support for
+what goes inside; you need to use a list or table to lay out the
+abbreviations, in the usual way.
 @PP
 Next comes an optional introduction, exactly like the preface except that
 its name is @Code "@Introduction" and the default title in English is

@@ -16,6 +16,7 @@ file and the @Code "@Report" symbol:
 "    @Author {}"
 "    @Institution {}"
 "    @DateLine { No }"
+"    @AtEnd {}"
 "    @CoverSheet { Yes }"
 "    @ContentsSeparate { No }"
 "    @InitialFont { Times Base 12p }"
@@ -83,6 +84,13 @@ taken to be a date and printed:
 @ID @Code "@DateLine { 4 July, 1776 }"
 A good plan is to use @Code "@DateLine { Yes }" until
 the report is finalized.
+@PP
+The {@Code "@AtEnd"} option will come out on a single unnumbered
+page with no page headers or footers, and using the same margins as for
+even pages, after the very last page of the report; even after the
+index if there is one.  It is intended to make it possible to
+include a back cover, so @Code "@PageOf last.page" does not take
+account of any @Code "@AtEnd" page.
 @PP
 The remaining options (except {@Code "@Abstract"}) are setup file options
 (Section {@NumberOf setup}) that frequently need to be changed.  If your

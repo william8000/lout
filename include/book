@@ -3,7 +3,7 @@
 #   Lout setup file for books                                                 #
 #                                                                             #
 #   Jeffrey H. Kingston                                                       #
-#   5 February 1999                                                           #
+#   17 September 1999                                                         #
 #                                                                             #
 ###############################################################################
 
@@ -304,6 +304,7 @@
   # @SubSubSectionGap		{ 1.5v	@OrIfPlain 2f	} # between sub-subs.
   # @SubAppendixGap		{ 2.0v	@OrIfPlain 3f	} # between subappendices
   # @SubSubAppendixGap		{ 1.5v	@OrIfPlain 2f	} # between sub-subapps
+  # @AbbreviationsInContents	{ Yes		} # add abbreviations to contents
   # @IntroductionInContents	{ Yes		} # add introduction to contents
   # @PartInContents		{ Yes		} # add parts to contents
   # @ChapterInContents		{ Yes		} # add chapters to contents
@@ -355,6 +356,7 @@
   # @ContentsPrefix		{		} # for structured page nums
   # @FigureContentsPrefix	{		} # for structured page nums
   # @TableContentsPrefix	{		} # for structured page nums
+  # @AbbreviationsPrefix	{		} # for structured page nums
   # @IntroductionPrefix		{		} # for structured page nums
   # @ChapterPrefix		{		} # for structured page nums
   # @AppendixPrefix		{		} # for structured page nums

@@ -363,6 +363,26 @@
   }
 }
 
+{ abbreviations @Word @CurrLang @Case {
+    Czech	@Yield { ?? }
+    Danish	@Yield { ?? }
+    Dutch       @Yield { ?? }
+    English	@Yield { Abbreviations }
+    EnglishUK	@Yield { Abbreviations }
+    Finnish	@Yield { ?? }
+    French	@Yield { ?? }
+    German	@Yield { ?? }
+    Hungarian	@Yield { ?? }
+    Italian	@Yield { ?? }
+    Norwegian   @Yield { ?? }
+    Polish	@Yield { ?? }
+    Russian	@Yield { ?? }
+    Slovenian   @Yield { ?? }
+    Spanish	@Yield { ?? }
+    Swedish	@Yield { ?? }
+  }
+}
+
 { introduction @Word @CurrLang @Case {
     Czech	@Yield { {@Char Uacute}vod }
     Danish	@Yield { Indledning }

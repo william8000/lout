@@ -1,6 +1,6 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -38,10 +38,10 @@
 
 /*****************************************************************************/
 /*                                                                           */
-/*  LINE *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, *nel) */
+/*  LINE *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, *len) */
 /*                                                                           */
 /*  Read all of the lines of fp into memory and return a null-terminated     */
-/*  array of pointers to these lines, and set *nel to the number of lines.   */
+/*  array of pointers to these lines, and set *len to the number of lines.   */
 /*  Make sure the lines themselves are null-terminated, also.                */
 /*                                                                           */
 /*  fname is the name of the file being sorted, and is used for error        */

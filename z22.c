@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -903,12 +903,14 @@ OBJECT relocate_link, OBJECT sym)
 	    FALSE, TRUE, FALSE)) != nilobj )
 	{
 	  if( opt_components(z) != nilobj )  GazumpOptimize(z, actual(y));
+	  debug2(DGA, D, "  FreeGalley relocating %s to just before %s",
+	    SymName(actual(z)), SymName(whereto(z)));
 	  DetachGalley(z);
 	  Parent(index, Up(z));
 	  MoveLink(Up(index), Up(srch), PARENT);  /* just before new dest */
 	}
 	else
-	{ debug0(DGA, D, "  calling FreeGalley from FreeGalley");
+	{ debug1(DGA, D, "  FreeGalley freeing galley %s", SymName(actual(z)));
 	  FreeGalley(z, z, inners, nilobj, sym);
 	  if( *inners == nilobj )  New(*inners, ACAT);
 	  Link(*inners, y);

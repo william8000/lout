@@ -242,6 +242,7 @@ def @ReportSetup
         named @DateLine { @DateLine }
         named @CoverSheet { @CoverSheet }
         named @ContentsSeparate { @ContentsSeparate }
+        named @AtEnd { dft }
         named @InitialFont { @InitialFont }
         named @InitialBreak { @InitialBreak }
         named @InitialSpace { @InitialSpace }
@@ -527,6 +528,11 @@ def @ReportSetup
 			    @AtTop { @TitleMaterial }
 			    @FirstPageNumber
 		    //	NonStart @Runner
+		    //  @AtEnd @Case {
+			    dft @Yield @Null
+			    else @Yield
+				 @EvenPage @Orient { @PageOrientation } @AtEnd
+			}
 		}
 
 		Yes @Yield {
@@ -550,6 +556,11 @@ def @ReportSetup
 			    @FirstPageNumber
 		    //	@ReportBodyWithCoverSheet
 		    //	NonStart @Runner
+		    //  @AtEnd @Case {
+			    dft @Yield @Null
+			    else @Yield
+				 @EvenPage @Orient { @PageOrientation } @AtEnd
+			}
 		}
 	    }
         }

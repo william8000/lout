@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.16 (May 1999)")
+#define	LOUT_VERSION    AsciiToFull("Basser Lout Version 3.17 (September 1999)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -896,6 +896,548 @@ typedef union
 /*                                                                           */
 /*  typedef OBJECT - the general-purpose record used throughout Lout.        */
 /*                                                                           */
+/*  This record is a complex union type.  Which fields are defined in any    */
+/*  given record depends on its type() tag field, as follows.  But first     */
+/*  we define some collections of fields that are commonly defined together. */
+/*                                                                           */
+/*  ALL - these fields are defined in all objects.  They won't be mentioned  */
+/*        again, but they are always there.                                  */
+/*                                                                           */
+/*      type            Tag field for the record                             */
+/*      rec_size        Size of this record, in words (for memory allocator) */
+/*      succ            Next element on list of parents, children            */
+/*      pred            Previous element on list of parents, children        */
+/*      fpos            Position in input file which gave rise to this       */
+/*                      object (could be null; overwritten by word_save_mark */
+/*                      locally in FixAndPrintOjbect).  It sub-fields are:   */
+/*                                                                           */
+/*                          file_num   internal file number                  */
+/*                          line_num   line number in that file              */
+/*                          col_num    column number on that line            */
+/*                                                                           */
+/*                      Lout attempts to put a meaningful fpos into every    */
+/*                      object, so that error messages related to that       */
+/*                      object can have meaningful line numbers.  This has   */
+/*                      not been done in every case; it ought to be.         */
+/*                                                                           */
+/*  TOKEN - these fields are defined for all objects that are input tokens,  */
+/*          They may be overwritten after parsing is completed.              */
+/*                                                                           */
+/*      precedence      Precedence of this token (0 if has no parameters)    */
+/*      hspace          Horizontal space preceding this token                */
+/*      vspace          Vertical space preceding this token                  */
+/*                                                                           */
+/*  SIZED - these fields are defined for all objects that represent Lout     */
+/*          objects and hence have a horizontal and vertical size.  They     */
+/*          will be undefined until after MinSize() is called on the object, */
+/*          and defined thereafter.                                          */
+/*                                                                           */
+/*      back[COLM]      Horizontal size to left of object's mark             */
+/*      fwd[COLM]       Horizontal size to right of object's mark            */
+/*      back[ROWM]      Vertical size above object's mark                    */
+/*      fwd[ROWM]       Vertical size below object's mark                    */
+/*                                                                           */
+/*  GAP - a gap between two Lout objects.                                    */
+/*                                                                           */
+/*      nobreak         TRUE if gap is unbreakable (has u tag)               */
+/*      mark            TRUE if gap is marked (has ^ tag)                    */
+/*      join            TRUE if a mark-joining gap (e.g. | not ||)           */
+/*      units           units of measurement (fixed, or r or d etc)          */
+/*      mode            gap mode (mark-to-mark, etc.)                        */
+/*      width           width of gap in the given units                      */
+/*                                                                           */
+/*  STYLE - the style (attributes affecting the appearance) of an object.    */
+/*                                                                           */
+/*      line_gap        How much to separate lines by                        */
+/*      vadjust         TRUE when @VAdjust is in effect                      */
+/*      hadjust         TRUE when @HAdjust is in effect                      */
+/*      padjust         TRUE when @PAdjust is in effect                      */
+/*      small_caps      TRUE when small capitals wanted                      */
+/*      space_style     Spacing style (lout, troff etc. from @Space)         */
+/*      space_gap       Object separation given a white space, i.e. "1s"     */
+/*      hyph_style      Hyphenation (undefined, off, on)                     */
+/*      fill_style      Fill lines (undefined, off, on)                      */
+/*      display_style   Display style for lines (adjust, centre, etc.)       */
+/*      yunit           Value of y unit of measurement                       */
+/*      zunit           Value of z unit of measurement                       */
+/*      font            Which internal font (including size) to use          */
+/*      colour          Which internal colour to use                         */
+/*      language        Which internal language to use                       */
+/*      nobreakfirst    TRUE if break not allowed after first line of para   */
+/*      nobreaklastt    TRUE if break not allowed before last line of para   */
+/*                                                                           */
+/*  CONSTRAINT - a constraint on how large some object is allowed to be,     */
+/*               either horizontally or vertically                           */
+/*                                                                           */
+/*      bc              how large back may be (MAX_FULL_LEN if infinite)     */
+/*      fc              how large fwd may be (MAX_FULL_LEN if infinite)      */
+/*      bfc             how large back + fwd may be (MAX_FULL_LEN if inf.)   */
+/*                                                                           */
+/*                                                                           */
+/*  Here now is the list of all object types, what they represent, and       */
+/*  what fields they contain.  The list also indicates what children each    */
+/*  object of the given type can expect to have.                             */
+/*                                                                           */
+/*  LINK - one link in the directed acyclic graph which is Lout's universal  */
+/*         internal data structure.  All the other types below are various   */
+/*         types of nodes.  Has ALL only (and no fpos) except see CROSS_SYM  */
+/*                                                                           */
+/*  GAP_OBJ - a gap between two Lout objects                                 */
+/*                                                                           */
+/*      gap             The gap itself (type GAP)                            */
+/*      underline       TRUE if continuous underlining crosses this gap      */
+/*      save_*          These fields used by optimum paragraph breaker only  */
+/*      first child     If the gap is not just white space, the gap object   */
+/*                                                                           */
+/*  CLOSURE - an invocation of a user-defined symbol, not yet expanded       */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           After sizing if indefinite (the sizes will be zero)  */
+/*      save_style      Style to print this invocation in when expanded      */
+/*      actual          The symbol table record defining this symbol         */
+/*      threaded        TRUE if symbol lies on a vertical thread             */
+/*      external_ver    TRUE if symbol is external in a vertical galley      */
+/*      external_hor    TRUE if symbol is external in a horizontal galley    */
+/*      children        PAR objects whose children are the actual parameters */
+/*                                                                           */
+/*  UNDER_REC - a temporary object inserted by FixAndPrintObject to help     */
+/*              with working out continuous underlining                      */
+/*                                                                           */
+/*      back(COLM)      Horizontal position of start of underline            */
+/*      fwd(COLM)       Horizontal position of end of underline              */
+/*      back(ROWM)      [type clash] font determining underline appearance   */
+/*                                                                           */
+/*  PAGE_LABEL - a @PageLabel object                                         */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           Indefinite, so all sizes will be zero                */
+/*      first child     The parameter of the @PageLabel object               */
+/*                                                                           */
+/*  NULL_CLOS - a @Null object                                               */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           Indefinite, so all sizes will be zero                */
+/*                                                                           */
+/*  CROSS, FORCE_CROSS - a cross reference (or forcing cross reference) obj  */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           Indefinite, so all sizes will be zero                */
+/*      cross_type      Type of cross reference (preceding, following, etc.) */
+/*      children        The two parameters of the cross reference            */
+/*                                                                           */
+/*  HEAD - the header record for a galley invocation                         */
+/*                                                                           */
+/*      force_gall      TRUE if this is a forcing galley (i.e. "force into") */
+/*      actual          The symbol table record defining this galley         */
+/*      enclose_obj     If galley has @Enclose, the enclose object           */
+/*      limiter         Helps decide whether to break off or scale if stuck  */
+/*      opt_components  If optimizing, the sequence of components            */
+/*      opt_constraints If optimizing, the sequence of size constraints      */
+/*      opt_counts      If optimizing, the sequence of numbers of components */
+/*                      In each child of opt_counts, comp_count has the num  */
+/*      opt_comps_permitted number of components left before opt break       */
+/*      opt_hyph        If optimizing, whether to hyphenate the galley       */
+/*      opt_gazumped    If optimizing, galley has been gazumped recently     */
+/*      gall_dir        Promotion direction (COLM for horizontal galleys)    */
+/*      ready_galls     Galleys read in from cross reference database        */
+/*      must_expand     TRUE if must expand galley object even if indefinite */
+/*      sized           TRUE after galley object has been sized              */
+/*      foll_or_prec    Direction of search for target (forward, back, etc.) */
+/*      whereto         Symbol this galley is targeted at                    */
+/*      seen_nojoin     TRUE if // op found within galley anywhere           */
+/*                                                                           */
+/*  SPLIT - a split object, used for building tables                         */
+/*                                                                           */
+/*      SIZED           The size of the whole object                         */
+/*      first child     An object whose horizontal size is the overall size  */
+/*      second child    An object whose vertical size is the overall size    */
+/*                                                                           */
+/*  PAR - actual parameter of a symbol invocation (always child of CLOSURE)  */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      actual          The symbol table record defining this parameter      */
+/*      first child     A Lout object, the value of this parameter           */
+/*                                                                           */
+/*  WORD, QWORD - a literal word, or a literal word entered in quotes ""     */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the word                                 */
+/*      word_font       Font to print this word in (from style)              */
+/*      word_colour     Colour to print this word in (from style)            */
+/*      word_language   Language (for hyphenation) of this word (from style) */
+/*      underline       TRUE if continuous underlining goes under this word  */
+/*      word_hyph       Hyphenation wanted for this word (from style)        */
+/*      word_save_mark  Coord of column mark, temporarily in FixAndPrint     */
+/*      string[]        The characters of the word, null-terminated          */
+/*                                                                           */
+/*  WORD, QWORD when used as database header records                         */
+/*                                                                           */
+/*      string[]        Database index file name                             */
+/*      reading         TRUE if this database can be read from               */
+/*      in_memory       TRUE if this database's index is held in memory      */
+/*      db_filep        Pointer to database file (if not in_memory)          */
+/*      left_pos        Seek pos of 1st entry in db_filep (if not in_memory) */
+/*      db_lines        Pointer to database index lines (if in_memory)       */
+/*      db_lineslen     Number of database index lines (if in_memory)        */
+/*      first child     List of symbols held in this database                */
+/*      other children  CROSS_SYM symbols of symbols in this database        */
+/*                      The *links* to these have the following fields:      */
+/*                          number   An ID number for this sym in this db    */
+/*                          db_targ  TRUE if sym is a galley target          */
+/*                                                                           */
+/*  WORD, QWORD when used as font records                                    */
+/*                                                                           */
+/*      string[]        Font name                                            */
+/*      font_num        The number of this font                              */
+/*      font_page       Number of most recent page using this font           */
+/*      font_size       Size of this font                                    */
+/*      font_xheight2   Half-x height of this font                           */
+/*      font_spacewidth Preferred width of space between words in this font  */
+/*      font_mapping    The mapping to apply with this font                  */
+/*      font_recoded    TRUE if font needs recoding in PostScript output     */
+/*      font_firstpage  TRUE if this font is used on the very first page     */
+/*                                                                           */
+/*  WORD, QWORD when used in hash table to check whether crs defined twice   */
+/*                                                                           */
+/*      db_checksym     Symbol of the cross reference                        */
+/*      string[]        Tag of the cross reference                           */
+/*                                                                           */
+/*  HSPANNER (VSPANNER) - An object that spans columns (rows)                */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      spanner_broken  TRUE after BreakObject() applied to this object      */
+/*      spanner_count   Number of columns (rows) spanned by this spanner     */
+/*      spanner_sized   Number of cols (rows) of this spanner sized so far   */
+/*      first child     The object that is doing the spanning                */
+/*                                                                           */
+/*  COL_THR (ROW_THR) - object representing all objects on a col (row) mark  */
+/*                                                                           */
+/*      SIZED           The horizontal (vertical) size only                  */
+/*      thr_state       Tells whether thread is sized or not yet             */
+/*      children        The objects on the mark                              */
+/*      parents         The parents of the children (one-to-one)             */
+/*                                                                           */
+/*  ACAT - a paragraph (sequence of objects separated by & or white space)   */
+/*                                                                           */
+/*      SIZED           The size of the object                               */
+/*      save_style      The style to print this paragraph in                 */
+/*      children        The paragraph's objects and gaps (obj-gap-obj...obj) */
+/*                                                                           */
+/*  HCAT (VCAT) - a horizontal (vertical) sequence of objects                */
+/*                                                                           */
+/*      SIZED           The size of the object                               */
+/*      save_style      The style to print this object in                    */
+/*      children        The objects and gaps (obj-gap-obj...obj)             */
+/*      adjust_cat      Whether to perform adjustment (@VAdjust, etc.)       */
+/*                                                                           */
+/*  WIDE (HIGH) - @Wide (@High) object                                       */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      constraint      The horizontal (vertical) size constraint            */
+/*      first child     The right parameter of this symbol                   */
+/*                                                                           */
+/*  HSHIFT (VSHIFT) - @HShift (@VShift) object                               */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      shift_type      left, right etc.                                     */
+/*      shift_gap       The amount to shift                                  */
+/*      first child     The right parameter of this symbol                   */
+/*                                                                           */
+/*  HSCALE (VSCALE) - @HScale (@VScale) object                               */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      save_mark       used temporarily by FixAndPrintObject                */
+/*      constraint      used temporarily by FixAndPrintObject                */
+/*      first child     The right parameter of this symbol                   */
+/*                                                                           */
+/*  SCALE - @Scale object                                                    */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      bc(constraint)  The horizontal scale factor                          */
+/*      fc(constraint)  The vertical scale factor                            */
+/*      save_mark       used temporarily by FixAndPrintObject                */
+/*      vert_sized      TRUE if vertical size of object is known             */
+/*      first child     The right parameter of this symbol                   */
+/*                                                                           */
+/*  ONE_COL (ONE_ROW) - @OneCol (@OneRow) object                             */
+/*  HCOVER (VCOVER) - @HCover (@VCover) object                               */
+/*  HCONTRACT (VCONTRACT) - @HContract (@VContract) object                   */
+/*  HEXPAND (VEXPAND) - @HExpand (@VExpand) object                           */
+/*  START_HSPAN, START_VSPAN - @StartHSpan, @StartVSpan                      */
+/*  START_HVSPAN - @StartHVSpan                                              */
+/*  HSPAN (VSPAN) - @HSpan (@VSpan) symbols                                  */
+/*  KERN_SHRINK - @KernShrink object                                         */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      first child     The right parameter of this symbol                   */
+/*                                                                           */
+/*  PADJUST (HADJUST, VADJUST) - @PAdjust (@HAdjust, @VAdjust) symbols       */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      first child     The right parameter of this symbol                   */
+/*                                                                           */
+/*  ROTATE - @Rotate symbol                                                  */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      save_mark       used temporarily by FixAndPrintObject                */
+/*      sparec(cons)    Amount to rotate by (after manifesting)              */
+/*      first child     Amount to rotate by (before manifesting)             */
+/*      last child      The right parameter of this symbol                   */
+/*                                                                           */
+/*  BACKGROUND - @Background symbol                                          */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      children        The two parameters of this symbol                    */
+/*                                                                           */
+/*  GRAPHIC, PLAIN_GRAPHIC - @Graphic, @PlainGraphic symbols                 */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      save_mark       used temporarily by FixAndPrintObject                */
+/*      children        The two parameters of this symbol                    */
+/*                                                                           */
+/*  CASE - @Case symbol                                                      */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      first child     The left parameter of @Case                          */
+/*      last child      The right parameter (sequence of @Yield objects)     */
+/*                                                                           */
+/*  VERBATIM (RAWVERBATIM) - @Verbatim (@RawVerbatim) symbol                 */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      first child     The right parameter of this symbol                   */
+/*                                                                           */
+/*  FILTERED - object recording filtered Lout object                         */
+/*                                                                           */
+/*      filter_use_begin TRUE if filter enclosed in @Begin ... @End          */
+/*      filter_actual   The symbol this is an invocation of                  */
+/*      first child     WORD containing file name of filter output           */
+/*                                                                           */
+/*  XCHAR - @Char symbol                                                     */
+/*  NEXT - @Next symbol                                                      */
+/*  ONE_OF - @OneOf symbol                                                   */
+/*  UNDERLINE - @Underline symbol                                            */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      last child      The right parameter of this symbol                   */
+/*                                                                           */
+/*  FONT, SPACE, BREAK - @Font, @Space, @Break symbols                       */
+/*  YUNIT, ZUNIT, COLOUR, LANGUAGE - @YUnit, @ZUnit, @Colour, @Language syms */
+/*  PLUS, MINUS, - @Plus, @Minus symbols                                     */
+/*  MELD, COMMON, RUMP, INSERT - @Meld, @Common, @Rump, @Insert symbols      */
+/*  OPEN, TAGGED - @Open, @Tagged symbols                                    */
+/*  YIELD - @Yield symbol                                                    */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      first child     The left parameter of this symbol                    */
+/*      last child      The right parameter of this symbol                   */
+/*                                                                           */
+/*  ENV_OBJ - a Lout object with environment attached                        */
+/*                                                                           */
+/*      first child     The Lout object                                      */
+/*      last child      Its environment (ENV object)                         */
+/*                                                                           */
+/*  ENV - environment of some Lout object                                    */
+/*                                                                           */
+/*      children        Components of the environment                        */
+/*                                                                           */
+/*  INCGRAPHIC, SINCGRAPHIC - @IncludeGraphic, @SysIncludeGraphic symbols    */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      SIZED           The size of the object                               */
+/*      save_mark       used temporarily by FixAndPrintObject                */
+/*      incgraphic_ok   TRUE if file name pans out OK                        */
+/*      last child      The right parameter of this symbol                   */
+/*                                                                           */
+/*  TSPACE, TJUXTA - tokens representing white space                         */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      mark(gap)       FALSE                                                */
+/*      join(gap)       TRUE                                                 */
+/*                                                                           */
+/*  BEGIN - @Begin symbol                                                    */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*      actual          Symbol this @Begin starts parameter of               */
+/*                                                                           */
+/*  END - @End symbol                                                        */
+/*  LBR, RBR - tokens representing left brace and right brace                */
+/*  USE, NOT_REVEALED - @Use, @NotRevealed symbols                           */
+/*  GSTUB_EXT, GSTUB_INT, GSTUB_NONE - stubs for transferred galleys         */
+/*  UNEXPECTED_EOF - unexpected end of file token                            */
+/*  INCLUDE, SYS_INCLUDE - @Include, @SysInclude symbols                     */
+/*  PREPEND, SYS_PREPEND - @PrependGraphic, @SysPrependGraphic symbols       */
+/*  ENVA, ENVB, ENVC, ENVD - @LEnvA, @LEnvB, @LEnvC, @LEnvD tokens only      */
+/*  CENV, CLOS, LVIS, LUSE, LEO - @LCEnv, @LClos, @LVis, @LUse, @LEO tokens  */
+/*  BACKEND - @BackEnd symbol                                                */
+/*  CURR_LANG, CURR_FAMILY, CURR_FACE - @CurrLang, @CurrFamily, @CurrFace    */
+/*                                                                           */
+/*      TOKEN           While still being parsed                             */
+/*                                                                           */
+/*  DEAD - an index of a dead galley                                         */
+/*                                                                           */
+/*  UNATTACHED - the index of an unattached galley                           */
+/*                                                                           */
+/*      actual          The galley referred to                               */
+/*      non_blocking    TRUE if this index should not block galley flushing  */
+/*      blocked         TRUE if this index is now blocking galley flushing   */
+/*      pinpoint        Exact anchor point of this index                     */
+/*                                                                           */
+/*  RECEPTIVE, RECEIVING - the index of a receptive or receiving object      */
+/*                                                                           */
+/*      actual          The object (symbol invocation) referred to           */
+/*      trigger_externs TRUE is this index's galley has external galleys     */
+/*      non_blocking    TRUE if this index should not block galley flushing  */
+/*      blocked         TRUE if this index is now blocking galley flushing   */
+/*                                                                           */
+/*  RECURSIVE - the index of a recursive but definite object                 */
+/*                                                                           */
+/*      actual          The recursive symbol invocation referred to          */
+/*                                                                           */
+/*  PRECEDES - an index recording a precedes/follows flushing constraint     */
+/*                                                                           */
+/*      first child     Other parent of this is the corresponding FOLLOWS    */
+/*                                                                           */
+/*  FOLLOWS - an index recording a precedes/follows flushing constraint      */
+/*                                                                           */
+/*      blocked         TRUE if this index is now blocking galley flushing   */
+/*      first child     Other parent of this is the corresponding PRECEDES   */
+/*                                                                           */
+/*  CROSS_LIT - not actually an object at all                                */
+/*                                                                           */
+/*  CROSS_PREC, CROSS_FOLL, CROSS_FOLL_OR_PREC - the index of a cross ref    */
+/*                                                                           */
+/*      actual          The cross reference referred to                      */
+/*      underline       TRUE if continuous underline goes through here       */
+/*      first child     Equal to actual                                      */
+/*                                                                           */
+/*  GALL_PREC, GALL_FOLL, GALL_FOLL_OR_PREC - index of a galley              */
+/*                                                                           */
+/*      actual          The galley referred to                               */
+/*      underline       TRUE if continuous underline goes through here       */
+/*      pinpoint        Exact anchor point of this index                     */
+/*                                                                           */
+/*  GALL_TARG - index of the target of a galley                              */
+/*                                                                           */
+/*      actual          The galley target (symbol invocation) referred to    */
+/*      underline       TRUE if continuous underline goes through here       */
+/*                                                                           */
+/*  PAGE_LABEL_IND - the index of a @PageLabel object                        */
+/*                                                                           */
+/*      actual          The @PageLabel object referred to                    */
+/*      underline       TRUE if continuous underline goes through here       */
+/*      first child     Equal to actual                                      */
+/*                                                                           */
+/*  SCALE_IND - the index of a @Scale symbol with empty left parameter       */
+/*  COVER_IND - the index of an @HCover or @VCover object                    */
+/*  EXPAND_IND - the index of an @HExpand or @VExpand object                 */
+/*                                                                           */
+/*      actual          The object referred to                               */
+/*      underline       TRUE if continuous underline goes through here       */
+/*                                                                           */
+/*  THREAD - a sequence of threads (basically local to Manifest)             */
+/*                                                                           */
+/*      children        The threads                                          */
+/*                                                                           */
+/*  CROSS_SYM - a record of the cross reference state of some symbol         */
+/*                                                                           */
+/*      target_state    Whether we currently have a preceding target         */
+/*      target_file     Which file target is written to                      */
+/*      target_val      Value of target (if target_state == SEEN_TARGET)     */
+/*      target_seq      A sequence number                                    */
+/*      target_pos      Seek position of target in target_file               */
+/*      target_lnum     Line number of target in target_file                 */
+/*      gall_seq        Sequence number for galleys targeted to here         */
+/*      symb            The symbol table record of the symbol this is for    */
+/*      gall_tag        I forget!                                            */
+/*      gall_tfile      The most recent cr database file for this sym        */
+/*      children        Cross references and galleys waiting for a target    */
+/*                      These children have the following fields:            */
+/*                                                                           */
+/*                          string[]   The sequence number                   */
+/*                          cs_type    The cross reference type              */
+/*                          cs_fnum    File number where value written       */
+/*                          cs_pos     File seek position                    */
+/*                          cs_lnum    File line number                      */
+/*                                                                           */
+/*  CR_ROOT - all CROSS_SYM objects are children of this singleton           */
+/*                                                                           */
+/*      children        All CROSS_SYM symbols                                */
+/*                                                                           */
+/*  MACRO - a symbol table entry for a symbol which is a macro               */
+/*  LOCAL - a symbol table entry for a symbol which is a local symbol        */
+/*  LPAR - a symbol table entry for a symbol which is a left parameter       */
+/*  RPAR - a symbol table entry for a symbol which is a right parameter      */
+/*  NPAR - a symbol table entry for a symbol which is a named parameter      */
+/*                                                                           */
+/*      enclosing       The symbol that this one is defined within, if any   */
+/*      sym_body        The symbol body (token sequence if MACRO)            */
+/*      base_uses       Local to symbol table, for calculating call graph    */
+/*      uses            Call graph info                                      */
+/*      marker          For call graph calculation                           */
+/*      imports         The import list preceding this symbol, if any        */
+/*      filter          Child @Filter symbol, if any                         */
+/*      use_invocation  A @Use clause containing this symbol, if any         */
+/*      predefined      If predefined symbol, its non-zero enum code         */
+/*      has_compulsory  Number of parameters with "compulsory" tag           */
+/*      uses_count      Number of times this symbol is used                  */
+/*      npar_code       One-letter abbreviation for this NPAR                */
+/*      cross_sym       The CROSS_SYM record for this symbol, if any         */
+/*      recursive       TRUE if symbol is recursive                          */
+/*      has_body        TRUE if symbol has a body parameter                  */
+/*      imports_encl    TRUE if symbol imports the symbol enclosing itself   */
+/*      right_assoc     TRUE if this symbol has "associativity right"        */
+/*      precedence      The precedence of this symbol                        */
+/*      indefinite      TRUE if this symbol is indefinite (e.g. receptive)   */
+/*      recursive       TRUE if symbol is recursive                          */
+/*      is_extern_target   TRUE if symbol is the target of external galley   */
+/*      uses_extern_target TRUE if symbol uses target of an external galley  */
+/*      visible         TRUE if symbol is exported                           */
+/*      uses_galley     TRUE if symbol uses a galley                         */
+/*      horiz_galley    if galley, ROWM if vertical, COLM if horizontal      */
+/*      is_compulsory   TRUE if this is a parameter with "compulsory" tag    */
+/*      dirty           TRUE if must copy this parameter, not link it        */
+/*      has_par         TRUE if this symbol has at least one parameter       */
+/*      has_lpar        TRUE if this symbol has a left parameter             */
+/*      has_rpar        TRUE if this symbol has a right or body parameter    */
+/*      has_target      TRUE if this symbol has a target (is a galley)       */
+/*      force_target    TRUE if this symbol has a forcing target             */
+/*      is_target       TRUE if this symbol is @Target, defining a target    */
+/*      has_tag         TRUE if this symbol has a @Tag parameter             */
+/*      is_tag          TRUE if this symbol is a @Tag parameter              */
+/*      has_key         TRUE if this symbol has a @Key parameter             */
+/*      is_key          TRUE if this symbol is a @Key parameter              */
+/*      has_optimize    TRUE if this symbol has an @Optimize parameter       */
+/*      is_optimize     TRUE if this symbol is an @Optimize parameter        */
+/*      has_merge       TRUE if this symbol has a @Merge parameter           */
+/*      is_merge        TRUE if this symbol is a @Merge parameter            */
+/*      has_enclose     TRUE if this symbol has an @Enclose parameter        */
+/*      is_enclose      TRUE if this symbol is an @Enclose parameter         */
+/*                                                                           */
+/*  EXT_GALL - a record of an external galley, not actually read in yet      */
+/*                                                                           */
+/*      eg_fnum         Number of file read from                             */
+/*      eg_fpos         Position in that file                                */
+/*      eg_lnum         Line number in that file                             */
+/*      eg_cont         Continuation (where to look for next galley)         */
+/*      eg_symbol       The symbol that is the target of this galley         */
+/*      first child     The galley tag                                       */
+/*      second child    The galley sequence string                           */
+/*                                                                           */
+/*  CR_LIST - a list of cross references                                     */
+/*                                                                           */
+/*      children        The cross-references                                 */
+/*                                                                           */
+/*  DISPOSED - a disposed object (available for reallocation)                */
+/*                                                                           */
 /*****************************************************************************/
 
 typedef union rec
@@ -1002,12 +1544,12 @@ typedef union rec
      unsigned char	otype;
      unsigned char	otarget_state;
      FILE_NUM		otarget_file;
-     FILE_NUM		ocr_file;
+     /* FILE_NUM	ocr_file; unused */
      union rec		*otarget_val;
      int		otarget_seq;
      int		otarget_pos;
      int		otarget_lnum;
-     int		ocr_seq;
+     /* int		ocr_seq; unused */
      int		ogall_seq;
      union rec		*osymb;
      union rec		*ogall_tag;
@@ -1184,12 +1726,12 @@ typedef union rec
 
 #define	target_state(x)		(x)->os7.otarget_state
 #define	target_file(x)		(x)->os7.otarget_file
-#define	cr_file(x)		(x)->os7.ocr_file
+/* #define cr_file(x)		(x)->os7.ocr_file unused */
 #define	target_val(x)		(x)->os7.otarget_val
 #define	target_seq(x)		(x)->os7.otarget_seq
 #define	target_pos(x)		(x)->os7.otarget_pos
 #define	target_lnum(x)		(x)->os7.otarget_lnum
-#define	cr_seq(x)		(x)->os7.ocr_seq
+/* #define cr_seq(x)		(x)->os7.ocr_seq unused */
 #define	gall_seq(x)		(x)->os7.ogall_seq
 #define	symb(x)			(x)->os7.osymb
 #define	gall_tag(x)		(x)->os7.ogall_tag
@@ -1316,8 +1858,8 @@ typedef struct mapvec {
 #define	KERN_SHRINK	    31		/* to s   @KernShrink                */
 #define	HCONTRACT	    32		/* to s   @HContract                 */
 #define	VCONTRACT	    33		/* to s   @VContract                 */
-#define	HLIMITED	    34		/* to s   @HContract                 */
-#define	VLIMITED	    35		/* to s   @VContract                 */
+#define	HLIMITED	    34		/* to s   @HLimited                  */
+#define	VLIMITED	    35		/* to s   @VLimited                  */
 #define	HEXPAND		    36		/* to s   @HExpand                   */
 #define	VEXPAND		    37		/* to s   @VExpand                   */
 #define	START_HSPAN	    38		/* to s   @StartHSpan                */
@@ -1391,7 +1933,7 @@ typedef struct mapvec {
 #define	SYS_PREPEND	   106		/*    s   @SysPrepend                */
 #define	DATABASE	   107		/*    s   @Database                  */
 #define	SYS_DATABASE	   108		/*    s   @SysDatabase               */
-#define	START		   109		/*    s   \Start                     */
+/* #define	START		   109	*/	/*    s   \Start                     */
 #define	DEAD		   110		/*   i    a dead galley              */
 #define	UNATTACHED	   111		/*   i    an inner, unsized galley   */
 #define	RECEPTIVE	   112		/*   i    a receptive object index   */

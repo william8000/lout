@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.16)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.17)                       */
 /*  COPYRIGHT (C) 1991, 1999 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.usyd.edu.au)                                */
@@ -275,7 +275,7 @@ FULL_CHAR *Image(unsigned int c)
     case SYS_PREPEND:		return  KW_SYSPREPEND;
     case DATABASE:		return  KW_DATABASE;
     case SYS_DATABASE:		return  KW_SYSDATABASE;
-    case START:	 		return  AsciiToFull("start");
+    /* case START: 		return  AsciiToFull("start"); unused */
 
     case DEAD:			return  AsciiToFull("dead");
     case UNATTACHED:		return  AsciiToFull("unattached");

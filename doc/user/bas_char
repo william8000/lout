@@ -14,11 +14,11 @@ Systems Symbol font, plus the characters {@Char quotesinglbase},
 {@Char quotedblbase}, {@Char ellipsis}, {@Char OE}, {@Char oe},
 {@Char quotedblleft}, {@Char quotedblright}, {@Char fi},
 {@Char fl}, {@Char endash}, {@Char emdash}, {@Char bullet}, {@Char dagger},
-{@Char daggerdbl}, {@Char florin}, and {@Char fraction}.  If it exists
-at all, you will find it here.  ISO-LATIN-2 and Russian characters are
-available separately.  In principle, there is no limit to the characters available,
-but to go beyond those given in this section requires expertise in defining
-encoding vectors and fonts @Cite { $kingston1995lout.expert}.
+{@Char daggerdbl}, {@Char florin}, {@Char fraction}, and @Euro.  If it
+exists at all, you will find it here.  ISO-LATIN-2 and Russian characters
+are available separately.  In principle, there is no limit to the characters
+available, but to go beyond those given in this section requires expertise
+in defining encoding vectors and fonts @Cite { $kingston1995lout.expert}.
 @PP
 First up we have the characters that you get simply by typing
 them.  The characters themselves are shown at the left, and what you
@@ -151,6 +151,8 @@ sufficiently important to deserve their own symbols:
     @Rowa
 	A { @TradeMark	trademark @Index @Code "@TradeMark" }
 	B { "@TradeMark"}
+	C { @Euro	euro @Index @Code "@Euro" }
+	D { "@Euro"}
 }
 Next we have the complete ISO-LATIN-1 character set, whose members you
 iso.latin.1 @Index { ISO-LATIN-1 character set }
