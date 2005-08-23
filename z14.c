@@ -1,7 +1,7 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -234,7 +234,8 @@ typedef struct {
 	  }								\
 									\
 	  mode(gap(newg)) = ADD_HYPH;					\
-	  I.nat_width += size(hyph_word, COLM);				\
+	  if( !marginkerning(save_style(x)) )				\
+	    I.nat_width += size(hyph_word, COLM);			\
 	  debug0(DOF, DDD, "   adding hyph_word from nat_width");	\
         }								\
       }									\
@@ -317,7 +318,9 @@ typedef struct {
     /* if hyphenation case, must take away width of hyph_word */	\
     /* and increase the badness to discourage breaks at this point */	\
     if( mode(gap(g)) == ADD_HYPH )					\
-    { I.nat_width -= size(hyph_word,COLM);				\
+    {									\
+      if( !marginkerning(save_style(x)) )				\
+	I.nat_width -= size(hyph_word,COLM);				\
       save_badness(g) += HYPH_BAD_INCR;					\
       debug0(DOF, DDD, "   subtracting hyph_word from nat_width");	\
     }									\
@@ -494,6 +497,248 @@ static FULL_CHAR *IntervalPrint(INTERVAL I, OBJECT x)
   return res;
 } /* end IntervalPrint */
 #endif
+
+/*****************************************************************************/
+/*                                                                           */
+/*  BOOLEAN SmallGlyphHeight(FONT_NUM fnum, FULL_CHAR chr)                   */
+/*                                                                           */
+/*  Part of margin kerning, contributed by Ludovic Courtes.                  */
+/*                                                                           */
+/*  Return true if CHAR's glyph height in font FONTNUM is "small".  A        */
+/*  glyph's height is considered small when it is lower than or equal to     */
+/*  three fourth of the height of the glyph for `x'.  Initially, I           */
+/*  considered that anything strictly smaller than `x' would be enough,      */
+/*  but some fonts (namely Palatino) have a glyph for `v' which is           */
+/*  slightly smaller than that for `x', hence weird results.                 */
+/*                                                                           */
+/*****************************************************************************/
+
+#define SmallGlyphHeight(fnum, chr)			             \
+(FontGlyphHeight((fnum), (chr)) <= (3*(FontGlyphHeight((fnum), 'x') >> 2)))
+
+
+/*@KernWordLeftMargin ()@*****************************************************/
+/*                                                                           */
+/*  Part of margin kerning, contributed by Ludovic Courtes                   */
+/*                                                                           */
+/*  Perform left margin kerning of word FIRST_ON_LINE, whose parent is       */
+/*  PARENT.  If FIRST_ON_LINE's first glyph(s) deserve margin kerning, then  */
+/*  a new word object containing this/these glyph(s) is prepended to         */
+/*  FIRST_ON_LINE in PARENT.                                                 */
+/*                                                                           */
+/*****************************************************************************/
+
+static void KernWordLeftMargin(OBJECT first_on_line, OBJECT parent)
+{
+  /* It's a word: look at its first characters' glyph height.  */
+  FONT_NUM font;
+  FULL_CHAR *word_content, *wordp;
+  FULL_CHAR kerned_glyphs[20];
+  FULL_LENGTH kerned_glyphs_width = 0;
+  unsigned kerned_glyph_count = 0, word_len;
+
+  assert( is_word( type(first_on_line) ), "KernWordLeftMargin");
+
+  font = word_font(first_on_line);
+  word_content = string(first_on_line);
+  word_len = StringLength(word_content);
+
+  if(font >= 1)
+  {
+    /* Determine how many subsequent characters beginning WORD_CONTENT
+       deserve margin kerning.  Glyphs wider than the glyph for `x' will
+       _not_ be kerned at all, and only up to the width of the glyph for `x'
+       can be protruded in other cases.  */
+    FULL_LENGTH x_width = FontGlyphWidth(font, 'x');
+
+    for(wordp = word_content;
+       (*wordp) && (SmallGlyphHeight(font, *wordp));
+       wordp++, kerned_glyph_count++)
+    {
+      FULL_LENGTH glyph_width;
+
+      glyph_width = FontGlyphWidth(font, *wordp);
+      if(kerned_glyphs_width + glyph_width > x_width)
+       break;
+      if(kerned_glyph_count >= sizeof(kerned_glyphs))
+       break;
+
+      kerned_glyphs_width += glyph_width;
+      kerned_glyphs[kerned_glyph_count] = *wordp;
+    }
+
+    kerned_glyphs[kerned_glyph_count] = '\0';
+  }
+
+  if(kerned_glyph_count > 0)
+  { OBJECT z;
+    FULL_CHAR *unacc = NULL;
+    FULL_LENGTH glyph_width;
+
+    debug2(DOF, DD, "   margin-kerning %u glyph from "
+          "word \"%s\" (left margin)",
+          kerned_glyph_count, word_content);
+
+    /* Get font information.  */
+    if(finfo[font].font_table)
+    {
+      MAPPING m;
+      m = font_mapping(finfo[font].font_table);
+      unacc = MapTable[m]->map[MAP_UNACCENTED];
+    }
+
+    /* Add the first characters.  */
+    z = MakeWord(WORD, kerned_glyphs, &fpos(first_on_line));
+    word_font(z) = word_font(first_on_line);
+    word_colour(z) = word_colour(first_on_line);
+    word_texture(z) = word_texture(first_on_line);
+    word_outline(z) = word_outline(first_on_line);
+    word_language(z) = word_language(first_on_line);
+    word_baselinemark(z) = word_baselinemark(first_on_line);
+    word_ligatures(z) = word_ligatures(first_on_line);
+    word_hyph(z) = hyph_style(save_style(z)) == HYPH_ON;
+    underline(z) = underline(first_on_line);
+    FontWordSize(z);
+
+    /* Make it zero-width.
+       FIXME:  This awful trick allows Z to expand outside of the
+       paragraph itself while still appearing as having a null
+       width.  */
+    glyph_width = size(z, COLM);
+    back(z, COLM) = -glyph_width;
+    fwd(z, COLM) = glyph_width;
+    Link(parent, z);
+
+    /* Add a zero-width gap object.  */
+    New(z, GAP_OBJ);
+    vspace(z) = 0;
+    if ((word_content[kerned_glyph_count]) && (unacc))
+      hspace(z) = FontKernLength(font, unacc,
+                                word_content[kerned_glyph_count - 1],
+                                word_content[kerned_glyph_count]);
+    else
+      hspace(z) = 0;
+    underline(z) = underline(first_on_line);
+    SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
+    Link(parent, z);
+
+    /* Remove the first char from FIRST_ON_LINE and recompute its size.  */
+    {
+      unsigned s;
+      for (s = 0; s < word_len - kerned_glyph_count; s++)
+       word_content[s] = word_content[s + kerned_glyph_count];
+      word_content[word_len - kerned_glyph_count] = '\0';
+    }
+    FontWordSize(first_on_line);
+  }
+}
+
+
+/*@KernWordRightMargin ()@****************************************************/
+/*                                                                           */
+/*  Perform right margin kerning of word LAST_ON_LINE, whose parent is       */
+/*  PARENT.  If LAST_ON_LINE's first glyph(s) deserve margin kerning, then   */
+/*  a new word object containing this/these glyph(s) is prepended to         */
+/*  LAST_ON_LINE in PARENT.                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+static void KernWordRightMargin(OBJECT last_on_line, OBJECT parent)
+{
+  FONT_NUM  font;
+  FULL_CHAR *word_content, *wordp;
+  FULL_CHAR kerned_glyphs[20];
+  FULL_LENGTH kerned_glyphs_width = 0;
+  unsigned kerned_glyph_count = 0, word_len;
+
+  assert( is_word( type(last_on_line) ), "KernWordRightMargin");
+
+  font = word_font(last_on_line);
+  word_content = string(last_on_line);
+  word_len = StringLength(word_content);
+
+  if(font >= 1)
+  {
+    /* Determine how many subsequent characters ending WORD_CONTENT deserve
+       margin kerning.  Glyphs wider than the glyph for `x' will _not_ be
+       kerned at all, and only up to the width of the glyph for `x' can be
+       protruded in other cases.  */
+    FULL_LENGTH x_width = FontGlyphWidth(font, 'x');
+
+    for(wordp = &word_content[word_len - 1];
+       (wordp >= word_content) && (SmallGlyphHeight(font, *wordp));
+       wordp--, kerned_glyph_count++)
+    {
+      FULL_LENGTH glyph_width;
+
+      glyph_width = FontGlyphWidth(font, *wordp);
+      if(kerned_glyphs_width + glyph_width > x_width)
+       break;
+      if(kerned_glyph_count >= sizeof(kerned_glyphs))
+       break;
+
+      kerned_glyphs_width += glyph_width;
+      kerned_glyphs[kerned_glyph_count] = *wordp;
+    }
+
+    kerned_glyphs[kerned_glyph_count] = '\0';
+  }
+
+  if(kerned_glyph_count > 0)
+  { OBJECT z;
+    FULL_CHAR *unacc = NULL;
+
+    /* Get font information.  */
+    if (finfo[font].font_table)
+    {
+      MAPPING m;
+      m = font_mapping(finfo[font].font_table);
+      unacc = MapTable[m]->map[MAP_UNACCENTED];
+    }
+
+    debug2(DOF, DD, "   margin-kerning %u glyph from "
+          "word \"%s\" (right margin)",
+          kerned_glyph_count, word_content);
+
+    /* Add a zero-width gap object.  */
+    New(z, GAP_OBJ);
+    vspace(z) = 0;
+    if((word_len > 1) && (unacc))
+      hspace(z) = FontKernLength(font, unacc,
+                                word_content[word_len - kerned_glyph_count - 1],
+                                word_content[word_len - kerned_glyph_count]);
+    else
+      hspace(z) = 0;
+    underline(z) = underline(last_on_line);
+    SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
+    Link(parent, z);
+
+    /* Add the last characters.  */
+    z = MakeWord(WORD, &word_content[word_len - kerned_glyph_count],
+                &fpos(last_on_line));
+    word_font(z) = word_font(last_on_line);
+    word_colour(z) = word_colour(last_on_line);
+    word_texture(z) = word_texture(last_on_line);
+    word_outline(z) = word_outline(last_on_line);
+    word_language(z) = word_language(last_on_line);
+    word_baselinemark(z) = word_baselinemark(last_on_line);
+    word_ligatures(z) = word_ligatures(last_on_line);
+    word_hyph(z) = hyph_style(save_style(last_on_line)) == HYPH_ON;
+    underline(z) = underline(last_on_line);
+
+    FontWordSize(z);
+
+    /* Make it zero-width.  */
+    fwd(z, COLM) = 0;
+    back(z, COLM) = 0;
+
+    /* Remove the last char from LAST_ON_LINE and recompute its size.  */
+    word_content[word_len - kerned_glyph_count] = '\0';
+    FontWordSize(last_on_line);
+
+    Link(parent, z);
+  }
+}
 
 
 /*@::FillObject()@************************************************************/
@@ -748,6 +993,19 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       back(y, COLM) = 0;
       fwd(y, COLM) = max_width;
 
+      if( marginkerning(save_style(x)) )
+      {
+       /* Margin kerning: look at this line's first character.  */
+       OBJECT first_on_line, parent;
+
+       /* Get the first object on this line.  */
+       parent = NextDown(llink);
+       Child(first_on_line, parent);
+
+       if( is_word( type(first_on_line) ) )
+         KernWordLeftMargin(first_on_line, parent);
+      }
+
       /* if outdented paragraphs, add 2.0f @Wide & to front of new line */
       if( display_style(save_style(x)) == DISPLAY_OUTDENT ||
           display_style(save_style(x)) == DISPLAY_ORAGGED )
@@ -784,17 +1042,38 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       Child(lgap, llink);
       if( mode(gap(lgap)) == ADD_HYPH )
       { OBJECT z, tmp;
+	FONT_NUM font;
+        FULL_CHAR *unacc = NULL, *word_content;
+        unsigned word_len;
 
 	/* find word hyphen attaches to, since need its underline and font */
 	Child(tmp, PrevDown(LastDown(x)));  /* last is lgap, so one before */
 	debug2(DOF, D, "tmp = %s %s", Image(type(tmp)), EchoObject(tmp));
 	assert(is_word(type(tmp)), "FillObject: !is_word(type(tmp))!");
+	word_content = string(tmp);
+        word_len = StringLength(word_content);
+
+        /* get font information */
+        font = word_font(tmp);
+        if (finfo[font].font_table)
+	{
+	  MAPPING m;
+	  m = font_mapping(finfo[font].font_table);
+	  unacc = MapTable[m]->map[MAP_UNACCENTED];
+	}
 
 	/* add zero-width gap object */
         New(z, GAP_OBJ);
 	debug0(DOF, DD, "   adding hyphen");
 	debug0(DOF, DD, "");
 	hspace(z) = vspace(z) = 0;
+	vspace(z) = 0;
+	if (unacc)
+          hspace(z) =
+	    FontKernLength(font, unacc, word_content[word_len - 1], CH_HYPHEN);
+        else
+          hspace(z) = 0;
+
 	underline(z) = underline(tmp);
 	SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
 	Link(x, z);
@@ -811,7 +1090,23 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
 	underline(z) = underline(tmp);
 	FontWordSize(z);
+	if( marginkerning(save_style(x)) )
+        {
+          /* Margin kerning: set the hyphen's width to zero.  */
+          back(z, COLM) = 0;
+          fwd(z, COLM) = 0;
+        }
 	Link(x, z);
+      }
+      else if( marginkerning(save_style(x)) )
+      {
+        /* Margin kerning: look at the height of this line's last char.  */
+        OBJECT last_on_line;
+
+        /* Get the last object on this line.  */
+        Child(last_on_line, PrevDown(LastDown(x)));
+        if( is_word(type(last_on_line)) )
+          KernWordRightMargin(last_on_line, x);
       }
 
       /* attach y to res, recycle lgap for gap separating the two lines */

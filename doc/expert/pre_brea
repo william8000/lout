@@ -144,9 +144,10 @@ last lines of the paragraphs of {@I object}.
 These options work by adding the @Code "u" (unbreakable) suffix to the
 appropriate gaps during paragraph breaking, so their precise effect is
 as described for this suffix.  These options may be countermanded by
-@Code "breakablefirst @Break" and @Code "breakablelast @Break".  The
-width of the outdenting used in the @Code "outdent" style may be changed
-like this:
+@Code "breakablefirst @Break" and @Code "breakablelast @Break".
+@PP
+The width of the outdenting used in the @Code "outdent" style may be
+changed like this:
 @IL
 
 @LI {
@@ -158,6 +159,9 @@ switch to outdenting style.  The width may be preceded by @Code "+" or
 }
 
 @EL
+Margin kerning, in which small (usually punctuation) characters protrude
+into the margin, may be obtained by @Code "marginkerning @Break" and turned
+off by @Code { "nomarginkerning @Break" }.
 @PP
 Several options may be given to the @@Break symbol simultaneously, in
 any order.  For example,

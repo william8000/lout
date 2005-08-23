@@ -381,6 +381,7 @@ symbol whose options control the appearance of features specific to books
 "    # @ChapterHeadingFormat { number @DotSep title }"
 "    # @AboveChapterGap { 3.00f }"
 "    # @ChapterInContents { Yes }"
+"    # @ChapterContentsIndent { 0f }"
 "}"
 }
 This is just a representative sample of these options.  Section
@@ -492,4 +493,10 @@ much space is left before each one.
 the table of contents for each chapter; it may be @Code Yes or {@Code No},
 but would always be {@Code Yes}.  The default value of the corresponding
 options for sub-subsections and sub-subappendices, however, is {@Code No}.
+@Code "@ChapterContentsIndent" determines how far from the left margin
+the contents entry is indented if it is printed at all.  The default
+value shown above causes no indenting; but the default values for
+the corresponding @Code "@SectionrContentsIndent" and
+@Code "@SubSectionrContentsIndent" symbols are @Code 3f and @Code 6f
+respectively, producing the familiar indenting structure.
 @End @Section

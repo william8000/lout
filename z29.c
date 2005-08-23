@@ -1,7 +1,7 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -467,7 +467,7 @@ unsigned xpredefined, OBJECT xenclosing, OBJECT xbody)
   len = StringLength(str);
   hash(str, len, sum);
 
-  ifdebug(DST, DD, sym_spread[sum]++;  sym_count++);
+  ifdebug(DST, D, sym_spread[sum]++;  sym_count++);
   entry = (OBJECT) &symtab[sum];
   for( plink = Down(entry);  plink != entry;  plink = NextDown(plink) )
   { Child(p, plink);
@@ -523,7 +523,7 @@ void InsertAlternativeName(FULL_CHAR *str, OBJECT s, FILE_POS *xfpos)
   len = StringLength(str);
   hash(str, len, sum);
 
-  ifdebug(DST, DD, sym_spread[sum]++;  sym_count++);
+  ifdebug(DST, D, sym_spread[sum]++;  sym_count++);
   entry = (OBJECT) &symtab[sum];
   for( plink = Down(entry);  plink != entry;  plink = NextDown(plink) )
   { Child(p, plink);
@@ -716,7 +716,7 @@ OBJECT ChildSymWithCode(OBJECT s, unsigned char code)
 
 void CheckSymSpread(void)
 { int i, j, sum, usum;  OBJECT entry, plink;
-  debug2(DST, DD, "Symbol table spread (table size = %d, symbols = %d):",
+  fprintf(stderr, "Symbol table spread (table size = %d, symbols = %d):",
     MAX_TAB, sym_count);
   usum = sum = 0;
   for( i = 0;  i < MAX_TAB;  i++ )

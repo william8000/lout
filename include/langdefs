@@ -4,6 +4,7 @@ langdef Danish Dansk da				{ danish	. : ! ? .) ?) !) .' !' ?' }
 langdef Dutch Nederlands nl			{ dutch		. : ! ? .) ?) !) .' !' ?' }
 langdef English en				{ english	. : ! ? .) ?) !) .' !' ?' }
 langdef EnglishUK "en-GB"			{ engluk	. : ! ? .) ?) !) .' !' ?' }
+langdef Esperanto eo				{ esperanto	. : ! ? .) ?) !) .' !' ?' }
 langdef Finnish Suomi fi			{ finnish				  }
 langdef French Francais "Fran\347ais" fr	{ french				  }
 langdef German Deutsch de			{ german				  }

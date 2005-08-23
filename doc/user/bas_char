@@ -85,8 +85,8 @@ or not, inside one pair of double quotes:
     A { "\"@PP\"" }
     B { "\"\\\"@PP\\\"\"" }
 }
-Next we have some miscellaneous characters which have been deemed
-sufficiently important to deserve their own symbols:
+The following characters have been deemed important enough to deserve
+their own symbols:
 @ID @OneRow @Tab
     vmargin { 0.5vx }
     @Fmta { @Col A ! @Col @Code B ! @Col ! @Col C ! @Col @Code D !
@@ -301,7 +301,7 @@ exotic characters obtained with the @Code "@Sym" symbol:
 There is only one Symbol font; it does not come in bold or italic faces
 like the other fonts.  Typing @Code "@B @Sym alpha" is therefore useless,
 and anyway there is no bold @Sym alpha character in any font distributed
-with Lout (except see Section {@NumberOf teq}).
+with Lout. # (except see Section {@NumberOf teq}).
 @PP
 Next there are the dingbats.  Here they are with their
 dingbats. @Index { dingbats characters }

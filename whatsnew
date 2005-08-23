@@ -399,4 +399,25 @@ Changes and new features introduced in Version 3.30 [October 2004]
 	of contents.  On second thoughts I'm unwilling to do this.  I need
 	to be convinced that Lout should encourage this strange thing.
 
+Changes and new features introduced in Version 3.31 [August 2005]
+
+   Bug fixes:
+     Ludovic Courtes's fix for ligatures problem
+     Kingston and Piotrowski's fix for list number referencing problem
+     Fix for things adjacent to relations disappearing in program texts
+   Added @VStrut, @ZeroWidth, @ZeroHeight symbols to basic setup module
+   New User's Guide section ("Precise object placement") documenting
+     @VStrut, @ZeroWidth, @ZeroHeight, and similar already existing symbols
+   Improved rule for avoiding orphan section headings, following a
+     suggestion by Ludovic Courtes
+   Added @ChapterContentsIndent, @SectionContentsIndent etc. to setup files
+   Latin3 and Esperanto (contributed by Ludovic Courtes)
+   "Bullets" and "Symbols" footnote numbering styles (contributed by
+     Michael Piotrowski)
+   "marginkerning @Break" (contributed by Ludovic Courtes)
+   @E inline equation symbol now squeezes superscripts, more like TeX
+   "lout @Space" now used throughout program texts by default (can be
+     changed by setup file options)
+
+
 Jeff Kingston

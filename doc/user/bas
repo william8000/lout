@@ -20,6 +20,7 @@ simple to use.
 @Include { bas_par2 }
 @Include { bas_line }
 @Include { bas_hyph }
+@Include { bas_marg }
 @Include { bas_unde }
 @Include { bas_lang }
 @Include { bas_date }

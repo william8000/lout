@@ -41,10 +41,10 @@ takes no account of the available @I vertical space when choosing the
 scale factor.  The chosen scale factor could enlarge the vertical size so
 much that the object no longer fits on the page, with disastrous results.
 @PP
-By using a @Code "@Wide" symbol to restrict the available horizontal
-space, this form of scaling can also be used to scale to a nominated
-width.  For example,
-wide @RawIndex { @Code "@Wide" }
+By using the @Code "@Wide" symbol from Section {@NumberOf precise} to
+restrict the available horizontal space, this form of scaling can also
+be used to scale to a nominated width.  For example,
+wide. @RawIndex { @Code "@Wide" }
 wide.scale @SubIndex { with @Code "@Scale" }
 @ID @Code "5c @Wide @Scale @Box WARNING!"
 produces

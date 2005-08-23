@@ -33,6 +33,7 @@ file.  Here is part of the @Code "@Use" clause from {@Code cprint}:
 @Rowb A { "fixedfont" }			B { Courier  }
 @Rowb A { "fixedsize" }			B { -1.0p         }
 @Rowb A { "fixedline" }			B { 1.0vx         }
+@Rowb A { "fixedspace" }		B { lout         }
 @Rowb A { "fixedtabin" }		B { 8		  }
 @Rowb A { "fixedtabout" }		B { 8s		  }
 
@@ -67,10 +68,10 @@ shown, which apply when @Code style is {@Code varying} and {@Code symbol}.
 @PP
 We can see in this extract that the default value of @Code style is
 {@Code fixed}, and of @Code "numbers" is {@Code No}.  We can also see the
-default font family, font face, font size,
-line spacing, and tab settings when the style is {@Code "fixed"}.  The
-font family name for @Code "fixed" style is {@Code "Courier"}, but for the
-other styles (not shown) it is empty.  This causes the @Code "fixed" style
+default font family, font face, font size, line spacing, spacing mode,
+and tab settings when the style is {@Code "fixed"}.  The font family
+name for @Code "fixed" style is {@Code "Courier"}, but for the other
+styles (not shown) it is empty.  This causes the @Code "fixed" style
 to always switch to Courier, and the other styles to use the same font
 family as in the surrounding document.
 @PP

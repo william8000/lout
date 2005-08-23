@@ -85,6 +85,7 @@ default values:
     font { Courier }
     size { -1.0p }
     line { 1.0vx }
+    space { lout }
     tabin { 8 }
     tabout { 8s }
     identifiers { Base }
@@ -116,8 +117,13 @@ size.programs @Index { @Code "size" option (programs) }
 programs. @RawIndex { programs }
 programs.line @SubIndex { @Code "line" option }
 line.programs @Index { @Code "line" option (programs) }
-the font size to use, and {@Code "line"}, the inter-line spacing.  The
-default value for @Code "size" asks for one point smaller than in the
+the font size to use, {@Code "line"}, the inter-line spacing, and
+{@Code "space"}, the spacing mode (as for the @Code "@Space" symbol
+of Section {@NumberOf white}).
+programs. @RawIndex { programs }
+programs.space @SubIndex { @Code "space" option }
+space.programs @Index { @Code "space" option (programs) }
+The default value for @Code "size" asks for one point smaller than in the
 surrounding document; this was done to compensate for Courier's relatively
 large appearance compared to other fonts of the same nominal size.
 @PP

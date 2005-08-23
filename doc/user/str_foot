@@ -115,11 +115,16 @@ through the document (or through each chapter in the case of books);
 page.  @Code "@FootNoteLocation" determines the default value of
 footnotelocatin. @Index @Code "@FootNoteLocation"
 the @Code "@Location" option mentioned above; it may be either
-@Code "ColFoot" or {@Code "PageFoot"}.  @Code "@FootNoteNumbers"
-determines how the footnotes are numbered;
+@Code "ColFoot" or {@Code "PageFoot"}.
+@PP
+@Code "@FootNoteNumbers" determines how the footnotes are numbered;
 footnotenumbers. @Index @Code "@FootNoteNumbers"
 it may be {@Code Arabic}, {@Code Roman}, {@Code UCRoman}, {@Code Alpha},
-or {@Code UCAlpha}.
+or {@Code UCAlpha}, which give the obvious results.  It may also be
+{@Code Bullets}, which uses sequences of bullets to mark the footnotes,
+following a style proposed by typographer Jan Tschichold, and it
+may be {@Code Symbols}, which produces the traditional sequence of
+daggers and similar symbols.
 @PP
 @Code "@FootNoteFont" and @Code "@FootNoteBreak" determine the
 footnotefont. @Index @Code "@FootNoteFont"

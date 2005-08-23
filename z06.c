@@ -1,7 +1,7 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -38,7 +38,7 @@
 static	OBJECT		cross_name;	/* name of the cr database   */
 
 
-#define	MAX_STACK	100			/* size of parser stacks     */
+#define	MAX_STACK	200			/* size of parser stacks     */
 static	OBJECT		obj_stack[MAX_STACK];	/* stack of objects          */
 static	int		otop = -1;		/* top of obj_stack          */
 static	OBJECT		tok_stack[MAX_STACK];	/* stack of tokens           */

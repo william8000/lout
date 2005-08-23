@@ -273,6 +273,7 @@ ordinary.setup @Index @Code "@OrdinarySetup"
 "  # @SectionHeadingFont { Bold }"
 "  # @SectionGap { 2.00v }"
 "  # @SectionInContents { Yes }"
+"  # @SectionContentsIndent { 0f }"
 "}"
 }
 Section {@NumberOf setup} explains how to make your own setup file and
@@ -309,4 +310,7 @@ before each one.
 the table of contents for each section; it may be @Code Yes or {@Code No},
 but would always be {@Code Yes}.  The default value of the corresponding
 options for sub-subsections and sub-subappendices, however, is {@Code No}.
+@Code "@SectionContentsIndent" determines the indent of the contents
+entry if printed at all; the default value shown above, @Code {0f},
+asks for zero indenting, so the entry will appear at the left margin.
 @End @Section

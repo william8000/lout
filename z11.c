@@ -1,7 +1,7 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -81,6 +81,7 @@ FULL_CHAR *EchoStyle(STYLE *style)
   }
   if( nobreakfirst(*style) ) StringCat(res, AsciiToFull(":NBF"));
   if( nobreaklast(*style) ) StringCat(res, AsciiToFull(":NBL"));
+  if( marginkerning(*style) ) StringCat(res, AsciiToFull(":MK"));
   sprintf(buff, ":C%d:P%d", colour(*style), texture(*style));
   StringCat(res, AsciiToFull(buff));
   StringCat(res, AsciiToFull("]"));
@@ -212,6 +213,10 @@ static void changebreak(STYLE *style, OBJECT x)
 	nobreaklast(*style) = TRUE;
     else if( StringEqual(string(x), STR_BREAK_LAST) )
 	nobreaklast(*style) = FALSE;
+    else if( StringEqual(string(x), STR_BREAK_MARGINKERNING) )
+	marginkerning(*style) = TRUE;
+    else if( StringEqual(string(x), STR_BREAK_NOMARGINKERNING) )
+	marginkerning(*style) = FALSE;
     else Error(11, 5, "found unknown option to %s symbol (%s)",
 	   WARN, &fpos(x), KW_BREAK, string(x));
   }

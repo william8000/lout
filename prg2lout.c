@@ -1284,43 +1284,45 @@ TOKEN PercentToken		= FixedToken("%",  "@PO");
 TOKEN HatToken			= FixedToken("^",  "@PO");
 TOKEN AmpersandToken		= FixedToken("&",  "@PO");
 TOKEN SlashToken		= FixedToken("/",  "@PO");
-TOKEN ArrowToken		= FixedToken("->", "arrowright @A @PO");
+TOKEN ArrowToken		= FixedToken("->", "@A sym {arrowright} @PO");
 TOKEN BackSlashToken		= FixedToken("\\", "@PO");
 TOKEN LeftParenToken		= FixedToken("(",  "@PO");
 TOKEN RightParenToken		= FixedToken(")",  "@PO");
-TOKEN PlusToken			= FixedToken("+",  "plus @A @PO");
-TOKEN EqualToken		= FixedToken("=",  "equal @A @PO");
+TOKEN PlusToken			= FixedToken("+",  "@A sym {plus} @PO");
+TOKEN EqualToken		= FixedToken("=",  "@A sym {equal} @PO");
 TOKEN LeftBraceToken		= FixedToken("{",  "@PO");
 TOKEN RightBraceToken		= FixedToken("}",  "@PO");
 TOKEN BarToken			= FixedToken("|",  "@PO");
 TOKEN CircumToken		= FixedToken("~",  "@PO");
 TOKEN LeftBracketToken		= FixedToken("[",  "@PO");
+TOKEN LeftBracketBarToken	= FixedToken("[|", "@PO");
 TOKEN RightBracketToken		= FixedToken("]",  "@PO");
+TOKEN RightBracketBarToken	= FixedToken("|]", "@PO");
 TOKEN SemicolonToken		= FixedToken(";",  "@PO");
 TOKEN ColonToken		= FixedToken(":",  "@PO");
-TOKEN LessToken			= FixedToken("<",  "less @A @PO");
-TOKEN GreaterToken		= FixedToken(">",  "greater @A @PO");
+TOKEN LessToken			= FixedToken("<",  "@A sym {less} @PO");
+TOKEN GreaterToken		= FixedToken(">",  "@A sym {greater} @PO");
 TOKEN QuestionToken		= FixedToken("?",  "@PO");
 TOKEN CommaToken		= FixedToken(",",  "@PO");
 TOKEN DotToken			= FixedToken(".",  "@PO");
 TOKEN DotDotToken		= FixedToken("..", "@PO");
 TOKEN DotDotDotToken		= FixedToken("...","@PO");
-TOKEN LessEqualToken		= FixedToken("<=", "lessequal @A @PO");
-TOKEN GreaterEqualToken		= FixedToken(">=", "greaterequal @A @PO");
-TOKEN CNotEqualToken		= FixedToken("!=", "notequal @A @PO");
-TOKEN EiffelNotEqualToken	= FixedToken("/=", "notequal @A @PO");
-TOKEN BlueNotEqualToken		= FixedToken("<>", "notequal @A @PO");
+TOKEN LessEqualToken		= FixedToken("<=", "@A sym {lessequal} @PO");
+TOKEN GreaterEqualToken		= FixedToken(">=", "@A sym {greaterequal} @PO");
+TOKEN CNotEqualToken		= FixedToken("!=", "@A sym {notequal} @PO");
+TOKEN EiffelNotEqualToken	= FixedToken("/=", "@A sym {notequal} @PO");
+TOKEN BlueNotEqualToken		= FixedToken("<>", "@A sym {notequal} @PO");
 TOKEN AssignToken		= FixedToken(":=", "@PO");
 TOKEN QuestionAssignToken	= FixedToken("?=", "@PO");
 TOKEN DollarToken		= FixedToken("$",  "@PO");
-TOKEN ImpliesToken		= FixedToken("=>", "arrowdblright @A @PO");
-TOKEN LeftArrowToken		= FixedToken("<-", "arrowleft @A @PO");
+TOKEN ImpliesToken		= FixedToken("=>","@A sym {arrowdblright} @PO");
+TOKEN LeftArrowToken		= FixedToken("<-", "@A sym {arrowleft} @PO");
 TOKEN HaskellLambdaToken	= FixedToken("\\", "@PLAMBDA");
 TOKEN DoubleColonToken		= FixedToken("::",  "@PDOUBLECOLON");
 TOKEN FunctionCompositionToken	= FixedToken(" . ",  "@PCIRC");
-TOKEN HaskellEquivalenceToken	= FixedToken("==",  "equivalence @A @PO");
+TOKEN HaskellEquivalenceToken	= FixedToken("==",  "@A sym {equivalence} @PO");
 TOKEN HaskellConcatenationToken = FixedToken("++", "@PPLUSPLUS");
-TOKEN EqvToken			= FixedToken("<=>", "arrowdblboth @A @PO");
+TOKEN EqvToken			= FixedToken("<=>","@A sym {arrowdblboth} @PO");
 TOKEN HaskellOrToken		= FixedToken("||", "@PO");
 TOKEN HaskellAndToken		= FixedToken("&&", "@PO");
 TOKEN HaskellBacktickToken	= FixedToken("`", "@PO");
@@ -1445,42 +1447,42 @@ TOKEN RSLIdentifierToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN RSLProductToken           = FixedToken( "><",  "multiply @A @PO" ) ;
-TOKEN RSLPartialMapToken        = FixedToken( "-~m->",  "@PartialMap @FA @PO" ) ;
-TOKEN RSLAndToken               = FixedToken( "/\\",  "logicaland @A @PO" ) ;
-TOKEN RSLAlwaysToken            = FixedToken( "always",  "@Eq { square } @FA @PO" ) ;
-TOKEN RSLIsInToken              = FixedToken( "isin",  "element @A @PO" ) ;
-TOKEN RSLSubsetToken            = FixedToken( "<<=",  "reflexsubset @A @PO" ) ;
-TOKEN RSLUnionToken             = FixedToken( "union", "union @A @PO" ) ;
-TOKEN RSLListStartToken         = FixedToken( "<.",  "angleleft @A @PO" ) ;
-TOKEN RSLParToken               = FixedToken( "@Eq { dbar } @FA @PO",  "@PO" ) ;
-TOKEN RSLIntChoiceToken         = FixedToken( "|^|",  "@IntChoice @FA @PO" ) ;
-TOKEN RSLTurnstileToken         = FixedToken( "|-",  "@Eq { vdash } @FA @PO" ) ;
-TOKEN RSLListToken              = NoParameterToken( "-list",  "{*}" ) ;
-TOKEN RSLPartialFnToken         = FixedToken( "-~->",  "@PartialFn @FA @PO" ) ;
-TOKEN RSLRelationToken          = FixedToken( "<->",  "arrowboth @A @PO" ) ;
-TOKEN RSLOrToken                = FixedToken( "\\/",  "logicalor @A @PO" ) ;
-TOKEN RSLNotIsInToken           = FixedToken( "~isin",  "notelement @A @PO" ) ;
-TOKEN RSLProperSupersetToken	= FixedToken( ">>",  "propersuperset @A @PO" ) ;
-TOKEN RSLInterToken             = FixedToken( "inter",  "intersection @A @PO" ) ;
-TOKEN RSLListEndToken           = FixedToken( ".>",  "angleright @A @PO" ) ;
-TOKEN RSLInterlockToken         = FixedToken( "++",  "@Interlock @FA @PO" ) ;
-TOKEN RSLLambdaToken            = FixedToken( "-\\",  "lambda @A @PO" ) ;
-TOKEN RSLImplementsRelToken     = FixedToken( "{=",  "@Eq { preceq } @FA @PO" ) ;
-TOKEN RSLInfListToken           = FixedToken( "-inflist",  "@InfList @FA @PO" ) ;
-TOKEN RSLMapToken               = FixedToken( "-m->",  "@Map @FA @PO" ) ;
-TOKEN RSLSTToken                = FixedToken( ":-",  "dotmath @A @PO" ) ;
-TOKEN RSLNotEqualToken          = FixedToken( "~=",  "notequal @A @PO" ) ;
-TOKEN RSLPowerToken             = FixedToken( "**",  "arrowup @A @PO" ) ;
-TOKEN RSLProperSubsetToken      = FixedToken( "<<",  "propersubset @A @PO" ) ;
-TOKEN RSLSupersetToken          = FixedToken( ">>=",  "reflexsuperset @A @PO" ) ;
-TOKEN RSLOverrideToken          = FixedToken( "!!",  "@Dagger @FA @PO" ) ;
-TOKEN RSLMapletToken            = FixedToken( "+>",  "@Eq { mapsto } @FA @PO" ) ;
-TOKEN RSLExtChoiceToken         = FixedToken( "|=|",  "@ExtChoice @FA @PO" ) ;
-TOKEN RSLApplyToken             = FixedToken( "#",  "degree @A @PO" ) ;
-TOKEN RSLImplementsExprToken    = FixedToken( "[=",  "@Eq { sqsubseteq } @FA @PO" ) ;
-TOKEN RSLPrimeToken             = NoParameterToken( "'", "{'}" ) ;
-TOKEN RSLExistsOneToken         = FixedToken( "exists!",  "{@Sym existential}! @FA @PO" );
+TOKEN RSLProductToken    = FixedToken("><",  "@A sym{multiply} @PO" ) ;
+TOKEN RSLPartialMapToken = FixedToken("-~m->",  "@PartialMap @FA @PO" ) ;
+TOKEN RSLAndToken        = FixedToken("/\\",  "@A sym{logicaland} @PO" ) ;
+TOKEN RSLAlwaysToken     = FixedToken("always",  "@Eq { square } @FA @PO" ) ;
+TOKEN RSLIsInToken       = FixedToken("isin",  "@A sym{element @PO" ) ;
+TOKEN RSLSubsetToken     = FixedToken("<<=",  "@A sym{reflexsubset} @PO" ) ;
+TOKEN RSLUnionToken      = FixedToken("union", "@A sym{union} @PO" ) ;
+TOKEN RSLListStartToken  = FixedToken("<.",  "@A sym{angleleft} @PO" ) ;
+TOKEN RSLParToken        = FixedToken("@Eq { dbar } @FA @PO",  "@PO" ) ;
+TOKEN RSLIntChoiceToken  = FixedToken("|^|",  "@IntChoice @FA @PO" ) ;
+TOKEN RSLTurnstileToken  = FixedToken("|-",  "@Eq { vdash } @FA @PO" ) ;
+TOKEN RSLListToken       = NoParameterToken( "-list",  "{*}" ) ;
+TOKEN RSLPartialFnToken  = FixedToken("-~->",  "@PartialFn @FA @PO" ) ;
+TOKEN RSLRelationToken   = FixedToken("<->",  "@A sym{arrowboth} @PO" ) ;
+TOKEN RSLOrToken         = FixedToken("\\/",  "@A sym{logicalor} @PO" ) ;
+TOKEN RSLNotIsInToken    = FixedToken("~isin",  "@A sym{notelement }@PO" ) ;
+TOKEN RSLProperSuperToken= FixedToken(">>",  "@A sym{propersuperset} @PO" ) ;
+TOKEN RSLInterToken      = FixedToken("inter",  "@A sym{intersection} @PO" ) ;
+TOKEN RSLListEndToken    = FixedToken(".>",  "@A sym{angleright} @PO" ) ;
+TOKEN RSLInterlockToken  = FixedToken("++",  "@Interlock @FA @PO" ) ;
+TOKEN RSLLambdaToken     = FixedToken("-\\",  "@A sym{lambda} @PO" ) ;
+TOKEN RSLImplRelToken	 = FixedToken("{=",  "@Eq { preceq } @FA @PO" ) ;
+TOKEN RSLInfListToken    = FixedToken("-inflist",  "@InfList @FA @PO" ) ;
+TOKEN RSLMapToken        = FixedToken("-m->",  "@Map @FA @PO" ) ;
+TOKEN RSLSTToken         = FixedToken(":-",  "@A sym{dotmath} @PO" ) ;
+TOKEN RSLNotEqualToken   = FixedToken("~=",  "@A sym{notequal} @PO" ) ;
+TOKEN RSLPowerToken      = FixedToken("**",  "@A sym{arrowup} @PO" ) ;
+TOKEN RSLProperSubsetToken = FixedToken( "<<",  "@A sym{propersubset} @PO" ) ;
+TOKEN RSLSupersetToken   = FixedToken(">>=",  "@A sym{reflexsuperset} @PO" ) ;
+TOKEN RSLOverrideToken   = FixedToken("!!",  "@Dagger @FA @PO" ) ;
+TOKEN RSLMapletToken     = FixedToken("+>",  "@Eq { mapsto } @FA @PO" ) ;
+TOKEN RSLExtChoiceToken  = FixedToken("|=|",  "@ExtChoice @FA @PO" ) ;
+TOKEN RSLApplyToken      = FixedToken("#",  "@A sym{degree} @PO" ) ;
+TOKEN RSLImplExprToken   = FixedToken("[=",  "@Eq { sqsubseteq } @FA @PO" ) ;
+TOKEN RSLPrimeToken      = NoParameterToken( "'", "{'}" ) ;
+TOKEN RSLExistsOneToken  = FixedToken("exists!",  "{@Sym existential}! @FA @PO" );
 
 
 
@@ -3092,7 +3094,9 @@ LANGUAGE NonpareilLanguage = {
     &LeftBraceToken,
     &RightBraceToken,
     &LeftBracketToken,
+    &LeftBracketBarToken,
     &RightBracketToken,
+    &RightBracketBarToken,
     &CommaToken,
     &ColonToken,
     &AssignToken,
@@ -3105,12 +3109,12 @@ LANGUAGE NonpareilLanguage = {
     &NonpareilOperatorToken,
   },
   {
-    "builtin", "case", "class", "creation", "coerce", "else", "elsif", "end",
-    "extend", "extension", "false", "from", "fun", "if", "in", "infix",
-    "inherit", "introduce", "invariant", "is", "let", "local", "meet",
-    "module", "noncreation", "norename", "prefix", "private", "postfix",
-    "rename", "require", "self", "system", "then", "to", "true", "use",
-    "when", "yield",
+    "as", "builtin", "case", "class", "coerce", "creation", "else", "elsif",
+    "end", "enum", "extend", "extension", "false", "filter", "fun",
+    "genesis", "if", "in", "infix", "infixr", "inherit", "introduce",
+    "invariant", "is", "let", "local", "meet", "module", "noncreation",
+    "norename", "predefined", "prefix", "private", "postfix", "rename",
+    "require", "self", "system", "then", "true", "use", "when", "yield",
 
     /* not reserved words strictly speaking, but conventionally set like them */
     "and", "or", "not"
@@ -3181,13 +3185,13 @@ LANGUAGE RSLLanguage = {
     &RSLIntChoiceToken, &RSLTurnstileToken, &RSLListToken,
     &RSLPartialFnToken, &RSLRelationToken, &RSLOrToken,
     &GreaterEqualToken,
-    &RSLNotIsInToken, &RSLProperSupersetToken, &RSLInterToken,
+    &RSLNotIsInToken, &RSLProperSuperToken, &RSLInterToken,
     &RSLListEndToken, &RSLInterlockToken, &RSLLambdaToken,
-    &RSLImplementsRelToken, &RSLInfListToken, &RSLMapToken, &ImpliesToken,
+    &RSLImplRelToken, &RSLInfListToken, &RSLMapToken, &ImpliesToken,
     &RSLSTToken, &RSLNotEqualToken, &RSLPowerToken,
     &RSLProperSubsetToken, &RSLSupersetToken, &RSLOverrideToken,
     &RSLMapletToken, &RSLExtChoiceToken, &RSLApplyToken,
-    &RSLImplementsExprToken, &CCommentEscapeToken, &EiffelCommentToken,
+    &RSLImplExprToken, &CCommentEscapeToken, &EiffelCommentToken,
     &EiffelCommentEscapeToken, &BackSlashToken, &RSLExistsOneToken, &StarToken
   },
   { "Bool", "Char", "Int", "Nat", "Real", "Text", "Unit", "abs", "any",
@@ -4047,6 +4051,7 @@ void EndEmit(TOKEN *current_token, unsigned char *end_delim)
 	case '^':
 	case '~':
 	case '-':
+	case '\'':
 
 	  if( !quoted_now )
 	  { putc('"', out_fp);

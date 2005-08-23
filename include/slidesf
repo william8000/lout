@@ -42,6 +42,10 @@ def @OverheadSetup
     named @LectureInContents		{ Yes			}
     named @OverheadInContents		{ No			}
     named @ReferencesInContents		{ Yes			}
+    named @LectureContentsIndent	{ 0f			}
+    named @OverheadContentsIndent	{ 0f			}
+    named @OverheadInLectureContentsIndent { 2f			}
+    named @ReferencesContentsIndent	{ 0f			}
     named @LectureNumInTheorems		{ Yes			}
     named @OverheadNumInTheorems	{ No			}
     named @LectureNumInDisplays		{ Yes			}
@@ -167,6 +171,7 @@ def @OverheadSetup
 		       @LectureHeadingFormat { @RefHeading @RefListTitle } |
 	    //  @PageMark @Tag
 	    //  @ReferencesInContents @ContentsEntry
+	            indent { @ReferencesContentsIndent }
 		    title { @RefHeading @RefListTitle }
 		    pagenum { @PageOf @Tag }
 	    //  Start @Runner @MajorTitle { @GetTitle }
@@ -248,7 +253,7 @@ def @OverheadSetup
 	    headingbreak { @OverheadHeadingBreak }
 	    headingformat { @Num @OverheadHeadingFormat @Body }
 	    incontents { @OverheadInContents }
-	    contentsindent { 0f }
+	    contentsindent { @OverheadContentsIndent }
 	    numbers { @OverheadNumbers }
 	    attachnum { @OverheadsList&&preceding @Tagged @Tag }
 	    retrievenum { @OverheadsList&&@Tag @Open { num } }
@@ -326,7 +331,7 @@ def @OverheadSetup
 		headingbreak { @OverheadHeadingBreak }
 		headingformat { @Num @OverheadHeadingFormat @Body }
 		incontents { @OverheadInContents }
-		contentsindent { 2f }
+		contentsindent { @OverheadInLectureContentsIndent }
 		numbers { @OverheadNumbers }
 		attachnum { @LecOverheadsList&&preceding @Tagged @Tag }
 		retrievenum { @LecOverheadsList&&@Tag @Open { num } }
@@ -354,7 +359,7 @@ def @OverheadSetup
 	    headingbreak { @LectureHeadingBreak }
 	    headingformat { @Num @LectureHeadingFormat @Body }
 	    incontents { @LectureInContents }
-	    contentsindent { 0f }
+	    contentsindent { @LectureContentsIndent }
 	    word { lecture @WordVal @LectureWord }
 	    numbers {  @LectureNumbers }
 	    attachnum { @LectureList&&preceding @Tagged @Tag }

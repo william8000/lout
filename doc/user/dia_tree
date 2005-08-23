@@ -239,9 +239,7 @@ end of the stub path:
 @Code @Verbatim {
 @Tree {
 @Circle @Eq { a }
-@StubSub
-    from { SW }
-    to { SE }
+@StubSub from { SW } to { SE }
 @Box outlinestyle { noline }
     @Eq { T tsub a }
 }
@@ -250,9 +248,7 @@ end of the stub path:
 @Diag {
 @Tree {
 @Circle @Eq { a }
-@StubSub
-    from { SW }
-    to { SE }
+@StubSub from { SW } to { SE }
 @Box outlinestyle { noline }
     @Eq { T tsub a }
 }

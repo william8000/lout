@@ -120,5 +120,5 @@ patterns, and hyphenated.  The hyphen character "-" is treated specially.
 
 Extreme lengths were resorted to to compress the .lp file as much as
 possible.  Files significantly larger than german.lh are likely to cause
-Lout to abort with an error message.  Please contact jeff@cs.usyd.edu.au
+Lout to abort with an error message.  Please contact jeff@it.usyd.edu.au
 if you have problems with this or anything else.

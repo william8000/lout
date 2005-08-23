@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.30                          #
+#  Make file for installing Basser Lout Version 3.31                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
 #  undated                                                                    #
@@ -253,11 +253,11 @@ DBFIX   = 0
 USESTAT = 1
 SAFEDFT = 0
 
-# DEBUGGING = 0
-# TRACING =
+DEBUGGING = 0
+TRACING =
 
-DEBUGGING = 1
-TRACING = -g
+# DEBUGGING = 1
+# TRACING = -g
 
 BINDIR	= /home/jeff/bin
 LIBDIR	= /home/jeff/lout.lib

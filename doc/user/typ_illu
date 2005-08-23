@@ -58,7 +58,7 @@ makes things very awkward for filled paragraphs and centring, which depend
 on knowing how much space is available to be occupied.  So you should either
 avoid filled paragraphs and all displays and lists altogether in
 illustrations, or else enclose your object in a @Code "@Wide" symbol:
-wide @RawIndex { @Code "@Wide" }
+wide. @RawIndex { @Code "@Wide" }
 wide.illustrations @SubIndex { with illustrations }
 @ID @OneRow @Code {
 "@Illustration 5c @Wide {"

@@ -344,6 +344,10 @@
   # @LectureInContents		{ Yes		} # add lectures to contents
   # @OverheadInContents		{ No		} # add overheads to contents
   # @ReferencesInContents	{ Yes		} # add references to contents
+  # @LectureContentsIndent	{ 0f		} # contents indent of lectures
+  # @OverheadInLectureContentsIndent { 2f	} # .. of overhead within lec
+  # @OverheadContentsIndent	{ 0f		} # .. of stand-alone overhead
+  # @ReferencesContentsIndent	{ 0f		} # .. of references
   # @LectureNumInTheorems	{ Yes		} # theorem num has lecture num
   # @OverheadNumInTheorems	{ No		} # theorem num has overhead num
   # @LectureNumInDisplays	{ Yes		} # display num has lecture num

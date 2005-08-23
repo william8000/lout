@@ -8,15 +8,15 @@ programs. @Index { programs }
 computer.programs. @RawIndex { computer programs @I see programs }
 in conjunction with the @Code prg2lout
 prg2lout. @Index { @Code prg2lout filter program }
-@FootNote {
-Prior to Version 3.18 of Lout, this chapter described how to typeset
-programs written in the C programming language using the
-@Code c2lout filter, and Eiffel programs using the @Code eif2lout
-filter.  These have now been withdrawn and replaced by {@Code prg2lout},
-which handles multiple languages.  Ordinary Lout documents require no
-modifications as a result of this change.
-}
 filter program, which is always installed wherever Lout is.
+# @FootNote {
+# Prior to Version 3.18 of Lout, this chapter described how to typeset
+# programs written in the C programming language using the
+# @Code c2lout filter, and Eiffel programs using the @Code eif2lout
+# filter.  These have now been withdrawn and replaced by {@Code prg2lout},
+# which handles multiple languages.  Ordinary Lout documents require no
+# modifications as a result of this change.
+# }
 @PP
 It is possible to simply print out one or more program files independently
 of any document.  Alternatively, the program text may be printed as part of

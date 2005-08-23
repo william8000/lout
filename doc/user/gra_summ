@@ -18,7 +18,7 @@ their possible values are:
 @Rowa
     A { style }
     B { frame }
-    C { {@Code frame}, {@Code axes}, or {@Code none} }
+    C { {@Code frame}, {@Code grid}, {@Code axes}, or {@Code none} }
 @Rowa
     A { width }
     B { 6.0c }

@@ -1,7 +1,7 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */

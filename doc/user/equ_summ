@@ -582,9 +582,8 @@ ragged @Break {
 }
 @DP
 Finally, here is the long list of full names from the Adobe Symbol font;
-these are the same characters as you get with the @Code "@Sym" symbol
-of Section {@NumberOf characters}, but within equations you don't need
-to type {@Code "@Sym"}:
+these are as for the @Code "@Sym" symbol of Section {@NumberOf characters},
+but within equations you don't type {@Code "@Sym"}:
 @DP
 ragged @Break {
 "space"		@Dbl @Eq {  space		}

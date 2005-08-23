@@ -1,0 +1,33 @@
+@Section
+   @Title { Margin kerning }
+   @Tag { mkern }
+@Begin
+@PP
+The @Code "@Break" symbol offers a variant of ordinary paragraph
+breaking called @I { margin kerning }, in which small characters
+margin.kerning. @Index { margin kerning }
+that happen to end up at the start or end of a line protrude
+slightly into the margin.  This is said to make documents
+look better, particularly in narrow columns.  For example,
+@ID @Code @Verbatim {
+2i @Wide marginkerning @Break {
+This is a test, just a little test, of
+margin kerning.   It should kern small
+characters at the margins.
+}
+}
+produces
+@ID 2i @Wide marginkerning @Break {
+This is a test, just a little test, of
+margin kerning.   It should kern small
+characters at the margins.
+}
+in which the comma at the end of the first line protrudes.  (For the
+@Code "@Wide" symbol, which produces a two-inch column here,
+see Section {@NumberOf precise}.)
+@PP
+As with most @Code "@Break" options, you probably want this in your
+@Code "@InitialBreak" option, described in Section {@NumberOf paras},
+if you use it at all.  By default there is no margin kerning.  To turn
+it off in a context where it is on, use @Code {"nomarginkerning @Break"}.
+@End @Section

@@ -26,6 +26,7 @@ def @NonpareilSetup
     named fixedfont				{ Courier }# font family
     named fixedsize				{ -1.0p	}  # font size
     named fixedline				{ 1.0vx	}  # line-space
+    named fixedspace				{ lout	}  # spacing mode
     named fixedtabin				{ 8	}  # tab interval
     named fixedtabout				{ 8s	}  # tab width
 
@@ -49,6 +50,7 @@ def @NonpareilSetup
     named varyingfont				{	}  # font family
     named varyingsize				{ 1.0f	}  # font size
     named varyingline				{ 1.0vx	}  # line-space
+    named varyingspace				{ lout	}  # spacing mode
     named varyingtabin				{ 8	}  # tab interval
     named varyingtabout				{ 3f	}  # tab width
 
@@ -72,6 +74,7 @@ def @NonpareilSetup
     named symbolfont				{	}  # font family
     named symbolsize				{ 1.0f	}  # font size
     named symbolline				{ 1.0vx	}  # line-space
+    named symbolspace				{ lout	}  # spacing mode
     named symboltabin				{ 8	}  # tab interval
     named symboltabout				{ 3f	}  # tab width
 
@@ -105,6 +108,7 @@ def @NonpareilSetup
 	named font         { dft           }  # font family
 	named size         { dft           }  # font size
 	named line         { dft           }  # line-space
+	named space        { dft           }  # spacing mode
 	named tabin        { dft           }  # tab interval
 	named tabout       { dft           }  # tab width
 	named identifiers  { dft           }  # ident. font
@@ -215,6 +219,15 @@ def @NonpareilSetup
 	      iffixed   { fixedline   }
 	      ifvarying { varyingline }
 	      ifsymbol  { symbolline  }
+	}
+
+
+	def @InitSpace
+	{
+	  space @Test
+	      iffixed   { fixedspace   }
+	      ifvarying { varyingspace }
+	      ifsymbol  { symbolspace  }
 	}
 
 
@@ -368,7 +381,7 @@ def @NonpareilSetup
 
 
 	def @A		# get characters from the Adobe Symbol font
-	    left sym
+	    named sym {}
 	    right x
 	{
 	    style @Case {
@@ -381,7 +394,7 @@ def @NonpareilSetup
 	macro "$>" { {} & }
 
 
-	{ @InitFontFamily Base @InitSize } @Font
+	{ @InitFontFamily Base @InitSize } @Font @InitSpace @Space
 	{ @InitLine lines nohyphen } @Break @Body
 
     @End @Nonpareil

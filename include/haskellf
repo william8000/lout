@@ -27,6 +27,7 @@ def @HaskellSetup
     named fixedfont				{ Courier }# font family
     named fixedsize				{ -1.0p	}  # font size
     named fixedline				{ 1.0vx	}  # line-space
+    named fixedspace				{ lout	}  # spacing mode
     named fixedtabin				{ 4	}  # tab interval
     named fixedtabout				{ 4s	}  # tab width
 
@@ -53,6 +54,7 @@ def @HaskellSetup
     named varyingfont				{	}  # font family
     named varyingsize				{ 1.0f	}  # font size
     named varyingline				{ 1.0vx	}  # line-space
+    named varyingspace				{ lout	}  # spacing mode
     named varyingtabin				{ 4	}  # tab interval
     named varyingtabout				{ 1.5f	}  # tab width
 
@@ -79,6 +81,7 @@ def @HaskellSetup
     named symbolfont				{	}  # font family
     named symbolsize				{ 1f	}  # font size
     named symbolline				{ 1.0vx	}  # line-space
+    named symbolspace				{ lout	}  # spacing mode
     named symboltabin				{ 4	}  # tab interval
     named symboltabout				{ 1.7f	}  # tab width
 
@@ -115,6 +118,7 @@ def @HaskellSetup
 	named font         { dft           }  # font family
 	named size         { dft           }  # font size
 	named line         { dft           }  # line-space
+	named space        { dft           }  # spacing mode
 	named tabin        { dft           }  # tab interval
 	named tabout       { dft           }  # tab width
 	named braces       { dft           }  # braces font
@@ -229,6 +233,15 @@ def @HaskellSetup
 	}
 
 
+	def @InitSpace
+	{
+	  space @Test
+	      iffixed   { fixedspace   }
+	      ifvarying { varyingspace }
+	      ifsymbol  { symbolspace  }
+	}
+
+
 	def @PO		# for formatting operators
 	    right x
 	{
@@ -247,7 +260,7 @@ def @HaskellSetup
 
 
 	def @A		# get characters from the Adobe Symbol font
-	    left sym
+	    named sym {}
 	    right x
 	{
 	    style @Case {
@@ -459,7 +472,7 @@ def @HaskellSetup
 	macro "$>" { {} & }
 
 
-	{ @InitFontFamily Base @InitSize } @Font
+	{ @InitFontFamily Base @InitSize } @Font @InitSpace @Space
 	{ @InitLine lines nohyphen } @Break @Body
 
     @End @Haskell

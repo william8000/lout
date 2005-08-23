@@ -131,7 +131,26 @@ def @BookSetup
     named @IndexAInContents		{  Yes				}
     named @IndexBInContents		{  Yes				}
     named @ColophonInContents		{  Yes				}
+
+    named @PrefaceContentsIndent	{  0f 				}
+    named @SubPrefaceContentsIndent	{  3f 				}
+    named @AbbreviationsContentsIndent	{  0f				}
+    named @IntroductionContentsIndent	{  0f				}
+    named @SubIntroductionContentsIndent{  3f				}
     named @PartContentsIndent		{  0.5rt			}
+    named @ChapterContentsIndent	{  0f				}
+    named @SectionContentsIndent	{  3f				}
+    named @SubSectionContentsIndent	{  6f				}
+    named @SubSubSectionContentsIndent	{  9f				}
+    named @AppendixContentsIndent	{  0f				}
+    named @SubAppendixContentsIndent	{  3f				}
+    named @SubSubAppendixContentsIndent	{  6f				}
+    named @ReferencesContentsIndent	{  0f				}
+    named @GlossaryContentsIndent	{  0f				}
+    named @IndexContentsIndent		{  0f				}
+    named @IndexAContentsIndent		{  0f				}
+    named @IndexBContentsIndent		{  0f				}
+    named @ColophonContentsIndent	{  0f				}
 
     named @SubPrefaceNumInTheorems	{  No				}
     named @SubIntroductionNumInTheorems	{  No				}
@@ -490,6 +509,7 @@ def @BookSetup
 		headingbreak { @ChapterHeadingBreak }
 		headingformat { @Num @ChapterHeadingFormat @Body }
 		incontents { @ReferencesInContents }
+		contentsindent { @ReferencesContentsIndent }
 		pnprefix { @ReferencesPrefix }
 		inrunners { Yes }
 		sendheader { @ChapterFull @Body }
@@ -523,6 +543,7 @@ def @BookSetup
 		headingformat { @Num @ChapterHeadingFormat @Body }
 		headingtext { @GlossaryText }
 		incontents { @GlossaryInContents }
+		contentsindent { @GlossaryContentsIndent }
 		pnprefix { @GlossaryPrefix }
 		inrunners { Yes }
 		sendheader { @Full @Body }
@@ -556,6 +577,7 @@ def @BookSetup
 		headingformat { @Num @ChapterHeadingFormat @Body }
 		headingtext { @IndexText }
 		incontents { @IndexInContents }
+		contentsindent { @IndexContentsIndent }
 		pnprefix { @IndexPrefix }
 		inrunners { Yes }
 		sendheader { @Full @Body }
@@ -589,6 +611,7 @@ def @BookSetup
 		headingformat { @Num @ChapterHeadingFormat @Body }
 		headingtext { @IndexAText }
 		incontents { @IndexAInContents }
+		contentsindent { @IndexAContentsIndent }
 		pnprefix { @IndexAPrefix }
 		inrunners { Yes }
 		sendheader { @Full @Body }
@@ -622,6 +645,7 @@ def @BookSetup
 		headingformat { @Num @ChapterHeadingFormat @Body }
 		headingtext { @IndexAText }
 		incontents { @IndexBInContents }
+		contentsindent { @IndexBContentsIndent }
 		pnprefix { @IndexBPrefix }
 		inrunners { Yes }
 		sendheader { @Full @Body }
@@ -654,6 +678,7 @@ def @BookSetup
 		headingbreak { @ChapterHeadingBreak }
 		headingformat { @Num @ChapterHeadingFormat @Body }
 		incontents { @ColophonInContents }
+		contentsindent { @ColophonContentsIndent }
 		pnprefix { @ColophonPrefix }
 		inrunners { Yes }
 		sendheader { @Full @Body }
@@ -886,7 +911,7 @@ def @BookSetup
 		headingbreak { @SubPrefaceHeadingBreak }
 		headingformat { @Num @SubPrefaceHeadingFormat @Body }
 		incontents { @SubPrefaceInContents }
-		contentsindent { 3f }
+		contentsindent { @SubPrefaceContentsIndent }
 		numbers { @SubPrefaceNumbers }
 		attachnum { @SubPrefaceList&&preceding @Tagged @Tag }
 		retrievenum { @SubPrefaceList&&@Tag @Open { num } }
@@ -913,6 +938,7 @@ def @BookSetup
 	    headingbreak { @ChapterHeadingBreak }
 	    headingformat { @Num @ChapterHeadingFormat @Body }
 	    incontents { @PrefaceInContents }
+	    contentsindent { @PrefaceContentsIndent }
 	    pnprefix { @PrefacePrefix }
 	    sendheader { @ChooseFull @Body }
 	    innergap { @SectionGap }
@@ -947,6 +973,7 @@ def @BookSetup
 	    headingbreak { @ChapterHeadingBreak }
 	    headingformat { @Num @ChapterHeadingFormat @Body }
 	    incontents { @AbbreviationsInContents }
+	    contentsindent { @AbbreviationsContentsIndent }
 	    pnprefix { @AbbreviationsPrefix }
 	    sendheader { @Full @Body }
 	    innergap { @SectionGap }
@@ -1010,7 +1037,7 @@ def @BookSetup
 		headingbreak { @SubIntroductionHeadingBreak }
 		headingformat { @Num @SubIntroductionHeadingFormat @Body }
 		incontents { @SubIntroductionInContents }
-		contentsindent { 3f }
+		contentsindent { @SubIntroductionContentsIndent }
 		numbers { @SubIntroductionNumbers }
 		attachnum { @SubIntroductionList&&preceding @Tagged @Tag }
 		retrievenum { @SubIntroductionList&&@Tag @Open { num } }
@@ -1037,6 +1064,7 @@ def @BookSetup
 	    headingbreak { @ChapterHeadingBreak }
 	    headingformat { @Num @ChapterHeadingFormat @Body }
 	    incontents { @IntroductionInContents }
+	    contentsindent { @IntroductionContentsIndent }
 	    pnprefix { @IntroductionPrefix }
 	    sendheader { @Full @Body }
 	    innergap { @SectionGap }
@@ -1177,7 +1205,7 @@ def @BookSetup
 			headingbreak { @SubSubSectionHeadingBreak }
 			headingformat { @Num @SubSubSectionHeadingFormat @Body }
 			incontents { @SubSubSectionInContents }
-			contentsindent { 9f }
+			contentsindent { @SubSubSectionContentsIndent }
 			numbers { @SubSubSectionNumbers }
 			attachnum { @SubSubSectionList&&preceding @Tagged @Tag }
 			retrievenum { @SubSubSectionList&&@Tag @Open { num } }
@@ -1203,7 +1231,7 @@ def @BookSetup
 		    headingbreak { @SubSectionHeadingBreak }
 		    headingformat { @Num @SubSectionHeadingFormat @Body }
 		    incontents { @SubSectionInContents }
-		    contentsindent { 6f }
+		    contentsindent { @SubSectionContentsIndent }
 		    numbers { @SubSectionNumbers }
 		    attachnum { @SubSectionList&&preceding @Tagged @Tag }
 		    retrievenum { @SubSectionList&&@Tag @Open { num } }
@@ -1230,7 +1258,7 @@ def @BookSetup
 		headingbreak { @SectionHeadingBreak }
 		headingformat { @Num @SectionHeadingFormat @Body }
 		incontents { @SectionInContents }
-		contentsindent { 3f }
+		contentsindent { @SectionContentsIndent }
 		numbers { @SectionNumbers }
 		attachnum { @SectionList&&preceding @Tagged @Tag }
 		retrievenum { @SectionList&&@Tag @Open { num } }
@@ -1260,6 +1288,7 @@ def @BookSetup
 		headingformat { @Num @PartHeadingFormat @Body }
 		bypassnumber { @PartNumber }
 		incontents { @PartInContents }
+		contentsindent { @PartContentsIndent }
 		sendheader { @Full @Body }
 		inrunners { Yes }
 		tag { @Tag }
@@ -1287,7 +1316,7 @@ def @BookSetup
 	    headingbreak { @ChapterHeadingBreak }
 	    headingformat { @Num @ChapterHeadingFormat @Body }
 	    incontents { @ChapterInContents }
-	    contentsindent { 0f }
+	    contentsindent { @ChapterContentsIndent }
 	    word { chapter @WordVal @ChapterWord }
 	    numbers { @ChapterNumbers }
 	    attachnum { @ChapterList&&preceding @Tagged @Tag }
@@ -1407,7 +1436,7 @@ def @BookSetup
 		    headingbreak { @SubSubAppendixHeadingBreak }
 		    headingformat { @Num @SubSubAppendixHeadingFormat @Body }
 		    incontents { @SubSubAppendixInContents }
-		    contentsindent { 6f }
+		    contentsindent { @SubSubAppendixContentsIndent }
 		    numbers { @SubSubAppendixNumbers }
 		    attachnum { @SubSubAppendixList&&preceding @Tagged @Tag }
 		    retrievenum { @SubSubAppendixList&&@Tag @Open { num } }
@@ -1434,7 +1463,7 @@ def @BookSetup
 		headingbreak { @SubAppendixHeadingBreak }
 		headingformat { @Num @SubAppendixHeadingFormat @Body }
 		incontents { @SubAppendixInContents }
-		contentsindent { 3f }
+		contentsindent { @SubAppendixContentsIndent }
 		numbers { @SubAppendixNumbers }
 		attachnum { @SubAppendixList&&preceding @Tagged @Tag }
 		retrievenum { @SubAppendixList&&@Tag @Open { num } }
@@ -1464,6 +1493,7 @@ def @BookSetup
 		headingformat { @Num @PartHeadingFormat @Body }
 		bypassnumber { @PartNumber }
 		incontents { @PartInContents }
+		contentsindent { @PartContentsIndent }
 		sendheader { @Full @Body }
 		inrunners { Yes }
 		tag { @Tag }
@@ -1491,7 +1521,7 @@ def @BookSetup
 	    headingbreak { @AppendixHeadingBreak }
 	    headingformat { @Num @AppendixHeadingFormat @Body }
 	    incontents { @AppendixInContents }
-	    contentsindent { 0f }
+	    contentsindent { @AppendixContentsIndent }
 	    word { appendix @WordVal @AppendixWord }
 	    numbers { @AppendixNumbers }
 	    attachnum { @AppendixList&&preceding @Tagged @Tag }

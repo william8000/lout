@@ -411,7 +411,25 @@
   # @IndexAInContents		{ Yes		} # add index A to contents
   # @IndexBInContents		{ Yes		} # add index B to contents
   # @ColophonInContents		{ Yes		} # add colophon to contents
-  # @PartContentsIndent         { 0.5rt		} # indent of part contents entry
+  # @PrefaceContentsIndent	{ 0f		} # indent in contents of preface
+  # @SubPrefaceContentsIndent	{ 3f		} # indent in contents of sub-preface
+  # @AbbreviationsContentsIndent{ 0f		} # indent in contents of abbreviations
+  # @IntroductionContentsIndent	{ 0f		} # indent in contents of introduction
+  # @SubIntroductionContentsIndent { 3f		} # indent in contents of sub-intro
+  # @PartContentsIndent		{ 0.5rt		} # indent in contents of part (dft is ctr)
+  # @ChapterContentsIndent	{ 0f		} # indent in contents of chapter
+  # @SectionContentsIndent	{ 3f		} # indent in contents of section
+  # @SubSectionContentsIndent	{ 6f		} # indent in contents of subsection
+  # @SubSubSectionContentsIndent{ 9f		} # indent in contents of sub-subsection
+  # @AppendixContentsIndent	{ 0f		} # indent in contents of appendix
+  # @SubAppendixContentsIndent	{ 3f		} # indent in contents of sub-appendix
+  # @SubSubAppendixContentsIndent { 6f		} # indent in contents of sub-subappendix
+  # @ReferencesContentsIndent	{ 0f		} # indent in contents of references
+  # @GlossaryContentsIndent	{ 0f		} # indent in contents of gloassary
+  # @IndexContentsIndent	{ 0f		} # indent in contents of index
+  # @IndexAContentsIndent	{ 0f		} # indent in contents of index A
+  # @IndexBContentsIndent	{ 0f		} # indent in contents of index B
+  # @ColophonContentsIndent	{ 0f		} # indent in contents of colophon
   # @SubPrefaceNumInTheorems	{ No		} # theorem num has sub-preface num
   # @SubIntroductionNumInTheorems { No		} # theorem num has sub-intro num
   # @ChapterNumInTheorems	{ Yes		} # theorem num has chapter num

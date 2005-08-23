@@ -107,8 +107,9 @@ export
     @ListGap @ListIndent @ListRightIndent @ListLabelWidth
     @NumberSeparator
 
-    @Word @Roman @UCRoman @Alpha @UCAlpha @Months @ShortMonths @WeekDays
-    @ShortWeekDays @TwelveHours @ShortHours @MeriDiems @ShortMeriDiems
+    @Word @Roman @UCRoman @Alpha @UCAlpha @FnBullets @FnSymbols
+    @Months @ShortMonths @WeekDays @ShortWeekDays
+    @TwelveHours @ShortHours @MeriDiems @ShortMeriDiems
 
     @Sym @Ding @R @I @B @BI @S @F @II
     "~" "~~" "``" "''" ",," "--" "---" "..."
@@ -119,8 +120,8 @@ export
 
     @Date @Time @DateTimeFormat @DropCapTwo @DropCapThree @Centre @Right
     @NoDotSep @NoDotJoin @Join @Sep @DotSep @ColonSep @DotJoin @DashJoin
-    @NumSep @OverStrike @Sup @Sub @FullWidthRule @LocalWidthRule
-    @Box @CurveBox @ShadowBox @BoundaryMarks
+    @NumSep @VStrut @ZeroWidth @ZeroHeight @OverStrike @Sup @Sub
+    @FullWidthRule @LocalWidthRule @Box @CurveBox @ShadowBox @BoundaryMarks
     @NumberMarker @NumberOf @TitleMarker @TitleOf
     @PageMarker @PageMark @NoLinkPageMark @PageOf @CrossLink @ExternalLink
 
@@ -360,6 +361,8 @@ def @BasicSetup
     #    @UCRoman         upper case Roman numerals I, II, ... , CC           #
     #    @Alpha           lower case Roman alphabet a, b,  ... , z            #
     #    @UCAlpha         upper case Roman alphabet A, B,  ... , Z            #
+    #    @FnBullets       bullets as footnote markers                         #
+    #    @FnSymbols       traditional footnote symbols asterisk, dagger, etc. #
     #    @Months          months of the year:  January, ... , December        #
     #    @ShortMonths     months of the year, abbreviated:  Jan, ..., Dec     #
     #    @WeekDays        days of the week:  Sunday, ... , Saturday           #
@@ -375,6 +378,8 @@ def @BasicSetup
     def @UCRoman	left @Tag right @Val { @Val }
     def @Alpha		left @Tag right @Val { @Val }
     def @UCAlpha	left @Tag right @Val { @Val }
+    def @FnBullets	left @Tag right @Val { @Val }
+    def @FnSymbols	left @Tag right @Val { @Val }
     def @Months		left @Tag right @Val { @Val }
     def @ShortMonths	left @Tag right @Val { @Val }
     def @WeekDays	left @Tag right @Val { @Val }
@@ -405,8 +410,8 @@ def @BasicSetup
 	{}
     {}
 
-    @SysDatabase @Word @Roman @UCRoman @Alpha @UCAlpha @Months
-		 @ShortMonths @WeekDays @ShortWeekDays @TwelveHours
+    @SysDatabase @Word @Roman @UCRoman @Alpha @UCAlpha @FnBullets @FnSymbols
+		 @Months @ShortMonths @WeekDays @ShortWeekDays @TwelveHours
 		 @ShortHours @MeriDiems @ShortMeriDiems @DateTimeFormat
     { standard  }
 
@@ -683,6 +688,27 @@ def @BasicSetup
         }
     }
 
+
+    ###########################################################################
+    #                                                                         #
+    #   @VStrut, @ZeroWidth, @ZeroHeight                                      #
+    #                                                                         #
+    ###########################################################################
+
+
+    def @VStrut
+        named above { 0.5f }
+        named below { 0.5f }
+	right x
+    {
+	x &0iu @VContract { above @High ^/ below @High }
+    }
+
+
+    def @ZeroWidth right x { @HContract { |0io x |0io } }
+
+    def @ZeroHeight right x { @VContract { /0io x /0io } }
+
 
     ###########################################################################
     #                                                                         #
@@ -1451,7 +1477,8 @@ def @BasicSetup
 	        |indent
 	        labelwidth @Wide {
 		    # @NumberMarker @Value {style num} {style num} &0io
-		    @NumberMarker @Value {num} {style type num} &0io
+		    # @NumberMarker @Value {num} {style type num} &0io
+		    @NumberMarker @Value {type num} {style type num} &0io
 		}
 	        |itemindent  @ItemPlace  |rightindent
 	        //gap  @MakeList @NotRevealed @Next num

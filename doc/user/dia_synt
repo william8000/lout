@@ -309,7 +309,7 @@ options, @Code "A" and {@Code "B"}:
     B { @ACell body }
 }
 }
-Although the concept extends to more than two options, the symnbol
+Although the concept extends to more than two options, the symbol
 doesn't.  The summary at the end of this chapter shows the other
 three directions.
 @PP

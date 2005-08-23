@@ -1,0 +1,291 @@
+###############################################################
+#                                                             #
+#  LtLatin3.LCM                                               #
+#                                                             #
+#  LCM (Lout Character Mapping) file for the ISO Latin-3      #
+#  Encoding.						      #
+#                                                             #
+#  This covers mostly Esperanto and Maltese, and it covered   #
+#  Turkish before the introduction of Latin5 in 1988.         #
+#                                                             #
+#  Six (!) character codes are unused in Latin-3.  I re-used  #
+#  three of them (i.e. in a non-standard fashion) to          #
+#  incorporate useful characters such as the Euro symbol and  #
+#  French "guillemets" (quotation marks).  Suggestions for    #
+#  remaining codes are welcome.                               #
+#                                                             #
+#  Ludovic Courtès <ludo@chbouib.org>.                        #
+#                                                             #
+#  Dec- Octal   Character       Functions ...                 #
+#  imal code    name                                          #
+#  code                                                       #
+#                                                             #
+###############################################################
+
+000	000	-none-
+001	001	-none-
+002	002	-none-
+003	003	-none-
+004	004	-none-
+005	005	-none-
+006	006	-none-
+007	007	-none-
+008	010	-none-
+009	011	-none-
+010	012	-none-
+011	013	-none-
+012	014	-none-
+013	015	-none-
+014	016	-none-
+015	017	-none-
+016	020	-none-
+017	021	-none-
+018	022	-none-
+019	023	-none-
+020	024	-none-
+021	025	-none-
+022	026	-none-
+023	027	-none-
+024	030	-none-
+025	031	-none-
+026	032	-none-
+027	033	-none-
+028	034	-none-
+029	035	-none-
+030	036	-none-
+031	037	-none-
+032	040	space
+033	041	exclam
+034	042	quotedbl
+035	043	numbersign
+036	044	dollar
+037	045	percent
+038	046	ampersand
+039	047	quoteright
+040	050	parenleft
+041	051	parenright
+042	052	asterisk
+043	053	plus
+044	054	comma
+045	055	hyphen
+046	056	period
+047	057	slash
+048	060	zero
+049	061	one
+050	062	two
+051	063	three
+052	064	four
+053	065	five
+054	066	six
+055	067	seven
+056	070	eight
+057	071	nine
+058	072	colon
+059	073	semicolon
+060	074	less
+061	075	equal
+062	076	greater
+063	077	question
+064	100	at
+065	101	A		LC a;
+066	102	B		LC b;
+067	103	C		LC c;
+068	104	D		LC d;
+069	105	E		LC e;
+070	106	F		LC f;
+071	107	G		LC g;
+072	110	H		LC h;
+073	111	I		LC i;
+074	112	J		LC j;
+075	113	K		LC k;
+076	114	L		LC l;
+077	115	M		LC m;
+078	116	N		LC n;
+079	117	O		LC o;
+080	120	P		LC p;
+081	121	Q		LC q;
+082	122	R		LC r;
+083	123	S		LC s;
+084	124	T		LC t;
+085	125	U		LC u;
+086	126	V		LC v;
+087	127	W		LC w;
+088	130	X		LC x;
+089	131	Y		LC y;
+090	132	Z		LC z;
+091	133	bracketleft
+092	134	backslash
+093	135	bracketright
+094	136	asciicircum
+095	137	underscore
+096	140	quoteleft
+097	141	a		UC A;
+098	142	b		UC B;
+099	143	c		UC C;
+100	144	d		UC D;
+101	145	e		UC E;
+102	146	f		UC F;
+103	147	g		UC G;
+104	150	h		UC H;
+105	151	i		UC I;
+106	152	j		UC J;
+107	153	k		UC K;
+108	154	l		UC L;
+109	155	m		UC M;
+110	156	n		UC N;
+111	157	o		UC O;
+112	160	p		UC P;
+113	161	q		UC Q;
+114	162	r		UC R;
+115	163	s		UC S;
+116	164	t		UC T;
+117	165	u		UC U;
+118	166	v		UC V;
+119	167	w		UC W;
+120	170	x		UC X;
+121	171	y		UC Y;
+122	172	z		UC Z;
+123	173	braceleft
+124	174	bar
+125	175	braceright
+126	176	asciitilde
+127	177	-none-
+128	200	quotesinglebase
+129	201	quotedblbase
+130	202	ellipsis
+131	203	-none-
+132	204	-none-
+133	205	quotedblleft
+134	206	quotedblright
+135	207	fi
+136	210	fl
+137	211	endash
+138	212	emdash
+139	213	bullet
+140	214	dagger
+141	215	daggerdbl
+142	216	florin
+143	217	fraction
+144	220	dotlessi
+145	221	grave
+146	222	acute
+147	223	circumflex
+148	224	tilde
+149	225	macron
+150	226	breve
+151	227	dotaccent
+152	230	dieresis
+153	231	-none-
+154	232	ring
+155	233	cedilla
+156	234	-none-
+157	235	-none-
+158	236	ogonek
+159	237	caron
+160	240	space
+161	241	Hbar		LC hbar;	UA H;		AC bar;
+162	242	breve
+163	243	sterling
+164	244	currency
+# Char #165 is unused in Latin-3.  So we use it for the Euro sign.
+# In Latin-9 (ISO-8859-15), the Euro symbol sits at char #164, and the
+# currency sign is removed.  But we want to keep the latter for real
+# Latin-3 compatibility.
+165	245	euro
+166	246	Hcircumflex	LC hcircumflex;	UA H;		AC circumflex;
+167	247	section
+168	250	dieresis
+169	251	Idot		LC i;		UA I;
+170	252	Scedilla	LC scedilla;	UA S;		AC cedilla;
+171	253	Gbreve		LC gbreve;	UA G;		AC breve;
+172	254	Jcircumflex	LC jcircumflex;	UA J;		AC circumflex;
+173	255	hyphen
+# Char #174 is unused in Latin-3.  We use it for French guillemet.
+174	256	guillemotleft
+175	257	Zdotaccent	LC zdotaccent;	UA Z;		AC dotaccent;
+176	260	degree
+177	261	hbar		UC Hbar;	UA h;		AC bar;
+178	262	twosuperior
+179	263	threesuperior
+180	264	acute
+181	265	mu
+182	266	hcircumflex	UC Hcircumflex;	UA h;		AC circumflex;
+# FIXME:  Char #183 should be "middle dot".
+183	267	dotaccent
+184	270	cedilla
+185	271	dotlessi	UC I;
+186	272	scedilla	UC Scedilla;	UA s;		AC cedilla;
+187	273	gbreve		UC Gbreve;	UA g;		AC breve;
+188	274	jcircumflex	UC Jcircumflex;	UA j;		AC circumflex;
+189	275	onehalf
+# Char #190 is unused in Latin-3.  We use it for French guillemet.
+190	276	guillemotright
+191	277	zdotaccent	UC Zdotaccent;	UA z;		AC dotaccent;
+192	300	Agrave		LC agrave;	UA A;		AC grave;
+193	301	Aacute		LC aacute;	UA A;		AC acute;
+194	302	Acircumflex	LC acircumflex;	UA A;		AC circumflex;
+# Char #195 is unused.
+195	303	Abreve		LC abreve;	UA A;		AC breve;
+196	304	Adieresis	LC adieresis;	UA A;		AC dieresis;
+197	305	Cdotaccent	LC cdotaccent;	UA C;		AC dotaccent;
+198	306	Ccircumflex	LC ccircumflex;	UA C;		AC circumflex;
+199	307	Ccedilla	LC ccedilla;	UA C;		AC cedilla;
+200	310	Egrave		LC egrave;	UA E;		AC grave;
+201	311	Eacute		LC eacute;	UA E;		AC acute;
+202	312	Ecircumflex	LC ecircumflex;	UA E;		AC circumflex;
+203	313	Edieresis	LC edieresis;	UA E;		AC dieresis;
+204	314	Igrave		LC igrave;	UA I;		AC grave;
+205	315	Iacute		LC iacute;	UA I;		AC acute;
+206	316	Icircumflex	LC icircumflex;	UA I;		AC circumflex;
+207	317	Idieresis	LC idieresis;	UA I;		AC dieresis;
+# Char #208 is unused.
+208	320	Dcroat 		LC dcroat;	UA D;
+209	321	Ntilde		LC ntilde;	UA N;		AC tilde;
+210	322	Ograve		LC ograve;	UA O;		AC grave;
+211	323	Oacute		LC oacute;	UA O;		AC acute;
+212	324	Ocircumflex	LC ocircumflex;	UA O;		AC circumflex;
+213	325	Gdotaccent	LC gdotaccent;	UA G;		AC dotaccent;
+214	326	Odieresis	LC odieresis;	UA O;		AC dieresis;
+215	327	multiply
+216	330	Gcircumflex	LC gcircumflex;	UA G;		AC circumflex;
+217	331	Ugrave		LC ugrave;	UA U;		AC grave;
+218	332	Uacute		LC uacute;	UA U;		AC acute;
+219	333	Ucircumflex	LC ucircumflex;	UA U;		AC circumflex;
+220	334	Udieresis	LC udieresis;	UA U;		AC dieresis;
+221	335	Ubreve		LC ubreve;	UA U;		AC breve;
+222	336	Scircumflex	LC scircumflex;	UA S;		AC circumflex;
+223	337	germandbls
+224	340	agrave		UC Agrave;	UA a;		AC grave;
+225	341	aacute		UC Aacute;	UA a;		AC acute;
+226	342	acircumflex	UC Acircumflex;	UA a;		AC circumflex;
+# Char #227 is unused.
+227	343	abreve		UC Abreve;	UA a;		AC breve;
+228	344	adieresis	UC Adieresis;	UA a;		AC dieresis;
+229	345	cdotaccent	UC Cdotaccent;	UA c;		AC dotaccent;
+230	346	ccircumflex	UC Ccircumflex;	UA c;		AC circumflex;
+231	347	ccedilla	UC Ccedilla;	UA c;		AC cedilla;
+232	350	egrave		UC Egrave;	UA e;		AC grave
+233	351	eacute		UC Eacute;	UA e;		AC acute;
+234	352	ecircumflex	UC Ecircumflex;	UA e;		AC circumflex;
+235	353	edieresis	UC Edieresis;	UA e;		AC dieresis;
+236	354	igrave		UC Igrave;	UA i;		AC grave;
+237	355	iacute		UC Iacute;	UA dotlessi;	AC acute;
+238	356	icircumflex	UC Icircumflex;	UA dotlessi;	AC circumflex;
+239	357	idieresis	UC Idieresis;	UA i;		AC dieresis;
+# Char #240 is unused.
+240	360	dcroat 		UC Dcroat;	UA d;
+241	361	ntilde		UC Ntilde;	UA n;		AC tilde;
+242	362	ograve		UC Ograve;	UA o;		AC grave;
+243	363	oacute		UC Oacute;	UA o;		AC acute;
+244	364	ocircumflex	UC Ocircumflex;	UA o;		AC circumflex;
+245	365	gdotaccent	UC Gdotaccent;	UA g;		AC dotaccent;
+246	366	odieresis	UC Odieresis;	UA o;		AC dieresis;
+247	367	divide
+248	370	gcircumflex	UC Gcircumflex;	UA g;		AC circumflex;
+249	371	ugrave		UC Ugrave;	UA u;		AC grave;
+250	372	uacute		UC Uacute;	UA u;		AC acute;
+251	373	ucircumflex	UC Ucircumflex;	UA u;		AC circumflex;
+252	374	udieresis	UC Udieresis;	UA u;		AC dieresis;
+253	375	ubreve		UC Ubreve;	UA u;		AC breve;
+254	376	scircumflex	UC Scircumflex;	UA s;		AC circumflex;
+255	377	dotaccent

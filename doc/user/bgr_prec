@@ -1,0 +1,190 @@
+@Section
+   @Title { Precise object placement }
+   @Tag { precise }
+@Begin
+@PP
+This section offers some tips on placing objects precisely where you
+want them.  This isn't a subject with any clear boundaries, so the
+section is mainly a list of examples, covering the use of the
+@Code {"@OneCol"}, @Code {"@OneRow"}, @Code {"@Wide"}, @Code {"@High"},
+@Code {"@HExpand"}, @Code {"@VExpand"}, @Code {"@HShift"}, @Code {"@VShift"},
+@Code {"@VStrut"}, @Code {"@OverStrike"}, @Code {"@ZeroHeight"},
+and @Code {"@ZeroWidth"} symbols.
+@PP
+The @Code "@OneCol" symbol causes the following object to be kept
+onecol. @Index @Code "@OneCol"
+on one line.  (The name stands for `one column', which is a bit
+confusing unless you are an expert.)  For example, you could use
+it to prevent hyphenation in a particular word, or to keep someone's
+name together on one line:
+@ID @Code "@OneCol { Mr. Jones }"
+although there is also the @Code "~" symbol for that.  Similarly,
+@Code "@OneRow" causes the following object to be kept in one
+onerow. @Index @Code "@OneRow"
+column.  It is commonly used to keep displays and list items
+together:
+@ID @Code "@IndentedDisplay @OneRow ..."
+and 
+@ID @Code "@ListItem @OneRow ..."
+are the usual uses.
+@PP
+Loosely speaking, the @Code {"@Wide"} symbol causes the object following
+wide. @Index @Code "@Wide"
+it to have a particular width.  It also has a @Code "@OneCol" effect.
+Paragraphs within the object will be broken if necessary in order to
+satisfy the width restriction.  More precisely, the result of the
+@Code {"@Wide"} symbol is an object with the given width, with the
+following object fitting inside it, so having at most that width.  Compare
+@ID @Code "5c @Wide @Box { A box }"
+which produces
+@ID 5c @Wide @Box { A box }
+with
+@ID @Code "@Box 5c @Wide { A box }"
+which produces
+@ID @Box 5c @Wide { A box }
+In the first example, the only obligation on the box is to be
+at most five centimetres wide, so that it fits into the space
+allowed it.  In the second example, the box is drawn around
+an object guaranteed to be exactly five centimetres wide.
+The width of the box itself will be five centimetres plus twice the
+box margin width.  Any length (Section {@NumberOf objects}) is allowed,
+and the object following @Code "@Wide" may be arbitrary as usual.
+@PP
+The @Code "@High" symbol is like @Code {"@Wide"}, only vertical.  The two
+high. @Index @Code "@High"
+may be used together:
+@ID @Code "@Box 5c @Wide 5c @High { A box }"
+produces
+@ID @Box 5c @Wide 5c @High { A box }
+Be careful when using @Code "@High" to allow enough space for
+whatever is inside.  An error message will be printed if you
+don't, and the @Code "@High" symbol will be ignored.
+@PP
+Instead of a particular width, it is quite common to want something
+to be as wide as possible.  For this there is the @Code "@HExpand"
+hexpand. @Index @Code "@HExpand"
+symbol:
+@ID @Code "@IndentedDisplay @Box @HExpand { A box }"
+produces
+@IndentedDisplay @Box @HExpand { A box }
+Notice how @Code "@HExpand" is placed after the @Code "@Box" symbol,
+to ensure that the box is drawn around something as wide as possible,
+analogously to the second @Code "@Wide" example above.  Lout has
+carefully worked out that `as wide as possible' means the column width
+minus the indent width and box margins.
+@PP
+Here is an example of @Code "@Wide" and @Code "@HExpand" working
+together:
+@ID @Box margin { 0.3c } 8c @Wide {
+Name: @Underline @HExpand
+@LP
+Address: @Underline @HExpand
+}
+The problem is to get the underlines to be as wide as possible.
+The solution is
+@ID @Code @Verbatim {
+@Box margin { 0.3c } 8c @Wide {
+Name: @Underline @HExpand
+@LP
+Address: @Underline @HExpand
+}
+}
+Each @Code "@HExpand" symbol produces for its result an object
+which is as wide as possible, in this example containing nothing.
+When that object is underlined, the underline is as wide as possible.
+@PP
+Although there is a corresponding @Code "@VExpand" symbol, it is not very
+vexpand. @Index @Code "@VExpand"
+useful alone because `as high as possible' does not mean `down to the foot
+of the page' as you would expect.  It is mainly useful within
+{@Code "@High"}.
+@PP
+The @Code {"@HShift"} and @Code {"@VShift"} symbols control the alignment
+hshift. @Index @Code "@HShift"
+vshift. @Index @Code "@VShift"
+of objects with neighbouring objects.  There are not many places in document
+formatting where alignment actually matters.  Ordinary lines of text are
+one of them:
+@ID @Code "faults such as {-0.3f @VShift s}lipped letters"
+produces
+@ID { faults such as {-0.3f @VShift s}lipped letters }
+with the object following @Code "@VShift" aligned with neighbouring
+objects such that it appears 0.3 times the current font size lower
+than it normally would.  The object following @Code {"@VShift"} may
+be arbitrary as usual.  Examples requiring @Code "@HShift" are very
+rare; one appears below.
+@PP
+The @Code "@VStrut" symbol is used to compensate for missing
+vstrut. @Index @Code "@VStrut"
+letter ascenders and descenders.  For example, the three
+boxes @Box { e }, @Box { f }, and @Box { g } look ragged
+because their contents differ in their ascenders and descenders.
+The solution is to insert a @I strut into each box:  an invisible
+object of zero width whose height is that of a letter with both
+an ascender and a descender.  This is done with the
+@Code "@VStrut" symbol, which attaches such a strut to the
+following object:
+@ID @Code "@Box { @VStrut e }, @Box { @VStrut f }, and @Box { @VStrut g }"
+produces
+@ID { @Box { @VStrut e }, @Box { @VStrut f }, and @Box { @VStrut g } }
+The @Code "@VStrut" symbol has @Code "above" and @Code "below" options
+which determine how high and low (relative to the middle of the letter
+`x') the strut is to go.  Their default values are both @Code { "0.5f" }.
+@PP
+Missing descenders can cause list items to appear unequally spaced,
+because the space between list items is ordinarily measured from
+the bottom edge of the higher list item to the top edge of the lower
+one, rather than from baseline to baseline.  Enclosing the last word
+of the troublesome items in @Code "@VStrut" will fix this problem.
+@PP
+The @Code "@OverStrike" symbol causes the objects on
+overstrike. @Index @Code "@OverStrike"
+each side of it to be overstruck:
+@ID @Code "= @OverStrike \"/\""
+produces
+@ID { = @OverStrike "/" }
+The objects to be overstruck may be arbitrary as usual.  For example,
+Section {@NumberOf overall} recommends this symbol for overstriking
+two graphs, to get what appears to be one graph with two coordinate
+systems superimposed.  The second object is printed after the first
+and will paint over it.
+@PP
+Sometimes the best way to get Lout to do what you want is to make it
+pretend that some object has zero width or height, using the
+zerowidth. @Index @Code "@ZeroWidth"
+zeroheight. @Index @Code "@ZeroHeight"
+@Code "@ZeroWidth" and @Code "@ZeroHeight" symbols.  Lout will
+format the overall document as though the object in question had
+zero width or height, but it will still print the entire object.
+@PP
+For example, you might have an inline equation that causes the
+line spacing to increase to accommodate it -- @E { 2 sup 2 sup N } say --
+but you would rather it didn't.  Writing
+@ID @Code "@ZeroHeight @E { 2 sup 2 sup N }"
+causes Lout to pretend that the object has zero height, and so
+it will not increase the line spacing around this version of
+{@ZeroHeight @E { 2 sup 2 sup N }}, as you can see.
+@PP
+The @Code "@HShift" and @Code "@VShift" symbols provide a way to move
+the printed object with respect to the zero-width one:
+@ID @Code @Verbatim {
+{@ZeroWidth 1w @HShift ``}My dear Sir Thomas!'' cried
+Mrs. Norris, red with anger, ``Fanny can walk.''
+}
+This example produces `hanging punctuation':
+@ID 5c @Wide ragged @Break {
+{@ZeroWidth 1w @HShift ``}My dear Sir Thomas!'' cried
+Mrs. Norris, red with anger, ``Fanny can walk.''
+}
+The double quotes are printed at zero width, and @Code "1w @HShift"
+ensures that they appear just to the left of the empty object that
+Lout thinks it is placing, so that they protrude into the margin
+rather than overstriking the next word (the Expert's Guide
+@Cite { $kingston1995lout.expert } explains the @Code "w" unit of
+measurement).
+@PP
+Some of the symbols described in this section are Lout primitives, described
+in full detail in the Expert's Guide @Cite { $kingston1995lout.expert };
+and that is also the place to look for more information about precise
+object placement.
+@End @Section

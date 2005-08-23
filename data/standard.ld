@@ -11,6 +11,8 @@
 #    @UCRoman        upper case Roman numerals       #
 #    @Alpha          lower case Roman alphabet       #
 #    @UCAlpha        upper case Roman alphabet       #
+#    @FnBullets      bullets as footnote markers     #
+#    @FnSymbols      traditional footnote markers    #
 #    @Months         months of the year              #
 #    @ShortMonths    months of the year, abbreviated #
 #    @WeekDays       days of the week                #
@@ -30,6 +32,7 @@
     Dutch       @Yield { Inhoudsopgave }
     English	@Yield { Contents }
     EnglishUK	@Yield { Contents }
+    Esperanto	@Yield { Enhavo }
     Finnish	@Yield { Sis{@Char adieresis}lt{@Char odieresis} }
     French	@Yield { Table des Mati{@Char egrave}res }
     German	@Yield { Inhalt }
@@ -54,6 +57,7 @@
     Dutch       @Yield { Referenties }
     English	@Yield { References }
     EnglishUK	@Yield { References }
+    Esperanto	@Yield { Referencoj }
     Finnish	@Yield { Viitteet }
     French	@Yield { R{@Char eacute}f{@Char eacute}rences }
     German	@Yield { Literaturverzeichnis }
@@ -78,6 +82,7 @@
     Dutch       @Yield { Bibliografie } 
     English	@Yield { Bibliography }
     EnglishUK	@Yield { Bibliography }
+    Esperanto	@Yield { Bibliografio }
     Finnish	@Yield { Kirjallisuusluettelo }
     French	@Yield { Bibliographie }
     German	@Yield { Literaturverzeichnis }
@@ -102,6 +107,7 @@
     Dutch       @Yield { Figuur }
     English	@Yield { Figure }
     EnglishUK	@Yield { Figure }
+    Esperanto	@Yield { Figuro }
     Finnish	@Yield { Kuva }
     French	@Yield { Figure }
     German	@Yield { Abbildung }
@@ -126,6 +132,7 @@
     Dutch       @Yield { Lijst van figuren } # Figuren, Figurenlijst
     English	@Yield { List of Figures }
     EnglishUK	@Yield { List of Figures }
+    Esperanto	@Yield { Figurolisto }
     Finnish	@Yield { Kuvat }
     French	@Yield { Liste des figures }
     German	@Yield { Abbildungsverzeichnis }
@@ -150,6 +157,7 @@
     Dutch       @Yield { Tabel }
     English	@Yield { Table }
     EnglishUK	@Yield { Table }
+    Esperanto	@Yield { Tabelo }
     Finnish	@Yield { Taulukko }
     French	@Yield { Table }
     German	@Yield { Tabelle }
@@ -174,6 +182,7 @@
     Dutch       @Yield { Lijst van tabellen }  # Tabellen, Tabellenlijst
     English	@Yield { List of Tables }
     EnglishUK	@Yield { List of Tables }
+    Esperanto	@Yield { Tabelolisto }
     Finnish	@Yield { Taulukot }
     French	@Yield { Liste des tables }
     German	@Yield { Tabellenverzeichnis }
@@ -198,6 +207,7 @@
     Dutch       @Yield { Definitie }
     English	@Yield { Definition }
     EnglishUK	@Yield { Definition }
+    Esperanto	@Yield { Difino }
     Finnish	@Yield { M{@Char adieresis}{@Char adieresis}ritelm{@Char adieresis} }
     French	@Yield { D{@Char eacute}finition }
     German	@Yield { Definition }
@@ -222,6 +232,7 @@
     Dutch       @Yield { Lemma }
     English	@Yield { Lemma }
     EnglishUK	@Yield { Lemma }
+    Esperanto	@Yield { Lemo }
     Finnish	@Yield { Lemma }
     French	@Yield { Lemme }
     German	@Yield { Lemma }
@@ -246,6 +257,7 @@
     Dutch       @Yield { Theorema }
     English	@Yield { Theorem }
     EnglishUK	@Yield { Theorem }
+    Esperanto	@Yield { Teoremo }
     Finnish	@Yield { Lause }
     French	@Yield { Th{@Char eacute}or{@Char egrave}me }
     German	@Yield { Theorem }
@@ -270,6 +282,7 @@
     Dutch       @Yield { Propositie } # Bewering
     English	@Yield { Proposition }
     EnglishUK	@Yield { Proposition }
+    Esperanto	@Yield { Propozicio }
     Finnish	@Yield { Propositio }
     French	@Yield { Proposition }
     German	@Yield { Satz }
@@ -294,6 +307,7 @@
     Dutch       @Yield { Corollaar }
     English	@Yield { Corollary }
     EnglishUK	@Yield { Corollary }
+    Esperanto	@Yield { Korolario }
     Finnish	@Yield { Seuraus }
     French	@Yield { Corollaire }
     German	@Yield { Korollar }
@@ -318,6 +332,7 @@
     Dutch       @Yield { Voorbeeld }
     English	@Yield { Example }
     EnglishUK	@Yield { Example }
+    Esperanto	@Yield { Ekzemplo }
     Finnish	@Yield { Esimerkki }
     French	@Yield { Exemple }
     German	@Yield { Beispiel }
@@ -342,6 +357,7 @@
     Dutch       @Yield { Stelling }
     English	@Yield { Claim }
     EnglishUK	@Yield { Claim }
+    Esperanto	@Yield { Aserto }
     Finnish	@Yield { V{@Char adieresis}ite }
     French	@Yield { Affirmation }
     German	@Yield { Behauptung }
@@ -366,6 +382,7 @@
     Dutch       @Yield { Bewijs }
     English	@Yield { Proof }
     EnglishUK	@Yield { Proof }
+    Esperanto	@Yield { Pruvo }
     Finnish	@Yield { Todistus }
     French	@Yield { Preuve }
     German	@Yield { Beweis }
@@ -390,6 +407,7 @@
     Dutch       @Yield { Samenvatting }
     English	@Yield { Abstract }
     EnglishUK	@Yield { Abstract }
+    Esperanto	@Yield { Resumo }
     Finnish	@Yield { Yleiskatsaus }
     French	@Yield { R{@Char eacute}sum{@Char eacute} }
     German	@Yield { Zusammenfassung }
@@ -414,6 +432,7 @@
     Dutch       @Yield { Voorwoord } # or { Woord vooraf }
     English	@Yield { Preface }
     EnglishUK	@Yield { Preface }
+    Esperanto	@Yield { Preface }
     Finnish	@Yield { Esipuhe }
     French	@Yield { Pr{@Char eacute}face }
     German	@Yield { Vorwort }
@@ -438,6 +457,7 @@
     Dutch       @Yield { ?? }
     English	@Yield { Abbreviations }
     EnglishUK	@Yield { Abbreviations }
+    Esperanto	@Yield { Mallongigo }
     Finnish	@Yield { Lyhenteet }
     French	@Yield { Abr{@Char eacute}viation }
     German	@Yield { Abk{@Char udiaresis}rzungsverzeichnis }
@@ -462,6 +482,7 @@
     Dutch       @Yield { Afkortingen }
     English	@Yield { Introduction }
     EnglishUK	@Yield { Introduction }
+    Esperanto	@Yield { Enkonduko }
     Finnish	@Yield { Johdanto }
     French	@Yield { Introduction }
     German	@Yield { Einleitung }
@@ -486,6 +507,7 @@
     Dutch       @Yield { Hoofdstuk }
     English	@Yield { Chapter }
     EnglishUK	@Yield { Chapter }
+    Esperanto	@Yield { {@Char Ccircumflex}apitro }
     Finnish	@Yield { Luku }
     French	@Yield { Chapitre }
     German	@Yield { Kapitel }
@@ -510,6 +532,7 @@
     Dutch       @Yield { Appendix }
     English	@Yield { Appendix }
     EnglishUK	@Yield { Appendix }
+    Esperanto	@Yield { Aldono }
     Finnish	@Yield { Liite }
     French	@Yield { Annexe }
     German	@Yield { Anhang }
@@ -534,9 +557,10 @@
     Dutch       @Yield { Lecture }
     English	@Yield { Lecture }
     EnglishUK	@Yield { Lecture }
+    Esperanto	@Yield { Prelego }
     Finnish	@Yield { Luento }
     French	@Yield { Conf{@Char eacute}rence }
-    German	@Yield { Lecture }
+    German	@Yield { Vorselung }
     Hungarian	@Yield { Lecture }
     Italian	@Yield { Conferenza }
     Norwegian   @Yield { Lecture }
@@ -558,6 +582,7 @@
     Dutch       @Yield { ?? }
     English	@Yield { Glossary }
     EnglishUK	@Yield { Glossary }
+    Esperanto	@Yield { Glosaro }
     Finnish	@Yield { ?? }
     French	@Yield { Glossaire }
     German	@Yield { Glossar }
@@ -582,6 +607,7 @@
     Dutch       @Yield { Index }
     English	@Yield { Index }
     EnglishUK	@Yield { Index }
+    Esperanto	@Yield { Indekso }
     Finnish	@Yield { Hakemisto }
     French	@Yield { Index }
     German	@Yield { Index }
@@ -606,9 +632,10 @@
     Dutch       @Yield { ?? }
     English	@Yield { Colophon }
     EnglishUK	@Yield { Colophon }
+    Esperanto	@Yield { Kolofono }
     Finnish	@Yield { ?? }
     French	@Yield { ?? }
-    German	@Yield { ?? }
+    German	@Yield { Kolophon }
     Hungarian	@Yield { ?? }
     Italian	@Yield { ?? }
     Norwegian   @Yield { ?? }
@@ -630,6 +657,7 @@
     Dutch       @Yield { Zonder titel }
     English	@Yield { No title }
     EnglishUK	@Yield { No title }
+    Esperanto	@Yield { Sen titolo }
     Finnish	@Yield { Ei nime{@Char adieresis} }
     French	@Yield { Sans titre }
     German	@Yield { Ohne Titel }
@@ -654,6 +682,7 @@
     Dutch       @Yield { pagina's } # or {bladzijden}, {pag.}, {blz.}
     English	@Yield { pages }
     EnglishUK	@Yield { pages }
+    Esperanto	@Yield { pa{@Char gcircumflex}oj }
     Finnish	@Yield { sivut }
     French	@Yield { pages }
     German	@Yield { Seiten }
@@ -678,6 +707,7 @@
     Dutch       @Yield { pagina } # or {bladzijde}, {pag.}, {blz.}
     English	@Yield { page }
     EnglishUK	@Yield { page }
+    Esperanto	@Yield { pa{@Char gcircumflex}o }
     Finnish	@Yield { sivu }
     French	@Yield { page }
     German	@Yield { Seite }
@@ -702,6 +732,7 @@
     Dutch       @Yield { Ongepubliceerd } # or {Zonder uitgever}
     English	@Yield { No publisher }
     EnglishUK	@Yield { No publisher }
+    Esperanto	@Yield { Sen eldonisto }
     Finnish	@Yield { Ei kustantajaa }
     French	@Yield { Sans {@Char eacute}diteur }
     German	@Yield { Ohne Verleger }
@@ -726,6 +757,7 @@
     Dutch       @Yield { Technisch rapport }
     English	@Yield { Tech. Rep. }
     EnglishUK	@Yield { Tech. Rep. }
+    Esperanto	@Yield { Teknika raporto }
     Finnish	@Yield { Tekn. rap. }
     French	@Yield { Rapport technique }
     German	@Yield { Techn. Ber. }
@@ -750,6 +782,7 @@
     Dutch       @Yield { Proefschrift } # or {Dissertatie}
     English	@Yield { Ph.D. thesis }
     EnglishUK	@Yield { Ph.D. thesis }
+    Esperanto	@Yield { Doktoriga tezo }
     Finnish	@Yield { tohtorinv{@Char adieresis}it{@Char odieresis}skirja }
     French	@Yield { Th{@Char egrave}se de Doctorat }
     German	@Yield { Doktorarbeit }
@@ -775,6 +808,7 @@
     Dutch       @Yield { Doctoraalscriptie } 
     English	@Yield { Master's thesis }
     EnglishUK	@Yield { Master's thesis }
+    Esperanto	@Yield { Magistriga tezo }
     Finnish	@Yield { diplomity{@Char odieresis} }
     French	@Yield { M{@Char eacute}moire de Ma{@Char icircumflex}trise }
     German	@Yield { Magisterarbeit }
@@ -800,6 +834,7 @@
     Dutch       @Yield { In }
     English	@Yield { In }
     EnglishUK	@Yield { In }
+    Esperanto	@Yield { En }
     Finnish	@Yield { teoksessa }
     French	@Yield { dans }
     German	@Yield { In }
@@ -824,6 +859,7 @@
     Dutch       @Yield { ?? }
     English	@Yield { ctd. }
     EnglishUK	@Yield { ctd. }
+    Esperanto	@Yield { sekva{@Char jcircumflex}o }
     Finnish	@Yield { jatk. }
     French	@Yield { suite }
     German	@Yield { Fortsetzung }
@@ -848,6 +884,7 @@
     Dutch       @Yield { a.m. }
     English	@Yield { a.m. }
     EnglishUK	@Yield { a.m. }
+    Esperanto	@Yield { a.t.m. } # antauxtagmeze
     Finnish	@Yield { a.m. }
     French	@Yield { a.m. }
     German	@Yield { a.m. }
@@ -872,6 +909,7 @@
     Dutch       @Yield { p.m. }
     English	@Yield { p.m. }
     EnglishUK	@Yield { p.m. }
+    Esperanto	@Yield { p.t.m. } # posttagmeze
     Finnish	@Yield { p.m. }
     French	@Yield { p.m. }
     German	@Yield { p.m. }
@@ -896,6 +934,7 @@
     Dutch       @Yield { am }
     English	@Yield { am }
     EnglishUK	@Yield { am }
+    Esperanto	@Yield { atm }
     Finnish	@Yield { am }
     French	@Yield { am }
     German	@Yield { am }
@@ -920,6 +959,7 @@
     Dutch       @Yield { pm }
     English	@Yield { pm }
     EnglishUK	@Yield { pm }
+    Esperanto	@Yield { ptm }
     Finnish	@Yield { pm }
     French	@Yield { pm }
     German	@Yield { pm }
@@ -1344,32 +1384,32 @@
 
 
 {  ?? @Alpha ??		}
-{   1 @Alpha a		}
-{   2 @Alpha b		}
-{   3 @Alpha c		}
-{   4 @Alpha d		}
-{   5 @Alpha e		}
-{   6 @Alpha f		}
-{   7 @Alpha g		}
-{   8 @Alpha h		}
-{   9 @Alpha i		}
-{  10 @Alpha j		}
-{  11 @Alpha k		}
-{  12 @Alpha l		}
-{  13 @Alpha m		}
-{  14 @Alpha n		}
-{  15 @Alpha o		}
-{  16 @Alpha p		}
-{  17 @Alpha q		}
-{  18 @Alpha r		}
-{  19 @Alpha s		}
-{  20 @Alpha t		}
-{  21 @Alpha u		}
-{  22 @Alpha v		}
-{  23 @Alpha w		}
-{  24 @Alpha x		}
-{  25 @Alpha y		}
-{  26 @Alpha z		}
+{   1 @Alpha "a"	}
+{   2 @Alpha "b"	}
+{   3 @Alpha "c"	}
+{   4 @Alpha "d"	}
+{   5 @Alpha "e"	}
+{   6 @Alpha "f"	}
+{   7 @Alpha "g"	}
+{   8 @Alpha "h"	}
+{   9 @Alpha "i"	}
+{  10 @Alpha "j"	}
+{  11 @Alpha "k"	}
+{  12 @Alpha "l"	}
+{  13 @Alpha "m"	}
+{  14 @Alpha "n"	}
+{  15 @Alpha "o"	}
+{  16 @Alpha "p"	}
+{  17 @Alpha "q"	}
+{  18 @Alpha "r"	}
+{  19 @Alpha "s"	}
+{  20 @Alpha "t"	}
+{  21 @Alpha "u"	}
+{  22 @Alpha "v"	}
+{  23 @Alpha "w"	}
+{  24 @Alpha "x"	}
+{  25 @Alpha "y"	}
+{  26 @Alpha "z"	}
 
 { 27 @Alpha @CurrLang @Case {
     Croatian	@Yield { ?? }
@@ -1377,6 +1417,7 @@
     Danish	@Yield { @Char ae }
     English	@Yield { ?? }
     EnglishUK	@Yield { ?? }
+    Esperanto	@Yield { @Char ccircumflex }
     Dutch	@Yield { ?? }
     Finnish	@Yield { @Char aring }
     French	@Yield { @Char ae }
@@ -1401,6 +1442,7 @@
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
     EnglishUK	@Yield { ?? }
+    Esperanto	@Yield { @Char gcircumflex }
     Finnish	@Yield { @Char adieresis }
     French	@Yield { ?? }
     German	@Yield { ?? }
@@ -1424,6 +1466,7 @@
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
     EnglishUK	@Yield { ?? }
+    Esperanto	@Yield { @Char hcircumflex }
     Finnish	@Yield { @Char odieresis }
     French	@Yield { ?? }
     German	@Yield { ?? }
@@ -1440,33 +1483,43 @@
     UpperSorbian @Yield { ?? }
 } }
 
+{ 30 @Alpha @CurrLang @Case {
+    Esperanto	@Yield { @Char jcircumflex }
+    else        @Yield { ?? }
+} }
+
+{ 31 @Alpha @CurrLang @Case {
+    Esperanto	@Yield { @Char ubreve }
+    else        @Yield { ?? }
+} }
+
 {  ?? @UCAlpha ??	}
-{   1 @UCAlpha A	}
-{   2 @UCAlpha B	}
-{   3 @UCAlpha C	}
-{   4 @UCAlpha D	}
-{   5 @UCAlpha E	}
-{   6 @UCAlpha F	}
-{   7 @UCAlpha G	}
-{   8 @UCAlpha H	}
-{   9 @UCAlpha I	}
-{  10 @UCAlpha J	}
-{  11 @UCAlpha K	}
-{  12 @UCAlpha L	}
-{  13 @UCAlpha M	}
-{  14 @UCAlpha N	}
-{  15 @UCAlpha O	}
-{  16 @UCAlpha P	}
-{  17 @UCAlpha Q	}
-{  18 @UCAlpha R	}
-{  19 @UCAlpha S	}
-{  20 @UCAlpha T	}
-{  21 @UCAlpha U	}
-{  22 @UCAlpha V	}
-{  23 @UCAlpha W	}
-{  24 @UCAlpha X	}
-{  25 @UCAlpha Y	}
-{  26 @UCAlpha Z	}
+{   1 @UCAlpha "A"	}
+{   2 @UCAlpha "B"	}
+{   3 @UCAlpha "C"	}
+{   4 @UCAlpha "D"	}
+{   5 @UCAlpha "E"	}
+{   6 @UCAlpha "F"	}
+{   7 @UCAlpha "G"	}
+{   8 @UCAlpha "H"	}
+{   9 @UCAlpha "I"	}
+{  10 @UCAlpha "J"	}
+{  11 @UCAlpha "K"	}
+{  12 @UCAlpha "L"	}
+{  13 @UCAlpha "M"	}
+{  14 @UCAlpha "N"	}
+{  15 @UCAlpha "O"	}
+{  16 @UCAlpha "P"	}
+{  17 @UCAlpha "Q"	}
+{  18 @UCAlpha "R"	}
+{  19 @UCAlpha "S"	}
+{  20 @UCAlpha "T"	}
+{  21 @UCAlpha "U"	}
+{  22 @UCAlpha "V"	}
+{  23 @UCAlpha "W"	}
+{  24 @UCAlpha "X"	}
+{  25 @UCAlpha "Y"	}
+{  26 @UCAlpha "Z"	}
 
 { 27 @UCAlpha @CurrLang @Case {
     Croatian	@Yield { ?? }
@@ -1475,6 +1528,7 @@
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
     EnglishUK	@Yield { ?? }
+    Esperanto	@Yield { @Char Ccircumflex }
     Finnish	@Yield { @Char Aring }
     French	@Yield { @Char AE }
     German	@Yield { ?? }
@@ -1498,6 +1552,7 @@
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
     EnglishUK	@Yield { ?? }
+    Esperanto	@Yield { @Char Gcircumflex }
     Finnish	@Yield { @Char Adieresis }
     French	@Yield { ?? }
     German	@Yield { ?? }
@@ -1521,6 +1576,7 @@
     Dutch	@Yield { ?? }
     English	@Yield { ?? }
     EnglishUK	@Yield { ?? }
+    Esperanto	@Yield { @Char Hcircumflex }
     Finnish	@Yield { @Char Odieresis }
     French	@Yield { ?? }
     German	@Yield { ?? }
@@ -1537,6 +1593,32 @@
     UpperSorbian @Yield { ?? }
 } }
 
+{ 30 @UCAlpha @CurrLang @Case {
+    Esperanto	@Yield { @Char Jcircumflex }
+    else        @Yield { ?? }
+} }
+
+{ 31 @UCAlpha @CurrLang @Case {
+    Esperanto	@Yield { @Char Ubreve }
+    else        @Yield { ?? }
+} }
+
+{ ?? @FnBullets ?? }
+{  1 @FnBullets @Bullet }
+{  2 @FnBullets { @Bullet @Bullet } }
+{  3 @FnBullets { @Bullet @Bullet @Bullet } }
+{  4 @FnBullets { @Bullet @Bullet @Bullet @Bullet } }
+
+{ ?? @FnSymbols ?? }
+{  1 @FnSymbols @Star }
+{  2 @FnSymbols @Dagger }
+{  3 @FnSymbols @DaggerDbl }
+{  4 @FnSymbols @SectSym }
+{  5 @FnSymbols @ParSym }
+{  6 @FnSymbols "||" }
+{  7 @FnSymbols { @Star @Star } }
+{  8 @FnSymbols { @Dagger @Dagger } }
+{  9 @FnSymbols { @DaggerDbl @DaggerDbl } }
 
 { 1 @Months @CurrLang @Case {
     Croatian	@Yield { sije{@Char ccaron}anj }
@@ -1545,6 +1627,7 @@
     Dutch       @Yield { januari }
     English	@Yield { January }
     EnglishUK	@Yield { January }
+    Esperanto	@Yield { januaro }
     Finnish	@Yield { tammikuu }
     French	@Yield { janvier }
     German	@Yield { Januar }
@@ -1568,6 +1651,7 @@
     Dutch       @Yield { februari }
     English	@Yield { February }
     EnglishUK	@Yield { February }
+    Esperanto	@Yield { februaro }
     Finnish	@Yield { helmikuu }
     French	@Yield { f{@Char eacute}vrier }
     German	@Yield { Februar }
@@ -1591,6 +1675,7 @@
     Dutch       @Yield { maart }
     English	@Yield { March }
     EnglishUK	@Yield { March }
+    Esperanto	@Yield { marto }
     Finnish	@Yield { maaliskuu }
     French	@Yield { mars }
     German	@Yield { M{@Char adieresis}rz }
@@ -1614,6 +1699,7 @@
     Dutch       @Yield { april }
     English	@Yield { April }
     EnglishUK	@Yield { April }
+    Esperanto	@Yield { aprilo }
     Finnish	@Yield { huhtikuu }
     French	@Yield { avril }
     German	@Yield { April }
@@ -1637,6 +1723,7 @@
     Dutch       @Yield { mei }
     English	@Yield { May }
     EnglishUK	@Yield { May }
+    Esperanto	@Yield { majo }
     Finnish	@Yield { toukokuu }
     French	@Yield { mai }
     German	@Yield { Mai }
@@ -1660,6 +1747,7 @@
     Dutch       @Yield { juni }
     English	@Yield { June }
     EnglishUK	@Yield { June }
+    Esperanto	@Yield { junio }
     Finnish	@Yield { kes{@Char adieresis}kuu }
     French	@Yield { juin }
     German	@Yield { Juni }
@@ -1684,6 +1772,7 @@
     Dutch       @Yield { juli }
     English	@Yield { July }
     EnglishUK	@Yield { July }
+    Esperanto	@Yield { julio }
     Finnish	@Yield { hein{@Char adieresis}kuu }
     French	@Yield { juillet }
     German	@Yield { Juli }
@@ -1707,6 +1796,7 @@
     Dutch       @Yield { augustus }
     English	@Yield { August }
     EnglishUK	@Yield { August }
+    Esperanto	@Yield { a{@Char ubreve}gusto }
     Finnish	@Yield { elokuu }
     French	@Yield { ao{@Char ucircumflex}t }
     German	@Yield { August }
@@ -1730,6 +1820,7 @@
     Dutch       @Yield { september }
     English	@Yield { September }
     EnglishUK	@Yield { September }
+    Esperanto	@Yield { septembro }
     Finnish	@Yield { syyskuu }
     French	@Yield { septembre }
     German	@Yield { September }
@@ -1753,6 +1844,7 @@
     Dutch       @Yield { oktober }
     English	@Yield { October }
     EnglishUK	@Yield { October }
+    Esperanto	@Yield { oktobro }
     Finnish	@Yield { lokakuu }
     French	@Yield { octobre }
     German	@Yield { Oktober }
@@ -1776,6 +1868,7 @@
     Dutch       @Yield { november }
     English	@Yield { November }
     EnglishUK	@Yield { November }
+    Esperanto	@Yield { novembro }
     Finnish	@Yield { marraskuu }
     French	@Yield { novembre }
     German	@Yield { November }
@@ -1799,6 +1892,7 @@
     Dutch       @Yield { december }
     English	@Yield { December }
     EnglishUK	@Yield { December }
+    Esperanto	@Yield { decembro }
     Finnish	@Yield { joulukuu }
     French	@Yield { d{@Char eacute}cembre }
     German	@Yield { Dezember }
@@ -1823,6 +1917,7 @@
     Dutch       @Yield { jan }
     English	@Yield { Jan }
     EnglishUK	@Yield { Jan }
+    Esperanto	@Yield { jan }
     Finnish	@Yield { tammikuu }
     French	@Yield { jan }
     German	@Yield { Jan }
@@ -1846,6 +1941,7 @@
     Dutch       @Yield { feb }
     English	@Yield { Feb }
     EnglishUK	@Yield { Feb }
+    Esperanto	@Yield { feb }
     Finnish	@Yield { helmikuu }
     French	@Yield { f{@Char eacute}v }
     German	@Yield { Feb }
@@ -1869,6 +1965,7 @@
     Dutch       @Yield { mrt }
     English	@Yield { Mar }
     EnglishUK	@Yield { Mar }
+    Esperanto	@Yield { mar }
     Finnish	@Yield { maaliskuu }
     French	@Yield { mar }
     German	@Yield { M{@Char adieresis}r }
@@ -1892,6 +1989,7 @@
     Dutch       @Yield { apr }
     English	@Yield { Apr }
     EnglishUK	@Yield { Apr }
+    Esperanto	@Yield { apr }
     Finnish	@Yield { huhtikuu }
     French	@Yield { avr }
     German	@Yield { Apr }
@@ -1915,6 +2013,7 @@
     Dutch       @Yield { mei }
     English	@Yield { May }
     EnglishUK	@Yield { May }
+    Esperanto	@Yield { maj }
     Finnish	@Yield { toukokuu }
     French	@Yield { mai }
     German	@Yield { Mai }
@@ -1938,6 +2037,7 @@
     Dutch       @Yield { jun }
     English	@Yield { Jun }
     EnglishUK	@Yield { Jun }
+    Esperanto	@Yield { jun }
     Finnish	@Yield { kes{@Char adieresis}kuu }
     French	@Yield { juin }
     German	@Yield { Jun }
@@ -1961,6 +2061,7 @@
     Dutch       @Yield { jul }
     English	@Yield { Jul }
     EnglishUK	@Yield { Jul }
+    Esperanto	@Yield { jul }
     Finnish	@Yield { hein{@Char adieresis}kuu }
     French	@Yield { juil }
     German	@Yield { Jul }
@@ -1984,6 +2085,7 @@
     Dutch       @Yield { aug }
     English	@Yield { Aug }
     EnglishUK	@Yield { Aug }
+    Esperanto	@Yield { a{@Char ubreve}g }
     Finnish	@Yield { elokuu }
     French	@Yield { ao{@Char ucircumflex} }
     German	@Yield { Aug }
@@ -2007,6 +2109,7 @@
     Dutch       @Yield { sep }
     English	@Yield { Sep }
     EnglishUK	@Yield { Sep }
+    Esperanto	@Yield { sep }
     Finnish	@Yield { syyskuu }
     French	@Yield { sep }
     German	@Yield { Sep }
@@ -2030,6 +2133,7 @@
     Dutch       @Yield { okt }
     English	@Yield { Oct }
     EnglishUK	@Yield { Oct }
+    Esperanto	@Yield { okt }
     Finnish	@Yield { lokakuu }
     French	@Yield { oct }
     German	@Yield { Okt }
@@ -2053,6 +2157,7 @@
     Dutch       @Yield { nov }
     English	@Yield { Nov }
     EnglishUK	@Yield { Nov }
+    Esperanto	@Yield { nov }
     Finnish	@Yield { marraskuu }
     French	@Yield { nov }
     German	@Yield { Nov }
@@ -2076,6 +2181,7 @@
     Dutch       @Yield { dec }
     English	@Yield { Dec }
     EnglishUK	@Yield { Dec }
+    Esperanto	@Yield { dec }
     Finnish	@Yield { joulukuu }
     French	@Yield { d{@Char eacute}c }
     German	@Yield { Dez }
@@ -2100,6 +2206,7 @@
     Dutch       @Yield { zondag }
     English	@Yield { Sunday }
     EnglishUK	@Yield { Sunday }
+    Esperanto	@Yield { diman{@Char ccircumflex}o }
     Finnish	@Yield { sunnuntai }
     French	@Yield { dimanche }
     German	@Yield { Sonntag }
@@ -2123,6 +2230,7 @@
     Dutch       @Yield { maandag }
     English	@Yield { Monday }
     EnglishUK	@Yield { Monday }
+    Esperanto	@Yield { lundo }
     Finnish	@Yield { maanantai }
     French	@Yield { lundi }
     German	@Yield { Montag }
@@ -2146,6 +2254,7 @@
     Dutch       @Yield { dinsdag }
     English	@Yield { Tuesday }
     EnglishUK	@Yield { Tuesday }
+    Esperanto	@Yield { mardo }
     Finnish	@Yield { tiistai }
     French	@Yield { mardi }
     German	@Yield { Dienstag }
@@ -2169,6 +2278,7 @@
     Dutch       @Yield { woensdag }
     English	@Yield { Wednesday }
     EnglishUK	@Yield { Wednesday }
+    Esperanto	@Yield { merkredo }
     Finnish	@Yield { keskiviikko }
     French	@Yield { mercredi }
     German	@Yield { Mittwoch }
@@ -2192,6 +2302,7 @@
     Dutch       @Yield { donderdag }
     English	@Yield { Thursday }
     EnglishUK	@Yield { Thursday }
+    Esperanto	@Yield { {@Char jcircumflex}a{@Char ubreve}do }
     Finnish	@Yield { torstai }
     French	@Yield { jeudi }
     German	@Yield { Donnerstag }
@@ -2215,6 +2326,7 @@
     Dutch       @Yield { vrijdag }
     English	@Yield { Friday }
     EnglishUK	@Yield { Friday }
+    Esperanto	@Yield { vendredo }
     Finnish	@Yield { perjantai }
     French	@Yield { vendredi }
     German	@Yield { Freitag }
@@ -2238,6 +2350,7 @@
     Dutch       @Yield { zaterdag }
     English	@Yield { Saturday }
     EnglishUK	@Yield { Saturday }
+    Esperanto	@Yield { sabato }
     Finnish	@Yield { lauantai }
     French	@Yield { samedi }
     German	@Yield { Samstag }
@@ -2262,6 +2375,7 @@
     Dutch       @Yield { zo }
     English	@Yield { Sun }
     EnglishUK	@Yield { Sun }
+    Esperanto	@Yield { dim }
     Finnish	@Yield { su }
     French	@Yield { dim }
     German	@Yield { So }
@@ -2285,6 +2399,7 @@
     Dutch       @Yield { ma }
     English	@Yield { Mon }
     EnglishUK	@Yield { Mon }
+    Esperanto	@Yield { lun }
     Finnish	@Yield { ma }
     French	@Yield { lun }
     German	@Yield { Mo }
@@ -2308,6 +2423,7 @@
     Dutch       @Yield { di }
     English	@Yield { Tue }
     EnglishUK	@Yield { Tue }
+    Esperanto	@Yield { mar }
     Finnish	@Yield { ti }
     French	@Yield { mar }
     German	@Yield { Di }
@@ -2331,6 +2447,7 @@
     Dutch       @Yield { wo }
     English	@Yield { Wed }
     EnglishUK	@Yield { Wed }
+    Esperanto	@Yield { mer }
     Finnish	@Yield { ke }
     French	@Yield { mer }
     German	@Yield { Mi }
@@ -2354,6 +2471,7 @@
     Dutch       @Yield { do }
     English	@Yield { Thu }
     EnglishUK	@Yield { Thu }
+    Esperanto	@Yield { {@Char jcircumflex}a{@Char ubreve} }
     Finnish	@Yield { to }
     French	@Yield { jeu }
     German	@Yield { Do }
@@ -2377,6 +2495,7 @@
     Dutch       @Yield { vr }
     English	@Yield { Fri }
     EnglishUK	@Yield { Fri }
+    Esperanto	@Yield { ven }
     Finnish	@Yield { pe }
     French	@Yield { ven }
     German	@Yield { Fr }
@@ -2400,6 +2519,7 @@
     Dutch       @Yield { za }
     English	@Yield { Sat }
     EnglishUK	@Yield { Sat }
+    Esperanto	@Yield { sab }
     Finnish	@Yield { la }
     French	@Yield { sam }
     German	@Yield { Sa }
@@ -2528,6 +2648,7 @@
     Dutch	@Yield { @DayNum @Month @Year			}
     English	@Yield { @DayNum @Month, @Year			}
     EnglishUK	@Yield { @DayNum @Month, @Year			}
+    Esperanto	@Yield { @DayNum"a" "de" @Month "de" @Year	}
     Finnish	@Yield { @DayNum. @Month"ta" @Year		}
     French	@Yield { @DayNum @Month @Year			}
     German	@Yield { @DayNum. @Month @Year			}
@@ -2552,6 +2673,7 @@
     Dutch	@Yield { @ShortHour.@Minute			}
     English	@Yield { @TwelveHour.@Minute @MeriDiem		}
     EnglishUK	@Yield { @TwelveHour.@Minute @MeriDiem		}
+    Esperanto	@Yield { @ShortHour:@Minute			}
     Finnish	@Yield { @ShortHour.@Minute			}
     French	@Yield { @ShortHour"h"@Minute			}
     German	@Yield { @ShortHour.@Minute			}

@@ -508,7 +508,7 @@ def @PodSetup
 
 
 	def @A		# get characters from the Adobe Symbol font
-	    left sym
+	    named sym {}
 	    right x
 	{
 	    style @Case {

@@ -531,12 +531,17 @@ def @DocumentSetup
     #  @Protect x                                                             #
     #                                                                         #
     #  Like @CNP, this reserves space on the current page or else makes sure  #
-    #  x appears on the following page.  Lookahead is proportional to font    #
-    #  size.                                                                  #
+    #  x appears on the following page.                                       #
+    #                                                                         #
+    #  Prior to Version 3.31 the amount of lookahead was just 3.0f.  But      #
+    #  in Version 3.31, following a suggestion of Ludovic Courtes, this       #
+    #  was changed to @OneRow { 1.0f @High @LP 2.0v @High }, which            #
+    #  approximates the height of a title line, a paragraph separator, and    #
+    #  the first two lines of the section, and so works somewhat better.      #
     #                                                                         #
     ###########################################################################
 
-    def @Protect right x { 3.0f @High //0io // x }
+    def @Protect right x { @OneRow { 1.0f @High @LP 2.0v @High } //0io // x }
 
 
     ###########################################################################
@@ -688,6 +693,8 @@ def @DocumentSetup
 	    UCRoman @Yield @UCRoman&&num
 	    Alpha   @Yield @Alpha&&num
 	    UCAlpha @Yield @UCAlpha&&num
+	    Bullets @Yield @FnBullets&&num
+	    Symbols @Yield @FnSymbols&&num
 	}
     }
 
@@ -4822,7 +4829,7 @@ def @DocumentSetup
 	    left @Num right @Body {}
 	named headingtext { @Null }	# heading text
 	named incontents { No }         # entry in table of contents required
-	named contentsindent { 0f }	# only if type is Major
+	named contentsindent { 0f }	# only used if type is Minor
 	named word {}
 	named numbers { None }
 	named attachnum {}		# only if numbers is not None
@@ -4947,6 +4954,7 @@ def @DocumentSetup
 
 		{ Yes.Major Yes.MajorIntro Yes.ExtraMajor Yes.ExtraMajorIntro } @Yield {
 			incontents @MajorContentsEntry
+			    indent { contentsindent }
 			    crosstag { tag }
 			    number { @LongNum }
 			    title { initiallanguage @Language title }
@@ -4955,6 +4963,7 @@ def @DocumentSetup
 
 		{ Yes.VeryMajor } @Yield {
 			incontents @VeryMajorContentsEntry
+			    indent { contentsindent }
 			    title { initiallanguage @Language {
 				bypassnumber @ColonSep title } }
 		}

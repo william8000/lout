@@ -1,7 +1,7 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -278,7 +278,7 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
   FULL_CHAR *lig, int *ligtop, FILE_NUM fnum, struct metrics *fnt,
   int *lnum, FILE *fp)
 { FULL_CHAR buff[MAX_BUFF], command[MAX_BUFF], ch, ligchar;
-  int i, wx = 0, llx = 0, lly = 0, urx = 0, ury = 0;
+  int prev_ligtop, prev_lig, i, wx = 0, llx = 0, lly = 0, urx = 0, ury = 0;
   float fl_wx, fl_llx, fl_lly, fl_urx, fl_ury;
   BOOLEAN wxfound, bfound;
   OBJECT AFMfilename;
@@ -317,7 +317,10 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
       }
       else if( StringEqual(command, "L") &&
 	BackEnd->uses_font_metrics && ch != '\0' )
-      { if( lig[ch] == 1 )  lig[ch] = (*ligtop) - MAX_CHARS;
+      {
+	prev_ligtop = *ligtop;
+	prev_lig = lig[ch];
+	if( lig[ch] == 1 )  lig[ch] = (*ligtop) - MAX_CHARS;
 	lig[(*ligtop)++] = ch;
 	i++;  /* skip L */
 	while( buff[i] == ' ' )  i++;
@@ -328,7 +331,8 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
 	  else
 	  { Error(37, 1, "ignoring unencoded ligature character %s in font file %s (line %d)",
 	      WARN, &fpos(AFMfilename), command, FileName(fnum), *lnum);
-	    lig[ch] = 1;
+	    lig[ch] = prev_lig;  /* patch by Ludovic Courtes, added v. 3.31 */
+	    *ligtop = prev_ligtop;
 	  }
 	  if( *ligtop > 2*MAX_CHARS - 5 )
 	    Error(37, 2, "too many ligature characters in font file %s (line %d)",
@@ -336,7 +340,8 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
 	  while( buff[i] != ' ' && buff[i] != ';' )  i++;
 	  while( buff[i] == ' ' ) i++;
 	}
-	lig[(*ligtop)++] = '\0';
+	if( *ligtop != prev_ligtop )  /* this test by Ludovic Courtes, 3.31 */
+	  lig[(*ligtop)++] = '\0';
       }
       while( buff[i] != ';' && buff[i] != '\0' )  i++;
       if( buff[i] == ';' )
@@ -1977,3 +1982,50 @@ BOOLEAN FontNeeded(FILE *fp)
   }
   return first_need;
 } /* end FontNeeded */
+
+
+/*@::FontGlyphHeight()@*******************************************************/
+/*                                                                           */
+/*  SHORT_LENGTH FontGlyphHeight(fnum, chr)                                  */
+/*                                                                           */
+/*  Contributed as part of margin kerning by Ludovic Courtes.                */
+/*                                                                           */
+/*  Return the height of the glyph that corresponds to character chr in      */
+/*  font fnum.                                                               */
+/*                                                                           */
+/*****************************************************************************/
+
+FULL_LENGTH FontGlyphHeight(FONT_NUM fnum, FULL_CHAR chr)
+{
+  struct metrics *fnt;
+
+  assert ((fnum >= 1) && (fnum <= font_count), "FontGlyphHeight");
+
+  fnt = finfo[fnum].size_table;
+  return (fnt ? fnt[chr].up - fnt[chr].down : 0);
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  SHORT_LENGTH FontGlyphWidth(fnum, chr)                                   */
+/*                                                                           */
+/*  Contributed as part of margin kerning by Ludovic Courtes.                */
+/*                                                                           */
+/*  Return the width of the glyph that corresponds to character chr in       */
+/*  font fnum.                                                               */
+/*                                                                           */
+/*****************************************************************************/
+
+FULL_LENGTH FontGlyphWidth(FONT_NUM fnum, FULL_CHAR chr)
+{
+  struct metrics *fnt;
+
+  assert ((fnum >= 1) && (fnum <= font_count), "FontGlyphWidth");
+
+  fnt = finfo[fnum].size_table;
+  return (fnt ? fnt[chr].right - fnt[chr].left : 0);
+}
+
+
+

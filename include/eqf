@@ -106,6 +106,7 @@ export	"`" "``" "```" bin rel punct non vctr big small
 	matrix pmatrix bmatrix brmatrix fmatrix cmatrix amatrix
 
 def @Eq                  
+    named initzunit { 1f }
     body @Body
 @Begin
 
@@ -138,7 +139,9 @@ def @Eq
     #                     Lout but is used by the @SupGap symbol.     #
     #                                                                 #
     #  Knuth also recommends some changes that depend on whether the  #
-    #  equation is displayed or inline; these are not implemented.    #
+    #  equation is displayed or inline; these are not implemented,    #
+    #  except that the @E symbol for inline equations (defined as     #
+    #  a macro at the bottom of this file) includes a @VSqueeze.      #
     #                                                                 #
     ###################################################################
 
@@ -1690,8 +1693,8 @@ def @Eq
     macro amatrix  { matrix atleft { blangle } atright { brangle } }
 
     { Slope xheight2mark } @Font { separate @SpaceGap } @Space
-    1f @ZUnit 1f @YUnit @Body
+    initzunit @ZUnit 1f @YUnit @Body
 
 @End @Eq                  
 
-macro @E { @OneCol @Eq }
+macro @E { @OneCol @Eq initzunit { 0.7f } }

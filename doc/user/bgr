@@ -18,5 +18,6 @@ get them beyond the usual @Code "@SysInclude { doc }" or whatever.
 @Include { bgr_scal }
 @Include { bgr_mirr }
 @Include { bgr_incl }
+@Include { bgr_prec }
 @EndSections
 @End @Chapter

@@ -58,6 +58,7 @@
   # fixedfont			{ Courier	} # font family
   # fixedsize			{ -1.0p		} # font size
   # fixedline			{ 1.0vx		} # line-space
+  # fixedspace			{ lout		} # spacing mode
   # fixedtabin			{ 8		} # tab interval
   # fixedtabout			{ 8s		} # tab width
 
@@ -83,6 +84,7 @@
   # varyingsize			{ 1.0f		} # font size
   # varyingline			{ 1.0vx		} # line-space
   # varyingtabin		{ 8		} # tab interval
+  # varyingspace		{ lout		} # spacing mode
   # varyingtabout		{ 3f		} # tab width
 
   # varyingidentifiers		{ Slope		} # identifier face
@@ -106,6 +108,7 @@
   # symbolfont			{		} # font family
   # symbolsize			{ 1.0f		} # font size
   # symbolline			{ 1.0vx		} # line-space
+  # symbolspace			{ lout		} # spacing mode
   # symboltabin			{ 8		} # tab interval
   # symboltabout		{ 3f		} # tab width
 

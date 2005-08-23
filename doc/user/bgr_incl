@@ -32,18 +32,16 @@ called @Code "lout.eps" in the current directory, and removed after
 being copied into the output file.
 @PP
 If you place an included illustration in a line of text, or anywhere
-where you care about its alignment with things on either side of it,
+where you care about its alignment with things on each side,
 it will be positioned with its centre at the same height as the
-centre of the letter x.  If this is not where you want it, use the
-@Code "@VShift" symbol:
+centre of the letter x.  If this is not what you want, use the
+@Code "@VShift" symbol from Section {@NumberOf precise}:
 vshift. @Index @Code "@VShift"
 @ID @Code "... +0.5f @VShift @IncludeGraphic ..."
 prints the illustration half of the current font size higher on the
 page than would otherwise have been the case, and
 @ID @Code "... -0.5f @VShift @IncludeGraphic ..."
-prints it half the current font size lower.  Any length (Section
-{@NumberOf objects}) is allowed, and the object following @Code "@VShift"
-may in fact be arbitrary as usual.
+prints it half the current font size lower.
 @PP
 Sometimes you need to include the same EPS file many times, for
 example once per page.  If it is a large file it can make the
@@ -72,6 +70,6 @@ output file a lot shorter, and it usually makes it print faster as
 well.  On the other hand, {@Code "@IncludeGraphicRepeated"} uses
 Level 2 PostScript features which some older printers may not have,
 and it consumes a lot of memory in the printer.  If memory runs out
-your job will not print properly, so @Code "@IncludeGraphicRepeated"
-must be used with caution.
+your job will not print properly, so use @Code "@IncludeGraphicRepeated"
+with caution.
 @End @Section

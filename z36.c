@@ -1,7 +1,7 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -42,7 +42,8 @@
 /*  TeX hyphenation files often contain escape sequences consisting of a     */
 /*  backslash and two or three characters to denote 8-bit characters.  This  */
 /*  code will read and translate such sequences if they are in the following */
-/*  list.                                                                    */
+/*  list.  Latin-3 and a few other codes supplied by Ludovic Courtes and     */
+/*  added for Version 3.31.                                                  */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -60,6 +61,8 @@ static char *tex_codes[] = {
 	"adieresis",	"\"a",	"\344",
 
 	"ccedilla",	"cc",	"\347",
+	"Ccircumflex",  "^C",   "\306",  /* Latin-3 */
+	"ccircumflex",  "^c",   "\346",  /* Latin-3 */
 
 	"Egrave",	"`E",	"\310",
 	"Eacute",	"'E",	"\311",
@@ -70,6 +73,12 @@ static char *tex_codes[] = {
 	"ecircumflex",	"^e",	"\352",
 	"edieresis",	"\"e",	"\353",
 
+	"Gcircumflex",  "^G",   "\330",  /* Latin-3 */
+	"gcircumflex",  "^g",   "\370",  /* Latin-3 */
+
+	"Hcircumflex",  "^H",   "\246",  /* Latin-3 */
+	"hcircumflex",  "^h",   "\266",  /* Latin-3 */
+
 	"Igrave",	"`I",	"\314",
 	"Iacute",	"'I",	"\315",
 	"Icircumflex",	"^I",	"\316",
@@ -78,6 +87,9 @@ static char *tex_codes[] = {
 	"iacute",	"'\\i",	"\355",
 	"icircumflex",	"^\\i",	"\356",
 	"idieresis",	"\"\\i","\357",
+
+	"Jcircumflex",  "^J",   "\254",  /* Latin-3 */
+	"jcircumflex",  "^j",   "\274",  /* Latin-3 */
 
 	"Ograve",	"`O",	"\322",
 	"Oacute",	"'O",	"\323",
@@ -90,14 +102,21 @@ static char *tex_codes[] = {
 	"otilde",	"~o",	"\365",
 	"odieresis",	"\"o",	"\366",
 
+	"Scircumflex",  "^S",   "\336",
+	"scircumflex",  "^s",   "\376",
+
 	"Ugrave",	"`U",	"\331",
 	"Uacute",	"'U",	"\332",
 	"Ucircumflex",	"^U",	"\333",
 	"Udieresis",	"\"U",	"\334",
+	"Ubreve",       "~U",   "\335",  /* Latin-3 */
+
 	"ugrave",	"`u",	"\371",
 	"uacute",	"'u",	"\372",
 	"ucircumflex",	"^u",	"\373",
 	"udieresis",	"\"u",	"\374",
+	"ubreve",       "~u",   "\375",  /* Latin-3 */
+
 
 	"",		"",	""
 };
@@ -122,8 +141,9 @@ static void DecodeEscapes(FULL_CHAR *str, FULL_CHAR *fname, int hline_num)
       }
       else
       {
-	Error(36, 1, "in hyphenation file %s, unknown escape sequence (line %d)",
-	  FATAL, no_fpos, fname, hline_num);
+	Error(36, 1,
+	  "in hyphenation file %s, unknown escape sequence \"%s\" (line %d)",
+	  FATAL, no_fpos, fname, q + 1, hline_num);
       }
     }
     else *p++ = *q++;

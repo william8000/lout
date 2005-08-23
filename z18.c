@@ -1,7 +1,7 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -89,6 +89,7 @@ void TransferInit(OBJECT InitEnv)
   smallcaps_len(InitialStyle)   = 0.7 * FR;		/* i.e. 0.7 scale    */
   nobreakfirst(InitialStyle)	= FALSE;
   nobreaklast(InitialStyle)	= FALSE;
+  marginkerning(InitialStyle)	= FALSE;
   baselinemark(InitialStyle)	= FALSE;                /* i.e. not baseline */
   ligatures(InitialStyle)	= TRUE;                 /* i.e. ligatures    */
 

@@ -373,6 +373,16 @@
   # @IndexInContents		{ Yes		} # add index to contents
   # @IndexAInContents		{ Yes		} # add index A to contents
   # @IndexBInContents		{ Yes		} # add index B to contents
+  # @SectionContentsIndent	{ 0f		} # contents indent of sections
+  # @SubSectionContentsIndent	{ 3f		} # contents indent of subsections
+  # @SubSubSectionContentsIndent{ 6f		} # contents indent of sub-subsections
+  # @AppendixContentsIndent	{ 0f		} # contents indent of appendices
+  # @SubAppendixContentsIndent	{ 3f		} # contents indent of sub-appendices
+  # @SubSubAppendixContentsIndent { 6f		} # contents indent of sub-subappendices
+  # @ReferencesContentsIndent	{ 0f		} # contents indent of references
+  # @IndexContentsIndent	{ 0f		} # contents indent of index
+  # @IndexAContentsIndent	{ 0f		} # contents indent of index A
+  # @IndexBContentsIndent	{ 0f		} # contents indent of index B
   # @SectionNumInTheorems	{ No		} # theorem num has section num
   # @SubSectionNumInTheorems	{ No		} # theorem num has subsect num
   # @SubSubSectionNumInTheorems	{ No		} # theorem num has sub-ss. num

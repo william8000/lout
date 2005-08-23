@@ -38,17 +38,19 @@ At the time of writing, the following languages were available:
     A { EnglishUK en-GB }
     B { Slovak Slovensky Slovencina }
 @Rowa
-    A { Finnish Suomi fi }
+    A { Esperanto eo }
     B { Slovenian Slovenia Slovenija sl }
 @Rowa
-    A { French Francais Fran{@Char ccedilla}ais fr }
+    A { Finnish Suomi fi }
     B { Spanish Espa{@Char ntilde}ol es }
 @Rowa
-    A { German Deutsch de }
+    A { French Francais Fran{@Char ccedilla}ais fr }
     B { Swedish Svenska sv }
 @Rowa
-    A { Hungarian Magyar hu }
+    A { German Deutsch de }
     B { UpperSorbian hornjoserbsce serbsce }
+@Rowa
+    A { Hungarian Magyar hu }
 }
 File @Code "include/langdefs" in the distribution always has the exact
 list of known languages.  As shown, most languages have alternative

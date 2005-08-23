@@ -139,6 +139,18 @@ def @ReportSetup
     named @IndexAInContents		{ Yes			}
     named @IndexBInContents		{ Yes			}
 
+    named @SectionContentsIndent	{ 0f			}
+    named @SubSectionContentsIndent	{ 3f			}
+    named @SubSubSectionContentsIndent	{ 6f			}
+    named @AppendixContentsIndent	{ 0f			}
+    named @SubAppendixContentsIndent	{ 3f			}
+    named @SubSubAppendixContentsIndent	{ 6f			}
+    named @ReferencesContentsIndent	{ 0f			}
+    named @GlossaryContentsIndent	{ 0f			}
+    named @IndexContentsIndent		{ 0f			}
+    named @IndexAContentsIndent		{ 0f			}
+    named @IndexBContentsIndent		{ 0f			}
+
     named @SectionNumInTheorems		{ No			}
     named @SubSectionNumInTheorems	{ No			}
     named @SubSubSectionNumInTheorems	{ No			}
@@ -360,6 +372,7 @@ def @ReportSetup
                 headingbreak { @ReferencesHeadingBreak }
                 headingformat { @ReferencesHeadingFormat @Body }
                 incontents { @ReferencesInContents }
+                contentsindent { @ReferencesContentsIndent }
 		majornum {}
 		majortitle {}
 		minornum {}
@@ -394,6 +407,7 @@ def @ReportSetup
                 headingformat { @GlossaryHeadingFormat @Body }
                 headingtext { @GlossaryText }
                 incontents { @GlossaryInContents }
+                contentsindent { @GlossaryContentsIndent }
                 prefix { @GlossaryPrefix }
                 inrunners { Yes }
 		majornum {}
@@ -432,6 +446,7 @@ def @ReportSetup
                 headingformat { @IndexHeadingFormat @Body }
                 headingtext { @IndexText }
                 incontents { @IndexInContents }
+                contentsindent { @IndexContentsIndent }
                 prefix { @IndexPrefix }
                 inrunners { Yes }
 		majornum {}
@@ -469,6 +484,7 @@ def @ReportSetup
                 headingformat { @IndexAHeadingFormat @Body }
                 headingtext { @IndexAText }
                 incontents { @IndexAInContents }
+                contentsindent { @IndexAContentsIndent }
                 prefix { @IndexAPrefix }
                 inrunners { Yes }
 		majornum {}
@@ -506,6 +522,7 @@ def @ReportSetup
                 headingformat { @IndexBHeadingFormat @Body }
                 headingtext { @IndexBText }
                 incontents { @IndexBInContents }
+                contentsindent { @IndexBContentsIndent }
                 prefix { @IndexBPrefix }
                 inrunners { Yes }
 		majornum {}
@@ -728,7 +745,7 @@ def @ReportSetup
 		    headingbreak { @SubSubSectionHeadingBreak }
 		    headingformat { @Num @SubSubSectionHeadingFormat @Body }
 		    incontents { @SubSubSectionInContents }
-		    contentsindent { 6f }
+		    contentsindent { @SubSubSectionContentsIndent }
 		    numbers { @SubSubSectionNumbers }
 		    attachnum { @SubSubSectionList&&preceding @Tagged @Tag }
 		    retrievenum { @SubSubSectionList&&@Tag @Open { num } }
@@ -755,7 +772,7 @@ def @ReportSetup
 		headingbreak { @SubSectionHeadingBreak }
 		headingformat { @Num @SubSectionHeadingFormat @Body }
 		incontents { @SubSectionInContents }
-		contentsindent { 3f }
+		contentsindent { @SubSectionContentsIndent }
 		numbers { @SubSectionNumbers }
 		attachnum { @SubSectionList&&preceding @Tagged @Tag }
 		retrievenum { @SubSectionList&&@Tag @Open { num } }
@@ -781,7 +798,7 @@ def @ReportSetup
 	    headingbreak { @SectionHeadingBreak }
 	    headingformat { @Num @SectionHeadingFormat @Body }
 	    incontents { @SectionInContents }
-	    contentsindent { 0f }
+	    contentsindent { @SectionContentsIndent }
 	    numbers { @SectionNumbers }
 	    attachnum { @SectionList&&preceding @Tagged @Tag }
 	    retrievenum { @SectionList&&@Tag @Open { num } }
@@ -895,7 +912,7 @@ def @ReportSetup
 		    headingbreak { @SubSubAppendixHeadingBreak }
 		    headingformat { @Num @SubSubAppendixHeadingFormat @Body }
 		    incontents { @SubSubAppendixInContents }
-		    contentsindent { 6f }
+		    contentsindent { @SubSubAppendixContentsIndent }
 		    numbers { @SubSubAppendixNumbers }
 		    attachnum { @SubSubAppendixList&&preceding @Tagged @Tag }
 		    retrievenum { @SubSubAppendixList&&@Tag @Open { num } }
@@ -922,7 +939,7 @@ def @ReportSetup
 		headingbreak { @SubAppendixHeadingBreak }
 		headingformat { @Num @SubAppendixHeadingFormat @Body }
 		incontents { @SubAppendixInContents }
-		contentsindent { 3f }
+		contentsindent { @SubAppendixContentsIndent }
 		numbers { @SubAppendixNumbers }
 		attachnum { @SubAppendixList&&preceding @Tagged @Tag }
 		retrievenum { @SubAppendixList&&@Tag @Open { num } }
@@ -949,7 +966,7 @@ def @ReportSetup
 	    headingbreak { @AppendixHeadingBreak }
 	    headingformat { @Num @AppendixHeadingFormat @Body }
 	    incontents { @AppendixInContents }
-	    contentsindent { 0f }
+	    contentsindent { @AppendixContentsIndent }
 	    word { appendix @WordVal @AppendixWord }
 	    numbers { @AppendixNumbers }
 	    attachnum { @AppendixList&&preceding @Tagged @Tag }

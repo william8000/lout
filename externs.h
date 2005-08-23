@@ -1,7 +1,7 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.30 (October 2004)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.31 (August 2005)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -574,6 +574,8 @@ typedef void *POINTER;
 #define	STR_BREAK_NOLAST	AsciiToFull("unbreakablelast")
 #define	STR_BREAK_LAST		AsciiToFull("breakablelast")
 #define	STR_BREAK_SETOUTDENT	AsciiToFull("setoutdent")
+#define STR_BREAK_MARGINKERNING AsciiToFull("marginkerning")
+#define STR_BREAK_NOMARGINKERNING AsciiToFull("nomarginkerning")
 
 #define STR_SPACE_LOUT		AsciiToFull("lout")
 #define STR_SPACE_COMPRESS	AsciiToFull("compress")
@@ -674,6 +676,7 @@ typedef struct
   BOOLEAN	onobreaklast	: 1;	/* no break after last line of para  */
   BOOLEAN	obaselinemark	: 1;	/* baseline metrics                  */
   BOOLEAN	oligatures	: 1;	/* use ligatures                     */
+  BOOLEAN	omarginkerning	: 1;	/* perform margin kerning            */
 } STYLE;
 
 #define	line_gap(x)	(x).osu1.oline_gap
@@ -695,6 +698,7 @@ typedef struct
 #define	nobreaklast(x)	(x).onobreaklast
 #define	baselinemark(x)	(x).obaselinemark
 #define	ligatures(x)	(x).oligatures
+#define	marginkerning(x)(x).omarginkerning
 #define	yunit(x)	(x).oyunit
 #define	zunit(x)	(x).ozunit
 #define	outdent_len(x)	(x).ooutdent_len
@@ -716,6 +720,7 @@ typedef struct
   nobreaklast(x) = nobreaklast(y),					\
   baselinemark(x) = baselinemark(y),					\
   ligatures(x) = ligatures(y),						\
+  marginkerning(x) = marginkerning(y),					\
   vadjust(x) = vadjust(y), 						\
   hadjust(x) = hadjust(y), 						\
   padjust(x) = padjust(y), 						\
@@ -3379,6 +3384,8 @@ extern	void	  FontPrintPageResources(FILE *fp);
 extern	void	  FontAdvanceCurrentPage(void);
 extern	void	  FontPageUsed(OBJECT face);
 extern	BOOLEAN	  FontNeeded(FILE *fp);
+extern	FULL_LENGTH FontGlyphHeight(FONT_NUM fnum, FULL_CHAR chr);
+extern	FULL_LENGTH FontGlyphWidth(FONT_NUM fnum, FULL_CHAR chr);
 
 /*****  z38.c	  Character Mappings    **************************************/
 extern	MAP_VEC	  MapTable[];

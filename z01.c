@@ -1,7 +1,7 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.30)                       */
-/*  COPYRIGHT (C) 1991, 2004 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
+/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -883,7 +883,7 @@ int main(int argc, char *argv[])
   CheckErrorBlocks();
 
   /* wrapup */
-  ifdebug(DST, DD, CheckSymSpread() );
+  ifdebug(DST, D, CheckSymSpread() );
   ifdebug(ANY, D, DeleteEverySym() );
   debug0(DMA, D, "at end of run:");
   ifdebug(DMA, D, DebugMemory() );

@@ -147,12 +147,14 @@ may be used inside the @Code "x" and @Code "y" options:
     A { "ymark" }
     B { The row mark of the object being placed (for expert users) }
 }
-The usual precedences and associativities apply to the mathematical
-operators; braces (not parentheses) may be used for grouping.  It is
-best to give values to @Code "x" and @Code y that do not depend on
-any assumptions about where the coordinate system's origin is; this
-is true of the examples above.  At the point where @Code "@Place" occurs,
-the result is an empty object.  As with margin notes, Lout does not know
-what is happening and will not lay out the rest of the page around the
+Negative numbers have to be enclosed in double quotes to avoid the
+initial @Code "-" being mistaken for subtraction.  The usual precedences
+and associativities apply to the mathematical operators; braces (not
+parentheses) may be used for grouping.  It is best to give values to
+@Code "x" and @Code y that do not depend on any assumptions about
+where the coordinate system's origin is; this is true of the examples
+above.  At the point where @Code "@Place" occurs, the result is an
+empty object.  As with margin notes, Lout does not know what is
+happening and will not lay out the rest of the page around the
 placed object.
 @End @Section

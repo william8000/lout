@@ -32,16 +32,6 @@ Equations may appear within a paragraph of text, or they may be
 displayed.  {@Code "@Eq"}'s job is to produce an object containing the
 equation; it neither knows nor cares where this equation goes.
 @PP
-To get an equation within a paragraph, simply place @Code "@Eq { ... }"
-at the desired point.  To make the optimal paragraph breaker work hard to
-arrange the paragraph so that the equation does not spread over two
-lines, use {@Code "@OneCol @Eq { ... }"}.  This is needed so frequently
-that a symbol @Code "@E" is defined in @Code "eq" along with @Code "@Eq"
-equations. @RawIndex { equations }
-equations.e @SubIndex { @Code "@E" }
-eaaa.equations @Index { @Code "@E" (equations) }
-which is an abbreviation for {@Code "@OneCol @Eq"}.
-@PP
 To display an equation, use a display symbol like @Code "@IndentedDisplay"
 or @Code "@CentredDisplay" (Section {@NumberOf displays}).  For example,
 @ID @Code "@CentredDisplay @Eq { int supp pi on 0 sin ` x = 0 }"
@@ -50,6 +40,14 @@ produces
 There are also symbols for aligned and numbered displays, which are
 very commonly used with equations.  These symbols are the subject of
 Section {@NumberOf mathdisplays}.
+@PP
+To get an equation within a paragraph, it is best to use a variant of
+@Code "@Eq" called {@Code "@E"}.  An equation within @Code "@E { ... }"
+will be prevented from breaking across two lines, and its superscripts
+will appear slightly lower, which is desirable within paragraphs.
+equations. @RawIndex { equations }
+equations.e @SubIndex { @Code "@E" }
+eaaa.equations @Index { @Code "@E" (equations) }
 @PP
 In this chapter we show the Lout input at the left, and its
 result at the right:
