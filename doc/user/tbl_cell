@@ -128,6 +128,13 @@ Note the difference between a coloured background, obtained with
 {@Code "paint"}, and a coloured entry, obtained using the @Code "@Colour"
 symbol.
 @PP
+When an entry in a table consists of several paragraphs, it will usually
+be best to enclose it in {@Code "@OneRow"}, since otherwise @Code "@Tbl"
+is likely to take each paragraph as a separate row, leading to incorrect
+vertical spacing.  A convenient way to do this is
+@ID @Code "aformat { @Cell @OneRow A | @Cell @OneRow B }"
+and so on.
+@PP
 @Code "@Tbl" offers many places where you can set cell options.  The meaning
 of the option is the same wherever you set it;
 what changes is the extent of its application.  Taking the @Code "paint"

@@ -15,6 +15,7 @@
 #  Version 3.16 by Jeffrey H. Kingston, May 1999.                             #
 #  Version 3.17 by Jeffrey H. Kingston, September 1999.                       #
 #  Version 3.21 by Jeffrey H. Kingston, May 2000.                             #
+#  Minor changes in later versions undated.                                   #
 #                                                                             #
 #  This Lout package contains the general definitions used by all types of    #
 #  documents.  It needs to be extended (see docf, reportf, bookf, slidesf,    #

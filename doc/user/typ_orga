@@ -91,4 +91,18 @@ file.  You might also find it useful to construct your book
 @I { top-down }, as computer scientists call it, laying out all the
 chapters and sections as empty skeletons and filling their contents in
 later.
+@PP
+When some part of your document has to be repeated, one way to avoid
+entering it twice is to place that part in a separate file and use
+@Code "@Include" in two places to include it twice.  This works, but
+there are two caveats.  First, it may be better to use a definition
+(Section {@NumberOf definitions}), since that gives you an object
+with a name, which you can use with confidence anywhere at all.
+Second, Lout treats @Code "@Include" in a peculiar way when it
+appears in the setup part of a document (in definitions, databases,
+and the @Code "@Use" clauses that appear within setup files):  it
+reads the file as usual the first time, and silently skips it the
+other times.  This is done to simplify the handling of files of
+definitions that depend on other files of definitions, as described
+in the Expert's Guide @Cite { $kingston1995lout.expert }.
 @End @Section

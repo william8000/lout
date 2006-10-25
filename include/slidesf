@@ -4,7 +4,6 @@
 #  @OverheadSetup extension to @DocumentSetup.                            #
 #                                                                         #
 #  Jeffrey H. Kingston                                                    #
-#  August 1994                                                            #
 #                                                                         #
 #  This package extends DocumentSetup with definitions for overheads.     #
 #                                                                         #
@@ -22,7 +21,11 @@ def @OverheadSetup
     named @OverheadNumbers		{ Arabic		}
     named @FirstOverheadNumber		{ 1			}
     named @TitlePageFont		{ Helvetica Base      	}
-    named @LectureHeadingFont		{ Bold 1.20f		}
+    named @AboveTitleGap		{ 0.5i			}
+    named @AboveAuthorGap		{ 1.0i			}
+    named @AboveInstitutionGap		{ 0.5i			}
+    named @AboveDateLineGap		{ 0.5i			}
+    named @LectureHeadingFont		{ Bold 1.2f		}
     named @LectureHeadingBreak		{ 1.2fx nohyphen	}
     named @LectureHeadingFormat
 	    left number right title	{ @Centre number @DP @Centre title @DP }
@@ -149,11 +152,12 @@ def @OverheadSetup
 	{
 	    @TitlePageFont @Font @InitialBreak @Break
 	    @InitialSpace @Space clines @Break {
-		//0.5i	|0.5rt 1.5f @Font @InitialBreak @Break
-			       @InitialSpace @Space clines @Break @Title |
-		//1i    |0.5rt clines @Break @Author |
-		//0.5i  |0.5rt clines @Break @I @Institution |
-		//0.5i  @DatePart
+		//0.5i
+	        //@AboveTitleGap       |0.5rt 1.5f @Font @InitialBreak @Break
+			           @InitialSpace @Space clines @Break @Title |
+		//@AboveAuthorGap      |0.5rt clines @Break @Author |
+		//@AboveInstitutionGap |0.5rt clines @Break @I @Institution |
+		//@AboveDateLineGap    @DatePart
 	    }
 	}
 

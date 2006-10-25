@@ -1,7 +1,7 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -288,6 +288,23 @@ void BreakChange(STYLE *style, OBJECT x)
 			    width(res_gap) : gap_inc == GAP_INC ?
 			    outdent_len(*style) + width(res_gap) :
 			    find_max(outdent_len(*style) - width(res_gap), 0);
+			}
+		      }
+		      else if( StringEqual(string(y), STR_BREAK_SCALE) )
+		      {
+			debug1(DSS, D, "  found %s", STR_BREAK_SCALE);
+			if( NextDown(link)==x || NextDown(NextDown(link))==x )
+			{
+			  Error(11, 12, "scale factor missing after %s in %s",
+			    WARN, &fpos(x), STR_BREAK_SCALE, KW_BREAK);
+			}
+			else
+			{
+			  float val;
+			  link = NextDown(NextDown(link));
+			  Child(y, link);
+			  val = GetScaleFactor(y);
+			  blanklinescale(*style) = (int) (val * SF);
 			}
 		      }
 		      else

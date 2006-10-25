@@ -28,7 +28,7 @@ initialspace. @Index { @Code "@InitialSpace" option }
 @Code "@InitialFont" option described at the end of Section
 {@NumberOf fonts}, in that you can set it at the beginning of your
 document, like this:
-@ID @Code {
+@ID @OneRow @Code {
 "@SysInclude { doc }"
 "@Document"
 "    @InitialSpace { lout }"

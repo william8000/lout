@@ -1,7 +1,7 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -974,8 +974,12 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	      /* append a gap to res (recycle g) */
 	      MoveLink(Up(g), res, PARENT);
 	      GapCopy(gap(g), line_gap(save_style(x)));
+	      /* *** old formula before blanklinescale 
 	      width(gap(g)) *= find_max(1, vspace(g));
-
+	      *** */
+	      if( vspace(g) > 1 )
+	        width(gap(g)) +=
+		 (width(gap(g))*blanklinescale(save_style(x))*(vspace(g)-1))/SF;
 	    }
 	    NextDefiniteWithGap(x, link, y, g, jn);
 	  }

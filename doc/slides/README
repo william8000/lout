@@ -6,13 +6,13 @@ a set of overhead transparencies entitled
 Document Formatting System.'  To format
 the transparencies, type
 
-	lout all > outfile.ps
+	lout -r2 all > outfile.ps
 
-in this directory.  This needs to be done
-twice to resolve all cross references.
-There should be no error messages at all
-after the second run.  A copy of the final
-outfile.ps is included.
+in this directory.  The -r2 flag causes Lout
+to run twice over the document, which is needed
+to resolve all cross references.  There should
+be no error messages at all after the second run.
+A copy of the final outfile.ps is included.
 
 Jeff Kingston
-24 August 2005
+25 October 2006

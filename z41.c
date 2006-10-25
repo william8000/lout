@@ -1,7 +1,7 @@
 /*@z41.c:Object Input-Output:AppendToFile, ReadFromFile@**********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -29,8 +29,23 @@
 /*****************************************************************************/
 #include "externs.h"
 
-static FILE_NUM	last_write_fnum = NO_FILE;
-static FILE	*last_write_fp  = null;
+static FILE_NUM	last_write_fnum;
+static FILE	*last_write_fp;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void ReadFromFileInit(void)                                              */
+/*                                                                           */
+/*  Initialize this module.                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+void ReadFromFileInit(void)
+{
+  last_write_fnum = NO_FILE;
+  last_write_fp  = null;
+}
 
 
 /*****************************************************************************/

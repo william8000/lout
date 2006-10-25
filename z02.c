@@ -1,7 +1,7 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -236,8 +236,8 @@ void LexPush(FILE_NUM x, int offs, int ftyp, int lnum, BOOLEAN same)
   }
   stack_free += 1;
   ifdebug(DMA, D,
-    DebugRegisterUsage(MEM_LEX,1, (MAX_LINE+BUFFER_SIZE+2)*sizeof(FULL_CHAR)));
-  mem_block = (FULL_CHAR *) malloc((MAX_LINE+BUFFER_SIZE+2)*sizeof(FULL_CHAR));
+    DebugRegisterUsage(MEM_LEX,1, (MAX_LINE+BUFFER_SIZE+3)*sizeof(FULL_CHAR)));
+  mem_block = (FULL_CHAR *) malloc((MAX_LINE+BUFFER_SIZE+3)*sizeof(FULL_CHAR));
   if( mem_block == NULL )
     Error(2, 3, "run out of memory when opening file %s",
       FATAL, PosOfFile(x), FullFileName(x));
@@ -364,6 +364,8 @@ long LexNextTokenPos(void)
 /*                                                                           */
 /*  Move to new line of input file.  May need to recharge buffer.            */
 /*                                                                           */
+/*  Patched JeffK 16/10/06 to fix bug when CRLF falls on block boundary.     */
+/*                                                                           */
 /*****************************************************************************/
 
 static void srcnext(void)
@@ -383,7 +385,7 @@ static void srcnext(void)
   /* if buffer is empty, read next block */
   /*** changed by JK 9/92 from "if( chpt == limit )" to fix long lines bug */
   if( chpt >= limit )
-  { if( chpt > limit )
+  { if( chpt > limit+1 || (chpt == limit + 1 && chtbl[*limit] != NEWLINE) )
     { col_num(file_pos) = 1;
       Error(2, 5, "line is too long (or final newline missing)",
 	FATAL, &file_pos);
@@ -409,7 +411,7 @@ static void srcnext(void)
     debugcond4(DLA, DD, stack_free <= 1,
       "srcnext: %d = fread(0x%x, %d, %d, fp)",
       blksize, buf, sizeof(char), BUFFER_SIZE);
-    frst = buf;  limit = buf + blksize;  *limit = CH_LF;
+    frst = buf;  limit = buf + blksize;  *limit = CH_LF; *(limit + 1) = CH_CR;
   }
 
   /* if nothing more to read, make this clear */
@@ -683,8 +685,10 @@ OBJECT LexGetToken(void)
 	      FileNum(string(fname), SOURCE_SUFFIX) == NO_FILE) )
 	  {
 	    /* need to define and read this include file */
-	    debug1(DFS, D, "  calling DefineFile %s from LexGetToken",
-	      string(fname));
+	    debug4(DFS, D, "  calling DefineFile %s from LexGetToken (%s, %d, %d)",
+	      string(fname), bool(InDefinitions),
+	        FileNum(string(fname), STR_EMPTY),
+		FileNum(string(fname), SOURCE_SUFFIX));
 	    fnum = DefineFile(string(fname), STR_EMPTY, &fpos(fname),
 	      INCLUDE_FILE,
 	      predefined(res)==INCLUDE ? INCLUDE_PATH : SYSINCLUDE_PATH);

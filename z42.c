@@ -1,7 +1,7 @@
 /*@z42.c:Colour Service:ColourChange, ColourCommand@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -162,7 +162,7 @@ static COLOUR_TABLE col_tab;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  ColourInit()                                                             */
+/*  ColourInit(void)                                                         */
 /*                                                                           */
 /*  Initialize this module.                                                  */
 /*                                                                           */

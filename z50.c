@@ -1,7 +1,7 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -92,15 +92,16 @@ static OBJECT		supplied;	/* Resources supplied by this file   */
 
 /*****************************************************************************/
 /*                                                                           */
-/*  PDF_PrintInitialize(FILE *fp)                                            */
+/*  void PDF_PrintInitialize(FILE *fp, BOOLEAN enc)                          */
 /*                                                                           */
 /*  Initialize this module; fp is the output file.                           */
 /*                                                                           */
 /*****************************************************************************/
 
-static void PDF_PrintInitialize(FILE *fp)
+static void PDF_PrintInitialize(FILE *fp, BOOLEAN enc)
 {
   debug0(DPF, DD, "PDF_PrintInitialize(fp)");
+  assert(!enc, "PDF_PrintInitialize");
   out_fp = fp;
   prologue_done = FALSE;
   gs_stack_top = -1;
@@ -847,14 +848,14 @@ static void PDF_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
 
 /*****************************************************************************/
 /*                                                                           */
-/*  PDF_LinkCheck()                                                          */
+/*  PDF_LinkCheck(void)                                                      */
 /*                                                                           */
 /*  Called at end of run; will check that for every link source point there  */
 /*  is a link dest point.                                                    */
 /*                                                                           */
 /*****************************************************************************/
 
-static void PDF_LinkCheck()
+static void PDF_LinkCheck(void)
 {
   debug0(DPF, D, "PDF_LinkCheck()");
 

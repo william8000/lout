@@ -35,7 +35,7 @@ graphs. @RawIndex { graphs (statistical) }
 graphs.save @SubIndex { @Code save option }
 save. @RawIndex { @Code "save" option }
 save.in.graphs @SubIndex { in graphs }
-@ID @Code @Verbatim {
+@ID @OneRow @Code @Verbatim {
 @Graph
     save { yes }
 ...

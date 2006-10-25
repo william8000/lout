@@ -3,7 +3,6 @@
 #   Lout setup file for books                                                 #
 #                                                                             #
 #   Jeffrey H. Kingston                                                       #
-#   17 September 1999                                                         #
 #                                                                             #
 ###############################################################################
 
@@ -60,6 +59,9 @@
   # @ListIndent		{ 0s			} # indent of list items
   # @ListRightIndent	{ 0s			} # right indent of list items
   # @ListLabelWidth	{ 2.00f	@OrIfPlain 5s	} # width allowed for list tags
+  # @ListLabelRight	{ No			} # right-adjust list labels
+  # @ListLabelRightGap	{ 2s			} # gap when right-adjusting
+  # @ListBreak		{ 			} # break style of list items
   # @NumberSeparator	{ .			} # separates nums like 2.3.7
   # @CrossLinkFormat	{ @Body			} # format of cross links
   # @ExternalLinkFormat	{ @Body			} # format of external links
@@ -208,6 +210,7 @@
   # @IndexBTypeOrdinary	{ @PageNum		} # Ordinary pagenum format
   # @IndexBTypeMain	{ @B @PageNum		} # Main pagenum format
   # @IndexBTypeSpecial	{ @I @PageNum		} # Special pagenum format
+  # @IndexBRangeFormat	{ @From--@To		} # index page range format
   # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)
   # @IndexBColumnGap	{ 1.00c	@OrIfPlain 6s	} # index B column gap
   # @IndexBCtd		{ Yes			} # include (ctd.) lines

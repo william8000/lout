@@ -212,23 +212,27 @@ symbol whose options control the appearance of features specific to
 overhead.setup. @Index @Code "@OverheadSetup"
 overheads (in other words, the features described in this section).  Here
 are some of these options and their default values:
-@ID @OneRow @Code {
-"@Use { @OverheadSetup"
-"  # @DateLine { No }"
-"  # @FirstOverheadNumber { 1 }"
-"  # @FirstLectureNumber { 1 }"
-"  # @ContentsWord { contents }"
-"  # @LectureNumbers { Arabic }"
-"  # @OverheadNumbers { Arabic }"
-"  # @TitlePageFont { Helvetica Base }"
-"  # @LectureHeadingFont { Bold 1.20f }"
-"  # @LectureHeadingFormat { @Centre number @DP @Centre title @DP }"
-"  # @OverheadHeadingFormat { @Centre title @DP }"
-"  # @OverheadHeadingFont { Bold }"
-"  # @LectureInContents { Yes }"
-"  # @OverheadInContents { No }"
-"  # @ReferencesInContents { Yes }"
-"}"
+@ID @OneRow @Code @Verbatim {
+@Use { @OverheadSetup
+  # @DateLine { No }
+  # @FirstOverheadNumber { 1 }
+  # @FirstLectureNumber { 1 }
+  # @ContentsWord { contents }
+  # @LectureNumbers { Arabic }
+  # @OverheadNumbers { Arabic }
+  # @TitlePageFont { Helvetica Base }
+  # @AboveTitleGap { 0.5i }
+  # @AboveAuthorGap { 1.0i }
+  # @AboveInstitutionGap { 0.5i }
+  # @AboveDateLineGap { 0.5i }
+  # @LectureHeadingFont { Bold 1.20f }
+  # @LectureHeadingFormat { @Centre number @DP @Centre title @DP }
+  # @OverheadHeadingFormat { @Centre title @DP }
+  # @OverheadHeadingFont { Bold }
+  # @LectureInContents { Yes }
+  # @OverheadInContents { No }
+  # @ReferencesInContents { Yes }
+}
 }
 For an introduction to setup files and their options, consult
 Section {@NumberOf setup}.  The first four options are as for
@@ -238,9 +242,11 @@ produces `Contents' in the current language.  @Code "@LectureNumbers"
 and @Code "@OverheadNumbers" determine the style of numbering of lectures
 and overheads, and may be {@Code None}, {@Code Arabic}, {@Code Roman},
 {@Code UCRoman}, {@Code Alpha}, or {@Code UCAlpha} as usual.  Next come
-options for setting the font of the overall title page, the
-title page of each lecture, and so on, and finally options which
-determine which entries are made in any table of contents.
+options for setting the font of the overall title page, the gap
+above the title, author, institution, and dateline that appear on that
+page; then options controlling the appearance of the headings at the
+start of each lecture and overhead, and finally options which determine
+which entries are made in any table of contents.
 @PP
 The @Code "@LectureHeadingFormat" option determines the
 format of the heading of each lecture.  Within it, the symbol @Code "number" 

@@ -1,7 +1,7 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -31,7 +31,7 @@
 #include "externs.h"
 
 #define	MAX_DEPTH  	30			/* max depth of galleys      */
-static OBJECT		root_galley = nilobj;	/* the root galley           */
+static OBJECT		root_galley;		/* the root galley           */
 static OBJECT		targets[MAX_DEPTH];	/* currently open \Inputs    */
 static CONSTRAINT	constraints[MAX_DEPTH];	/* their COLM constraints    */
 static int		itop;			/* stack top	             */
@@ -81,6 +81,7 @@ void TransferInit(OBJECT InitEnv)
   font(InitialStyle)            = 0;			/* i.e. undefined    */
   colour(InitialStyle)          = 0;			/* i.e. undefined    */
   texture(InitialStyle)         = 1;			/* i.e. "null"       */
+  blanklinescale(InitialStyle)  = SF;			/* i.e. 1.0 (scaled) */
   outline(InitialStyle)         = FALSE;		/* i.e. not outlined */
   language(InitialStyle)        = 0;			/* i.e. undefined    */
   yunit(InitialStyle)           = 0;			/* i.e. zero         */

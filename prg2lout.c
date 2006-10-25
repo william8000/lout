@@ -2,9 +2,9 @@
 /*****************************************************************************/
 /*                                                                           */
 /*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
-/*  COPYRIGHT (C) 2000 Jeffrey H. Kingston                                   */
+/*  COPYRIGHT (C) 2000, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Version 2.3, November 2002                                               */
+/*  Version 2.4, October 2006                                                */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -3359,7 +3359,7 @@ LANGUAGE PodLanguage = {
   NO_MATCH_PRINT,
   {
     &PodVerbatimLineToken, &PodEmptyLineToken, &PodIgnoreToken,
-    &PodHeading1Token, &PodHeading2Token,
+    &PodHeading1Token, &PodHeading2Token, &PodHeading3Token,
     &PodOverToken, &PodItemToken, &PodBackToken,
     &PodItemBullet, &PodItem0, &PodItem1, &PodItem2, &PodItem3,
     &PodItem4, &PodItem5, &PodItem6, &PodItem7, &PodItem8, &PodItem9,
@@ -3436,8 +3436,14 @@ LANGUAGE *languages[] = {
 #define DEBUG_EMIT	0
 #define DEBUG_MAIN	0
 
-#define PRG2LOUT_VERSION "prg2lout Version 2.1 (April 2001)"
+#define PRG2LOUT_VERSION "prg2lout Version 2.4 (October 2006)"
 #define	MAX_LINE	1024
+
+typedef enum {
+  BLANKNUMBERED_NO,			/* blank lines have no line numbers  */
+  BLANKNUMBERED_NOPRINT,		/* blank line numbers not printed    */
+  BLANKNUMBERED_YES			/* blank line numbers printed        */
+} BLANKNUMBERED_TYPE;
 
 static char	file_name[MAX_LINE];	/* current input file name           */
 static unsigned char curr_line[MAX_LINE]; /* current input line              */
@@ -3450,6 +3456,7 @@ static char	*style_option;		/* value of -p option, else null     */
 static char	*font_option;		/* value of -f option, else null     */
 static char	*size_option;		/* value of -s option, else null     */
 static char	*line_option;		/* value of -v option, else null     */
+static char	*bls_option;		/* value of -b option, else null     */
 static char	*tabin_option;		/* value of -t option, else null     */
 static char	*tabout_option;		/* value of -T option, else null     */
 static char	*setup_option;		/* value of -S option, else null     */
@@ -3461,6 +3468,7 @@ static int	tab_in;			/* tab interval, value of -t option  */
 static float	tab_out;		/* tab interval width (-T option)    */
 static char 	tab_unit;		/* unit of measurement for tab       */
 static BOOLEAN 	print_lines;		/* TRUE if we are printing line nums */
+BLANKNUMBERED_TYPE blanknumbered;	/* blank line numbering              */
 static int 	print_num;		/* current line num for printing     */
 
 static FILE	*in_fp;			/* where input comes from	     */
@@ -3843,11 +3851,16 @@ void EmitRaw(unsigned char ch)
   {
     char buff[20];
     if( out_formfeed )  print_num--;
-    sprintf(buff, "%d", print_num++);
-    fprintf(out_fp, "@PL{\"%s\"}", buff);
-    out_linepos += strlen(buff);
-    out_linestart = FALSE;
-    EmitTab();
+    if( ch != '\n' || blanknumbered == BLANKNUMBERED_YES )
+    {
+      sprintf(buff, "%d", print_num);
+      fprintf(out_fp, "@PL{\"%s\"}", buff);
+      out_linepos += strlen(buff);
+      out_linestart = FALSE;
+      EmitTab();
+    }
+    if( ch != '\n' || blanknumbered != BLANKNUMBERED_NO )
+      print_num++;
   }
 
   switch( ch )
@@ -3927,11 +3940,12 @@ void StartEmit(LANGUAGE *lang, TOKEN *current_token,
   {
     char buff[20];
     if( out_formfeed )  print_num--;
-    sprintf(buff, "%d", print_num++);
+    sprintf(buff, "%d", print_num);
     fprintf(out_fp, "@PL{\"%s\"}", buff);
     out_linepos += strlen(buff);
     out_linestart = FALSE;
     EmitTab();
+    print_num++;
   }
 
   switch( current_token->print_style )
@@ -5024,9 +5038,10 @@ int main(int argc, char *argv[])
   tab_out = 3;
   tab_unit = 'f';
   print_lines = FALSE;
+  blanknumbered = BLANKNUMBERED_YES;
   numbered_option = NULL;
   headers_option = TRUE;
-  font_option = size_option = line_option = tabin_option =
+  font_option = size_option = line_option = bls_option = tabin_option =
     tabout_option = setup_option = language_option = (char *) NULL;
   if( argc == 1 )
   { PrintUsage();
@@ -5159,6 +5174,17 @@ int main(int argc, char *argv[])
 	break;
 
 
+      case 'b':
+     
+	/* read blanklinescale */
+	if( raw_seen )
+	{ fprintf(err_fp, "%s: -b illegal with -r option\n", ErrorHeader());
+	  exit(1);
+	}
+	GetArg(bls_option, "usage: -b<scale_factor>", FALSE);
+	break;
+
+
       case 't':
      
 	/* read tab interval */
@@ -5222,6 +5248,20 @@ int main(int argc, char *argv[])
 	{ fprintf(err_fp, "%s usage: -L  or  -L<number>\n", ErrorHeader());
 	  exit(1);
 	}
+	break;
+
+
+      case 'N':
+     
+	/* print numbers on non-blank lines only */
+	blanknumbered = BLANKNUMBERED_NOPRINT;
+	break;
+
+
+      case 'M':
+     
+	/* like -N but do not assign line numbers to blank lines */
+	blanknumbered = BLANKNUMBERED_NO;
 	break;
 
 
@@ -5373,19 +5413,24 @@ int main(int argc, char *argv[])
       /* this string has been disguised to avoid recognition by prg2lout */
       fprintf(out_fp, "%s\n", lang->lang_sym);
       if( style_option != NULL )
-	fprintf(out_fp, "    style { %s }\n", style_option );
+	fprintf(out_fp, "    style { %s }\n", style_option);
       if( font_option != NULL )
-	fprintf(out_fp, "    font { %s }\n", font_option );
+	fprintf(out_fp, "    font { %s }\n", font_option);
       if( size_option != NULL )
-	fprintf(out_fp, "    size { %s }\n", size_option );
+	fprintf(out_fp, "    size { %s }\n", size_option);
       if( line_option != NULL )
-	fprintf(out_fp, "    line { %s }\n", line_option );
+	fprintf(out_fp, "    line { %s }\n", line_option);
+      if( bls_option != NULL )
+	fprintf(out_fp, "    blanklinescale { %s }\n", bls_option);
       if( tabin_option != NULL )
-	fprintf(out_fp, "    tabin { %s }\n", tabin_option );
+	fprintf(out_fp, "    tabin { %s }\n", tabin_option);
       if( tabout_option != NULL )
-	fprintf(out_fp, "    tabout { %s }\n", tabout_option );
+	fprintf(out_fp, "    tabout { %s }\n", tabout_option);
       if( print_lines )
-	fprintf(out_fp, "    numbered { %d }\n", print_num );
+	fprintf(out_fp, "    numbered { %d }\n", print_num);
+      if( print_lines && blanknumbered != BLANKNUMBERED_YES )
+	fprintf(out_fp, "    blanknumbered { %s }\n",
+	  blanknumbered == BLANKNUMBERED_NO ? "No" : "NoPrint");
       fprintf(out_fp, "%s%s\n", "@Be", "gin");
       while( (ch = getc(in_fp)) != EOF )
 	putc(ch, out_fp);

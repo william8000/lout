@@ -4,14 +4,15 @@ This directory contains the Lout source files for the Expert's Guide
 to the Lout Document Formatting System.  To produce the Guide, type
 the command
 
-	lout all > outfile.ps
+	lout -r4 all > outfile.ps
 
-in this directory.  This must be done four times to completely resolve
-all cross references, although the PostScript file outfile.ps is
-printable after the first run.  Auxiliary files with .li and .ld
-suffixes will be created in this directory.  A copy of the final
-outfile.ps is included.  There should be no warning messages on
-the fifth run, except this one:
+in this directory.  The -r4 flag causes Lout to run over the document
+four times.  This is necessary to completely resolve all cross
+references, although a readable PostScript file outfile.ps would
+be generated after a single run if -r4 was omitted.  Auxiliary files
+with .li and .ld suffixes will be created in this directory.  A copy
+of the final outfile.ps is included.  There should be no warning
+messages on the fourth run, except this one:
 
 lout file "pre_conc" (from "pre" line 7, from "all" line 25):
    162,1: 13.2c object too high for 8.7c space; will try elsewhere
@@ -20,4 +21,4 @@ which just warns about a figure that is not able to be placed on
 the first possible page, and so has to appear on the next page.
 
 Jeffrey H. Kingston
-24 August 2005
+25 October 2006

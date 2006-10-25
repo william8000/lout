@@ -1,7 +1,7 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -175,8 +175,27 @@ typedef struct trie_rec
   int		string_first;		/* the first (last inserted) string  */
 } *TRIE;
 
-static TRIE	HyphTables[MAX_LANGUAGE] = { NULL };
-static BOOLEAN	TriedFile[MAX_LANGUAGE]  = { FALSE };
+static TRIE	HyphTables[MAX_LANGUAGE];
+static BOOLEAN	TriedFile[MAX_LANGUAGE];
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void HyphInit(void)                                                      */
+/*                                                                           */
+/*  Initialize this module.                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+void HyphInit(void)
+{
+  int i;
+  for( i = 0;  i < MAX_LANGUAGE;  i++ )
+  {
+    HyphTables[i] = NULL;
+    TriedFile[i] = FALSE;
+  }
+}
 
 
 /*@::CompressValue(), UncompressValue()@**************************************/

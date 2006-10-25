@@ -1,7 +1,7 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -247,7 +247,7 @@ OBJECT ReplaceWithTidy(OBJECT x, int spacing)
 /*                                                                           */
 /*****************************************************************************/
 
-static float GetScaleFactor(OBJECT x)
+float GetScaleFactor(OBJECT x)
 { float scale_factor;
   if( !is_word(type(x)) )
   { Error(8, 3, "replacing invalid scale factor by 1.0", WARN, &fpos(x));
@@ -1018,7 +1018,9 @@ OBJECT *enclose, BOOLEAN fcr)
     case WORD:
     case QWORD:
     
-      if( !ok || *crs == nilobj )
+      /* *** patched by JeffK 17/10/06 following a suggestion of Ludovic Courtes *** */
+      /* if( !ok || *crs == nilobj ) */
+      if( !ok )
       {	word_font(x) = font(*style);
 	word_colour(x) = colour(*style);
 	word_texture(x) = texture(*style);
@@ -1029,7 +1031,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	word_hyph(x) = hyph_style(*style) == HYPH_ON;
 	debug3(DOM, DDD, "  manfifest/WORD underline() := %s for %s %s",
 	  "UNDER_OFF", Image(type(x)), EchoObject(x));
-	if( small_caps(*style) && ok )  x = MapSmallCaps(x, style);
+	if( small_caps(*style) && ok )  x = MapSmallCaps(x, style);  /* unreachable */
 	underline(x) = UNDER_OFF;
 	ReplaceWithSplit(x, bthr, fthr);
 	break;

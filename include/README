@@ -31,6 +31,7 @@ Setup files (containing mainly lists of options settable by the user)
        blue             Blue
        cprint           C and C++
        eiffel           Eiffel
+       haskell          Haskell
        java             Java
        modula           Modula-2 (quick hack, does not use prg2lout)
        np               Nonpareil
@@ -68,6 +69,7 @@ Source files containing Lout and PostScript source code for the packages
        bluef            Blue
        cprintf          C and C++
        eiffelf          Eiffel
+       haskellf         Haskell
        javaf            Java
        modulaf          Modula-2
        npf              Nonpareil
@@ -100,4 +102,4 @@ Miscellaneous source files
 
 
 Jeffrey H. Kingston
-30 October 2002
+20 October 2006

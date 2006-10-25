@@ -4,10 +4,6 @@
 #  Lout @BasicSetup package                                                   #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  5 February 1999                                                            #
-#  Modified 30 October 2002 - reorganization of colours, textures, lengths    #
-#                                                                             #
-#  Based on the first part of the @DocumentLayout package, version 3.11.      #
 #                                                                             #
 #  This package contains basic symbols used widely throughout many            #
 #  documents, for font changes, particular characters, standard words in      #
@@ -104,7 +100,8 @@ export
     @InitialColour @OptimizePages @HeadingFont
     @ParaGap @ParaIndent @DisplayGap @DisplayIndent @DefaultIndent
     @DisplayNumStyle @WideIndent @VeryWideIndent
-    @ListGap @ListIndent @ListRightIndent @ListLabelWidth
+    @ListGap @ListIndent @ListRightIndent
+    @ListLabelWidth @ListLabelRight @ListLabelRightGap @ListBreak
     @NumberSeparator
 
     @Word @Roman @UCRoman @Alpha @UCAlpha @FnBullets @FnSymbols
@@ -270,6 +267,9 @@ def @BasicSetup
     named @ListIndent	  { 0s			} # indent of list items
     named @ListRightIndent{ 0s			} # right indent of list items
     named @ListLabelWidth { 2.0f @OrIfPlain 5s	} # width allowed for list tags
+    named @ListLabelRight { No			} # right align label
+    named @ListLabelRightGap { 2s		} # right align gap
+    named @ListBreak      {                     } # break style of list item
     named @NumberSeparator{ .			} # separates numbers like 2.3.7
     import @BasicSetup
     named @CrossLinkFormat
@@ -1468,26 +1468,40 @@ def @BasicSetup
 	named itemindent      { 0c		 }
 	named rightindent     { @ListRightIndent }
 	named labelwidth      { @ListLabelWidth  }
+	named labelright      { @ListLabelRight  }
+	named labelrightgap   { @ListLabelRightGap }
 	named start           { 1                }
+	named break           { @ListBreak       }
+	named colnum          { 1                }
+	named colgap          { 1.0c             }
+	named colheight       { 5.0c             }
     {
         def @MakeList right num
 	{
 	    def @NormalItem
 	    {
+	        def @Align right x
+		{
+		  labelright @Case {
+		    { Yes yes } @Yield { labelwidth @Wide { |1rt @OneCol { x |labelrightgap } } }
+		    else @Yield x
+		  }
+		}
+
 	        |indent
 	        labelwidth @Wide {
 		    # @NumberMarker @Value {style num} {style num} &0io
 		    # @NumberMarker @Value {num} {style type num} &0io
-		    @NumberMarker @Value {type num} {style type num} &0io
+		    @NumberMarker @Value {type num} {@Align style type num} &0io
 		}
-	        |itemindent  @ItemPlace  |rightindent
+	        |itemindent  break @Break @ItemPlace  |rightindent
 	        //gap  @MakeList @NotRevealed @Next num
 	    }
 
 	    def @ParagraphItem
 	    {
 		@NumberMarker @Value {num} {style type num} &0io
-	        |indent  @ParagraphItemPlace  |rightindent
+	        |indent  break @Break @ParagraphItemPlace  |rightindent
 	        //gap  @MakeList @NotRevealed @Next num
 	    }
 
@@ -1519,7 +1533,45 @@ def @BasicSetup
 	    @MakeList start // @EndListPlace
 	}
 
-	@ListGalleyPlace
+	def @ColPieceTwo
+	{
+	   colheight @High 50c @Wide @ListGalleyPlace ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed
+	}
+
+	def @ColPieceThree
+	{
+	   colheight @High 50c @Wide @ListGalleyPlace ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed
+	}
+
+	def @ColPieceFour
+	{
+	   colheight @High 50c @Wide @ListGalleyPlace ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed
+	}
+
+	def @ColPieceFive
+	{
+	   colheight @High 50c @Wide @ListGalleyPlace ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed
+	}
+
+	colnum @Case
+	{
+	  1 @Yield @ListGalleyPlace
+	  2 @Yield @ColPieceTwo
+	  3 @Yield @ColPieceThree
+	  4 @Yield @ColPieceFour
+	  5 @Yield @ColPieceFive
+	  else @Yield @ListGalleyPlace
+	}
 	//
 	@ListGalley
     }

@@ -1,7 +1,7 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -63,7 +63,7 @@
     if( type(y) == GAP_OBJ )  g = y, jn = jn && join(gap(y));		\
     else if( type(y)==SPLIT ? SplitIsDefinite(y):is_definite(type(y)) )	\
     {									\
-      debug2(DFS, D, "  NextDefiniteWithGap at %s %s",			\
+      debug2(DFS, DD, "  NextDefiniteWithGapLDN at %s %s",		\
 	Image(type(y)), EchoObject(y));					\
       assert( g != nilobj, "NextDefiniteWithGap: g == nilobj!" );	\
       break;								\

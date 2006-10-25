@@ -141,6 +141,10 @@ OPTIONS
               current directory.
 
    Miscellaneous options
+       -r num Run Lout num times, producing output  only  on  the
+              last run.  Useful for bringing cross references  up
+	      to date quickly.
+
        -x     Initializing  run,  not  for ordinary use: read and
               check all font files mentioned in font definitions,
               read  and  check all hyphenation files mentioned in
@@ -178,12 +182,6 @@ FILES AND ENVIRONMENT VARIABLE
 
 SEE ALSO
        prg2lout(1), lpr(1), ghostview(1)
-
-MAILING LIST
-       A public mailing list for discussion of Lout  exists.   To
-       subscribe,  mail  lout-request@ptc.spbu.ru  with  the word
-       subscribe in the Subject line.  To post an item,  mail  it
-       to lout@ptc.spbu.ru.
 
 REFERENCES
        Jeffrey  H. Kingston, "A User's Guide to the Lout Document

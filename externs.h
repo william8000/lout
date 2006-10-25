@@ -1,7 +1,7 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.31 (August 2005)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.32 (October 2006)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -442,6 +442,7 @@ typedef void *POINTER;
 #define	CH_FLAG_OUTFILE		'o'	/* the -o command line flag          */
 #define	CH_FLAG_PLAIN		'p'	/* the -p command line flag          */
 #define	CH_FLAG_FFPLAIN		'P'	/* the -P command line flag          */
+#define	CH_FLAG_RUNS		'r'	/* the -r command line flag          */
 #define	CH_FLAG_SUPPRESS	's'	/* the -s command line flag          */
 #define	CH_FLAG_SAFE		'S'	/* the -S command line flag          */
 #define	CH_FLAG_NOTEXTURE	't'	/* the -t command line flag          */
@@ -569,6 +570,7 @@ typedef void *POINTER;
 #define	STR_BREAK_LINES		AsciiToFull("lines")
 #define	STR_BREAK_CLINES	AsciiToFull("clines")
 #define	STR_BREAK_RLINES	AsciiToFull("rlines")
+#define	STR_BREAK_SCALE		AsciiToFull("blanklinescale")
 #define	STR_BREAK_NOFIRST	AsciiToFull("unbreakablefirst")
 #define	STR_BREAK_FIRST		AsciiToFull("breakablefirst")
 #define	STR_BREAK_NOLAST	AsciiToFull("unbreakablelast")
@@ -670,6 +672,7 @@ typedef struct
   FONT_NUM	ofont;			/* current font                      */
   COLOUR_NUM	ocolour;		/* current colour		     */
   TEXTURE_NUM	otexture;		/* current texture		     */
+  unsigned short oblanklinescale;	/* scale factor for blank lines      */
   LANGUAGE_NUM	olanguage	: 6;	/* current language		     */
   BOOLEAN	ooutline	: 2;	/* TRUE if outlining words           */
   BOOLEAN	onobreakfirst	: 1;	/* no break after first line of para */
@@ -692,6 +695,7 @@ typedef struct
 #define	font(x)		(x).ofont
 #define	colour(x)	(x).ocolour
 #define	texture(x)	(x).otexture
+#define	blanklinescale(x)(x).oblanklinescale
 #define	outline(x)	(x).ooutline
 #define	language(x)	(x).olanguage
 #define	nobreakfirst(x)	(x).onobreakfirst
@@ -714,6 +718,7 @@ typedef struct
   font(x) = font(y),							\
   colour(x) = colour(y),						\
   texture(x) = texture(y),						\
+  blanklinescale(x) = blanklinescale(y),				\
   outline(x) = outline(y),						\
   language(x) = language(y), 						\
   nobreakfirst(x) = nobreakfirst(y),					\
@@ -1995,7 +2000,7 @@ typedef struct back_end_rec {
   BOOLEAN fractional_spacing_avail;	/* TRUE if fractional spacing avail. */
   BOOLEAN uses_font_metrics;		/* TRUE if actual font metrics used  */
   BOOLEAN colour_avail;			/* TRUE if colour is available       */
-  void (*PrintInitialize)(FILE *fp);
+  void (*PrintInitialize)(FILE *fp, BOOLEAN encapsulated);
   void (*PrintLength)(FULL_CHAR *buff, int length, int length_dim);
   void (*PrintPageSetupForFont)(OBJECT face, int font_curr_page,
     FULL_CHAR *font_name, FULL_CHAR *first_size_str);
@@ -2011,8 +2016,8 @@ typedef struct back_end_rec {
   void (*CoordTranslate)(FULL_LENGTH xdist, FULL_LENGTH ydist);
   void (*CoordRotate)(FULL_LENGTH amount);
   void (*CoordScale)(float hfactor, float vfactor);
-  void (*CoordHMirror)();
-  void (*CoordVMirror)();
+  void (*CoordHMirror)(void);
+  void (*CoordVMirror)(void);
   void (*SaveGraphicState)(OBJECT x);
   void (*RestoreGraphicState)(void);
   void (*PrintGraphicObject)(OBJECT x);
@@ -2025,7 +2030,7 @@ typedef struct back_end_rec {
     FULL_LENGTH urx, FULL_LENGTH ury);
   void (*LinkURL)(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
     FULL_LENGTH urx, FULL_LENGTH ury);
-  void (*LinkCheck)();
+  void (*LinkCheck)(void);
 } *BACK_END;
 
 
@@ -2325,6 +2330,7 @@ typedef struct back_end_rec {
 #define	FR	          4096		/* virtual unit for frame units      */
 #define	DG	           128		/* virtual unit for degrees          */
 #define	SF	           128		/* virtual unit for @Scale factors   */
+                                        /* including blankline scale         */
 
 /* default size of characters for the PLAINTEXT back end */
 #define	PLAIN_WIDTH        144		/* default char width, 10 per inch   */
@@ -2356,7 +2362,8 @@ typedef struct back_end_rec {
 /* error types */
 #define	INTERN		     0		/* internal error (i.e. bug)         */
 #define	FATAL		     1		/* fatal error, abort now            */
-#define	WARN		     2		/* warning, non-fatal                */
+#define	FATAL_WITH_USAGE     2		/* fatal error, abort now + usage    */
+#define	WARN		     3		/* warning, non-fatal                */
 
 /* status values returned by AttachGalley() */
 #define	ATTACH_KILLED	     0
@@ -2598,13 +2605,13 @@ typedef struct back_end_rec {
 #define	GetMem(x, siz, pos)						\
 { newcount;								\
   if( (zz_size=(siz)) >= MAX_OBJECT_REC )				\
-    Error(1, 1, "word is too long", FATAL, pos);			\
+    x = NULL, Error(1, 1, "word is too long", FATAL, pos);		\
   else if( zz_free[zz_size] == nilobj )					\
     x = GetMemory(zz_size, pos);					\
   else									\
-  { x = zz_hold = zz_free[zz_size];					\
+  { x = zz_free[zz_size];						\
     freecount;								\
-    zz_free[zz_size] = pred(zz_hold, CHILD);				\
+    zz_free[zz_size] = pred(x, CHILD);					\
   }									\
 }
 
@@ -2954,7 +2961,7 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
     if( type(y) == GAP_OBJ )  g = y, jn = jn && join(gap(y));		\
     else if( type(y)==SPLIT ? SplitIsDefinite(y):is_definite(type(y)) )	\
     {									\
-      debug2(DFS, D, "  NextDefiniteWithGap at %s %s",			\
+      debug2(DFS, DD, "  NextDefiniteWithGap at %s %s",			\
 	Image(type(y)), EchoObject(y));					\
       assert( g != nilobj, "NextDefiniteWithGap: g == nilobj!" );	\
       break;								\
@@ -3018,6 +3025,7 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 /*****************************************************************************/
 
 /*****  z01.c	  Supervise		**************************************/
+extern	void	  PrintUsage(FILE *fp);
 extern	int	  main(int argc, char *argv[]);
 extern	POINTER	  MemCheck;
 extern	OBJECT	  StartSym;
@@ -3116,6 +3124,7 @@ extern	BOOLEAN	  EqualManifested(OBJECT x, OBJECT y);
 
 /*****  z08.c	  Object Manifest	**************************************/
 extern	OBJECT	  ReplaceWithTidy(OBJECT x, int one_word);
+extern	float	  GetScaleFactor(OBJECT x);
 extern	OBJECT	  Manifest(OBJECT x, OBJECT env, STYLE *style, OBJECT bthr[2],
 		    OBJECT fthr[2], OBJECT *target, OBJECT *crs, BOOLEAN ok,
 		    BOOLEAN need_expand, OBJECT *enclose, BOOLEAN fcr);
@@ -3131,6 +3140,7 @@ extern	OBJECT	  ClosureExpand(OBJECT x, OBJECT env, BOOLEAN crs_wanted,
 extern	OBJECT	  ParameterCheck(OBJECT x, OBJECT env);
 
 /*****  z10.c	  Cross References	**************************************/
+extern	void	  CrossInitModule(void);
 extern	void	  CrossInit(OBJECT sym);
 extern	OBJECT	  CrossMake(OBJECT sym, OBJECT val, int ctype);
 extern	OBJECT	  GallTargEval(OBJECT sym, FILE_POS *dfpos);
@@ -3220,6 +3230,7 @@ extern	void	  SizeGalley(OBJECT hd, OBJECT env, BOOLEAN rows,
 		    OBJECT enclose);
 
 /***    z22.c	  Galley Service	**************************************/
+extern	void	  PromoteInit(void);
 extern	void	  ClearHeaders(OBJECT hd);
 extern	void	  Interpose(OBJECT z, int typ, OBJECT x, OBJECT y);
 extern	void	  FlushInners(OBJECT inners, OBJECT hd);
@@ -3265,7 +3276,8 @@ extern	void	  ProfilePrint(void);
 #endif
 
 /*****	z28.c	  Error Service		**************************************/
-extern	void	  ErrorInit(FULL_CHAR *str);
+extern	void	  ErrorInit(void);
+extern	void	  ErrorSetFile(FULL_CHAR *str);
 extern	BOOLEAN	  ErrorSeen(void);
 extern	void	  EnterErrorBlock(BOOLEAN ok_to_print);
 extern	void	  LeaveErrorBlock(BOOLEAN commit);
@@ -3333,6 +3345,7 @@ extern	OBJECT	  Next(OBJECT x, int inc, BOOLEAN *done);
 /*****  z33.c	  Database Service	**************************************/
 extern	OBJECT	  OldCrossDb;
 extern	OBJECT	  NewCrossDb;
+extern	void	  DbInit(void);
 extern	OBJECT	  DbCreate(OBJECT x);
 extern	void	  DbInsert(OBJECT db, BOOLEAN gall, OBJECT sym, FULL_CHAR *tag,
 		    FILE_POS *tagfpos, FULL_CHAR *seq, FILE_NUM dfnum,
@@ -3360,6 +3373,7 @@ extern	OBJECT	  MomentSym;
 extern	OBJECT	  StartMoment(void);
 
 /*****  z36.c	  Hyphenation     	**************************************/
+extern	void	  HyphInit(void);
 extern	BOOLEAN	  ReadHyphTable(LANGUAGE_NUM lnum);
 extern	OBJECT	  Hyphenate(OBJECT x);
 
@@ -3389,10 +3403,11 @@ extern	FULL_LENGTH FontGlyphWidth(FONT_NUM fnum, FULL_CHAR chr);
 
 /*****  z38.c	  Character Mappings    **************************************/
 extern	MAP_VEC	  MapTable[];
+extern	void	  MapInit(void);
 extern	MAPPING	  MapLoad(OBJECT filename, BOOLEAN recoded);
 extern	FULL_CHAR MapCharEncoding(FULL_CHAR *str, MAPPING m);
 extern	FULL_CHAR *MapEncodingName(MAPPING m);
-extern	void	  MapPrintEncodings();
+extern	void	  MapPrintEncodings(void);
 extern	void	  MapEnsurePrinted(MAPPING m, int curr_page);
 extern	void	  MapPrintPSResources(FILE *fp);
 extern	OBJECT	  MapSmallCaps(OBJECT x, STYLE *style);
@@ -3430,6 +3445,7 @@ extern	void	  FilterWrite(OBJECT x, FILE *fp, int *linecount);
 extern	void	  FilterScavenge(BOOLEAN all);
 
 /*****  z41.c	  Object Input-Output   **************************************/
+extern	void	  ReadFromFileInit(void);
 extern	OBJECT	  ReadFromFile(FILE_NUM fnum, long pos, int lnum);
 extern	void	  AppendToFile(OBJECT x, FILE_NUM fnum, int *pos, int *lnum);
 extern	void	  CloseFiles(void);
@@ -3515,8 +3531,8 @@ extern	void    PDFText_Close(FILE* in_fp);
 extern	BOOLEAN PDFHasValidTextMatrix(void);
 
 /*****  z49.c	  PostScript back end   **************************************/
-extern	BOOLEAN	  Encapsulated;
 extern	BACK_END  PS_BackEnd;
+extern	BACK_END  PS_NullBackEnd;
 extern	void	  PS_IncGRepeated(OBJECT x);
 extern	int	  PS_FindIncGRepeated(OBJECT x, int typ);
 extern	void	  PS_PrintEPSFile(FILE *fp, FILE_POS *pos);
@@ -3528,6 +3544,7 @@ extern	BACK_END  PDF_BackEnd;		/* PDF back end record               */
 
 /*****  z51.c	  Plain text back end   **************************************/
 extern	BACK_END  Plain_BackEnd;	/* Plain Text back end record        */
+extern	BACK_END  Plain_NullBackEnd;	/* Plain Text null back end record   */
 extern	FULL_LENGTH PlainCharWidth;	/* character width                   */
 extern	FULL_LENGTH PlainCharHeight;	/* character height		     */
 extern	BOOLEAN	  PlainFormFeed;	/* true if using \f		     */

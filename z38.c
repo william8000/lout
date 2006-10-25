@@ -1,7 +1,7 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -58,9 +58,25 @@
 
 MAP_VEC	MapTable[MAX_MAP];		/* the mappings                      */
 
-static	OBJECT	notdef_word = nilobj;	/* notdef word                       */
-static	int	maptop = 1;		/* first free slot in MapTable[]     */
+static	OBJECT	notdef_word;		/* notdef word                       */
+static	int	maptop;			/* first free slot in MapTable[]     */
 					/* save 0 for "no mapping"           */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void MapInit(void)                                                       */
+/*                                                                           */
+/*  Initialize this module.                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+void MapInit(void)
+{
+  notdef_word = nilobj;
+  maptop = 1;
+}
+
 
 /*****************************************************************************/
 /*                                                                           */

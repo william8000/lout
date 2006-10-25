@@ -1,7 +1,7 @@
 /*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -36,27 +36,46 @@ static BOOLEAN	print_block[MAX_BLOCKS];	/* TRUE if print this block  */
 static int	start_block[MAX_BLOCKS];	/* first message of block    */
 static char	message[MAX_ERRORS][MAX_BUFF];	/* the error messages        */
 static int	message_fnum[MAX_ERRORS];	/* file number of error mess */
-static FILE	*fp = NULL;			/* file pointer of log file  */
-static BOOLEAN	error_seen = FALSE;		/* TRUE after first error    */
-static int	block_top = 0;			/* first free error block    */
-static int	mess_top = 0;			/* first free error message  */
+static FILE	*fp;				/* file pointer of log file  */
+static BOOLEAN	error_seen;			/* TRUE after first error    */
+static int	block_top;			/* first free error block    */
+static int	mess_top;			/* first free error message  */
+static int	CurrentFileNum;
 
 
 /*****************************************************************************/
 /*                                                                           */
-/*  ErrorInit(str)                                                           */
+/*  void ErrorInit()                                                         */
+/*                                                                           */
+/*  Initialize this module (must be called before anything else).            */
+/*                                                                           */
+/*****************************************************************************/
+
+void ErrorInit()
+{
+  fp = NULL;
+  error_seen = FALSE;
+  block_top = 0;
+  mess_top = 0;
+  CurrentFileNum = -1;
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  ErrorSetFile(str)                                                        */
 /*                                                                           */
 /*  Open log file str and initialise this module.                            */
 /*                                                                           */
 /*****************************************************************************/
 
-void ErrorInit(FULL_CHAR *str)
+void ErrorSetFile(FULL_CHAR *str)
 { if( fp != NULL )
     Error(28, 1, "-e argument appears twice in command line", FATAL, no_fpos);
   fp = StringFOpen(str, WRITE_FILE);
   if( fp == NULL )
     Error(28, 2, "cannot open error file %s", FATAL, no_fpos, str);
-} /* end ErrorInit */
+} /* end ErrorSetFile */
 
 
 /*****************************************************************************/
@@ -82,7 +101,7 @@ BOOLEAN ErrorSeen(void)
 /*****************************************************************************/
 
 static void PrintFileBanner(int fnum)
-{ static int CurrentFileNum = -1;
+{
   if( fnum != CurrentFileNum )
   { fprintf(fp, "lout%s:%s", EchoFileSource(fnum), (char *) STR_NEWLINE);
     CurrentFileNum = fnum;
@@ -198,6 +217,7 @@ POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...
 
 
     case FATAL:
+    case FATAL_WITH_USAGE:
     
       while( block_top > 0 )  LeaveErrorBlock(TRUE);
       if( AltErrorFormat )
@@ -213,6 +233,8 @@ POINTER Error(int set_num, int msg_num, char *str, int etype, FILE_POS *pos, ...
       }
       /* for estrip's benefit: Error(28, 5, "  %6s: fatal error: %s%s") */
       /* for estrip's benefit: Error(28, 8, "%s: fatal error: %s%s") */
+      if( etype == FATAL_WITH_USAGE )
+	PrintUsage(fp);
       exit(1);
       break;
 

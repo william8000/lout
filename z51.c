@@ -1,7 +1,7 @@
 /*@z51.c:Plain Text Back End:Plain_BackEnd@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -57,15 +57,16 @@ static BOOLEAN		prologue_done;	/* TRUE after prologue is printed    */
 
 /*****************************************************************************/
 /*                                                                           */
-/*  void Plain_PrintInitialize(fp)                                           */
+/*  void Plain_PrintInitialize(FILE *fp, BOOLEAN enc)                        */
 /*                                                                           */
 /*  Initialize this module; fp is the output file.                           */
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_PrintInitialize(FILE *fp)
+void Plain_PrintInitialize(FILE *fp, BOOLEAN enc)
 {
   debug0(DPT, DD, "Plain_PrintInitialize(fp)");
+  assert(!enc, "Plain_PrintInitialize");
   out_fp = fp;
   prologue_done = FALSE;
   debug0(DPT, DD, "Plain_PrintInitialize returning.");
@@ -602,14 +603,14 @@ static void Plain_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
 
 /*****************************************************************************/
 /*                                                                           */
-/*  Plain_LinkCheck()                                                        */
+/*  Plain_LinkCheck(void)                                                    */
 /*                                                                           */
 /*  Called at end of run; will check that for every link source point there  */
 /*  is a link dest point.                                                    */
 /*                                                                           */
 /*****************************************************************************/
 
-static void Plain_LinkCheck()
+static void Plain_LinkCheck(void)
 {
   debug0(DPT, D, "Plain_LinkCheck()");
   /* do nothing; no links in plain text output */
@@ -666,3 +667,134 @@ static struct back_end_rec plain_back = {
 };
 
 BACK_END Plain_BackEnd = &plain_back;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Plain_NullBackEnd                                                        */
+/*                                                                           */
+/*  The record into which all of these functions are packaged.               */
+/*                                                                           */
+/*****************************************************************************/
+
+static void Plain_NullPrintInitialize(FILE *fp, BOOLEAN enc)
+{}
+
+static void Plain_NullPrintPageSetupForFont(OBJECT face, int font_curr_page,
+  FULL_CHAR *font_name, FULL_CHAR *short_name)
+{}
+
+static void Plain_NullPrintPageResourceForFont(FULL_CHAR *font_name,
+  BOOLEAN first)
+{}
+
+static void Plain_NullPrintMapping(MAPPING m)
+{}
+
+static void Plain_NullPrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
+  FULL_CHAR *label)
+{}
+
+static void Plain_NullPrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v,
+  FULL_CHAR *label)
+{}
+
+static void Plain_NullPrintAfterLastPage(void)
+{}
+
+static void Plain_NullPrintWord(OBJECT x, int hpos, int vpos)
+{}
+
+static void Plain_NullPrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
+  FULL_LENGTH ymk, OBJECT z)
+{}
+
+static void Plain_NullPrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
+  TEXTURE_NUM pat, FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
+{}
+
+static void Plain_NullCoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
+{}
+
+static void Plain_NullCoordRotate(FULL_LENGTH amount)
+{}
+
+static void Plain_NullCoordScale(float hfactor, float vfactor)
+{}
+
+static void Plain_NullSaveGraphicState(OBJECT x)
+{}
+
+static void Plain_NullRestoreGraphicState(void)
+{}
+
+static void Plain_NullPrintGraphicObject(OBJECT x)
+{}
+
+static void Plain_NullDefineGraphicNames(OBJECT x)
+{}
+
+static void Plain_NullSaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist,
+  FULL_LENGTH ydist)
+{}
+
+static void Plain_NullPrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
+  FULL_LENGTH rowmark)
+{}
+
+static void Plain_NullLinkSource(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{}
+
+static void Plain_NullLinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{}
+
+static void Plain_NullLinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{}
+
+static void Plain_NullLinkCheck(void)
+{}
+
+static struct back_end_rec plain_null_back = {
+  PLAINTEXT,				/* the code number of the back end   */
+  STR_PLAINTEXT,			/* string name of the back end       */
+  FALSE,				/* TRUE if @Scale is available       */
+  FALSE,				/* TRUE if @Rotate is available      */
+  FALSE,				/* TRUE if @VMirror, @HMirror avail  */
+  FALSE,				/* TRUE if @Graphic is available     */
+  FALSE,				/* TRUE if @IncludeGraphic is avail. */
+  TRUE,					/* TRUE if @PlainGraphic is avail.   */
+  FALSE,				/* TRUE if fractional spacing avail. */
+  FALSE,				/* TRUE if actual font metrics used  */
+  FALSE,				/* TRUE if colour is available       */
+  Plain_NullPrintInitialize,
+  Plain_PrintLength,
+  Plain_NullPrintPageSetupForFont,
+  Plain_NullPrintPageResourceForFont,
+  Plain_NullPrintMapping,
+  Plain_NullPrintBeforeFirstPage,
+  Plain_NullPrintBetweenPages,
+  Plain_NullPrintAfterLastPage,
+  Plain_NullPrintWord,
+  Plain_NullPrintPlainGraphic,
+  Plain_NullPrintUnderline,
+  Plain_NullCoordTranslate,
+  Plain_NullCoordRotate,
+  Plain_NullCoordScale,
+  NULL,
+  NULL,
+  Plain_NullSaveGraphicState,
+  Plain_NullRestoreGraphicState,
+  Plain_NullPrintGraphicObject,
+  Plain_NullDefineGraphicNames,
+  Plain_NullSaveTranslateDefineSave,
+  Plain_NullPrintGraphicInclude,
+  Plain_NullLinkSource,
+  Plain_NullLinkDest,
+  Plain_NullLinkURL,
+  Plain_NullLinkCheck,
+};
+
+BACK_END Plain_NullBackEnd = &plain_null_back;

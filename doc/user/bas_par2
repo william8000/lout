@@ -196,10 +196,9 @@ Serves to'advance an honest minde.
 }
 This style is the only one for which it is useful to indent individual
 lines in the input; as the result shows, such indents will be
-respected, as will blank lines.  However, Lout's rule that only white
-space separating objects affects the result (Section {@NumberOf spaces})
-still holds, which means that indenting the first line is not
-effective:
+respected.  However, Lout's rule that only white space separating objects
+affects the result (Section {@NumberOf spaces}) still holds, which means
+that indenting the first line is not effective:
 @ID @OneRow @Code {
 "@IndentedDisplay lines @Break @I {"
 "     And finde"
@@ -232,7 +231,72 @@ The result is
      What winde
 Serves to'advance an honest minde.
 }
-as desired.  To set the entire document in a paragraph breaking style other
+as desired.
+@PP
+When using {@Code lines}, {@Code clines}, and {@Code "rlines @Break"},
+blank lines are respected and ordinarily appear at their full height.
+However, it often looks better to give somewhat
+blanklinescale. @Index { @Code blanklinescale }
+less than this to blank lines.  For this there is the {@Code blanklinescale}
+option to {@Code "@Break"}:
+@ID @OneRow @Code @Verbatim {
+@IndentedDisplay { lines blanklinescale 0.6 } @Break @I {
+Go, and catch a falling star,
+     Get with child a mandrake root,
+Tell me, where all past years are,
+     Or who cleft the Devil's foot,
+Teach me to hear Mermaides singing,
+Or to keep off envies stinging,
+     And finde
+     What winde
+Serves to'advance an honest minde.
+
+If thou be'st born to strange sights,
+     Things invisible to see,
+Ride ten thousand days and nights,
+     Till age snow white hairs on thee,
+Thou, when thou return'st, wilt tell me
+All strange wonders that befell thee,
+     And swear
+     No where
+Lives a woman true, and fair.
+}
+}
+As shown, @Code "blanklinescale" may appear at any point in the
+object to the left of {@Code "@Break"}, followed by a number
+indicating how much to scale the usual height of a blank line by.  The
+object to the left of @Code "@Break" has to be enclosed in braces as
+shown, to ensure that its extent is clear.  The result is
+@IndentedDisplay { lines blanklinescale 0.6 } @Break @I {
+Go, and catch a falling star,
+     Get with child a mandrake root,
+Tell me, where all past years are,
+     Or who cleft the Devil's foot,
+Teach me to hear Mermaides singing,
+Or to keep off envies stinging,
+     And finde
+     What winde
+Serves to'advance an honest minde.
+
+If thou be'st born to strange sights,
+     Things invisible to see,
+Ride ten thousand days and nights,
+     Till age snow white hairs on thee,
+Thou, when thou return'st, wilt tell me
+All strange wonders that befell thee,
+     And swear
+     No where
+Lives a woman true, and fair.
+}
+in which the verses are separated by considerably less than a full
+blank line; instead of a baseline-to-baseline gap of twice the
+interline space, as usual, the gap here is only 1.6 times the
+interline space.  Two blank lines would give 2.2 times the
+interline space, and so on.  There is no unit of measurement
+associated with {@Code "blanklinescale"}, because it is a scale
+factor, not a length.
+@PP
+To set the entire document in a paragraph breaking style other
 than {@Code "adjust"}, you need to change the @Code "@InitialBreak" option,
 as explained at the end of Section {@NumberOf linespace}.
 @PP

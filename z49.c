@@ -1,7 +1,7 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -49,13 +49,13 @@
 #define MAX_GS		50		/* maximum depth of graphics states  */
 #define	STRING_SIZE	16000		/* used by forms code                */
 
-BOOLEAN			Encapsulated;	/* TRUE if EPS file is wanted	     */
+BOOLEAN			encapsulated;	/* TRUE if EPS file is wanted	     */
 static int		wordcount;	/* atoms printed since last newline  */
 static int		pagecount;	/* total number of pages printed     */
 static BOOLEAN		prologue_done;	/* TRUE after prologue is printed    */
 static OBJECT		needs;		/* Resource needs of included EPSFs  */
 static OBJECT		supplied;	/* Resources supplied by this file   */
-static OBJECT		incg_files = nilobj; /* IncludeGraphicRepeated files */
+static OBJECT		incg_files;	 /* IncludeGraphicRepeated files */
 static FILE		*out_fp;	/* file to print PostScript on       */
 
 
@@ -326,10 +326,11 @@ static	OBJECT		link_source_list;	/* the link source names     */
 /*                                                                           */
 /*****************************************************************************/
 
-static void PS_PrintInitialize(FILE *fp)
+static void PS_PrintInitialize(FILE *fp, BOOLEAN enc)
 {
   debug0(DPO, DD, "PS_PrintInitialize(fp)");
   out_fp = fp;
+  encapsulated = enc;
   prologue_done = FALSE;
   gs_stack_top = -1;
   currentfont = NO_FONT;
@@ -340,6 +341,7 @@ static void PS_PrintInitialize(FILE *fp)
   wordcount = pagecount = 0;
   New(needs, ACAT);
   New(supplied, ACAT);
+  incg_files = NULL;
   debug0(DPO, DD, "PS_PrintInitialize returning.");
   link_dest_tab = ltab_new(200);
   New(link_source_list, ACAT);
@@ -501,7 +503,7 @@ static BOOLEAN strip_out(FULL_CHAR *buff)
 } /* end strip_out */
 
 void PS_PrintEPSFile(FILE *fp, FILE_POS *pos)
-{ int state;  OBJECT y;
+{ int state, x;  OBJECT y;
   FULL_CHAR buff[MAX_LINE];
   debug0(DPO, D, "[ PS_PrintEPSFile");
 
@@ -520,7 +522,10 @@ void PS_PrintEPSFile(FILE *fp, FILE_POS *pos)
       }
       else
       { if( StringBeginsWith(buff, AsciiToFull("%%LanguageLevel:")) )
-	  Error(49, 10, "ignoring LanguageLevel comment in EPS file", WARN, pos);
+	{
+	  if( sscanf((char *) buff, "%%%%LanguageLevel: %d", &x) != 1 || x > 2 )
+	    Error(49,10,"ignoring LanguageLevel comment in EPS file",WARN,pos);
+	}
 	if( StringBeginsWith(buff, AsciiToFull("%%Extensions:")) )
 	  Error(49, 11, "ignoring Extensions comment in EPS file", WARN, pos);
 	if( !strip_out(buff) )
@@ -646,7 +651,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   debug2(DPO, DD, "PrintBeforeFirst(%d, %d)", h, v);
 
   /* print header comments for PostScript DSC 3.0 output */
-  p0(Encapsulated ? "%!PS-Adobe-3.0 EPSF-3.0" : "%!PS-Adobe-3.0");
+  p0(encapsulated ? "%!PS-Adobe-3.0 EPSF-3.0" : "%!PS-Adobe-3.0");
   p1("%%%%Creator: %s", LOUT_VERSION);
   p1("%%%%CreationDate: %s", TimeString());
   p0("%%DocumentData: Binary");
@@ -661,9 +666,25 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
 
   /* print procedure definitions part of header */
   p0("%%BeginProlog");
+  if( encapsulated )
+  {
+    p0("50 dict begin  % EPSF defs in own dict");
+    pnl;
+  }
+
   p1("%%%%BeginResource: procset %s", StartUpResource);
-  p0("/save_cp { currentpoint /cp_y exch def /cp_x exch def } def");
-  p0("/restore_cp { cp_x cp_y moveto } def");
+  p0("/cp_x 0 def");
+  p0("/cp_y 0 def");
+  p0("/louts 0 def");
+  p0("/loutv 0 def");
+  p0("/loutf 0 def");
+  p0("/ymark 0 def");
+  p0("/xmark 0 def");
+  p0("/ysize 0 def");
+  p0("/xsize 0 def");
+
+  p0("/save_cp { currentpoint /cp_y exch def /cp_x exch def } bind def");
+  p0("/restore_cp { cp_x cp_y moveto } bind def");
   p0("/outline { gsave 1 1 1 setrgbcolor dup show save_cp");
   p0("  grestore true charpath stroke restore_cp } bind def");
   p0("/m  { 3 1 roll moveto show } bind def");
@@ -678,10 +699,10 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("/co { gsave 3 1 roll rmoveto outline grestore } bind def");
   p0("/ul { gsave setlinewidth dup 3 1 roll");
   p0("      moveto lineto stroke grestore } bind def");
-  p1("/in { %d mul } def", IN);
-  p1("/cm { %d mul } def", CM);
-  p1("/pt { %d mul } def", PT);
-  p1("/em { %d mul } def", EM);
+  p1("/in { %d mul } bind def", IN);
+  p1("/cm { %d mul } bind def", CM);
+  p1("/pt { %d mul } bind def", PT);
+  p1("/em { %d mul } bind def", EM);
   p0("/sp { louts mul } def");
   p0("/vs { loutv mul } def");
   p0("/ft { loutf mul } def");
@@ -725,28 +746,31 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   /* copied from PostScript Language Reference Manual (2nd Ed.), p. 726  */
   /* but then revised to follow Adobe's Technical Note #5144             */
 
+  p0("/PreEPSF_state 0 def");
+  p0("/dict_stack 0 def");
+  p0("/ops_count 0 def");
+
   p0("/LoutStartEPSF { % prepare for EPSF inclusion");
+  p0("  /PreEPSF_state save def");
+  p0("  /dict_stack countdictstack def");
+  p0("  /ops_count count 1 sub def");
   p0("  userdict begin");
-  p0("    /PreEPSF_state save def");
-  p0("    /dict_stack countdictstack def");
-  p0("    /ops_count count 1 sub def");
-  p0("    /showpage {} def");
-  p0("    0 setgray 0 setlinecap");
-  p0("    1 setlinewidth 0 setlinejoin");
-  p0("    10 setmiterlimit [] 0 setdash newpath");
-  p0("    /languagelevel where");
-  p0("    { pop languagelevel");
-  p0("      1 ne");
-  p0("      { false setstrokeadjust false setoverprint");
-  p0("      } if");
+  p0("  /showpage {} def");
+  p0("  0 setgray 0 setlinecap");
+  p0("  1 setlinewidth 0 setlinejoin");
+  p0("  10 setmiterlimit [] 0 setdash newpath");
+  p0("  /languagelevel where");
+  p0("  { pop languagelevel");
+  p0("    1 ne");
+  p0("    { false setstrokeadjust false setoverprint");
   p0("    } if");
+  p0("  } if");
   p0("} bind def");
   pnl;
   p0("/LoutEPSFCleanUp { % clean up after EPSF inclusion");
-  p0("    count ops_count sub { pop } repeat");
-  p0("    countdictstack dict_stack sub { end } repeat");
-  p0("    PreEPSF_state restore");
-  p0("  end % userdict");
+  p0("  count ops_count sub { pop } repeat");
+  p0("  countdictstack dict_stack sub { end } repeat");
+  p0("  PreEPSF_state restore");
   p0("} bind def");
   pnl;
 
@@ -821,7 +845,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("      setcolor");
   p0("    } ifelse");
   p0("  } ifelse");
-  p0("} def");
+  p0("} bind def");
   pnl;
 
   p0("% num LoutSetGray -");
@@ -831,7 +855,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("  [ /DeviceGray ]");
   p0("  LoutCurrentP");
   p0("  LoutSetCCSP");
-  p0("} def");
+  p0("} bind def");
   pnl;
 
   p0("% r g b LoutSetRGBColor -");
@@ -841,7 +865,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("  [ /DeviceRGB ]");
   p0("  LoutCurrentP");
   p0("  LoutSetCCSP");
-  p0("} def");
+  p0("} bind def");
   pnl;
 
   p0("% h s b LoutSetHSBColor -");
@@ -850,7 +874,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("  gsave sethsbcolor");
   p0("  currentrgbcolor grestore");
   p0("  LoutSetRGBColor");
-  p0("} def");
+  p0("} bind def");
   pnl;
 
   p0("% c m y k LoutSetRGBColor -");
@@ -860,7 +884,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("  [ /DeviceCMYK ]");
   p0("  LoutCurrentP");
   p0("  LoutSetCCSP");
-  p0("} def");
+  p0("} bind def");
   pnl;
 
   p0("% p LoutSetTexture -");
@@ -869,7 +893,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("  LoutCurrentCCS");
   p0("  3 -1 roll");
   p0("  LoutSetCCSP");
-  p0("} def");
+  p0("} bind def");
   pnl;
 
   p0("% <scale > <scalex> <scaley> <rotate> <hshift> <vshift>");
@@ -902,14 +926,14 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("  {");
   p0("    pop pop null");
   p0("  } ifelse");
-  p0("} def");
+  p0("} bind def");
   pnl;
 
   p0("/LoutTextureSolid");
   p0("{");
   p0("  null");
   p0("  LoutSetTexture");
-  p0("} def");
+  p0("} bind def");
 
   /* PostScript forms, if needed */
 
@@ -1069,6 +1093,8 @@ static void PS_PrintAfterLastPage(void)
     pnl;
     p0("pgsave restore");
     p0("showpage");
+    if( encapsulated )
+      p0("end % EPSF defs in own dict");
     pnl;
     p0("%%Trailer");
 
@@ -1111,19 +1137,19 @@ static void PS_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
   debug2(DPO, DD, "PrintBetweenPages(%d, %d)", h, v);
 
   pnl;
-  p0("pgsave restore");
-  p0("showpage");
   gs_stack_top = 0;
   cpexists = FALSE;
   currentfont = NO_FONT;
   currentbaselinemark = FALSE;
   currentcolour = NO_COLOUR;
   currenttexture = NO_TEXTURE;
-  if( Encapsulated )
+  if( encapsulated )
   { PS_PrintAfterLastPage();
     Error(49, 6, "truncating -EPS document at end of first page",
       FATAL, no_fpos);
   }
+  p0("pgsave restore");
+  p0("showpage");
   pnl;
   fprintf(out_fp, "%%%%Page: ");
   for( p = label;  *p != '\0';  p++ )
@@ -1372,13 +1398,13 @@ static void PS_CoordScale(float hfactor, float vfactor)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  void PS_CoordHMirror()                                                   */
+/*  void PS_CoordHMirror(void)                                               */
 /*                                                                           */
 /*  Reflect coordinate system about y axis.                                  */
 /*                                                                           */
 /*****************************************************************************/
 
-static void PS_CoordHMirror()
+static void PS_CoordHMirror(void)
 {
   debug0(DPO, D, "CoordHMirror()");
   cpexists = FALSE;
@@ -1389,13 +1415,13 @@ static void PS_CoordHMirror()
 
 /*****************************************************************************/
 /*                                                                           */
-/*  void PS_CoordVMirror()                                                   */
+/*  void PS_CoordVMirror(void)                                               */
 /*                                                                           */
 /*  Reflect coordinate system about x axis.                                  */
 /*                                                                           */
 /*****************************************************************************/
 
-static void PS_CoordVMirror()
+static void PS_CoordVMirror(void)
 {
   debug0(DPO, D, "CoordVMirror()");
   cpexists = FALSE;
@@ -1433,7 +1459,7 @@ static void PS_SaveGraphicState(OBJECT x)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  PS_RestoreGraphicState()                                                 */
+/*  PS_RestoreGraphicState(void)                                             */
 /*                                                                           */
 /*  Restore previously saved coordinate system.  NB we normally assume that  */
 /*  no white space is needed before any item of output, but since this       */
@@ -1442,7 +1468,7 @@ static void PS_SaveGraphicState(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void PS_RestoreGraphicState(void)
+static void PS_RestoreGraphicState(void)
 { debug0(DPO, D, "PS_RestoreGraphicState()");
   pnl;
   p0("grestore");
@@ -1557,7 +1583,8 @@ void PS_DefineGraphicNames(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void PS_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
+static void PS_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist,
+  FULL_LENGTH ydist)
 {
   if( gs_stack_top >= MAX_GS - 1 ||
       font(save_style(x)) != currentfont ||
@@ -1696,7 +1723,8 @@ BOOLEAN PS_FindBoundingBox(FILE *fp, FILE_POS *pos, FULL_LENGTH *llx,
 /*                                                                           */
 /*****************************************************************************/
 
-void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
+static void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
+  FULL_LENGTH rowmark)
 { OBJECT y, full_name;  FILE *fp;  BOOLEAN compressed;  int fnum;
   debug0(DPO, D, "PS_PrintGraphicInclude(x)");
 
@@ -1878,14 +1906,14 @@ static void PS_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
 
 /*****************************************************************************/
 /*                                                                           */
-/*  PS_LinkCheck()                                                           */
+/*  PS_LinkCheck(void)                                                       */
 /*                                                                           */
 /*  Called at end of run; will check that for every link source point there  */
 /*  is a link dest point.                                                    */
 /*                                                                           */
 /*****************************************************************************/
 
-static void PS_LinkCheck()
+static void PS_LinkCheck(void)
 { OBJECT y, link;
   debug0(DPO, D, "PS_LinkCheck()");
 
@@ -1950,3 +1978,140 @@ static struct back_end_rec ps_back = {
 };
 
 BACK_END PS_BackEnd = &ps_back;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PS_NullBackEnd                                                           */
+/*                                                                           */
+/*  A null (non-printing) version of the PostScript back end.                */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PS_NullPrintInitialize(FILE *fp, BOOLEAN enc)
+{}
+
+static void PS_NullPrintPageSetupForFont(OBJECT face, int font_curr_page,
+  FULL_CHAR *font_name, FULL_CHAR *short_name)
+{}
+
+static void PS_NullPrintPageResourceForFont(FULL_CHAR *font_name,
+  BOOLEAN first)
+{}
+
+static void PS_NullPrintMapping(MAPPING m)
+{}
+
+static void PS_NullPrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
+  FULL_CHAR *label)
+{}
+
+static void PS_NullPrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v,
+  FULL_CHAR *label)
+{}
+
+static void PS_NullPrintAfterLastPage(void)
+{}
+
+static void PS_NullPrintWord(OBJECT x, int hpos, int vpos)
+{}
+
+static void PS_NullPrintPlainGraphic(OBJECT x, FULL_LENGTH xmk,
+  FULL_LENGTH ymk, OBJECT z)
+{}
+
+static void PS_NullPrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
+  TEXTURE_NUM pat, FULL_LENGTH xstart, FULL_LENGTH xstop, FULL_LENGTH ymk)
+{}
+
+static void PS_NullCoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
+{}
+
+static void PS_NullCoordRotate(FULL_LENGTH amount)
+{}
+
+static void PS_NullCoordScale(float hfactor, float vfactor)
+{}
+
+static void PS_NullCoordHMirror(void)
+{}
+
+static void PS_NullCoordVMirror(void)
+{}
+
+static void PS_NullSaveGraphicState(OBJECT x)
+{}
+
+static void PS_NullRestoreGraphicState(void)
+{}
+
+static void PS_NullPrintGraphicObject(OBJECT x)
+{}
+
+static void PS_NullDefineGraphicNames(OBJECT x)
+{}
+
+static void PS_NullSaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist,
+  FULL_LENGTH ydist)
+{}
+
+static void PS_NullPrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
+  FULL_LENGTH rowmark)
+{}
+
+static void PS_NullLinkSource(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{}
+
+static void PS_NullLinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{}
+
+static void PS_NullLinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
+  FULL_LENGTH urx, FULL_LENGTH ury)
+{}
+
+static void PS_NullLinkCheck(void)
+{}
+
+static struct back_end_rec ps_null_back = {
+  POSTSCRIPT,				/* the code number of the back end   */
+  STR_POSTSCRIPT,			/* string name of the back end       */
+  TRUE,					/* TRUE if @Scale is available       */
+  TRUE,					/* TRUE if @Rotate is available      */
+  TRUE,					/* TRUE if @HMirror, @VMirror avail  */
+  TRUE,					/* TRUE if @Graphic is available     */
+  TRUE,					/* TRUE if @IncludeGraphic is avail. */
+  FALSE,				/* TRUE if @PlainGraphic is avail.   */
+  TRUE,					/* TRUE if fractional spacing avail. */
+  TRUE,					/* TRUE if actual font metrics used  */
+  TRUE,					/* TRUE if colour is available       */
+  PS_NullPrintInitialize,
+  PS_PrintLength,
+  PS_NullPrintPageSetupForFont,
+  PS_NullPrintPageResourceForFont,
+  PS_NullPrintMapping,
+  PS_NullPrintBeforeFirstPage,
+  PS_NullPrintBetweenPages,
+  PS_NullPrintAfterLastPage,
+  PS_NullPrintWord,
+  PS_NullPrintPlainGraphic,
+  PS_NullPrintUnderline,
+  PS_NullCoordTranslate,
+  PS_NullCoordRotate,
+  PS_NullCoordScale,
+  PS_NullCoordHMirror,
+  PS_NullCoordVMirror,
+  PS_NullSaveGraphicState,
+  PS_NullRestoreGraphicState,
+  PS_NullPrintGraphicObject,
+  PS_NullDefineGraphicNames,
+  PS_NullSaveTranslateDefineSave,
+  PS_NullPrintGraphicInclude,
+  PS_NullLinkSource,
+  PS_NullLinkDest,
+  PS_NullLinkURL,
+  PS_NullLinkCheck,
+};
+
+BACK_END PS_NullBackEnd = &ps_null_back;

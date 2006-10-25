@@ -1,7 +1,7 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -154,7 +154,8 @@ static void dtab_debug(DBCHECK_TABLE S, FILE *fp)
 #endif
 
 static DBCHECK_TABLE DbCheckTable;		/* the dbcheck table         */
-static BOOLEAN	     DbCheckTableInit = FALSE;	/* TRUE if table inited	     */
+static BOOLEAN	     DbCheckTableInit;		/* TRUE if table inited	     */
+static int extra_seq;
 
 
 /*****************************************************************************/
@@ -165,6 +166,23 @@ static BOOLEAN	     DbCheckTableInit = FALSE;	/* TRUE if table inited	     */
 /*****************************************************************************/
 
 OBJECT OldCrossDb, NewCrossDb;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void DbInit(void)                                                        */
+/*                                                                           */
+/*  Initialize this module..                                                 */
+/*                                                                           */
+/*****************************************************************************/
+
+void DbInit(void)
+{
+  DbCheckTable = NULL;
+  DbCheckTableInit = FALSE;
+  OldCrossDb = NewCrossDb = nilobj;
+  extra_seq = 0;
+}
 
 
 /*****************************************************************************/
@@ -270,7 +288,6 @@ void DbInsert(OBJECT db, BOOLEAN gall, OBJECT sym, FULL_CHAR *tag,
 FILE_POS *tagfpos, FULL_CHAR *seq, FILE_NUM dfnum, long dfpos, int dlnum,
 BOOLEAN check)
 { int symnum;  OBJECT chk;
-  static int extra_seq = 0;
   FULL_CHAR buff[MAX_BUFF];
   assert( is_word(type(db)), "DbInsert: db!" );
   assert( tag[0] != '\0', "DbInsert: null tag!" );

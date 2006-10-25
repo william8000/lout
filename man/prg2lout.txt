@@ -54,6 +54,10 @@ OPTIONS
           -v1.1fx  meaning  1.1 times the font size measured from
           baseline to baseline.
 
+     -b num
+          Select a blank line scale factor.  The default is -b1.0
+          meaning no scaling.  A good alternative is 0.6.
+
      -t num
           Set the tab interval  to  num  characters  (default  is
           -t8).
@@ -73,6 +77,10 @@ OPTIONS
           number  or  1  if number is not given.  You may need to
           give  the  1  anyway  to prevent prg2lout from taking a
           following file name as a number.
+
+     -N   Do not print line numbers on blank lines.
+
+     -M   Like -N but do not assign line numbers to blank lines.
 
      -S filename
           Use  filename  as  the setup file instead of the system

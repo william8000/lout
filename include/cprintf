@@ -18,6 +18,7 @@ export @CP
 def @CPSetup
     named pipe					{	}  # pipe through this
     named numbered				{ No	}  # numbered lines?
+    named blanknumbered				{ Yes	}  # blanks numbered?
     named style
 	named @OrIfPlain left x right y
 	{ @BackEnd @Case { PlainText @Yield y else @Yield x } }
@@ -27,6 +28,7 @@ def @CPSetup
     named fixedfont				{ Courier }# font family
     named fixedsize				{ -1.0p	}  # font size
     named fixedline				{ 1.0vx	}  # line-space
+    named fixedblanklinescale			{ 1.0	}  # blank-line scale
     named fixedspace				{ lout	}  # spacing mode
     named fixedtabin				{ 8	}  # tab interval
     named fixedtabout				{ 8s	}  # tab width
@@ -51,6 +53,7 @@ def @CPSetup
     named varyingfont				{	}  # font family
     named varyingsize				{ 1.0f	}  # font size
     named varyingline				{ 1.0vx	}  # line-space
+    named varyingblanklinescale			{ 1.0	}  # blank-line scale
     named varyingspace				{ lout	}  # spacing mode
     named varyingtabin				{ 8	}  # tab interval
     named varyingtabout				{ 3f	}  # tab width
@@ -75,6 +78,7 @@ def @CPSetup
     named symbolfont				{	}  # font family
     named symbolsize				{ 1.0f	}  # font size
     named symbolline				{ 1.0vx	}  # line-space
+    named symbolblanklinescale			{ 1.0	}  # blank-line scale
     named symbolspace				{ lout	}  # spacing mode
     named symboltabin				{ 8	}  # tab interval
     named symboltabout				{ 3f	}  # tab width
@@ -103,22 +107,24 @@ def @CPSetup
 	@A "$>"
 
     def @CP
-	named style        { style         }  # style
-	named numbered	   { numbered	   }  # want numbered lines?
-	named pipe         { pipe          }  # pipe through this first
-	named font         { dft           }  # font family
-	named size         { dft           }  # font size
-	named line         { dft           }  # line-space
-	named space        { dft           }  # spacing mode
-	named tabin        { dft           }  # tab interval
-	named tabout       { dft           }  # tab width
-	named identifiers  { dft           }  # ident. font
-	named keywords     { dft           }  # keyword font
-	named operators    { dft           }  # operator font
-	named numbers      { dft           }  # number font
-	named strings      { dft           }  # string font
-	named comments     { dft           }  # comment font
-	named linenumbers  { dft           }  # line numbers font
+	named style          { style         }  # style
+	named numbered       { numbered      }  # want numbered lines?
+	named blanknumbered  { blanknumbered }  # numbered blank lines?
+	named pipe           { pipe          }  # pipe through this first
+	named font           { dft           }  # font family
+	named size           { dft           }  # font size
+	named line           { dft           }  # line-space
+	named blanklinescale { dft           }  # blank-line scale
+	named space          { dft           }  # spacing mode
+	named tabin          { dft           }  # tab interval
+	named tabout         { dft           }  # tab width
+	named identifiers    { dft           }  # ident. font
+	named keywords       { dft           }  # keyword font
+	named operators      { dft           }  # operator font
+	named numbers        { dft           }  # number font
+	named strings        { dft           }  # string font
+	named comments       { dft           }  # comment font
+	named linenumbers    { dft           }  # line numbers font
 	body @Body			      # filtered, see below
     @Begin
 
@@ -181,16 +187,26 @@ def @CPSetup
 		}
 	    }
 
+	    def wantblanknumbered
+	    {
+	        blanknumbered @Case {
+		  { No no }		@Yield "-M"
+		  { NoPrint noprint }	@Yield "-N"
+		  { Yes yes }		@Yield ""
+		}
+	    }
+
 	    pipe @Case {
 		"" @Yield {
-	    	    "prg2lout -r -lC" wantnumbered -i{@FilterIn}
-		    -o{@FilterOut} -e{@FilterErr}
+	    	    "prg2lout -r -lC" wantblanknumbered wantnumbered
+		    -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
 		    -t{@InitTab} -T{@InitTabWidth}
 		}
 		else @Yield {
 	    	    "cat" @FilterIn "|" pipe "|"
-		    "prg2lout -r -lC" wantnumbered -o{@FilterOut}
-		    -e{@FilterErr} -t{@InitTab} -T{@InitTabWidth}
+		    "prg2lout -r -lC" wantblanknumbered wantnumbered
+		    -o{@FilterOut} -e{@FilterErr}
+		    -t{@InitTab} -T{@InitTabWidth}
 		}
 	    }
 	}
@@ -220,6 +236,15 @@ def @CPSetup
 	      iffixed   { fixedline   }
 	      ifvarying { varyingline }
 	      ifsymbol  { symbolline  }
+	}
+
+
+	def @InitBLS
+	{
+	  blanklinescale @Test
+	      iffixed   { fixedblanklinescale   }
+	      ifvarying { varyingblanklinescale }
+	      ifsymbol  { symbolblanklinescale  }
 	}
 
 
@@ -396,7 +421,7 @@ def @CPSetup
 
 
 	{ @InitFontFamily Base @InitSize } @Font @InitSpace @Space
-	{ @InitLine lines nohyphen } @Break @Body
+	{ @InitLine lines nohyphen "blanklinescale" @InitBLS } @Break @Body
 
     @End @CP
 

@@ -1,7 +1,7 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -125,7 +125,7 @@ BOOLEAN xleft, BOOLEAN xright, BOOLEAN xindef, unsigned char xprec)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  static void PrintUsage(fp)                                               */
+/*  void PrintUsage(fp)                                                      */
 /*  static void PrintVersion(lib, fp)                                        */
 /*                                                                           */
 /*  Print usage information / version information on file fp.                */
@@ -138,37 +138,43 @@ BOOLEAN xleft, BOOLEAN xright, BOOLEAN xindef, unsigned char xprec)
 #define lput3(fmt, p1, p2, p3)    { fprintf(fp,fmt, p1, p2, p3);     lputnl; }
 #define lput4(fmt, p1, p2, p3, p4){ fprintf(fp,fmt, p1, p2, p3, p4); lputnl; }
 
-static void PrintUsage(FILE *fp)
+void PrintUsage(FILE *fp)
 {
   lputnl;
   lput0("usage:  lout options files"					    );
   lputnl;
-  lput0("  -s              suppress access to cross reference database"	    );
-  lput0("  -EPS            EPS (Encapsulated PostScript) output"	    );
-  lput0("  -PDF or -Z      PDF (Adobe Portable Document Format) output"     );
-  lput0("  -p              plain text output instead of PostScript"	    );
-  lput0("  -P              like -p but with form-feed char between pages"   );
-  lput0("  -S              safe execution (disable calls to system(3))"	    );
-  lput0("  -U              unsafe execution (allow calls to system(3))"	    );
-  lput0("  -l              ASCII collation order when sorting indexes etc." );
-  lput0("  -L              locale collation order when sorting indexes etc.");
-  lput0("  -o file         output to file instead of stdout"		    );
-  lput0("  -e file         error messages to file instead of stderr"	    );
   lput0("  -a              alternative error format:  file:line:col ..."    );
-  lput0("  -w              print total number of words in output"	    );
+  lput0("  -c file         use file.li instead of lout.li for crossrefs"    );
+  lput0("  -C directory    add directory to LCM file search path"	    );
+  lput0("  -d<various>     debug the Lout run (if enabled in binary)"	    );
+  lput0("  -D directory    add directory to database file search path"	    );
+  lput0("  -e file         error messages to file instead of stderr"	    );
+  lput0("  -EPS            EPS (Encapsulated PostScript) output"	    );
+  lput0("  -F directory    add directory to font metrics file search path"  );
+  lput0("  -h file         use hyphenation file"                            );
+  lput0("  -H directory    add directory to hyphenation file search path"   );
   lput0("  -i file         like @SysInclude { file }; not recommended"	    );
   lput0("  -I directory    add directory to include file search path"	    );
-  lput0("  -C directory    add directory to LCM file search path"	    );
-  lput0("  -F directory    add directory to font metrics file search path"  );
-  lput0("  -H directory    add directory to hyphenation file search path"   );
-  lput0("  -D directory    add directory to database file search path"	    );
-  lput0("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'");
-  lput0("  -c file         use file.li instead of lout.li for crossrefs"    );
+  lput0("  -k              suppress all kerning"                            );
+  lput0("  -l              ASCII collation order when sorting indexes etc." );
+  lput0("  -L              locale collation order when sorting indexes etc.");
+  lput0("  -m<addr>        monitor address during Lout run (for debugging)" );
   lput0("  -M              save memory (don't read in database indexes)"    );
+  lput0("  -o file         output to file instead of stdout"		    );
+  lput0("  -p              plain text output instead of PostScript"	    );
+  lput0("  -P              like -p but with form-feed char between pages"   );
+  lput0("  -PDF or -Z      PDF (Adobe Portable Document Format) output"     );
+  lput0("  -r<integer>     run Lout <integer> times; print on last run only");
+  lput0("  -s              suppress access to cross reference database"	    );
+  lput0("  -S              safe execution (disable calls to system(3))"	    );
   lput0("  -t              ignore texture changes, always use solid colour" );
-  lput0("  -x              initializing run, not for ordinary use"	    );
   lput0("  -u              print this usage message on stderr and exit"	    );
+  lput0("  -U              unsafe execution (allow calls to system(3))"	    );
   lput0("  -V              print version and configuration information"	    );
+  lput0("  -w              print total number of words in output"	    );
+  lput0("  -x              initializing run, not for ordinary use"	    );
+  lput0("  -Z              PDF (Adobe Portable Document Format) output"     );
+  lput0("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'");
   lput0("  -               a file name denoting standard input"		    );
   lputnl;
 } /* end PrintUsage */
@@ -221,51 +227,37 @@ static FULL_CHAR *GetArg(char *argv[], int argc, int *i)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  main(argc, argv)                                                         */
+/*  void run(int argc, char *argv[], int *runs_to_do, FULL_CHAR *lib)        */
 /*                                                                           */
-/*  Read command line, initialise everything, read definitions, read         */
-/*  galleys, clean up and exit.                                              */
+/*  Carry out one run of Lout.  If *runs_to_do is -1, set it.                */
 /*                                                                           */
 /*****************************************************************************/
 
-int main(int argc, char *argv[])
+typedef enum {
+  BE_PLAIN,
+  BE_PS,
+  BE_PDF
+} BE_TYPE;
+
+static void run(int argc, char *argv[], int run_num, int *runs_to_do,
+  FULL_CHAR *lib)
 { int i, len;  FULL_CHAR *arg;
   OBJECT t, y, res, s;			/* current token, parser output      */
   BOOLEAN stdin_seen;			/* TRUE when stdin file seen         */
   int source_file_count;		/* number of source files in command */
   FULL_CHAR *cross_db;			/* name of cross reference database  */
   FULL_CHAR *outfile;			/* name of output file               */
-  FULL_CHAR *lib;			/* name of library directory         */
   FILE *out_fp;
   long MemCheckLong;
   FULL_CHAR oname[MAX_BUFF], oval[MAX_BUFF], buff[MAX_BUFF], *p;
-  int bp;  OBJECT z;
-  BOOLEAN seen_wordcount;
-#if LOCALE_ON
-  char catname[MAX_BUFF], *loc;
-#endif
-
-  /* find the name of the library directory, from envt or else from -D */
-  lib = AsciiToFull(getenv("LOUTLIB"));
-  if( lib == (FULL_CHAR *) NULL )
-    lib = AsciiToFull(LIB_DIR);
-
-  /* set locale if that's what we are doing */
-#if LOCALE_ON
-  loc = setlocale(LC_MESSAGES, "");
-  if( loc == (char *) NULL )
-  { Error(1, 6, "unable to initialize locale", WARN, no_fpos);
-    loc = "C";
-  }
-  sprintf(catname, "%s/%s/%s/LC_MESSAGES/errors.%s",
-    lib, LOCALE_DIR, loc, loc);
-  MsgCat = catopen(catname, 0);
-#endif
+  int bp, runcount;  OBJECT z;
+  BOOLEAN seen_wordcount, encapsulated;
+  BE_TYPE be_type;
 
   /* initialise various modules, add current directory to search paths */
   TotalWordCount = 0;
   seen_wordcount = FALSE;
-  BackEnd = PS_BackEnd;
+  be_type = BE_PS;
   PlainCharWidth = PLAIN_WIDTH;
   PlainCharHeight = PLAIN_HEIGHT;
   PlainFormFeed = FALSE;
@@ -273,9 +265,10 @@ int main(int argc, char *argv[])
   UseCollate = COLLATE;
   AllowCrossDb = TRUE;
   InMemoryDbIndexes = TRUE;
-  Encapsulated = FALSE;
+  encapsulated = FALSE;
   SafeExecution = SAFE_DFT ? TRUE : FALSE;
   Kern = TRUE;
+  ErrorInit();
   MemInit();
   InitSym();
   LexInit();
@@ -299,10 +292,22 @@ int main(int argc, char *argv[])
      
 	/* read name of output file */
 	if( (outfile = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 7, "usage: -o <filename>", FATAL, no_fpos);
+	  Error(1, 7, "usage: -o <filename>", FATAL_WITH_USAGE, no_fpos);
 	if( StringEndsWith(outfile, SOURCE_SUFFIX) )
 	  Error(1, 28, "-o: output file name %s ends with %s",
 	    FATAL, no_fpos, outfile, SOURCE_SUFFIX);
+	break;
+
+
+      case CH_FLAG_RUNS:
+     
+	/* multiple runs */
+	if( sscanf(argv[i]+2, "%d", &runcount) != 1 )
+	  Error(1, 32, "usage: -r<integer>", FATAL_WITH_USAGE, no_fpos);
+	if( runcount <= 0 || runcount > 20 )
+	  Error(1, 33, "invalid value of -r", FATAL_WITH_USAGE, no_fpos);
+	assert(*runs_to_do == -1 || *runs_to_do == runcount, "-r");
+	*runs_to_do = runcount;
 	break;
 
 
@@ -345,7 +350,7 @@ int main(int argc, char *argv[])
      
 	/* read name of cross reference database */
 	if( (cross_db = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 8, "usage: -c <filename>", FATAL, no_fpos);
+	  Error(1, 8, "usage: -c <filename>", FATAL_WITH_USAGE, no_fpos);
 	break;
 
 
@@ -353,8 +358,8 @@ int main(int argc, char *argv[])
      
 	/* read log file name */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 9, "usage: -e <filename>", FATAL, no_fpos);
-	ErrorInit(arg);
+	  Error(1, 9, "usage: -e <filename>", FATAL_WITH_USAGE, no_fpos);
+	ErrorSetFile(arg);
 	break;
 
 
@@ -369,8 +374,8 @@ int main(int argc, char *argv[])
      
 	/* -EPS produces encapsulated PostScript output */
 	if( !StringEqual(AsciiToFull(argv[i]+1), STR_EPS) )
-	  Error(1, 10, "usage: -EPS", FATAL, no_fpos);
-	Encapsulated = TRUE;
+	  Error(1, 10, "usage: -EPS", FATAL_WITH_USAGE, no_fpos);
+	encapsulated = TRUE;
 	break;
 
 
@@ -378,7 +383,7 @@ int main(int argc, char *argv[])
      
 	/* add directory to database and sysdatabase paths */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 11, "usage: -D <directoryname>", FATAL, no_fpos);
+	  Error(1, 11, "usage: -D <directoryname>", FATAL_WITH_USAGE, no_fpos);
 	AddToPath(DATABASE_PATH, MakeWord(WORD, arg, no_fpos));
 	AddToPath(SYSDATABASE_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
@@ -388,7 +393,7 @@ int main(int argc, char *argv[])
      
 	/* add directory to character mapping path */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 12, "usage: -C <directoryname>", FATAL, no_fpos);
+	  Error(1, 12, "usage: -C <directoryname>", FATAL_WITH_USAGE, no_fpos);
 	AddToPath(MAPPING_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
 
@@ -397,7 +402,7 @@ int main(int argc, char *argv[])
      
 	/* add directory to font path */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 13, "usage: -F <directoryname>", FATAL, no_fpos);
+	  Error(1, 13, "usage: -F <directoryname>", FATAL_WITH_USAGE, no_fpos);
 	AddToPath(FONT_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
 
@@ -406,7 +411,7 @@ int main(int argc, char *argv[])
      
 	/* add directory to hyph path */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 14, "usage: -H <directoryname>", FATAL, no_fpos);
+	  Error(1, 14, "usage: -H <directoryname>", FATAL_WITH_USAGE, no_fpos);
 	AddToPath(HYPH_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
 
@@ -415,7 +420,7 @@ int main(int argc, char *argv[])
      
 	/* add directory to include and sysinclude paths */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 15, "usage: -I <directoryname>", FATAL, no_fpos);
+	  Error(1, 15, "usage: -I <directoryname>", FATAL_WITH_USAGE, no_fpos);
 	AddToPath(INCLUDE_PATH, MakeWord(WORD, arg, no_fpos));
 	AddToPath(SYSINCLUDE_PATH, MakeWord(WORD, arg, no_fpos));
 	break;
@@ -425,7 +430,7 @@ int main(int argc, char *argv[])
      
 	/* read sysinclude file and strip any .lt suffix */
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 16, "usage: -i <filename>", FATAL, no_fpos);
+	  Error(1, 16, "usage: -i <filename>", FATAL_WITH_USAGE, no_fpos);
 	len = StringLength(arg) - StringLength(SOURCE_SUFFIX);
 	if( len >= 0 && StringEqual(&arg[len], SOURCE_SUFFIX) )
 	  StringCopy(&arg[len], STR_EMPTY);
@@ -438,9 +443,9 @@ int main(int argc, char *argv[])
      
 	/* declare hyphenation file */
 	if( FirstFile(HYPH_FILE) != NO_FILE )
-	  Error(1, 17, "two -h options illegal", FATAL, no_fpos);
+	  Error(1, 17, "two -h options illegal", FATAL_WITH_USAGE, no_fpos);
 	if( (arg = GetArg(argv, argc, &i)) == NULL )
-	  Error(1, 18, "usage: -h <filename>", FATAL, no_fpos);
+	  Error(1, 18, "usage: -h <filename>", FATAL_WITH_USAGE, no_fpos);
 	debug0(DFS, D, "  calling DefineFile from main (2)");
 	DefineFile(arg, STR_EMPTY, no_fpos, HYPH_FILE, INCLUDE_PATH);
 	DefineFile(arg, HYPH_SUFFIX, no_fpos, HYPH_PACKED_FILE, INCLUDE_PATH);
@@ -468,7 +473,7 @@ int main(int argc, char *argv[])
 
       case CH_FLAG_PDF:
 
-	BackEnd = PDF_BackEnd;
+	be_type = BE_PDF;
 	break;
 
 
@@ -476,7 +481,7 @@ int main(int argc, char *argv[])
 
 	if( StringEqual(AsciiToFull(argv[i]+1), STR_PDF) )
 	{
-	  BackEnd = PDF_BackEnd;
+	  be_type = BE_PDF;
 	  break;
 	}
 	PlainFormFeed = TRUE;
@@ -485,7 +490,7 @@ int main(int argc, char *argv[])
 
       case CH_FLAG_PLAIN:
      
-	BackEnd = Plain_BackEnd;
+	be_type = BE_PLAIN;
 	if( *(argv[i]+2) != '\0' )
 	{ float len1, len2;  FULL_CHAR units1, units2;
 	  if( sscanf(argv[i]+2, "%f%c%f%c",&len1,&units1,&len2,&units2) != 4 )
@@ -633,8 +638,8 @@ int main(int argc, char *argv[])
 
       default:
      
-	PrintUsage(stderr);
-	Error(1, 26, "unknown command line flag %s", FATAL, no_fpos, argv[i]);
+	Error(1, 26, "unknown command line flag %s", FATAL_WITH_USAGE,
+	  no_fpos, argv[i]);
 	break;
 
     }
@@ -650,6 +655,8 @@ int main(int argc, char *argv[])
 	source_file_count++;
     }
   } /* for */
+  if( *runs_to_do == -1 )
+    *runs_to_do = 1;
 
   if( UseCollate )
   {
@@ -660,29 +667,47 @@ int main(int argc, char *argv[])
   /* start timing if required */
   ifdebug(DPP, D, ProfileOn("main"));
 
-  /* open output file, or stdout if none specified, and initialize printer */
-  if( StringEqual(outfile, STR_STDOUT) )
+  /* sort out output file and back end */
+  if( run_num == *runs_to_do )
   {
+    /* last run, so open output file (or stdout if none specified) */
+    if( StringEqual(outfile, STR_STDOUT) )
+    {
 #if OS_DOS
-    /* For DOS/Win32 we need to set binary mode on stdout to prevent
-       PDF compressed streams and xrefs from being corrupted - Uwe 12/98 */
-    if( BackEnd->code != PLAINTEXT &&
-	_setmode(_fileno(stdout), _O_BINARY) == -1 )
-      Error(1, 31, "cannot set binary mode on stdout", FATAL, no_fpos);
+      /* For DOS/Win32 we need to set binary mode on stdout to prevent
+	 PDF compressed streams and xrefs from being corrupted - Uwe 12/98 */
+      if( be_type != BE_PLAIN && _setmode(_fileno(stdout), _O_BINARY) == -1 )
+	Error(1, 31, "cannot set binary mode on stdout", FATAL, no_fpos);
 #endif
-    out_fp = stdout;
+      out_fp = stdout;
+    }
+    else
+    { out_fp = StringFOpen(outfile, WRITE_FILE);
+      if( out_fp == null )
+	Error(1, 27, "cannot open output file %s", FATAL, no_fpos, outfile);
+    }
+    if( be_type == BE_PLAIN )
+      BackEnd = Plain_BackEnd;
+    else if( be_type == BE_PS )
+      BackEnd = PS_BackEnd;
+    else
+      BackEnd = PDF_BackEnd;
+    BackEnd->PrintInitialize(out_fp, encapsulated);
   }
   else
-  { out_fp = StringFOpen(outfile, WRITE_FILE);
-    if( out_fp == null )
-      Error(1, 27, "cannot open output file %s", FATAL, no_fpos, outfile);
+  {
+    /* not last run, so use a null backend */
+    if( be_type == BE_PLAIN )
+      BackEnd = Plain_NullBackEnd;
+    else
+      BackEnd = PS_NullBackEnd;
+    BackEnd->PrintInitialize(NULL, encapsulated);
   }
 
   /* initialize miscellaneous modules */
   ColourInit();
   TextureInit();
   LanguageInit();
-  BackEnd->PrintInitialize(out_fp);
 
   /* append default directories to file search paths */
   AddToPath(FONT_PATH,      MakeWordThree(lib, STR_DIR, AsciiToFull(FONT_DIR)));
@@ -836,8 +861,14 @@ int main(int argc, char *argv[])
   /* initialize filter module */
   FilterInit();
 
-  /* initialize enviroment table module */
+  /* initialize enviroment table module, etc. */
+  CrossInitModule();
   EnvInit();
+  DbInit();
+  HyphInit();
+  MapInit();
+  ReadFromFileInit();
+  PromoteInit();
 
   /* initialise scope chain to <StartSym> */
   PushScope(StartSym, FALSE, FALSE);
@@ -890,6 +921,53 @@ int main(int argc, char *argv[])
   ifdebug(DPP, D, ProfileOff("main"));
   ifdebug(DPP, D, ProfilePrint());
   ifdebug(DET, D, EnvDebug());
+
+} /* end run */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  main(argc, argv)                                                         */
+/*                                                                           */
+/*  Read command line, initialise everything, read definitions, read         */
+/*  galleys, clean up and exit.                                              */
+/*                                                                           */
+/*****************************************************************************/
+
+int main(int argc, char *argv[])
+{ 
+  FULL_CHAR *lib;			/* name of library directory         */
+  int run_num, runs_to_do;
+#if LOCALE_ON
+  char catname[MAX_BUFF], *loc;
+#endif
+
+  /* find the name of the library directory, from envt or else from -D */
+  lib = AsciiToFull(getenv("LOUTLIB"));
+  if( lib == (FULL_CHAR *) NULL )
+    lib = AsciiToFull(LIB_DIR);
+
+  /* set locale if that's what we are doing */
+#if LOCALE_ON
+  loc = setlocale(LC_MESSAGES, "");
+  if( loc == (char *) NULL )
+  { Error(1, 6, "unable to initialize locale", WARN, no_fpos);
+    loc = "C";
+  }
+  sprintf(catname, "%s/%s/%s/LC_MESSAGES/errors.%s",
+    lib, LOCALE_DIR, loc, loc);
+  MsgCat = catopen(catname, 0);
+#endif
+
+  run_num = 1;  runs_to_do = -1;
+  do
+  {
+    if( run_num > 1 )
+      Error(1, 34, "lout -r beginning run %d:", WARN, no_fpos, run_num);
+    run(argc, argv, run_num, &runs_to_do, lib);
+    run_num++;
+  }
+  while( run_num <= runs_to_do );
 
 #if LOCALE_ON
   catclose(MsgCat);

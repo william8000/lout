@@ -1,7 +1,7 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -48,8 +48,8 @@ static	BOOLEAN		suppress_visible;		/* suppress visible  */
 static	int		scope_top;			/* scope stack top   */
 static	struct { OBJECT f1, f2; } symtab[MAX_TAB];	/* the hash table    */
 #if DEBUG_ON
-static	int		sym_spread[MAX_TAB] = { 0 };	/* hash table spread */
-static	int		sym_count = 0;			/* symbol count      */
+static	int		sym_spread[MAX_TAB];		/* hash table spread */
+static	int		sym_count;			/* symbol count      */
 #endif
 
 
@@ -87,6 +87,11 @@ void InitSym(void)
   suppress_visible = FALSE;
   for( i = 0;  i < MAX_TAB;  i++ )
     symtab[i].f1 = symtab[i].f2 = (OBJECT) &symtab[i];
+#if DEBUG_ON
+  for( i = 0;  i < MAX_TAB;  i++ )
+    sym_spread[i] = 0;
+  sym_count = 0;
+#endif
 } /* end InitSym */
 
 

@@ -60,4 +60,11 @@ pipe is
 since it cuts away the unwanted tab characters.  Unfortunately, we
 can't show the result of this on an actual example, since that would
 prevent this manual from being formatted on a non-Unix system.
+@PP
+When using @Code "pipe" it is also possible to omit {@Code "@Include"}
+and use the pipe to get the file as well as select from it:
+@ID @OneRow @Code {
+"@Eiffel pipe { \"cat /usr/staff/jeff/Eiffel/hash.e | sed -n /^.insert/,/^..end/p | cut -c2-\" } {}"
+}
+This pipes nothing into the {@Code cat} command, which does no harm.
 @End @Section

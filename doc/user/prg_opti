@@ -80,11 +80,14 @@ which allow a finer control over the style.  Here they all are, with their
 default values:
 @ID @OneRow @Code @Verbatim {
 @CP         [ or @Eiffel, @Blue, etc. ]
-    style { fixed }
+    pipe {}
     numbered { No }
+    blanknumbered { Yes }
+    style { fixed }
     font { Courier }
     size { -1.0p }
     line { 1.0vx }
+    blanklinescale { 1.0 }
     space { lout }
     tabin { 8 }
     tabout { 8s }
@@ -98,15 +101,32 @@ default values:
     ...
 }
 }
-We are already familiar with {@Code "style"}.  After that comes
-{@Code "numbered"}, whose value may be {@Code "No"} (the default),
-{@Code "Yes"}, or a number, and which determines whether or not
+Apart from {@Code "pipe"}, {@Code "numbered"} and {@Code "blanknumbered"},
+the default values shown are for @Code "style { fixed }" only; the other
+styles have other defaults (Section {@NumberOf cpsetup}).  For the
+{@Code "pipe"} option, see Section {@NumberOf pipes}.
+@PP
+The value of {@Code "numbered"} may be {@Code "No"} (the default),
+{@Code "Yes"}, or a number, and it determines whether or not
 programs. @RawIndex { programs }
 programs.numbered @SubIndex { @Code "numbered" option }
 numbered.programs @Index { @Code "numbered" option (programs) }
-line numbers are to be added and if so the value of the first
-one.  Next we have
-{@Code "font"}, which determines the font family to use, {@Code "size"},
+line numbers are to be added, and if so the value of the first one.
+If @Code "numbered" is {@Code "Yes"}, then the {@Code "blanknumbered"}
+option becomes relevant, and it determines whether blank lines are to
+programs. @RawIndex { programs }
+programs.blanknumbered @SubIndex { @Code "blanknumbered" option }
+blanknumbered.programs @Index { @Code "blanknumbered" option (programs) }
+receive line numbers or not.  It has three acceptable values:  {@Code "Yes"},
+the default value, meaning that blank lines are printed with line numbers,
+just like other lines; {@Code No}, meaning that blank lines are not
+assigned line numbers; and {@Code NoPrint}, meaning that blank lines
+are assigned line numbers but these numbers are not printed, so that
+the line numbers printed before and after a single blank line will
+differ by 2.
+@PP
+The {@Code "style"} option is already familiar.  Next comes {@Code "font"},
+which determines the font family to use, {@Code "size"},
 programs. @RawIndex { programs }
 programs.font @SubIndex { @Code "font" option }
 font.option. @RawIndex { @Code "font" option }
@@ -117,13 +137,18 @@ size.programs @Index { @Code "size" option (programs) }
 programs. @RawIndex { programs }
 programs.line @SubIndex { @Code "line" option }
 line.programs @Index { @Code "line" option (programs) }
-the font size to use, {@Code "line"}, the inter-line spacing, and
-{@Code "space"}, the spacing mode (as for the @Code "@Space" symbol
-of Section {@NumberOf white}).
+the font size to use, {@Code "line"}, the inter-line spacing,
+{@Code "blanklinescale"}, a scale factor by which the usual
+programs. @RawIndex { programs }
+programs.blanklinescale @SubIndex { @Code "blanklinescale" option }
+blanklinescale.programs @Index { @Code "blanklinescale" option (programs) }
+height of blank lines without printed line numbers is reduced (as in the
+option to the @Code "@Break" symbol of the same name), and {@Code "space"}, the
+spacing mode (as for the @Code "@Space" symbol of Section {@NumberOf white}).
 programs. @RawIndex { programs }
 programs.space @SubIndex { @Code "space" option }
 space.programs @Index { @Code "space" option (programs) }
-The default value for @Code "size" asks for one point smaller than in the
+The default value of @Code "size" asks for one point smaller than in the
 surrounding document; this was done to compensate for Courier's relatively
 large appearance compared to other fonts of the same nominal size.
 @PP
@@ -150,7 +175,5 @@ programs.comments @SubIndex { @Code "comments" option }
 comments.programs @Index { @Code "comments" option (programs) }
 numbers, strings, and comments.  {@Code "Base"} means the basic face; other
 commonly available choices are {@Code "Slope"} and {@Code "Bold"}.  These
-options may all be set to different faces if desired.  The default values
-shown are correct for @Code "style { fixed }" only; the other styles
-have other defaults (Section {@NumberOf cpsetup}).
+options may all be set to different faces if desired.
 @End @Section

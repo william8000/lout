@@ -1,7 +1,7 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -30,6 +30,27 @@
 /*                                                                           */
 /*****************************************************************************/
 #include "externs.h"
+
+/* these three variables refer to the root galley only */
+static BOOLEAN first = TRUE;		  /* if first component unwritten    */
+static OBJECT page_label = nilobj;	  /* current page label object       */
+static OBJECT prev_page_label = nilobj; /* previous page label object      */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void PromoteInit(void)                                                   */
+/*                                                                           */
+/*  Initialize this module.                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+void PromoteInit(void)
+{
+  first = TRUE;
+  page_label = nilobj;
+  prev_page_label = nilobj;
+}
 
 
 /*****************************************************************************/
@@ -551,11 +572,6 @@ void HandleHeader(OBJECT hd, OBJECT header)
 
 void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 {
-  /* these three variables refer to the root galley only */
-  static BOOLEAN first = TRUE;		  /* if first component unwritten    */
-  static OBJECT page_label = nilobj;	  /* current page label object       */
-  static OBJECT prev_page_label = nilobj; /* previous page label object      */
-
   OBJECT dest, link, y, z, tmp1, tmp2, why, top_y;
   FULL_CHAR *label_string, buff[MAX_LINE];
   FULL_LENGTH aback, afwd;

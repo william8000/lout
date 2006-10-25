@@ -80,7 +80,9 @@ its lines be; otherwise the lines are enclosed in a {@Code "@OneRow"}
 symbol after breaking.
 @PP
 The length of the gap used to separate the lines produced by paragraph
-breaking is always {@Code 1v}.  However, the @Code v unit itself and the
+breaking is always {@Code 1v}, except when {@Code lines}, {@Code clines},
+or {@Code rlines} encounter a completely blank line, for which see below.
+However, the @Code v unit itself and the
 v.unit.effect @SubIndex { effect on paragraph breaking }
 gap mode may be changed:
 @IL
@@ -105,6 +107,23 @@ smaller by the length of @I gap than it would otherwise have been.
 
 @EL
 In each case, the mode of @I gap is adopted within {@I object}.
+@PP
+When {@Code lines}, {@Code clines}, or {@Code rlines} encounter one or more
+completely blank lines, a single vertical concatenation operator is inserted
+to implement these, ensuring that the entire set of lines will disappear if
+they happen to fall on a page or column break.  The gap width of the
+concatenation operator is {@Code 1v} for the first newline as usual, plus
+{@Code 1v} multiplied by the @I { blank line scale factor }, an arbitrary
+decimal number with no units, for the remaining newlines.  This scale factor
+is settable by
+@ID {
+@Code "{ blanklinescale" @I num @Code "} @Break" @I object
+}
+The default value is {@Code 1.0}, which gives blank lines their full
+height.  However it often looks better if they are reduced somewhat.
+A value as small as {@Code 0.6} looks good; it gives width {@Code 1.6v}
+to the concatenation symbol inserted at a single blank line.  The
+usual gap mode is of course appended.
 @PP
 The @@Break symbol also controls hyphenation:
 @IL

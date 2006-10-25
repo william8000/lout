@@ -1,15 +1,19 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.31                          #
+#  Make file for installing Basser Lout Version 3.32                          #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
-#  undated                                                                    #
 #                                                                             #
 #     make prg2lout     Compile a small auxiliary program called prg2lout     #
 #     make lout         Compile the Lout source                               #
+#     make all          Equivalent to "make prg2lout" and "make lout"         #
+#                                                                             #
 #     make install      Install the Lout and prg2lout binaries and libraries  #
 #     make installman   Install the Lout and prg2lout manual entries          #
 #     make installdoc   Install the Lout documentation                        #
+#     make allinstall   Equivalent to "make install", "make installman",      #
+#                       and "make installdoc".                                #
+#                                                                             #
 #     make installfr    Install French error messages (optional)              #
 #     make installde    Install German error messages (optional)              #
 #     make clean        Remove compilation temporaries                        #
@@ -63,18 +67,24 @@
 #                                                                             #
 #  (5) Set the following four macros defined below to appropriate values:     #
 #                                                                             #
-#      BINDIR    Directory where Lout's binary goes.  This directory is       #
-#                assumed to exist.                                            #
+#      BINDIR      Directory where Lout's binary goes.  This directory is     #
+#                  assumed to exist.                                          #
 #                                                                             #
-#      LIBDIR    Directory where Lout's libraries go.  This directory will    #
-#                be created (but its parent must exist already).              #
+#      LOUTLIBDIR  Directory where Lout's libraries go.  This directory will  #
+#                  be created and must not exist already (but its parent      #
+#                  must exist already).  It will be completely removed by     #
+#                  an uninstall.  In short, it is the library directory for   #
+#                  Lout only, not a general library directory.                #
 #                                                                             #
-#      DOCDIR    Directory where the documents describing the Lout system     #
-#                (written in Lout) go.  This directory will be created (but   #
-#                its parent must exist already).                              #
+#      LOUTDOCDIR  Directory where the documents describing the Lout system   #
+#                  (written in Lout) go.  This directory will be created      #
+#                  (but its parent must exist already).                       #
 #                                                                             #
-#      MANDIR    Directory where the lout and prg2lout online manual entries  #
-#                (in nroff -man) go.  This directory is assumed to exist.     #
+#      MANDIR      Directory where the lout and prg2lout manual entries       #
+#                  (in nroff -man) go.  This directory is assumed to exist.   #
+#                                                                             #
+#      They are currently defined using a common stem called $(PREFIX),       #
+#      but you don't have to use $(PREFIX) if you don't want to.              #
 #                                                                             #
 #  (6) Set the following two macros defined below to appropriate values.      #
 #      I strongly recommend CHARIN=1 and CHAROUT=0 for all sites (English     #
@@ -174,27 +184,27 @@
 #      binary in this directory.  No changes are made in other directories.   #
 #                                                                             #
 # (12) This makefile assumes that Lout is not installed on your system        #
-#      already.  If you do have an earlier version of Lout installed,         #
-#      the simplest way to get rid of it is to type "make uninstall" now.     #
-#      Of course, this is assuming that the old version was installed in the  #
+#      already.  If you do have an earlier version of Lout installed, the     #
+#      simplest way to get rid of it is to type "make uninstall" now.  Of     #
+#      course, this is assuming that the old version was installed in the     #
 #      same directories as where you are about to install the new version.    #
 #                                                                             #
 # (13) Execute "make install".  This will do the following things:            #
 #                                                                             #
 #      (a) It will copy the lout and prg2lout binaries into $(BINDIR);        #
 #                                                                             #
-#      (b) It will create $(LIBDIR) and copy all the library files into it;   #
+#      (b) It will create $(LOUTLIBDIR) and copy the library files into it;   #
 #                                                                             #
 #      (c) It will perform an initializing "lout -x" run.  This run will      #
 #          do the following checks and initializations:                       #
 #                                                                             #
 #          (i)   It will read all the hyphenation (.lh) files mentioned       #
-#                in file $(LIBDIR)/include/langdefs, check them, and build    #
-#                the packed (.lp) versions;                                   #
+#                in file $(LOUTLIBDIR)/include/langdefs, check them, and      #
+#                build the packed (.lp) versions;                             #
 #                                                                             #
-#          (ii)  It will read and check the four standard database            #
-#                (.ld) files in directory $(LIBDIR)/data, and build           #
-#                the corresponding database index (.li) files.                #
+#          (ii)  It will read and check the four standard database (.ld)      #
+#                files in directory $(LOUTLIBDIR)/data, and build the         #
+#                corresponding database index (.li) files.                    #
 #                                                                             #
 #      (d) It will change the mode of the files created in (c) to be          #
 #          publicly readable, just in case they weren't created that way.     #
@@ -207,38 +217,38 @@
 #      These entries are troff files; plain text versions are also available  #
 #      in directory ./man if you need them (install them yourself).           #
 #                                                                             #
-# (15) Execute "make installdoc".  This creates directory $(DOCDIR) and       #
+# (15) Execute "make installdoc".  This creates directory $(LOUTDOCDIR) and   #
 #      copies the Lout documentation into it.                                 #
 #                                                                             #
 # (16) If you want French error messages, execute "make installfr" now.       #
 #      If you want German error messages, execute "make installde" now.       #
 #      These commands compile the error messages files into packed forms      #
-#      using the gencat command, and store them in $(LIBDIR)/locale.          #
+#      using the gencat command, and store them in $(LOUTLIBDIR)/locale.      #
 #                                                                             #
 # (17) Execute "make clean".  This cleans up this directory.                  #
 #                                                                             #
 # (18) If the usual language at your site is not English, you might like to   #
 #      now change the default value of the @InitialLanguage option on line    #
-#      252 of file $(LIBDIR)/include/bsf.  This will mean that by default     #
+#      251 of file $(LOUTLIBDIR)/include/bsf.  This will mean that by default #
 #      the date and words like Chapter and July will appear in a different    #
 #      language, and hyphenation will be carried out according to patterns    #
 #      designed for that language.  You can find the list of known languages  #
-#      in the User's Guide, or in file $(LIBDIR)/include/langdefs; if yours   #
-#      is not on the list, let me know and we can work together to add it.    #
-#      This has nothing to do with locales and USELOC.                        #
+#      in the User's Guide, or in file $(LOUTLIBDIR)/include/langdefs; if     #
+#      yours is not on the list, let me know and we can work together to      #
+#      add it.  This has nothing to do with locales and USELOC.               #
 #                                                                             #
 # (19) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
-#      on line 64 of file $(LIBDIR)/include/dsf:                              #
+#      on line 65 of file $(LOUTLIBDIR)/include/dsf:                          #
 #                                                                             #
 #          named @PageType { A4 @OrIfPlain Other }                            #
 #                                                                             #
 #      This is saying that the page type is to be A4 by default, unless       #
 #      plain text output is in effect (lout -p), in which case the page       #
 #      type is Other, which means that the page dimensions come from the      #
-#      @PageWidth and @PageHeight options.  Just change the A4, not the       #
-#      rest.  You can find the list of known page types, alternative to A4,   #
-#      in the User's Guide, and also at line 721 in $(LIBDIR)/include/dsf.    #
+#      @PageWidth and @PageHeight options.  Just change the A4, not the rest. #
+#      You can find the list of known page types, alternative to A4, in the   #
+#      User's Guide, or at line 738 in $(LOUTLIBDIR)/include/dsf.             #
 #                                                                             #
 #  Mail jeff@it.usyd.edu.au if you have any problems.                         #
 #                                                                             #
@@ -259,10 +269,11 @@ TRACING =
 # DEBUGGING = 1
 # TRACING = -g
 
-BINDIR	= /home/jeff/bin
-LIBDIR	= /home/jeff/lout.lib
-DOCDIR	= /home/jeff/lout.doc
-MANDIR	= /home/jeff/lout.man
+PREFIX	= /home/jeff
+BINDIR	= $(PREFIX)/bin
+LOUTLIBDIR	= $(PREFIX)/lout.lib
+LOUTDOCDIR	= $(PREFIX)/lout.doc
+MANDIR	= $(PREFIX)/lout.man
 
 LIBFONT = font
 LIBMAPS = maps
@@ -297,7 +308,7 @@ CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
 	  -DUSE_STAT=$(USESTAT)					\
 	  -DSAFE_DFT=$(SAFEDFT)					\
 	  -DCOLLATE=$(COLLATE)					\
-	  -DLIB_DIR=\"$(LIBDIR)\"				\
+	  -DLIB_DIR=\"$(LOUTLIBDIR)\"				\
 	  -DFONT_DIR=\"$(LIBFONT)\"				\
 	  -DMAPS_DIR=\"$(LIBMAPS)\"				\
 	  -DINCL_DIR=\"$(LIBINCL)\"				\
@@ -333,6 +344,8 @@ prg2lout:	prg2lout.c
 	$(CC) $(COPTS) -o prg2lout prg2lout.c
 	chmod a+x prg2lout
 
+all:	lout prg2lout
+
 install: lout prg2lout
 	@echo ""
 	@echo "(a) Installing lout and prg2lout binaries into BINDIR $(BINDIR)"
@@ -341,50 +354,50 @@ install: lout prg2lout
 	cp prg2lout $(BINDIR)/prg2lout
 	chmod 755 $(BINDIR)/prg2lout
 	@echo ""
-	@echo "(b) Installing library files into LIBDIR $(LIBDIR)"
-	mkdir $(LIBDIR)
-	chmod 755 $(LIBDIR)
+	@echo "(b) Installing library files into LOUTLIBDIR $(LOUTLIBDIR)"
+	mkdir $(LOUTLIBDIR)
+	chmod 755 $(LOUTLIBDIR)
 	@echo ""
-	mkdir $(LIBDIR)/$(LIBINCL)
-	chmod 755 $(LIBDIR)/$(LIBINCL)
-	cp include/* $(LIBDIR)/$(LIBINCL)
-	chmod 644 $(LIBDIR)/$(LIBINCL)/*
+	mkdir $(LOUTLIBDIR)/$(LIBINCL)
+	chmod 755 $(LOUTLIBDIR)/$(LIBINCL)
+	cp include/* $(LOUTLIBDIR)/$(LIBINCL)
+	chmod 644 $(LOUTLIBDIR)/$(LIBINCL)/*
 	@echo ""
-	mkdir $(LIBDIR)/$(LIBDATA)
-	chmod 755 $(LIBDIR)/$(LIBDATA)
-	cp data/* $(LIBDIR)/$(LIBDATA)
-	chmod 644 $(LIBDIR)/$(LIBDATA)/*
+	mkdir $(LOUTLIBDIR)/$(LIBDATA)
+	chmod 755 $(LOUTLIBDIR)/$(LIBDATA)
+	cp data/* $(LOUTLIBDIR)/$(LIBDATA)
+	chmod 644 $(LOUTLIBDIR)/$(LIBDATA)/*
 	@echo ""
-	mkdir $(LIBDIR)/$(LIBHYPH)
-	chmod 755 $(LIBDIR)/$(LIBHYPH)
-	cp hyph/* $(LIBDIR)/$(LIBHYPH)
-	chmod 644 $(LIBDIR)/$(LIBHYPH)/*
+	mkdir $(LOUTLIBDIR)/$(LIBHYPH)
+	chmod 755 $(LOUTLIBDIR)/$(LIBHYPH)
+	cp hyph/* $(LOUTLIBDIR)/$(LIBHYPH)
+	chmod 644 $(LOUTLIBDIR)/$(LIBHYPH)/*
 	@echo ""
-	mkdir $(LIBDIR)/$(LIBFONT)
-	chmod 755 $(LIBDIR)/$(LIBFONT)
-	cp font/* $(LIBDIR)/$(LIBFONT)
-	chmod 644 $(LIBDIR)/$(LIBFONT)/*
+	mkdir $(LOUTLIBDIR)/$(LIBFONT)
+	chmod 755 $(LOUTLIBDIR)/$(LIBFONT)
+	cp font/* $(LOUTLIBDIR)/$(LIBFONT)
+	chmod 644 $(LOUTLIBDIR)/$(LIBFONT)/*
 	@echo ""
-	mkdir $(LIBDIR)/$(LIBMAPS)
-	chmod 755 $(LIBDIR)/$(LIBMAPS)
-	cp maps/* $(LIBDIR)/$(LIBMAPS)
-	chmod 644 $(LIBDIR)/$(LIBMAPS)/*
+	mkdir $(LOUTLIBDIR)/$(LIBMAPS)
+	chmod 755 $(LOUTLIBDIR)/$(LIBMAPS)
+	cp maps/* $(LOUTLIBDIR)/$(LIBMAPS)
+	chmod 644 $(LOUTLIBDIR)/$(LIBMAPS)/*
 	@echo ""
-	mkdir $(LIBDIR)/$(LIBLOCA)
-	chmod 755 $(LIBDIR)/$(LIBLOCA)
+	mkdir $(LOUTLIBDIR)/$(LIBLOCA)
+	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)
 	@echo ""
 	@echo "(c) Initializing run (should be silent, no errors expected)"
-	$(BINDIR)/lout -x -s $(LIBDIR)/$(LIBINCL)/init
+	$(BINDIR)/lout -x -s $(LOUTLIBDIR)/$(LIBINCL)/init
 	@echo ""
 	@echo "(d) Changing mode of files just created by initializing run"
-	chmod 644 $(LIBDIR)/$(LIBDATA)/*
-	chmod 644 $(LIBDIR)/$(LIBHYPH)/*
+	chmod 644 $(LOUTLIBDIR)/$(LIBDATA)/*
+	chmod 644 $(LOUTLIBDIR)/$(LIBHYPH)/*
 
 installman:
 	@echo ""
 	@echo "Installing manual entries into MANDIR $(MANDIR)"
-	sed -e "s@<BINDIR>@$(BINDIR)@" -e "s@<LIBDIR>@$(LIBDIR)@"	\
-	    -e "s@<DOCDIR>@$(DOCDIR)@" -e "s@<MANDIR>@$(MANDIR)@"	\
+	sed -e "s@<BINDIR>@$(BINDIR)@" -e "s@<LIBDIR>@$(LOUTLIBDIR)@"	\
+	    -e "s@<LOUTDOCDIR>@$(LOUTDOCDIR)@" -e "s@<MANDIR>@$(MANDIR)@"	\
 	man/lout.1 > $(MANDIR)/lout.1
 	chmod 644 $(MANDIR)/lout.1
 	cp man/prg2lout.1 $(MANDIR)/prg2lout.1
@@ -392,40 +405,42 @@ installman:
 
 installdoc:
 	@echo ""
-	@echo "Creating DOCDIR $(DOCDIR) and copying documentation into it"
-	$(RCOPY) doc $(DOCDIR)
-	chmod 755 $(DOCDIR)
-	chmod 755 $(DOCDIR)/*
-	chmod 644 $(DOCDIR)/*/*
+	@echo "Creating LOUTDOCDIR $(LOUTDOCDIR) and copying documentation into it"
+	$(RCOPY) doc $(LOUTDOCDIR)
+	chmod 755 $(LOUTDOCDIR)
+	chmod 755 $(LOUTDOCDIR)/*
+	chmod 644 $(LOUTDOCDIR)/*/*
+
+allinstall:	install installman installdoc
 
 installfr:
 	@echo ""
-	@echo "Putting French error messages into $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)"
-	mkdir $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)
-	chmod 755 $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)
-	mkdir $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES
-	chmod 755 $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES
-	cp locale/msgs.fr $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/msgs.$(LOC_FR)
-	gencat $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/errors.$(LOC_FR)	\
-	       $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/msgs.$(LOC_FR)
-	chmod 644 $(LIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/*
+	@echo "Putting French error messages into $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)"
+	mkdir $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)
+	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)
+	mkdir $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES
+	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES
+	cp locale/msgs.fr $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/msgs.$(LOC_FR)
+	gencat $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/errors.$(LOC_FR)	\
+	       $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/msgs.$(LOC_FR)
+	chmod 644 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/*
 
 installde:
 	@echo ""
-	@echo "Putting German error messages into $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)"
-	mkdir $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)
-	chmod 755 $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)
-	mkdir $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES
-	chmod 755 $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES
-	cp locale/msgs.de $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/msgs.$(LOC_DE)
-	gencat $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/errors.$(LOC_DE)	\
-	       $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/msgs.$(LOC_DE)
-	chmod 644 $(LIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/*
+	@echo "Putting German error messages into $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)"
+	mkdir $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)
+	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)
+	mkdir $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES
+	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES
+	cp locale/msgs.de $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/msgs.$(LOC_DE)
+	gencat $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/errors.$(LOC_DE)	\
+	       $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/msgs.$(LOC_DE)
+	chmod 644 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/*
 
 uninstall:
 	-rm -f  $(BINDIR)/lout $(BINDIR)/prg2lout
-	-rm -fr $(LIBDIR)
-	-rm -fr $(DOCDIR)
+	-rm -fr $(LOUTLIBDIR)
+	-rm -fr $(LOUTDOCDIR)
 	-rm -f  $(MANDIR)/lout.1 $(MANDIR)/prg2lout.1
 
 clean:	

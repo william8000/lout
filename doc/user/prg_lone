@@ -34,9 +34,18 @@ Select an inter-line spacing size in Lout units.  The default is
 @Code -v1.1fx meaning 1.1 times the font size measured from baseline
 to baseline.
 }
+@TI { {@Code -b}{@I number} } {
+Select a blank line scale factor, usually a number between 0.5 and 1.0,
+indicating the factor by which the usual amount of white space inserted
+to represent a blank line is to be reduced.  The default is @Code { 1.0 },
+meaning no reduction.
+}
 @TI { {@Code -L}{@I number} } {
 Add line numbers to the program print, starting with {@I number}, or
 1 if {@I number} is omitted.
+}
+@TI { {@Code -N} } {
+Do not print line numbers at the start of blank lines.
 }
 @TI { {@Code -S}{@I file} } {
 Use @I file as the setup file for printing your language.  This allows

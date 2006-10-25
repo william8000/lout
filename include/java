@@ -33,6 +33,7 @@
 @Use { @JavaSetup
   # pipe			{		} # pipe source through this
   # numbered			{ No		} # No, Yes, or a line number
+  # numberedblanks		{ Yes		} # No or Yes
   # style	                { fixed		} # fixed, varying, or symbol
 
   # the following options apply when style is "fixed"
@@ -40,6 +41,7 @@
   # fixedfont			{ Courier	} # font family
   # fixedsize			{ -1.0p		} # font size
   # fixedline			{ 1.0vx		} # line-space
+  # fixedblanklinescale		{ 1.0		} # blank-line scale
   # fixedspace			{ lout		} # spacing mode
   # fixedtabin			{ 8		} # tab interval
   # fixedtabout			{ 8s		} # tab width
@@ -65,6 +67,7 @@
   # varyingfont			{		} # font family
   # varyingsize			{ 1.0f		} # font size
   # varyingline			{ 1.0vx		} # line-space
+  # varyingblanklinescale	{ 1.0		} # blank-line scale
   # varyingspace		{ lout		} # spacing mode
   # varyingtabin		{ 8		} # tab interval
   # varyingtabout		{ 3f		} # tab width
@@ -90,6 +93,7 @@
   # symbolfont			{		} # font family
   # symbolsize			{ 1.0f		} # font size
   # symbolline			{ 1.0vx		} # line-space
+  # symbolblanklinescale	{ 1.0		} # blank-line scale
   # symbolspace			{ lout		} # spacing mode
   # symboltabin			{ 8		} # tab interval
   # symboltabout		{ 3f		} # tab width

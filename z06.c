@@ -1,7 +1,7 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -40,11 +40,11 @@ static	OBJECT		cross_name;	/* name of the cr database   */
 
 #define	MAX_STACK	200			/* size of parser stacks     */
 static	OBJECT		obj_stack[MAX_STACK];	/* stack of objects          */
-static	int		otop = -1;		/* top of obj_stack          */
+static	int		otop;			/* top of obj_stack          */
 static	OBJECT		tok_stack[MAX_STACK];	/* stack of tokens           */
-static	int		ttop = -1;		/* top of tok_stack          */
-static	int		unknown_count = 0;	/* no. of unknown symbols    */
-	BOOLEAN		InDefinitions = TRUE;	/* TRUE when in definitions  */
+static	int		ttop;			/* top of tok_stack          */
+static	int		unknown_count;		/* no. of unknown symbols    */
+	BOOLEAN		InDefinitions;		/* TRUE when in definitions  */
 #if DEBUG_ON
 static	BOOLEAN		debug_now = FALSE;	/* TRUE when want to debug   */
 #endif
@@ -707,7 +707,16 @@ void SetScope(OBJECT env, int *count, BOOLEAN vis_only)
 /*****************************************************************************/
 
 void InitParser(FULL_CHAR *cross_db)
-{ if( StringLength(cross_db) >= MAX_WORD )
+{
+  otop = -1;
+  ttop = -1;
+  unknown_count = 0;
+  InDefinitions = TRUE;
+  debug0(DOP, D, "InitParser setting InDefinitions to TRUE");
+#if DEBUG_ON
+  debug_now = FALSE;
+#endif
+  if( StringLength(cross_db) >= MAX_WORD )
     Error(6, 10, "cross reference database file name %s is too long",
       FATAL, no_fpos, cross_db);
   cross_name = MakeWord(WORD, cross_db, no_fpos);
@@ -808,7 +817,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 
     /* if error in definitions, stop now */
     if( ErrorSeen() )
-      Error(6, 14, "exiting now", FATAL, &fpos(t));
+      Error(6, 14, "exiting now (error in definitions)", FATAL, &fpos(t));
 
     if( encl == StartSym )
     {
@@ -829,7 +838,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 
           /* if error in definitions, stop now */
           if( ErrorSeen() )
-	    Error(6, 39, "exiting now", FATAL, &fpos(t));
+	    Error(6, 39, "exiting now (error in definitions)", FATAL, &fpos(t));
 
 	}
 	else if( type(t) == USE )
@@ -894,6 +903,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       debug_now = TRUE;
 #endif
       InDefinitions = FALSE;
+      debug0(DOP, D, "Parse() setting InDefinitions to FALSE");
       debugcond4(DOP, DD, debug_now, "[ Parse (first) (%s, %s, %s, %s)",
 	EchoToken(*token), SymName(encl), bool(defs_allowed),
 	bool(transfer_allowed));
@@ -1416,7 +1426,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 	} /* end while */
 
 	/* report absence of compulsory parameters */
-	debug4(DOP, D, "%s %s %d : %d", EchoFilePos(&fpos(x)),
+	debug4(DOP, DD, "%s %s %d : %d", EchoFilePos(&fpos(x)),
 	  SymName(xsym), compulsory_count, has_compulsory(xsym));
 	if( compulsory_count < has_compulsory(xsym) )
 	{

@@ -3,9 +3,13 @@
    @Tag { precise }
 @Begin
 @PP
-This section offers some tips on placing objects precisely where you
-want them.  This isn't a subject with any clear boundaries, so the
-section is mainly a list of examples, covering the use of the
+This section offers some tips on placing objects precisely where you want
+them relative to each other.  If your problem is to place objects precisely
+at some unusual point on the page, you probably need a margin note or the
+@Code "@Place" symbol, for which see Section {@NumberOf marginnotes}.
+@PP
+Precise object placement is not a subject with any clear boundaries, so
+this section is mainly a list of examples, covering the use of the
 @Code {"@OneCol"}, @Code {"@OneRow"}, @Code {"@Wide"}, @Code {"@High"},
 @Code {"@HExpand"}, @Code {"@VExpand"}, @Code {"@HShift"}, @Code {"@VShift"},
 @Code {"@VStrut"}, @Code {"@OverStrike"}, @Code {"@ZeroHeight"},
@@ -186,5 +190,7 @@ measurement).
 Some of the symbols described in this section are Lout primitives, described
 in full detail in the Expert's Guide @Cite { $kingston1995lout.expert };
 and that is also the place to look for more information about precise
-object placement.
+object placement.  In particular, the Lout primitives described there
+for horizontal and vertical concatenation, @Code "/" and {@Code "|"},
+offer possibilities beyond what has been described here.
 @End @Section

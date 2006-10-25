@@ -1,7 +1,7 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -34,7 +34,7 @@
 #define	WRITTEN_TARGET	2
 #define INIT_CROSSREF_NUM	100
 
-static OBJECT RootCross = nilobj;		/* header for all crs        */
+static OBJECT RootCross;			/* header for all crs        */
 
 /*****************************************************************************/
 /*                                                                           */
@@ -157,7 +157,22 @@ static void crtab_debug(CROSSREF_TABLE S)
 } /* end crtab_debug */
 #endif
 
-static CROSSREF_TABLE crossref_tab = NULL;
+static CROSSREF_TABLE crossref_tab;
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void CrossInitModule(void)                                               */
+/*                                                                           */
+/*  Initialize this module.                                                  */
+/*                                                                           */
+/*****************************************************************************/
+
+void CrossInitModule(void)
+{
+  RootCross = nilobj;
+  crossref_tab = NULL;
+}
 
 
 /*@@**************************************************************************/
@@ -343,10 +358,6 @@ void CrossAddTag(OBJECT x)
 /*  *crs for this purpose.  The result replaces x, which is disposed.        */
 /*                                                                           */
 /*****************************************************************************/
-static OBJECT nbt[2] = { nilobj, nilobj };
-static OBJECT nft[2] = { nilobj, nilobj };
-static OBJECT ntarget = nilobj;
-static OBJECT nenclose = nilobj;
 
 OBJECT CrossExpand(OBJECT x, OBJECT env, STYLE *style,
 OBJECT *crs, OBJECT *res_env)
@@ -354,6 +365,7 @@ OBJECT *crs, OBJECT *res_env)
   int ctype, count, i;  FULL_CHAR buff[MAX_BUFF], seq[MAX_BUFF], *str;
   FILE_NUM fnum, dfnum;  BOOLEAN tagerror = FALSE;
   long cont, dfpos;  int dlnum;
+  OBJECT nbt[2], nft[2], ntarget, nenclose;
   assert( is_cross(type(x)), "CrossExpand: x!" );
   debug2(DCR, DD, "[ CrossExpand( %s, env, style, %s, res_env )",
     EchoObject(x), EchoObject(*crs));
@@ -362,6 +374,8 @@ OBJECT *crs, OBJECT *res_env)
   /* manifest and tidy the right parameter */
   Child(tag, LastDown(x));
   debug0(DOM, D, "  [ calling Manifest from CrossExpand");
+  ntarget = nenclose = nilobj;
+  nbt[COLM] = nft[COLM] = nbt[ROWM] = nft[ROWM] = nilobj;
   tag = Manifest(tag, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, FALSE);
   debug0(DOM, D, "  ] returning from Manifest");
   tag = ReplaceWithTidy(tag, WORD_TIDY);   /* && */

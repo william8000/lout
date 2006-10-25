@@ -1,12 +1,2 @@
-gvim prg
-gvim prg_lone
-gvim prg_embe
-gvim prg_opti
-gvim prg_chan
-gvim prg_tabs
-gvim prg_form
-gvim prg_comm
-gvim prg_prog
-gvim prg_pipe
-gvim prg_erro
-gvim prg_perl
+gvt prg prg_lone prg_embe prg_opti prg_chan prg_tabs prg_form \
+  prg_comm prg_prog prg_pipe prg_erro prg_perl

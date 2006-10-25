@@ -1,7 +1,7 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.31)                       */
-/*  COPYRIGHT (C) 1991, 2005 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -41,7 +41,7 @@ static	BOOLEAN	instring = FALSE;	/* TRUE while making a string        */
 
 /*****************************************************************************/
 /*                                                                           */
-/*  BeginString()                                                            */
+/*  BeginString(void)                                                        */
 /*                                                                           */
 /*  Locate a clear buffer into which debug output may be accumulated.        */
 /*                                                                           */
@@ -84,7 +84,7 @@ void AppendString(FULL_CHAR *str)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  FULL_CHAR *EndString()                                                   */
+/*  FULL_CHAR *EndString(void)                                               */
 /*                                                                           */
 /*  Return the string constructed by previous AppendString operations.       */
 /*                                                                           */

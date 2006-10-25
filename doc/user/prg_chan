@@ -25,17 +25,19 @@ file.  Here is part of the @Code "@Use" clause from {@Code cprint}:
    bformat { @Cell { "    #" A } | @Cell { "{" B } | @Cell "}" }
 {
 @Rowa A { "@Use {  @CPSetup" }
-@Rowb A { "pipe" } B {          }
-@Rowb A { "numbered" } B { No         }
-@Rowb A { "style" } B { fixed         }
+@Rowb A { "pipe" }			B {		}
+@Rowb A { "numbered" }			B { No		}
+@Rowb A { "blanknumbered" }		B { Yes		}
+@Rowb A { "style" }			B { fixed	}
 
 @Rowa 
-@Rowb A { "fixedfont" }			B { Courier  }
-@Rowb A { "fixedsize" }			B { -1.0p         }
-@Rowb A { "fixedline" }			B { 1.0vx         }
-@Rowb A { "fixedspace" }		B { lout         }
-@Rowb A { "fixedtabin" }		B { 8		  }
-@Rowb A { "fixedtabout" }		B { 8s		  }
+@Rowb A { "fixedfont" }			B { Courier	}
+@Rowb A { "fixedsize" }			B { -1.0p	}
+@Rowb A { "fixedline" }			B { 1.0vx	}
+@Rowb A { "fixedblanklinescale" }	B { 1.0		}
+@Rowb A { "fixedspace" }		B { lout	}
+@Rowb A { "fixedtabin" }		B { 8		}
+@Rowb A { "fixedtabout" }		B { 8s		}
 
 @Rowa 
 @Rowb A { "fixedidentifiers" }		B { Base  }
@@ -55,10 +57,10 @@ file.  Here is part of the @Code "@Use" clause from {@Code cprint}:
 @Rowb A { "fixedcommentsformat" }	B { "@Body"  }
 @Rowb A { "fixedlinenumbersformat" }	B { "@Body"  }
 
-@Rowa 
-@Rowa A { "..." }
-
-@Rowa 
+#@Rowa 
+#@Rowa A { "..." }
+#
+#@Rowa 
 @Rowa A { "}" }
 }
 The @Code pipe option will be explained in Section {@NumberOf pipes}.  The
@@ -66,17 +68,17 @@ options whose name begins with @Code "fixed" apply only when
 @Code style is {@Code fixed}; there are corresponding options, not
 shown, which apply when @Code style is {@Code varying} and {@Code symbol}.
 @PP
-We can see in this extract that the default value of @Code style is
-{@Code fixed}, and of @Code "numbers" is {@Code No}.  We can also see the
-default font family, font face, font size, line spacing, spacing mode,
-and tab settings when the style is {@Code "fixed"}.  The font family
-name for @Code "fixed" style is {@Code "Courier"}, but for the other
-styles (not shown) it is empty.  This causes the @Code "fixed" style
-to always switch to Courier, and the other styles to use the same font
-family as in the surrounding document.
+This extract shows that the default value of @Code "numbered" is {@Code No},
+of @Code "blanknumbered" is {@Code Yes}, and of @Code style is {@Code fixed}.
+It also shows the default font family, font face, font size,
+line spacing, blank line scale factor, spacing mode, and tab settings when
+the style is {@Code "fixed"}.  The font family name for @Code "fixed" style
+is {@Code "Courier"}, but for the other styles (not shown) it is empty.
+This causes the @Code "fixed" style to always switch to Courier, and the
+other styles to use the same font family as in the surrounding document.
 @PP
-The options from @Code "fixedidentifiers" to @Code "fixedlinenumbers" allow
-you to set the font face to use for each of these parts of your
+The options from @Code "fixedidentifiers" to @Code "fixedlinenumbers"
+allow you to set the font face to use for each of these parts of your
 program.  People who want fixed-width fonts do not usually want very
 exciting font faces either, so the default values above are all
 {@Code "Base"}, but for the {@Code varying} and {@Code symbol} styles,
@@ -127,7 +129,11 @@ import @CPSetup
 macro @NCP { @CP numbered { Yes } }
 }
 (or the equivalent for your language) in your @Code mydefs file, so that
-you can type @Code "@NCP" instead of {@Code "@CP numbered { Yes }"}.
+you can type @Code "@NCP" instead of {@Code "@CP numbered { Yes }"}.  On
+the other hand, it is quite safe to change @Code "blanknumbered" to
+{@Code "No"} or {@Code "NoPrint"} in the setup file; this will cause
+line numbers to be omitted from blank lines whenever there happen to
+be line numbers.
 @PP
 The setup files for the other languages are identical to this one, except
 that the symbol after @Code "@Use" is different, and some of the
