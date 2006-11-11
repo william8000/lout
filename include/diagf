@@ -688,6 +688,7 @@ def @DiagSetup
 	   @HVCurve @HVCurveArrow @VHCurve @VHCurveArrow
 	   @LVRLine @LVRArrow @RVLLine @RVLArrow
 	   @LVRCurve @LVRCurveArrow @RVLCurve @RVLCurveArrow
+	   @DHUCurve @DHUCurveArrow @UHDCurve @UHDCurveArrow
 	   @HVHLine @HVHArrow @VHVLine @VHVArrow
 	   @HVHCurve @HVHCurveArrow @VHVCurve @VHVCurveArrow
 	   @DWrapLine @DWrapArrow @UWrapLine @UWrapArrow
@@ -4785,6 +4786,63 @@ def @DiagSetup
 
 
 	    import @Geometry
+	    def @DHULinePath
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	      {arrow @FromArrowLength backarrowlength}
+	      {arrow @ToArrowLength arrowlength}
+	      "{" from "}" "{" to "}"
+	      xindent zindent bias "ldiagdhulinepath"
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    import @Geometry
+	    def @DHUCurvePath
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	      {arrow @FromArrowLength backarrowlength}
+	      {arrow @ToArrowLength arrowlength}
+	      "{" from "}" "{" to "}"
+	      xindent zindent bias radius "ldiagdhucurvepath"
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    import @Geometry
+	    def @UHDLinePath
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	      {arrow @FromArrowLength backarrowlength}
+	      {arrow @ToArrowLength arrowlength}
+	      "{" from "}" "{" to "}"
+	      xindent zindent bias "ldiaguhdlinepath"
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    import @Geometry
+	    def @UHDCurvePath
+	    {
+		@BackEnd @Case {
+		  PostScript @Yield {
+	      {arrow @FromArrowLength backarrowlength}
+	      {arrow @ToArrowLength arrowlength}
+	      "{" from "}" "{" to "}"
+	      xindent zindent bias radius "ldiaguhdcurvepath"
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+
+	    import @Geometry
 	    def @HVHLinePath  # still to do
 	    {
 		@BackEnd @Case {
@@ -5235,6 +5293,10 @@ def @DiagSetup
 		    lvrcurve			@Yield @LVRCurvePath
 		    rvlline			@Yield @RVLLinePath
 		    rvlcurve			@Yield @RVLCurvePath
+		    dhuline			@Yield @DHULinePath
+		    dhucurve			@Yield @DHUCurvePath
+		    uhdline			@Yield @UHDLinePath
+		    uhdcurve			@Yield @UHDCurvePath
 		    hvhline			@Yield @HVHLinePath
 		    hvhcurve			@Yield @HVHCurvePath
 		    vhvline			@Yield @VHVLinePath
@@ -5670,6 +5732,15 @@ def @DiagSetup
 	macro @LVRCurveArrow	{ @Link path { lvrcurve } arrow { yes }	}
 	macro @RVLCurve		{ @Link path { rvlcurve }		}
 	macro @RVLCurveArrow	{ @Link path { rvlcurve } arrow { yes }	}
+
+	macro @DHULine		{ @Link path { dhuline  }		}
+	macro @DHUArrow		{ @Link path { dhuline  } arrow { yes }	}
+	macro @UHDLine		{ @Link path { uhdline  }		}
+	macro @UHDArrow		{ @Link path { uhdline  } arrow { yes }	}
+	macro @DHUCurve		{ @Link path { dhucurve }		}
+	macro @DHUCurveArrow	{ @Link path { dhucurve } arrow { yes }	}
+	macro @UHDCurve		{ @Link path { uhdcurve }		}
+	macro @UHDCurveArrow	{ @Link path { uhdcurve } arrow { yes }	}
 
 	macro @HVHLine		{ @Link path { hvhline  }		}
 	macro @HVHArrow		{ @Link path { hvhline  } arrow { yes }	}

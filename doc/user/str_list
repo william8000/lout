@@ -368,6 +368,7 @@ are all the options, together with their default values:
     rightindent { 0c }
     gap { 1v }
     start { 1 }
+    font { }
     break { }
     colnum { 1 }
     colgap { 1.0c }
@@ -439,6 +440,21 @@ item.  It must be decimal:
 }
 looks strange, but it is the correct way to number the first
 item (xxv).
+@PP
+The @Code "font" option defines a font (or any value suited for
+the @Code "@Font" symbol) which is to be applied to each item
+(but not the labels).  For example, you might be bothered by
+the fact that a list item whose last line has no descenders in
+its letters is closer to the next list item, producing a slightly
+irregular appearance.  One way to solve this problem is
+@ID @OneRow @Code @Verbatim {
+@NumberedList
+    font { strut }
+}
+since the value @Code "strut" given to the @Code "@Font" symbol
+causes it to insert an invisible vertical strut into every word under
+the influence of that symbol.  For more information, including
+another way to insert struts, consult Section {@NumberOf precise}.
 @PP
 The @Code "break" option defines a break style (suitable for the
 @Code "@Break" symbol) which is to be applied to each item.  If

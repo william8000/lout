@@ -87,7 +87,7 @@ words are usually misspelt identifiers.  The ten digits are not letters
 and may not appear in identifiers; and although the underscore character
 is a letter and may be used in identifiers, it is not conventional to
 do so.  The complete list of predefined identifiers is
-@ID @OneRow @Code {
+@CD @OneRow @Code {
 {     "@BackEnd"
   @JL "@Background"
   @JL "@Begin"

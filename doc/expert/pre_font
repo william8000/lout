@@ -109,8 +109,24 @@ through the baseline, or not, like this:
 "baselinemark @Font ..."
 "xheight2mark @Font ..."
 }
-The default value is {@Code xheight2mark}.  It's useful when
-words in different font sizes appear side by side on a line.
+The default value is {@Code xheight2mark}; this was how Lout did it
+before this option was added, because it makes equation formatting
+easy.  The other value, {@Code baselinemark}, is useful when words
+in different font sizes appear side by side on a line.
+@PP
+Finally, a feature added in Version 3.33 requests that the height
+and depth of every character be increased to the `bounding box'
+size of the font -- that is, to the height of the font's highest
+character and the depth of the font's deepest character.  Ensuring
+in this way that every character has the same height and depth can
+make documents more uniform in layout.  To get this feature, use
+@ID @Code { "strut @Font ..." }
+either alone or combined with other options to {@Code "@Font"}.  It
+is called @Code strut because it is like inserting an invisible
+vertical strut into every non-empty word.  By default struts are off;
+but anyway if you need to turn them off for some reason, use
+{@Code "nostrut @Font"}.  Struts are always turned off in equations, for
+example, because they are not appropriate for equation formatting.
 @PP
 There are two predefined symbols, @@CurrFamily and @@CurrFace, which
 respectively return the family and face names of the current font.  For
@@ -120,7 +136,7 @@ example, right now @@CurrFamily is @CurrFamily and @@CurrFace is
 To inform Lout that certain fonts exist, it is necessary to create a
 database of @Code "@FontDef" symbols.  A typical entry in such a
 database looks like this:
-@ID @Code @Verbatim {
+@ID @OneRow @Code @Verbatim {
 { @FontDef
     @Tag { Times-Base }
     @Family { Times }

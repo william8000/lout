@@ -178,6 +178,13 @@ def @ReportSetup
     named @SubAppendixNumInTables	{ No			}
     named @SubSubAppendixNumInTables	{ No			}
 
+    named @SectionNumInFloaters		{ No			}
+    named @SubSectionNumInFloaters	{ No			}
+    named @SubSubSectionNumInFloaters	{ No			}
+    named @AppendixNumInFloaters	{ No			}
+    named @SubAppendixNumInFloaters	{ No			}
+    named @SubSubAppendixNumInFloaters	{ No			}
+
     named @SectionNumInRunners		{ Yes			}
     named @SubSectionNumInRunners	{ No			}
     named @SubSubSectionNumInRunners	{ No			}
@@ -187,6 +194,7 @@ def @ReportSetup
 
     named @FigureContentsPrefix		{			}
     named @TableContentsPrefix		{			}
+    named @FloaterContentsPrefix	{			}
     named @SectionPrefix		{			}
     named @AppendixPrefix		{			}
     named @ReferencesPrefix		{			}
@@ -608,6 +616,7 @@ def @ReportSetup
 		    //	Yes @BeginDisplayCounter {}
 		    //	Yes @BeginFigureCounter {}
 		    //	Yes @BeginTableCounter {}
+		    //	Yes @BeginFloaterCounter {}
 		    //  @AbstractDisplay @Do { @NoForceFull @AbstractPart }
 		    //  @ReportBodyWithoutCoverSheet
 		    //  @PageList
@@ -631,6 +640,7 @@ def @ReportSetup
 		    //	Yes @BeginDisplayCounter {}
 		    //	Yes @BeginFigureCounter {}
 		    //	Yes @BeginTableCounter {}
+		    //	Yes @BeginFloaterCounter {}
 		    //  @SimpleOddOrEvenIntroPageList
 			    @ColumnNumber { 1 }
 			    @PageHeaders { Simple }
@@ -670,6 +680,7 @@ def @ReportSetup
 	named @RunningTitle { dft }
 	named @InitialLanguage {}
 	named @BypassNumber { dft }
+	named @NewPage { No }
 	body @Body
     {
 
@@ -700,6 +711,7 @@ def @ReportSetup
 	    named @RunningTitle { dft }
 	    named @InitialLanguage { @InitialLanguage }
 	    named @BypassNumber { dft }
+	    named @NewPage { No }
 	    body @Body
         {
 
@@ -731,6 +743,7 @@ def @ReportSetup
 		named @RunningTitle { dft }
 		named @InitialLanguage { @InitialLanguage }
 		named @BypassNumber { dft }
+		named @NewPage { No }
 		body @Body
 	    {
 
@@ -756,7 +769,9 @@ def @ReportSetup
 		    indisplays { @SubSubSectionNumInDisplays }
 		    infigures { @SubSubSectionNumInFigures }
 		    intables { @SubSubSectionNumInTables }
+		    infloaters { @SubSubSectionNumInFloaters }
 		    inrunners { @SubSubSectionNumInRunners }
+		    newpage { @NewPage }
 		    @Body
 
 	    }
@@ -783,7 +798,9 @@ def @ReportSetup
 		indisplays { @SubSectionNumInDisplays }
 		infigures { @SubSectionNumInFigures }
 		intables { @SubSectionNumInTables }
+		infloaters { @SubSectionNumInFloaters }
 		inrunners { @SubSectionNumInRunners }
+		newpage { @NewPage }
 		@Body
         }
 
@@ -809,7 +826,9 @@ def @ReportSetup
 	    indisplays { @SectionNumInDisplays }
 	    infigures { @SectionNumInFigures }
 	    intables { @SectionNumInTables }
+	    infloaters { @SectionNumInFloaters }
 	    inrunners { @SectionNumInRunners }
+	    newpage { @NewPage }
 	    @Body
 
     }
@@ -828,6 +847,7 @@ def @ReportSetup
         named @RunningTitle { dft }
 	named @InitialLanguage {}
 	named @BypassNumber { dft }
+	named @NewPage { No }
         body @Body
     {
         def @EndSubAppendicesPlace { @Galley }
@@ -866,6 +886,7 @@ def @ReportSetup
             named @RunningTitle { dft }
 	    named @InitialLanguage { @InitialLanguage }
 	    named @BypassNumber { dft }
+	    named @NewPage { No }
             body @Body
         {
 
@@ -898,6 +919,7 @@ def @ReportSetup
 		named @RunningTitle { dft }
 		named @InitialLanguage { @InitialLanguage }
 		named @BypassNumber { dft }
+		named @NewPage { No }
 		body @Body
             {
 
@@ -923,7 +945,9 @@ def @ReportSetup
 		    indisplays { @SubSubAppendixNumInDisplays }
 		    infigures { @SubSubAppendixNumInFigures }
 		    intables { @SubSubAppendixNumInTables }
+		    infloaters { @SubSubAppendixNumInFloaters }
 		    inrunners { @SubSubAppendixNumInRunners }
+		    newpage { @NewPage }
 		    @Body
 
             }
@@ -950,7 +974,9 @@ def @ReportSetup
 		indisplays { @SubAppendixNumInDisplays }
 		infigures { @SubAppendixNumInFigures }
 		intables { @SubAppendixNumInTables }
+		infloaters { @SubAppendixNumInFloaters }
 		inrunners { @SubAppendixNumInRunners }
+		newpage { @NewPage }
 		@Body
 
         }
@@ -978,7 +1004,9 @@ def @ReportSetup
 	    indisplays { @AppendixNumInDisplays }
 	    infigures { @AppendixNumInFigures }
 	    intables { @AppendixNumInTables }
+	    infloaters { @AppendixNumInFloaters }
 	    inrunners { Yes }
+	    newpage { @NewPage }
 	    @Body
     }
 

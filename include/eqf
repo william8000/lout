@@ -1692,7 +1692,7 @@ def @Eq
     macro cmatrix  { matrix atleft { blceil  } atright { brceil  } }
     macro amatrix  { matrix atleft { blangle } atright { brangle } }
 
-    { Slope xheight2mark } @Font { separate @SpaceGap } @Space
+    { Slope xheight2mark nostrut } @Font { separate @SpaceGap } @Space
     initzunit @ZUnit 1f @YUnit @Body
 
 @End @Eq                  

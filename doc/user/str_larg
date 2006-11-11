@@ -46,16 +46,31 @@ symbols, like this:
 }
 This arrangement is reminiscent of the one for lists, and, as for
 lists, there may be no paragraph or new page symbols before, between,
-or after the sections.  To change the gap between sections, you need
-to change the @Code "@SectionGap" option in the setup file, as explained
-in Chapter {@NumberOf types}.  If you just want a new page before one
-section, not all sections, place @Code "@NP" at the very end of the
-previous section, just before its {@Code "@End @Section"}.
+or after the sections.
 @PP
 The @Code "@Begin ... @End @Section" that brackets the body of each
 section may be abbreviated to {@Code "{ ... }"}.  However, the long
 form is recommended because it helps Lout to detect missing or extra
 braces within the body of the section.
+@PP
+To change the gap between sections, you need to change the
+@Code "@SectionGap" option in the setup file, as explained in
+Chapter {@NumberOf types}.  If you just want a new page or column
+before one section, then use the @Code "@NewPage" option of that
+section, like this:
+@ID @OneRow @Code {
+"@Section"
+"    @Title { Bandicoots and quolls }"
+"    @NewPage { Yes }"
+"@Begin"
+"..."
+"@End @Section"
+}
+The @Code "@NewPage" option is only available with large-scale structure
+symbols that usually do not appear on a new page (like {@Code "@Section"}),
+and it forces them to appear on a new page.  You can't use it with
+large-scale structure symbols that usually appear on a new page (like
+{@Code "@Chapter"}) to force them not to -- there is no way to do that.
 @PP
 All large-scale structure symbols have a @Code "@Tag" option, whose
 use is explained in Section {@NumberOf cross}, and a @Code "@RunningTitle"

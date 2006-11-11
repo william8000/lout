@@ -1,6 +1,6 @@
 /*@z17.c:Gap Widths:GetGap()@*************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -262,9 +262,11 @@ void GetGap(OBJECT x, STYLE *style, GAP *res_gap, unsigned *res_inc)
   { Error(17, 5, "%.1fr too large (1.0r substituted)", WARN, &fpos(x), num);
     w = FR;
   }
+  /* don't have short lengths any more ***
   if( w > MAX_SHORT_LENGTH )
-    Error(17, 5, "%s exceeds maximum allowed gap size", FATAL, &fpos(x),
+    Error(17, 5, "%s exceeds maximum allowed gap size", INTERN, &fpos(x),
       string(x));
+  *** */
   width(*res_gap) = w;
 
   /* read the optional gap mode */

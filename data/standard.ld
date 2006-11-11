@@ -200,6 +200,20 @@
   }
 }
 
+# unlikely to be used in practice
+{ floater @Word @CurrLang @Case {
+    English	@Yield { Floater }
+    EnglishUK	@Yield { Floater }
+  }
+}
+
+# unlikely to be used in practice
+{ floaterlist @Word @CurrLang @Case {
+    English	@Yield { List of Floaters }
+    EnglishUK	@Yield { List of Floaters }
+  }
+}
+
 { definition @Word @CurrLang @Case {
     Croatian	@Yield { Definicija }
     Czech	@Yield { Definice }

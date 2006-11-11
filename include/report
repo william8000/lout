@@ -66,6 +66,7 @@
   # @ListLabelWidth	{ 2.00f	@OrIfPlain 5s	} # width allowed for list tags
   # @ListLabelRight	{ No			} # right-adjust list labels
   # @ListLabelRightGap	{ 2s			} # gap when right-adjusting
+  # @ListFont		{ 			} # font of list items
   # @ListBreak		{ 			} # break style of list items
   # @NumberSeparator	{ .			} # separates nums like 2.3.7
   # @CrossLinkFormat	{ @Body			} # format of cross links
@@ -106,24 +107,37 @@
   # @PageEnclose	{ @Body			} # enclose every page in this
   # @ColumnNumber	{ 1			} # number of columns (1 to 10)
   # @ColumnGap		{ 1.00c	@OrIfPlain 6s	} # column gap
+
   # @FigureLocation	{ PageTop		} # default figure location
-  # @TableLocation	{ PageTop		} # default table location
   # @FigureFormat	{ @CC @Body		} # default figure format
-  # @TableFormat	{ @CC @Body		} # default table format
   # @FigureWord		{ figure		} # "Figure" word else anything
-  # @TableWord		{ table			} # "Table" word else anything
   # @FigureNumbers	{ Arabic		} # method of numbering figures
-  # @TableNumbers	{ Arabic		} # method of numbering tables
   # @FigureCaptionPos	{ Below 		} # Above or Below
-  # @TableCaptionPos	{ Below			} # Above or Below
   # @FigureCaptionFont  { -2p                   } # figure caption font
   # @FigureCaptionBreak { adjust hyphen 1.2fx   } # figure caption break
   # @FigureCaptionFormat{ {@B { word @NumSep number. &2s }} @Insert caption }
+  # @MakeFigureContents { No                    } # list of figures at start
+
+  # @TableLocation	{ PageTop		} # default table location
+  # @TableFormat	{ @CC @Body		} # default table format
+  # @TableWord		{ table			} # "Table" word else anything
+  # @TableNumbers	{ Arabic		} # method of numbering tables
+  # @TableCaptionPos	{ Below			} # Above or Below
   # @TableCaptionFont   { -2p                   } # table caption font
   # @TableCaptionBreak  { adjust hyphen 1.2fx   } # table caption break
   # @TableCaptionFormat { {@B { word @NumSep number. &2s }} @Insert caption }
-  # @MakeFigureContents { No                    } # list of figures at start
   # @MakeTableContents  { No                    } # list of tables at start
+
+  # @FloaterLocation	{ PageTop		} # default floater location
+  # @FloaterFormat	{ @CC @Body		} # default floater format
+  # @FloaterWord	{ floater		} # "Floater" word else anything
+  # @FloaterNumbers	{ Arabic		} # method of numbering floaters
+  # @FloaterCaptionPos	{ Below			} # Above or Below
+  # @FloaterCaptionFont { -2p                   } # floater caption font
+  # @FloaterCaptionBreak{ adjust hyphen 1.2fx   } # floater caption break
+  # @FloaterCaptionFormat{ {@B { word @NumSep number. &2s }} @Insert caption }
+  # @MakeFloaterContents{ No                    } # list of floaters at start
+
   # @MakeContents	{ No			} # make contents? Yes or No
   # @ContentsGap	{ 0.20v	@OrIfPlain 0f	} # extra gap above minor entry
   # @ContentsGapAbove	{ 0.80v	@OrIfPlain 1f	} # extra gap above major entry
@@ -135,6 +149,7 @@
   # @ContentsLeader	{ ..			} # leader symbol in contents
   # @ContentsLeaderGap	{ 4s	@OrIfPlain 2s	} # gap between leaders
   # @ContentsRightWidth	{ 3f	@OrIfPlain 6s	} # page numbers column width
+
   # @MakeReferences	{ Yes			} # make references? Yes or No
   # @RefCiteStyle	{ [cite]		} # citation style
   # @RefCiteLabels	{ @RefNum		} # citation items
@@ -150,6 +165,7 @@
   # @RefListBreak	{        		} # break style of ref list
   # @RefListLabelWidth 	{ @ListLabelWidth	} # Labels column width
   # @RefListSortKey	{ @Tag			} # sorting key
+
   # @MakeGlossary	{ No			} # make glossary? Yes or No
   # @GlossaryText	{ @Null			} # glossary initial text
   # @GlossaryFont	{			} # glossary entries font
@@ -162,7 +178,7 @@
   # @GlossaryColumnGap	{ 1.00c @OrIfPlain 6s	} # glossary column gap
   # @InGlossaryFont	{ smallcaps		} # font for @InGlossary
   # @InGlossaryFormat	{ @Body			} # format for @InGlossary
-  # @MakeIndex		{ No			} # make index? Yes or No
+
   # @MakeIndex		{ No			} # make index? Yes or No
   # @IndexText		{ @Null			} # index initial text
   # @IndexFont		{			} # index entries font
@@ -183,6 +199,7 @@
   # @IndexSpacerBelow	{ 1v			} # space below index spacer
   # @IndexSpacerFont	{ +3p			} # font of index spacer
   # @IndexSpacerFormat	{ @Body			} # format of index spacer
+
   # @MakeIndexA		{ No 			} # make index A? Yes or No
   # @IndexAText		{ @Null			} # index A initial text
   # @IndexAFont		{			} # index A entries font
@@ -203,6 +220,7 @@
   # @IndexASpacerBelow	{ 1v			} # space below index A spacer
   # @IndexASpacerFont	{ +3p			} # font of index A spacer
   # @IndexASpacerFormat	{ @Body			} # format of index A spacer
+
   # @MakeIndexB		{ No 			} # make index B? Yes or No
   # @IndexBText		{ @Null			} # index B initial text
   # @IndexBFont		{			} # index B entries font
@@ -223,8 +241,10 @@
   # @IndexBSpacerBelow	{ 1v			} # space below index B spacer
   # @IndexBSpacerFont	{ +3p			} # font of index B spacer
   # @IndexBSpacerFormat	{ @Body			} # format of index B spacer
+
   # @TopGap		{ 0.75c	@OrIfPlain 2f	} # gap between figures
   # @MidGap		{ 0.75c	@OrIfPlain 2f	} # gap above/below body text
+
   # @FootNoteNumbers	{ Arabic		} # footnote numbers
   # @FootNoteThrough	{ No			} # numbered through chapter?
   # @FootNoteLocation	{ ColFoot		} # where the footnote appears
@@ -244,6 +264,7 @@
   # @EndNoteBreak	{ 1.2fx	@OrIfPlain 1fx	} # break for endnotes
   # @EndNoteFormat	{ { number &0.05f } @Insert body } # endnote format
   # @EndNoteGap		{ 0.20c	@OrIfPlain 1f	} # gap between endnotes
+
   # @TheoremWord	{ theorem		} # "Theorem" word, etc.
   # @TheoremTitleFormat	{ (title)		} # only if title present
   # @TheoremFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
@@ -266,6 +287,7 @@
   # @ExampleTitleFormat	{ (title)		} # only if title present
   # @ExampleFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
   # @ProofWord		{ proof			} # "Proof" word, etc.
+
   # @PageHeaders	{ Simple		} # None Simple Titles NoTitles
   # @PageNumbers	{ Arabic		} # page numbers
   # @FirstPageNumber	{ 1			} # number of first page 
@@ -445,6 +467,12 @@
   # @AppendixNumInTables	{ No		} # table num has appendix num
   # @SubAppendixNumInTables	{ No		} # table num has sub-app num
   # @SubSubAppendixNumInTables	{ No		} # table num has sub-sa. num
+  # @SectionNumInFloaters	{ No		} # floater num has section num
+  # @SubSectionNumInFloaters	{ No		} # floater num has subsect num
+  # @SubSubSectionNumInFloaters	{ No		} # floater num has sub-ss. num
+  # @AppendixNumInFloaters	{ No		} # floater num has appendix num
+  # @SubAppendixNumInFloaters	{ No		} # floater num has sub-app num
+  # @SubSubAppendixNumInFloaters{ No		} # floater num has sub-sa. num
   # @SectionNumInRunners 	{ Yes		} # runners have section num
   # @SubSectionNumInRunners 	{ No		} # runners have subsect num
   # @SubSubSectionNumInRunners 	{ No		} # runners have sub-ss. num
@@ -453,6 +481,7 @@
   # @SubSubAppendixNumInRunners { No		} # runners have sub-sa. num
   # @FigureContentsPrefix	{		} # for structured page nums
   # @TableContentsPrefix	{		} # for structured page nums
+  # @FloaterContentsPrefix	{		} # for structured page nums
   # @SectionPrefix		{		} # for structured page nums
   # @AppendixPrefix		{		} # for structured page nums
   # @ReferencesPrefix		{		} # for structured page nums

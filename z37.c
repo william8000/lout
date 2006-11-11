@@ -1,6 +1,6 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -43,17 +43,17 @@
 /* These definitions have been moved to "externs.h" since z24.c needs them:  */
 /*                                                                           */
 /*  struct metrics {							     */
-/*    SHORT_LENGTH up;							     */
-/*    SHORT_LENGTH down;						     */
-/*    SHORT_LENGTH left;						     */
-/*    SHORT_LENGTH right;						     */
-/*    SHORT_LENGTH last_adjust;						     */
+/*    FULL_LENGTH up;							     */
+/*    FULL_LENGTH down;							     */
+/*    FULL_LENGTH left;							     */
+/*    FULL_LENGTH right;						     */
+/*    FULL_LENGTH last_adjust;						     */
 /*  };							     		     */
 /*                                                                           */
 /*  typedef struc composite_rec {                                            */
 /*    FULL_CHAR char_code;                                                   */
-/*    SHORT_LENGTH x_offset;                                                 */
-/*    SHORT_LENGTH y_offset;                                                 */
+/*    FULL_LENGTH x_offset;                                                  */
+/*    FULL_LENGTH y_offset;                                                  */
 /*  } COMPOSITE;                                                             */
 /*                                                                           */
 /*  typedef struct font_rec {						     */
@@ -64,12 +64,14 @@
 /*    int               cmp_top;                   length of cmp_table       */
 /*    OBJECT		font_table;		   record of sized fonts     */
 /*    OBJECT            original_face;             face object of font       */
-/*    SHORT_LENGTH	underline_pos;             position of underline     */
-/*    SHORT_LENGTH	underline_thick;           thickness of underline    */
+/*    FULL_LENGTH	underline_pos;             position of underline     */
+/*    FULL_LENGTH	underline_thick;           thickness of underline    */
 /*    unsigned short	*kern_table;		   first kerning chars       */
 /*    FULL_CHAR		*kern_chars;		   second kerning chars      */
 /*    unsigned char	*kern_value;		   points into kern_lengths  */
-/*    SHORT_LENGTH	*kern_sizes;		   sizes of kernings         */
+/*    FULL_LENGTH	*kern_sizes;		   sizes of kernings         */
+/*    FULL_LENGTH	bbox_lly;		   lly of font bbox          */
+/*    FULL_LENGTH	bbox_ury;		   ury of font bbox          */
 /*  } FONT_INFO;							     */
 /*                                                                           */
 /*****************************************************************************/
@@ -125,10 +127,10 @@
 /*                          |                  +   font_recoded    +         */
 /*                  ++++++++++++++++++++       +   font_mapping    +         */
 /*                  +                  +       +   font_spacewidth +         */
-/*       (optional) + WORD             +       +                   +         */
-/*                  +   string (extra  +       +++++++++++++++++++++         */
-/*                  +   AFM file name) +                                     */
-/*                  +                  +                                     */
+/*       (optional) + WORD             +       +   font_bbox_lly   +         */
+/*                  +   string (extra  +       +   font_bbox_ury   +         */
+/*                  +   AFM file name) +       +                   +         */
+/*                  +                  +       +++++++++++++++++++++         */
 /*                  ++++++++++++++++++++                                     */
 /*                                                                           */
 /*****************************************************************************/
@@ -249,7 +251,7 @@ static void DebugKernTable(FONT_NUM fnum)
   unsigned short *kt = finfo[fnum].kern_table;
   FULL_CHAR      *kc = finfo[fnum].kern_chars;
   unsigned char  *kv = finfo[fnum].kern_value;
-  SHORT_LENGTH   *ks = finfo[fnum].kern_sizes;
+  FULL_LENGTH    *ks = finfo[fnum].kern_sizes;
   debug1(DFT, DD, "DebugKernTable(%d)", fnum);
   for( i = 0;  i < MAX_CHARS;  i++ )
   { if( kt[i] != 0 )
@@ -482,7 +484,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   OBJECT cs, link, db, fontdef_obj, y, ylink;
   FULL_CHAR tag[100], seq[100];
   FILE_NUM dfnum; long dfpos, cont; int dlnum;
-  BOOLEAN font_name_found;
+  BOOLEAN font_name_found, font_bbox_found;
   OBJECT family, face, font_name, AFMfilename, Extrafilename, LCMfilename;
   OBJECT recode, first_size;
   FULL_CHAR buff[MAX_BUFF], command[MAX_BUFF], ch;
@@ -495,7 +497,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   FILE_NUM fnum, extra_fnum;  FILE *fp, *extra_fp;
   struct metrics *fnt;
   FULL_CHAR *lig;  unsigned short *composite;  COMPOSITE *cmp;
-  unsigned short *kt;  FULL_CHAR *kc;  unsigned char *kv;  SHORT_LENGTH *ks;
+  unsigned short *kt;  FULL_CHAR *kc;  unsigned char *kv;  FULL_LENGTH *ks;
+  FULL_LENGTH bbox_llx, bbox_lly, bbox_urx, bbox_ury;
   debug2(DFT, D, "FontRead(%s, %s)", family_name, face_name);
 
 
@@ -690,7 +693,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   font_recoded(first_size) = font_recoded(face);
   font_mapping(first_size) = font_mapping(face);
   font_num(face) = font_num(first_size); /* Uwe's suggestion, helps PDF */
-  /* leaves font_xheight2 and font_spacewidth still to do */
+  /* font_xheight2, font_bbox_lly, font_bbox_ury, font_spacewidth still to do */
 
 
   /***************************************************************************/
@@ -756,15 +759,16 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
     Error(37, 25, "run out of memory while reading font file %s",
       FATAL, &fpos(err), FileName(fnum));
   for( i = 0;  i < MAX_CHARS;  i++ )  kt[i] = 0;  /* i.e. no kerns */
-  ks = (SHORT_LENGTH *) NULL;			  /* i.e. no kern sizes */
+  ks = (FULL_LENGTH *) NULL;			  /* i.e. no kern sizes */
 
   /* read font metrics file fp */
   xhfound = upfound = utfound = FALSE;
   xheight2 = under_thick = under_pos = 0;
   kc = (FULL_CHAR *) NULL;
   kv = (unsigned char *) NULL;
-  ks = (SHORT_LENGTH *) NULL;
-  font_name_found = FALSE;  lnum = 1;
+  ks = (FULL_LENGTH *) NULL;
+  font_name_found = font_bbox_found = FALSE;  lnum = 1;
+  bbox_llx = bbox_lly = bbox_urx = bbox_ury = 0;
   while( (status = ReadOneLine(fp, buff, MAX_BUFF)) != 0 &&
     !(buff[0] == 'E' && StringEqual(buff, AsciiToFull("EndFontMetrics"))) )
   {
@@ -827,6 +831,19 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	    WARN, &fpos(AFMfilename), command, KW_FONTDEF, string(y));
 	  font_name_found = TRUE;
 	}
+	else if( StringEqual(command, AsciiToFull("FontBBox")) )
+	{
+	  if( font_bbox_found )
+	  { Error(37, 69, "FontBBox found twice in font file %s (line %d)",
+	      FATAL, &fpos(AFMfilename), FileName(fnum), lnum);
+	  }
+	  if( sscanf( (char *) buff, "FontBBox %d %d %d %d",
+		&bbox_llx, &bbox_lly, &bbox_urx, &bbox_ury) != 4 )
+	  { Error(37, 70, "FontBBox format error in font file %s (line %d)",
+	      FATAL, &fpos(AFMfilename), FileName(fnum), lnum);
+	  }
+	  font_bbox_found = TRUE;
+	}
 	break;
 
 
@@ -870,8 +887,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	    2 * num_pairs * sizeof(unsigned char)));
 	  kv = (unsigned char *) malloc(2 * num_pairs * sizeof(unsigned char));
 	  ifdebug(DMA, D, DebugRegisterUsage(MEM_FONTS, 0,
-	    num_pairs * sizeof(SHORT_LENGTH)));
-	  ks = (SHORT_LENGTH *) malloc(num_pairs * sizeof(SHORT_LENGTH));
+	    num_pairs * sizeof(FULL_LENGTH)));
+	  ks = (FULL_LENGTH *) malloc(num_pairs * sizeof(FULL_LENGTH));
 	  last_ch1 = '\0';
 	  while( ReadOneLine(fp, buff, MAX_BUFF) != 0 &&
 	    !StringBeginsWith(buff, AsciiToFull("EndKernPairs")) )
@@ -964,8 +981,18 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   fp = (FILE *) NULL;
 
   /* complete the initialization of first_size */
-  font_xheight2(first_size) =
-    BackEnd->uses_font_metrics ? xheight2 : PlainCharHeight / 4;
+  if( BackEnd->uses_font_metrics )
+  {
+    font_xheight2(first_size) = xheight2;
+    font_bbox_lly(first_size) = bbox_lly - xheight2;
+    font_bbox_ury(first_size) = bbox_ury - xheight2;
+  }
+  else
+  {
+    font_xheight2(first_size) = PlainCharHeight / 4;
+    font_bbox_lly(first_size) = - PlainCharHeight / 2;
+    font_bbox_ury(first_size) = PlainCharHeight / 2;
+  }
   ch = MapCharEncoding(STR_PS_SPACENAME, font_mapping(first_size));
   font_spacewidth(first_size) = ch == '\0' ? 0 : fnt[ch].right;
 
@@ -1060,19 +1087,19 @@ void FontChange(STYLE *style, OBJECT x)
 { /* register */ int i;
   OBJECT requested_family, requested_face, requested_size;
   OBJECT par[3], family, face, fsize, y = nilobj, link, new, old, tmpf;
-  GAP gp;  SHORT_LENGTH flen = 0;  int num, c;  unsigned inc;
+  GAP gp;  FULL_LENGTH flen = 0;  int num, c;  unsigned inc;
   struct metrics *newfnt, *oldfnt;
   FULL_CHAR *lig;
   int cmptop;
   COMPOSITE *oldcmp, *newcmp;
-  SHORT_LENGTH *oldks, *newks;  int klen;
+  FULL_LENGTH *oldks, *newks;  int klen;
   debug2(DFT, D, "FontChange( %s, %s )", EchoStyle(style), EchoObject(x));
   assert( font(*style) <= font_count, "FontChange: font_count!");
   ifdebug(DFT, DD, FontDebug());
 
   /***************************************************************************/
   /*                                                                         */
-  /*  Analyse x, doing any small-caps, baselinemark and ligatures changes    */
+  /*  Analyse x, doing any small-caps, baselinemark, strut, and ligatures    */
   /*  immediately, and putting all the other words of x into par[0 .. num-1] */
   /*  for further analysis.                                                  */
   /*                                                                         */
@@ -1098,6 +1125,10 @@ void FontChange(STYLE *style, OBJECT x)
         baselinemark(*style) = TRUE;
       else if( StringEqual(string(x), STR_XHEIGHT2_MARK) )
         baselinemark(*style) = FALSE;
+      else if( StringEqual(string(x), STR_NOSTRUT) )
+        strut(*style) = FALSE;
+      else if( StringEqual(string(x), STR_STRUT) )
+        strut(*style) = TRUE;
       else if( StringEqual(string(x), STR_LIG) )
         ligatures(*style) = TRUE;
       else if( StringEqual(string(x), STR_NOLIG) )
@@ -1126,6 +1157,10 @@ void FontChange(STYLE *style, OBJECT x)
 	    baselinemark(*style) = TRUE;
 	  else if( StringEqual(string(y), STR_XHEIGHT2_MARK) )
 	    baselinemark(*style) = FALSE;
+	  else if( StringEqual(string(y), STR_NOSTRUT) )
+	    strut(*style) = FALSE;
+	  else if( StringEqual(string(y), STR_STRUT) )
+	    strut(*style) = TRUE;
 	  else if( StringEqual(string(y), STR_LIG) )
 	    ligatures(*style) = TRUE;
 	  else if( StringEqual(string(y), STR_NOLIG) )
@@ -1412,6 +1447,8 @@ void FontChange(STYLE *style, OBJECT x)
   font_num(new)         = font_count;
   font_size(new)        = BackEnd->uses_font_metrics ? flen : font_size(old);
   font_xheight2(new)    = font_xheight2(old) * font_size(new) / font_size(old);
+  font_bbox_lly(new)    = font_bbox_lly(old) * font_size(new) / font_size(old);
+  font_bbox_ury(new)    = font_bbox_ury(old) * font_size(new) / font_size(old);
   font_recoded(new)	= font_recoded(old);
   font_mapping(new)	= font_mapping(old);
   font_spacewidth(new)	= font_spacewidth(old) * font_size(new)/font_size(old);
@@ -1466,19 +1503,19 @@ void FontChange(STYLE *style, OBJECT x)
   finfo[font_count].kern_chars = finfo[font_num(old)].kern_chars;
   finfo[font_count].kern_value = finfo[font_num(old)].kern_value;
   oldks = finfo[font_num(old)].kern_sizes;
-  if( oldks != (SHORT_LENGTH *) NULL )
+  if( oldks != (FULL_LENGTH *) NULL )
   { klen = oldks[0];
-    ifdebug(DMA, D, DebugRegisterUsage(MEM_FONTS, 0, klen * sizeof(SHORT_LENGTH)));
+    ifdebug(DMA, D, DebugRegisterUsage(MEM_FONTS, 0, klen * sizeof(FULL_LENGTH)));
     finfo[font_count].kern_sizes = newks =
-      (SHORT_LENGTH *) malloc(klen * sizeof(SHORT_LENGTH));
-    if( newks == (SHORT_LENGTH *) NULL )
+      (FULL_LENGTH *) malloc(klen * sizeof(FULL_LENGTH));
+    if( newks == (FULL_LENGTH *) NULL )
       Error(37, 55, "run out of memory when changing font or font size",
 	FATAL, &fpos(x));
     newks[0] = klen;
     for( i = 1;  i < klen;  i++ )
       newks[i] = (oldks[i] * font_size(new)) / font_size(old);
   }
-  else finfo[font_count].kern_sizes = (SHORT_LENGTH *) NULL;
+  else finfo[font_count].kern_sizes = (FULL_LENGTH *) NULL;
 
   /* return new font number and exit */
   font(*style) = font_count;
@@ -1661,6 +1698,14 @@ void FontWordSize(OBJECT x)
     /* set sizes of x */
     back(x, COLM) = 0;
     fwd(x, COLM)  = r;
+    if( word_strut(x) )
+    {
+      int vadjust;
+      vadjust = font_bbox_ury(finfo[word_font(x)].font_table);
+      u = find_max(u, vadjust);
+      vadjust = font_bbox_lly(finfo[word_font(x)].font_table);
+      d = find_min(d, vadjust);
+    }
     if( word_baselinemark(x) )
     { int vadjust = font_xheight2(finfo[word_font(x)].font_table);
       back(x, ROWM) = u + vadjust;
@@ -1986,7 +2031,7 @@ BOOLEAN FontNeeded(FILE *fp)
 
 /*@::FontGlyphHeight()@*******************************************************/
 /*                                                                           */
-/*  SHORT_LENGTH FontGlyphHeight(fnum, chr)                                  */
+/*  FULL_LENGTH FontGlyphHeight(fnum, chr)                                   */
 /*                                                                           */
 /*  Contributed as part of margin kerning by Ludovic Courtes.                */
 /*                                                                           */
@@ -2008,7 +2053,7 @@ FULL_LENGTH FontGlyphHeight(FONT_NUM fnum, FULL_CHAR chr)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  SHORT_LENGTH FontGlyphWidth(fnum, chr)                                   */
+/*  FULL_LENGTH FontGlyphWidth(fnum, chr)                                    */
 /*                                                                           */
 /*  Contributed as part of margin kerning by Ludovic Courtes.                */
 /*                                                                           */
@@ -2026,6 +2071,3 @@ FULL_LENGTH FontGlyphWidth(FONT_NUM fnum, FULL_CHAR chr)
   fnt = finfo[fnum].size_table;
   return (fnt ? fnt[chr].right - fnt[chr].left : 0);
 }
-
-
-

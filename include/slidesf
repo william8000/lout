@@ -57,6 +57,8 @@ def @OverheadSetup
     named @OverheadNumInFigures		{ No			}
     named @LectureNumInTables		{ Yes			}
     named @OverheadNumInTables		{ No			}
+    named @LectureNumInFloaters		{ Yes			}
+    named @OverheadNumInFloaters	{ No			}
     named @LectureNumInRunners		{ Yes			}
     named @OverheadNumInRunners		{ Yes			}
     named @LecturePrefix		{			}
@@ -267,6 +269,7 @@ def @OverheadSetup
             indisplays { @OverheadNumInDisplays }
             infigures { @OverheadNumInFigures }
             intables { @OverheadNumInTables }
+            infloaters { @OverheadNumInFloaters }
 	    sendheader { @Full @Body }
 	    innergap { @DisplayGap }
             inrunners { @OverheadNumInRunners }
@@ -375,6 +378,7 @@ def @OverheadSetup
 	    indisplays { @LectureNumInDisplays }
 	    infigures { @LectureNumInFigures }
 	    intables { @LectureNumInTables }
+	    infloaters { @LectureNumInFloaters }
 	    sendheader { @Full @Body }
 	    innergap { @DisplayGap }
 	    inrunners { @LectureNumInRunners }

@@ -101,7 +101,7 @@ export
     @ParaGap @ParaIndent @DisplayGap @DisplayIndent @DefaultIndent
     @DisplayNumStyle @WideIndent @VeryWideIndent
     @ListGap @ListIndent @ListRightIndent
-    @ListLabelWidth @ListLabelRight @ListLabelRightGap @ListBreak
+    @ListLabelWidth @ListLabelRight @ListLabelRightGap @ListFont @ListBreak
     @NumberSeparator
 
     @Word @Roman @UCRoman @Alpha @UCAlpha @FnBullets @FnSymbols
@@ -269,6 +269,7 @@ def @BasicSetup
     named @ListLabelWidth { 2.0f @OrIfPlain 5s	} # width allowed for list tags
     named @ListLabelRight { No			} # right align label
     named @ListLabelRightGap { 2s		} # right align gap
+    named @ListFont       {                     } # font style of list item
     named @ListBreak      {                     } # break style of list item
     named @NumberSeparator{ .			} # separates numbers like 2.3.7
     import @BasicSetup
@@ -1471,6 +1472,7 @@ def @BasicSetup
 	named labelright      { @ListLabelRight  }
 	named labelrightgap   { @ListLabelRightGap }
 	named start           { 1                }
+	named font            { @ListFont        }
 	named break           { @ListBreak       }
 	named colnum          { 1                }
 	named colgap          { 1.0c             }
@@ -1494,14 +1496,14 @@ def @BasicSetup
 		    # @NumberMarker @Value {num} {style type num} &0io
 		    @NumberMarker @Value {type num} {@Align style type num} &0io
 		}
-	        |itemindent  break @Break @ItemPlace  |rightindent
+	        |itemindent  break @Break font @Font @ItemPlace  |rightindent
 	        //gap  @MakeList @NotRevealed @Next num
 	    }
 
 	    def @ParagraphItem
 	    {
 		@NumberMarker @Value {num} {style type num} &0io
-	        |indent  break @Break @ParagraphItemPlace  |rightindent
+	        |indent break @Break font @Font @ParagraphItemPlace |rightindent
 	        //gap  @MakeList @NotRevealed @Next num
 	    }
 
@@ -1535,32 +1537,32 @@ def @BasicSetup
 
 	def @ColPieceTwo
 	{
-	   colheight @High 50c @Wide @ListGalleyPlace ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed
+	   colheight @High 500c @Wide @ListGalleyPlace ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed
 	}
 
 	def @ColPieceThree
 	{
-	   colheight @High 50c @Wide @ListGalleyPlace ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed
+	   colheight @High 500c @Wide @ListGalleyPlace ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed
 	}
 
 	def @ColPieceFour
 	{
-	   colheight @High 50c @Wide @ListGalleyPlace ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed
+	   colheight @High 500c @Wide @ListGalleyPlace ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed
 	}
 
 	def @ColPieceFive
 	{
-	   colheight @High 50c @Wide @ListGalleyPlace ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed ||colgap
-	   colheight @High 50c @Wide @ListGalleyPlace @NotRevealed
+	   colheight @High 500c @Wide @ListGalleyPlace ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed ||colgap
+	   colheight @High 500c @Wide @ListGalleyPlace @NotRevealed
 	}
 
 	colnum @Case

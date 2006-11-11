@@ -1,6 +1,6 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -384,6 +384,7 @@ static OBJECT DoWord(FULL_CHAR *buff, FULL_CHAR *q, OBJECT x, FONT_NUM fnum)
   word_outline(res) = word_outline(x);
   word_language(res) = word_language(x);
   word_baselinemark(res) = word_baselinemark(x);
+  word_strut(res) = word_strut(x);
   word_ligatures(res) = word_ligatures(x);
   word_hyph(res) = word_hyph(x);
   underline(res) = UNDER_OFF;

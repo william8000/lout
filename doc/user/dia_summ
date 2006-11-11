@@ -765,6 +765,112 @@ A:: @Circle /0.8c |1.5c B:: @Circle
 }
 }
 
+@LI {
+@Code {
+"@Link"
+"    path { dhuline }"
+"    bias { 2.0f }"
+}
+||6ct
+@Diag {
+//0.5f
+A:: @Circle /0.8c |1.5c B:: @Circle /2f
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { dhuline } from { A } to { B }
+}
+&2.5c
+@Diag {
+//0.5f
+|1.5c B:: @Circle /0.8c A:: @Circle /2f
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { dhuline } from { A } to { B }
+}
+}
+
+@LI {
+@Code {
+"@Link"
+"    path { uhdline }"
+"    bias { 2.0f }"
+}
+||6ct
+@Diag {
+//2.5f
+A:: @Circle /0.8c |1.5c B:: @Circle
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { uhdline } from { A } to { B }
+}
+&2.5c
+@Diag {
+//2.5f
+|1.5c B:: @Circle /0.8c A:: @Circle
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { uhdline } from { A } to { B }
+}
+}
+
+@LI {
+@Code {
+"@Link"
+"    path { dhucurve }"
+"    bias { 2.0f }"
+"    radius { 1.0f }"
+}
+||6ct
+@Diag {
+//0.5f
+A:: @Circle /0.8c |1.5c B:: @Circle /2f
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { dhucurve } from { A } to { B }
+}
+&2.5c
+@Diag {
+//0.5f
+|1.5c B:: @Circle /0.8c A:: @Circle  /2f
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { dhucurve } from { A } to { B }
+}
+}
+
+@LI {
+@Code {
+"@Link"
+"    path { uhdcurve }"
+"    bias { 2.0f }"
+"    radius { 1.0f }"
+}
+||6ct
+@Diag {
+//2.5f
+A:: @Circle /0.8c |1.5c B:: @Circle
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { uhdcurve } from { A } to { B }
+}
+&2.5c
+@Diag {
+//2.5f
+|1.5c B:: @Circle /0.8c A:: @Circle
+//
+@ShowTags @Link
+    pathstyle { solid dashed }
+    path { uhdcurve } from { A } to { B }
+}
+}
+
 @LII {
 In the following links, the @Code "hfrac" and @Code "hbias" options
 determine how far across from @Code "FROM" to @Code "TO" the path turns
@@ -1078,6 +1184,23 @@ path also has an abbreviation which adds a forward arrow:
     C { RVLCurveArrow }
 
 @Rowa
+    A { dhuline }
+    B { DHULine }
+    C { DHUArrow }
+@Rowa
+    A { uhdline }
+    B { UHDLine }
+    C { UHDArrow }
+@Rowa
+    A { dhucurve }
+    B { DHUCurve }
+    C { DHUCurveArrow }
+@Rowa
+    A { uhdcurve }
+    B { RVLCurve }
+    C { RVLCurveArrow }
+
+@Rowa
     A { hvhline }
     B { HVHLine }
     C { HVHArrow }
@@ -1133,6 +1256,7 @@ have been omitted where they are the same as the {@Code linklabel} options.
 {@Code "ccurve"}, {@Code "bezier"},
 {@Code "vhline"}, {@Code "hvline"}, {@Code "vhcurve"}, {@Code "hvcurve"},
 {@Code "lvrline"}, {@Code "rvlline"}, {@Code "lvrcurve"}, {@Code "rvlcurve"},
+{@Code "dhuline"}, {@Code "uhdline"}, {@Code "dhucurve"}, {@Code "uhdcurve"},
 {@Code "hvhline"}, {@Code "vhvline"}, {@Code "hvhcurve"}, {@Code "vhvcurve"},
 {@Code "dwrapline"}, {@Code "uwrapline"}, {@Code "dwrapcurve"},
 {@Code "uwrapcurve"}, or any path }

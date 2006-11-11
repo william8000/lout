@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -952,6 +952,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		word_outline(z) = outline(save_style(x));
 		word_language(z) = language(save_style(x));
 		word_baselinemark(z) = baselinemark(save_style(x));
+		word_strut(z) = strut(save_style(x));
 		word_ligatures(z) = ligatures(save_style(x));
 		word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
 		underline(z) = UNDER_OFF;
@@ -1048,6 +1049,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		    word_outline(prev) == word_outline(y) &&
 		    word_language(prev) == word_language(y) &&
 		    word_baselinemark(prev) == word_baselinemark(y) &&
+		    word_strut(prev) == word_strut(y) &&
 		    word_ligatures(prev) == word_ligatures(y) &&
 		    underline(prev) == underline(y) &&
 		    NextDown(NextDown(Up(prev))) == link
@@ -1068,6 +1070,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		  word_outline(y) = word_outline(prev);
 		  word_language(y) = word_language(prev);
 		  word_baselinemark(y) = word_baselinemark(prev);
+		  word_strut(y) = word_strut(prev);
 		  word_ligatures(y) = word_ligatures(prev);
 		  word_hyph(y) = word_hyph(prev);
 		  underline(y) = underline(prev);

@@ -12,8 +12,10 @@ page.type @Index @Code "@PageType"
 @PageHeight {}
 @PageOrientation { Portrait }
 }
-The usual way to determine the page size is to set the @Code "@PageType"
-option to the name of the paper you use:
+The default value at your site may be different, since installers of
+Lout are recommended to set it to the usual size of a piece of paper
+at their location.  The easy way to change the page size is to set
+the @Code "@PageType" option to the name of the paper you use:
 @ID @Tab
     vmargin { 0.5vx }
     @Fmtb { @Col ! @Col ! @Col @I @RR B ! @Col @I @RR C }
@@ -27,7 +29,9 @@ option to the name of the paper you use:
 @Rowa A { Legal  }	B {  612p }  C { 1008p }
 @Rowa A { Statement }	B {  396p }  C {  612p }
 @Rowa A { Executive }	B {  540p }  C {  720p }
-@Rowa A { A2 }		B { 1190p }  C { 1884p }
+@Rowa A { A0 }		B { 2380p }  C { 3368p }
+@Rowa A { A1 }		B { 1684p }  C { 2380p }
+@Rowa A { A2 }		B { 1190p }  C { 1684p }
 @Rowa A { A3 }		B {  842p }  C { 1190p }
 @Rowa A { A4 }		B {  595p }  C {  842p }
 @Rowa A { A5 }		B {  420p }  C {  595p }
@@ -85,8 +89,8 @@ the basic ones:
     A { "@PageOrientation { ReverseLandscape }" }
     B { @Box 1.4c @Wide 1.0c @High { //1rt &1rt 180d @Rotate Hello } }
 }
-@Code ReverseLandscape might be useful when post-processing the PostScript output
-to print two landscape pages per sheet.  The @Code "@PageOrientation" symbol is
-available at the start of a document, as well as in the setup file, like
-{@Code "@InitialFont"} and {@Code "@PageHeaders"}.
+@Code ReverseLandscape might be useful when post-processing the PostScript
+output to print two landscape pages per sheet.  The @Code "@PageOrientation"
+symbol is available at the start of a document, as well as in the setup
+file, like {@Code "@InitialFont"} and {@Code "@PageHeaders"}.
 @End @Section

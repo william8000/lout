@@ -138,6 +138,13 @@ def @OrdinarySetup
     named @SubAppendixNumInTables	{ No			}
     named @SubSubAppendixNumInTables	{ No			}
 
+    named @SectionNumInFloaters		{ No			}
+    named @SubSectionNumInFloaters	{ No			}
+    named @SubSubSectionNumInFloaters	{ No			}
+    named @AppendixNumInFloaters	{ No			}
+    named @SubAppendixNumInFloaters	{ No			}
+    named @SubSubAppendixNumInFloaters	{ No			}
+
     named @SectionNumInRunners		{ Yes			}
     named @SubSectionNumInRunners	{ No			}
     named @SubSubSectionNumInRunners	{ No			}
@@ -408,6 +415,7 @@ def @OrdinarySetup
 		Yes @BeginDisplayCounter {}
 		Yes @BeginFigureCounter {}
 		Yes @BeginTableCounter {}
+		Yes @BeginFloaterCounter {}
             //  @BackEnd @Case {
 
 		    PlainText @Yield {
@@ -486,6 +494,7 @@ def @OrdinarySetup
             named @RunningTitle { dft }
 	    named @InitialLanguage {}
 	    named @BypassNumber { dft }
+	    named @NewPage { No }
             body @Body
         {
 
@@ -515,6 +524,7 @@ def @OrdinarySetup
 		named @RunningTitle { dft }
 		named @InitialLanguage { @InitialLanguage }
 		named @BypassNumber { dft }
+		named @NewPage { No }
 		body @Body
             {
 
@@ -546,6 +556,7 @@ def @OrdinarySetup
 		    named @RunningTitle { dft }
 		    named @InitialLanguage { @InitialLanguage }
 		    named @BypassNumber { dft }
+		    named @NewPage { No }
 		    body @Body
 		{
 
@@ -571,7 +582,9 @@ def @OrdinarySetup
 			indisplays { @SubSubSectionNumInDisplays }
 			infigures { @SubSubSectionNumInFigures }
 			intables { @SubSubSectionNumInTables }
+			infloaters { @SubSubSectionNumInFloaters }
 			inrunners { @SubSubSectionNumInRunners }
+			newpage { @NewPage }
 			@Body
 
 	        }
@@ -598,7 +611,9 @@ def @OrdinarySetup
 		    indisplays { @SubSectionNumInDisplays }
 		    infigures { @SubSectionNumInFigures }
 		    intables { @SubSectionNumInTables }
+		    infloaters { @SubSectionNumInFloaters }
 		    inrunners { @SubSectionNumInRunners }
+		    newpage { @NewPage }
 		    @Body
 
             }
@@ -625,7 +640,9 @@ def @OrdinarySetup
                 indisplays { @SectionNumInDisplays }
                 infigures { @SectionNumInFigures }
                 intables { @SectionNumInTables }
+                infloaters { @SectionNumInFloaters }
                 inrunners { @SectionNumInRunners }
+		newpage { @NewPage }
                 @Body
 
         }
@@ -647,6 +664,7 @@ def @OrdinarySetup
             named @RunningTitle { dft }
 	    named @InitialLanguage {}
 	    named @BypassNumber { dft }
+	    named @NewPage { No }
             body @Body
 	{
 
@@ -677,6 +695,7 @@ def @OrdinarySetup
 		named @RunningTitle { dft }
 		named @InitialLanguage { @InitialLanguage }
 		named @BypassNumber { dft }
+		named @NewPage { No }
 		body @Body
             {
 
@@ -708,6 +727,7 @@ def @OrdinarySetup
 		    named @RunningTitle { dft }
 		    named @InitialLanguage { @InitialLanguage }
 		    named @BypassNumber { dft }
+		    named @NewPage { No }
 		    body @Body
 		{
 
@@ -733,7 +753,9 @@ def @OrdinarySetup
 			indisplays { @SubSubAppendixNumInDisplays }
 			infigures { @SubSubAppendixNumInFigures }
 			intables { @SubSubAppendixNumInTables }
+			infloaters { @SubSubAppendixNumInFloaters }
 			inrunners { @SubSubAppendixNumInRunners }
+			newpage { @NewPage }
 			@Body
 
 		}
@@ -760,7 +782,9 @@ def @OrdinarySetup
 		    indisplays { @SubAppendixNumInDisplays }
 		    infigures { @SubAppendixNumInFigures }
 		    intables { @SubAppendixNumInTables }
+		    infloaters { @SubAppendixNumInFloaters }
 		    inrunners { @SubAppendixNumInRunners }
+		    newpage { @NewPage }
 		    @Body
 	    }
 
@@ -787,7 +811,9 @@ def @OrdinarySetup
 		indisplays { @AppendixNumInDisplays }
 		infigures { @AppendixNumInFigures }
 		intables { @AppendixNumInTables }
+		infloaters { @AppendixNumInFloaters }
 		inrunners { Yes }
+		newpage { @NewPage }
 		@Body
 
 	}

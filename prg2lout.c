@@ -4,16 +4,16 @@
 /*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
 /*  COPYRIGHT (C) 2000, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Version 2.4, October 2006                                                */
+/*  Version 2.5, November 2006                                               */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
 /*  The University of Sydney 2006                                            */
 /*  AUSTRALIA                                                                */
 /*                                                                           */
-/*  C and C++, Eiffel, Blue, Java, Nonpareil by Jeff Kingston                */
+/*  C and C++, Eiffel, Blue, Java, and Nonpareil by Jeff Kingston            */
 /*  Perl and Pod by Jeff Kingston and Mark Summerfield                       */
-/*  Python by Mark Summerfield                                               */
+/*  Python by Mark Summerfield (Python 2.5 update Nov 2006)                  */
 /*  Ruby by Michael Piotrowski                                               */
 /*  Haskell by Thorsten Seitz (Nov 2002)                                     */
 /*  RSL by Darren Bane (February 2003)                                       */
@@ -2871,13 +2871,13 @@ LANGUAGE CLanguage = {
 
 
 /* Tokens, keywords taken from the on-line documentation supplied with Python
- * 1.5.1 */
+ * 2.5 */
 LANGUAGE PythonLanguage = {
   { "Python", "python"  },
   "python", "@Python",
   NO_MATCH_ERROR,
   { &BackSlashToken,
-    &PythonDblStringToken, &PythonSnglStringToken, 
+    &PythonDblStringToken, &PythonSnglStringToken,
     &PythonTriSnglStringToken, &PythonTriDblStringToken,
     &PythonCommentToken, &PythonCommentEscapeToken, &IdentifierToken,
     &NumberToken, &PlusToken, &MinusToken, &StarToken, &PythonPowerToken,
@@ -2889,61 +2889,59 @@ LANGUAGE PythonLanguage = {
     &LeftParenToken, &RightParenToken, &LeftBraceToken,
     &RightBraceToken, &LeftBracketToken, &RightBracketToken,
     &CommaToken, &ColonToken, &DotToken, &PythonBacktickToken,
-    &EqualToken, &SemicolonToken, 
+    &EqualToken, &SemicolonToken,
   },
 
-  { 
+  {
     /* Keywords */
-    "and",       "del",       "for",       "is",        "raise",    
-    "assert",    "elif",      "from",      "lambda",    "return",   
-    "break",     "else",      "global",    "not",       "try",      
-    "class",     "except",    "if",        "or",        "while",    
-    "continue",  "exec",      "import",    "pass",               
-    "def",       "finally",   "in",        "print",
+    "and",       "del",       "for",       "is",        "raise",
+    "as",	 "elif",      "from",      "lambda",    "return",
+    "break",     "else",      "global",    "not",       "try",
+    "class",     "except",    "if",        "or",        "while",
+    "continue",  "exec",      "import",    "pass",	"with",
+    "def",       "finally",   "in",        "print",	"yield",
     /* Built-ins */
-    "None", 
+    "False", "True", "None", "NotImplemented", "Ellipsis",
     /* Built-in Exceptions */
-    "Exception", "StandardError", "ArithmeticError", "LookupError", 
-    "AssertionError", "AttributeError", "EOFError", "FloatingPointError", 
-    "IOError", "ImportError", "IndexError", "KeyError", "KeyboardInterrupt", 
-    "MemoryError", "NameError", "OverflowError", "RuntimeError", "SyntaxError", 
-    "SystemError", "SystemExit", "TypeError", "ValueError", "ZeroDivisionError", 
-    /* Built-in Functions */
+    "BaseException", "SystemExit", "KeyboardInterrupt", "Exception",
+    "GeneratorExit", "StopIteration", "StandardError", "ArithmeticError",
+    "FloatingPointError", "OverflowError", "ZeroDivisionError", "AssertionError",
+    "AttributeError", "EnvironmentError", "IOError", "OSError",
+    "WindowsError", "VMSError", "EOFError", "ImportError", "LookupError",
+    "IndexError", "KeyError", "MemoryError", "NameError", "UnboundLocalError",
+    "ReferenceError", "RuntimeError", "NotImplementedError", "SyntaxError",
+    "IndentationError", "TabError", "SystemError", "TypeError", "ValueError",
+    "UnicodeError", "UnicodeDecodeError", "UnicodeEncodeError",
+    "UnicodeTranslateError",
+    "Warning", "DeprecationWarning", "PendingDeprecationWarning",
+    "RuntimeWarning", "SyntaxWarning", "UserWarning", "FutureWarning",
+    "ImportWarning", "UnicodeWarning",
+    /* Built-in Functions (excluding those designated "non-essential") */
     "__import__",
-    "abs", "apply",
-    "callable", "chr", "cmp", "coerce", "compile", "complex",
-    "delattr", "dir", "divmod",
-    "eval", "execfile",
-    "filter", "float",
+    "abs", "all", "any",
+    "basestring", "bool",
+    "callable", "chr", "classmethod", "cmp", "compile", "complex",
+    "delattr", "dict", "dir", "divmod",
+    "enumerate", "eval", "execfile",
+    "file", "filter", "float", "frozenset",
     "getattr", "globals",
-    "hasattr", "hash", "hex",
-    "id", "input", "intern", "int", "isinstance", "issubclass",
+    "hasattr", "hash", "help", "hex",
+    "id", "input", "int", "isinstance", "issubclass", "iter",
     "len", "list", "locals", "long",
     "map", "max", "min",
-    "oct", "open", "ord",
-    "pow",
-    "range", "raw_input", "reduce", "reload", "repr", "round",
-    "setattr", "slice", "str",
+    "object", "oct", "open", "ord",
+    "pow", "property",
+    "range", "raw_input", "reduce", "reload", "repr", "reversed", "round",
+    "set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super",
     "tuple", "type",
+    "unichr", "unicode",
     "vars",
     "xrange",
+    "zip",
     /* Built-in Modules */
-    "__builtin__", "__main__", 
-    "al", "array", "audioop", 
-    "binascii", 
-    "cPickle", "cStringIO", "cd", "cmath", "crypt", 
-    "dbm", 
-    "fcntl", "fl", "fm", 
-    "gdbm", "gl", "grp", 
-    "imageop", "imgfile", "imp", 
-    "jpeg", 
-    "marshal", "math", "md5", "mpz", 
-    "operator", 
-    "parser", "posix", "pwd", 
-    "re", "regex", "resource", "rgbimg", "rotor", 
-    "select", "signal", "socket", "struct", "sunaudiodev", "sys", "syslog", 
-    "termios", "thread", "time", 
-    "zlib", 
+    /* This has been deleted because the original list was simply wrong.
+       Python has a large library of modules but they are not built-in
+       or part of the language per-se. */
   }
 };
 
@@ -3436,7 +3434,7 @@ LANGUAGE *languages[] = {
 #define DEBUG_EMIT	0
 #define DEBUG_MAIN	0
 
-#define PRG2LOUT_VERSION "prg2lout Version 2.4 (October 2006)"
+#define PRG2LOUT_VERSION "prg2lout Version 2.5 (November 2006)"
 #define	MAX_LINE	1024
 
 typedef enum {

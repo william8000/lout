@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.32 (October 2006)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.33 (November 2006)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -209,8 +209,6 @@ If you're compiling this, you've got the wrong settings in the makefile!
 /*                      below to be 128 (2**7).  The value given is 2**23-1, */
 /*                      which is about 148 metres in Lout's precision.       */
 /*                                                                           */
-/*  MAX_SHORT_LENGTH    The maximum value storable in type SHORT_LENGTH.     */
-/*                                                                           */
 /*  MAX_FILES           The maximum number of files.  This could only be     */
 /*                      increased if the file_num() field of type FILE_POS   */
 /*                      is enlarged beyond its present 16 bits.              */
@@ -265,7 +263,6 @@ If you're compiling this, you've got the wrong settings in the makefile!
 /*****************************************************************************/
 
 #define	MAX_FULL_LENGTH	8388607	/* 2**23 - 1, about 148 metres */
-#define	MAX_SHORT_LENGTH 32767
 #define	MAX_FILES	65535
 #define MAX_LINE        2048
 #define MAX_WORD        2048
@@ -322,20 +319,11 @@ typedef int FULL_LENGTH;
 
 /*****************************************************************************/
 /*                                                                           */
-/*  typedef SHORT_LENGTH - an short integer physical distance.               */
-/*                                                                           */
-/*****************************************************************************/
-
-typedef short int SHORT_LENGTH;
-
-
-/*****************************************************************************/
-/*                                                                           */
 /*  FONT_NUM - internal name for a font.                                     */
 /*                                                                           */
 /*****************************************************************************/
 
-typedef short unsigned FONT_NUM;
+typedef unsigned short FONT_NUM;
 
 
 /*****************************************************************************/
@@ -344,7 +332,7 @@ typedef short unsigned FONT_NUM;
 /*                                                                           */
 /*****************************************************************************/
 
-typedef short unsigned COLOUR_NUM;
+typedef unsigned short COLOUR_NUM;
 
 
 /*****************************************************************************/
@@ -353,7 +341,7 @@ typedef short unsigned COLOUR_NUM;
 /*                                                                           */
 /*****************************************************************************/
 
-typedef short unsigned TEXTURE_NUM;
+typedef unsigned short TEXTURE_NUM;
 
 
 /*****************************************************************************/
@@ -362,7 +350,7 @@ typedef short unsigned TEXTURE_NUM;
 /*                                                                           */
 /*****************************************************************************/
 
-typedef unsigned LANGUAGE_NUM;
+typedef unsigned int LANGUAGE_NUM;
 
 
 /*****************************************************************************/
@@ -371,7 +359,7 @@ typedef unsigned LANGUAGE_NUM;
 /*                                                                           */
 /*****************************************************************************/
 
-typedef unsigned MAPPING;
+typedef unsigned int MAPPING;
 
 
 /*****************************************************************************/
@@ -592,6 +580,8 @@ typedef void *POINTER;
 #define	STR_LIG			AsciiToFull("lig")
 #define	STR_NOLIG		AsciiToFull("nolig")
 #define	STR_XHEIGHT2_MARK	AsciiToFull("xheight2mark")
+#define	STR_NOSTRUT		AsciiToFull("nostrut")
+#define	STR_STRUT		AsciiToFull("strut")
 
 #define	STR_GAP_RJUSTIFY	AsciiToFull("1rt")
 #define	STR_GAP_ZERO_HYPH	AsciiToFull("0ch")
@@ -606,13 +596,12 @@ typedef void *POINTER;
 /*****************************************************************************/
 
 typedef struct
-{ unsigned	ospare	 : 7;		/* left for other things in STYLE    */
+{ FULL_LENGTH	owidth;			/* width of the gap                  */
   BOOLEAN	onobreak : 1;		/* TRUE if this gap is unbreakable   */
   BOOLEAN	omark	 : 1;		/* TRUE if this gap is marked        */
   BOOLEAN	ojoin	 : 1;		/* TRUE if joins exist across gap    */
   unsigned	ounits	 : 3;		/* units of measurement: fixed, etc  */
   unsigned	omode	 : 3;		/* spacing mode: edge-to-edge, etc   */
-  SHORT_LENGTH	owidth;			/* width of the gap                  */
 } GAP;
 
 #define	nobreak(x)	(x).onobreak
@@ -647,93 +636,89 @@ typedef struct
 /*****************************************************************************/
 
 typedef struct
-{ union {
-    GAP		oline_gap;		/* separation between lines          */
-    struct {
-      BOOLEAN	ovadjust	: 1;	/* @VAdjust in effect                */
-      BOOLEAN	ohadjust	: 1;	/* @HAdjust in effect                */
-      BOOLEAN	opadjust	: 1;	/* @PAdjust in effect                */
-      unsigned	osmall_caps	: 1;	/* small capitals                    */
-      unsigned  ospace_style	: 3;	/* space style: lout, troff, tex, .. */
-    } oss1;
-  } osu1;
-  union {
-    GAP		ospace_gap;		/* separation induced by white space */
-    struct {
-      unsigned	ohyph_style	: 2;	/* hyphenation off or on             */
-      unsigned	ofill_style	: 2;	/* fill lines with text off/on       */
-      unsigned	odisplay_style	: 3;	/* display lines adjusted, ragged... */
-    } oss2;
-  } osu2;
-  SHORT_LENGTH	oyunit;			/* value of y unit of measurement    */
-  SHORT_LENGTH	ozunit;			/* value of z unit of measurement    */
-  SHORT_LENGTH	ooutdent_len;		/* amount to outdent in outdent style*/
-  SHORT_LENGTH	osmallcaps_len;		/* size of small capitals            */
+{
+  GAP		oline_gap;		/* separation between lines          */
+  GAP		ospace_gap;		/* separation induced by white space */
+  FULL_LENGTH	oyunit;			/* value of y unit of measurement    */
+  FULL_LENGTH	ozunit;			/* value of z unit of measurement    */
+  FULL_LENGTH	ooutdent_len;		/* amount to outdent in outdent style*/
+  FULL_LENGTH	osmallcaps_len;		/* size of small capitals            */
   FONT_NUM	ofont;			/* current font                      */
   COLOUR_NUM	ocolour;		/* current colour		     */
   TEXTURE_NUM	otexture;		/* current texture		     */
   unsigned short oblanklinescale;	/* scale factor for blank lines      */
-  LANGUAGE_NUM	olanguage	: 6;	/* current language		     */
+  LANGUAGE_NUM	olanguage       : 6;	/* current language		     */
+  BOOLEAN	ovadjust	: 1;	/* @VAdjust in effect                */
+  BOOLEAN	ohadjust	: 1;	/* @HAdjust in effect                */
+  BOOLEAN	opadjust	: 1;	/* @PAdjust in effect                */
+  unsigned	osmall_caps	: 1;	/* small capitals                    */
+  unsigned	ospace_style	: 3;	/* space style: lout, troff, tex, .. */
+  unsigned	ohyph_style	: 2;	/* hyphenation off or on             */
+  unsigned	ofill_style	: 2;	/* fill lines with text off/on       */
+  unsigned	odisplay_style	: 3;	/* display lines adjusted, ragged... */
   BOOLEAN	ooutline	: 2;	/* TRUE if outlining words           */
   BOOLEAN	onobreakfirst	: 1;	/* no break after first line of para */
   BOOLEAN	onobreaklast	: 1;	/* no break after last line of para  */
-  BOOLEAN	obaselinemark	: 1;	/* baseline metrics                  */
+  BOOLEAN	obaselinemark	: 1;	/* baseline char metrics             */
+  BOOLEAN	ostrut		: 1;	/* strut char metrics                */
   BOOLEAN	oligatures	: 1;	/* use ligatures                     */
   BOOLEAN	omarginkerning	: 1;	/* perform margin kerning            */
 } STYLE;
 
-#define	line_gap(x)	(x).osu1.oline_gap
-#define	vadjust(x)	(x).osu1.oss1.ovadjust
-#define	hadjust(x)	(x).osu1.oss1.ohadjust
-#define	padjust(x)	(x).osu1.oss1.opadjust
-#define	small_caps(x)	(x).osu1.oss1.osmall_caps
-#define	space_style(x)	(x).osu1.oss1.ospace_style
-#define	space_gap(x)	(x).osu2.ospace_gap
-#define	hyph_style(x)	(x).osu2.oss2.ohyph_style
-#define	fill_style(x)	(x).osu2.oss2.ofill_style
-#define	display_style(x)(x).osu2.oss2.odisplay_style
-#define	font(x)		(x).ofont
-#define	colour(x)	(x).ocolour
-#define	texture(x)	(x).otexture
-#define	blanklinescale(x)(x).oblanklinescale
-#define	outline(x)	(x).ooutline
-#define	language(x)	(x).olanguage
-#define	nobreakfirst(x)	(x).onobreakfirst
-#define	nobreaklast(x)	(x).onobreaklast
-#define	baselinemark(x)	(x).obaselinemark
-#define	ligatures(x)	(x).oligatures
-#define	marginkerning(x)(x).omarginkerning
+#define	line_gap(x)	(x).oline_gap
+#define	space_gap(x)	(x).ospace_gap
 #define	yunit(x)	(x).oyunit
 #define	zunit(x)	(x).ozunit
 #define	outdent_len(x)	(x).ooutdent_len
 #define	smallcaps_len(x)(x).osmallcaps_len
+#define	font(x)		(x).ofont
+#define	colour(x)	(x).ocolour
+#define	texture(x)	(x).otexture
+#define	blanklinescale(x)(x).oblanklinescale
+#define	language(x)	(x).olanguage
+#define	vadjust(x)	(x).ovadjust
+#define	hadjust(x)	(x).ohadjust
+#define	padjust(x)	(x).opadjust
+#define	small_caps(x)	(x).osmall_caps
+#define	space_style(x)	(x).ospace_style
+#define	hyph_style(x)	(x).ohyph_style
+#define	fill_style(x)	(x).ofill_style
+#define	display_style(x)(x).odisplay_style
+#define	outline(x)	(x).ooutline
+#define	nobreakfirst(x)	(x).onobreakfirst
+#define	nobreaklast(x)	(x).onobreaklast
+#define	baselinemark(x)	(x).obaselinemark
+#define	strut(x)	(x).ostrut
+#define	ligatures(x)	(x).oligatures
+#define	marginkerning(x)(x).omarginkerning
 
 #define StyleCopy(x, y)							\
 ( GapCopy(line_gap(x), line_gap(y)),					\
-  hyph_style(x) = hyph_style(y),					\
-  fill_style(x) = fill_style(y),					\
-  display_style(x) = display_style(y),					\
-  small_caps(x) = small_caps(y),					\
   GapCopy(space_gap(x), space_gap(y)),					\
+  yunit(x) = yunit(y),							\
+  zunit(x) = zunit(y),							\
+  outdent_len(x) = outdent_len(y),					\
+  smallcaps_len(x) = smallcaps_len(y),					\
   font(x) = font(y),							\
   colour(x) = colour(y),						\
   texture(x) = texture(y),						\
   blanklinescale(x) = blanklinescale(y),				\
-  outline(x) = outline(y),						\
   language(x) = language(y), 						\
-  nobreakfirst(x) = nobreakfirst(y),					\
-  nobreaklast(x) = nobreaklast(y),					\
-  baselinemark(x) = baselinemark(y),					\
-  ligatures(x) = ligatures(y),						\
-  marginkerning(x) = marginkerning(y),					\
   vadjust(x) = vadjust(y), 						\
   hadjust(x) = hadjust(y), 						\
   padjust(x) = padjust(y), 						\
+  small_caps(x) = small_caps(y),					\
   space_style(x) = space_style(y),					\
-  yunit(x) = yunit(y),							\
-  zunit(x) = zunit(y),							\
-  outdent_len(x) = outdent_len(y),					\
-  smallcaps_len(x) = smallcaps_len(y)					\
+  hyph_style(x) = hyph_style(y),					\
+  fill_style(x) = fill_style(y),					\
+  display_style(x) = display_style(y),					\
+  outline(x) = outline(y),						\
+  nobreakfirst(x) = nobreakfirst(y),					\
+  nobreaklast(x) = nobreaklast(y),					\
+  baselinemark(x) = baselinemark(y),					\
+  strut(x) = strut(y),							\
+  ligatures(x) = ligatures(y),						\
+  marginkerning(x) = marginkerning(y)					\
 )
 
 
@@ -818,6 +803,8 @@ typedef struct { union rec *opred, *osucc; } LIST;
 /*                                                                           */
 /*  The fpos is overwritten in WORDs and QWORDs during FixAndPrintObject by  */
 /*  the horizontal coordinate of the word, which has to be remembered.       */
+/*  This part of the record is also used by font records to hold font        */
+/*  bounding box data.                                                       */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -846,14 +833,15 @@ typedef union
   } os21;
 
   struct /* used by WORD objects only, except underline used by all */
-	 /* objects, including GAP_OBJ                                  */
+	 /* objects, including GAP_OBJ                              */
   {	FONT_NUM	oword_font;
 	COLOUR_NUM	oword_colour;
 	TEXTURE_NUM	oword_texture;
-	unsigned	ounderline	   : 2;  /* aligns with os23.underline */
+	unsigned	ounderline	   : 2; /* aligns with os23.underline */
 	BOOLEAN		oword_outline	   : 1;
 	LANGUAGE_NUM	oword_language	   : 6;
 	BOOLEAN		oword_baselinemark : 1;
+	BOOLEAN		oword_strut	   : 1;
 	BOOLEAN		oword_ligatures	   : 1;
 	unsigned	oword_hyph	   : 1;
   } os22;
@@ -886,8 +874,9 @@ typedef union
   } os24;
 
   struct /* used by WORD and QWORD when they are font records */
-  {	FONT_NUM	ofont_num;
-	unsigned short	ofont_page;
+  {
+    	FULL_LENGTH	ofont_bbox_lly;
+    	FULL_LENGTH	ofont_bbox_ury;
   } os25;
 
   struct /* used by symbol table entries */
@@ -946,6 +935,8 @@ typedef union
   {	FULL_LENGTH	ofont_size;
 	FULL_LENGTH	ofont_xheight2;
 	FULL_LENGTH	ofont_spacewidth;
+    	FONT_NUM	ofont_num;
+	unsigned short	ofont_page;
 	MAPPING		ofont_mapping	: 7;
 	BOOLEAN		ofont_recoded	: 1;
   } os32;
@@ -974,7 +965,7 @@ typedef union
 
 /*****************************************************************************/
 /*                                                                           */
-/*  typedef FOURTH_UNION - twelve bytes holding a STYLE or CONSTRAINT.       */
+/*  typedef FOURTH_UNION - 11 32-bit words holding a STYLE or CONSTRAINT.    */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -1042,27 +1033,32 @@ typedef union
 /*                                                                           */
 /*  STYLE - the style (attributes affecting the appearance) of an object.    */
 /*                                                                           */
-/*      line_gap        How much to separate lines by                        */
-/*      vadjust         TRUE when @VAdjust is in effect                      */
-/*      hadjust         TRUE when @HAdjust is in effect                      */
-/*      padjust         TRUE when @PAdjust is in effect                      */
-/*      small_caps      TRUE when small capitals wanted                      */
-/*      space_style     Spacing style (lout, troff etc. from @Space)         */
-/*      space_gap       Object separation given a white space, i.e. "1s"     */
-/*      hyph_style      Hyphenation (undefined, off, on)                     */
-/*      fill_style      Fill lines (undefined, off, on)                      */
-/*      display_style   Display style for lines (adjust, centre, etc.)       */
-/*      yunit           Value of y unit of measurement                       */
-/*      zunit           Value of z unit of measurement                       */
-/*      font            Which internal font (including size) to use          */
-/*      colour          Which internal colour to use                         */
-/*      texture         Which internal texture to use                        */
-/*      outline         TRUE if outlining words rather than filling them     */
-/*      language        Which internal language to use                       */
-/*      nobreakfirst    TRUE if break not allowed after first line of para   */
-/*      nobreaklast     TRUE if break not allowed before last line of para   */
-/*      baselinemark    TRUE if mark is to pass through character baseline   */
-/*      ligatures       TRUE if ligatures wanted                             */
+/*      line_gap        separation between lines                             */
+/*      space_gap       separation induced by white space                    */
+/*      yunit           value of y unit of measurement                       */
+/*      zunit           value of z unit of measurement                       */
+/*      outdent_len     amount to outdent in outdent style                   */
+/*      smallcaps_len   size of small capitals                               */
+/*      font            current font                                         */
+/*      colour          current colour		                             */
+/*      texture         current texture		                             */
+/*      blanklinescale  scale factor for blank lines                         */
+/*      language        current language		                     */
+/*      vadjust	        @VAdjust in effect                                   */
+/*      hadjust	        @HAdjust in effect                                   */
+/*      padjust	        @PAdjust in effect                                   */
+/*      small_caps	small capitals                                       */
+/*      space_style	space style: lout, troff, tex, ..                    */
+/*      hyph_style	hyphenation off or on                                */
+/*      fill_style	fill lines with text off/on                          */
+/*      display_style	display lines adjusted, ragged...                    */
+/*      outline	: 2     TRUE if outlining words                              */
+/*      nobreakfirst	no break after first line of para                    */
+/*      nobreaklast	no break after last line of para                     */
+/*      baselinemark	baseline char metrics                                */
+/*      strut       	strut char metrics                                   */
+/*      ligatures	use ligatures                                        */
+/*      marginkerning	perform margin kerning                               */
 /*                                                                           */
 /*  CONSTRAINT - a constraint on how large some object is allowed to be,     */
 /*               either horizontally or vertically                           */
@@ -1170,6 +1166,7 @@ typedef union
 /*      word_outline    If TRUE, print this word in outline (from style)     */
 /*      word_language   Language (for hyphenation) of this word (from style) */
 /*      word_baselinemark TRUE if mark of this word goes through baseline    */
+/*      word_strut      TRUE if this word's char metrics are to be strutted  */
 /*      word_ligatures  TRUE if ligatures wanted in this word                */
 /*      underline       TRUE if continuous underlining goes under this word  */
 /*      word_hyph       Hyphenation wanted for this word (from style)        */
@@ -1198,6 +1195,8 @@ typedef union
 /*      font_page       Number of most recent page using this font           */
 /*      font_size       Size of this font                                    */
 /*      font_xheight2   Half-x height of this font                           */
+/*      font_bbox_lly   The lly value of the font bounding box               */
+/*      font_bbox_ury   The ury value of the font bounding box               */
 /*      font_spacewidth Preferred width of space between words in this font  */
 /*      font_mapping    The mapping to apply with this font                  */
 /*      font_recoded    TRUE if font needs recoding in PostScript output     */
@@ -1656,8 +1655,8 @@ typedef union rec
      SECOND_UNION	ou2;
      GAP		ogap;
      int		osave_badness;		/* optimum paragraph breaker */
-     SHORT_LENGTH	osave_space;		/* optimum paragraph breaker */
-     SHORT_LENGTH	osave_actual_gap;	/* optimum paragraph breaker */
+     FULL_LENGTH	osave_space;		/* optimum paragraph breaker */
+     FULL_LENGTH	osave_actual_gap;	/* optimum paragraph breaker */
      union rec  	*osave_prev;		/* optimum paragraph breaker */
      union rec  	*osave_cwid;		/* optimum paragraph breaker */
   } os5;
@@ -1675,8 +1674,8 @@ typedef union rec
      union rec		*oimports;
      union rec		*ofilter;
      union rec		*ouse_invocation;
-     short unsigned 	opredefined;
-     short unsigned 	ohas_compulsory;
+     unsigned short 	opredefined;
+     unsigned short 	ohas_compulsory;
      unsigned char	ouses_count;
      unsigned char	onpar_code;
      BOOLEAN		ois_optimize	     : 1;
@@ -1737,6 +1736,8 @@ typedef union rec
 
 #define type(x)			(x)->os1.ou1.os11.otype
 #define	rec_size(x)		(x)->os1.ou1.os11.orec_size
+#define font_bbox_lly(x)	(x)->os1.ou2.os25.ofont_bbox_lly
+#define font_bbox_ury(x)	(x)->os1.ou2.os25.ofont_bbox_ury
 #define	precedence(x)		(x)->os1.ou2.os21.oprecedence
 #define	hspace(x)		(x)->os1.ou2.os21.ohspace
 #define	vspace(x)		(x)->os1.ou2.os21.ovspace
@@ -1750,6 +1751,7 @@ typedef union rec
 #define	word_outline(x)		(x)->os1.ou2.os22.oword_outline
 #define	word_language(x)	(x)->os1.ou2.os22.oword_language
 #define	word_baselinemark(x)	(x)->os1.ou2.os22.oword_baselinemark
+#define	word_strut(x)		(x)->os1.ou2.os22.oword_strut
 #define	word_ligatures(x)	(x)->os1.ou2.os22.oword_ligatures
 #define	spanner_fixed(x)	word_language(x)
 #define	spanner_broken(x)	word_outline(x)
@@ -1909,8 +1911,8 @@ typedef union rec
 #define	item(x)			(x)->os9.oitem
 #define	next(x)			(x)->os9.onext
 
-#define	font_num(x)		(x)->os1.ou2.os25.ofont_num
-#define	font_page(x)		(x)->os1.ou2.os25.ofont_page
+#define	font_num(x)		(x)->os1.ou3.os32.ofont_num
+#define	font_page(x)		(x)->os1.ou3.os32.ofont_page
 #define	font_size(x)		(x)->os1.ou3.os32.ofont_size
 #define	font_xheight2(x)	(x)->os1.ou3.os32.ofont_xheight2
 #define	font_spacewidth(x)	(x)->os1.ou3.os32.ofont_spacewidth
@@ -1926,17 +1928,17 @@ typedef union rec
 /*****************************************************************************/
 
 struct metrics {
-  SHORT_LENGTH up;
-  SHORT_LENGTH down;
-  SHORT_LENGTH left;
-  SHORT_LENGTH right;
-  SHORT_LENGTH last_adjust;
+  FULL_LENGTH up;
+  FULL_LENGTH down;
+  FULL_LENGTH left;
+  FULL_LENGTH right;
+  FULL_LENGTH last_adjust;
 };
 
 typedef struct composite_rec {
   FULL_CHAR char_code;
-  SHORT_LENGTH x_offset;
-  SHORT_LENGTH y_offset;
+  FULL_LENGTH x_offset;
+  FULL_LENGTH y_offset;
 } COMPOSITE;
 
 typedef struct font_rec {
@@ -1947,12 +1949,12 @@ typedef struct font_rec {
   int			cmp_top;		/* length of cmp_table	     */
   OBJECT		font_table;		/* record of sized fonts     */
   OBJECT		original_face;		/* face object of this font  */
-  SHORT_LENGTH		underline_pos;		/* position of underline     */
-  SHORT_LENGTH		underline_thick;	/* thickness of underline    */
+  FULL_LENGTH		underline_pos;		/* position of underline     */
+  FULL_LENGTH		underline_thick;	/* thickness of underline    */
   unsigned short	*kern_table;		/* first kerning chars       */
   FULL_CHAR		*kern_chars;		/* second kerning chars      */
   unsigned char		*kern_value;		/* points into kern_lengths  */
-  SHORT_LENGTH		*kern_sizes;		/* sizes of kernings         */
+  FULL_LENGTH		*kern_sizes;		/* sizes of kernings         */
 } FONT_INFO;
 
 

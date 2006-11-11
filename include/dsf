@@ -30,7 +30,7 @@ export
 
     @Runner
 	
-    @Figure @Table
+    @Figure @Table @Floater
     @FootNote @AnotherFootNote @EndNote
     @LeftNote @RightNote @OuterNote @InnerNote @Place
     @Theorem @Proof @EndProof
@@ -54,7 +54,7 @@ export
     @IndexBlanks @IndexSpacer @InitialIndexSpacer @IndexLetters
 
     @BypassContentsEntry @BypassMajorContentsEntry
-    @BypassFigureContentsEntry @BypassTableContentsEntry
+    @BypassFigureContentsEntry @BypassTableContentsEntry @BypassFloaterContentsEntry
     @BypassReference @BypassChapReference
     @BypassBeginIndex @BypassRawIndex @BypassEndIndex
     @BypassBeginIndexA @BypassRawIndexA @BypassEndIndexA
@@ -86,8 +86,8 @@ def @DocumentSetup
     named @PageEnclose right @Body { @Body		} # page enclose
     named @ColumnNumber		{  1			} # number of columns (1 to 10)
     named @ColumnGap		{  1.00c @OrIfPlain 6s	} # column gap
+
     named @FigureLocation	{  PageTop		} # default figure location
-    named @TableLocation	{  PageTop		} # default table location
     named @FigureFormat
     	named @II right x { |@DisplayIndent x |      }
     	named @QQ right x { |@DisplayIndent x |@DisplayIndent }
@@ -95,6 +95,16 @@ def @DocumentSetup
     	named @RR right x { |1.0rt x |      }
 	right @Body
 				{  @CC @Body		} # default figure format
+    named @FigureWord		{  figure		} # "Figure" word else anything
+    named @FigureNumbers	{  Arabic		} # method of numbering figures
+    named @FigureCaptionPos	{  Below		} # Above or Below
+    named @FigureCaptionFont    {  -2p 			} # figure caption font
+    named @FigureCaptionBreak   {  adjust hyphen 1.2fx	} # figure caption break
+    named @FigureCaptionFormat named word {} named number {} named caption {}
+				{  {@B { word @NumSep number. &2s }} @Insert caption }
+    named @MakeFigureContents   {  No			} # list of figures at start
+
+    named @TableLocation	{  PageTop		} # default table location
     named @TableFormat
     	named @II right x { |@DisplayIndent x |      }
     	named @QQ right x { |@DisplayIndent x |@DisplayIndent }
@@ -102,22 +112,32 @@ def @DocumentSetup
     	named @RR right x { |1.0rt x |      }
 	right @Body
 				{  @CC @Body		} # default table format
-    named @FigureWord		{  figure		} # "Figure" word else anything
     named @TableWord		{  table		} # "Table" word else anything
-    named @FigureNumbers	{  Arabic		} # method of numbering figures
     named @TableNumbers		{  Arabic		} # method of numbering tables
-    named @FigureCaptionPos	{  Below		} # Above or Below
     named @TableCaptionPos	{  Below		} # Above or Below
-    named @FigureCaptionFont    {  -2p 			} # figure caption font
-    named @FigureCaptionBreak   {  adjust hyphen 1.2fx	} # figure caption break
-    named @FigureCaptionFormat named word {} named number {} named caption {}
-				{  {@B { word @NumSep number. &2s }} @Insert caption }
     named @TableCaptionFont     {  -2p			} # figure caption font
     named @TableCaptionBreak    {  adjust hyphen 1.2fx	} # figure caption break
     named @TableCaptionFormat named word {} named number {} named caption {}
 				{  {@B { word @NumSep number. &2s }} @Insert caption }
-    named @MakeFigureContents   {  No			} # list of figures at start
     named @MakeTableContents    {  No			} # list of tables at start
+
+    named @FloaterLocation	{  PageTop		} # default floater location
+    named @FloaterFormat
+    	named @II right x { |@DisplayIndent x |      }
+    	named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+    	named @CC right x { |0.5rt x |      }
+    	named @RR right x { |1.0rt x |      }
+	right @Body
+				{  @CC @Body		} # default floater format
+    named @FloaterWord		{  floater		} # "Floater" word else anything
+    named @FloaterNumbers	{  Arabic		} # method of numbering floaters
+    named @FloaterCaptionPos	{  Below		} # Above or Below
+    named @FloaterCaptionFont   {  -2p			} # figure caption font
+    named @FloaterCaptionBreak  {  adjust hyphen 1.2fx	} # figure caption break
+    named @FloaterCaptionFormat named word {} named number {} named caption {}
+				{  {@B { word @NumSep number. &2s }} @Insert caption }
+    named @MakeFloaterContents  {  No			} # list of floaters at start
+
     named @MakeContents		{  No			} # make contents? Yes or No
     named @ContentsGap		{  0.20v @OrIfPlain 0f	} # extra gap above minor entry
     named @ContentsGapAbove	{  0.80v @OrIfPlain 1f	} # extra gap above major entry
@@ -258,6 +278,7 @@ def @DocumentSetup
     named @GlossaryColumnGap	{  1.00c @OrIfPlain 6s	} # glossary column gap
     named @InGlossaryFont	{  smallcaps		} # font for @InGlossary
     named @InGlossaryFormat right @Body { @Body	}	# format for @InGlossary
+
     named @MakeIndex		{  No			} # make index? Yes or No
     named @IndexText		{  @Null		} # initial index text
     named @IndexFont		{			} # index entries font
@@ -290,6 +311,7 @@ def @DocumentSetup
     named @IndexSpacerFont	{  +3p 			} # font of index spacer
     named @IndexSpacerFormat
 	right @Body		{  @Body		} # format of index spacer
+
     named @MakeIndexA		{  No			} # make index A? Yes or No
     named @IndexAText		{  @Null		} # initial index text
     named @IndexAFont		{			} # index A entries font
@@ -322,6 +344,7 @@ def @DocumentSetup
     named @IndexASpacerFont	{  +3p 			} # font of index A spacer
     named @IndexASpacerFormat
 	right @Body		{  @Body		} # format of index A spacer
+
     named @MakeIndexB		{  No			} # make index B? Yes or No
     named @IndexBText		{  @Null		} # initial index text
     named @IndexBFont		{			} # index B entries font
@@ -354,11 +377,13 @@ def @DocumentSetup
     named @IndexBSpacerFont	{  +3p 			} # font of index B spacer
     named @IndexBSpacerFormat
 	right @Body		{  @Body		} # format of index B spacer
+
     named @MakeColophon		{  No			} # make colophon? Yes or No
     named @ColophonFont		{			} # font for colophon
     named @ColophonBreak	{			} # break style for colophon
     named @ColophonColumnNumber	{  1			} # colophon columns (1 to 10)
     named @ColophonColumnGap	{  1.00c @OrIfPlain 6s	} # colophon column gap
+
     named @TopGap		{  0.75c @OrIfPlain 2f	} # gap between figures
     named @MidGap		{  0.75c @OrIfPlain 2f	} # gap above/below body text
 
@@ -742,6 +767,8 @@ def @DocumentSetup
 	    Legal       @Yield  612p
 	    Statement   @Yield  396p
 	    Executive   @Yield  540p
+	    A0          @Yield 2380p
+	    A1          @Yield 1684p
 	    A2          @Yield 1190p
 	    A3          @Yield  842p
 	    A4          @Yield  595p
@@ -764,6 +791,8 @@ def @DocumentSetup
 	    Legal       @Yield 1008p
 	    Statement   @Yield  612p
 	    Executive   @Yield  720p
+	    A0          @Yield 3368p
+	    A1          @Yield 2380p
 	    A2          @Yield 1684p
 	    A3          @Yield 1190p
 	    A4          @Yield  842p
@@ -1425,7 +1454,7 @@ def @DocumentSetup
 	}
     }
 
-    def @EqualWidth right x { 50c @Wide x }	# believe it or not
+    def @EqualWidth right x { 500c @Wide x }	# believe it or not
 
     def @ColList right num
     {
@@ -2305,6 +2334,7 @@ def @DocumentSetup
     def @ContentsPlace { @Galley }
     def @FigureContentsPlace { @Galley }
     def @TableContentsPlace { @Galley }
+    def @FloaterContentsPlace { @Galley }
 
     def @SendContents into { @ContentsPlace&&foll_or_prec }
 	right x
@@ -2319,6 +2349,12 @@ def @DocumentSetup
     }
 
     def @SendTableContents into { @TableContentsPlace&&foll_or_prec }
+	right x
+    {
+	x
+    }
+
+    def @SendFloaterContents into { @FloaterContentsPlace&&foll_or_prec }
 	right x
     {
 	x
@@ -2384,6 +2420,30 @@ def @DocumentSetup
     {
 	@MakeTableContents.wanted @Case {
 	    Yes.Yes   @Yield { @SendTableContents @ContentsItem
+				   indent { indent }
+				   crosstag { crosstag }
+				   number { number }
+				   title { title }
+				   pagenum { pagenum }
+				   pregap { pregap }
+				   postgap { postgap }
+			     }
+	    else      @Yield @Null
+	}
+    }
+
+    def @FloaterContentsEntry
+	left  wanted
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+	named pregap { @ContentsGap }
+	named postgap { 0c }
+    {
+	@MakeFloaterContents.wanted @Case {
+	    Yes.Yes   @Yield { @SendFloaterContents @ContentsItem
 				   indent { indent }
 				   crosstag { crosstag }
 				   number { number }
@@ -2474,6 +2534,16 @@ def @DocumentSetup
 	}
     }
 
+    def @FloaterContentsSection
+    {
+	def @FloaterContentsList { @FloaterContentsPlace // @FloaterContentsList }
+
+	@MakeFloaterContents @Case {
+	    { Yes Bypass }  @Yield @FloaterContentsList
+	    else	    @Yield @Null
+	}
+    }
+
     ###########################################################################
     #                                                                         #
     #  Bypass table of contents.                                              #
@@ -2530,6 +2600,27 @@ def @DocumentSetup
 	named pagenum {}
     {
 	@MakeTableContents @Case {
+	    Bypass @Yield { @ContentsItem
+				indent { indent }
+				crosstag { crosstag }
+				number { number }
+				title { title }
+				pagenum { pagenum }
+				pregap { @ContentsGap }
+				postgap { 0c }
+			  }
+	    else  @Yield  @Null
+	}
+    }
+
+    def @BypassFloaterContentsEntry into { @FloaterContentsPlace&&preceding }
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+    {
+	@MakeFloaterContents @Case {
 	    Bypass @Yield { @ContentsItem
 				indent { indent }
 				crosstag { crosstag }
@@ -3978,16 +4069,6 @@ def @DocumentSetup
 	    }
 	}
 
-	#def @TableLabel
-	#{
-	#    @TableNumbers @Case {
-	#	No   @Yield @Null
-	#	else @Yield {
-	#	    @CaptionFormat { {table @WordVal @TableWord} @NumSep @TableNumber }
-	#	}
-	#    }
-	#}
-
 	def @CaptionVal
 	{
 	    @TableCaptionFont @Font @TableCaptionBreak @Break
@@ -4107,6 +4188,241 @@ def @DocumentSetup
 	    EvenPageTop   @Yield @EvenPageSend @NonRawTableVal
 	    EvenFullPage  @Yield @EvenFullPageSend @NonRawTableVal
 	    else	  @Yield @NonRawTableVal
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Floating floaters (exact clone of figure and table code above).        #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag prefix
+    def @FloaterPrefixMarker
+	named @Tag {}
+	named prefix {}
+    {
+	@Null
+    }
+
+    export @Tag count
+    def @FloaterCounterMarker
+	named @Tag {}
+	named count {}
+    {
+	@Null
+    }
+
+    def @RawFloaterNum right tag
+    {
+	@FloaterCounterMarker&&tag @Open { @Next count }
+    }
+
+    def @FloaterCounterIncrement
+	right tag
+    {
+	   @FloaterCounterMarker&&preceding @Tagged tag
+	// @FloaterPrefixMarker&&preceding @Tagged tag
+	// @FloaterCounterMarker count { @RawFloaterNum tag }
+	// @NumberMarker @Tag { tag }
+		@Value { { @FloaterPrefixMarker&&tag @Open { prefix } }
+		    @Join {@FloaterNumbers @Num @RawFloaterNum tag}
+		}
+    }
+
+    def @BeginFloaterCounter
+	left condition
+	right prefix
+    {
+	condition @Do {
+	       @FloaterPrefixMarker prefix { prefix }
+	    // @FloaterCounterMarker count { 0 }
+	}
+    }
+
+    def @EndFloaterList { @Galley //@MidGap @EndFloaterList }
+
+    def @Floater
+	named @Tag {}
+	named @Caption { dft }
+	named @ShortCaption { dft }
+	named @CaptionPos { @FloaterCaptionPos }
+	named @Format
+    	    named @II right x { |@DisplayIndent x |               }
+    	    named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+    	    named @CC right x { |0.5rt x          |               }
+    	    named @RR right x { |1.0rt x          |               }
+		right @Body { @FloaterFormat @Body }
+	named @InitialLanguage { @InitialLanguage }
+	named @BypassNumber { dft }
+	named @OnePage { dft }
+	named @Location { @FloaterLocation }
+	right @Body
+    {
+	def @FloaterNumber
+	{
+	    @BypassNumber @Dft @NumberOf @Tag
+	}
+
+	def @ContentsCaption
+	{
+	    @ShortCaption @Dft @Caption
+	}
+
+	def @OnePg
+	{
+	    @OnePage @Case {
+		{ No  no } @Yield No
+		{ Yes yes } @Yield Yes
+		dft @Yield { @Location @Case {
+				PageTop		@Yield No
+				EvenPageTop	@Yield No
+				FullPage	@Yield No
+				EvenFullPage	@Yield No
+				PageFoot	@Yield Yes
+				ColTop		@Yield No
+				ColFoot		@Yield Yes
+				ColEnd		@Yield No
+				Display		@Yield Yes
+				AfterLine	@Yield Yes
+				TryAfterLine	@Yield Yes
+				Raw		@Yield No
+			     }
+			   }
+	    }
+	}
+
+	def @CaptionState
+	{
+	    @Caption @Case {
+		dft  @Yield None
+		else @Yield { @CaptionPos @Case {
+		    { Below below } @Yield Below
+		    { Above above } @Yield Above
+		} }
+	    }
+	}
+
+	def @CaptionVal
+	{
+	    @FloaterCaptionFont @Font @FloaterCaptionBreak @Break
+	    { ||0.5rt @FloaterCaptionFormat
+		 word { floater @WordVal @FloaterWord }
+		 number { @FloaterNumber }
+		 caption { @Caption }
+	    }
+	}
+
+	def @FloaterVal
+	{
+	    @InitialLanguage @Language
+	    {
+		@MakeFloaterContents @FloaterContentsEntry
+		    indent { 0f }
+		    crosstag { @Tag }
+		    number { @FloaterNumber }
+		    title { @InitialLanguage @Language @ContentsCaption }
+		    pagenum { @PageOf @Tag }
+		// @FloaterCounterIncrement @Tag
+		// @Body
+		// @PageMark @Tag
+	    }
+	}
+
+	def @FloaterTarget
+	{
+	    @Location @Case {
+		PageTop		@Yield  @PageTopPlace&&following
+		EvenPageTop	@Yield  @PageTopPlace&&following
+		FullPage	@Yield  @FullPagePlace&&following
+		EvenFullPage	@Yield  @FullPagePlace&&following
+		PageFoot	@Yield  @PageFootAndTopPlace&&following
+		ColTop		@Yield  @ColTopPlace&&following
+		ColFoot		@Yield  @ColFootAndTopPlace&&following
+		ColEnd		@Yield  @EndFloaterList&&following
+		Display		@Yield  @AfterLinePlace&&following
+		AfterLine	@Yield  @AfterLinePlace&&following
+		TryAfterLine	@Yield  @TryAfterLinePlace&&following
+	    }
+	}
+
+	def @SendEncl into { @FloaterTarget }
+	    right x
+	{
+	    def @Enclose right x
+	    {
+		@OnePg @Case {
+                	No  @Yield @Format x
+                	Yes @Yield x
+            	}
+	    }
+
+	    x
+	}
+
+	def @Send into { @FloaterTarget }
+	    right x
+	{
+	    x
+	}
+
+	def @EvenFullPageSend into { @EvenFullPagePlace&&following }
+	    right x
+	{
+	    @OneRow x
+	}
+
+	def @EvenPageSend into { @EvenPagePlace&&following }
+	    right x
+	{
+	    @OneRow x
+	}
+
+	def @RawFloaterVal
+	{
+	    @OnePg.@CaptionState @Case
+	    {
+		Yes.Below @Yield @OneRow { @Format @FloaterVal @DP @CaptionVal }
+		Yes.Above @Yield @OneRow { @CaptionVal @DP @Format @FloaterVal }
+		Yes.None  @Yield @OneRow { @Format @FloaterVal }
+		No.Below  @Yield         { @Format @FloaterVal @DP @CaptionVal }
+		No.Above  @Yield         { @CaptionVal @DP @Format @FloaterVal }
+		No.None   @Yield         { @Format @FloaterVal }
+	    }
+	}
+
+	def @NonRawFloaterVal
+	{
+	  @OnePg.@CaptionState @Case
+	  {
+	    Yes.Below @Yield {
+		@Send @OneRow { @Format @FloaterVal @DP @CaptionVal // @DupRunner}
+	    }
+	    Yes.Above @Yield {
+		@Send @OneRow { @CaptionVal @DP @Format @FloaterVal // @DupRunner}
+	    }
+	    Yes.None @Yield {
+		@Send @OneRow { @Format @FloaterVal // @DupRunner }
+	    }
+	    No.Below @Yield {
+		@SendEncl { @FloaterVal // @Send { @CaptionVal // @DupRunner } }
+	    }
+	    No.Above @Yield {
+		@Send { @CaptionVal // @SendEncl { @FloaterVal // @DupRunner } }
+	    }
+	    No.None @Yield {
+		@SendEncl { @FloaterVal // @DupRunner }
+	    }
+	  }
+	}
+
+	@Location @Case {
+	    Raw		  @Yield @RawFloaterVal
+	    Display	  @Yield { @NonRawFloaterVal &1rt }
+	    EvenPageTop   @Yield @EvenPageSend @NonRawFloaterVal
+	    EvenFullPage  @Yield @EvenFullPageSend @NonRawFloaterVal
+	    else	  @Yield @NonRawFloaterVal
 	}
     }
 
@@ -4846,6 +5162,7 @@ def @DocumentSetup
 	named indisplays { No }
 	named infigures { No }
 	named intables { No }
+	named infloaters { No }
 	named inrunners { No }
 	named sendheader right @Body {}
 	named innergap {}
@@ -4855,6 +5172,7 @@ def @DocumentSetup
 	    //innergap @ChapRefSection
 	}
 	named wantindefinite { No }
+	named newpage { No }
 	right @Body
     {
 
@@ -4973,14 +5291,22 @@ def @DocumentSetup
 	    }
 	}
 
+	def @MinorTitle right x
+	{
+	  newpage @Case {
+	    { No no } @Yield @Protect {@LongNum headingformat title}
+	    { Yes yes } @Yield { @Null @NP @LongNum headingformat title }
+	  }
+	}
+
 	def @Heading
 	{
 
 	    type @Case {
 
 		Minor @Yield {
-		    headingfont @Font
-		    headingbreak @Break @Protect {@LongNum headingformat title}
+		    headingfont @Font headingbreak @Break
+		      @MinorTitle {@LongNum headingformat title}
 		    // @Run @StartIfMajor
 		    // @PageMark tag
 		    @DP headingtext
@@ -5026,6 +5352,7 @@ def @DocumentSetup
             //  indisplays @BeginDisplayCounter @ShortNum
             //  infigures @BeginFigureCounter @ShortNum
             //  intables @BeginTableCounter @ShortNum
+            //  infloaters @BeginFloaterCounter @ShortNum
             //  @Body
 	    //innergap  @IfMajor endifmajor innergap
             //  @Run NonStart

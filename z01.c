@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -907,7 +907,7 @@ static void run(int argc, char *argv[], int run_num, int *runs_to_do,
   FilterScavenge(TRUE);
 
   /* print word count, if required */
-  if( seen_wordcount )
+  if( seen_wordcount && run_num == *runs_to_do )
     Error(1, 29, "total of all words printed: %d", WARN,no_fpos,TotalWordCount);
 
   /* check for unbalanced error blocks */

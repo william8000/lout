@@ -1,6 +1,6 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -754,7 +754,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("  /PreEPSF_state save def");
   p0("  /dict_stack countdictstack def");
   p0("  /ops_count count 1 sub def");
-  p0("  userdict begin");
+  p0("  20 dict begin");
   p0("  /showpage {} def");
   p0("  0 setgray 0 setlinecap");
   p0("  1 setlinewidth 0 setlinejoin");
@@ -1774,6 +1774,7 @@ static void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
   }
 
   cpexists = FALSE;
+  currentfont = NO_FONT;  /* added by JeffK 31/10/06 */
   wordcount = 0;
   debug0(DPO, D, "PS_PrintGraphicInclude returning.");
 } /* end PS_PrintGraphicInclude */

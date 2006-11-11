@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -1027,6 +1027,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	word_outline(x) = outline(*style);
 	word_language(x) = language(*style);
 	word_baselinemark(x) = baselinemark(*style);
+	word_strut(x) = strut(*style);
 	word_ligatures(x) = ligatures(*style);
 	word_hyph(x) = hyph_style(*style) == HYPH_ON;
 	debug3(DOM, DDD, "  manfifest/WORD underline() := %s for %s %s",
@@ -1062,6 +1063,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	word_outline(y) = outline(*style);
 	word_language(y) = language(*style);
 	word_baselinemark(y) = baselinemark(*style);
+	word_strut(y) = strut(*style);
 	word_ligatures(y) = ligatures(*style);
 	word_hyph(y) = hyph_style(*style) == HYPH_ON;
 	if( small_caps(*style) && ok )  y = MapSmallCaps(y, style);
@@ -1102,6 +1104,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  word_outline(y) = outline(*style);
 	  word_language(y) = language(*style);
 	  word_baselinemark(y) = baselinemark(*style);
+	  word_strut(y) = strut(*style);
 	  word_ligatures(y) = ligatures(*style);
 	  word_hyph(y) = hyph_style(*style) == HYPH_ON;
 	  if( small_caps(*style) && ok )  y = MapSmallCaps(y, style);
@@ -1236,6 +1239,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	    word_outline(prev) == word_outline(y) &&
 	    word_language(prev) == word_language(y) &&
 	    word_baselinemark(prev) == word_baselinemark(y) &&
+	    word_strut(prev) == word_strut(y) &&
 	    word_ligatures(prev) == word_ligatures(y) )
 	    /* no need to compare underline() since both are false */
 	{ unsigned typ;
@@ -1253,6 +1257,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  word_outline(y) = word_outline(prev);
 	  word_language(y) = word_language(prev);
 	  word_baselinemark(y) = word_baselinemark(prev);
+	  word_strut(y) = word_strut(prev);
 	  word_ligatures(y) = word_ligatures(prev);
 	  word_hyph(y) = word_hyph(prev);
 	  underline(y) = UNDER_OFF;

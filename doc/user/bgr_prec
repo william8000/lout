@@ -141,6 +141,26 @@ the bottom edge of the higher list item to the top edge of the lower
 one, rather than from baseline to baseline.  Enclosing the last word
 of the troublesome items in @Code "@VStrut" will fix this problem.
 @PP
+Alternatively, and possibly more conveniently, Version 3.33 of Lout
+has added a @Code "strut" option to the @Code "@Font" symbol, used
+alone like this:
+@ID @Code "strut @Font ..."
+or in combination with other values suited to go to the left of
+{@Code "@Font"}, like this:
+@ID @Code "{ strut +2p } @Font ..."
+This causes a vertical strut to be added to every word under the
+influence of the {@Code "@Font"} symbol.  The height of this
+kind of strut is fixed at the height of the highest character in
+the font, and its depth at the depth of the deepest character,
+as recorded by the `font bounding box' stored with the description
+of the font.  For example,
+@ID @Code "strut @Font { @Box { e }, @Box { @f }, and @Box { g } }"
+produces
+@ID strut @Font { @Box { e }, @Box { f }, and @Box { g } }
+If you need many struts, it might pay to include @Code "strut"
+in the @Code "@InitialFont" option of your document, so that it
+applies everywhere.
+@PP
 The @Code "@OverStrike" symbol causes the objects on
 overstrike. @Index @Code "@OverStrike"
 each side of it to be overstruck:

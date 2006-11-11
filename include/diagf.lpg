@@ -2501,6 +2501,208 @@ ldiagdict begin
   % count (  stack size is) 1 ldiagdebugprint pop
 } def
 
+% farr tarr { from } { to } xindent zindent bias ldiagdhulinepath -
+/ldiagdhulinepath
+{
+  % (entering ldiagdhulinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel 270 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength 270 dg ldiagatangle ldiagpadd /FROM ldiagpointdef
+  270 dg /FROM@ANGLE ldiagangledef
+
+  to (CTR) ldiagdolabel 270 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength 270 dg ldiagatangle ldiagpadd /TO ldiagpointdef
+  90 dg /TO@ANGLE ldiagangledef
+
+  /XDOWN [ FROM exch pop TO exch pop ldiagmin bias sub ] cvx def
+  FROM pop XDOWN /P1 ldiagpointdef
+  TO pop XDOWN /P2 ldiagpointdef
+  /HORIZ [ P1 P2 ldiagangleto ] cvx def
+  P1 P1 0 0 1 ft 270 dg ldiagatangle ldiagpadd 0 0 1 ft HORIZ ldiagatangle
+  ldiagpadd ldiagangleto /P1@ANGLE ldiagangledef
+  P2 P2 0 0 1 ft 90 dg ldiagatangle ldiagpadd 0 0 1 ft HORIZ ldiagatangle
+  ldiagpadd ldiagangleto /P2@ANGLE ldiagangledef
+
+  P1 0.5 ldiagpmul P2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  HORIZ /LMID@ANGLE ldiagangledef
+
+  /XINDENT [ xindent FROM P1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent P2 TO ldiagdistance ldiagmin ] cvx def
+  0 XINDENT FROM ldiagpsub /LFROM ldiagpointdef
+  270 dg /LFROM@ANGLE ldiagangledef
+  0 ZINDENT TO ldiagpsub /LTO ldiagpointdef
+  90 dg /LTO@ANGLE ldiagangledef
+
+  FROM LFROM P1 LMID P2 LTO TO
+
+  % (leaving ldiagdhulinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias radius ldiagdhucurvepath -
+/ldiagdhucurvepath
+{
+  % (entering ldiagdhucurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel 270 dg from (CIRCUM) ldiagdolabel ldiagpadd 0 0
+  fromarrowlength 270 dg ldiagatangle ldiagpadd /FROM ldiagpointdef
+  270 dg /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel 270 dg to (CIRCUM) ldiagdolabel ldiagpadd 0 0
+  toarrowlength 270 dg ldiagatangle ldiagpadd /TO ldiagpointdef
+  90 dg /TO@ANGLE ldiagangledef
+  /XDOWN [ FROM exch pop TO exch pop ldiagmin bias sub ] cvx def
+  /XP1 [ FROM pop XDOWN ] cvx def
+  /XP2 [ TO pop XDOWN ] cvx def
+  /HORIZ [ XP1 XP2 ldiagangleto ] cvx def
+  XP1 0.5 ldiagpmul XP2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  HORIZ /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM XP1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent XP2 TO ldiagdistance ldiagmin ] cvx def
+  0 XINDENT FROM ldiagpsub /LFROM ldiagpointdef
+  270 dg /LFROM@ANGLE ldiagangledef
+  0 ZINDENT TO ldiagpsub /LTO ldiagpointdef
+  90 dg /LTO@ANGLE ldiagangledef
+  /RADIUS [ radius XP1 XP2 ldiagdistance 2 div ldiagmin ] cvx def
+  /XP1PRE [ XP1 0 0 RADIUS 90 dg ldiagatangle ldiagpadd ] cvx def
+  /XP1POST [ XP1 0 0 RADIUS HORIZ ldiagatangle ldiagpadd ] cvx def
+  /XP1CTR [ XP1PRE 0 0 RADIUS HORIZ ldiagatangle ldiagpadd ] cvx def
+  XP1CTR 0 0 RADIUS XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd
+  /P1 ldiagpointdef
+  XP1PRE XP1POST ldiagangleto /P1@ANGLE ldiagangledef
+  /XP2PRE [ 0 0 RADIUS HORIZ ldiagatangle XP2 ldiagpsub ] cvx def
+  /XP2POST [ XP2 0 0 RADIUS 90 dg ldiagatangle ldiagpadd ] cvx def
+  /XP2CTR [ XP2PRE 0 0 RADIUS 90 dg ldiagatangle ldiagpadd ] cvx def
+  XP2CTR 0 0 RADIUS XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd
+  /P2 ldiagpointdef
+  XP2PRE XP2POST ldiagangleto /P2@ANGLE ldiagangledef
+  FROM LFROM XP1PRE
+  {} {} { [XP1CTR clockwise] P1 [XP1CTR clockwise] } {} { [XP1CTR] P1 [XP1CTR] }
+  {} {} {} HORIZ round ldiagquadcase
+  XP1POST LMID XP2PRE
+  {} {} { [XP2CTR clockwise ] P2 [XP2CTR clockwise ] } {} { [XP2CTR] P2 [XP2CTR] }
+  {} {} {} HORIZ round ldiagquadcase
+  XP2POST LTO TO
+
+  % (leaving ldiagdhucurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias ldiaguhdlinepath -
+/ldiaguhdlinepath
+{
+  % (entering ldiaguhdlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel 90 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength 90 dg ldiagatangle ldiagpadd /FROM ldiagpointdef
+  90 dg /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel 90 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength 90 dg ldiagatangle ldiagpadd /TO ldiagpointdef
+  270 dg /TO@ANGLE ldiagangledef
+  /XUP [ FROM exch pop TO exch pop ldiagmax bias add ] cvx def
+  FROM pop XUP /P1 ldiagpointdef
+  TO pop XUP /P2 ldiagpointdef
+  /HORIZ [ P1 P2 ldiagangleto ] cvx def
+  P1 P1 0 0 1 ft 90 dg ldiagatangle ldiagpadd 0 0 1 ft HORIZ ldiagatangle
+  ldiagpadd ldiagangleto /P1@ANGLE ldiagangledef
+  P2 P2 0 0 1 ft 270 dg ldiagatangle ldiagpadd 0 0 1 ft HORIZ ldiagatangle
+  ldiagpadd ldiagangleto /P2@ANGLE ldiagangledef
+  P1 0.5 ldiagpmul P2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  HORIZ /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM P1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent P2 TO ldiagdistance ldiagmin ] cvx def
+  FROM 0 XINDENT ldiagpadd /LFROM ldiagpointdef
+  90 dg /LFROM@ANGLE ldiagangledef
+  TO 0 ZINDENT ldiagpadd /LTO ldiagpointdef
+  270 dg /LTO@ANGLE ldiagangledef
+  FROM LFROM P1 LMID P2 LTO TO
+
+  % (leaving ldiaguhdlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+
+% farr tarr { from } { to } xindent zindent bias radius ldiaguhdcurvepath -
+/ldiaguhdcurvepath
+{
+  % (entering ldiaguhdcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel 90 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength 90 dg ldiagatangle ldiagpadd /FROM ldiagpointdef
+  90 dg /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel 90 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength 90 dg ldiagatangle ldiagpadd /TO ldiagpointdef
+  270 dg /TO@ANGLE ldiagangledef
+  /XUP [ FROM exch pop TO exch pop ldiagmax bias add ] cvx def
+  /XP1 [ FROM pop XUP ] cvx def
+  /XP2 [ TO pop XUP ] cvx def
+  /HORIZ [ XP1 XP2 ldiagangleto ] cvx def
+  XP1 0.5 ldiagpmul XP2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  HORIZ /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM XP1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent XP2 TO ldiagdistance ldiagmin ] cvx def
+  FROM 0 XINDENT ldiagpadd /LFROM ldiagpointdef
+  90 dg /LFROM@ANGLE ldiagangledef
+  TO 0 ZINDENT ldiagpadd /LTO ldiagpointdef
+  270 dg /LTO@ANGLE ldiagangledef
+  /RADIUS [ radius XP1 XP2 ldiagdistance 0.5 mul ldiagmin ] cvx def
+  /XP1PRE [ XP1 0 0 RADIUS 270 dg ldiagatangle ldiagpadd ] cvx def
+  /XP1POST [ XP1 0 0 RADIUS HORIZ ldiagatangle ldiagpadd ] cvx def
+  /XP1CTR [ XP1PRE 0 0 RADIUS HORIZ ldiagatangle ldiagpadd ] cvx def
+  XP1CTR 0 0 RADIUS XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd
+  /P1 ldiagpointdef
+  XP1PRE XP1POST ldiagangleto /P1@ANGLE ldiagangledef
+  /XP2PRE [ 0 0 RADIUS HORIZ ldiagatangle XP2 ldiagpsub ] cvx def
+  /XP2POST [ XP2 0 0 RADIUS 270 dg ldiagatangle ldiagpadd ] cvx def
+  /XP2CTR [ XP2PRE 0 0 RADIUS 270 dg ldiagatangle ldiagpadd ] cvx def
+  XP2CTR 0 0 RADIUS XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd
+  /P2 ldiagpointdef
+  XP2PRE XP2POST ldiagangleto /P2@ANGLE ldiagangledef
+  FROM LFROM XP1PRE
+  {} {} {[XP1CTR] P1 [XP1CTR]} {} {[XP1CTR clockwise] P1 [XP1CTR clockwise]}
+  {} {} {} HORIZ round ldiagquadcase
+  XP1POST LMID XP2PRE
+  {} {} {[XP2CTR] P2 [XP2CTR]} {} {[XP2CTR clockwise] P2 [XP2CTR clockwise]}
+  {} {} {} HORIZ round ldiagquadcase
+  XP2POST LTO TO
+
+  % (leaving ldiaguhdcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
 % farr tarr { from } { to } xindent zindent hfrac hbias ldiaghvhlinepath -
 /ldiaghvhlinepath % still to do
 {

@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.32)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
 /*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -224,6 +224,7 @@ typedef struct {
 	    word_outline(hyph_word) = outline(save_style(x));		\
 	    word_language(hyph_word) = language(save_style(x));		\
 	    word_baselinemark(hyph_word) = baselinemark(save_style(x));	\
+	    word_strut(hyph_word) = strut(save_style(x));		\
 	    word_ligatures(hyph_word) = ligatures(save_style(x));	\
 	    word_hyph(hyph_word) = hyph_style(save_style(x))==HYPH_ON;	\
 	  }								\
@@ -595,6 +596,7 @@ static void KernWordLeftMargin(OBJECT first_on_line, OBJECT parent)
     word_outline(z) = word_outline(first_on_line);
     word_language(z) = word_language(first_on_line);
     word_baselinemark(z) = word_baselinemark(first_on_line);
+    word_strut(z) = word_strut(first_on_line);
     word_ligatures(z) = word_ligatures(first_on_line);
     word_hyph(z) = hyph_style(save_style(z)) == HYPH_ON;
     underline(z) = underline(first_on_line);
@@ -722,6 +724,7 @@ static void KernWordRightMargin(OBJECT last_on_line, OBJECT parent)
     word_outline(z) = word_outline(last_on_line);
     word_language(z) = word_language(last_on_line);
     word_baselinemark(z) = word_baselinemark(last_on_line);
+    word_strut(z) = word_strut(last_on_line);
     word_ligatures(z) = word_ligatures(last_on_line);
     word_hyph(z) = hyph_style(save_style(last_on_line)) == HYPH_ON;
     underline(z) = underline(last_on_line);
@@ -805,6 +808,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       word_outline(res) = outline(save_style(x));
       word_language(res) = language(save_style(x));
       word_baselinemark(res) = baselinemark(save_style(x));
+      word_strut(res) = strut(save_style(x));
       word_ligatures(res) = ligatures(save_style(x));
       word_hyph(res) = hyph_style(save_style(x)) == HYPH_ON;
       back(res, COLM) = fwd(res, COLM) = 0;
@@ -828,6 +832,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   word_outline(tmp) = 0;
   word_language(tmp) = 0;
   word_baselinemark(tmp) = FALSE;
+  word_strut(tmp) = FALSE;
   word_ligatures(tmp) = TRUE;
   word_hyph(tmp) = 0;
   underline(tmp) = UNDER_OFF;
@@ -1019,6 +1024,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	word_outline(t1) = 0;
 	word_language(t1) = 0;
 	word_baselinemark(t1) = FALSE;
+	word_strut(t1) = FALSE;
 	word_ligatures(t1) = TRUE;
 	word_hyph(t1) = 0;
 	underline(t1) = UNDER_OFF;
@@ -1086,6 +1092,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	word_outline(z) = word_outline(tmp);
 	word_language(z) = word_language(tmp);
 	word_baselinemark(z) = word_baselinemark(tmp);
+	word_strut(z) = word_strut(tmp);
 	word_ligatures(z) = word_ligatures(tmp);
 	word_hyph(z) = hyph_style(save_style(x)) == HYPH_ON;
 	underline(z) = underline(tmp);
@@ -1199,6 +1206,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	        word_outline(prev) == word_outline(next) &&
 	        word_language(prev) == word_language(next) &&
 	        word_baselinemark(prev) == word_baselinemark(next) &&
+	        word_strut(prev) == word_strut(next) &&
 	        word_ligatures(prev) == word_ligatures(next) &&
 	        underline(prev) == underline(next) )
 	    { 
@@ -1212,6 +1220,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	      word_outline(tmp) = word_outline(prev);
 	      word_language(tmp) = word_language(prev);
 	      word_baselinemark(tmp) = word_baselinemark(prev);
+	      word_strut(tmp) = word_strut(prev);
 	      word_ligatures(tmp) = word_ligatures(prev);
 	      word_hyph(tmp) = word_hyph(prev);
 	      FontWordSize(tmp);
