@@ -1,7 +1,7 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -243,6 +243,8 @@ void MemInit(void)
   zz_lengths[ CURR_FACE    ] =
   zz_lengths[ CURR_YUNIT   ] =
   zz_lengths[ CURR_ZUNIT   ] =
+  zz_lengths[ GET_CONTEXT  ] =
+  zz_lengths[ SET_CONTEXT  ] =
   zz_lengths[ COMMON       ] =
   zz_lengths[ RUMP         ] =
   zz_lengths[ MELD         ] =

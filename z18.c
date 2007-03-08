@@ -1,7 +1,7 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -36,6 +36,8 @@ static OBJECT		targets[MAX_DEPTH];	/* currently open \Inputs    */
 static CONSTRAINT	constraints[MAX_DEPTH];	/* their COLM constraints    */
 static int		itop;			/* stack top	             */
 static CONSTRAINT	initial_constraint;	/* initial COLM constraint   */
+       CONTEXT		InitialContext =	/* initial context	     */
+	 { nilobj, nilobj, nilobj, NULL };
        STYLE		InitialStyle;		/* initial style             */
        OBJECT		InitialEnvironment;	/* initial environment	     */
 
@@ -94,6 +96,7 @@ void TransferInit(OBJECT InitEnv)
   baselinemark(InitialStyle)	= FALSE;                /* i.e. not baseline */
   strut(InitialStyle)		= FALSE;                /* i.e. not strutted */
   ligatures(InitialStyle)	= TRUE;                 /* i.e. ligatures    */
+  context(InitialStyle) 	= InitialContext;
 
   /* construct destination for root galley */
   New(up_hd, HEAD);

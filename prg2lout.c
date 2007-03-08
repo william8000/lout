@@ -1326,10 +1326,11 @@ TOKEN EqvToken			= FixedToken("<=>","@A sym {arrowdblboth} @PO");
 TOKEN HaskellOrToken		= FixedToken("||", "@PO");
 TOKEN HaskellAndToken		= FixedToken("&&", "@PO");
 TOKEN HaskellBacktickToken	= FixedToken("`", "@PO");
-TOKEN PythonPowerToken          = FixedToken( "**",  "@PO" ) ;
-TOKEN PythonBitLeftShiftToken   = FixedToken( "<<",  "@PO" ) ;
-TOKEN PythonBitRightShiftToken  = FixedToken( ">>",  "@PO" ) ;
-TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" ) ;
+TOKEN PythonPowerToken          = FixedToken( "**",  "@PO" );
+TOKEN PythonBitLeftShiftToken   = FixedToken( "<<",  "@PO" );
+TOKEN PythonBitRightShiftToken  = FixedToken( ">>",  "@PO" );
+TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" );
+TOKEN PythonDecoratorToken      = FixedToken( "@",  "@PO" );
 
 
 /*****************************************************************************/
@@ -1362,6 +1363,7 @@ TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" ) ;
 TOKEN StarToken			= NoParameterToken("*",  "{@PA}");
 TOKEN MinusToken		= NoParameterToken("-",  "{@PM}");
 TOKEN EiffelDotToken		= NoParameterToken(".",  "{@PD}");
+TOKEN NonpareilDotDotToken	= NoParameterToken("..",  "{@PDD}");
 TOKEN NonpareilExclamationToken	= NoParameterToken("!",  "@PO{\"!\" &0.1f}");
 TOKEN HaskellColonToken		= NoParameterToken(":", "{@PCOLON}");
 
@@ -2889,7 +2891,7 @@ LANGUAGE PythonLanguage = {
     &LeftParenToken, &RightParenToken, &LeftBraceToken,
     &RightBraceToken, &LeftBracketToken, &RightBracketToken,
     &CommaToken, &ColonToken, &DotToken, &PythonBacktickToken,
-    &EqualToken, &SemicolonToken,
+    &EqualToken, &SemicolonToken, &PythonDecoratorToken, &DotDotDotToken
   },
 
   {
@@ -3102,20 +3104,20 @@ LANGUAGE NonpareilLanguage = {
     &RightParenToken,
     &EiffelDotToken,
     &NonpareilExclamationToken,
-    &DotDotToken,
+    &NonpareilDotDotToken,
     &DotDotDotToken,
     &NonpareilOperatorToken,
   },
   {
     "as", "builtin", "case", "class", "coerce", "creation", "else", "elsif",
-    "end", "enum", "extend", "extension", "false", "filter", "fun",
-    "genesis", "if", "in", "infix", "infixr", "inherit", "introduce",
-    "invariant", "is", "let", "local", "meet", "module", "noncreation",
-    "norename", "predefined", "prefix", "private", "postfix", "rename",
-    "require", "self", "system", "then", "true", "use", "when", "yield",
+    "end", "enum", "extend", "extension", "filter", "genesis", "if", "in",
+    "infix", "infixl", "infixr", "inherit", "introduce", "invariant",
+    "is", "let", "local", "meet", "module", "noncreation", "norename",
+    "predefined", "prefix", "prefun", "private", "postfix", "rename",
+    "require", "system", "then", "typeof", "upto", "use", "when", "yield",
 
-    /* not reserved words strictly speaking, but conventionally set like them */
-    "and", "or", "not"
+    /* not keywords, but conventionally set like them */
+    "false", "true", "self", "and", "or", "not"
   }
 };
 
@@ -4063,6 +4065,7 @@ void EndEmit(TOKEN *current_token, unsigned char *end_delim)
 	case '^':
 	case '~':
 	case '-':
+	case '.':
 	case '\'':
 
 	  if( !quoted_now )

@@ -94,23 +94,34 @@ file option may be overridden at any node by giving the option again there.
 Sometimes a diagram contains several different node types, each with
 its own combination of options (for example, the syntax diagrams of
 Section {@NumberOf dia_synt} have three node types).  To handle these
-cases there are three alternative versions of the @Code "@Node"
-symbol, called {@Code "@ANode"}, {@Code "@BNode"}, and
+cases there are five alternative versions of the @Code "@Node"
+symbol, called {@Code "@ANode"},
 diagrams. @RawIndex { diagrams }
 diagrams.anode @SubIndex { @Code "@ANode" symbol }
 anode.diagrams @Index { @Code "@ANode" symbol (diagrams) }
+{@Code "@BNode"},
 diagrams. @RawIndex { diagrams }
 diagrams.bnode @SubIndex { @Code "@BNode" symbol }
 bnode.diagrams @Index { @Code "@BNode" symbol (diagrams) }
+{@Code "@CNode"},
 diagrams. @RawIndex { diagrams }
 diagrams.cnode @SubIndex { @Code "@CNode" symbol }
 cnode.diagrams @Index { @Code "@CNode" symbol (diagrams) }
-{@Code "@CNode"}.  These have exactly the same options as
+{@Code "@DNode"},
+diagrams. @RawIndex { diagrams }
+diagrams.dnode @SubIndex { @Code "@DNode" symbol }
+dnode.diagrams @Index { @Code "@DNode" symbol (diagrams) }
+and
+diagrams. @RawIndex { diagrams }
+diagrams.enode @SubIndex { @Code "@ENode" symbol }
+enode.diagrams @Index { @Code "@ENode" symbol (diagrams) }
+{@Code "@ENode"}.  These have exactly the same options as
 {@Code "@Node"}, but the @I default values of these options
 are different, in that they come from @Code "@Diag" options,
 or else setup file options, that have an extra letter in front
-of their name:  @Code { a }, @Code { b }, or @Code { c }.  Here is
-a small example (see later in this section for the @Code font option):
+of their name:  @Code { a }, @Code { b }, @Code { c },
+@Code { d }, or @Code { e }.  Here is a small example (see later
+in this section for the @Code font option):
 @ID @OneRow {
 @Code @Verbatim {
 @Diag
@@ -137,9 +148,10 @@ a small example (see later in this section for the @Code font option):
 }
 }
 Note that when giving an option directly to {@Code "@ANode"},
-{@Code "@BNode"}, and {@Code "@CNode"}, the initial @Code { a },
-@Code { b }, or @Code { c } used with @Code "@Diag" and in the
-setup file is omitted.
+{@Code "@BNode"}, {@Code "@CNode"}, {@Code "@DNode"}, and
+{@Code "@ENode"}, the initial @Code { a }, @Code { b },
+@Code { c }, @Code { d }, or @Code { e } used with @Code "@Diag"
+and in the setup file is omitted.
 @PP
 To save time in simple cases, @Code "@Diag" provides nine other
 node symbols called

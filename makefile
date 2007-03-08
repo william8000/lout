@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-#  Make file for installing Basser Lout Version 3.33                          #
+#  Make file for installing Basser Lout                                       #
 #                                                                             #
 #  Jeffrey H. Kingston                                                        #
 #                                                                             #

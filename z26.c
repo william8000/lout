@@ -1,7 +1,7 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -208,6 +208,8 @@ FULL_CHAR *Image(unsigned int c)
     case SPACE:			return  KW_SPACE;
     case YUNIT:			return  KW_YUNIT;
     case ZUNIT:			return  KW_ZUNIT;
+    case SET_CONTEXT:		return  KW_SET_CONTEXT;
+    case GET_CONTEXT:		return  KW_GET_CONTEXT;
     case BREAK:			return  KW_BREAK;
     case UNDERLINE:		return  KW_UNDERLINE;
     case COLOUR:		return  KW_COLOUR;

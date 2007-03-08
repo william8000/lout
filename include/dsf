@@ -931,8 +931,9 @@ def @DocumentSetup
 	named @Owner      {}
 	named @Prefix     {}
 	named @Tag        {}
-    { @Null
-      # "(@Runner:"@Start":"@MajorTitle")"
+    {
+      @Null
+      # red @Colour "(@Runner:"@Start":"@MajorTitle":"@MinorTitle")"
     }
 
     def @DupRunner # duplicate previous runner

@@ -377,6 +377,176 @@
 
   #############################################################################
   #                                                                           #
+  #  @DNode options                                                           #
+  #                                                                           #
+  #############################################################################
+
+  # doutline		{ box			}
+  # dmargin		{ 0.6f			}
+  # dshadow		{ 0.4f			}
+  # dsides		{ 3			}
+  # dangle		{ "dup 180 exch div"	}  # 180d / sides
+  # dtranslate		{			}
+  # doutlinestyle	{ solid			}
+  # doutlinedashlength	{ 0.2f			}
+  # doutlinewidth	{ thin			}
+  # dpaint		{ none			}
+  # dtexture		{ solid			}
+  # dfont		{			}
+  # dbreak		{			}
+  # dformat		{ @Body			}
+  # dvalign		{ ctr			}
+  # dvsize		{			}
+  # dvindent		{ ctr			}
+  # dvstrut		{ no			}
+  # dvmargin		{			}
+  # dtopmargin		{			}
+  # dfootmargin		{			}
+  # dhalign		{ ctr			}
+  # dhsize              {			}
+  # dhindent		{ ctr			}
+  # dhstrut		{ no			}
+  # dhmargin		{			}
+  # dleftmargin		{			}
+  # drightmargin	{			}
+  # dnodelabel		{			}
+  # dnodelabelmargin	{ 0.2f			}
+  # dnodelabelfont	{ "-2p"			}
+  # dnodelabelbreak	{ ragged nohyphen	}
+  # dnodelabelformat	{ @Body			}
+  # dnodelabelpos	{			}
+  # dnodelabelangle	{ horizontal		}
+  # dnodelabelprox	{ outside		}
+  # dnodelabelctr	{ no			}
+  # dnodelabeladjust	{ 0 0			}
+  # dalabel		{			}
+  # dalabelmargin	{			}
+  # dalabelfont		{			}
+  # dalabelbreak	{			}
+  # dalabelformat	{			}
+  # dalabelpos		{ NE			}
+  # dalabelangle	{			}
+  # dalabelprox		{			}
+  # dalabelctr		{ 			}
+  # dalabeladjust	{			}
+  # dblabel		{			}
+  # dblabelmargin	{			}
+  # dblabelfont		{			}
+  # dblabelbreak	{			}
+  # dblabelformat	{			}
+  # dblabelpos		{ NW			}
+  # dblabelangle	{			}
+  # dblabelprox		{			}
+  # dblabelctr		{ 			}
+  # dblabeladjust	{			}
+  # dclabel		{			}
+  # dclabelmargin	{			}
+  # dclabelfont		{			}
+  # dclabelbreak	{			}
+  # dclabelformat	{			}
+  # dclabelpos		{ SW			}
+  # dclabelangle	{			}
+  # dclabelprox		{			}
+  # dclabelctr		{ 			}
+  # dclabeladjust	{			}
+  # ddlabel		{			}
+  # ddlabelmargin	{			}
+  # ddlabelfont		{			}
+  # ddlabelbreak	{			}
+  # ddlabelformat	{			}
+  # ddlabelpos		{ SE			}
+  # ddlabelangle	{			}
+  # ddlabelprox		{			}
+  # ddlabelctr		{ 			}
+  # ddlabeladjust	{			}
+
+  #############################################################################
+  #                                                                           #
+  #  @ENode options                                                           #
+  #                                                                           #
+  #############################################################################
+
+  # eoutline		{ box			}
+  # emargin		{ 0.6f			}
+  # eshadow		{ 0.4f			}
+  # esides		{ 3			}
+  # eangle		{ "dup 180 exch div"	}  # 180d / sides
+  # etranslate		{			}
+  # eoutlinestyle	{ solid			}
+  # eoutlinedashlength	{ 0.2f			}
+  # eoutlinewidth	{ thin			}
+  # epaint		{ none			}
+  # etexture		{ solid			}
+  # efont		{			}
+  # ebreak		{			}
+  # eformat		{ @Body			}
+  # evalign		{ ctr			}
+  # evsize		{			}
+  # evindent		{ ctr			}
+  # evstrut		{ no			}
+  # evmargin		{			}
+  # etopmargin		{			}
+  # efootmargin		{			}
+  # ehalign		{ ctr			}
+  # ehsize              {			}
+  # ehindent		{ ctr			}
+  # ehstrut		{ no			}
+  # ehmargin		{			}
+  # eleftmargin		{			}
+  # erightmargin	{			}
+  # enodelabel		{			}
+  # enodelabelmargin	{ 0.2f			}
+  # enodelabelfont	{ "-2p"			}
+  # enodelabelbreak	{ ragged nohyphen	}
+  # enodelabelformat	{ @Body			}
+  # enodelabelpos	{			}
+  # enodelabelangle	{ horizontal		}
+  # enodelabelprox	{ outside		}
+  # enodelabelctr	{ no			}
+  # enodelabeladjust	{ 0 0			}
+  # ealabel		{			}
+  # ealabelmargin	{			}
+  # ealabelfont		{			}
+  # ealabelbreak	{			}
+  # ealabelformat	{			}
+  # ealabelpos		{ NE			}
+  # ealabelangle	{			}
+  # ealabelprox		{			}
+  # ealabelctr		{ 			}
+  # ealabeladjust	{			}
+  # eblabel		{			}
+  # eblabelmargin	{			}
+  # eblabelfont		{			}
+  # eblabelbreak	{			}
+  # eblabelformat	{			}
+  # eblabelpos		{ NW			}
+  # eblabelangle	{			}
+  # eblabelprox		{			}
+  # eblabelctr		{ 			}
+  # eblabeladjust	{			}
+  # eclabel		{			}
+  # eclabelmargin	{			}
+  # eclabelfont		{			}
+  # eclabelbreak	{			}
+  # eclabelformat	{			}
+  # eclabelpos		{ SW			}
+  # eclabelangle	{			}
+  # eclabelprox		{			}
+  # eclabelctr		{ 			}
+  # eclabeladjust	{			}
+  # edlabel		{			}
+  # edlabelmargin	{			}
+  # edlabelfont		{			}
+  # edlabelbreak	{			}
+  # edlabelformat	{			}
+  # edlabelpos		{ SE			}
+  # edlabelangle	{			}
+  # edlabelprox		{			}
+  # edlabelctr		{ 			}
+  # edlabeladjust	{			}
+
+  #############################################################################
+  #                                                                           #
   #  Link options                                                             #
   #                                                                           #
   #############################################################################

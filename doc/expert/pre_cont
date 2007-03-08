@@ -1,0 +1,45 @@
+@Section
+   @Title { "@SetContext" and "@GetContext" }
+   @Tag { cont }
+@Begin
+@PP
+As earlier sections showed, the style information contains many
+attributes:  the current font, break style, colour and texture,
+and so on.  It is also possible
+@FootNote { From Version 3.34 of Basser Lout. }
+to add arbitrary additional information to the style, using the
+@@SetContext symbol, and retrieve it using @@GetContext.  For example,
+@ID @OneRow @Code @Verbatim {
+{dirn @Yield up} @SetContext {
+The current direction is {@GetContext dirn}.
+}
+}
+produces
+@ID @OneRow {
+{dirn @Yield up} @SetContext {
+The current direction is {@GetContext dirn}.
+}
+}
+The object to the left of @@SetContext must be a @@Yield symbol whose
+left parameter, the {@I key}, evaluates to a simple word, and whose
+right parameter, the {@I value}, may be an arbitrary object.  Since
+@@Yield has high precedence it will usually be necessary to enclose
+non-trivial values in braces.  The effect is to associate the value
+with the key in a symbol table throughout the right parameter of the
+@@SetContext symbol, as part of the style information.  The value may
+be retrieved anywhere in this region by invoking @@GetContext with the
+key as its right parameter.
+@PP
+The value is evaluated using the style and environment where it occurs,
+not where it is used.  In any case in most applications the value will
+be a simple word, independent of any style and environment, used to
+select a branch in a case expression, like this:
+@ID @OneRow @Code @Verbatim {
+{@GetContext dirn} @Case {
+  up @Yield ...
+  down @Yield ...
+}
+}
+@@GetContext reports an error if there is no value associated with
+its key in the current style.
+@End @Section

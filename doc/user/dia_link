@@ -244,6 +244,10 @@ of possible values for @Code "arrowstyle" is
     B { @Diag vstrut { no } { A:: @Circle  |2c B:: @Circle 
 	// @Link from { A } to { B } arrow { yes } arrowstyle { solid } } }
 @Rowa
+    A { solidwithbar }
+    B { @Diag vstrut { no } { A:: @Circle  |2c B:: @Circle 
+	// @Link from { A } to { B } arrow { yes } arrowstyle { solidwithbar } } }
+@Rowa
     A { halfopen }
     B { @Diag vstrut { no } { A:: @Circle  |2c B:: @Circle 
 	// @Link from { A } to { B } arrow { yes } arrowstyle { halfopen } } }
@@ -285,6 +289,18 @@ path, at the appropriate width (although never dashed or dotted), from its
 base to its point, and hence can and does ensure that the link path does
 not overstrike and thicken the point of the arrow.
 }
+The arrow with style @Code solidwithbar has a bar at the tip of the
+arrowhead, whose length equals the width of the arrow and whose
+width is {@Code pathwidth}, like this:
+@ID @Diag {
+A:: @Box margin { 0i } outlinestyle { noline } 3c @Wide
+//
+@Link from { A@W } to { A@CTR } arrow { forward } arrowstyle { solidwithbar }
+@Link from { A@CTR } to { A@E } arrow { back } backarrowstyle { solidwithbar }
+}
+This example shows that half of the bar extends beyond the area
+allocated to the arrow, so that if two of these arrows meet from
+opposite directions, their bars will exactly overstrike.
 @PP
 Corresponding with {@Code arrowstyle}, {@Code arrowwidth}, and
 {@Code arrowlength}, there are {@Code backarrowstyle},

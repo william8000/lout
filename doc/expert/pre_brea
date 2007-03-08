@@ -74,6 +74,13 @@ rlines.break @Index { @Code rlines @@Break }
 @@Break, then right-justify each line with respect to the others.
 }
 
+@LI {
+2i @Wide { |1rt @Code olines @@Break @I object }
+olines.break @Index { @Code olines @@Break }
+|2m Break the paragraphs of {@I object} into lines as for @Code "lines"
+@@Break, then as for outdenting.
+}
+
 @EL
 If the paragraph was an entire component of a galley, so will each of
 its lines be; otherwise the lines are enclosed in a {@Code "@OneRow"}

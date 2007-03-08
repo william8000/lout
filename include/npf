@@ -102,7 +102,7 @@ def @NonpareilSetup
 
     export
     
-	@PI @PK @PO @PN @PS @PC @PL @PA @PM @PD
+	@PI @PK @PO @PN @PS @PC @PL @PA @PM @PD @PDD
 	@A "$>"
 
     def @Nonpareil
@@ -401,6 +401,15 @@ def @NonpareilSetup
 	    @PO @BackEnd @Case {
 		PlainText @Yield "."
 		else @Yield { "1.4f" @Font "+0.04f" @VShift "." &"0.05f" }
+	    }
+	}
+
+
+	def @PDD	# for formatting double dots, if wanted larger
+	{
+	    @PO @BackEnd @Case {
+		PlainText @Yield ".."
+		else @Yield { "1.4f" @Font "+0.04f" @VShift ".." &"0.05f" }
 	    }
 	}
 

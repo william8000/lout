@@ -1,7 +1,7 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -942,7 +942,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		bool(adjust_cat(new_line)), EchoObject(new_line));
 
 	      /* may need to insert space at start of remainder */
-	      if( hspace(g) > 0 )
+	      if( hspace(g)>0 || display_style(save_style(x))==DISPLAY_ORAGGED )
 	      {
 		/* make an empty word to occupy the first spot */
 		z = MakeWord(WORD, STR_EMPTY, &fpos(g));
@@ -965,7 +965,10 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		vspace(z) = 0;
 		underline(z) = UNDER_OFF;
 		GapCopy(gap(z), space_gap(save_style(x)));
-		width(gap(z)) *= hspace(z);
+		if( display_style(save_style(x)) == DISPLAY_ORAGGED )
+		  width(gap(z)) = outdent_len(save_style(x));
+		else
+		  width(gap(z)) *= hspace(z);
 		Link(NextDown(Down(x)), z);
 
 		debug2(DSF, D, "  hspace(g) = %d, width(gap(z)) = %s",

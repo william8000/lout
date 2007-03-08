@@ -10,7 +10,7 @@ width.  Lout works out suitable column widths and performs paragraph
 breaking automatically, finding an `optimal' break with the method
 used by the @TeX
 tex.paragraph @SubIndex { paragraph breaking }
-system.  It offers nine styles of paragraph breaking,
+system.  It offers ten styles of paragraph breaking,
 which we will explore with the aid of this example:
 @ID @OneRow @Code {
 It is a truth universally
@@ -25,7 +25,7 @@ breakzzz.sym @Index { @Code "@Break" symbol }
 This example causes every paragraph in the following object to be
 broken using the @Code ragged style, of which more below.
 @PP
-The first two of the nine styles perform @I { line adjustment }, which
+The first two of the ten styles perform @I { line adjustment }, which
 line.adjustment @Index { line adjustment }
 means that they enlarge the spaces between the objects making up each
 line so as to fill the lines completely:
@@ -129,10 +129,11 @@ recommended way is to separate them by an @Code "~" symbol:
 It's best not to bother about this until you actually get a bad line
 break, since chances are good that the words will fall on one line anyway.
 @PP
-The last three styles differ from the first five in breaking the
+The last four styles differ from the first six in breaking the
 paragraph at the points where it is broken in the original input:
 lines. @Index { @Code lines paragraph breaking style }
 clines. @Index { @Code clines paragraph breaking style }
+olines. @Index { @Code olines paragraph breaking style }
 rlines. @Index { @Code rlines paragraph breaking style }
 @IndentedList
 @LI @Tab
@@ -171,9 +172,21 @@ in possession of a good fortune,
 must be in want of a wife.
 }}
 }
+@LI @Tab
+    @Fmta { @Col 6c @Wide @Code A ! @Col 7c @Wide B }
+{
+@Rowa
+    A { "olines @Break ..." }
+    B { olines @Break {
+It is a truth universally
+acknowledged, that a single man
+in possession of a good fortune,
+must be in want of a wife.
+}}
+}
 @EndList
-The lines are left-justified, centred, or right-justified with respect
-to each other in the same way as for the ragged styles.
+The lines are left-justified, centred, right-justified, or outdented
+with respect to each other in the same way as for the ragged styles.
 @PP
 When using the @Code lines style, there are some fine points concerning
 the proper use of white space.  Consider this example:
@@ -233,9 +246,9 @@ Serves to'advance an honest minde.
 }
 as desired.
 @PP
-When using {@Code lines}, {@Code clines}, and {@Code "rlines @Break"},
-blank lines are respected and ordinarily appear at their full height.
-However, it often looks better to give somewhat
+When using {@Code lines}, {@Code clines}, {@Code rlines}, and
+{@Code "olines @Break"}, blank lines are respected and ordinarily appear
+at their full height.  However, it often looks better to give somewhat
 blanklinescale. @Index { @Code blanklinescale }
 less than this to blank lines.  For this there is the {@Code blanklinescale}
 option to {@Code "@Break"}:

@@ -1,7 +1,7 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -753,6 +753,8 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case SPACE:
     case YUNIT:
     case ZUNIT:
+    case SET_CONTEXT:
+    case GET_CONTEXT:
     case BREAK:
     case UNDERLINE:
     case COLOUR:
@@ -768,7 +770,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
 	braces_needed = (DEFAULT_PREC <= outer_prec);
 	if( braces_needed )  cprint(KW_LBR), aprint(" ");
 
-	/* print left parameter */
+	/* print left parameter, if any */
 	if( Down(x) != LastDown(x) )
 	{ CountChild(y, Down(x), count);
 	  echo(y, find_max(outer_prec, DEFAULT_PREC), count);
@@ -957,7 +959,7 @@ FULL_CHAR *EchoObject(OBJECT x)
 /*                                                                           */
 /*  DebugObject(x)                                                           */
 /*                                                                           */
-/*  Send an image of unsized object x to result.                             */
+/*  Send an image of unsized object x to stderr.                             */
 /*                                                                           */
 /*****************************************************************************/
 

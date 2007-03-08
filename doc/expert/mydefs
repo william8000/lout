@@ -35,6 +35,7 @@
    def @@Font                 { @Code "@Font"                 }
    def @@ForceGalley          { @Code "@ForceGalley"          }
    def @@Galley               { @Code "@Galley"               }
+   def @@GetContext           { @Code "@GetContext"           }
    def @@Graphic              { @Code "@Graphic"              }
    def @@HAdjust              { @Code "@HAdjust"              }
    def @@HCover               { @Code "@HCover"               }
@@ -81,6 +82,7 @@
    def @@Scale                { @Code "@Scale"                }
    def @@SetColor             { @Code "@SetColor"             }
    def @@SetColour            { @Code "@SetColour"            }
+   def @@SetContext           { @Code "@SetContext"           }
    def @@SetHeaderComponent   { @Code "@SetHeaderComponent"   }
    def @@Space                { @Code "@Space"                }
    def @@StartHSpan           { @Code "@StartHSpan"           }

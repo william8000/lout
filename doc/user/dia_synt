@@ -54,6 +54,11 @@ where @Code { ... } stands for the rest of the diagram, as we are about
 to describe.  For completeness there are also @Code "@StartLeft" and
 @Code "@StartUp" symbols, but diagrams never start off in these directions.
 @PP
+If you accidentally omit the starting symbol ({@Code "@StartRight"} or
+whatever), you will get several error messages, the first of which
+should mention @Code { diag_dirn }; it is trying to tell you, in a
+cryptic way, that it doesn't know which direction you want to go in.
+@PP
 The @Code title option is optional; if given, the effect is as shown
 (this option is also available with {@Code "@Diag"}).  Subsequent
 examples will omit the enclosing {@Code "@SyntaxDiag { ... }"}.
@@ -76,13 +81,13 @@ Lout will insert the appropriate arrows, taking account of which
 direction (right, up, left, or down) the diagram is currently
 moving.  This is true for all the syntax diagram symbols; we
 won't mention it again.
-@FootNote {
-This wonderfully useful effect is achieved by a dirty trick, one
-of whose consequences is that if you see an error message
-similar to `@Code { replacing unknown "@Case" option 0p by 1p }'
-it means you've forgotten the initial @Code "@StartRight" or
-whatever.
-}
+# @FootNote {
+# This wonderfully useful effect is achieved by a dirty trick, one
+# of whose consequences is that if you see an error message
+# similar to `@Code { replacing unknown "@Case" option 0p by 1p }'
+# it means you've forgotten the initial @Code "@StartRight" or
+# whatever.
+# }
 @PP
 Occasionally, instead of a cell one wants the horizontal or
 vertical line to continue uninterrupted.  For this there is
@@ -555,9 +560,12 @@ symbols of @@Diag to construct its three types of cells.  In fact, the
 So any of the other @Code "@Diag" options can be used freely with
 {@Code "@SyntaxDiag"}; and the format of the three cell types can be
 changed by using @Code "@Diag" instead of {@Code "@SyntaxDiag"}, and
-choosing new values for these (and other) options.
+choosing new values for these (and other) options.  For example, if
+you need four or five types of cell, just set some @Code { d } and
+@Code { e } options and use @Code "@DCell" and @Code "@ECell" in
+addition to {@Code "@ACell"}, {@Code "@BCell"}, and {@Code "@CCell"}.
 @PP
-If there are more than three cell types, it is necessary to fall back
+If there are more than five cell types, it is necessary to fall back
 on the {@Code "@XCell"} symbol, which produces a cell without nominating
 any particular cell type.  After @Code "@XCell" there must be a regular
 @Code "@Diag" node, like this:
@@ -570,12 +578,13 @@ any particular cell type.  After @Code "@XCell" there must be a regular
 @StartRight @XCell @Ellipse INIT
 }
 }
-This way there is no limit to the number of different kinds of cells.  Also,
-since (for example) @Code "@ACell" is merely an abbreviation for
+This way there is no limit to the number of different kinds of cells.
+Also, since (for example) @Code "@ACell" is merely an abbreviation for
 @ID @OneRow @Code @Verbatim { @XCell @ANode }
-any node options may follow {@Code "@ACell"}, {@Code "@BCell"}, and
-{@Code "@CCell"}.  The appearance of the arrows can be changed in the usual
-way, by setting options as has been done above for {@Code "arrowlength"}.
+any node options may follow {@Code "@ACell"}, {@Code "@BCell"},
+{@Code "@CCell"}, {@Code "@DCell"}, and {@Code "@ECell"}.  The
+appearance of the arrows can be changed in the usual way, by
+setting options as has been done above for {@Code "arrowlength"}.
 @PP
 There are three options specifically related to syntax diagrams:
 @ID @OneRow @Code @Verbatim {

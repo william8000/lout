@@ -1,7 +1,7 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -219,8 +219,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case GAP_OBJ:
     
       New(res, GAP_OBJ);
-      mark(gap(res)) = mark(gap(x));
-      join(gap(res)) = join(gap(x));
+      GapCopy(gap(res), gap(x));
       hspace(res) = hspace(x);
       vspace(res) = vspace(x);
       if( Down(x) != x )
@@ -280,6 +279,8 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case SPACE:
     case YUNIT:
     case ZUNIT:
+    case SET_CONTEXT:
+    case GET_CONTEXT:
     case BREAK:
     case UNDERLINE:
     case COLOUR:

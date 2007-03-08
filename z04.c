@@ -1,7 +1,7 @@
 /*@z04.c:Token Service:NewToken(), CopyTokenList()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -194,6 +194,8 @@ FULL_CHAR *EchoToken(OBJECT x)
     case SPACE:
     case YUNIT:
     case ZUNIT:
+    case SET_CONTEXT:
+    case GET_CONTEXT:
     case BREAK:
     case UNDERLINE:
     case COLOUR:

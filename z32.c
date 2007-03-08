@@ -1,7 +1,7 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -126,6 +126,8 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     case LINK_DEST:
     case LINK_DEST_NULL:
     case LINK_URL:
+    case SET_CONTEXT:
+    case GET_CONTEXT:
     
       Child(y, LastDown(x));
       y = Next(y, inc, done);

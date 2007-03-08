@@ -1,7 +1,7 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -293,7 +293,7 @@ OBJECT *enclose, BOOLEAN fcr)
 { OBJECT bt[2], ft[2], y, link, gaplink, g, first_bt, last_ft, z;
   int par, perp;
   unsigned res_inc;  BOOLEAN still_backing;
-  STYLE new_style;
+  STYLE new_style, gap_style;
   debug1(DOM, DD, "[ ManifestCat(%s)", EchoObject(x));
     
   StyleCopy(new_style, *style);
@@ -339,12 +339,18 @@ OBJECT *enclose, BOOLEAN fcr)
     assert( type(g) == GAP_OBJ, "Manifest/VCAT: type(g) != GAP_OBJECT!" );
     assert( Down(g) != g, "Manifest/VCAT: GAP_OBJ has no child!" );
     Child(z, Down(g));
-    debug1(DOM, DD, "manifesting gap, style = %s", EchoStyle(style));
-    z = Manifest(z, env, &new_style, nbt, nft, &ntarget, crs, FALSE, FALSE, enclose, fcr);
-    debug1(DOM, DD, "replacing with tidy, style = %s", EchoStyle(style));
+    debug2(DOM, DD, "manifesting gap, z = %s, style = %s",
+      EchoObject(z), EchoStyle(style));
+    z = Manifest(z, env, &new_style, nbt, nft, &ntarget, crs, FALSE,
+      FALSE, enclose, fcr);
+    debug1(DOM, DD, "after manifesting gap, z = %s", EchoObject(z));
+    if( type(z) == ACAT )
+      StyleCopy(gap_style, save_style(z));
+    else
+      StyleCopy(gap_style, *style);
     z = ReplaceWithTidy(z, ACAT_TIDY);
-    debug1(DOM, DD, "calling GetGap, style = %s", EchoStyle(style));
-    GetGap(z, style, &gap(g), &res_inc);
+    debug1(DOM, DD, "calling GetGap, style = %s", EchoStyle(&gap_style));
+    GetGap(z, &gap_style, &gap(g), &res_inc);
     if( bt[perp] )  Link(bt[perp], g);
     if( ft[perp] )  Link(ft[perp], g);
 
@@ -897,7 +903,7 @@ OBJECT *enclose, BOOLEAN fcr)
 { OBJECT bt[2], ft[2], y, link, nextlink, gaplink, g, gword;
   register FULL_CHAR *p;
   OBJECT res = nilobj, res_env, res_env2, hold_env, hold_env2, z, prev;
-  OBJECT link1, link2, x1, x2, y1, y2, vc;
+  OBJECT link1, link2, x1, x2, y1, y2, vc, value_env, key, value;
   int i, par, num1, num2;  GAP res_gap;  unsigned res_inc;  STYLE new_style;
   BOOLEAN done, multiline;  FULL_CHAR ch;  float scale_factor;
   static int depth = 0;
@@ -931,7 +937,9 @@ OBJECT *enclose, BOOLEAN fcr)
   }
 #endif
 
-  debug2(DOM, DD,   "[Manifest(%s %s )", Image(type(x)), EchoObject(x));
+  debug1(DOM, DD,   "[Manifest(%s)", Image(type(x)));
+  debug0(DOM, DD,  "  object: ");
+  ifdebug(DOM, DD, DebugObject(x));
   debug1(DOM, DD,  "  environment: %s", EchoObject(env));
   debug6(DOM, DD,  "  style: %s;  target: %s;  threads: %s%s%s%s",
 	EchoStyle(style), SymName(*target),
@@ -1018,7 +1026,7 @@ OBJECT *enclose, BOOLEAN fcr)
     case WORD:
     case QWORD:
     
-      /* *** patched by JeffK 17/10/06 following a suggestion of Ludovic Courtes *** */
+      /* *** patched by JeffK 17/10/06 as suggested by Ludovic Courtes *** */
       /* if( !ok || *crs == nilobj ) */
       if( !ok )
       {	word_font(x) = font(*style);
@@ -1684,6 +1692,114 @@ OBJECT *enclose, BOOLEAN fcr)
       y = Manifest(y, env, &new_style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);
       DeleteLink(Down(x));
       MergeNode(y, x);  x = y;
+      break;
+
+
+    case SET_CONTEXT:
+
+      /* check that we have a valid YIELD node for left parameter */
+      debug0(DOM, D, " entering @SetContext");
+      Child(y, Down(x));
+      if( type(y) != YIELD )
+	Error(8, 33, "left parameter of @SetContext is not obj @Yield obj",
+	  FATAL, &fpos(x));
+      assert(Down(y) != y && NextDown(Down(y)) == LastDown(y),
+	"@Yield in @SetContext");
+
+      /* unlink key and manifest it */
+      Child(key, Down(y));
+      DeleteLink(Down(y));
+      key = Manifest(key, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
+	&nenclose, fcr);
+      key = ReplaceWithTidy(key, WORD_TIDY);
+      if( !is_word(type(key)) )
+	Error(8, 33, "@SetContext: key is not a simple word", FATAL,&fpos(key));
+      debug1(DOM, D, " @SetContext: `key' argument: %s", string(key));
+
+      /* unlink value but don't manifest it */
+      Child(value, Down(y));
+      DeleteLink(Down(y));
+      debug1(DOM, D, " @SetContext: `value' argument: type %s",
+	Image(type(value)));
+      debug0(DOM, D, " @SetContext: parameters fetched");
+
+      /* get the right parameter's value */
+      Child(z, LastDown(x));
+
+      /* memorize the key, value, style and environment for use when */
+      /* manifesting VALUE in `@GetContext'.  */
+      StyleCopy(new_style, *style);
+      context_key(context(new_style)) = key;
+      context_value(context(new_style)) = value;
+      context_style(context(new_style)) = style;
+      context_env(context(new_style)) = env;
+
+      ReplaceNode(z, x);
+      DisposeObject(x);
+      x = Manifest(z, env, &new_style, bthr, fthr, target, crs, ok,
+	FALSE, enclose, fcr);
+      break;
+
+
+    case GET_CONTEXT:
+
+      assert( Down(x) != x, "Manifest: GET_CONTEXT!" );
+      Child(y, Down(x));
+      y = ReplaceWithTidy(y, WORD_TIDY);
+      value_env = env;
+      if( is_word(type(y)) )
+      { STYLE *s; OBJECT value = nilobj; int found = 0;
+
+	debug1(DOM, D, " @GetContext %s", string(y));
+
+	/* iterate over the contexts until one that contains the key being */
+	/* looked for (currently Y) is found.  */
+	for( s = style; s != NULL; )
+	{
+	  CONTEXT *ctx = &context(*s);
+	  if( !ctx )
+	  { s = NULL;
+	  }
+	  else if( context_key(*ctx) != nilobj
+		   && (StringEqual(string(context_key(*ctx)), string(y))) )
+	  {
+	    value = context_value(*ctx), found = TRUE;
+
+	    /* VALUE is to be manifested with the style associated to CTX */
+	    StyleCopy(new_style, *style);
+	    context(new_style) = context(*context_style(*ctx));
+	    debug3(DOM, D, " @GetContext %s -> value has type %s (%p)", string(y),
+	      Image(type(value)), value);
+
+	    /* same for the environment */
+	    value_env = context_env(*ctx);
+	    break;
+	  }
+	  else s = context_style(*ctx);
+	}
+
+	if( !found )
+	{ Error(8, 33, "no value for context variable `%s', using the empty string",
+	    WARN, &fpos(x), string(y));
+	  res = MakeWord(WORD, STR_EMPTY, &fpos(x));
+	  StyleCopy(new_style, *style);
+	}
+	else res = CopyObject(value, &fpos(value));
+      }
+      else
+      { Error(8, 33, "%s dropped (right parameter is not a simple word)",
+	  WARN, &fpos(x), KW_GET_CONTEXT);
+	res = MakeWord(WORD, STR_EMPTY, &fpos(x));
+	StyleCopy(new_style, *style);
+      }
+
+      ReplaceNode(res, x);
+      DisposeObject(x);
+
+      /* manifest the context value under the style and environment that */
+      /* were in effect at the `@SetContext' invocation point.  */
+      x = Manifest(res, value_env, &new_style, bthr, fthr, target, crs,
+	ok, FALSE, enclose, fcr);
       break;
 
 

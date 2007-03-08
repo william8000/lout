@@ -27,11 +27,13 @@ use the @Code "&-" symbol:
 @IndentedDisplay @Code {
 "after&-math"
 }
-If @Code "&-" occurs directly after a hyphen character, hyphenation
-will be permitted but no extra hyphen will be inserted.  To prevent
-hyphenation of a word, enclose the word in a @Code "@OneCol" symbol.
+This both allows hyphenation at the point marked and prevents it
+in the adjacent word fragments.  If @Code "&-" occurs directly after
+a hyphen character, hyphenation will be permitted but no extra hyphen
+will be inserted.
 @PP
-To turn hyphenation off throughout the document, you need to set the
-@Code "@InitialBreak" option to {@Code "nohyphen"}, as described at the
-end of Section {@NumberOf linespace}.
+To prevent hyphenation of a word, enclose the word in a @Code "@OneCol"
+symbol.  To turn hyphenation off throughout the document, you need to set
+the @Code "@InitialBreak" option to {@Code "nohyphen"}, as described at
+the end of Section {@NumberOf linespace}.
 @End @Section

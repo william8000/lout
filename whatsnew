@@ -451,4 +451,20 @@ Changes and new features introduced in Version 3.33 [November 2006]
    "@NewPage { Yes }" option to "@Section" etc. for properly spaced new page
    "@Floater" symbol added (clone of "@Figure" and "@Table")
 
+Changes and new features introduced in Version 3.34 [March 2007]
+
+   Bug fixes:
+     New @Diag link shapes symbols now visible as they should be
+     Better handling of ellipsis (...) and similar tokens in Python
+     Font change in |{{Crystal Base 9p} @Font 4f} no longer ignored
+     Fixed bug causing cross reference database to occasionally add space
+   prg2lout Python language now implements @ token (Mark Summerfield)
+   &- now turns off hyphenation within immediately adjacent words
+   New "olines @Break" style combines "lines @Break" with outdenting
+   New @Pipe, @PipeVerbatim, and @PipeRawVerbatim symbols (Unix only)
+   In @Diag, "arrowstyle { solidwithbar }" for arrows like this: -->|
+   New @SetContext and @GetContext symbols for experts (Ludovic Courtes)
+   In @Diag, new @DNode and @ENode symbols like @ANode, @BNode, and @CNode
+     (also usable as @DCell and @ECell in syntax diagrams)
+
 Jeff Kingston

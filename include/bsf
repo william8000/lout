@@ -104,6 +104,8 @@ export
     @ListLabelWidth @ListLabelRight @ListLabelRightGap @ListFont @ListBreak
     @NumberSeparator
 
+    @Pipe @PipeVerbatim @PipeRawVerbatim
+
     @Word @Roman @UCRoman @Alpha @UCAlpha @FnBullets @FnSymbols
     @Months @ShortMonths @WeekDays @ShortWeekDays
     @TwelveHours @ShortHours @MeriDiems @ShortMeriDiems
@@ -279,6 +281,42 @@ def @BasicSetup
     named @ExternalLinkFormat
 	right @Body	  { @Body		} # format for external links
 @Begin
+
+    ###########################################################################
+    #                                                                         #
+    #   @Pipe, @PipeVerbatim, and @PipeRawVerbatim                            #
+    #                                                                         #
+    ###########################################################################
+
+    def @Pipe
+	left command
+	right x
+    {
+	def @Filter { "cat" @FilterIn "|" command ">" @FilterOut }
+
+	x
+    }
+
+    def @PipeVerbatim
+	left command
+	right x
+    {
+	def @Filter {
+	  "(echo @Verbatim @Begin ; (cat" @FilterIn "|" command "); echo @End @Verbatim ) >" @FilterOut }
+
+	x
+    }
+
+    def @PipeRawVerbatim
+	left command
+	right x
+    {
+	def @Filter {
+	  "(echo @RawVerbatim @Begin ; (cat" @FilterIn "|" command "); echo @End @Verbatim ) >" @FilterOut }
+
+	x
+    }
+
 
     ###########################################################################
     #                                                                         #

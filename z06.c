@@ -1,7 +1,7 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -292,7 +292,9 @@ if( obj_prev )								\
   if( obj_prev )							\
   { New(tmp, typ);  precedence(tmp) = prec;				\
     vspace(tmp) = vspace(t);  hspace(tmp) = hspace(t);			\
+    width(gap(tmp)) = 0;  nobreak(gap(tmp)) = TRUE;			\
     mark(gap(tmp)) = FALSE;  join(gap(tmp)) = TRUE;			\
+    units(gap(tmp)) = FIXED_UNIT;  mode(gap(tmp)) = EDGE_MODE;		\
     FposCopy(fpos(tmp), fpos(t));					\
     PushToken(tmp);							\
   }									\
@@ -440,6 +442,8 @@ static BOOLEAN Reduce(void)
     case SPACE:
     case YUNIT:
     case ZUNIT:
+    case SET_CONTEXT:
+    case GET_CONTEXT:
     case BREAK:
     case UNDERLINE:
     case COLOUR:
@@ -1046,6 +1050,8 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case SPACE:
       case YUNIT:
       case ZUNIT:
+      case SET_CONTEXT:
+      case GET_CONTEXT:
       case BREAK:
       case UNDERLINE:
       case COLOUR:

@@ -509,6 +509,244 @@ def @DiagSetup
 
     ###########################################################################
     #                                                                         #
+    #  @DNode options of @DiagSetup                                           #
+    #                                                                         #
+    ###########################################################################
+
+    import @Geometry named doutline
+	named margin {}
+	named shadow {}
+	named sides {}
+	named angle {}
+					{ box			}
+    named dmargin			{ 0.6f          	}
+    import @Geometry named dshadow	{ 0.4f          	}
+    import @Geometry named dsides	{ 3			}
+    import @Geometry named dangle	{ "dup 180 exch div"	}
+    named dtranslate			{			}
+    named doutlinestyle
+	named solid             { "/ldiagsolid"			}
+	named dashed            { "/ldiagdashed"		}
+	named cdashed           { "/ldiagcdashed"		}
+	named dotdashed         { "/ldiagdotdashed"		}
+	named dotcdashed        { "/ldiagdotcdashed"		}
+	named dotdotdashed      { "/ldiagdotdotdashed"		}
+	named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+	named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	named dotted            { "/ldiagdotted"		}
+	named noline            { "/ldiagnoline"		}
+					{ solid         	}
+    import @Geometry named doutlinedashlength	{ 0.2f		}
+    import @Geometry named doutlinewidth
+	named thin   { 0.04 ft }
+	named medium { 0.08 ft }
+	named thick  { 0.12 ft }
+					{ thin	         	}
+    named dpaint                 	{ none		       	}
+    import @TextureImport named dtexture{ solid			}
+    named dfont				{			}
+    named dbreak			{			}
+    named dformat right @Body    	{ @Body         	}
+
+    named dvalign			{ ctr           	}
+    named dvsize                 	{               	}
+    named dvindent			{ ctr           	}
+    named dvstrut
+	named no  { 0.0f }
+	named yes { 1.0f }
+					{ no            	}
+    named dvmargin               	{               	}
+    named dtopmargin             	{               	}
+    named dfootmargin            	{               	}
+
+    named dhalign			{ ctr           	}
+    named dhsize                 	{               	}
+    named dhindent			{ ctr           	}
+    named dhstrut
+	named no  { 0.0f }
+	named yes { 1.0f }
+					{ no            	}
+    named dhmargin               	{               	}
+    named dleftmargin            	{               	}
+    named drightmargin           	{               	}
+
+    named dnodelabel			{			}
+    named dnodelabelmargin		{ 0.2f			}
+    named dnodelabelfont		{ -2p			}
+    named dnodelabelbreak		{ ragged nohyphen	}
+    named dnodelabelformat right @Body	{ @Body			}
+    import @Geometry named dnodelabelpos{ 			}
+    import @Geometry named dnodelabelangle  { horizontal	}
+    named dnodelabelprox		{ outside		}
+    named dnodelabelctr			{ no			}
+    import @Geometry named dnodelabeladjust { 0 0		}
+
+    named dalabel			{			}
+    named dalabelmargin			{ 			}
+    named dalabelfont			{ 			}
+    named dalabelbreak			{ 			}
+    named dalabelformat right @Body	{ 			}
+    import @Geometry named dalabelpos	{ NE			}
+    import @Geometry named dalabelangle	{ 			}
+    named dalabelprox			{ 			}
+    named dalabelctr			{ 			}
+    import @Geometry named dalabeladjust{ 			}
+
+    named dblabel			{			}
+    named dblabelmargin			{ 			}
+    named dblabelfont			{ 			}
+    named dblabelbreak			{ 			}
+    named dblabelformat right @Body	{ 			}
+    import @Geometry named dblabelpos	{ NW			}
+    import @Geometry named dblabelangle	{ 			}
+    named dblabelprox			{ 			}
+    named dblabelctr			{ 			}
+    import @Geometry named dblabeladjust{ 			}
+
+    named dclabel			{			}
+    named dclabelmargin			{ 			}
+    named dclabelfont			{ 			}
+    named dclabelbreak			{ 			}
+    named dclabelformat right @Body	{ 			}
+    import @Geometry named dclabelpos	{ SW			}
+    import @Geometry named dclabelangle	{ 			}
+    named dclabelprox			{ 			}
+    named dclabelctr			{ 			}
+    import @Geometry named dclabeladjust{ 			}
+
+    named ddlabel			{			}
+    named ddlabelmargin			{ 			}
+    named ddlabelfont			{ 			}
+    named ddlabelbreak			{ 			}
+    named ddlabelformat right @Body	{ 			}
+    import @Geometry named ddlabelpos	{ SE			}
+    import @Geometry named ddlabelangle	{ 			}
+    named ddlabelprox			{ 			}
+    named ddlabelctr			{ 			}
+    import @Geometry named ddlabeladjust{ 			}
+
+    ###########################################################################
+    #                                                                         #
+    #  @ENode options of @DiagSetup                                           #
+    #                                                                         #
+    ###########################################################################
+
+    import @Geometry named eoutline
+	named margin {}
+	named shadow {}
+	named sides {}
+	named angle {}
+					{ box			}
+    named emargin			{ 0.6f          	}
+    import @Geometry named eshadow	{ 0.4f          	}
+    import @Geometry named esides	{ 3			}
+    import @Geometry named eangle	{ "dup 180 exch div"	}
+    named etranslate			{			}
+    named eoutlinestyle
+	named solid             { "/ldiagsolid"			}
+	named dashed            { "/ldiagdashed"		}
+	named cdashed           { "/ldiagcdashed"		}
+	named dotdashed         { "/ldiagdotdashed"		}
+	named dotcdashed        { "/ldiagdotcdashed"		}
+	named dotdotdashed      { "/ldiagdotdotdashed"		}
+	named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+	named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	named dotted            { "/ldiagdotted"		}
+	named noline            { "/ldiagnoline"		}
+					{ solid         	}
+    import @Geometry named eoutlinedashlength	{ 0.2f		}
+    import @Geometry named eoutlinewidth
+	named thin   { 0.04 ft }
+	named medium { 0.08 ft }
+	named thick  { 0.12 ft }
+					{ thin	         	}
+    named epaint                 	{ none		       	}
+    import @TextureImport named etexture{ solid			}
+    named efont				{			}
+    named ebreak			{			}
+    named eformat right @Body    	{ @Body         	}
+
+    named evalign			{ ctr           	}
+    named evsize                 	{               	}
+    named evindent			{ ctr           	}
+    named evstrut
+	named no  { 0.0f }
+	named yes { 1.0f }
+					{ no            	}
+    named evmargin               	{               	}
+    named etopmargin             	{               	}
+    named efootmargin            	{               	}
+
+    named ehalign			{ ctr           	}
+    named ehsize                 	{               	}
+    named ehindent			{ ctr           	}
+    named ehstrut
+	named no  { 0.0f }
+	named yes { 1.0f }
+					{ no            	}
+    named ehmargin               	{               	}
+    named eleftmargin            	{               	}
+    named erightmargin           	{               	}
+
+    named enodelabel			{			}
+    named enodelabelmargin		{ 0.2f			}
+    named enodelabelfont		{ -2p			}
+    named enodelabelbreak		{ ragged nohyphen	}
+    named enodelabelformat right @Body	{ @Body			}
+    import @Geometry named enodelabelpos{ 			}
+    import @Geometry named enodelabelangle  { horizontal	}
+    named enodelabelprox		{ outside		}
+    named enodelabelctr			{ no			}
+    import @Geometry named enodelabeladjust { 0 0		}
+
+    named ealabel			{			}
+    named ealabelmargin			{ 			}
+    named ealabelfont			{ 			}
+    named ealabelbreak			{ 			}
+    named ealabelformat right @Body	{ 			}
+    import @Geometry named ealabelpos	{ NE			}
+    import @Geometry named ealabelangle	{ 			}
+    named ealabelprox			{ 			}
+    named ealabelctr			{ 			}
+    import @Geometry named ealabeladjust{ 			}
+
+    named eblabel			{			}
+    named eblabelmargin			{ 			}
+    named eblabelfont			{ 			}
+    named eblabelbreak			{ 			}
+    named eblabelformat right @Body	{ 			}
+    import @Geometry named eblabelpos	{ NW			}
+    import @Geometry named eblabelangle	{ 			}
+    named eblabelprox			{ 			}
+    named eblabelctr			{ 			}
+    import @Geometry named eblabeladjust{ 			}
+
+    named eclabel			{			}
+    named eclabelmargin			{ 			}
+    named eclabelfont			{ 			}
+    named eclabelbreak			{ 			}
+    named eclabelformat right @Body	{ 			}
+    import @Geometry named eclabelpos	{ SW			}
+    import @Geometry named eclabelangle	{ 			}
+    named eclabelprox			{ 			}
+    named eclabelctr			{ 			}
+    import @Geometry named eclabeladjust{ 			}
+
+    named edlabel			{			}
+    named edlabelmargin			{ 			}
+    named edlabelfont			{ 			}
+    named edlabelbreak			{ 			}
+    named edlabelformat right @Body	{ 			}
+    import @Geometry named edlabelpos	{ SE			}
+    import @Geometry named edlabelangle	{ 			}
+    named edlabelprox			{ 			}
+    named edlabelctr			{ 			}
+    import @Geometry named edlabeladjust{ 			}
+
+    ###########################################################################
+    #                                                                         #
     #  @Link options of @DiagSetup                                            #
     #                                                                         #
     ###########################################################################
@@ -673,12 +911,12 @@ def @DiagSetup
 
     export "::" @ShowPoints @ShowTags @ShowDirections @CatchTags @Transform
 
-           @Node @ANode @BNode @CNode
+           @Node @ANode @BNode @CNode @DNode @ENode
            @Box @CurveBox @ShadowBox @Square @Diamond @Polygon
 	   @Isosceles @Ellipse @Circle
-	   @ArrowHead @SolidArrowHead @OpenArrowHead @HalfOpenArrowHead
-	   @SolidCurvedArrowHead @OpenCurvedArrowHead @HalfOpenCurvedArrowHead
-	   @CircleArrowHead @BoxArrowHead
+	   @ArrowHead @SolidArrowHead @SolidWithBarArrowHead @OpenArrowHead
+	   @HalfOpenArrowHead @SolidCurvedArrowHead @OpenCurvedArrowHead
+	   @HalfOpenCurvedArrowHead @CircleArrowHead @BoxArrowHead
 
 	   @Link
 	   @Line @DoubleLine @Arrow @DoubleArrow @Curve @CurveArrow
@@ -687,6 +925,7 @@ def @DiagSetup
 	   @HVLine @HVArrow @VHLine @VHArrow
 	   @HVCurve @HVCurveArrow @VHCurve @VHCurveArrow
 	   @LVRLine @LVRArrow @RVLLine @RVLArrow
+	   @DHULine @DHUArrow @UHDLine @UHDArrow
 	   @LVRCurve @LVRCurveArrow @RVLCurve @RVLCurveArrow
 	   @DHUCurve @DHUCurveArrow @UHDCurve @UHDCurveArrow
 	   @HVHLine @HVHArrow @VHVLine @VHVArrow
@@ -698,7 +937,7 @@ def @DiagSetup
 
 	   @StartRight @StartUp @StartLeft @StartDown
 	   @StartRightRight @StartRightRightRight @StartRightDown
-	   @Skip @XCell @ACell @BCell @CCell
+	   @Skip @XCell @ACell @BCell @CCell @DCell @ECell
 	   @Sequence @OneOrBoth @Select @Optional @OptionalDiverted @Diverted
 	   @Loop @LoopOpposite @Repeat @RepeatOpposite @RepeatDiverted
 
@@ -982,6 +1221,142 @@ def @DiagSetup
         named chmargin               		{ chmargin       	}
         named cleftmargin            		{ cleftmargin    	}
         named crightmargin           		{ crightmargin   	}
+
+	#######################################################################
+	#                                                                     #
+	#  @DNode options of @Diag                                            #
+	#                                                                     #
+	#######################################################################
+
+	import @Geometry named doutline
+	    named margin {}
+	    named shadow {}
+	    named sides {}
+	    named angle {}
+						{ doutline
+						    margin { margin }
+						    shadow { shadow }
+						    sides  { sides  }
+						    angle  { angle  }
+						}
+        named dmargin                		{ dmargin        	}
+	import @Geometry named dshadow		{ dshadow		}
+	import @Geometry named dsides		{ dsides		}
+	import @Geometry named dangle		{ dangle		}
+	named dtranslate			{ dtranslate		}
+	named dnodetag				{			}
+        named doutlinestyle
+	    named solid             { "/ldiagsolid"		}
+	    named dashed            { "/ldiagdashed"		}
+	    named cdashed           { "/ldiagcdashed"		}
+	    named dotdashed         { "/ldiagdotdashed"		}
+	    named dotcdashed        { "/ldiagdotcdashed"	}
+	    named dotdotdashed      { "/ldiagdotdotdashed"	}
+	    named dotdotcdashed     { "/ldiagdotdotcdashed"	}
+	    named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	    named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	    named dotted            { "/ldiagdotted"		}
+	    named noline            { "/ldiagnoline"		}
+						{ doutlinestyle     	}
+        import @Geometry named doutlinedashlength{ doutlinedashlength  	}
+        import @Geometry named doutlinewidth
+	    named thin   { 0.04 ft }
+	    named medium { 0.08 ft }
+	    named thick  { 0.12 ft }
+						{ doutlinewidth     	}
+        named dpaint                 		{ dpaint         	}
+	import @TextureImport named dtexture	{ dtexture		}
+	named dfont				{ dfont			}
+	named dbreak				{ dbreak		}
+        named dformat right @Body    		{ dformat @Body  	}
+        named dvalign				{ dvalign        	}
+        named dvsize                 		{ dvsize         	}
+        named dvindent				{ dvindent       	}
+        named dvstrut
+		named no  { 0.0f }
+		named yes { 1.0f }
+						{ dvstrut	 	}
+        named dvmargin               		{ dvmargin       	}
+        named dtopmargin             		{ dtopmargin     	}
+        named dfootmargin            		{ dfootmargin    	}
+        named dhalign				{ dhalign        	}
+        named dhsize                 		{ dhsize         	}
+        named dhindent				{ dhindent       	}
+        named dhstrut
+		named no  { 0.0f }
+		named yes { 1.0f }
+						{ dhstrut	 	}
+        named dhmargin               		{ dhmargin       	}
+        named dleftmargin            		{ dleftmargin    	}
+        named drightmargin           		{ drightmargin   	}
+
+	#######################################################################
+	#                                                                     #
+	#  @ENode options of @Diag                                            #
+	#                                                                     #
+	#######################################################################
+
+	import @Geometry named eoutline
+	    named margin {}
+	    named shadow {}
+	    named sides {}
+	    named angle {}
+						{ eoutline
+						    margin { margin }
+						    shadow { shadow }
+						    sides  { sides  }
+						    angle  { angle  }
+						}
+        named emargin                		{ emargin        	}
+	import @Geometry named eshadow		{ eshadow		}
+	import @Geometry named esides		{ esides		}
+	import @Geometry named eangle		{ eangle		}
+	named etranslate			{ etranslate		}
+	named enodetag				{			}
+        named eoutlinestyle
+	    named solid             { "/ldiagsolid"		}
+	    named dashed            { "/ldiagdashed"		}
+	    named cdashed           { "/ldiagcdashed"		}
+	    named dotdashed         { "/ldiagdotdashed"		}
+	    named dotcdashed        { "/ldiagdotcdashed"	}
+	    named dotdotdashed      { "/ldiagdotdotdashed"	}
+	    named dotdotcdashed     { "/ldiagdotdotcdashed"	}
+	    named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+	    named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+	    named dotted            { "/ldiagdotted"		}
+	    named noline            { "/ldiagnoline"		}
+						{ eoutlinestyle     	}
+        import @Geometry named eoutlinedashlength{ eoutlinedashlength  	}
+        import @Geometry named eoutlinewidth
+	    named thin   { 0.04 ft }
+	    named medium { 0.08 ft }
+	    named thick  { 0.12 ft }
+						{ eoutlinewidth     	}
+        named epaint                 		{ epaint         	}
+	import @TextureImport named etexture	{ etexture		}
+	named efont				{ efont			}
+	named ebreak				{ ebreak		}
+        named eformat right @Body    		{ eformat @Body  	}
+        named evalign				{ evalign        	}
+        named evsize                 		{ evsize         	}
+        named evindent				{ evindent       	}
+        named evstrut
+		named no  { 0.0f }
+		named yes { 1.0f }
+						{ evstrut	 	}
+        named evmargin               		{ evmargin       	}
+        named etopmargin             		{ etopmargin     	}
+        named efootmargin            		{ efootmargin    	}
+        named ehalign				{ ehalign        	}
+        named ehsize                 		{ ehsize         	}
+        named ehindent				{ ehindent       	}
+        named ehstrut
+		named no  { 0.0f }
+		named yes { 1.0f }
+						{ ehstrut	 	}
+        named ehmargin               		{ ehmargin       	}
+        named eleftmargin            		{ eleftmargin    	}
+        named erightmargin           		{ erightmargin   	}
 
 	#######################################################################
 	#                                                                     #
@@ -3697,6 +4072,706 @@ def @DiagSetup
 
 	#######################################################################
 	#                                                                     #
+	#  @DNode                                                             #
+	#                                                                     #
+	#######################################################################
+
+        def @DNode
+            import @Geometry named translate
+                named to precedence 10 left x right y {
+                  @BackEnd @Case {
+                    PostScript @Yield { x y "ldiagpsub" }
+                    PDF @Yield {""}
+                  }
+                }
+            {}
+            import @Geometry named rotate	{ 0d			}
+	    import @Geometry named outline
+		named margin {}
+		named shadow {}
+		named sides {}
+		named angle {}
+						{ doutline
+						    margin { margin }
+						    shadow { shadow }
+						    sides  { sides  }
+						    angle  { angle  }
+						}
+	    named margin               		{ dmargin        	}
+	    import @Geometry named shadow	{ dshadow		}
+	    import @Geometry named sides	{ dsides		}
+	    import @Geometry named angle	{ dangle		}
+	    named nodetag			{ dnodetag		}
+            named outlinestyle
+		named solid             { "/ldiagsolid"			}
+		named dashed            { "/ldiagdashed"		}
+		named cdashed           { "/ldiagcdashed"		}
+		named dotdashed         { "/ldiagdotdashed"		}
+		named dotcdashed        { "/ldiagdotcdashed"		}
+		named dotdotdashed      { "/ldiagdotdotdashed"		}
+		named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+		named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+		named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+		named dotted            { "/ldiagdotted"		}
+		named noline            { "/ldiagnoline"		}
+						{ doutlinestyle     	}
+            import @Geometry named outlinedashlength { doutlinedashlength}
+            import @Geometry named outlinewidth
+		named thin   { 0.04 ft }
+		named medium { 0.08 ft }
+		named thick  { 0.12 ft }
+						{ doutlinewidth     	}
+            named paint				{ dpaint         	}
+            import @TextureImport named texture	{ dtexture         	}
+	    named font				{ dfont			}
+	    named break				{ dbreak			}
+            named format right @Body		{ dformat @Body  	}
+            named valign			{ dvalign        	}
+            named vsize				{ dvsize         	}
+            named vindent			{ dvindent       	}
+	    named vstrut
+		named no  { 0.0f }
+		named yes { 1.0f }
+						{ dvstrut	 	}
+            named vmargin			{ dvmargin       	}
+            named topmargin			{ dtopmargin     	}
+            named footmargin			{ dfootmargin    	}
+
+            named halign			{ dhalign        	}
+            named hsize				{ dhsize         	}
+            named hindent			{ dhindent       	}
+	    named hstrut
+		named no  { 0.0f }
+		named yes { 1.0f }
+						{ dhstrut	 	}
+            named hmargin			{ dhmargin       	}
+            named leftmargin			{ dleftmargin    	}
+            named rightmargin			{ drightmargin   	}
+
+	    named nodelabel			{ dnodelabel		}
+	    named nodelabelmargin		{ dnodelabelmargin	}
+	    named nodelabelfont			{ dnodelabelfont		}
+	    named nodelabelbreak		{ dnodelabelbreak	}
+	    named nodelabelformat right @Body	{ dnodelabelformat @Body	}
+	    import @Geometry named nodelabelpos	{ dnodelabelpos		}
+	    named nodelabelprox			{ dnodelabelprox		}
+	    import @Geometry named nodelabelangle  { dnodelabelangle	}
+	    named nodelabelctr			{ dnodelabelctr		}
+	    import @Geometry named nodelabeladjust { dnodelabeladjust	}
+
+            named alabel			{ dalabel		}
+            named alabelmargin			{ dalabelmargin		}
+            named alabelfont			{ dalabelfont		}
+            named alabelbreak			{ dalabelbreak		}
+	    named alabelformat right @Body	{ dalabelformat @Body	}
+            import @Geometry named alabelpos	{ dalabelpos		}
+            named alabelprox			{ dalabelprox		}
+            import @Geometry named alabelangle	{ dalabelangle		}
+	    named alabelctr			{ dalabelctr		}
+            import @Geometry named alabeladjust	{ calabeladjust		}
+
+            named blabel			{ dblabel		}
+            named blabelmargin			{ dblabelmargin		}
+            named blabelfont			{ dblabelfont		}
+            named blabelbreak			{ dblabelbreak		}
+	    named blabelformat right @Body	{ dblabelformat @Body	}
+            import @Geometry named blabelpos	{ dblabelpos		}
+            named blabelprox			{ dblabelprox		}
+            import @Geometry named blabelangle	{ dblabelangle		}
+	    named blabelctr			{ dblabelctr		}
+            import @Geometry named blabeladjust	{ dblabeladjust		}
+
+            named clabel			{ dclabel		}
+            named clabelmargin			{ dclabelmargin		}
+            named clabelfont			{ dclabelfont		}
+            named clabelbreak			{ dclabelbreak		}
+	    named clabelformat right @Body	{ dclabelformat @Body	}
+            import @Geometry named clabelpos	{ dclabelpos		}
+            named clabelprox			{ dclabelprox		}
+            import @Geometry named clabelangle	{ dclabelangle		}
+	    named clabelctr			{ dclabelctr		}
+            import @Geometry named clabeladjust	{ dclabeladjust		}
+
+            named dlabel			{ ddlabel		}
+            named dlabelmargin			{ ddlabelmargin		}
+            named dlabelfont			{ ddlabelfont		}
+            named dlabelbreak			{ ddlabelbreak		}
+	    named dlabelformat right @Body	{ ddlabelformat @Body	}
+            import @Geometry named dlabelpos	{ ddlabelpos		}
+            named dlabelprox			{ ddlabelprox		}
+            import @Geometry named dlabelangle	{ ddlabelangle		}
+	    named dlabelctr			{ ddlabelctr		}
+            import @Geometry named dlabeladjust	{ ddlabeladjust		}
+
+            right @Body
+        {
+
+            def @LabelPos
+		left x
+		right y
+            {
+		nodelabelpos @Case {
+		    x    @Yield y
+		    else @Yield ""
+		}
+            }
+
+            def @If
+		left cond
+		right x
+            {
+		cond @Case {
+		    { yes Yes } @Yield x
+		    else        @Yield ""
+		}
+            }
+
+
+            def @Strut right x
+            {
+		def vs { 0.5w @VShift { vstrut @High } }
+		def hs {                hstrut @Wide   }
+
+		@HContract @VContract {
+		    @HContract @VContract x | vs / hs |
+		}
+            }
+
+	    def @Indent right x
+	    {
+		x @Case {
+		    { top left   } @Yield 0.0rt
+		    { ctr        } @Yield 0.5rt
+		    { foot right } @Yield 1.0rt
+		    { mctr	     } @Yield 0.5bx
+		    else           @Yield x
+		}
+	    }
+
+            def @VSize right x
+            {
+		vsize @Case {
+		    ""   @Yield x
+		    else @Yield { vsize @High { /{@Indent vindent} x / } }
+		}
+            }
+
+            def @HSize right x
+            {
+		hsize @Case {
+		    ""   @Yield x
+		    else @Yield { hsize @Wide { |{@Indent hindent} x | } }
+		}
+            }
+
+	    def @Align right x
+	    {
+		x @Case {
+		    { top left   } @Yield 0.0w
+		    { ctr        } @Yield 0.5w
+		    { foot right } @Yield 1.0w
+		    { mark       } @Yield "+0i"
+		    else           @Yield x
+		}
+	    }
+
+	    def @ALabel
+	    {
+		@DoLabel
+		    which	{ "a"						}
+		    label	{ alabel	     @Else nodelabel		}
+		    labelmargin	{ alabelmargin	     @Else nodelabelmargin	}
+		    labelfont	{ alabelfont	     @Else nodelabelfont	}
+		    labelbreak	{ alabelbreak	     @Else nodelabelbreak	}
+		    labelformat { alabelformat @Body @Else nodelabelformat @Body}
+		    labelpos	{ alabelpos	     @Else nodelabelpos		}
+		    labelprox	{ alabelprox	     @Else nodelabelprox	}
+		    labelangle	{ alabelangle	     @Else nodelabelangle	}
+		    labelctr	{ alabelctr	     @Else nodelabelctr		}
+		    labeladjust	{ alabeladjust	     @Else nodelabeladjust	}
+	    }
+
+	    def @BLabel
+	    {
+		@DoLabel
+		    which	{ "b"						}
+		    label	{ blabel	     @Else nodelabel		}
+		    labelmargin	{ blabelmargin	     @Else nodelabelmargin	}
+		    labelfont	{ blabelfont	     @Else nodelabelfont	}
+		    labelbreak	{ blabelbreak	     @Else nodelabelbreak	}
+		    labelformat { blabelformat @Body @Else nodelabelformat @Body}
+		    labelpos	{ blabelpos	     @Else nodelabelpos		}
+		    labelprox	{ blabelprox	     @Else nodelabelprox	}
+		    labelangle	{ blabelangle	     @Else nodelabelangle	}
+		    labelctr	{ blabelctr	     @Else nodelabelctr		}
+		    labeladjust	{ blabeladjust	     @Else nodelabeladjust	}
+	    }
+
+	    def @CLabel
+	    {
+		@DoLabel
+		    which	{ "c"						}
+		    label	{ clabel	     @Else nodelabel		}
+		    labelmargin	{ clabelmargin	     @Else nodelabelmargin	}
+		    labelfont	{ clabelfont	     @Else nodelabelfont	}
+		    labelbreak	{ clabelbreak	     @Else nodelabelbreak	}
+		    labelformat { clabelformat @Body @Else nodelabelformat @Body}
+		    labelpos	{ clabelpos	     @Else nodelabelpos		}
+		    labelprox	{ clabelprox	     @Else nodelabelprox	}
+		    labelangle	{ clabelangle	     @Else nodelabelangle	}
+		    labelctr	{ clabelctr	     @Else nodelabelctr		}
+		    labeladjust	{ clabeladjust	     @Else nodelabeladjust	}
+	    }
+
+	    def @DLabel
+	    {
+		@DoLabel
+		    which	{ "d"						}
+		    label	{ dlabel	     @Else nodelabel		}
+		    labelmargin	{ dlabelmargin	     @Else nodelabelmargin	}
+		    labelfont	{ dlabelfont	     @Else nodelabelfont	}
+		    labelbreak	{ dlabelbreak	     @Else nodelabelbreak	}
+		    labelformat { dlabelformat @Body @Else nodelabelformat @Body}
+		    labelpos	{ dlabelpos	     @Else nodelabelpos		}
+		    labelprox	{ dlabelprox	     @Else nodelabelprox	}
+		    labelangle	{ dlabelangle	     @Else nodelabelangle	}
+		    labelctr	{ dlabelctr	     @Else nodelabelctr		}
+		    labeladjust	{ dlabeladjust	     @Else nodelabeladjust	}
+	    }
+
+	    import @Geometry
+	    def @OutLine
+	    {
+	      @BackEnd @Case {
+	        PostScript @Yield {
+		outline @Case {
+		    box		@Yield { "ldiagbox"			}
+		    curvebox	@Yield { "("margin") ldiagcurvebox"	}
+		    shadowbox	@Yield { shadow "ldiagshadow ldiagbox"	}
+		    square	@Yield { "ldiagsquare"			}
+		    diamond	@Yield { "ldiagdiamond"			}
+		    polygon	@Yield { sides angle "ldiagpolygon"	}
+		    isosceles	@Yield { "ldiagisosceles"		}
+		    ellipse	@Yield { "ldiagellipse"			}
+		    circle	@Yield { "ldiagcircle"			}
+		    else	    @Yield {
+				    outline
+					margin { "("margin") ldiagdecodelength" }
+					shadow { shadow }
+					sides  { sides  }
+					angle  { angle  }
+		    }
+		}
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    def @Value
+            {
+              @BackEnd @Case {
+                PostScript @Yield {
+		@HContract @VContract
+		{
+		    {
+			"ldiagnodebegin [" @OutLine "]"
+			outlinedashlength "[" outlinestyle "]"
+			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
+			"(IN) ldiagpushtagdict"
+			//
+			"ldiagpopuptagdict"
+		    }
+		    @Graphic
+		    {
+			{@Align valign} @VShift {@Align halign} @HShift
+			@AddMargins
+			    mtop   { topmargin   @Else vmargin @Else margin }
+			    mfoot  { footmargin  @Else vmargin @Else margin }
+			    mleft  { leftmargin  @Else hmargin @Else margin }
+			    mright { rightmargin @Else hmargin @Else margin }
+			    @HSize @VSize @HContract @VContract
+			    font @Font break @Break format @Strut @Body
+		    }
+		    / {alabel @Else nodelabel} @IfNonEmpty @ALabel
+		    / {blabel @Else nodelabel} @IfNonEmpty @BLabel
+		    / {clabel @Else nodelabel} @IfNonEmpty @CLabel
+		    / {dlabel @Else nodelabel} @IfNonEmpty @DLabel
+		}
+                }
+                PDF @Yield {}
+              }
+            }
+
+	    def @TValue
+	    {
+		nodetag @Case {
+		    ""   @Yield @Value
+		    else @Yield { nodetag:: @Value }
+		}
+	    }
+
+            translate @Case {
+                  "" @Yield @TValue
+                  else @Yield {
+		    @Null & # so that preceding space gets chewed up
+                    @Transform translate { translate } rotate { rotate } @TValue
+                  }
+            }
+        }
+
+
+	#######################################################################
+	#                                                                     #
+	#  @ENode                                                             #
+	#                                                                     #
+	#######################################################################
+
+        def @ENode
+            import @Geometry named translate
+                named to precedence 10 left x right y {
+                  @BackEnd @Case {
+                    PostScript @Yield { x y "ldiagpsub" }
+                    PDF @Yield {""}
+                  }
+                }
+            {}
+            import @Geometry named rotate	{ 0d			}
+	    import @Geometry named outline
+		named margin {}
+		named shadow {}
+		named sides {}
+		named angle {}
+						{ eoutline
+						    margin { margin }
+						    shadow { shadow }
+						    sides  { sides  }
+						    angle  { angle  }
+						}
+	    named margin               		{ emargin        	}
+	    import @Geometry named shadow	{ eshadow		}
+	    import @Geometry named sides	{ esides		}
+	    import @Geometry named angle	{ eangle		}
+	    named nodetag			{ enodetag		}
+            named outlinestyle
+		named solid             { "/ldiagsolid"			}
+		named dashed            { "/ldiagdashed"		}
+		named cdashed           { "/ldiagcdashed"		}
+		named dotdashed         { "/ldiagdotdashed"		}
+		named dotcdashed        { "/ldiagdotcdashed"		}
+		named dotdotdashed      { "/ldiagdotdotdashed"		}
+		named dotdotcdashed     { "/ldiagdotdotcdashed"		}
+		named dotdotdotdashed   { "/ldiagdotdotdotdashed"	}
+		named dotdotdotcdashed  { "/ldiagdotdotdotcdashed"	}
+		named dotted            { "/ldiagdotted"		}
+		named noline            { "/ldiagnoline"		}
+						{ eoutlinestyle     	}
+            import @Geometry named outlinedashlength { eoutlinedashlength}
+            import @Geometry named outlinewidth
+		named thin   { 0.04 ft }
+		named medium { 0.08 ft }
+		named thick  { 0.12 ft }
+						{ eoutlinewidth     	}
+            named paint				{ epaint         	}
+            import @TextureImport named texture	{ etexture         	}
+	    named font				{ efont			}
+	    named break				{ ebreak			}
+            named format right @Body		{ eformat @Body  	}
+            named valign			{ evalign        	}
+            named vsize				{ evsize         	}
+            named vindent			{ evindent       	}
+	    named vstrut
+		named no  { 0.0f }
+		named yes { 1.0f }
+						{ evstrut	 	}
+            named vmargin			{ evmargin       	}
+            named topmargin			{ etopmargin     	}
+            named footmargin			{ efootmargin    	}
+
+            named halign			{ ehalign        	}
+            named hsize				{ ehsize         	}
+            named hindent			{ ehindent       	}
+	    named hstrut
+		named no  { 0.0f }
+		named yes { 1.0f }
+						{ ehstrut	 	}
+            named hmargin			{ ehmargin       	}
+            named leftmargin			{ eleftmargin    	}
+            named rightmargin			{ erightmargin   	}
+
+	    named nodelabel			{ enodelabel		}
+	    named nodelabelmargin		{ enodelabelmargin	}
+	    named nodelabelfont			{ enodelabelfont		}
+	    named nodelabelbreak		{ enodelabelbreak	}
+	    named nodelabelformat right @Body	{ enodelabelformat @Body	}
+	    import @Geometry named nodelabelpos	{ enodelabelpos		}
+	    named nodelabelprox			{ enodelabelprox		}
+	    import @Geometry named nodelabelangle  { enodelabelangle	}
+	    named nodelabelctr			{ enodelabelctr		}
+	    import @Geometry named nodelabeladjust { enodelabeladjust	}
+
+            named alabel			{ ealabel		}
+            named alabelmargin			{ ealabelmargin		}
+            named alabelfont			{ ealabelfont		}
+            named alabelbreak			{ ealabelbreak		}
+	    named alabelformat right @Body	{ ealabelformat @Body	}
+            import @Geometry named alabelpos	{ ealabelpos		}
+            named alabelprox			{ ealabelprox		}
+            import @Geometry named alabelangle	{ ealabelangle		}
+	    named alabelctr			{ ealabelctr		}
+            import @Geometry named alabeladjust	{ ealabeladjust		}
+
+            named blabel			{ eblabel		}
+            named blabelmargin			{ eblabelmargin		}
+            named blabelfont			{ eblabelfont		}
+            named blabelbreak			{ eblabelbreak		}
+	    named blabelformat right @Body	{ eblabelformat @Body	}
+            import @Geometry named blabelpos	{ eblabelpos		}
+            named blabelprox			{ eblabelprox		}
+            import @Geometry named blabelangle	{ eblabelangle		}
+	    named blabelctr			{ eblabelctr		}
+            import @Geometry named blabeladjust	{ eblabeladjust		}
+
+            named clabel			{ eclabel		}
+            named clabelmargin			{ eclabelmargin		}
+            named clabelfont			{ eclabelfont		}
+            named clabelbreak			{ eclabelbreak		}
+	    named clabelformat right @Body	{ eclabelformat @Body	}
+            import @Geometry named clabelpos	{ eclabelpos		}
+            named clabelprox			{ eclabelprox		}
+            import @Geometry named clabelangle	{ eclabelangle		}
+	    named clabelctr			{ eclabelctr		}
+            import @Geometry named clabeladjust	{ eclabeladjust		}
+
+            named dlabel			{ edlabel		}
+            named dlabelmargin			{ edlabelmargin		}
+            named dlabelfont			{ edlabelfont		}
+            named dlabelbreak			{ edlabelbreak		}
+	    named dlabelformat right @Body	{ edlabelformat @Body	}
+            import @Geometry named dlabelpos	{ edlabelpos		}
+            named dlabelprox			{ edlabelprox		}
+            import @Geometry named dlabelangle	{ edlabelangle		}
+	    named dlabelctr			{ edlabelctr		}
+            import @Geometry named dlabeladjust	{ edlabeladjust		}
+
+            right @Body
+        {
+
+            def @LabelPos
+		left x
+		right y
+            {
+		nodelabelpos @Case {
+		    x    @Yield y
+		    else @Yield ""
+		}
+            }
+
+            def @If
+		left cond
+		right x
+            {
+		cond @Case {
+		    { yes Yes } @Yield x
+		    else        @Yield ""
+		}
+            }
+
+
+            def @Strut right x
+            {
+		def vs { 0.5w @VShift { vstrut @High } }
+		def hs {                hstrut @Wide   }
+
+		@HContract @VContract {
+		    @HContract @VContract x | vs / hs |
+		}
+            }
+
+	    def @Indent right x
+	    {
+		x @Case {
+		    { top left   } @Yield 0.0rt
+		    { ctr        } @Yield 0.5rt
+		    { foot right } @Yield 1.0rt
+		    { mctr	     } @Yield 0.5bx
+		    else           @Yield x
+		}
+	    }
+
+            def @VSize right x
+            {
+		vsize @Case {
+		    ""   @Yield x
+		    else @Yield { vsize @High { /{@Indent vindent} x / } }
+		}
+            }
+
+            def @HSize right x
+            {
+		hsize @Case {
+		    ""   @Yield x
+		    else @Yield { hsize @Wide { |{@Indent hindent} x | } }
+		}
+            }
+
+	    def @Align right x
+	    {
+		x @Case {
+		    { top left   } @Yield 0.0w
+		    { ctr        } @Yield 0.5w
+		    { foot right } @Yield 1.0w
+		    { mark       } @Yield "+0i"
+		    else           @Yield x
+		}
+	    }
+
+	    def @ALabel
+	    {
+		@DoLabel
+		    which	{ "a"						}
+		    label	{ alabel	     @Else nodelabel		}
+		    labelmargin	{ alabelmargin	     @Else nodelabelmargin	}
+		    labelfont	{ alabelfont	     @Else nodelabelfont	}
+		    labelbreak	{ alabelbreak	     @Else nodelabelbreak	}
+		    labelformat { alabelformat @Body @Else nodelabelformat @Body}
+		    labelpos	{ alabelpos	     @Else nodelabelpos		}
+		    labelprox	{ alabelprox	     @Else nodelabelprox	}
+		    labelangle	{ alabelangle	     @Else nodelabelangle	}
+		    labelctr	{ alabelctr	     @Else nodelabelctr		}
+		    labeladjust	{ alabeladjust	     @Else nodelabeladjust	}
+	    }
+
+	    def @BLabel
+	    {
+		@DoLabel
+		    which	{ "b"						}
+		    label	{ blabel	     @Else nodelabel		}
+		    labelmargin	{ blabelmargin	     @Else nodelabelmargin	}
+		    labelfont	{ blabelfont	     @Else nodelabelfont	}
+		    labelbreak	{ blabelbreak	     @Else nodelabelbreak	}
+		    labelformat { blabelformat @Body @Else nodelabelformat @Body}
+		    labelpos	{ blabelpos	     @Else nodelabelpos		}
+		    labelprox	{ blabelprox	     @Else nodelabelprox	}
+		    labelangle	{ blabelangle	     @Else nodelabelangle	}
+		    labelctr	{ blabelctr	     @Else nodelabelctr		}
+		    labeladjust	{ blabeladjust	     @Else nodelabeladjust	}
+	    }
+
+	    def @CLabel
+	    {
+		@DoLabel
+		    which	{ "c"						}
+		    label	{ clabel	     @Else nodelabel		}
+		    labelmargin	{ clabelmargin	     @Else nodelabelmargin	}
+		    labelfont	{ clabelfont	     @Else nodelabelfont	}
+		    labelbreak	{ clabelbreak	     @Else nodelabelbreak	}
+		    labelformat { clabelformat @Body @Else nodelabelformat @Body}
+		    labelpos	{ clabelpos	     @Else nodelabelpos		}
+		    labelprox	{ clabelprox	     @Else nodelabelprox	}
+		    labelangle	{ clabelangle	     @Else nodelabelangle	}
+		    labelctr	{ clabelctr	     @Else nodelabelctr		}
+		    labeladjust	{ clabeladjust	     @Else nodelabeladjust	}
+	    }
+
+	    def @DLabel
+	    {
+		@DoLabel
+		    which	{ "d"						}
+		    label	{ dlabel	     @Else nodelabel		}
+		    labelmargin	{ dlabelmargin	     @Else nodelabelmargin	}
+		    labelfont	{ dlabelfont	     @Else nodelabelfont	}
+		    labelbreak	{ dlabelbreak	     @Else nodelabelbreak	}
+		    labelformat { dlabelformat @Body @Else nodelabelformat @Body}
+		    labelpos	{ dlabelpos	     @Else nodelabelpos		}
+		    labelprox	{ dlabelprox	     @Else nodelabelprox	}
+		    labelangle	{ dlabelangle	     @Else nodelabelangle	}
+		    labelctr	{ dlabelctr	     @Else nodelabelctr		}
+		    labeladjust	{ dlabeladjust	     @Else nodelabeladjust	}
+	    }
+
+	    import @Geometry
+	    def @OutLine
+	    {
+	      @BackEnd @Case {
+	        PostScript @Yield {
+		outline @Case {
+		    box		@Yield { "ldiagbox"			}
+		    curvebox	@Yield { "("margin") ldiagcurvebox"	}
+		    shadowbox	@Yield { shadow "ldiagshadow ldiagbox"	}
+		    square	@Yield { "ldiagsquare"			}
+		    diamond	@Yield { "ldiagdiamond"			}
+		    polygon	@Yield { sides angle "ldiagpolygon"	}
+		    isosceles	@Yield { "ldiagisosceles"		}
+		    ellipse	@Yield { "ldiagellipse"			}
+		    circle	@Yield { "ldiagcircle"			}
+		    else	    @Yield {
+				    outline
+					margin { "("margin") ldiagdecodelength" }
+					shadow { shadow }
+					sides  { sides  }
+					angle  { angle  }
+		    }
+		}
+		  }
+		  PDF @Yield {}
+		}
+	    }
+
+	    def @Value
+            {
+              @BackEnd @Case {
+                PostScript @Yield {
+		@HContract @VContract
+		{
+		    {
+			"ldiagnodebegin [" @OutLine "]"
+			outlinedashlength "[" outlinestyle "]"
+			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
+			"(IN) ldiagpushtagdict"
+			//
+			"ldiagpopuptagdict"
+		    }
+		    @Graphic
+		    {
+			{@Align valign} @VShift {@Align halign} @HShift
+			@AddMargins
+			    mtop   { topmargin   @Else vmargin @Else margin }
+			    mfoot  { footmargin  @Else vmargin @Else margin }
+			    mleft  { leftmargin  @Else hmargin @Else margin }
+			    mright { rightmargin @Else hmargin @Else margin }
+			    @HSize @VSize @HContract @VContract
+			    font @Font break @Break format @Strut @Body
+		    }
+		    / {alabel @Else nodelabel} @IfNonEmpty @ALabel
+		    / {blabel @Else nodelabel} @IfNonEmpty @BLabel
+		    / {clabel @Else nodelabel} @IfNonEmpty @CLabel
+		    / {dlabel @Else nodelabel} @IfNonEmpty @DLabel
+		}
+                }
+                PDF @Yield {}
+              }
+            }
+
+	    def @TValue
+	    {
+		nodetag @Case {
+		    ""   @Yield @Value
+		    else @Yield { nodetag:: @Value }
+		}
+	    }
+
+            translate @Case {
+                  "" @Yield @TValue
+                  else @Yield {
+		    @Null & # so that preceding space gets chewed up
+                    @Transform translate { translate } rotate { rotate } @TValue
+                  }
+            }
+        }
+
+
+	#######################################################################
+	#                                                                     #
 	#  @Box, @CurveBox, and other standard node abbreviations             #
 	#                                                                     #
 	#######################################################################
@@ -3749,6 +4824,30 @@ def @DiagSetup
 		  @BackEnd @Case {
 		    PostScript @Yield {
 		    "ldiagsolidarrowhead"
+		    # 0 0 xsize ysize * 0.5 0 ysize
+		    }
+		    PDF @Yield {}
+		  }
+		}
+	    {
+		length @Wide width @High
+	    }
+	}
+
+	def @SolidWithBarArrowHead
+	    named width { arrowwidth }
+	    named length { arrowlength }
+	    named pathwidth { pathwidth }
+	{
+	    @InsulatedNode
+		paint { nochange }
+		texture { solid }
+		outlinestyle { noline }
+		outlinewidth { pathwidth }
+		outline {
+		  @BackEnd @Case {
+		    PostScript @Yield {
+		    pathwidth "ldiagsolidwithbararrowhead"
 		    # 0 0 xsize ysize * 0.5 0 ysize
 		    }
 		    PDF @Yield {}
@@ -3983,6 +5082,9 @@ def @DiagSetup
 	{
 	    style @Case {
 		solid          @Yield @SolidArrowHead
+				  width { width } length { length }
+				  pathwidth { pathwidth }
+		solidwithbar   @Yield @SolidWithBarArrowHead
 				  width { width } length { length }
 				  pathwidth { pathwidth }
 		halfopen       @Yield @HalfOpenArrowHead
@@ -6018,17 +7120,29 @@ def @DiagSetup
 	macro @LineUpFrom    { no @ArrowUpFrom		}
 	macro @LineDownFrom  { no @ArrowDownFrom	}
 
-	macro @Right	{ "1p" }
-	macro @Up	{ "2p" }
-	macro @Left	{ "3p" }
-	macro @Down	{ "4p" }
+	macro @Right	{ "right" }
+	macro @Up	{ "up"    }
+	macro @Left	{ "left"  }
+	macro @Down	{ "down"  }
 
-	macro @CurrDirection { @CurrZUnit }
+	def @CurrDirection { @GetContext "diag_dirn" }
 
-	def @GoRight right x { @Right @ZUnit x }
-	def @GoUp    right x { @Up    @ZUnit x }
-	def @GoLeft  right x { @Left  @ZUnit x }
-	def @GoDown  right x { @Down  @ZUnit x }
+	def @GoRight right x { {"diag_dirn" @Yield @Right}  @SetContext x }
+	def @GoUp    right x { {"diag_dirn" @Yield @Up   }  @SetContext x }
+	def @GoLeft  right x { {"diag_dirn" @Yield @Left }  @SetContext x }
+	def @GoDown  right x { {"diag_dirn" @Yield @Down }  @SetContext x }
+
+	# macro @Right	{ "1p" }
+	# macro @Up	{ "2p" }
+	# macro @Left	{ "3p" }
+	# macro @Down	{ "4p" }
+
+	# macro @CurrDirection { @CurrZUnit }
+
+	# def @GoRight right x { @Right @ZUnit x }
+	# def @GoUp    right x { @Up    @ZUnit x }
+	# def @GoLeft  right x { @Left  @ZUnit x }
+	# def @GoDown  right x { @Down  @ZUnit x }
 
 	def @GoReverse right x
 	{
@@ -6289,6 +7403,8 @@ def @DiagSetup
 	macro @ACell { @XCell @ANode }
 	macro @BCell { @XCell @BNode }
 	macro @CCell { @XCell @CNode }
+	macro @DCell { @XCell @DNode }
+	macro @ECell { @XCell @ENode }
 
 
         #######################################################################

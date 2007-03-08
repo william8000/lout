@@ -1,7 +1,7 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -838,6 +838,8 @@ static void run(int argc, char *argv[], int run_num, int *runs_to_do,
   load(KW_FORCE_CROSS,  FORCE_CROSS,    TRUE,   TRUE,   FALSE, CROSSOP_PREC);
   load(KW_NULL,         NULL_CLOS,      FALSE,  FALSE,  TRUE,  NO_PREC     );
   load(KW_PAGE_LABEL,   PAGE_LABEL,     FALSE,  TRUE,   TRUE,  DEFAULT_PREC);
+  load(KW_SET_CONTEXT,  SET_CONTEXT,    TRUE,   TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_GET_CONTEXT,  GET_CONTEXT,    FALSE,   TRUE,   FALSE, DEFAULT_PREC);
 
 #define setcat(s, mk, jn)  has_mark(s)=mk, has_join(s)=jn
 

@@ -318,7 +318,9 @@ Long words may be hyph &0ih enat &0ih ed.
 }
 Basser Lout inserts hyphenation gaps automatically as required, again
 following the method of @TeX, which approximates the hyphenations in
-Webster's dictionary.  To prevent the hyphenation of a single word,
+Webster's dictionary.  However it does not insert hyphenation gaps
+in words on either side of a concatenation symbol which already has
+hyphenation mode.  To prevent the hyphenation of a single word,
 enclose it in quotes.  Further control over paragraph breaking and
 hyphenation is provided by the @@Break and @@Space symbols (Sections
 {@NumberOf break} and {@NumberOf space}).

@@ -28,6 +28,8 @@ captions.figures @SubIndex { in @Code "@Figure" and @Code "@Table" }
 can see this example at the top of page {@PageOf figex}.  Tables are
 table. @Index @Code "@Table"
 obtained in the same way using {@Code "@Table"} instead of {@Code "@Figure"}.
+There is a third symbol called {@Code "@Floater"}.  It won't be mentioned
+again, but it works exactly like like @Code "@Figure" and {@Code "@Table"}.
 @PP
 @Code "@Figure" and @Code "@Table" each have an @Code "@InitialLanguage"
 option which determines the language of the figure or table.  If this is

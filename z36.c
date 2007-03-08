@@ -1,7 +1,7 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -1077,10 +1077,30 @@ OBJECT Hyphenate(OBJECT x)
   /* for each word y of x, try to hyphenate it */
   for( link = Down(x);  link != x;  link = NextDown(link) )
   { Child(y, link);
+    if( is_word(type(y)) && word_hyph(y) )
+    {
+      /* don't hyphenate a word preceding &<len>h */
+      if( NextDown(link) != x )
+      {
+	Child(z, NextDown(link));
+	if( type(z) == GAP_OBJ && mode(gap(z)) == HYPH_MODE )
+	  word_hyph(y) = FALSE;
+      }
+    }
     if( !is_word(type(y)) || string(y)[0] == '\0' || !word_hyph(y) )
     {
       if( type(y) == GAP_OBJ && mode(gap(y)) == HYPH_MODE )
+      {
 	nobreak(gap(y)) = FALSE;
+
+	/* don't hyphenate a word following &<len>h */
+	if( NextDown(link) != x )
+	{
+	  Child(z, NextDown(link));
+	  if( is_word(type(z)) )
+	    word_hyph(z) = FALSE;
+	}
+      }
       continue;
     }
     debug1(DHY, DD, "Hyphenate() examining %s", EchoObject(y));
@@ -1112,7 +1132,7 @@ OBJECT Hyphenate(OBJECT x)
     /* if a - ended the run, hyphenate there only */
     if( key[stop] == CH_HYPHEN )
     {
-      /* actually, don't hyphenate if the hyphen is last in the word [thanks Uwe] */
+      /* don't hyphenate if the hyphen is last in the word [thanks Uwe] */
       if( key[stop+1] == '\0' )
 	continue;
 

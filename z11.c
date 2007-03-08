@@ -1,7 +1,7 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -52,8 +52,14 @@ FULL_CHAR *EchoStyle(STYLE *style)
   StringCat(res, EchoCatOp(VCAT,mark(line_gap(*style)),join(line_gap(*style))));
   StringCat(res, EchoGap(&line_gap(*style)));
   StringCat(res, AsciiToFull(", "));
-  StringCat(res, font(*style) == 0 ?
-		   AsciiToFull("nofont") : FontFamilyAndFace(font(*style)));
+  if( font(*style) == 0 )
+    StringCat(res, AsciiToFull("nofont"));
+  else
+  {
+    StringCat(res, FontFamilyAndFace(font(*style)));
+    StringCat(res, AsciiToFull(" "));
+    StringCat(res, EchoLength(FontSize(font(*style), nilobj)));
+  }
   StringCat(res, AsciiToFull(" ("));
   StringCat(res, AsciiToFull(spacewords[space_style(*style)]));
   StringCat(res, AsciiToFull(" "));
@@ -205,6 +211,8 @@ static void changebreak(STYLE *style, OBJECT x)
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_CENTRE;
     else if( StringEqual(string(x), STR_BREAK_RLINES) )
 	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_RIGHT;
+    else if( StringEqual(string(x), STR_BREAK_OLINES) )
+	fill_style(*style) = FILL_OFF, display_style(*style) = DISPLAY_ORAGGED;
     else if( StringEqual(string(x), STR_BREAK_NOFIRST) )
 	nobreakfirst(*style) = TRUE;
     else if( StringEqual(string(x), STR_BREAK_FIRST) )

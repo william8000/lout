@@ -3187,6 +3187,17 @@ ldiagdict begin
   0 0 xsize ysize 0.5 mul 0 ysize
 } def
 
+% shape and labels of the @SolidWithBarArrowHead symbol
+% <pathwidth> ldiagsolidwithbararrowhead -
+/ldiagsolidwithbararrowhead
+{
+  /pathwidth exch def
+  /XBK [ xsize pathwidth 0.5 mul sub ] cvx def
+  /XFW [ xsize pathwidth 0.5 mul add ] cvx def
+  0 0 XBK ysize 0.5 mul XBK 0 XFW 0 XFW ysize
+  XBK ysize XBK ysize 0.5 mul 0 ysize 0 0
+} def
+
 % shape and labels of the @OpenArrowHead symbol
 % <pathwidth> ldiagopenarrowhead -
 /ldiagopenarrowhead

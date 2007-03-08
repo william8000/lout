@@ -1,7 +1,7 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.33)                       */
-/*  COPYRIGHT (C) 1991, 2006 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -231,8 +231,10 @@ void FilterWrite(OBJECT x, FILE *fp, int *linecount)
   }
   else
     StringFPuts(KW_RBR, fp);
+  /* *** a line too far!  JeffK 8/3/07
   StringFPuts(STR_NEWLINE, fp);
   *linecount += 1;
+  *** */
   fclose(in_fp);
   debug0(DFH, D, "] FilterWrite returning.");
 } /* end FilterWrite */
