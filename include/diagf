@@ -917,6 +917,7 @@ def @DiagSetup
 	   @ArrowHead @SolidArrowHead @SolidWithBarArrowHead @OpenArrowHead
 	   @HalfOpenArrowHead @SolidCurvedArrowHead @OpenCurvedArrowHead
 	   @HalfOpenCurvedArrowHead @CircleArrowHead @BoxArrowHead
+	   @ManyArrowHead
 
 	   @Link
 	   @Line @DoubleLine @Arrow @DoubleArrow @Curve @CurveArrow
@@ -5074,6 +5075,25 @@ def @DiagSetup
 	    { length @Wide width @High }
 	}
 
+	def @ManyArrowHead
+	    named width { arrowwidth }
+	    named length { arrowlength }
+	    named pathwidth { pathwidth }
+	{
+	    @InsulatedNode
+		outlinestyle { noline }
+		paint { nochange }
+		texture { solid }
+		outlinewidth { pathwidth }
+		outline {
+		  @BackEnd @Case {
+		    PostScript @Yield { pathwidth "ldiagmanyarrowhead" }
+		    PDF @Yield {}
+		  }
+		}
+	    { length @Wide width @High }
+	}
+
 	def @ArrowHead
 	    named style { arrowstyle }
 	    named width { arrowwidth }
@@ -5106,6 +5126,9 @@ def @DiagSetup
 				  width { width } length { length }
 				  pathwidth { pathwidth }
 		box            @Yield @BoxArrowHead
+				  width { width } length { length }
+				  pathwidth { pathwidth }
+		many           @Yield @ManyArrowHead
 				  width { width } length { length }
 				  pathwidth { pathwidth }
 	    }

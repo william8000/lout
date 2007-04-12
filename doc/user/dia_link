@@ -275,6 +275,10 @@ of possible values for @Code "arrowstyle" is
     A { box }
     B { @Diag vstrut { no } { A:: @Circle  |2c B:: @Circle 
 	// @Link from { A } to { B } arrow { yes } arrowstyle { box } } }
+@Rowa
+    A { many }
+    B { @Diag vstrut { no } { A:: @Circle  |2c B:: @Box 
+	// @Link from { A } to { B } arrow { yes } arrowstyle { many } } }
 }
 The reader is invited to admire the beautifully sharp points on these
 arrowheads.

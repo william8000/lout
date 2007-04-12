@@ -1,6 +1,6 @@
 /*@z26.c:Echo Service:BeginString()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -212,6 +212,7 @@ FULL_CHAR *Image(unsigned int c)
     case GET_CONTEXT:		return  KW_GET_CONTEXT;
     case BREAK:			return  KW_BREAK;
     case UNDERLINE:		return  KW_UNDERLINE;
+    case UNDERLINE_COLOUR:	return  KW_UNDERLINE_COLOUR;
     case COLOUR:		return  KW_COLOUR;
     case TEXTURE:		return  KW_TEXTURE;
     case OUTLINE:		return  KW_OUTLINE;

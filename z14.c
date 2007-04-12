@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -220,6 +220,7 @@ typedef struct {
 	  { hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
 	    word_font(hyph_word) = 0;					\
 	    word_colour(hyph_word) = colour(save_style(x));		\
+	    word_underline_colour(hyph_word) = underline_colour(save_style(x));	\
 	    word_texture(hyph_word) = texture(save_style(x));		\
 	    word_outline(hyph_word) = outline(save_style(x));		\
 	    word_language(hyph_word) = language(save_style(x));		\
@@ -592,6 +593,7 @@ static void KernWordLeftMargin(OBJECT first_on_line, OBJECT parent)
     z = MakeWord(WORD, kerned_glyphs, &fpos(first_on_line));
     word_font(z) = word_font(first_on_line);
     word_colour(z) = word_colour(first_on_line);
+    word_underline_colour(z) = word_underline_colour(first_on_line);
     word_texture(z) = word_texture(first_on_line);
     word_outline(z) = word_outline(first_on_line);
     word_language(z) = word_language(first_on_line);
@@ -720,6 +722,7 @@ static void KernWordRightMargin(OBJECT last_on_line, OBJECT parent)
                 &fpos(last_on_line));
     word_font(z) = word_font(last_on_line);
     word_colour(z) = word_colour(last_on_line);
+    word_underline_colour(z) = word_underline_colour(last_on_line);
     word_texture(z) = word_texture(last_on_line);
     word_outline(z) = word_outline(last_on_line);
     word_language(z) = word_language(last_on_line);
@@ -804,6 +807,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       res = MakeWord(WORD, STR_EMPTY, &fpos(x));
       word_font(res) = font(save_style(x));
       word_colour(res) = colour(save_style(x));
+      word_underline_colour(res) = underline_colour(save_style(x));
       word_texture(res) = texture(save_style(x));
       word_outline(res) = outline(save_style(x));
       word_language(res) = language(save_style(x));
@@ -828,6 +832,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   back(tmp, COLM) = fwd(tmp, COLM) = back(tmp, ROWM) = fwd(tmp, ROWM) = 0;
   word_font(tmp) = 0;
   word_colour(tmp) = 0;
+  word_underline_colour(tmp) = 0;
   word_texture(tmp) = 1;
   word_outline(tmp) = 0;
   word_language(tmp) = 0;
@@ -1020,6 +1025,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	back(t1, COLM) = fwd(t1, COLM) = back(t1, ROWM) = fwd(t1, ROWM) = 0;
 	word_font(t1) = 0;
 	word_colour(t1) = 0;
+	word_underline_colour(t1) = 0;
 	word_texture(t1) = 1;
 	word_outline(t1) = 0;
 	word_language(t1) = 0;
@@ -1088,6 +1094,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	z = MakeWord(WORD, STR_HYPHEN, &fpos(y));
 	word_font(z) = word_font(tmp);
 	word_colour(z) = word_colour(tmp);
+	word_underline_colour(z) = word_underline_colour(tmp);
 	word_texture(z) = word_texture(tmp);
 	word_outline(z) = word_outline(tmp);
 	word_language(z) = word_language(tmp);
@@ -1202,6 +1209,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	    if( is_word(type(prev)) && is_word(type(next)) &&
 	        word_font(prev) == word_font(next) &&
 	        word_colour(prev) == word_colour(next) &&
+	        word_underline_colour(prev) == word_underline_colour(next) &&
 	        word_texture(prev) == word_texture(next) &&
 	        word_outline(prev) == word_outline(next) &&
 	        word_language(prev) == word_language(next) &&
@@ -1216,6 +1224,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	      tmp = MakeWordTwo(typ, string(prev), string(next), &fpos(prev));
 	      word_font(tmp) = word_font(prev);
 	      word_colour(tmp) = word_colour(prev);
+	      word_underline_colour(tmp) = word_underline_colour(prev);
 	      word_texture(tmp) = word_texture(prev);
 	      word_outline(tmp) = word_outline(prev);
 	      word_language(tmp) = word_language(prev);

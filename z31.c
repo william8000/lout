@@ -1,6 +1,6 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -234,6 +234,7 @@ void MemInit(void)
   zz_lengths[ ZUNIT        ] =
   zz_lengths[ BREAK        ] =
   zz_lengths[ UNDERLINE    ] =
+  zz_lengths[ UNDERLINE_COLOUR ] =
   zz_lengths[ COLOUR       ] =
   zz_lengths[ TEXTURE      ] =
   zz_lengths[ OUTLINE      ] =

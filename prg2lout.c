@@ -3111,10 +3111,10 @@ LANGUAGE NonpareilLanguage = {
   {
     "as", "builtin", "case", "class", "coerce", "creation", "else", "elsif",
     "end", "enum", "extend", "extension", "filter", "genesis", "if", "in",
-    "infix", "infixl", "infixr", "inherit", "introduce", "invariant",
-    "is", "let", "local", "meet", "module", "noncreation", "norename",
+    "infix", "infixl", "infixr", "inherit", "introduce", "invariant", "is",
+    "let", "local", "meet", "module", "noncoercive", "noncreation", "norename",
     "predefined", "prefix", "prefun", "private", "postfix", "rename",
-    "require", "system", "then", "typeof", "upto", "use", "when", "yield",
+    "require", "system", "then", "typeobj", "upto", "use", "when", "yield",
 
     /* not keywords, but conventionally set like them */
     "false", "true", "self", "and", "or", "not"

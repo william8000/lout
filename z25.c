@@ -1,6 +1,6 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -757,6 +757,7 @@ static void echo(OBJECT x, unsigned outer_prec, int count)
     case GET_CONTEXT:
     case BREAK:
     case UNDERLINE:
+    case UNDERLINE_COLOUR:
     case COLOUR:
     case TEXTURE:
     case OUTLINE:

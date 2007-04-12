@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -1223,13 +1223,13 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 		if( is_word(type(prev)) )
 		{
 	          underline_font = word_font(prev);
-		  underline_colour = word_colour(prev);
+		  underline_colour = word_underline_colour(prev);
 		  underline_texture = word_texture(prev);
 		}
 		else
 		{
 	          underline_font = font(save_style(x));
-		  underline_colour = colour(save_style(x));
+		  underline_colour = underline_colour(save_style(x));
 		  underline_texture = texture(save_style(x));
 		}
 	        underline_xstart = mk - back(prev, dim);
@@ -1243,10 +1243,10 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	        back(urec, COLM) = underline_xstart;
 	        fwd(urec, COLM) = mk + fwd(prev, dim);
 	        word_font(urec) = underline_font;
-	        word_colour(urec) = underline_colour;
+	        word_underline_colour(urec) = underline_colour;
 	        word_texture(urec) = underline_texture;
 	        underlining = FALSE;
-	        Link(Up(prev), urec);
+	        Link(NextDown(Up(prev)), urec);
 	      }
 	    }
 
@@ -1297,13 +1297,13 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	      if( is_word(type(prev)) )
 	      {
 	        underline_font = word_font(prev);
-	        underline_colour = word_colour(prev);
+	        underline_colour = word_underline_colour(prev);
 	        underline_texture = word_texture(prev);
 	      }
 	      else
 	      {
 	        underline_font = font(save_style(x));
-	        underline_colour = colour(save_style(x));
+	        underline_colour = underline_colour(save_style(x));
 	        underline_texture = texture(save_style(x));
 	      }
 	      underline_xstart = mk - back(prev, dim);
@@ -1316,10 +1316,10 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    back(urec, COLM) = underline_xstart;
 	    fwd(urec, COLM) = mk + fwd(prev, dim);
 	    word_font(urec) = underline_font;
-	    word_colour(urec) = underline_colour;
+	    word_underline_colour(urec) = underline_colour;
 	    word_texture(urec) = underline_texture;
 	    underlining = FALSE;
-	    Link(Up(prev), urec);
+	    Link(NextDown(Up(prev)), urec);
 	  }
 
 	  /* fix the last definite subobject, prev, which must exist */
@@ -1334,7 +1334,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	if( !is_definite(type(y)) && type(y) != LINK_DEST_NULL )
 	{
 	  if( type(y) == UNDER_REC )   /* generate an underline now */
-	  { BackEnd->PrintUnderline(word_font(y),word_colour(y),
+	  { BackEnd->PrintUnderline(word_font(y),word_underline_colour(y),
               word_texture(y), back(y, COLM), fwd(y, COLM), pg - xmk);
 	    link = PrevDown(link);     /* remove all trace of underlining */
 	    DisposeChild(Up(y));       /* in case we print this object again */

@@ -1,0 +1,50 @@
+@Section
+   @Title { Clipping }
+   @Tag { clipping }
+@Begin
+@PP
+The @Code "@HClip" symbol clips the following object horizontally to
+the available width:
+@ID @Code {
+"@Box 1c @Wide @HClip WARNING!"
+}
+produces
+@ID {
+@Box 1c @Wide @HClip WARNING!
+}
+The following object may be arbitrary as usual; for example, it
+could be an illustration included using @Code "@IncludeGraphic"
+(Section {@NumberOf include}).
+@PP
+We have used the @Code "@Wide" symbol from Section {@NumberOf precise}
+to make clear what the available width is in this small example (one
+centimetre), but @Code "@HClip" will work in any context; for example,
+you could use it to clip a table entry, or a display.
+@PP
+The @Code "@HClip" symbol has a @Code "shift" option which determines
+which part of the clipped object is displayed.  It may take on any
+value between {@Code "0.0"}, meaning to display the leftmost part
+(the default value), and {@Code "1.0"}, meaning to display the rightmost
+part:
+@ID @Code {
+"@Box 1c @Wide @HClip shift { 1.0 } WARNING!"
+}
+produces
+@ID {
+@Box 1c @Wide @HClip shift { 1.0 } WARNING!
+}
+To display the central part, use shift value {@Code "0.5"}.  Notice that
+there is no unit of measurement attached to the value of {@Code "shift"}.
+@PP
+There is also a @Code "@VClip" symbol which works in exactly the same
+way, only vertically.  The two symbols combine together naturally:
+@ID @Code {
+"@Box 1c @Wide 0.2c @High @HClip @VClip WARNING!"
+}
+produces
+@ID {
+@Box 1c @Wide 0.2c @High @HClip @VClip WARNING!
+}
+The @Code "shift" options may be used as usual to determine which part of
+the two-dimensional area is displayed.
+@End @Section

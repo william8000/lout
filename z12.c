@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -948,6 +948,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		z = MakeWord(WORD, STR_EMPTY, &fpos(g));
 		word_font(z) = font(save_style(x));
 		word_colour(z) = colour(save_style(x));
+		word_underline_colour(z) = underline_colour(save_style(x));
 		word_texture(z) = texture(save_style(x));
 		word_outline(z) = outline(save_style(x));
 		word_language(z) = language(save_style(x));
@@ -1048,6 +1049,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		    mode(gap(g)) == EDGE_MODE && !mark(gap(g)) &&
 		    word_font(prev) == word_font(y) &&
 		    word_colour(prev) == word_colour(y) &&
+		    word_underline_colour(prev) == word_underline_colour(y) &&
 		    word_texture(prev) == word_texture(y) &&
 		    word_outline(prev) == word_outline(y) &&
 		    word_language(prev) == word_language(y) &&
@@ -1069,6 +1071,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 		  y = MakeWordTwo(typ, string(prev), string(y), &fpos(prev));
 		  word_font(y) = word_font(prev);
 		  word_colour(y) = word_colour(prev);
+		  word_underline_colour(y) = word_underline_colour(prev);
 		  word_texture(y) = word_texture(prev);
 		  word_outline(y) = word_outline(prev);
 		  word_language(y) = word_language(prev);

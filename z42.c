@@ -1,6 +1,6 @@
 /*@z42.c:Colour Service:ColourChange, ColourCommand@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -175,17 +175,68 @@ void ColourInit(void)
 
 /*****************************************************************************/
 /*                                                                           */
+/*  BOOLEAN ColChange(OBJECT x, char *keyword, COLOUR_NUM *res)              */
+/*                                                                           */
+/*  Interpret x as a colour change.  If successful, return TRUE and          */
+/*  set *res (or leave it alone if x was nochange).  Else return FALSE.      */
+/*                                                                           */
+/*****************************************************************************/
+
+static BOOLEAN ColChange(OBJECT x, unsigned char *keyword, COLOUR_NUM *res)
+{ OBJECT cname;
+  debug2(DCO, D, "ColChange(%s, %s)", EchoObject(x), keyword);
+
+  /* if argument is not a word, fail and exit */
+  if( !is_word(type(x)) )
+  { Error(42, 3, "%s ignored (illegal left parameter)", WARN, &fpos(x),
+      keyword);
+    debug0(DCO, D, "ColChange returning (colour unchanged)");
+    return FALSE;
+  }
+
+  /* if argument is nochange, do nothing */
+  if( StringEqual(string(x), STR_COLOUR_NOCHANGE) ||
+      StringEqual(string(x), STR_EMPTY) )
+  { debug0(DCO, D, "ColourChange returning (colour nochange)");
+    return TRUE;
+  }
+
+  /* retrieve colour command if present, else insert it */
+  cname = ctab_retrieve(string(x), col_tab);
+  if( cname == nilobj )
+  { cname = MakeWord(type(x), string(x), &fpos(x));
+    ctab_insert(cname, &col_tab);
+    *res = word_colour(cname);
+  }
+  else *res = word_colour(cname);
+
+  debug1(DCO, D, "ColChange returning (colour = %s)", string(cname));
+  ifdebug(DCO, DD, ctab_debug(col_tab, stderr));
+  return TRUE;
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  ColourChange(style, x)                                                   */
 /*                                                                           */
 /*  Change the current style to contain the colour of colour command x.      */
+/*  Set the underline colour at the same time.                               */
 /*                                                                           */
 /*****************************************************************************/
 
 void ColourChange(STYLE *style, OBJECT x)
+{
+  if( ColChange(x, KW_COLOUR, &colour(*style)) )
+    underline_colour(*style) = colour(*style);
+}
+
+/* *** old version
+void ColourChange(STYLE *style, OBJECT x)
 { OBJECT cname;
   debug2(DCO, D, "ColourChange(%s, %s)", EchoStyle(style), EchoObject(x));
 
-  /* if argument is not a word, fail and exit */
+  ** if argument is not a word, fail and exit **
   if( !is_word(type(x)) )
   { Error(42, 3, "%s ignored (illegal left parameter)", WARN, &fpos(x),
       KW_COLOUR);
@@ -193,14 +244,14 @@ void ColourChange(STYLE *style, OBJECT x)
     return;
   }
 
-  /* if argument is nochange, do nothing */
+  ** if argument is nochange, do nothing **
   if( StringEqual(string(x), STR_COLOUR_NOCHANGE) ||
       StringEqual(string(x), STR_EMPTY) )
   { debug0(DCO, D, "ColourChange returning (colour nochange)");
     return;
   }
 
-  /* retrieve colour command if present, else insert it */
+  ** retrieve colour command if present, else insert it **
   { cname = ctab_retrieve(string(x), col_tab);
     if( cname == nilobj )
     { cname = MakeWord(type(x), string(x), &fpos(x));
@@ -212,7 +263,22 @@ void ColourChange(STYLE *style, OBJECT x)
 
   debug1(DCO, D, "ColourChange returning (colour = %s)", string(cname));
   ifdebug(DCO, DD, ctab_debug(col_tab, stderr));
-} /* ColourChange */
+}
+*** */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  void ColourUnderlineChange(STYLE *style, OBJECT x)                       */
+/*                                                                           */
+/*  Change the underline colour of *style as indicated by x.                 */
+/*                                                                           */
+/*****************************************************************************/
+
+void ColourUnderlineChange(STYLE *style, OBJECT x)
+{
+  ColChange(x, KW_UNDERLINE_COLOUR, &underline_colour(*style));
+}
 
 
 /*@::ColourCommand()@*********************************************************/

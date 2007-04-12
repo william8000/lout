@@ -46,6 +46,17 @@ def @Colour @Color left col right y { {@ColourCommand col} @SetColour y }
 
 ###########################################################################
 #                                                                         #
+#  @ColouredUnderline, @ColoredUnderline                                  #
+#                                                                         #
+###########################################################################
+
+def @ColouredUnderline @ColoredUnderline left col right y {
+  {@ColourCommand col} @SetUnderlineColour @Underline y
+}
+
+
+###########################################################################
+#                                                                         #
 #   @Texture                                                              #
 #                                                                         #
 ###########################################################################
@@ -119,7 +130,7 @@ export
 
     @Date @Time @DateTimeFormat @DropCapTwo @DropCapThree @Centre @Right
     @NoDotSep @NoDotJoin @Join @Sep @DotSep @ColonSep @DotJoin @DashJoin
-    @NumSep @VStrut @ZeroWidth @ZeroHeight @OverStrike @Sup @Sub
+    @NumSep @VStrut @ZeroWidth @ZeroHeight @OverStrike @Sup @Sub @HClip @VClip
     @FullWidthRule @LocalWidthRule @Box @CurveBox @ShadowBox @BoundaryMarks
     @NumberMarker @NumberOf @TitleMarker @TitleOf
     @PageMarker @PageMark @NoLinkPageMark @PageOf @CrossLink @ExternalLink
@@ -780,6 +791,35 @@ def @BasicSetup
 	{
 	    x /gap | 0.7f @Font y
 	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @HClip and @VClip                                                     #
+    #                                                                         #
+    ###########################################################################
+
+    def @HClip
+	named shift { 0.0 }
+	right x
+    {
+       { "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto 0 ysize lineto"
+	 "closepath clip gsave" // "grestore" } @Graphic
+	 {
+	   |{{shift}"rt"} @ZeroWidth {{shift}"w"} @HShift x |
+	 }
+    }
+
+    def @VClip
+	named shift { 0.0 }
+	right x
+    {
+       { "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto 0 ysize lineto"
+	 "closepath clip gsave" // "grestore" } @Graphic
+	 {
+	   /{{shift}"rt"} @ZeroHeight {{shift}"w"} @VShift x /
+	 }
     }
 
 

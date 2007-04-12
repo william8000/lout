@@ -1,6 +1,6 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -446,6 +446,7 @@ static BOOLEAN Reduce(void)
     case GET_CONTEXT:
     case BREAK:
     case UNDERLINE:
+    case UNDERLINE_COLOUR:
     case COLOUR:
     case TEXTURE:
     case OUTLINE:
@@ -1054,6 +1055,7 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
       case GET_CONTEXT:
       case BREAK:
       case UNDERLINE:
+      case UNDERLINE_COLOUR:
       case COLOUR:
       case TEXTURE:
       case OUTLINE:

@@ -1,6 +1,6 @@
 /*@z05.c:Read Definitions:ReadLangDef()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -278,6 +278,7 @@ static void ReadTokenList(OBJECT token, OBJECT res)
     case GET_CONTEXT:
     case BREAK:
     case UNDERLINE:
+    case UNDERLINE_COLOUR:
     case COLOUR:
     case TEXTURE:
     case OUTLINE:
@@ -752,6 +753,7 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
       /* find precedence clause, if any */
       if( is_string(t, KW_PRECEDENCE) )
       {	int prec = 0;
+	UnSuppressScope();
 	Dispose(t);
 	t = LexGetToken();
 	while( type(t) == WORD && decimaldigit(string(t)[0]) )
@@ -759,6 +761,7 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
 	  prec = prec * 10 + digitchartonum(string(t)[0]);
 	  Dispose(t);  t = LexGetToken();
 	}
+	SuppressScope();
 
 	if( prec < MIN_PREC )
 	{ Error(5, 37, "precedence is too low (%d substituted)",
@@ -775,10 +778,13 @@ void ReadDefinitions(OBJECT *token, OBJECT encl, unsigned char res_type)
 
       /* find associativity clause, if any */
       if( is_string(t, KW_ASSOC) )
-      {	Dispose(t);  t = LexGetToken();
+      {
+	UnSuppressScope();
+	Dispose(t);  t = LexGetToken();
 	if( is_string(t, KW_LEFT) )  right_assoc(res) = FALSE;
 	else if( !is_string(t, KW_RIGHT) )
 	  Error(5, 39, "associativity altered to %s", WARN, &fpos(t), KW_RIGHT);
+	SuppressScope();
 	Dispose(t);  t = LexGetToken();
       }
 

@@ -33,6 +33,7 @@ paragraph breaking options are in effect; }
 or half the height of an `x' above the baseline; }
 @LI { Whether to permit hyphenation or not; }
 @LI { What colour the object is to appear in; }
+@LI { What colour underlines within the object are to appear in; }
 @LI { Whether @@Outline is in effect; }
 @LI { The language of the object; }
 @LI { Whether @@VAdjust, @@HAdjust and @@PAdjust are in effect. }
@@ -42,7 +43,8 @@ document.  For example, the style of a parameter depends on where it is
 used; the style of a galley is the style of the first target that it
 attempts to attach itself to.  Of course, the style of any object can be
 changed by using the @@Font, @@Break, @@Space, @@SetColour or
-@@SetColor, @@Outline, and @@Language symbols.
+@@SetColor, @@SetUnderlineColour or @@SetUnderlineColor, @@Outline,
+and @@Language symbols.
 @PP
 There are no standard default values for style, except that row marks
 of words initially pass half the height of an `x' above the baseline,

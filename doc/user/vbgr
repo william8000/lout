@@ -5,4 +5,7 @@ gvim bgr_boxs
 gvim bgr_outl
 gvim bgr_rota
 gvim bgr_scal
+gvim bgr_clip
+gvim bgr_mirr
 gvim bgr_incl
+gvim bgr_prec

@@ -16,7 +16,7 @@ once, at the start, rather than over and over again for every time it
 appears in an @@IncludeGraphic, as would otherwise occur.
 @PP
 Any number of @@IncludeGraphicRepeated and @@SysIncludeGraphicRepeated
-directives may ppear at the start of the document.  The files involved
+directives may appear at the start of the document.  The files involved
 may be compressed as for @@IncludeGraphic.  The file names given within
 @@IncludeGraphicRepeated must be identical to the name used within the
 corresponding @@IncludeGraphic symbols, or else the @@IncludeGraphicRepeated
@@ -36,7 +36,7 @@ print job, so there is a risk that memory will run out if
 @PP
 The implementation of @@IncludeGraphicRepeated uses code given by
 the authors of PostScript which employs PostScript forms to save
-the EPS files @Cite { adobe1996epsforms }.  Lout's version of this code
+the EPS files @Cite { $adobe1996epsforms }.  Lout's version of this code
 is somewhat modified, partly for simplicity and partly to correct a
 possible bug caused by their use of a single filter to read all the
 EPS files, rather than a separate filter for each one.

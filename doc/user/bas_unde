@@ -24,4 +24,32 @@ underlined:  how far below the baseline the line should be drawn, and how
 thick.  The @Code "@Underline" symbol uses this information; the font
 it bases its underlining on is the font of the first object underlined
 if it is a word, or else the font of the enclosing paragraph.
+@PP
+The underline produced by @Code "@Underline" will have the same colour
+as whatever is being underlined.  If you want a different colour, you need
+the @Code "@ColouredUnderline" or equivalently @Code "@ColoredUnderline"
+symbol, which takes a colour on the left as well as the thing to be
+underlined on the right:
+@ID @OneRow @Code {
+"This little paragraph of text will have"
+"blue @ColouredUnderline { three underlined words } in it."
+}
+produces
+@ID @OneRow 1.6i @Wide {
+This little paragraph of text will have
+blue @ColouredUnderline { three underlined words } in it.
+}
+The colours available are as for the @Code "@Colour" symbol from
+Section {@NumberOf colour}.
+@PP
+There is no way to set a default value for the colour of a coloured
+underline, but you can make it easy to get an underline of a specific
+colour, by placing a definition at the start of your document, like this:
+@ID @OneRow @Code @Verbatim {
+import @BasicSetup
+def @MustCheck right x { blue @ColouredUnderline x }
+}
+This allows you to type @Code "@MustCheck" instead of
+{@Code "blue @ColouredUnderline"}.  Definitions are explained in
+general in Section {@NumberOf definitions}.
 @End @Section

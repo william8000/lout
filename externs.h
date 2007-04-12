@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.34 (March 2007)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.35 (April 2007)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -660,6 +660,7 @@ typedef struct style_type
   FULL_LENGTH	osmallcaps_len;		/* size of small capitals            */
   FONT_NUM	ofont;			/* current font                      */
   COLOUR_NUM	ocolour;		/* current colour		     */
+  COLOUR_NUM	ounderline_colour;	/* current underline colour	     */
   TEXTURE_NUM	otexture;		/* current texture		     */
   unsigned short oblanklinescale;	/* scale factor for blank lines      */
   LANGUAGE_NUM	olanguage       : 6;	/* current language		     */
@@ -689,6 +690,7 @@ typedef struct style_type
 #define	smallcaps_len(x)(x).osmallcaps_len
 #define	font(x)		(x).ofont
 #define	colour(x)	(x).ocolour
+#define	underline_colour(x) (x).ounderline_colour
 #define	texture(x)	(x).otexture
 #define	blanklinescale(x)(x).oblanklinescale
 #define	language(x)	(x).olanguage
@@ -718,6 +720,7 @@ typedef struct style_type
   smallcaps_len(x) = smallcaps_len(y),					\
   font(x) = font(y),							\
   colour(x) = colour(y),						\
+  underline_colour(x) = underline_colour(y),				\
   texture(x) = texture(y),						\
   blanklinescale(x) = blanklinescale(y),				\
   language(x) = language(y), 						\
@@ -839,7 +842,7 @@ typedef union
 
 /*@::SECOND_UNION, THIRD_UNION, FOURTH_UNION@*********************************/
 /*                                                                           */
-/*  typedef SECOND_UNION - eight bytes holding various flags etc.            */
+/*  typedef SECOND_UNION - twelve bytes holding various flags etc.           */
 /*                                                                           */
 /*****************************************************************************/
 
@@ -854,6 +857,7 @@ typedef union
 	 /* objects, including GAP_OBJ                              */
   {	FONT_NUM	oword_font;
 	COLOUR_NUM	oword_colour;
+	COLOUR_NUM	oword_underline_colour;
 	TEXTURE_NUM	oword_texture;
 	unsigned	ounderline	   : 2; /* aligns with os23.underline */
 	BOOLEAN		oword_outline	   : 1;
@@ -867,7 +871,8 @@ typedef union
   struct /* used by non-WORD objects */
   {	unsigned short	ofoll_or_prec;
 	unsigned short	ocross_type;	     /* CROSS objects only */
-	unsigned short  ounused_os23;
+	unsigned short  ounused_os23_a;
+	unsigned short  ounused_os23_b;
 	unsigned	ounderline   : 2;    /* aligns with os22.underline */
 	BOOLEAN		onon_blocking: 1;
 	BOOLEAN		osized       : 1;
@@ -1118,7 +1123,7 @@ typedef union
 /*      back(COLM)      Horizontal position of start of underline            */
 /*      fwd(COLM)       Horizontal position of end of underline              */
 /*      word_font       Font determining underline appearance                */
-/*      word_colour     The colour of the underline                          */
+/*      word_underline_colour  The colour of the underline                   */
 /*      word_texture    The texture of the underline                         */
 /*                                                                           */
 /*  PAGE_LABEL - a @PageLabel object                                         */
@@ -1180,6 +1185,7 @@ typedef union
 /*      SIZED           The size of the word                                 */
 /*      word_font       Font to print this word in (from style)              */
 /*      word_colour     Colour to print this word in (from style)            */
+/*      word_underline_colour  Colour to print underlines in (from style)    */
 /*      word_texture    texture to print this word in (from style)           */
 /*      word_outline    If TRUE, print this word in outline (from style)     */
 /*      word_language   Language (for hyphenation) of this word (from style) */
@@ -1384,7 +1390,8 @@ typedef union
 /*                                                                           */
 /*  FONT, SPACE, BREAK - @Font, @Space, @Break symbols                       */
 /*  YUNIT, ZUNIT - @YUnit, @ZUnit symbols                                    */
-/*  COLOUR, TEXTURE - @SetColour, @SetTexture symbols                        */
+/*  COLOUR, UNDERLINE_COLOUR, TEXTURE - @SetColour, @SetUnderlineColour      */
+/*  TEXTURE - @SetTexture                                                    */
 /*  OUTLINE, LANGUAGE - @Outline, @Language symbols                          */
 /*  PLUS, MINUS, - @Plus, @Minus symbols                                     */
 /*  MELD, COMMON, RUMP, INSERT - @Meld, @Common, @Rump, @Insert symbols      */
@@ -1764,6 +1771,7 @@ typedef union rec
 #define spanner_count(x)	word_font(x)
 #define incg_type(x)		word_font(x)
 #define	word_colour(x)		(x)->os1.ou2.os22.oword_colour
+#define	word_underline_colour(x) (x)->os1.ou2.os22.oword_underline_colour
 #define	word_texture(x)		(x)->os1.ou2.os22.oword_texture
 #define spanner_sized(x)	word_colour(x)
 #define	word_outline(x)		(x)->os1.ou2.os22.oword_outline
@@ -2138,95 +2146,96 @@ typedef struct back_end_rec {
 #define	GET_CONTEXT	    67		/* to s   @GetContext                */
 #define	BREAK		    68		/* to s   @Break                     */
 #define	UNDERLINE	    69		/* to s   @Underline                 */
-#define	COLOUR		    70		/* to s   @SetColour and @SetColor   */
-#define	TEXTURE		    71		/* to s   @SetTexture                */
-#define	OUTLINE		    72		/* to s   @Outline                   */
-#define	LANGUAGE	    73		/* to s   @Language                  */
-#define	CURR_LANG	    74		/* to s   @CurrLang                  */
-#define	CURR_FAMILY	    75		/* to s   @CurrFamily                */
-#define	CURR_FACE	    76		/* to s   @CurrFace                  */
-#define	CURR_YUNIT	    77		/* to s   @CurrYUnit                 */
-#define	CURR_ZUNIT	    78		/* to s   @CurrZUnit                 */
-#define	COMMON		    79		/* to s   @Common                    */
-#define	RUMP		    80		/* to s   @Rump                      */
-#define	MELD		    81		/* to s   @Meld                      */
-#define	INSERT		    82		/* to s   @Insert                    */
-#define	ONE_OF		    83		/* to s   @OneOf                     */
-#define	NEXT		    84		/* to s   @Next                      */
-#define	PLUS		    85		/* to s   @Plus                      */
-#define	MINUS		    86		/* to s   @Minus                     */
-#define	ENV_OBJ		    87		/* to s   object with envt (no name) */
-#define	ENV		    88		/* to s   @LEnv                      */
-#define	ENVA		    89		/* to s   @LEnvA                     */
-#define	ENVB		    90		/* to s   @LEnvB                     */
-#define	ENVC		    91		/* to s   @LEnvC                     */
-#define	ENVD		    92		/* to s   @LEnvD                     */
-#define	CENV		    93		/* to s   @LCEnv                     */
-#define	CLOS		    94		/* to s   @LClos                     */
-#define	LVIS		    95		/* to s   @LVis                      */
-#define	LUSE		    96		/* to s   @LUse                      */
-#define	LEO 		    97		/* to s   @LEO                       */
-#define	OPEN		    98		/* to s   @Open                      */
-#define	TAGGED		    99		/* to s   @Tagged                    */
-#define	INCGRAPHIC	   100		/* to s   @IncludeGraphic            */
-#define	SINCGRAPHIC	   101		/* to s   @SysIncludeGraphic         */
-#define	PLAIN_GRAPHIC	   102		/* to s   @PlainGraphic              */
-#define	GRAPHIC		   103		/* to s   @Graphic                   */
-#define	LINK_SOURCE	   104		/* to s   @LinkSource                */
-#define	LINK_DEST	   105		/* to s   @LinkDest                  */
-#define	LINK_URL	   106		/* to s   @URLLink                   */
-#define	TSPACE		   107		/* t      a space token, parser only */
-#define	TJUXTA		   108		/* t      a juxta token, parser only */
-#define	LBR		   109		/* t  s   left brace token           */
-#define	RBR		   110		/* t  s   right brace token          */
-#define	BEGIN		   111		/* t  s   @Begin token               */
-#define	END		   112		/* t  s   @End token                 */
-#define	USE		   113		/* t  s   @Use                       */
-#define	NOT_REVEALED	   114		/* t  s   @NotRevealed               */
-#define	GSTUB_NONE	   115		/* t      a galley stub, no rpar     */
-#define	GSTUB_INT	   116		/* t      galley stub internal rpar  */
-#define	GSTUB_EXT	   117		/* t      galley stub external rpar  */
-#define	UNEXPECTED_EOF	   118		/* t      unexpected end of file     */
-#define	INCLUDE		   119		/*    s   @Include                   */
-#define	SYS_INCLUDE	   120		/*    s   @SysInclude                */
-#define	PREPEND		   121		/*    s   @Prepend                   */
-#define	SYS_PREPEND	   122		/*    s   @SysPrepend                */
-#define	INCG_REPEATED	   123		/*    s   @IncludeGraphicRepeated    */
-#define	SINCG_REPEATED     124		/*    s   @SysIncludeGraphicRepeated */
-#define	DATABASE	   125		/*    s   @Database                  */
-#define	SYS_DATABASE	   126		/*    s   @SysDatabase               */
-#define	DEAD		   127		/*   i    a dead galley              */
-#define	UNATTACHED	   128		/*   i    an inner, unsized galley   */
-#define	RECEPTIVE	   129		/*   i    a receptive object index   */
-#define	RECEIVING	   130		/*   i    a receiving object index   */
-#define	RECURSIVE	   131		/*   i    a recursive definite obj.  */
-#define	PRECEDES	   132		/*   i    an ordering constraint     */
-#define	FOLLOWS		   133		/*   i    other end of ordering c.   */
-#define	CROSS_LIT	   134		/*   i    literal word cross-ref     */
-#define	CROSS_FOLL	   135		/*   i    following type cross-ref   */
-#define	CROSS_FOLL_OR_PREC 136		/*   i    follorprec type cross-ref  */
-#define	GALL_FOLL	   137		/*   i    galley with &&following    */
-#define	GALL_FOLL_OR_PREC  138		/*   i    galley with &&following    */
-#define	CROSS_TARG	   139		/*   i    value of cross-ref         */
-#define	GALL_TARG	   140		/*   i    target of these galleys    */
-#define	GALL_PREC	   141		/*   i    galley with &&preceding    */
-#define	CROSS_PREC	   142		/*   i    preceding type cross-ref   */
-#define	PAGE_LABEL_IND	   143		/*   i    index of PAGE_LABEL        */
-#define	SCALE_IND	   144		/*   i    index of auto SCALE        */
-#define	COVER_IND	   145		/*   i    index of HCOVER or VCOVER  */
-#define	EXPAND_IND	   146		/*   i    index of HEXPAND or VEXPD  */
-#define	THREAD		   147		/*        a sequence of threads      */
-#define	CROSS_SYM	   148		/*        cross-ref info             */
-#define	CR_ROOT		   149		/*        RootCross                  */
-#define	MACRO	           150		/*        a macro symbol             */
-#define	LOCAL	           151		/*        a local symbol             */
-#define	LPAR	           152		/*        a left parameter           */
-#define	NPAR	           153		/*        a named parameter          */
-#define	RPAR	           154		/*        a right parameter          */
-#define	EXT_GALL           155		/*        an external galley         */
-#define	CR_LIST	           156		/*        a list of cross references */
-#define	SCOPE_SNAPSHOT     157		/*        a scope snapshot	     */
-#define	DISPOSED           158		/*        a disposed record          */
+#define	UNDERLINE_COLOUR    70		/* to s   @SetUnderlineColour        */
+#define	COLOUR		    71		/* to s   @SetColour and @SetColor   */
+#define	TEXTURE		    72		/* to s   @SetTexture                */
+#define	OUTLINE		    73		/* to s   @Outline                   */
+#define	LANGUAGE	    74		/* to s   @Language                  */
+#define	CURR_LANG	    75		/* to s   @CurrLang                  */
+#define	CURR_FAMILY	    76		/* to s   @CurrFamily                */
+#define	CURR_FACE	    77		/* to s   @CurrFace                  */
+#define	CURR_YUNIT	    78		/* to s   @CurrYUnit                 */
+#define	CURR_ZUNIT	    79		/* to s   @CurrZUnit                 */
+#define	COMMON		    80		/* to s   @Common                    */
+#define	RUMP		    81		/* to s   @Rump                      */
+#define	MELD		    82		/* to s   @Meld                      */
+#define	INSERT		    83		/* to s   @Insert                    */
+#define	ONE_OF		    84		/* to s   @OneOf                     */
+#define	NEXT		    85		/* to s   @Next                      */
+#define	PLUS		    86		/* to s   @Plus                      */
+#define	MINUS		    87		/* to s   @Minus                     */
+#define	ENV_OBJ		    88		/* to s   object with envt (no name) */
+#define	ENV		    89		/* to s   @LEnv                      */
+#define	ENVA		    90		/* to s   @LEnvA                     */
+#define	ENVB		    91		/* to s   @LEnvB                     */
+#define	ENVC		    92		/* to s   @LEnvC                     */
+#define	ENVD		    93		/* to s   @LEnvD                     */
+#define	CENV		    94		/* to s   @LCEnv                     */
+#define	CLOS		    95		/* to s   @LClos                     */
+#define	LVIS		    96		/* to s   @LVis                      */
+#define	LUSE		    97		/* to s   @LUse                      */
+#define	LEO 		    98		/* to s   @LEO                       */
+#define	OPEN		    99		/* to s   @Open                      */
+#define	TAGGED		   100		/* to s   @Tagged                    */
+#define	INCGRAPHIC	   101		/* to s   @IncludeGraphic            */
+#define	SINCGRAPHIC	   102		/* to s   @SysIncludeGraphic         */
+#define	PLAIN_GRAPHIC	   103		/* to s   @PlainGraphic              */
+#define	GRAPHIC		   104		/* to s   @Graphic                   */
+#define	LINK_SOURCE	   105		/* to s   @LinkSource                */
+#define	LINK_DEST	   106		/* to s   @LinkDest                  */
+#define	LINK_URL	   107		/* to s   @URLLink                   */
+#define	TSPACE		   108		/* t      a space token, parser only */
+#define	TJUXTA		   109		/* t      a juxta token, parser only */
+#define	LBR		   110		/* t  s   left brace token           */
+#define	RBR		   111		/* t  s   right brace token          */
+#define	BEGIN		   112		/* t  s   @Begin token               */
+#define	END		   113		/* t  s   @End token                 */
+#define	USE		   114		/* t  s   @Use                       */
+#define	NOT_REVEALED	   115		/* t  s   @NotRevealed               */
+#define	GSTUB_NONE	   116		/* t      a galley stub, no rpar     */
+#define	GSTUB_INT	   117		/* t      galley stub internal rpar  */
+#define	GSTUB_EXT	   118		/* t      galley stub external rpar  */
+#define	UNEXPECTED_EOF	   119		/* t      unexpected end of file     */
+#define	INCLUDE		   120		/*    s   @Include                   */
+#define	SYS_INCLUDE	   121		/*    s   @SysInclude                */
+#define	PREPEND		   122		/*    s   @Prepend                   */
+#define	SYS_PREPEND	   123		/*    s   @SysPrepend                */
+#define	INCG_REPEATED	   124		/*    s   @IncludeGraphicRepeated    */
+#define	SINCG_REPEATED     125		/*    s   @SysIncludeGraphicRepeated */
+#define	DATABASE	   126		/*    s   @Database                  */
+#define	SYS_DATABASE	   127		/*    s   @SysDatabase               */
+#define	DEAD		   128		/*   i    a dead galley              */
+#define	UNATTACHED	   129		/*   i    an inner, unsized galley   */
+#define	RECEPTIVE	   130		/*   i    a receptive object index   */
+#define	RECEIVING	   131		/*   i    a receiving object index   */
+#define	RECURSIVE	   132		/*   i    a recursive definite obj.  */
+#define	PRECEDES	   133		/*   i    an ordering constraint     */
+#define	FOLLOWS		   134		/*   i    other end of ordering c.   */
+#define	CROSS_LIT	   135		/*   i    literal word cross-ref     */
+#define	CROSS_FOLL	   136		/*   i    following type cross-ref   */
+#define	CROSS_FOLL_OR_PREC 137		/*   i    follorprec type cross-ref  */
+#define	GALL_FOLL	   138		/*   i    galley with &&following    */
+#define	GALL_FOLL_OR_PREC  139		/*   i    galley with &&following    */
+#define	CROSS_TARG	   140		/*   i    value of cross-ref         */
+#define	GALL_TARG	   141		/*   i    target of these galleys    */
+#define	GALL_PREC	   142		/*   i    galley with &&preceding    */
+#define	CROSS_PREC	   143		/*   i    preceding type cross-ref   */
+#define	PAGE_LABEL_IND	   144		/*   i    index of PAGE_LABEL        */
+#define	SCALE_IND	   145		/*   i    index of auto SCALE        */
+#define	COVER_IND	   146		/*   i    index of HCOVER or VCOVER  */
+#define	EXPAND_IND	   147		/*   i    index of HEXPAND or VEXPD  */
+#define	THREAD		   148		/*        a sequence of threads      */
+#define	CROSS_SYM	   149		/*        cross-ref info             */
+#define	CR_ROOT		   150		/*        RootCross                  */
+#define	MACRO	           151		/*        a macro symbol             */
+#define	LOCAL	           152		/*        a local symbol             */
+#define	LPAR	           153		/*        a left parameter           */
+#define	NPAR	           154		/*        a named parameter          */
+#define	RPAR	           155		/*        a right parameter          */
+#define	EXT_GALL           156		/*        an external galley         */
+#define	CR_LIST	           157		/*        a list of cross references */
+#define	SCOPE_SNAPSHOT     158		/*        a scope snapshot	     */
+#define	DISPOSED           159		/*        a disposed record          */
 
 #define is_indefinite(x)  ((x) >= CLOSURE && (x) <= HEAD)
 #define is_header(x)  ((x) >= BEGIN_HEADER && (x) <= CLEAR_HEADER)
@@ -2246,20 +2255,20 @@ typedef struct back_end_rec {
 /*****************************************************************************/
 
 /* sides of a mark */
-#define	BACK	           159		/* means lies to left of mark        */
-#define	ON	           160		/* means lies on mark                */
-#define	FWD	           161		/* means lies to right of mark       */
+#define	BACK	           160		/* means lies to left of mark        */
+#define	ON	           161		/* means lies on mark                */
+#define	FWD	           162		/* means lies to right of mark       */
 
 /* constraint statuses */
-#define	PROMOTE	           162		/* this component may be promoted    */
-#define	CLOSE	           163		/* must close dest before promoting  */
-#define	BLOCK	           164		/* cannot promote this component     */
-#define	CLEAR	           165		/* this constraint is now satisfied  */
+#define	PROMOTE	           163		/* this component may be promoted    */
+#define	CLOSE	           164		/* must close dest before promoting  */
+#define	BLOCK	           165		/* cannot promote this component     */
+#define	CLEAR	           166		/* this constraint is now satisfied  */
 
 /* gap increment types */
-#define	GAP_ABS	           166		/* absolute,  e.g.  3p               */
-#define	GAP_INC	           167		/* increment, e.g. +3p               */
-#define	GAP_DEC	           168		/* decrement, e.g. -3p               */
+#define	GAP_ABS	           167		/* absolute,  e.g.  3p               */
+#define	GAP_INC	           168		/* increment, e.g. +3p               */
+#define	GAP_DEC	           169		/* decrement, e.g. -3p               */
 
 /* gap modes occupying mode(x) */
 #define	NO_MODE		     0		/* for error detection: no mode      */
@@ -2517,6 +2526,8 @@ typedef struct back_end_rec {
 #define	KW_UNDERLINE		AsciiToFull("@Underline")
 #define	KW_COLOUR		AsciiToFull("@SetColour")
 #define	KW_COLOR		AsciiToFull("@SetColor")
+#define	KW_UNDERLINE_COLOUR	AsciiToFull("@SetUnderlineColour")
+#define	KW_UNDERLINE_COLOR	AsciiToFull("@SetUnderlineColor")
 #define	KW_TEXTURE		AsciiToFull("@SetTexture")
 #define	KW_OUTLINE		AsciiToFull("@Outline")
 #define	KW_LANGUAGE		AsciiToFull("@Language")
@@ -3478,6 +3489,7 @@ extern	void	  CloseFiles(void);
 /*****  z42.c	  Colour Service        **************************************/
 extern	void	  ColourInit(void);
 extern	void	  ColourChange(STYLE *style, OBJECT x);
+extern	void	  ColourUnderlineChange(STYLE *style, OBJECT x);
 extern	FULL_CHAR *ColourCommand(COLOUR_NUM cnum);
 
 /*****  z43.c	  Language Service      **************************************/
@@ -3559,8 +3571,8 @@ extern	BOOLEAN PDFHasValidTextMatrix(void);
 extern	BACK_END  PS_BackEnd;
 extern	BACK_END  PS_NullBackEnd;
 extern	void	  PS_IncGRepeated(OBJECT x);
-extern	int	  PS_FindIncGRepeated(OBJECT x, int typ);
-extern	void	  PS_PrintEPSFile(FILE *fp, FILE_POS *pos);
+/* extern	int	  PS_FindIncGRepeated(OBJECT x, int typ); */
+/* extern	void	  PS_PrintEPSFile(FILE *fp, FILE_POS *pos); */
 extern	BOOLEAN	  PS_FindBoundingBox(FILE *fp, FILE_POS *pos, FULL_LENGTH *llx,
 		    FULL_LENGTH *lly, FULL_LENGTH *urx, FULL_LENGTH *ury);
 

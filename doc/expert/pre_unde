@@ -27,4 +27,8 @@ Second, Adobe font files specify the correct position and thickness of
 underlining for each font, and the @@Underline symbol follows these
 specifications.  The font used is the font of the first object underlined,
 if it is a simple word, or else the font of the enclosing paragraph.
+@PP
+The colour of the underline is usually the same as the colour of the
+text being underlined, but this can be changed using the
+@@SetUnderlineColour symbol (Section {@NumberOf underline_colour}).
 @End @Section

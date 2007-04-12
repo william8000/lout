@@ -1,0 +1,21 @@
+@Section
+   @Title { "@SetUnderlineColour" and "@SetUnderlineColor" }
+   @Tag { underline_colour }
+@Begin
+@PP
+The @@SetUnderlineColour and @@SetUnderlineColor symbols,
+setunderlinecolour.sym @Index { @@SetUnderlineColour symbol }
+setunderlinecolor.sym @Index { @@SetUnderlineColor symbol }
+which have identical effect, ensure that any underlining in
+the right parameter is done in the colour specified by their
+left parameter.  The left parameter is a colour as for
+@@SetColour in Section {@NumberOf colour}.
+@PP
+To actually get underlining, you have to use the @@Underline
+symbol (Section {@NumberOf underline}).
+@PP
+Note that the @@SetColour symbol from Section {@NumberOf colour}
+includes the effect of @@SetUnderlineColour, so in the usual
+case where underlining is to be in the same colour as the text
+being underlined, there is no need to use @@SetUnderlineColour.
+@End @Section

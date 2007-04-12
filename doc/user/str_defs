@@ -25,12 +25,15 @@ directory, containing definitions like this:
 "import @BasicSetup"
 "def @Batlow { Batlow Food Distributors Pty. Ltd. }"
 }
-The meaning of the first line, {@Code "import @BasicSetup"}, will
-be explained shortly.  After that comes @Code "def" for `define,'
-then the name of the symbol being defined, then its value between
-braces.  So this example defines a symbol called @Code "@Batlow" to
-stand for the object following it between braces.  Lout will read this
-file during its setup phase (Section {@NumberOf setup}).
+The meaning of the first line, {@Code "import @BasicSetup"}, will be
+explained shortly.  After that comes @Code "def" for `define,' then
+the name of the symbol being defined, then its value between braces.
+So this example defines a symbol called @Code "@Batlow" to stand for
+the object following it between braces.  Lout will read this file
+during its setup phase (Section {@NumberOf setup}).  Alternatively, you
+can place definitions directly into your document files, following your
+@Code "@SysInclude" lines and before {@Code "@Doc"}, {@Code "@Report"},
+or whatever symbol your document proper starts with.
 @PP
 Your symbols may have any names you wish made from letters and
 {@Code "@"}.  However, it is good practice to have exactly one

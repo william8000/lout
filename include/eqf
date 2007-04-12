@@ -59,8 +59,6 @@ export	"`" "``" "```" bin rel punct non vctr big small
 	triangle backslash forall exists neg
 	circle filledcircle square
 
-	"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
-
 	sum prod coprod int oint bcap bcup bvee bwedge bodot botimes
 	boplus buplus
 
@@ -104,6 +102,8 @@ export	"`" "``" "```" bin rel punct non vctr big small
 	dot dotdot hat tilde vec dyad overbar underbar sqrt root zroot
 	nextcol above labove cabove rabove mabove
 	matrix pmatrix bmatrix brmatrix fmatrix cmatrix amatrix
+
+	"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
 
 def @Eq                  
     named initzunit { 1f }
@@ -588,24 +588,6 @@ def @Eq
 	}
       }
     }
-
-
-    ###################################################################
-    #                                                                 #
-    #   Group 5 (digits)                                              #
-    #                                                                 #
-    ###################################################################
-
-    def "0" { zero            }
-    def "1" { one             }
-    def "2" { two             }
-    def "3" { three           }
-    def "4" { four            }
-    def "5" { five            }
-    def "6" { six             }
-    def "7" { seven           }
-    def "8" { eight           }
-    def "9" { nine            }
 
 
     ###################################################################
@@ -1691,6 +1673,24 @@ def @Eq
     macro fmatrix  { matrix atleft { blfloor } atright { brfloor } }
     macro cmatrix  { matrix atleft { blceil  } atright { brceil  } }
     macro amatrix  { matrix atleft { blangle } atright { brangle } }
+
+    ###################################################################
+    #                                                                 #
+    #   Group 5 (digits)                                              #
+    #                                                                 #
+    ###################################################################
+
+    def "0" { zero            }
+    def "1" { one             }
+    def "2" { two             }
+    def "3" { three           }
+    def "4" { four            }
+    def "5" { five            }
+    def "6" { six             }
+    def "7" { seven           }
+    def "8" { eight           }
+    def "9" { nine            }
+
 
     { Slope xheight2mark nostrut } @Font { separate @SpaceGap } @Space
     initzunit @ZUnit 1f @YUnit @Body

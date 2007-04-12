@@ -467,4 +467,13 @@ Changes and new features introduced in Version 3.34 [March 2007]
    In @Diag, new @DNode and @ENode symbols like @ANode, @BNode, and @CNode
      (also usable as @DCell and @ECell in syntax diagrams)
 
+Changes and new features introduced in Version 3.35 [April 2007]
+
+   Bug fix: @IncludeGraphicRepeated is working again, although it does
+     crash my printer (but fine with kghostview, evince, ps2pdf etc.)
+   Precedences and associativities now specifiable by invoking a macro
+   New @ColouredUnderline symbol makes coloured underlines
+   New "arrowstyle { many }" in @Diag makes "many"-relation arrowheads
+   New @HClip and @VClip symbols for clipping (see User's Guide)
+
 Jeff Kingston

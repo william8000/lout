@@ -41,12 +41,19 @@ User-defined symbols may be given a precedence and associativity:
 "}"
 }
 They come just after any @Code into clause and before any parameter
-definitions.  The precedence may be
-any whole number between 10 and 100, and if omitted is assigned the
-value 100.  The higher the number, the higher the precedence.  The
-associativity may be @Code left or {@Code right}, and if omitted
-defaults to {@Code right}.  Lout's symbols have the following
-precedences and associativities:
+definitions.  The precedence may be any whole number between 10 and
+100, and if omitted is assigned the value 100.  The higher the number,
+the higher the precedence.  The associativity may be @Code left or
+{@Code right}, and if omitted defaults to {@Code right}.
+@PP
+In the example above, the precedence and associativity are both
+literal words ({@Code 50} and {@Code right}).  It is also possible
+to define a macro whose value is a suitable literal word, and
+invoke that macro as the value of a precedence or associativity.
+But arbitrary expressions, including invocations of symbols other
+than macros, are not permitted.
+@PP
+Lout's symbols have the following precedences and associativities:
 @ID @Tab
    vmargin { 0.5vx }
    @Fmta { @Col @CC A ! @Col @CC B ! @Col C }

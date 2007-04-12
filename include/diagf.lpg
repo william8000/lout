@@ -3306,5 +3306,31 @@ ldiagdict begin
   0 0
 } def
 
+% shape and labels of the @ManyArrowHead symbol
+% <pathwidth> ldiagmanyarrowhead -
+/ldiagmanyarrowhead
+{
+  /pathwidth exch def
+  /LL [ 0 ysize 2 div pathwidth 2 div sub ] cvx def
+  /LU [ 0 ysize 2 div pathwidth 2 div add ] cvx def
+  LL
+  xsize 0
+  xsize pathwidth
+  LU
+  LL
+  []
+  LL
+  xsize LL exch pop
+  xsize LU exch pop
+  LU
+  LL
+  []
+  LL
+  xsize ysize pathwidth sub
+  xsize ysize
+  LU
+  LL
+} def
+
 end
 %%EndResource

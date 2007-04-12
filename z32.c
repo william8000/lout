@@ -1,6 +1,6 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -61,6 +61,7 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
       y = MakeWord(type(x), buff, &fpos(x));
       word_font(y) = word_font(x);
       word_colour(y) = word_colour(x);
+      word_underline_colour(y) = word_underline_colour(x);
       word_texture(y) = word_texture(x);
       word_outline(y) = word_outline(x);
       word_language(y) = word_language(x);

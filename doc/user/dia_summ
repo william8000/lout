@@ -1335,8 +1335,9 @@ or {@Code both} }
 @Rowa
   A { "   arrowstyle"}
   B { solid }
-  C { {@Code solid}, {@Code halfopen}, {@Code open}, {@Code curvedsolid},
-{@Code curvedhalfopen}, or {@Code curvedopen} }
+  C { {@Code solid}, {@Code solidwithbar}, {@Code halfopen}, {@Code open},
+{@Code curvedsolid}, {@Code curvedhalfopen}, {@Code curvedopen},
+{@Code circle}, {@Code box}, or {@Code many} }
 @Rowa
   A { "   arrowwidth"}
   B { 0.3f }
@@ -1348,8 +1349,9 @@ or {@Code both} }
 @Rowa
   A { "   backarrowstyle"}
   B { solid }
-  C { {@Code solid}, {@Code halfopen}, {@Code open}, {@Code curvedsolid},
-{@Code curvedhalfopen}, or {@Code curvedopen} }
+  C { {@Code solid}, {@Code solidwithbar}, {@Code halfopen}, {@Code open},
+{@Code curvedsolid}, {@Code curvedhalfopen}, {@Code curvedopen},
+{@Code circle}, {@Code box}, or {@Code many} }
 @Rowa
   A { "   backarrowwidth"}
   B { 0.3f }

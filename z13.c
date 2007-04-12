@@ -1,6 +1,6 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -545,6 +545,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
 	small_caps(save_style(y)) = FALSE;
 	font(save_style(y)) = word_font(x);
 	colour(save_style(y)) = word_colour(x);
+	underline_colour(save_style(y)) = word_underline_colour(x);
 	texture(save_style(y)) = word_texture(x);
 	outline(save_style(y)) = word_outline(x);
 	language(save_style(y)) = word_language(x);

@@ -1,6 +1,6 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -663,6 +663,7 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	fwd(last, COLM) = fwd(y, gall_dir(hd));
 	word_font(last) = word_font(y);
 	word_colour(last) = word_colour(y);
+	word_underline_colour(last) = word_underline_colour(y);
 	word_texture(last) = word_texture(y);
 	word_outline(last) = word_outline(y);
 	word_language(last) = word_language(y);

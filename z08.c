@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -1031,6 +1031,7 @@ OBJECT *enclose, BOOLEAN fcr)
       if( !ok )
       {	word_font(x) = font(*style);
 	word_colour(x) = colour(*style);
+	word_underline_colour(x) = underline_colour(*style);
 	word_texture(x) = texture(*style);
 	word_outline(x) = outline(*style);
 	word_language(x) = language(*style);
@@ -1067,6 +1068,7 @@ OBJECT *enclose, BOOLEAN fcr)
       if( is_word(type(y)) )
       { word_font(y) = font(*style);
 	word_colour(y) = colour(*style);
+	word_underline_colour(y) = underline_colour(*style);
 	word_texture(y) = texture(*style);
 	word_outline(y) = outline(*style);
 	word_language(y) = language(*style);
@@ -1108,6 +1110,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	if( is_word(type(y)) )
 	{ word_font(y) = font(*style);
 	  word_colour(y) = colour(*style);
+	  word_underline_colour(y) = underline_colour(*style);
 	  word_texture(y) = texture(*style);
 	  word_outline(y) = outline(*style);
 	  word_language(y) = language(*style);
@@ -1243,6 +1246,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	    prev != nilobj && is_word(type(prev)) && !mark(gap(g)) &&
 	    word_font(prev) == word_font(y) &&
 	    word_colour(prev) == word_colour(y) &&
+	    word_underline_colour(prev) == word_underline_colour(y) &&
 	    word_texture(prev) == word_texture(y) &&
 	    word_outline(prev) == word_outline(y) &&
 	    word_language(prev) == word_language(y) &&
@@ -1261,6 +1265,7 @@ OBJECT *enclose, BOOLEAN fcr)
 	  y = MakeWordTwo(typ, string(prev), string(y), &fpos(prev));
 	  word_font(y) = word_font(prev);
 	  word_colour(y) = word_colour(prev);
+	  word_underline_colour(y) = word_underline_colour(prev);
 	  word_texture(y) = word_texture(prev);
 	  word_outline(y) = word_outline(prev);
 	  word_language(y) = word_language(prev);
@@ -1644,47 +1649,93 @@ OBJECT *enclose, BOOLEAN fcr)
       break;
 
 
+    case UNDERLINE:
+
+      /* change x to an ACAT */
+      assert(Down(x) != x && NextDown(Down(x)) == x, "Manifest: UNDERLINE!");
+      type(x) = ACAT;
+      adjust_cat(x) = padjust(*style);
+      padjust(*style) = FALSE;
+      StyleCopy(save_style(x), *style);
+
+      /* manifest x's sole child and set underline flags in the child */
+      Child(y, Down(x));
+      y = Manifest(y, env, style, nbt, nft, target, crs, ok,FALSE,enclose,fcr);
+      SetUnderline(x);
+      ReplaceWithSplit(x, bthr, fthr);
+      break;
+
+
     case FONT:
     case SPACE:
     case YUNIT:
     case ZUNIT:
     case BREAK:
     case COLOUR:
+    case UNDERLINE_COLOUR:
     case TEXTURE:
     case LANGUAGE:
     
       assert( Down(x) != x && NextDown(Down(x)) != x, "Manifest: FONT!" );
       StyleCopy(new_style, *style);
       Child(y, Down(x));
-      y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE, &nenclose, fcr);
-      y = ReplaceWithTidy(y,
-        type(x) == COLOUR ? WORD_TIDY :
-	type(x) == TEXTURE ? PARA_TIDY : ACAT_TIDY);
+      y = Manifest(y, env, style, nbt, nft, &ntarget, crs, FALSE, FALSE,
+	&nenclose, fcr);
       switch( type(x) )
       {
-	case FONT:	FontChange(&new_style, y);
-			break;
+	case FONT:
 
-	case SPACE:	SpaceChange(&new_style, y);
-			break;
+	  y = ReplaceWithTidy(y, ACAT_TIDY);
+	  FontChange(&new_style, y);
+	  break;
 
-	case YUNIT:	YUnitChange(&new_style, y);
-			break;
+	case SPACE:
 
-	case ZUNIT:	ZUnitChange(&new_style, y);
-			break;
+	  y = ReplaceWithTidy(y, ACAT_TIDY);
+	  SpaceChange(&new_style, y);
+	  break;
 
-	case BREAK:	BreakChange(&new_style, y);
-			break;
+	case YUNIT:	
+
+	  y = ReplaceWithTidy(y, ACAT_TIDY);
+	  YUnitChange(&new_style, y);
+	  break;
+
+	case ZUNIT:	
+
+	  y = ReplaceWithTidy(y, ACAT_TIDY);
+	  ZUnitChange(&new_style, y);
+	  break;
+
+	case BREAK:	
+
+	  y = ReplaceWithTidy(y, ACAT_TIDY);
+	  BreakChange(&new_style, y);
+	  break;
 	
-	case COLOUR:	ColourChange(&new_style, y);
-			break;
+	case COLOUR:	
 
-	case TEXTURE:	TextureChange(&new_style, y);
-			break;
+	  y = ReplaceWithTidy(y, WORD_TIDY);
+	  ColourChange(&new_style, y);
+	  break;
 
-	case LANGUAGE:	LanguageChange(&new_style, y);
-			break;
+	case UNDERLINE_COLOUR:
+	  
+	  y = ReplaceWithTidy(y, WORD_TIDY);
+	  ColourUnderlineChange(&new_style, y);
+	  break;
+
+	case TEXTURE:
+	  
+	  y = ReplaceWithTidy(y, PARA_TIDY);
+	  TextureChange(&new_style, y);
+	  break;
+
+	case LANGUAGE:
+	  
+	  y = ReplaceWithTidy(y, ACAT_TIDY);
+	  LanguageChange(&new_style, y);
+	  break;
 
       }
       DisposeChild(Down(x));
@@ -1817,21 +1868,6 @@ OBJECT *enclose, BOOLEAN fcr)
       y = Manifest(y, env, &new_style, bthr, fthr, target, crs, ok, FALSE, enclose, fcr);
       DeleteLink(Down(x));
       MergeNode(y, x);  x = y;
-      break;
-
-
-    case UNDERLINE:
-
-      /* change x to an ACAT and set the underline flags in its child */
-      assert( Down(x) != x && NextDown(Down(x)) == x, "Manifest: UNDERLINE!" );
-      type(x) = ACAT;
-      adjust_cat(x) = padjust(*style);
-      padjust(*style) = FALSE;
-      StyleCopy(save_style(x), *style);
-      Child(y, Down(x));
-      y = Manifest(y, env, style, nbt, nft, target, crs, ok, FALSE, enclose, fcr);
-      SetUnderline(x);
-      ReplaceWithSplit(x, bthr, fthr);
       break;
 
 

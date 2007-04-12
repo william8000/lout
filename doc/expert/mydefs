@@ -84,6 +84,8 @@
    def @@SetColour            { @Code "@SetColour"            }
    def @@SetContext           { @Code "@SetContext"           }
    def @@SetHeaderComponent   { @Code "@SetHeaderComponent"   }
+   def @@SetUnderlineColor    { @Code "@SetUnderlineColor"    }
+   def @@SetUnderlineColour   { @Code "@SetUnderlineColour"   }
    def @@Space                { @Code "@Space"                }
    def @@StartHSpan           { @Code "@StartHSpan"           }
    def @@StartVSpan           { @Code "@StartVSpan"           }

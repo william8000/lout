@@ -1,6 +1,6 @@
 /*@z01.c:Supervise:StartSym, AllowCrossDb, etc.@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -773,6 +773,8 @@ static void run(int argc, char *argv[], int run_num, int *runs_to_do,
   load(KW_ZUNIT,        ZUNIT,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_BREAK,        BREAK,          TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_UNDERLINE,    UNDERLINE,      FALSE,  TRUE,   FALSE, DEFAULT_PREC);
+  load(KW_UNDERLINE_COLOUR, UNDERLINE_COLOUR,TRUE,TRUE, FALSE, DEFAULT_PREC);
+  load(KW_UNDERLINE_COLOR, UNDERLINE_COLOUR,TRUE,TRUE,  FALSE, DEFAULT_PREC);
   load(KW_COLOUR,       COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_COLOR,        COLOUR,         TRUE,   TRUE,   FALSE, DEFAULT_PREC);
   load(KW_TEXTURE,      TEXTURE,        TRUE,   TRUE,   FALSE, DEFAULT_PREC);

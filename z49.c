@@ -1,6 +1,6 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.34)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -390,7 +390,7 @@ void PS_IncGRepeated(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-int PS_FindIncGRepeated(OBJECT x, int typ)
+static int PS_FindIncGRepeated(OBJECT x, int typ)
 { OBJECT link, y;  int i;
   if( incg_files != nilobj )
   {
@@ -487,22 +487,27 @@ static void PS_PrintMapping(MAPPING m)
 
 /*****************************************************************************/
 /*                                                                           */
-/*  PS_PrintEPSFile(FILE *fp, FILE_POS *pos)                                 */
+/*  void PS_PrintEPSFile(FILE *fp, FILE_POS *pos, BOOLEAN strip_all)         */
 /*                                                                           */
 /*  Print EPS file fp to out_fp.                                             */
+/*                                                                           */
+/*  If strip_all is TRUE, strip out all lines beginning with %%, else        */
+/*  strip out only the most dangerous ones.                                  */
 /*                                                                           */
 /*****************************************************************************/
 #define	SKIPPING	0
 #define	READING_DNR	1
 #define FINISHED	2
 
-static BOOLEAN strip_out(FULL_CHAR *buff)
-{ if( StringBeginsWith(buff, AsciiToFull("%%EOF"))     )  return TRUE;
+static BOOLEAN strip_out(FULL_CHAR *buff, BOOLEAN strip_all)
+{
+  if( strip_all && StringBeginsWith(buff, AsciiToFull("%%")) ) return TRUE;
+  if( StringBeginsWith(buff, AsciiToFull("%%EOF"))     )  return TRUE;
   if( StringBeginsWith(buff, AsciiToFull("%%Trailer")) )  return TRUE;
   return FALSE;
 } /* end strip_out */
 
-void PS_PrintEPSFile(FILE *fp, FILE_POS *pos)
+static void PS_PrintEPSFile(FILE *fp, FILE_POS *pos, BOOLEAN strip_all)
 { int state, x;  OBJECT y;
   FULL_CHAR buff[MAX_LINE];
   debug0(DPO, D, "[ PS_PrintEPSFile");
@@ -528,7 +533,7 @@ void PS_PrintEPSFile(FILE *fp, FILE_POS *pos)
 	}
 	if( StringBeginsWith(buff, AsciiToFull("%%Extensions:")) )
 	  Error(49, 11, "ignoring Extensions comment in EPS file", WARN, pos);
-	if( !strip_out(buff) )
+	if( !strip_out(buff, strip_all) )
 	{
 	  StringFPuts(buff, out_fp);
 	  pnl;
@@ -545,7 +550,7 @@ void PS_PrintEPSFile(FILE *fp, FILE_POS *pos)
 	state = (ReadOneLine(fp, buff, MAX_LINE) == 0) ? FINISHED : READING_DNR;
       }
       else
-      { if( !strip_out(buff) )
+      { if( !strip_out(buff, strip_all) )
 	{
 	  StringFPuts(buff, out_fp);
 	  pnl;
@@ -947,7 +952,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
     p0("    put not { exit } if 1 add");
     p0("  } loop");
     p0("  1 add 2 copy () put pop currentglobal true setglobal exch");
-    p0("  0 1 array put setglobal pop");
+    p0("  0 4 array put setglobal pop");
     p0("} bind def");
   }
 
@@ -1029,11 +1034,24 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
       pnl;
       p0("  /PaintProc {");
       p0("    begin");
-      p0("      LoutStartEPSF");
-      p0("        EPSArray 0 get 0 1 put");
-      p0("        //AcquisitionProc 0 () /SubFileDecode filter");
-      p0("        cvx exec");
-      p0("      LoutEPSFCleanUp");
+      p0("      EPSArray 0 get 1 save put");
+      p0("      EPSArray 0 get 2 countdictstack put");
+      p0("      EPSArray 0 get 3 count 2 sub put");
+      p0("      20 dict begin");
+      p0("      /showpage {} def");
+      p0("      0 setgray 0 setlinecap");
+      p0("      1 setlinewidth 0 setlinejoin");
+      p0("      10 setmiterlimit [] 0 setdash newpath");
+      p0("      /languagelevel where");
+      p0("      { pop languagelevel 1 ne");
+      p0("        { false setstrokeadjust false setoverprint } if");
+      p0("      } if");
+      p0("      EPSArray 0 get 0 1 put");
+      p0("      //AcquisitionProc 0 () /SubFileDecode filter");
+      p0("      cvx exec");
+      p0("      count EPSArray 0 get 3 get sub { pop } repeat");
+      p0("      countdictstack EPSArray 0 get 2 get sub { end } repeat");
+      p0("      EPSArray 0 get 1 get restore");
       p0("    end");
       p0("  } bind def");
       pnl;
@@ -1043,7 +1061,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
       pnl;
       p1("Form%d /EPSArray get", fnum);
       p0("LoutReadFormEPS");
-      PS_PrintEPSFile(fp, &fpos(x));
+      PS_PrintEPSFile(fp, &fpos(x), TRUE);
       p1("Lout_Marker_%s", (char *) TimeString());
       p0("%%EndResource");
       pnl;
@@ -1763,7 +1781,7 @@ static void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
 
     /* copy through the include file, except divert resources lines to needs */
     /* and strip out some comment lines that cause problems                  */
-    PS_PrintEPSFile(fp, &fpos(y));
+    PS_PrintEPSFile(fp, &fpos(y), FALSE);
 
     /* wrapup */
     DisposeObject(full_name);
