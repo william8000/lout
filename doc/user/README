@@ -21,11 +21,11 @@ error message output on the last run for A4 size printing:
 
 lout:
         : lout -r beginning run 6:
-lout file "str_indx" (from "str" line 16, from "all" line 38):
-    54,1: 0.3c object too high for 0.1c space; will try elsewhere
-lout file "gra_summ" (from "gra" line 44, from "all" line 46):
+lout file "str_indx" (from "str" line 16, from "all" line 39):
+    53,1: 0.3c object too high for 0.0c space; will try elsewhere
+lout file "gra_summ" (from "gra" line 44, from "all" line 47):
     10,1: 24.1c object too high for 23.6c space; @Scale inserted
-lout file "prg_tabs" (from "prg" line 141, from "all" line 48):
+lout file "prg_tabs" (from "prg" line 141, from "all" line 49):
    66,23: prg2lout 2,1: program text ended within comment
    68,35: prg2lout 2,1: program text ended within comment
 
@@ -41,7 +41,7 @@ repeated failure to converge, caused by footnotes and floating figures
 close to large unbreakable displays.
 
 A copy of the final PostScript output file (A4 paper size) is
-stored at "ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.35.user.ps.gz".
+stored at "ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.36.user.ps.gz".
 
 Jeffrey H. Kingston
-13 April 2007
+27 July 2007

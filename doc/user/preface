@@ -18,7 +18,7 @@ gnu. @Index { GNU Public License }
 primary source is directory
 @ID @Code "ftp://ftp.it.usyd.edu.au/jeff/lout"
 containing a gzipped tar file of the current version
-(currently {@Code "lout-3.35.tar.gz"}), and various other things including
+(currently {@Code "lout-3.36.tar.gz"}), and various other things including
 a PostScript version of this guide.  The distribution contains source code,
 libraries, documentation, license, and installation instructions.
 @PP
@@ -52,7 +52,8 @@ E. Knuth's @TeX system @Cite { $knuth1984tex }, and the optimal paragraph
 breaking algorithm was applied to the problem of producing optimal page
 breaks.  The first implementations of horizontal galleys and optimal
 page breaking were by my student Gabor Inokai.  Vincent Tan contributed
-the PDF back end.  Valeriy E. Ushakov smoothed the path for many
+the PDF back end.  Ludovic Court{@Char egrave}s contributed the
+@Code "@Math" package.  Valeriy E. Ushakov smoothed the path for many
 people, by his contributions to improving Lout's robustness, and his
 tireless management of and responses to the Lout mailing list.  The
 current mailing list maintainer is Greg Woods.  The number of other

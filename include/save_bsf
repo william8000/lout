@@ -1369,11 +1369,10 @@ def @BasicSetup
     #                                                                         #
     ###########################################################################
 
-    export @Tag val display_val
+    export @Tag val
     def @NumDispCounterMarker
 	named @Tag {}
 	named val {}
-	named display_val {}
     {
 	@Null
     }
@@ -1395,13 +1394,13 @@ def @BasicSetup
         @NumDispCounterMarker&&preceding @Tagged tag
         # @NumDispCounterMarker val { @NumDispNum tag }
 	# @NumberMarker @Tag { tag } @Value { @NumDispNum tag }
-	@NumDispCounterMarker val { @NumDispNum tag } display_val { @DisplayNumber }
+	@NumDispCounterMarker val { @DisplayNumber }
         @NumberMarker @Tag { tag } @Value { @DisplayNumber }
     }
 
     def @NN
     {
-	@NumDispCounterMarker&&preceding @Open { @DisplayNumStyle display_val }
+	@NumDispCounterMarker&&preceding @Open { @DisplayNumStyle val }
     }
 
     def @Do
@@ -1442,8 +1441,8 @@ def @BasicSetup
 	right x
     {
 	@OneRow {
-           # @NumDispCounterIncrement @Tag
-           @NumDispCounterIncrement @BypassNumber { @BypassNumber } @Tag
+	   @NumDispCounterIncrement @Tag
+           # @NumDispCounterIncrement @BypassNumber { @BypassNumber } @Tag
 	   @PageMark @Tag
 	   ^//
 	   @OneRow x
@@ -1462,8 +1461,8 @@ def @BasicSetup
 	right x
     {
 	@OneRow {
-           # @NumDispCounterIncrement @Tag
-	   @NumDispCounterIncrement @BypassNumber { @BypassNumber } @Tag
+           @NumDispCounterIncrement @Tag
+	   # @NumDispCounterIncrement @BypassNumber { @BypassNumber } @Tag
 	   @PageMark @Tag
 	   ^/
 	   @OneRow x

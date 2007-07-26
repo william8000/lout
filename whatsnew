@@ -476,4 +476,17 @@ Changes and new features introduced in Version 3.35 [April 2007]
    New "arrowstyle { many }" in @Diag makes "many"-relation arrowheads
    New @HClip and @VClip symbols for clipping (see User's Guide)
 
+Changes and new features introduced in Version 3.36 [July 2007]
+
+   Bug fixes:
+      "lout -t" really does avoid textures completely now (Ludovic Courtes)
+      small patch (@PC becomes @PS) to prg2lout.c (Gabor Greif)
+      patch to haskellf (Gabor Greif)
+      changed haskellf symboloperators from "Symbol Base" to "Slope" (Kingston)
+   Lout now released under Version 3 of the GNU General Public License
+   Improved headings of numberless chapters/sections (Ludovic Courtes)
+   @BypassNumber option for numbered displays (Courtes/Kingston)
+   &- after "/" now hyphenates without inserting a hyphen, like &- after -
+   New @Math symbol (Courtes), will obsolete @Eq next release
+
 Jeff Kingston

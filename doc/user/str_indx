@@ -21,15 +21,14 @@ Galileo Galilei
     telescope, his use of, 201--203
     trial of, 205--211, @I 242, 395
 }
-Each line shows off one of Lout's four tricks:  the first is a
-@I { raw entry } (no page number attached); the second is a
-@I sub-entry (indented); the third has a @I { page number range }
-instead of a single page number; and the fourth is a @I { merged entry }
-(several page numbers or ranges within one entry) with a
-@I { special element } (the page number in italics).
+These lines show off Lout's five tricks:  the first is a @I { raw entry }
+(no page number attached); the second is a @I sub-entry (indented); the
+third has a @I { page number range } instead of a single page number; and
+the fourth has a @I { merged entry } (several page numbers or ranges within
+one entry) and a @I { special element } (the page number in italics).
 @PP
-We'll take each of them in turn in a moment, but first, let's see how
-to get a basic entry, like this one:
+We'll get to them in a moment, but first, let's see how to get a basic
+entry, like this one:
 @ID { Galileo Galilei, 201 }
 To get this into your index, type
 @ID @Code "galileo @Index { Galileo Galilei }"
@@ -106,7 +105,7 @@ result of {@Code "@PageOf"}).  If both ends of the range fall on the
 same page, the @Code "to" option is ignored:  you will never get
 201--201.
 @PP
-Our fourth and final trick is the merged entry:
+Our fourth trick is the merged entry:
 @ID { trial of, 205--211, 242, 395 }
 The main thing to grasp is that this merged entry was originally three
 separate entries (sub-entries in this case):
@@ -255,7 +254,8 @@ Although the page numbers in index entries will be kept up to date
 automatically as the document changes, as all cross references are, 
 it is best to refrain from inserting index entries until the document
 is complete and an overall plan of the structure of the index can
-be made.
+be made.  Place index entries for floating figures and tables within
+their captions.
 @PP
 Large indexes may benefit from {@I spacers} -- empty spaces or
 spacers. @Index { spacers in indexes }

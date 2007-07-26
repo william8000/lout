@@ -1,5 +1,6 @@
 @Section
    @Title { Spacing }
+   @Tag { equ_spacing }
 @Begin
 @PP
 There is a basic rule governing the use of white space characters (space,

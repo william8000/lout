@@ -5189,7 +5189,13 @@ def @DocumentSetup
 	def @LongNum
 	{
 	    numbers @Then {
-		initiallanguage @Language { word @NumSep @ShortNum }
+		# initiallanguage @Language { word @NumSep @ShortNum }
+		@ShortNum @Case {
+                  ""   @Yield { } # numberless: don't produce `word'
+                  else @Yield {
+                    initiallanguage @Language { word @NumSep @ShortNum }
+                  }
+               }
 	    }
 	}
 

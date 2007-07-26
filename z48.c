@@ -1,6 +1,6 @@
 /*@z48.c:PDF back end@********************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -12,7 +12,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either Version 2, or (at your option)      */
+/*  the Free Software Foundation; either Version 3, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -37,13 +37,14 @@
 /*                PDFText_Close(), PDFHasValidTextMatrix()                   */
 /*                                                                           */
 /*****************************************************************************/
-#define  PI   3.1415926535897931160
 #include "externs.h"
-
 
 /* ANSI headers */
 #include <ctype.h>
 #include <math.h>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 #include <time.h>
 
 /* zlib headers: define PDF_COMPRESSION = 0 if you don't have zlib library */
@@ -2714,13 +2715,13 @@ static char *PDFPage_EvalExpr(char* inExpr, float* outValue)
 
 	case k_sin:
 
-	  *outValue = sin((double) val1 * (double) PI / (double) 180.0);
+	  *outValue = sin((double) val1 * (double) M_PI / (double) 180.0);
 	  break;
 
 
 	case k_cos:
 
-	  *outValue = cos((double) val1 * (double) PI / (double) 180.0);
+	  *outValue = cos((double) val1 * (double) M_PI / (double) 180.0);
 	  break;
 
 

@@ -1,6 +1,6 @@
 /*@z28.c:Error Service:ErrorInit(), ErrorSeen()@******************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either Version 2, or (at your option)      */
+/*  the Free Software Foundation; either Version 3, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */

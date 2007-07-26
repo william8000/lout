@@ -308,7 +308,7 @@ hyphenation @Index { Hyphenation gap mode }
 tex.hyphenation @SubIndex { hyphenation }
 is chosen for replacement by {@Code "//1vx"}, a hyphen will be appended to
 the preceding object, unless that object is a word which already ends with
-a hyphen.  For example,
+a hyphen or slash.  For example,
 @ID @Code {
 Long words may be "hyph &0ih enat &0ih ed."
 }

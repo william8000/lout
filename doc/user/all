@@ -2,6 +2,7 @@
 @SysInclude { tab }
 @SysInclude { tbl }
 @SysInclude { eq }
+@SysInclude { math }
 @SysInclude { graph }
 @SysInclude { pie }
 @SysInclude { pas }
@@ -22,8 +23,8 @@ Lout
 Document Formatting System
 }
     @Author { Jeffrey H. Kingston }
-    @Edition { Version 3.35
-April, 2007 }
+    @Edition { Version 3.36
+July, 2007 }
     @Publisher {
 Copyright @CopyRight 1991, 2007 Jeffrey H. Kingston,
 School of Information Technologies,

@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either Version 2, or (at your option)      */
+/*  the Free Software Foundation; either Version 3, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.35 (April 2007)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.36 (July 2007)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -443,7 +443,7 @@ typedef void *POINTER;
 #define	CH_FLAG_PDF		'Z'	/* the -Z command line flag	     */
 
 #define	CH_SPACE		' '	/* space character                   */
-/* #define	CH_NEWLINE		'\n'*/ 	/* the newline character             */
+/* #define	CH_NEWLINE		'\n'*/ 	/* the newline character     */
 #define	CH_LF			'\n'	/* the line feed character           */
 #define	CH_CR			'\r'	/* the carriage return character     */
 #define	CH_SYMSTART		'@'	/* extra letter symbols may have     */
@@ -456,6 +456,7 @@ typedef void *POINTER;
 #define	CH_DECGAP		'-'	/* begins a decrementing gap	     */
 #define	CH_MINUS		'-'	/* minus sign                        */
 #define	CH_HYPHEN		'-'	/* the hyphen character		     */
+#define	CH_SLASH		'/'	/* the slash character		     */
 #define	CH_NOBREAK		'u'	/* `unbreakable' character for gaps  */
 
 #define	CH_UNIT_CM		'c'	/* unit of measurement: centimetres  */

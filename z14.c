@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either Version 2, or (at your option)      */
+/*  the Free Software Foundation; either Version 3, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -164,7 +164,7 @@ typedef struct {
 /*****************************************************************************/
 
 #define MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word)	\
-{ OBJECT newg, foll = nilobj, tmp;					\
+{ OBJECT newg, foll = nilobj, tmp;  int ch;				\
   BOOLEAN jn, unbreakable_at_right = FALSE;				\
   debug0(DOF, DDD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
 									\
@@ -211,34 +211,37 @@ typedef struct {
     { if( hyph_allowed )						\
       {									\
 	/* hyphenation is allowed, so add hyph_word to nat_width */	\
-	if( is_word(type(right)) && 					\
-	 !(string(right)[StringLength(string(right))-1] == CH_HYPHEN) )	\
-        {								\
-	  /* make sure hyph_word exists and is of the right font */	\
-	  debug0(DOF, DDD, "  MoveRightToGap checking hyph_word");	\
-	  if( hyph_word == nilobj )					\
-	  { hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
-	    word_font(hyph_word) = 0;					\
-	    word_colour(hyph_word) = colour(save_style(x));		\
-	    word_underline_colour(hyph_word) = underline_colour(save_style(x));	\
-	    word_texture(hyph_word) = texture(save_style(x));		\
-	    word_outline(hyph_word) = outline(save_style(x));		\
-	    word_language(hyph_word) = language(save_style(x));		\
-	    word_baselinemark(hyph_word) = baselinemark(save_style(x));	\
-	    word_strut(hyph_word) = strut(save_style(x));		\
-	    word_ligatures(hyph_word) = ligatures(save_style(x));	\
-	    word_hyph(hyph_word) = hyph_style(save_style(x))==HYPH_ON;	\
-	  }								\
-	  if( word_font(hyph_word) != word_font(right) )		\
-	  { word_font(hyph_word) = word_font(right);			\
-	    FposCopy(fpos(hyph_word), fpos(x));				\
-	    FontWordSize(hyph_word);					\
-	  }								\
+	if( is_word(type(right)) )					\
+	{								\
+	  ch = string(right)[StringLength(string(right))-1];		\
+	  if( ch != CH_HYPHEN && ch != CH_SLASH )			\
+	  {								\
+	    /* make sure hyph_word exists and is of the right font */	\
+	    debug0(DOF, DDD, "  MoveRightToGap checking hyph_word");	\
+	    if( hyph_word == nilobj )					\
+	    { hyph_word = MakeWord(WORD, STR_HYPHEN, &fpos(x));		\
+	      word_font(hyph_word) = 0;					\
+	      word_colour(hyph_word) = colour(save_style(x));		\
+	      word_underline_colour(hyph_word)=underline_colour(save_style(x));\
+	      word_texture(hyph_word) = texture(save_style(x));		\
+	      word_outline(hyph_word) = outline(save_style(x));		\
+	      word_language(hyph_word) = language(save_style(x));	\
+	      word_baselinemark(hyph_word) = baselinemark(save_style(x));\
+	      word_strut(hyph_word) = strut(save_style(x));		\
+	      word_ligatures(hyph_word) = ligatures(save_style(x));	\
+	      word_hyph(hyph_word) = hyph_style(save_style(x))==HYPH_ON;\
+	    }								\
+	    if( word_font(hyph_word) != word_font(right) )		\
+	    { word_font(hyph_word) = word_font(right);			\
+	      FposCopy(fpos(hyph_word), fpos(x));			\
+	      FontWordSize(hyph_word);					\
+	    }								\
 									\
-	  mode(gap(newg)) = ADD_HYPH;					\
-	  if( !marginkerning(save_style(x)) )				\
-	    I.nat_width += size(hyph_word, COLM);			\
-	  debug0(DOF, DDD, "   adding hyph_word from nat_width");	\
+	    mode(gap(newg)) = ADD_HYPH;					\
+	    if( !marginkerning(save_style(x)) )				\
+	      I.nat_width += size(hyph_word, COLM);			\
+	    debug0(DOF, DDD, "   adding hyph_word from nat_width");	\
+	  }								\
         }								\
       }									\
       else								\

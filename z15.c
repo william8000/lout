@@ -1,6 +1,6 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either Version 2, or (at your option)      */
+/*  the Free Software Foundation; either Version 3, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -32,7 +32,7 @@
 /*****************************************************************************/
 #include <math.h>
 #ifndef M_PI
-#define M_PI       3.1415926535897931160E0
+#define M_PI 3.14159265358979323846
 #endif
 #include "externs.h"
 
@@ -194,7 +194,7 @@ CONSTRAINT *hc, CONSTRAINT *vc, int dim)
   debug4(DSC, DD, "RotateConstraint(c, y, %sd, %s, %s, %s)",
 	buff, EchoConstraint(hc), EchoConstraint(vc), dimen(dim));
 
-  /* work out angle in radians between 0 and 2*PI */
+  /* work out angle in radians between 0 and 2*M_PI */
   theta = (float) angle * 2 * M_PI / (float) (DG * 360);
   while( theta < 0 ) theta += 2 * M_PI;
   while( theta >= 2 * M_PI ) theta -= 2 * M_PI;

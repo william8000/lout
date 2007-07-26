@@ -26,5 +26,6 @@ you, and it provides several hundred mathematical symbols.
 @Include { equ_defs }
 @Include { equ_summ }
 # @Include { equ_tequ } apparently not offered any more, forget why
+@Include { equ_math }
 @EndSections
 @End @Chapter

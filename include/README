@@ -19,6 +19,7 @@ Setup files (containing mainly lists of options settable by the user)
 
        diag             Diag diagram drawing package
        eq               Eq equation formatting package
+       math             Math, an alternative equation formatting package
        graph            Graph graph drawing package
        latin2           Latin2 (Eastern European characters) package
        pie              Pie pie graph drawing package
@@ -58,6 +59,7 @@ Source files containing Lout and PostScript source code for the packages
        diagf.etc        A file included by diagf
        diagf.lpg        A PostScript prepend file needed by diagf
        eqf              Eq equation formatting package
+       mathf            Math, an alternative equation formatting package
        graphf           Graph graph drawing package
        graphf.etc       A file included by graphf
        graphf.lpg       A PostScript prepend file needed by graphf

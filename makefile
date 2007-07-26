@@ -406,7 +406,7 @@ installman:
 installdoc:
 	@echo ""
 	@echo "Creating LOUTDOCDIR $(LOUTDOCDIR) and copying documentation into it"
-	$(RCOPY) doc $(LOUTDOCDIR)
+	$(RCOPY) doc/* $(LOUTDOCDIR)
 	chmod 755 $(LOUTDOCDIR)
 	chmod 755 $(LOUTDOCDIR)/*
 	chmod 644 $(LOUTDOCDIR)/*/*

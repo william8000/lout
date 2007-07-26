@@ -1,6 +1,6 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.35)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
 /*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -10,7 +10,7 @@
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either Version 2, or (at your option)      */
+/*  the Free Software Foundation; either Version 3, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -28,6 +28,9 @@
 /*                                                                           */
 /*****************************************************************************/
 #include <math.h>			/* for fabs()                        */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 #include "externs.h"
 
 
@@ -533,14 +536,13 @@ static void PDF_CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
 /*  Rotate coordinate system by given amount (in internal DG units)          */
 /*                                                                           */
 /*****************************************************************************/
-#define PI 3.1415926535897931160
 
 static void PDF_CoordRotate(FULL_LENGTH amount)
 { int theAmount;
   debug1(DPF, D, "PDF_CoordRotate(%.1f degrees)", (float) amount / DG);
   theAmount = ((amount / DG) % 360);
   if( theAmount != 0 )
-    PDFPage_Rotate(out_fp, (double) theAmount * (double) PI / (double) 180.0);
+    PDFPage_Rotate(out_fp, (double) theAmount * (double) M_PI / (double) 180.0);
   cpexists = FALSE;
   debug0(DPF, D, "CoordRotate returning.");
 } /* end PDF_CoordRotate */

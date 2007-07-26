@@ -4,7 +4,7 @@
 /*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
 /*  COPYRIGHT (C) 2000, 2006 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Version 2.5, November 2006                                               */
+/*  Part of Lout Version 3.36, July 2007                                     */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -15,12 +15,12 @@
 /*  Perl and Pod by Jeff Kingston and Mark Summerfield                       */
 /*  Python by Mark Summerfield (Python 2.5 update Nov 2006)                  */
 /*  Ruby by Michael Piotrowski                                               */
-/*  Haskell by Thorsten Seitz (Nov 2002)                                     */
+/*  Haskell by Thorsten Seitz (Nov 2002), mods by Gabor Greif                */
 /*  RSL by Darren Bane (February 2003)                                       */
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
-/*  the Free Software Foundation; either version 2, or (at your option)      */
+/*  the Free Software Foundation; either Version 3, or (at your option)      */
 /*  any later version.                                                       */
 /*                                                                           */
 /*  This program is distributed in the hope that it will be useful,          */
@@ -586,7 +586,7 @@ TOKEN CStringToken = {
 TOKEN CCharacterToken = {
   U "character",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  U "@PC",		/* Lout command for formatting characters           */
+  U "@PS",		/* Lout command for formatting characters           */
   U "",			/* no alternate command                             */
   U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
@@ -631,7 +631,7 @@ TOKEN EiffelStringToken = {
 TOKEN EiffelCharacterToken = {
   U "character",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  U "@PC",		/* Lout command for formatting characters           */
+  U "@PS",		/* Lout command for formatting characters           */
   U "",			/* no alternate command                             */
   U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
@@ -764,7 +764,7 @@ TOKEN HaskellStringToken = {
 TOKEN HaskellCharacterToken = {
   U "character",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
-  U "@PC",		/* Lout command for formatting characters           */
+  U "@PS",		/* Lout command for formatting characters           */
   U "",			/* no alternate command                             */
   U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
@@ -3109,12 +3109,13 @@ LANGUAGE NonpareilLanguage = {
     &NonpareilOperatorToken,
   },
   {
-    "as", "builtin", "case", "class", "coerce", "creation", "else", "elsif",
-    "end", "enum", "extend", "extension", "filter", "genesis", "if", "in",
-    "infix", "infixl", "infixr", "inherit", "introduce", "invariant", "is",
-    "let", "local", "meet", "module", "noncoercive", "noncreation", "norename",
-    "predefined", "prefix", "prefun", "private", "postfix", "rename",
-    "require", "system", "then", "typeobj", "upto", "use", "when", "yield",
+    "abstract", "as", "builtin", "case", "class", "coerce",
+    "else", "elsif", "end", "enum", "extend", "extension", "filter",
+    "function", "genesis", "if", "in", "infix", "inherit", "introduce",
+    "invariant", "is", "let", "local", "meet", "module", "noncoercive",
+    "noncreation", "norename", "predefined", "prefix", "prefun", "private",
+    "postfix", "rename", "require", "system", "then", "typeobj", "upto",
+    "use", "when", "yield",
 
     /* not keywords, but conventionally set like them */
     "false", "true", "self", "and", "or", "not"

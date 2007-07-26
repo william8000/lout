@@ -1,0 +1,212 @@
+# Written by Ludovic Courtès <ludo@gnu.org>, July 2007.
+#
+# Based on:
+# http://lists.planix.com/pipermail/lout-users/2007q2/004355.html .
+
+@Section
+  @Title { The @Code { "@Math" } package }
+  @Tag   { math_package }
+@Begin
+
+equations.math @SubIndex { @Code "@Math" }
+
+@PP
+
+The @Code { "@Math" } package provides features similar to those found
+in @Code { "@Eq" } but with improved formula layout.  For instance, the
+@Code { "@M" } symbol offers better rendering of equations within
+paragraphs than @Code { "@E" }.  To that end, @Code { "@Math" }
+implements the four equation layout styles described by Donald E. Knuth in
+@I { The { @TeX }book } along with the corresponding transition rules
+@Cite { $knuth1984tex }.  Namely, depending on its rendering context,
+a math formula may be in one of the following styles:
+
+@BulletList
+@LI { ``display'' style, for formulas displayed on lines by
+themselves; }
+@LI { ``text'' style, for formulas embedded in text; }
+@LI { ``script'' style, for formulas used in superscripts and
+subscripts; }
+@LI { ``subscript'' style, for second-order superscripts and
+subscripts. }
+@EndList
+
+In addition, formulas can be ``cramped'', meaning that exponents are
+lower than usual.
+
+@PP
+Fortunately, you usually don't need to be familiar with these display
+styles and corresponding layout algorithm to use @Code { "@Math" }.
+The sections below summarize the differences from @Code { "@Eq" } as
+well as the new features.
+
+@BeginSubSections
+
+@SubSection @Title { Differences from @Code { "@Eq" } }
+@Begin
+
+@PP
+First and foremost, the Lout definitions for the @Code "@Math" symbol
+are accessed via a setup file called {@Code "math"}, which you must
+include at the start of your document in the usual way:
+
+@ID @OneRow @Code {
+"@SysInclude { math }"
+"@SysInclude { doc }"
+"@Doc @Text @Begin"
+"..."
+"@End @Text"
+}
+
+Note that it is possible to include both @Code "eq" and { @Code "math"
+}.  Instead of typing formulas within { @Code "@Eq" } or { @Code "@E" },
+they must be embedded in { @Code "@Math" } or { @Code "@M" },
+respectively.
+@PP
+
+In @Code { "@Math" }, sums, products, integrations and similar large
+operations are laid out according to the current style.  For instance,
+the limits of a sum are laid out differently depending on the context:
+
+@BeginAlignedDisplays
+@CAND {
+  @Math { { sum from { i = 0 } to { n } { i sup 2 } } over { x + y } } }
+@CAND {
+  @Math { sum from { i = 0 } to { n } { i sup 2 } } }
+@EndAlignedDisplays
+
+Similarly, the @Code { "big" } symbol that is used in @Code { "@Eq" } to
+display sums, integrations, etc. is usually not needed: the size of the
+``sigma'' or other symbol automatically adapts to the context.
+@PP
+
+The @Code { "from" } and @Code { "to" } stand-alone symbols found in
+@Code { "@Eq" } are not available.  Instead, symbols such as @Code {
+"sum" } that require them have @Code { "from" } and @Code { "to" }
+options instead.  For example, instead of
+@ID { @Code { "@Eq { sum from i = 0 to n { i sup 2 } }" } }
+it is necessary to write
+@ID { @Code { "@Math { sum from { i = 0 } to { n } { i sup 2 } }" } }
+The braces are necessary now because @Code { "from" } and @Code { "to" }
+are options of @Code { "sum" }, and it is a general rule of Lout that
+the values of options have to be enclosed in braces.
+@PP
+
+Unlike those of @Code { "@Eq" }, mathematical operators obey standard
+precedence rules.  Thus, to get @M { { n + 1 } over 2 }, one must write
+@Code { "@M { { n + 1 } over 2 }" } instead of just
+@Code { "@E { n+1 over 2 }" }.
+
+@PP
+@Code "@Math" generally produces better mathematical layout than
+@Code { "@Eq" }.  Consider the following examples rendered with
+@Code "@Math" (on the left) and with @Code "@Eq" (on the right):
+
+@ID { @Math { 2 sup { 2 sup { 2 sup x } } }
+|8ct
+@Eq { 2 sup { 2 sup { 2 sup x } } } }
+
+//
+@RID { @Math { x supp { z supp d on c } on { y supp a on b } }
+|8ct
+@Eq { x supp { z supp d on c } on { y supp a on b } } }
+
+@ID { @Math { { { n + 1 } over 2 } over x }
+|8ct
+@Eq { { { n + 1 } over 2 } over x } }
+
+//
+@RID {
+@Math { a sub 0 + 1 over {
+        a sub 1 + 1 over {
+          a sub 2 + 1 over {
+            a sub 3 + 1 over {
+              a sub 4 } } } } }
+|8ct
+@Eq { a sub 0 + 1 over {
+        a sub 1 + 1 over {
+          a sub 2 + 1 over {
+            a sub 3 + 1 over {
+              a sub 4 } } } } } }
+
+@End @SubSection
+
+@SubSection @Title { New symbols and options }
+@Begin
+
+@LP
+The @Code { "@Math" } symbol has a few options not found in
+@Code { "@Eq" }.  The @Code "symbolfont" and @Code "basefont" options
+denote, respectively, the font where symbols are searched for and the font
+where other characters are searched for.  These fonts default to Symbol
+and Times, respectively.  Note that @Code "@Math" is currently tailored
+to use these fonts so using other fonts may require manual adaptation of
+equation layout.
+
+@PP
+Besides, @Code "@Math" provides several new symbols.  Symbols @Code
+"atop" and @Code "below" behave similarly to @Code "from" and @Code
+"to" in @Code "@Eq", respectively.  In other words, @Code "atop" prints
+its left parameter on top of its right parameter, while @Code "below"
+does the opposite operation:
+
+@ID { @Code { "@M { { a atop f } + { z below b } }" }
+|8ct
+@M { { a atop f } + { z below b } } }
+
+@ID {
+{ @Code {
+"@Math { sum from { { 1 <= i <= p } atop"
+"                 { 1 <= j <= q } atop"
+"                 { 1 <= k <= r } }"
+"        { a sub { ij } b sub { jk } c sub { ki } } }" }
+|8ct
+@Math { sum from { { 1 <= i <= p } atop
+                 { 1 <= j <= q } atop
+                 { 1 <= k <= r } }
+        { a sub { ij } b sub { jk } c sub { ki } } } } }
+
+@Code "@Math" produces spacing around operators that depends on the type
+of operator (see Section @NumberOf { "equ_spacing" }) and also on the
+current style.  When defining new operators for @Code "@Math", it is
+usually desirable to make sure they use spacing consistent with other
+operators.  To that end, @Code "@Math" provides spacing symbols similar
+to those found in @Code "@Eq", namely @Code { rel }, @Code { bin } and
+@Code { punct }.  However, these symbols differ from their @Code "@Eq"
+counterpart in that they take three parameters:  a left parameter, an
+@Code "op" option, and a right parameter.  For example,
+@ID @Code "@Math { x bin op { ! } y }"
+produces
+@ID @Math { x bin op { ! } y }
+The left and right parameters are laid out around the operator specified
+by the @Code { op } option, including appropriate spacing.
+
+@PP
+
+Finally, @Code "@Math" offers additional symbols that allow users to
+explicitly specify the style under which part of a math formula is to be
+laid out.  These low-level primitives may be useful in specific
+situations such as the one illustrated below:
+
+@ID { @Code {
+"@Math {"
+"  lim atop @SubScriptStyle { i --> infinity }"
+"     f(x) = { g(x) } over { h(x) } }"
+}
+|8ct
+@Math {
+  lim atop @SubScriptStyle { i --> infinity }
+      f(x) = { g(x) } over { h(x) } }
+}
+
+@Code "@SuperScriptStyle" and @Code "@SubScriptStyle" lay out their
+right parameter under the ``script'' or ``subscript'' style,
+respectively.  @Code "@NumeratorStyle" and @Code "@DenominatorStyle" lay
+out their right parameter as if it where the numerator or denominator of
+a fraction, respectively.  Likewise, @Code "@SquareRootStyle" lays out
+its right parameter as if it were below a square root.
+
+@End @SubSection
+
+@EndSubSections
+@End @Section
