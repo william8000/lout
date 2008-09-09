@@ -23,7 +23,7 @@ are with their default values:
 @EvenRightMargin { 2.50c }
 }
 When setting these options you must ensure that
-@ID @Eq { @Code "@OddLeftMargin" + @Code "@OddRightMargin" =
+@ID @Math { @Code "@OddLeftMargin" + @Code "@OddRightMargin" =
 @Code "@EvenLeftMargin" + @Code "@EvenRightMargin" }
 In other words, the total margin on odd pages must be the same as on
 even pages.

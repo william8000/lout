@@ -1,0 +1,295 @@
+@Section
+   @Title { Matrices }
+   @Tag { matrices }
+@Begin
+@PP
+The @Code matrix symbol {@PageMark matrix} builds an array of objects:
+mathematics.matrix @SubIndex { @Code "matrix" symbol }
+matrix.mathematics @Index { @Code "matrix" symbol (mathematics) }
+@ID {
+@Code @Verbatim {
+matrix
+   atleft { blpar }
+   atright { brpar }
+{
+   row col x sup 2 col y sup 2 col z sup 2
+   row col x col y col z
+   row col 1 col 1 col 1
+}
+}
+||9ct
+@Math {
+matrix
+   atleft { blpar }
+   atright { brpar }
+{
+   row col x sup 2 col y sup 2 col z sup 2
+   row col x col y col z
+   row col 1 col 1 col 1
+}
+}
+}
+The @Code atleft and @Code atright options place vertically scaled
+versions of their values at each side; if either is omitted the value
+is taken to be an empty object of zero width.  Although @Code blpar
+and @Code brpar are used here, since the options are vertically
+scaled it would also be reasonable to use just
+@ID @OneRow @Code @Verbatim {
+matrix
+   atleft { ( }
+   atright { ) }
+}
+The right parameter of @Code matrix is the array itself.  It must be
+enclosed in braces.  It is a sequence of rows introduced by
+@Code row symbols; each row is a sequence of objects introduced
+by @Code col symbols.  The @Code row and @Code col symbols have
+low precedence (Section {@NumberOf mat_summ}), but not as low as
+white space between objects, so it is safest to enclose the entries
+in braces, except in simple cases.
+@PP
+Entries built with the @Code col symbol have their objects centred in
+the column.  Also available are @Code lcol for left-justified entries,
+@Code ccol meaning the same as {@Code col}, @Code rcol for
+right-justified entries, and @Code mcol for alignment along column
+marks.  Each column may contain entries of different kinds, except
+that @Code mcol does not work well with any other sort.
+@PP
+When several matrices appear side by side, slight differences in height
+can cause an unsightly appearance:
+@ID @Math {
+matrix
+   atleft { ( }
+   atright { ) }
+{
+   row col a sub 11 col a sub 12
+   row col a sub 21 col a sub 22
+}
+matrix
+   atleft { ( }
+   atright { ) }
+{
+   row col b sub 11 col b sub 12
+   row col b sub 21 col b sub 22
+}
+=
+matrix
+   atleft { ( }
+   atright { ) }
+{
+   row col c sub 11 col c sub 12
+   row col c sub 21 col c sub 22
+}
+}
+To assist in resolving this problem, the @Code "matrix" symbol has
+a @Code "strut" option, which causes a strut to be inserted into
+every row, guaranteeing that every row has height at least equal
+to the height of the strut.  By using
+@ID @Code {
+"matrix"
+"    strut { Yes }"
+"..."
+}
+in each of the three matrices above, the result is improved to
+@ID @Math {
+matrix
+   atleft { ( }
+   atright { ) }
+   strut { Yes }
+{
+   row col a sub 11 col a sub 12
+   row col a sub 21 col a sub 22
+}
+matrix
+   atleft { ( }
+   atright { ) }
+   strut { Yes }
+{
+   row col b sub 11 col b sub 12
+   row col b sub 21 col b sub 22
+}
+=
+matrix
+   atleft { ( }
+   atright { ) }
+   strut { Yes }
+{
+   row col c sub 11 col c sub 12
+   row col c sub 21 col c sub 22
+}
+}
+By default, the strut has height @Code "0.5f" (half the current font
+size) both above and below the axis of the row.  This can be changed
+by giving any length as the value of the @Code "strut" option:
+@Code "strut { 2.0c }" for two centimetres above and below
+the axis, and so on.
+@PP
+Some symbols are defined which produce `matrices' with commonly needed
+@Code atleft and @Code atright options already set for you:
+@ID {
+@Code { "fmatrix { {n+1} over 2 }" }
+|7ct
+@Math { fmatrix { {n+1} over 2 } }
+}
+As this example shows, these symbols are very useful for getting large
+scaled delimiters around things that aren't necessarily matrices at all.
+Section {@NumberOf mat_summ} has the full list of these symbols.
+@PP
+Every fragment of mathematics has an @I axis running through it which
+is used to position it vertically
+mathematics.axis @SubIndex { axis of }
+axis @Index { axis (in mathematics) }
+with respect to nearby objects.  In the Expert's Guide to Lout
+@Cite { $kingston1995lout.expert } this is called a @I { row mark },
+but we'll stick with axis.  Here are some examples with the axis
+shown as a dashed line:
+@ID {
+@ShowHMark @Math { x sup 2 }
+||2c
+@ShowHMark @Math { non + }
+||2c
+@ShowHMark @Math { @ExA }
+}
+When these objects are placed adjacent to one another, their
+axes are merged:
+@ID @ShowHMark @Math { x sup 2 + @ExA }
+Most of the time you do not need to think about vertical
+positioning, because for most objects there is just one
+sensible place for the axis to go, and Lout puts it there.
+@PP
+Matrices and the delimiters that enclose them are the two
+exceptions.  Lout makes the axis of a matrix pass through
+its exact centre, and it shifts the axes of delimiters
+so that they exactly enclose the thing delimited.  These
+choices are never disastrous, but there are other possibilities
+that might be better sometimes.
+@PP
+The axis of a matrix could reasonably be set to the axis
+of any of its rows:
+@ID {
+@ShowHMark @Math {
+matrix userow { yes } {
+  axisrow col { x sup 3 } col { y sup 3 } col { z sup 3 }
+  row     col { x sup 2 } col { y sup 2 } col { z sup 2 }
+  row     col { x } col { y } col { z }
+}
+}
+||2c
+@ShowHMark @Math {
+matrix userow { yes } {
+  row     col { x sup 3 } col { y sup 3 } col { z sup 3 }
+  axisrow col { x sup 2 } col { y sup 2 } col { z sup 2 }
+  row     col { x } col { y } col { z }
+}
+}
+||2c
+@ShowHMark @Math {
+matrix userow { yes } {
+  row     col { x sup 3 } col { y sup 3 } col { z sup 3 }
+  row     col { x sup 2 } col { y sup 2 } col { z sup 2 }
+  axisrow col { x } col { y } col { z }
+}
+}
+}
+Alternatively, it could be set to where Lout usually places it,
+through the exact centre:
+@ID {
+@ShowHMark @Math {
+matrix {
+  row     col { x sup 3 } col { y sup 3 } col { z sup 3 }
+  row     col { x sup 2 } col { y sup 2 } col { z sup 2 }
+  row     col { x } col { y } col { z }
+}
+}
+}
+Delimiters could reasonably keep the axes that they naturally
+have (approximately through their centres, but not exactly):
+@ID {
+@ShowHMark @Math { pmatrix userow { yes } shiftdelim { no } { @ExA } }
+}
+or they could have their axes moved in the way that Lout usually does,
+to the point which allows them to evenly cover the thing delimited:
+@ID {
+@ShowHMark @Math { pmatrix userow { yes } { @ExA } }
+}
+Altogether then there are four possibilities when these two alternatives
+interact:
+@CD lines @Break @Tbl
+  aformat { @Cell 0.5w @VShift A | @Cell | @Cell B | @Cell | @Cell C }
+{
+@Rowa
+  A { }
+  B { Matrix axis
+uses row axis }
+  C { Matrix axis passes
+through centre }
+@Rowa
+  A { Delimiter
+keeps its axis }
+  B { @ShowHMark @Math { pmatrix userow {yes} shiftdelim {no } { @ExA } } }
+  C { @ShowHMark @Math { pmatrix userow {no } shiftdelim {no } { @ExA } } }
+@Rowa
+  A { Delimiter
+axis shifted }
+  B { @ShowHMark @Math { pmatrix userow {yes} shiftdelim {yes} { @ExA } } }
+  C { @ShowHMark @Math { pmatrix userow {no } shiftdelim {yes} { @ExA } } }
+}
+To supply these possibilities, the @Code "matrix" symbol and all
+its variants (@Code "fmatrix" etc.) have two options whose
+values may be {@Code "yes"} or {@Code "no"}:
+@ID @Code @Verbatim {
+matrix
+    userow { no }
+    shiftdelim { yes }
+{
+    ...
+}
+}
+The @Code "userow" option determines whether the axis of the
+matrix will use a row axis; the default is not to, i.e. to
+centre the axis.  The @Code "shiftdelim" option determines whether
+the axis of the delimiter will be shifted so that the delimiter
+evenly covers the thing delimited; the default is to do this.
+@PP
+If @Code "userow" is {@Code "yes"}, the next question is
+which row's axis to use to make the overall axis.  If you
+do nothing, the first (or only) row's axis becomes the
+overall axis.  To select some other row instead, replace
+the @Code "row" symbol that precedes the row by {@Code "axisrow"}:
+@ID @Code @Tbl
+  mv { 0.5vx }
+  mh { 1s }
+  aformat { @Cell A | @Cell | @Cell B | @Cell | @Cell C | @Cell |
+            @Cell D }
+  bformat { @Cell A | @Cell " col" | @Cell B | @Cell " col" | @Cell C |
+            @Cell "  col" | @Cell D }
+{
+@Rowa
+  A { "matrix userow { yes } {" &0io }
+@Rowb
+  A { "    row" }
+  B { "x sup 3" }
+  C { "y sup 3" }
+  D { "z sup 3" }
+@Rowb
+  A { "    axisrow" }
+  B { "x sup 2" }
+  C { "y sup 2" }
+  D { "z sup 2" }
+@Rowb
+  A { "    row" }
+  B { "x" }
+  C { "y" }
+  D { "z" }
+@Rowa
+  A { "}" }
+}
+The result of this is
+@ID @ShowHMark @Math {
+matrix userow { yes } {
+  row     col { x sup 3 } col { y sup 3 } col { z sup 3 }
+  axisrow col { x sup 2 } col { y sup 2 } col { z sup 2 }
+  row     col { x } col { y } col { z }
+}
+}
+with the axis through the second row as desired.
+@End @Section

@@ -1,7 +1,7 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -1082,15 +1082,16 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	debug0(DOF, DD, "   adding hyphen");
 	debug0(DOF, DD, "");
 	hspace(z) = vspace(z) = 0;
+	/* ***
 	vspace(z) = 0;
 	if (unacc)
           hspace(z) =
 	    FontKernLength(font, unacc, word_content[word_len - 1], CH_HYPHEN);
         else
           hspace(z) = 0;
-
+	*** */
 	underline(z) = underline(tmp);
-	SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, EDGE_MODE, 0);
+	SetGap(gap(z), TRUE, FALSE, TRUE, FIXED_UNIT, ADD_HYPH, 0);
 	Link(x, z);
 
 	/* add hyphen */

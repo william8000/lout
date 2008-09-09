@@ -53,10 +53,10 @@ of the document.  For example, the result for this document is
 Cross referencing also applies to large-scale structure symbols such as
 @Code "@Chapter" and @Code "@Section" (any symbol with a @Code "@Title"
 option), as well as @Code { "@FootNote" }, @Code { "@EndNote" },
-@Code { "@Figure" }, @Code { "@Table" }, the numbered display
-symbols, and @Code "@ListItem" and @Code "@DropListItem" (but not
-@Code "@TagItem" and {@Code "@DropTagItem"}).  Each of these symbols
-has a @Code "@Tag" option:
+@Code { "@Figure" }, @Code { "@Table" }, @Code { "@Floater" }, the
+numbered display symbols, and @Code "@ListItem" and @Code "@DropListItem"
+(but not @Code "@TagItem" and {@Code "@DropTagItem"}).  Each of these
+symbols has a @Code "@Tag" option:
 tag.option. @Index { @Code "@Tag" option }
 @ID @OneRow @Code {
 "@Section"
@@ -80,7 +80,10 @@ For further information on this point, please consult
 Section @NumberOf cross (page @PageOf { cross }).
 }
 For symbols with a @Code "@Title" option (chapters, sections, etc.)
-there is also the @Code "@TitleOf" symbol:
+or a @Code "@Caption" option (@Code { "@Figure" }, @Code { "@Table" },
+and @Code { "@Floater" }) there is also the @Code "@TitleOf" symbol,
+titleof. @Index @Code "@TitleOf"
+which returns the value of the @Code "@Title" or @Code "@Caption" option:
 @ID @OneRow @Code {
 "For further information on this point, please consult"
 "the @TitleOf { cross } section."
@@ -91,7 +94,15 @@ For further information on this point, please consult
 the @TitleOf { cross } section.
 }
 But this symbol won't work for footnotes, list items, and other
-things without a title.
+things without a title or caption.
+@PP
+For those with more expertise in using Lout, there is a
+pageparityof. @Index @Code "@PageParityOf"
+@Code "@PageParityOf" symbol which is very similar to @Code "@PageOf"
+except that it returns one of the two words @Code "Odd" and @Code "Even"
+instead of a page number, indicating whether the object it references is
+printed on an odd or even page.  For example, @Code "@PageParityOf cross"
+produces @Code {@PageParityOf cross}.
 @PP
 Like all tags, the value of the @Code "@Tag" option should be a simple
 word (although Lout does accept multi-word tags).  Cross referencing of
@@ -202,7 +213,7 @@ External links are obtained in much the same way as internal ones,
 except that the symbol to use is @Code "@ExternalLink" and instead
 of supplying a tag, you need to supply a URL:
 @ID @Code {
-"\"http://snark.ptc.spbu.ru/~uwe/lout/lout.html\" @ExternalLink { Lout Home Page }"
+"\"http://lout.wiki.sourceforge.net/\" @ExternalLink { Lout Home Page }"
 }
 Once again the result is the object to the right, modified by any
 @Code "@Format" option; and there is an {@Code "@ExternalLinkFormat"}

@@ -1,9 +1,9 @@
 
 ###############################################################################
 #                                                                             #
-#  Lout @Math package for equation formatting, based on @Eq.                  #
+#  Lout @Math package for formatting mathematics                              #
 #                                                                             #
-#  @Eq revision history:                                                      #
+#  @Math is based on the earlier @Eq package.  @Eq revision history:          #
 #                                                                             #
 #  Version 1.0 by Jeffrey H. Kingston, December 1990.                         #
 #  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
@@ -11,21 +11,27 @@
 #                                                                             #
 #  @Math revision history:                                                    #
 #                                                                             #
-#  Version 1.0 by Ludovic Courtès, June 2007.                                 #
+#  Version 4.0 by Ludovic Courtès, June 2007.                                 #
+#  Version 5.0 by Jeffrey H. Kingston, September 2008.                        #
 #                                                                             #
-#  See "Eq - a Lout package for typesetting mathematics" for user             #
-#  information.  Acknowledgement:  the @Eq language is based closely on       #
-#  the Eqn language of B. W. Kernighan and L. L. Cherry; the spacing rules    #
-#  are similar to those of the TeX system by D. E. Knuth.                     #
+#  Acknowledgement:  @Eq and @Math are based closely on the Eqn language      #
+#  of B. W. Kernighan and L. L. Cherry; the spacing rules are similar to      #
+#  those of the TeX system by D. E. Knuth.                                    #
 #                                                                             #
 #  Version 4.0 makes use of `@SetContext' and `@GetContext' (introduced in    #
-#  Basser Lout 3.34) to better honor the typesetting conventions outlined by  #
-#  Knuth.                                                                     #
+#  Lout 3.34) to better honor the typesetting conventions outlined by Knuth.  #
 #                                                                             #
 ###############################################################################
 
-export	"`" "``" "```" bin rel punct non vctr big small
+export
 
+        # Helper symbols
+	above below wideabove widebelow
+        "`" "``" "```" non big small vctr
+	@SuperScriptStyle @SubScriptStyle @NumeratorStyle
+	@DenominatorStyle @SquareRootStyle
+
+        # Ordinary symbols (Symbol font)
 	space exclam universal numbersign existential percent
 	ampersand suchthat parenleft parenright asteriskmath
 	plus comma minus period slash zero one two three four
@@ -57,59 +63,63 @@ export	"`" "``" "```" bin rel punct non vctr big small
 	bracketrightex bracketrightbt bracerighttp bracerightmid
 	bracerightbt
 
-	hbar Re Im partial infty prime nabla surd top bot dbar
-	triangle backslash forall exists neg
-	circle filledcircle square
+        # Ordinary symbols (arrows)
+	leftarrow longleftarrow dblleftarrow dbllongleftarrow
+	rightarrow longrightarrow dblrightarrow dbllongrightarrow
+	leftrightarrow longleftrightarrow dblleftrightarrow
+	dbllongleftrightarrow mapsto longmapsto hookleftarrow
+	hookrightarrow leadsto leftharpoonup rightharpoonup
+	leftharpoondown rightharpoondown rightleftharpoons
+	uparrow dbluparrow downarrow dbldownarrow updownarrow
+	dblupdownarrow nearrow searrow swarrow nwarrow
 
-	"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+        # Ordinary symbols (to get Roman font)
+	arccos arcsin arctan arg cos cosh cot coth csc deg det dim exp
+	gcd hom inf ker lg lim liminf limsup ln log max min Pr sec sin
+	sinh supr tan tanh mod "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+	"!" "?" "%" "(" ")" "[" "]"
 
-	sum prod coprod int oint bcap bcup bvee bwedge bodot botimes
-	boplus buplus
-
-	"+" "-" "+-" "-+" setminus cdot times "*" circ div cap cup uplus
-	sqcap sqcup triangleleft triangleright
-	wr bigcirc bigtriangleup bigtriangledown vee wedge oplus ominus
-	otimes oslash odot dagger daggerdbl amalg
-
-	"<" ">" "=" "<=" prec preceq "<<" subset subseteq sqsubseteq
-	in vdash smile frown ">=" succ succeq ">>" supset supseteq
-	sqsupseteq ni dashv mid parallel "==" "~" "-~" asymp "~~"
-	"=~" bowtie propto models doteq trieq perp notsub notin "!=" not
-	"<->" "<--" "-->" up down "<=>" "<==" "==>" dblup dbldown
-	":" "::" ":="
-
+        # Ordinary symbols (for atleft and atright)
 	lpar blpar rpar brpar lbrack blbrack rbrack brbrack lbrace blbrace
 	rbrace brbrace lfloor blfloor rfloor brfloor lceil blceil
 	rceil brceil langle blangle rangle brangle
 
-	";" "," col
+        # Ordinary symbols (miscellaneous)
+	hbar Re Im partial infty prime nabla surd top bot dbar triangle
+	backslash forall exists neg circle filledcircle square ldots cdots
+	vdots ddots del grad "..." ",...," "'" "''" "'''" "''''" empty
+        triangleup triangledown half third
+
+        # Variable-building symbols
+	dot dotdot hat tilde vec dyad overbar underbar
+	sup sub tsub supp on ton
 	
-	"!" "?" "%" "(" ")" "[" "]"
+        # Large operator symbols
+	largeop sum prod coprod bcap bcup bvee bwedge bodot botimes
+	boplus buplus int oint
 
-	arccos arcsin arctan arg cos cosh cot coth csc deg det dim exp
-	gcd hom inf ker lg lim liminf limsup ln log max min Pr sec sin
-	sinh supr tan tanh mod ldots cdots vdots ddots del grad
-	"..." ",...," "'" "''" "'''" "''''" empty
-
-	triangleup triangledown
-	
-	leftarrow longleftarrow dblleftarrow dbllongleftarrow
-	rightarrow longrightarrow dblrightarrow dbllongrightarrow
-	leftrightarrow longleftrightarrow dblleftrightarrow dbllongleftrightarrow
-	mapsto longmapsto hookleftarrow hookrightarrow leadsto
-	leftharpoonup rightharpoonup leftharpoondown rightharpoondown
-	rightleftharpoons
-	uparrow dbluparrow downarrow dbldownarrow updownarrow dblupdownarrow
-	nearrow searrow swarrow nwarrow
-
-	sup sub tsub supp on ton frac half third over
-        atop below wideatop widebelow
-	dot dotdot hat tilde vec dyad overbar underbar sqrt root zroot
+        # Unary operator symbols
+	sqrt root zroot
 	matrix pmatrix bmatrix brmatrix fmatrix cmatrix amatrix
 
-	@SuperScriptStyle @SubScriptStyle
-	@NumeratorStyle @DenominatorStyle
-	@SquareRootStyle
+        # Binary operator symbols
+	over frac
+        bin "+" "-" "+-" "-+" setminus cdot times "*" circ div
+	cap cup uplus sqcap sqcup triangleleft triangleright
+	wr bigcirc bigtriangleup bigtriangledown vee wedge oplus ominus
+	otimes oslash odot dagger daggerdbl amalg
+
+        # Relation symbols
+	rel "<" ">" "=" "<=" prec preceq "<<" subset subseteq sqsubseteq
+	in vdash smile frown ">=" succ succeq ">>" supset supseteq
+	sqsupseteq ni dashv mid parallel "==" "~" "-~" asymp "~~"
+	"=~" bowtie propto models doteq trieq perp notsub notin "!="
+	"<->" "<--" "-->" up down "<=>" "<==" "==>" dblup dbldown
+	":" "::" ":="
+        # not
+
+        # Punctuation symbols
+	punct ";" "," col
 
 def @Math
     named symbolfont	{ Symbol Base }
@@ -120,24 +130,57 @@ def @Math
     body @Body
 @Begin
 
+    ###################################################################
+    #                                                                 #
+    #   Operator Precedences (private)                                #
+    #                                                                 #
+    #   All @Math symbols with parameters have explicit precedences   #
+    #   defined by invoking one of the following macros.  Symbols     #
+    #   that are typically used to build variables have high          #
+    #   precedence (84-80), then come unary operators (70), then      #
+    #   binary operators (66-60), then relations and the rest.        #
+    #   See also http://en.wikipedia.org/wiki/Order_of_operations .   #
+    #                                                                 #
+    ###################################################################
+
+    macro @MaxPrec		{ 100 }
+    macro @HatPrec		{  84 }
+    macro @SubPrec		{  82 }
+    macro @SupPrec		{  80 }
+    macro @UnaryOpPrec		{  70 }
+    macro @BinaryOpTimesPrec	{  64 }
+    macro @BinaryOpDividePrec	{  62 }
+    macro @BinaryOpPrec		{  60 }
+    macro @RelationPrec		{  50 }
+    macro @PunctuationPrec	{  40 }
+    macro @HelperNonPrec	{  26 }
+    macro @HelperAbovePrec	{  24 }
+    macro @HelperColPrec	{  22 }
+    macro @HelperRowPrec	{  20 }
+
 
     ###################################################################
     #                                                                 #
-    #   Context-sensitive format changes.                             #
+    #   Context-sensitive format changes (private)                    #
     #                                                                 #
     #   Equation formatting (according to Knuth) demands changes in   #
     #   the appearance of equations depending on context.  Knuth      #
     #   distinguishes four major styles (the TeXbook, Ch. 17):        #
     #                                                                 #
-    #     display style (formulas displayed on lines by themselves)   #
-    #     text style    (formulas embedded in the text)               #
-    #     script style  (formulas used as superscripts or subscripts) #
-    #     scriptscript  (second-order superscripts or subscripts)     #
+    #     display        formulas displayed on lines by themselves    #
+    #     text           formulas embedded in the text                #
+    #     script         formulas used as superscripts or subscripts  #
+    #     scriptscript   second-order superscripts or subscripts      #
     #                                                                 #
     #   Each style has its own font size and spacing rules.           #
-    #                                                                 #
     #   Additionally, each of these styles can be ``cramped'',        #
-    #   meaning that exponents are not raised as much.                #
+    #   meaning that exponents are not raised as much.  To these      #
+    #   four styles @Math adds a fifth:                               #
+    #                                                                 #
+    #     nohspace       formulas enclosed in "non"                   #
+    #                                                                 #
+    #   which implements the "non" operator by causing all            #
+    #   style-dependent horizontal space to be 0.                     #
     #                                                                 #
     ###################################################################
 
@@ -176,6 +219,7 @@ def @Math
                     # display and text styles yield the same font size
                     { "display" "text" } @Yield 1.0f
                     else                 @Yield 0.7f } }
+               "nohspace" @Yield 1.0f
             }
         }
 
@@ -186,7 +230,7 @@ def @Math
             { @CrampedVar @Yield cramped } @SetContext {
                  # FIXME: Space is not properly inherited, hence this
                  # `@Space' invocation.
-                 { @EqDebug initialspace @Space x }
+                 { initialspace @Space x }
             }
         }
     }
@@ -201,18 +245,12 @@ def @Math
 
     def @SubScriptGap { 0.35fk }
 
-
-    ###################################################################
-    #                                                                 #
-    #   Spacing rules.                                                #
-    #                                                                 #
-    ###################################################################
-
     # Space around relational operators.
     def @CurrRelSpaceGap
     {
         @CurrStyle @Case {
           { "display" "text" } @Yield 0.300fe
+	  "nohspace"	       @Yield 0i
           else                 @Yield 0.030ce
         }
     }
@@ -222,6 +260,7 @@ def @Math
     {
         @CurrStyle @Case {
           { "display" "text" } @Yield 0.240fe
+	  "nohspace"	       @Yield 0i
           else                 @Yield 0.024ce
         }
     }
@@ -231,19 +270,10 @@ def @Math
     {
         @CurrStyle @Case {
           { "display" "text" } @Yield 0.180fe
+	  "nohspace"	       @Yield 0i
           else                 @Yield 0.018ce
         }
     }
-
-    def "`"       { &@CurrPunctSpaceGap  }
-    def "``"      { &@CurrBinarySpaceGap }
-    def "```"     { &@CurrRelSpaceGap    }
-    def bin	left l named op { "binop" } right r
-    { l &@CurrBinarySpaceGap op &@CurrBinarySpaceGap r }
-    def rel	left l named op { "relop" } right r
-    { l &@CurrRelSpaceGap op &@CurrRelSpaceGap r }
-    def punct	left l named symbol { "punct" } right r
-    { l &0.0ce symbol &@CurrPunctSpaceGap r }
 
     # Gap above/below math expressions (see, e.g., `to' and `from').
     def @AboveGap   { 0.15f }
@@ -256,79 +286,12 @@ def @Math
 
     ###################################################################
     #                                                                 #
-    #   Major styles: scripts, fractions, and square roots.           #
+    #   Miscellaneous helper definitions (private)                    #
     #                                                                 #
     ###################################################################
 
-    def @ScriptStyle
-        named level { "sup" }
-        right script
-    {
-        @WithStyle
-          style { @CurrStyle @Case {
-		   { "display" "text" }        @Yield "script"
-		   { "script" "scriptscript" } @Yield "scriptscript" } }
-          cramped { level @Case {
-                      "sub" @Yield "Yes"
-                      "sup" @Yield @Cramped } }
-        { script }
-    }
-
-    def @SuperScriptStyle right superscript
-    {
-        @ScriptStyle level { "sup" } superscript
-    }
-
-    def @SubScriptStyle right subscript
-    {
-        @ScriptStyle level { "sub" } subscript
-    }
-
-
-    def @FractionStyle
-        named level { "numerator" }
-        right x
-    {
-        @WithStyle
-          style { @CurrStyle @Case {
-		   "display"                   @Yield "text"
-	  	   "text"                      @Yield "script"
-		   { "script" "scriptscript" } @Yield "scriptscript" } }
-          cramped { level @Case {
-                      "numerator"    @Yield @Cramped
-                      "denominator"  @Yield "Yes"} }
-        { x }
-    }
-
-    def @NumeratorStyle right x
-    {
-        @FractionStyle level { "numerator" } x
-    }
-
-    def @DenominatorStyle right x
-    {
-        @FractionStyle level { "denominator" } x
-    }
-
-    def @SquareRootStyle right x
-    {
-        @WithStyle style { @CurrStyle } cramped { "Yes" } x
-    }
-
-
-    ###################################################################
-    #                                                                 #
-    #   Utilities: `big', `small', `@HLine', etc.                     #
-    #                                                                 #
-    ###################################################################
-
-    # XXX: Certainly not the best way to implement `non'.
-    def non	right x { { @CurrStyleVar @Yield "script" } @SetContext x }
-    def big	right x { 1.3f @Font x }
-    def small	right x { 0.6f @Font x }
-
-    def @Base   right x { basefont @Font x }
-    def @Sym    right x { symbolfont @Font x }
+    def @Base precedence @MaxPrec right x { basefont @Font x }
+    def @Sym  precedence @MaxPrec right x { symbolfont @Font x }
 
     def @HLine
 	named line { @BackEnd @Case { PostScript @Yield { "0.05 ft setlinewidth" } PDF @Yield { "__mul(__loutf, 0.05) w" } } }
@@ -355,29 +318,189 @@ def @Math
 	}
     }
 
+    def @Strut
+        precedence @MaxPrec
+	right x
+    {
+	@OneCol { x | @OneRow { 0.5f @High ^/ 0.5f @High } }
+    }
+
+    def @OrDefault
+        left l
+        right r
+    {
+        l @Case {
+           "dft" @Yield r
+           else  @Yield l
+        }
+    }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Helper symbols (public, exc @ScriptStyle and @FractionStyle)  #
+    #                                                                 #
+    ###################################################################
+
+    def above
+	precedence @HelperAbovePrec
+	associativity left
+	left x
+	named gap { @BelowGap }
+	named skew { 0c }
+	right y
+    {  
+	@HContract @VContract
+	{          |0.5rt x
+	   //gap   |0.5rt &skew y
+	}
+    }
+
+    def below
+	precedence @HelperAbovePrec
+	associativity left
+	left x
+	named gap { @AboveGap }
+	named skew { 0c }
+	right y
+    {
+	@HContract @VContract
+	{          |0.5rt &skew y
+	  ^//gap   |0.5rt x
+	}
+    }
+
+    def wideabove
+	precedence @HelperAbovePrec
+	associativity left
+	left x
+	named gap { @BelowGap  }
+	right y
+    {
+	@HContract @VContract
+	{
+	    x //gap @HScale y
+	}
+    }
+
+    def widebelow
+	precedence @HelperAbovePrec
+	associativity left
+	left x
+	named gap { @AboveGap  }
+	right y
+    {
+	@HContract @VContract
+	{
+	    @HScale y ^//gap x
+	}
+    }
+
+    def "`"       { &@CurrPunctSpaceGap  }
+    def "``"      { &@CurrBinarySpaceGap }
+    def "```"     { &@CurrRelSpaceGap    }
+
+    def non
+        precedence @HelperNonPrec
+        right x
+    {
+        { @CurrStyleVar @Yield "nohspace" } @SetContext x
+    }
+
+    def big
+        precedence @MaxPrec
+	right x
+    {
+	1.3f @Font x
+    }
+
+    def small
+        precedence @MaxPrec
+	right x
+    {
+        0.6f @Font x
+    }
+
     def vctr
+        precedence @MaxPrec
 	right x
     {
 	0.5w @VShift x
     }
 
-    def @Strut right x
+    def @ScriptStyle
+        named level { "sup" }
+        right script
     {
-	@OneCol { x | @OneRow { 0.5f @High ^/ 0.5f @High } }
+        @WithStyle
+            style { @CurrStyle @Case {
+	        { "display" "text" }        @Yield "script"
+	        { "script" "scriptscript" } @Yield "scriptscript"
+	        "nohspace"                  @Yield "nohspace"
+	    } }
+            cramped { level @Case {
+	        "sub" @Yield "Yes"
+	        "sup" @Yield @Cramped
+	    } }
+        { script }
+    }
+
+    def @SuperScriptStyle right superscript
+    {
+        @ScriptStyle level { "sup" } superscript
+    }
+
+    def @SubScriptStyle right subscript
+    {
+        @ScriptStyle level { "sub" } subscript
+    }
+
+    def @FractionStyle
+        named level { "numerator" }
+        right x
+    {
+        @WithStyle
+            style { @CurrStyle @Case {
+		"display"                   @Yield "text"
+		"text"                      @Yield "script"
+		{ "script" "scriptscript" } @Yield "scriptscript"
+		"nohspace"                  @Yield "nohspace"
+	    } }
+            cramped { level @Case {
+		"numerator"    @Yield @Cramped
+		"denominator"  @Yield "Yes"
+	    } }
+        { x }
+    }
+
+    def @NumeratorStyle right x
+    {
+        @FractionStyle level { "numerator" } x
+    }
+
+    def @DenominatorStyle right x
+    {
+        @FractionStyle level { "denominator" } x
+    }
+
+    def @SquareRootStyle right x
+    {
+        @WithStyle style { @CurrStyle } cramped { "Yes" } x
     }
 
     ###################################################################
     #                                                                 #
-    #   Full names                                                    #
+    #   Ordinary symbols (Symbol font)                                #
     #                                                                 #
     #   These symbols and their names are taken directly from the     #
     #   Adobe Systems Inc. Symbol font (see PostScript Language       #
     #   Reference Manual, pp. 256-257).  The only differences are:    #
     #                                                                 #
-    #      Adobe:  theta1        Eq:  thetaone                        #
+    #      Adobe:  theta1     @Math:  thetaone                        #
     #              sigma1             sigmaone                        #
     #              phi1               phione                          #
     #              omega1             omegaone                        #
+    #              Upsilon1           Upsilonone                      #
     #                                                                 #
     #   These were needed since Lout identifiers do not have digits.  #
     #                                                                 #
@@ -425,7 +548,7 @@ def @Math
     def Gamma           { @Sym @Char "Gamma" }
     def Eta             { @Sym @Char "Eta" }
     def Iota            { @Sym @Char "Iota" }
-    def thetaone        { @Sym @Char "thetaone" }
+    def thetaone        { @Sym @Char "theta1" }
     def Kappa           { @Sym @Char "Kappa" }
 
     def Lambda          { @Sym @Char "Lambda" }
@@ -438,7 +561,7 @@ def @Math
     def Sigma           { @Sym @Char "Sigma" }
     def Tau             { @Sym @Char "Tau" }
     def Upsilon         { @Sym @Char "Upsilon" }
-    def sigmaone        { @Sym @Char "sigmaone" }
+    def sigmaone        { @Sym @Char "sigma1" }
     def Omega           { @Sym @Char "Omega" }
     def Xi              { @Sym @Char "Xi" }
     def Psi             { @Sym @Char "Psi" }
@@ -458,7 +581,7 @@ def @Math
     def gamma           { @Sym @Char "gamma" }
     def eta             { @Sym @Char "eta" }
     def iota            { @Sym @Char "iota" }
-    def phione          { @Sym @Char "phione" }
+    def phione          { @Sym @Char "phi1" }
     def kappa           { @Sym @Char "kappa" }
     def lambda          { @Sym @Char "lambda" }
     def mu              { @Sym @Char "mu" }
@@ -471,7 +594,7 @@ def @Math
     def sigma           { @Sym @Char "sigma" }
     def tau             { @Sym @Char "tau" }
     def upsilon         { @Sym @Char "upsilon" }
-    def omegaone        { @Sym @Char "omegaone" }
+    def omegaone        { @Sym @Char "omega1" }
     def omega           { @Sym @Char "omega" }
     def xi              { @Sym @Char "xi" }
     def psi             { @Sym @Char "psi" }
@@ -480,7 +603,7 @@ def @Math
     def bar             { @Sym @Char "bar" }
     def braceright      { @Sym @Char "braceright" }
     def similar         { @Sym @Char "similar" }
-    def Upsilonone      { @Sym @Char "Upsilonone" }
+    def Upsilonone      { @Sym @Char "Upsilon1" }
     def minute          { @Sym @Char "minute" }
     def lessequal       { @Sym @Char "lessequal" }
     def fraction        { @Sym @Char "fraction" }
@@ -537,12 +660,6 @@ def @Math
     def product         { @Sym @Char "product" }
     def radical         { @Sym @Char "radical" }
     def dotmath         { @Sym @Char "dotmath" }
-
-    def @PureDot   # dot with no extra space
-    {
-	@HContract { &0io 0.4w @HShift dotmath }
-    }
-
     def logicalnot      { @Sym @Char "logicalnot" }
     def logicaland      { @Sym @Char "logicaland" }
     def logicalor       { @Sym @Char "logicalor" }
@@ -585,861 +702,7 @@ def @Math
 
     ###################################################################
     #                                                                 #
-    #   Short names                                                   #
-    #                                                                 #
-    #   These symbols, their names, and their spacing, are based on   #
-    #   the list in Appendix F of Donald E. Knuth's The TeXBook.      #
-    #                                                                 #
-    #   Group 1 (lowercase Greek letters):  see full names above      #
-    #   Group 2 (uppercase Greek letters):  see full names above      #
-    #   Group 3 (calligraphic capitals):    not provided by Eq        #
-    #                                                                 #
-    ###################################################################
-
-    ###################################################################
-    #                                                                 #
-    #   Group 4 (miscellaneous Ord symbols)                           #
-    #                                                                 #
-    #   Not all of Knuth's symbols are available.  The four suits     #
-    #   (heartsuit, etc.), have definitions above.                    #
-    #                                                                 #
-    ###################################################################
-
-    def hbar         { @OneCol { &0.1f @Base "-" ^/0.25fo h }	}
-    def Re           { Rfraktur					}
-    def Im           { Ifraktur					}
-    def partial      { partialdiff				}
-    def infty        { infinity					}
-    def prime        { minute        				}
-   #def emptyset     { defined above				}
-    def nabla        { gradient					}
-    def surd         { radical					}
-    def top          { 180d @Rotate perpendicular		}
-    def bot          { perpendicular				}
-    def dbar         { @Base "||"                         	}
-   #def angle        { defined above				}
-    def backslash    { "\\"					}
-    def forall       { universal					}
-    def exists       { existential				}
-    def neg          { logicalnot				}
-
-    def circle
-    { @HContract @VContract @BackEnd @Case {
-	PostScript @Yield {
-	  {
-	    "xsize ysize 2 div moveto"
-	    "xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
-	    "0.04 ft setlinewidth stroke"
-	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
-	}
-	PDF @Yield {
-	  #
-	  # VT: draws a counterclockwise 360 degree arc from 0 to +360
-	  # degree positions (straight right to straight right) with
-	  # centre = (xsize/2, ysize/2) and radius = xsize/2, 
-	  # implemented as two counterclockwise 180 degree arcs.
-	  # start at (xsize, ysize/2); the control points are:
-	  #
-	  #     pt1 = (xsize, ysize/2 + (4/3 * xsize/2))
-	  #     pt2 = (0, ysize/2 + (4/3 * xsize/2))
-	  #
-	  # end at (0, ysize/2).  Then start at (0, ysize/2); control points
-	  #
-	  #     pt1 = (0, ysize/2 - (4/3 * xsize/2))
-	  #     pt2 = (xsize, ysize/2 - (4/3 * xsize/2))
-	  #
-	  # and end at (xsize, ysize/2).
-
-	  {
-	    "__mul(0.04, __loutf) w"
-	    "__xsize __div(__ysize, 2) m"
-	    "__xsize __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
-	    "0 __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
-	    "0 __div(__ysize, 2) c"
-	    "0 __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
-	    "__xsize __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
-	    "__xsize __div(__ysize, 2) c S"
-	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
-	}
-      }
-    }
-
-    def filledcircle
-    { @HContract @VContract @BackEnd @Case {
-	PostScript @Yield {
-	  {
-	    "xsize ysize 2 div moveto"
-	    "xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
-	    "0.04 ft setlinewidth fill"
-	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
-	}
-	PDF @Yield {
-	  #
-	  # JK: I don't know how to fill in PDF, so this doesn't!
-	  #
-	  # VT: draws a counterclockwise 360 degree arc from 0 to +360
-	  # degree positions (straight right to straight right) with
-	  # centre = (xsize/2, ysize/2) and radius = xsize/2, 
-	  # implemented as two counterclockwise 180 degree arcs.
-	  # start at (xsize, ysize/2); the control points are:
-	  #
-	  #     pt1 = (xsize, ysize/2 + (4/3 * xsize/2))
-	  #     pt2 = (0, ysize/2 + (4/3 * xsize/2))
-	  #
-	  # end at (0, ysize/2).  Then start at (0, ysize/2); control points
-	  #
-	  #     pt1 = (0, ysize/2 - (4/3 * xsize/2))
-	  #     pt2 = (xsize, ysize/2 - (4/3 * xsize/2))
-	  #
-	  # and end at (xsize, ysize/2).
-
-	  {
-	    "__mul(0.04, __loutf) w"
-	    "__xsize __div(__ysize, 2) m"
-	    "__xsize __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
-	    "0 __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
-	    "0 __div(__ysize, 2) c"
-	    "0 __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
-	    "__xsize __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
-	    "__xsize __div(__ysize, 2) c S"
-	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
-	}
-      }
-    }
-
-    def square
-    { @HContract @VContract @BackEnd @Case {
-	PostScript @Yield {
-	  {
-	    "0 0 moveto xsize 0 lineto xsize ysize lineto"
-	    "0 ysize lineto closepath"
-	    "0.04 ft setlinewidth stroke"
-	  } @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
-	}
-	PDF @Yield {
-	  {
-	    "__mul(__loutf, 0.04) w"
-	    "0 0 m __xsize 0 l __xsize __ysize l"
-	    "0 __ysize l s"
-	  } @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
-	}
-      }
-    }
-
-    def triangle
-    { @HContract @VContract @BackEnd @Case {
-	PostScript @Yield {
-	  {
-	    "0 0 moveto xsize 0 lineto"
-	    "xsize 2 div ysize lineto closepath"
-	    "0.04 ft setlinewidth stroke"
-	  } @Graphic { 0.3f @Wide 0.3f @High ^| ^/ 0.3f @Wide 0.3f @High }
-	}
-	PDF @Yield {
-	  {
-	    "__mul(__loutf, 0.04) w"
-	    "0 0 m __xsize 0 l"
-	    "__div(__xsize, 2) __ysize l s"
-	  } @Graphic { 0.3f @Wide 0.3f @High ^| ^/ 0.3f @Wide 0.3f @High }
-	}
-      }
-    }
-
-
-    ###################################################################
-    #                                                                 #
-    #   Layout primitives.                                            #
-    #                                                                 #
-    ###################################################################
-
-    def atop
-	precedence 73
-	associativity left
-	left x
-	named gap { @BelowGap }
-	named skew { 0c }
-	right y
-    {  
-	@HContract @VContract
-	{          |0.5rt x
-	   //gap   |0.5rt &skew y
-	}
-    }
-
-    def below
-	precedence 73
-	associativity left
-	left x
-	named gap { @AboveGap }
-	named skew { 0c }
-	right y
-    {
-	@HContract @VContract
-	{          |0.5rt &skew y
-	  ^//gap   |0.5rt x
-	}
-    }
-
-    def wideatop
-	precedence 73
-	associativity left
-	left x
-	named gap { @BelowGap  }
-	right y
-    {
-	@HContract @VContract
-	{
-	    x //gap @HScale y
-	}
-    }
-
-    def widebelow
-	precedence 73
-	associativity left
-	left x
-	named gap { @AboveGap  }
-	right y
-    {
-	@HContract @VContract
-	{
-	    @HScale y ^//gap x
-	}
-    }
-
-    ###################################################################
-    #                                                                 #
-    #   Operator Precedence                                           #
-    #                                                                 #
-    #   We use the precedence illustrated by the following macros     #
-    #   for the various operator groups.  I.e., exponentiation and    #
-    #   square root precede multiplication and division, which in     #
-    #   turn precede addition and substraction, etc.                  #
-    #   See http://en.wikipedia.org/wiki/Order_of_operations .        #
-    #                                                                 #
-    ###################################################################
-
-    macro @PunctuationPrec	{ 13 }
-
-    macro @EqualityPrec		{ 23 }
-    macro @OrderingPrec		{ 33 }
-    macro @AdditionPrec		{ 43 }
-    macro @MultiplicationPrec	{ 53 }
-    macro @DivisionPrec         { 54 }
-    macro @ExponentPrec         { 63 }
-    macro @FactorialPrec        { 73 }
-
-
-    ###################################################################
-    #                                                                 #
-    #   Group 6 ("Large" operators)                                   #
-    #                                                                 #
-    #   Layout of large operators differs in several ways, depending  #
-    #   on whether they are in display mode or not.                   #
-    #                                                                 #
-    #     1. The operator itself is larger in display mode.  We       #
-    #        achieve this by automatically prepending `big' to the    #
-    #        operator's symbol when in display mode.                  #
-    #                                                                 #
-    #     2. The "bounds" of these operators (i.e., `from' and `to')  #
-    #        are set as limits (i.e., above and below the operator    #
-    #        symbol) when in display mode, and displayed to the       #
-    #        right of the symbol otherwise.  Integrations are an      #
-    #        exception (the only exception?).                         #
-    #                                                                 #
-    #   See ``The TeXbook'', Chapter 17.                              #
-    #                                                                 #
-    ###################################################################
-
-    def largeoperator
-	precedence 58
-	named symbol { "largeop" }
-	named from   { "" }
-	named to     { "" }
-        named limits { "Yes" } # whether to set `from' and `to' as limits
-    {
-        def @NoLimitsBody {
-	    0.5w @VShift {
-	      1.0w @VShift @OneRow {
-		      { |  0.3w @VShift @SuperScriptStyle to }
-	      ^/0.0fo { 0w @VShift symbol | }
-	      }
-
-	      /0.0fo
-
-	      { | 0.7w @VShift @SubScriptStyle from }
-	    }
-	    |{ @CurrPunctSpaceGap }
-        }
-
-        def @LimitsBody {
-            symbol atop  { @SuperScriptStyle from }
-                   below { @SubScriptStyle to }
-        }
-
-        limits @Case {
-            { "Yes" "yes" } @Yield @LimitsBody
-            { "No" "no" }   @Yield @NoLimitsBody
-        }
-    }
-
-    def simplelargeoperator
-        named symbol { "simplelargeop" }
-        named limits { "Auto" }
-        named from   { }
-        named to     { }
-    {
-        largeoperator symbol { @CurrStyle @Case {
-				  "display" @Yield { big symbol }
-				  else      @Yield symbol } }
-                      limits { limits @Case {
-                                  "Auto" @Yield {
-                                     @CurrStyle @Case {
-                                        "display" @Yield "Yes"
-                                         else     @Yield "No" } }
-                                  else   @Yield  limits } }
-                      from   { from }
-                      to     { to }
-    }
-
-    def sum	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { summation } limits { limits }
-                           from { from } to { to }  }
-    def prod	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { product } limits { limits }
-                           from { from } to { to }  }
-    def coprod	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { 180d @Rotate vctr product }
-                           limits { limits }
-                           from { from } to { to }  }
-    def bcap	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { intersection } limits { limits }
-                           from { from } to { to }  }
-    def bcup	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { union } limits { limits }
-                           from { from } to { to }  }
-    def bvee	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { logicalor } limits { limits }
-                           from { from } to { to }  }
-    def bwedge	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { logicaland } limits { limits }
-                           from { from } to { to }  }
-    def bodot	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { & @HContract {
-                                         circle /0io &0.5rt @PureDot } }
-                           limits { limits }
-                           from { from } to { to }  }
-    def botimes	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { circlemultiply } limits { limits }
-                           from { from } to { to }  }
-    def boplus	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { circleplus } limits { limits }
-                           from { from } to { to }  }
-    def buplus	named from { } named to { } named limits { "Auto" }
-    {  simplelargeoperator symbol { & @HContract {
-                                        &0.5rt 0.7f @Font plus
-                                        ^/0.2fo union } }
-                           limits { limits }
-                           from { from } to { to }  }
-
-    ###################################################################
-    #                                                                 #
-    #   Integrations are slightly different in that, according to     #
-    #   Knuth (Chapter 17, p. 144), ``superscripts and subscripts     #
-    #   are not set as limits, even in display style''.   Still, as   #
-    #   in TeX, we let users the possibility to override this.        #
-    #                                                                 #
-    ###################################################################
-
-    def integration
-        named symbol { "integration" }
-        named limits { "No" }
-        named from   { }
-        named to     { }
-    {
-        largeoperator symbol { @CurrStyle @Case {
-				  "display" @Yield { big symbol }
-				  else      @Yield symbol } }
-                      limits { limits }
-                      from   { from }
-                      to     { to }
-    }
-
-    def int
-        named limits { "No" }
-        named from   { }
-        named to     { }
-    {
-        integration symbol { vctr integral }
-                    limits { limits }
-                    from   { from }
-                    to     { to }
-    }
-
-    def oint
-        named limits { "No" }
-        named from   { }
-        named to     { }
-    {
-        integration symbol { @OneCol { vctr degree |0.015fo int } }
-                    limits { limits }
-                    from   { from }
-                    to     { to }
-    }
-
-
-
-    ###################################################################
-    #                                                                 #
-    #   Group 7 (binary operations)                                   #
-    #                                                                 #
-    #   All of Knuth's symbols are available except \star, \diamond   #
-    #   and \bullet; a few have been given more mnemonic names.       #
-    #                                                                 #
-    ###################################################################
-
-    def "+"      precedence @AdditionPrec left l right r
-    {  l bin op { plus } r		}
-    def "-"      precedence @AdditionPrec left l right r
-    {  l bin op { minus } r		}
-    def "+-"     precedence @AdditionPrec left l right r
-    {  l bin op { plusminus } r		}
-    def "-+"     precedence @AdditionPrec left l right r
-    {  l bin op { 180d @Rotate plusminus } r	}
-    def setminus precedence @AdditionPrec left l right r
-    {  l bin op { backslash } r		}
-    def cdot     precedence @AdditionPrec left l right r
-    {  l bin op { dotmath } r		}
-    def times    precedence @MultiplicationPrec left l right r
-    {  l bin op { multiply } r		}
-    def "*"      precedence @MultiplicationPrec left l right r
-    {  l bin op { asteriskmath } r	}
-   #def diamond		{ name used above				}
-    def circ     precedence @MultiplicationPrec left l right r
-    {  l bin op { circle } r		}
-   #def bullet		{ name used above				}
-    def div      precedence @DivisionPrec left l right r
-    {  l bin op { divide } r		}
-    def cap      precedence @MultiplicationPrec left l right r
-    {  l bin op { intersection } r	}
-    def cup      precedence @MultiplicationPrec left l right r
-    {  l bin op { union } r		}
-    def uplus    precedence @MultiplicationPrec left l right r
-    {  l
-       bin op { @OneRow @HContract { &0.5rt 0.7f @Font plus ^/0.2fo union} }
-       r  }
-
-    def sqcap    precedence @MultiplicationPrec left l right r
-    {  l
-       bin op { @HContract @VContract
-		    @BackEnd @Case {
-		      PostScript @Yield {
-			{	"0 0 moveto 0 ysize lineto xsize ysize lineto"
-			    "xsize 0 lineto"
-			    "0.04 ft setlinewidth stroke"
-			}
-			@Graphic
-			{	0.3f @Wide 0.3f @High ^| ^/
-			    0.3f @Wide 0.3f @High
-			}
-		      }
-		      PDF @Yield {
-			{	"__mul(__loutf, 0.04) w"
-			    "0 0 m 0 __ysize l __xsize __ysize l"
-			    "__xsize 0 l s"
-			}
-			@Graphic
-			{	0.3f @Wide 0.3f @High ^| ^/
-			    0.3f @Wide 0.3f @High
-			}
-		      }
-		    }
-	      }
-       r  }
-
-    def sqcup		{ 180d @Rotate sqcap			}
-    def triangleleft	left l right r
-    {  l bin op { "90d" @Rotate 0.8f @Font triangle } r }
-    def triangleright	left l right r
-    {  l bin op { "-90d" @Rotate 0.8f @Font triangle } r }
-    def wr		left l right r
-    {  l bin op { vctr {90d @Rotate similar } } r }
-    def bigcirc		left l right r
-    {  l bin op { 1.2f @Font circle} r }
-    def bigtriangleup	left l right r
-    {  l bin op { 1.2f @Font triangle } r }
-    def bigtriangledown	left l right r
-    {  l bin op { 180d @Rotate 1.2f @Font triangle } r }
-    def vee		left l right r
-    {  l bin op { logicalor } r }
-    def wedge		left l right r
-    {  l bin op { logicaland } r }
-    def oplus		left l right r
-    {  l bin op { circleplus } r }
-    def ominus		left l right r
-    {  l bin op { @OneRow @HContract { circle /0io &0.5rt minus } } r }
-    def otimes		left l right r
-    {  l bin op { circlemultiply } r }
-    def oslash		left l right r
-    {  l
-       bin op { `vctr 60d @Rotate @HContract {circle /0io &0.5rt minus`} }
-       r  }
-    def odot		left l right r
-    {  l bin op { @OneRow @HContract {circle /0io &0.5rt @PureDot } } r }
-    def dagger		left l right r
-    {  l bin op { @Base @Char "dagger" } r }
-    def daggerdbl	left l right r
-    {  l bin op { @Base @Char "daggerdbl" } r }
-    def amalg		left l right r
-    {  l bin op { 180d @Rotate vctr product } r }
-
-    ###################################################################
-    #                                                                 #
-    #   Group 8 (relations)                                           #
-    #                                                                 #
-    #   All Knuth's operators are available, but many have been       #
-    #   given different, more mnemonic names.  Also included is       #
-    #   a not operator for negating the relations.                    #
-    #                                                                 #
-    ###################################################################
-
-    def "<"		precedence @OrderingPrec left l right r
-    {  l rel op { less } r				}
-    def ">"		precedence @OrderingPrec left l right r
-    {  l rel op { greater } r				}
-    def "="		precedence @EqualityPrec left l right r
-    {  l rel op { equal } r				}
-    def "<="		precedence @OrderingPrec left l right r
-    {  l rel op { lessequal } r				}
-    def prec		left l right r
-    {  l
-       rel op { 0.45f @Font "-90d"
-                  @Rotate { parenrighttp ^| parenlefttp } }
-       r  }
-    def preceq		{ rel { @OneRow non prec /0.1f minus }	}
-    def "<<"		precedence @OrderingPrec left l right r
-    {  l rel op { less less } r				}
-    def subset		precedence @OrderingPrec left l right r
-    {  l rel op { propersubset } r			}
-    def subseteq	precedence @OrderingPrec left l right r
-    {  l rel op { reflexsubset } r			}
-    def sqsubseteq	precedence @OrderingPrec left l right r
-    {  l
-       rel op { @HContract @VContract
-		  @BackEnd @Case {
-		    PostScript @Yield {
-			  { { "xsize 0 moveto"
-			    "0 0 lineto"
-			    "0 ysize lineto"
-			    "xsize ysize lineto"
-			    "0.04 ft setlinewidth stroke"
-			    }
-			    @Graphic
-			    { 0.5f @Wide 0.25f @High ^/
-			      0.25f @High
-			    }
-			    /0.1f minus
-			  }
-		    }
-		    PDF @Yield {
-			  { { "__mul(__loutf, 0.04) w"
-			      "__xsize 0 m"
-			      "0 0 l"
-			      "0 __ysize l"
-			      "__xsize __ysize l s"
-			    }
-			    @Graphic
-			    { 0.5f @Wide 0.25f @High ^/
-			      0.25f @High
-			    }
-			    /0.1f minus
-			  }
-		    }
-		  }
-	      }
-       r  }
-
-    def in		precedence @OrderingPrec left l right r
-    {  l rel op { element } r				}
-    def vdash		precedence @OrderingPrec left l right r
-    {  l rel op { vctr {"-90d" @Rotate perpendicular} } r	}
-    def smile		precedence @OrderingPrec left l right r
-    {  l rel op { vctr 90d @Rotate parenleft } r	}
-    def frown		precedence @OrderingPrec left l right r
-    {  l rel op { vctr 90d @Rotate parenright } r	}
-
-    def ">="		precedence @OrderingPrec left l right r
-    {  l rel op { greaterequal } r			}
-    def succ		precedence @OrderingPrec left l right r
-    {  l
-       rel op { 0.45f @Font 90d @Rotate
-		 { parenrighttp ^| parenlefttp } }
-       r  }
-    def succeq		precedence @OrderingPrec left l right r
-    {  l rel op { @OneRow non succ /0.1f minus } r	}
-    def ">>"		precedence @OrderingPrec left l right r
-    {  l rel op { greater greater } r			}
-    def supset		precedence @OrderingPrec left l right r
-    {  l rel op { propersuperset } r			}
-    def supseteq	precedence @OrderingPrec left l right r
-    {  l rel op { reflexsuperset } r			}
-    def sqsupseteq	precedence @OrderingPrec left l right r
-    {  l
-       rel op { @HContract @VContract
-		   @BackEnd @Case {
-		     PostScript @Yield {
-		       {	{ "0 0 moveto xsize 0 lineto"
-			     "xsize ysize lineto"
-			     "0 ysize lineto"
-			     "0.04 ft setlinewidth stroke"
-			   }
-			   @Graphic
-			   { 0.5f @Wide 0.25f @High ^/
-			     0.25f @High
-			   }
-			 /0.1f minus
-		       }
-		     }
-		     PDF @Yield {
-		       {	{ "__mul(__loutf, 0.04) w"
-			 "0 0 m __xsize 0 l"
-			     "__xsize __ysize l"
-			     "0 __ysize l s"
-			   }
-			   @Graphic
-			   { 0.5f @Wide 0.25f @High ^/
-			     0.25f @High
-			   }
-			 /0.1f minus
-		       }
-		     }
-		   }
-		}
-       r  }
-    def ni		precedence @OrderingPrec left l right r
-    {  l rel op { 180d @Rotate element } r		}
-    def dashv		precedence @OrderingPrec left l right r
-    {  l rel op { vctr {90d @Rotate perpendicular} } r	}
-    def mid		precedence @OrderingPrec left l right r
-    {  l rel op { @Base "|" } r				}
-    def parallel	precedence @OrderingPrec left l right r
-    {  l rel op { @Base "||" } r			}
-
-    def "=="		precedence @EqualityPrec left l right r
-    {  l rel op { equivalence } r			}
-    def "~"		precedence @EqualityPrec left l right r
-    {  l rel op { similar } r				}
-    def "-~"		precedence @EqualityPrec left l right r
-    {  l rel op { @OneRow{similar^/0.07f/0.07f minus} } r	}
-    def asymp		precedence @EqualityPrec left l right r
-    {  l
-       rel op { 0.7f @Font @OneRow
-		   { 90d @Rotate parenleft ^/0.008f
-		   /0.008f 90d @Rotate parenright } }
-       r  }
-    def "~~"		precedence @EqualityPrec left l right r
-    {  l rel op { approxequal } r			}
-    def "=~"		precedence @EqualityPrec left l right r
-    {  l rel op { congruent } r				}
-    def bowtie		precedence @EqualityPrec left l right r
-    {  l rel op { non triangleright non triangleleft } r	}
-    def propto		precedence @EqualityPrec left l right r
-    {  l rel op { proportional } r			}
-    def models		precedence @EqualityPrec left l right r
-    {  l rel op { @Base vctr "|" &0.05fo vctr equal } r	}
-    def trieq		precedence @EqualityPrec left l right r
-    {  l
-       rel op { @OneRow @HContract {&0.5rt small triangle^/0.15f equal} }
-       r  }
-    def doteq		precedence @EqualityPrec left l right r
-    {  l
-       rel op { @OneRow @HContract { &0.5rt dotmath^/0.15f equal } }
-       r  }
-    def perp		precedence @EqualityPrec left l right r
-    {  l rel op { perpendicular } r			}
-
-    def notsub		precedence @OrderingPrec left l right r
-    {  l rel op { notsubset } r				}
-    def notin		precedence @OrderingPrec left l right r
-    {  l rel op { notelement } r			}
-    def "!="		precedence @EqualityPrec left l right r
-    {  l rel op { notequal } r				}
-
-    def "<->"		left l right r
-    {  l rel op { arrowboth } r				}
-    def "<--"		left l right r
-    {  l rel op { arrowleft } r				}
-    def "-->"		left l right r
-    {  l rel op { arrowright } r			}
-    def up		left l right r
-    {  l rel op { arrowup } r				}
-    def down		left l right r
-    {  l rel op { arrowdown } r				}
-    def "<=>"		left l right r
-    {  l rel op { arrowdblboth } r			}
-    def "<=="		left l right r
-    {  l rel op { arrowdblleft } r 			}
-    def "==>"		left l right r
-    {  l rel op { arrowdblright } r			}
-    def dblup		left l right r
-    {  l rel op { arrowdblup } r			}
-    def dbldown		left l right r
-    {  l rel op { arrowdbldown } r			}
-
-    def ":"		left l right r
-    {  l rel op { colon } r				}
-    def "::"		left l right r
-    {  l rel op { @OneCol {colon ` colon} } r		}
-    def ":="		left l right r
-    {  l rel op { colon{ //0.05fo equal } } r		}
-
-    def not right x	{ @HContract {@OneCol x /0co &0.5rt slash}}
-
-
-    ###################################################################
-    #                                                                 #
-    #   Groups 11 and 12 - openings and closings.                     #
-    #                                                                 #
-    ###################################################################
-
-    def lpar	{ parenleft				}
-    def rpar	{ parenright				}
-    def lbrack	{ bracketleft				}
-    def rbrack	{ bracketright				}
-    def lbrace	{ braceleft				}
-    def rbrace	{ braceright				}
-    def lfloor	{ ` "-0.15f" @VShift bracketleftbt	}
-    def rfloor	{   "-0.15f" @VShift bracketrightbt `	}
-    def lceil	{ ` "-0.1f"  @VShift bracketlefttp	}
-    def rceil	{   "-0.1f"  @VShift bracketrighttp `	}
-    def langle	{ angleleft				}
-    def rangle	{ angleright				}
-
-    def blpar	{ @OneRow {parenlefttp    ^/ parenleftex    / parenleftbt   } }
-    def brpar	{ @OneRow {parenrighttp   ^/ parenrightex   / parenrightbt  } }
-    def blbrack	{ @OneRow {bracketlefttp  ^/ bracketleftex  / bracketleftbt } }
-    def brbrack	{ @OneRow {bracketrighttp ^/ bracketrightex / bracketrightbt} }
-    def blbrace	{ @OneRow {bracelefttp    ^/ braceleftmid   / braceleftbt   } }
-    def brbrace	{ @OneRow {bracerighttp   ^/ bracerightmid  / bracerightbt  } }
-    def blfloor	{ @OneRow {bracketleftex  ^/ bracketleftex  / bracketleftbt } }
-    def brfloor	{ @OneRow {bracketrightex ^/ bracketrightex / bracketrightbt} }
-    def blceil	{ @OneRow {bracketlefttp  ^/ bracketleftex  / bracketleftex } }
-    def brceil	{ @OneRow {bracketrighttp ^/ bracketrightex / bracketrightex} }
-    def blangle	{ @HContract @VContract
-				@BackEnd @Case {
-				  PostScript @Yield {
-				    { "xsize 0 moveto"
-				      "0 ysize 2 div lineto"
-				      "xsize ysize lineto"
-				      "0.04 ft setlinewidth stroke"
-			          }
-			          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
-				  }
-				  PDF @Yield {
-				    { "__mul(__loutf, 0.04) w"
-				      "__xsize 0 m"
-				      "0 __div(__ysize, 2) l"
-				      "__xsize __ysize l S"
-			          }
-			          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
-				  }
-				}
-		}
-    def brangle	{ @HContract @VContract
-				@BackEnd @Case {
-				  PostScript @Yield {
-				    { "0 0 moveto"
-				      "xsize ysize 2 div lineto"
-				      "0 ysize lineto"
-				      "0.04 ft setlinewidth stroke"
-			          }
-			          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
-				  }
-				  PDF @Yield {
-				    { "__mul(__loutf, 0.04) w"
-				      "0 0 m"
-				      "__xsize __div(__ysize, 2) l"
-				      "0 __ysize l S"
-			          }
-			          @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
-				  }
-				}
-		}
-
-
-    ###################################################################
-    #                                                                 #
-    #   Group 13 - punctuation.                                       #
-    #                                                                 #
-    ###################################################################
-
-    def ";"     precedence @PunctuationPrec left l right r
-    {  l punct symbol { semicolon } r     }
-    def ","     precedence @PunctuationPrec left l right r
-    {  l punct symbol { comma     } r     }
-    def col     precedence @PunctuationPrec left l right r
-    {  l punct symbol { colon     } r     }
-
-
-    ###################################################################
-    #                                                                 #
-    #   Additional short symbols (Knuth p. 132)                       #
-    #                                                                 #
-    ###################################################################
-
-    def "!" { exclam          }
-    def "?" { question        }
-    def "%" { percent         }
-    def "(" { parenleft       }
-    def ")" { parenright      }
-    def "[" { bracketleft     }
-    def "]" { bracketright    }
-
-
-    ###################################################################
-    #                                                                 #
-    #   Common mathematical functions (from Knuth p. 162).            #
-    #   mod is included, since @Rel mod is easily typed if needed.    #
-    #                                                                 #
-    ###################################################################
-
-    def arccos	{ @Base "arccos"	}
-    def arcsin	{ @Base "arcsin"	}
-    def arctan	{ @Base "arctan"	}
-    def arg	{ @Base "arg"		}
-    def cos	{ @Base "cos"		}
-    def cosh	{ @Base "cosh"		}
-    def cot	{ @Base "cot"		}
-    def coth	{ @Base "coth"		}
-    def csc	{ @Base "csc"		}
-    def deg	{ @Base "deg"		}
-    def det	{ @Base "det"		}
-    def dim	{ @Base "dim"		}
-    def exp	{ @Base "exp"		}
-    def gcd	{ @Base "gcd"		}
-    def hom	{ @Base "hom"		}
-    def inf	{ @Base "inf"		}
-    def ker	{ @Base "ker"		}
-    def lg	{ @Base "lg"		}
-    def lim	{ @Base "lim"		}
-    def liminf	{ @OneCol { @Base "lim" ` @Base "inf" }	}
-    def limsup	{ @OneCol { @Base "lim" ` @Base "sup" }	}
-    def ln	{ @Base "ln"		}
-    def log	{ @Base "log"		}
-    def max	{ @Base "max"		}
-    def min	{ @Base "min"		}
-    def Pr	{ @Base "Pr"		}
-    def sec	{ @Base "sec"		}
-    def sin	{ @Base "sin"		}
-    def sinh	{ @Base "sinh"		}
-    def supr	{ @Base "sup"		}
-    def tan	{ @Base "tan"		}
-    def tanh	{ @Base "tanh"		}
-    def mod	{ @Base "mod"		}
-
-
-    ###################################################################
-    #                                                                 #
-    #  Arrow symbols.                                                 #
+    #  Ordinary symbols (arrows)                                      #
     #                                                                 #
     ###################################################################
 
@@ -1624,14 +887,277 @@ def @Math
     def searrow		{ 0.5w @VShift 0.5w @HShift 315d @Rotate arrowright }
     def swarrow		{ 0.5w @VShift 0.5w @HShift 225d @Rotate arrowright }
     def nwarrow		{ 0.5w @VShift 0.5w @HShift 135d @Rotate arrowright }
-
+
 
     ###################################################################
     #                                                                 #
-    #   Other symbols taken from TeX.                                 #
+    #   Ordinary symbols (to get Roman font)                          #
+    #                                                                 #
+    #   These symbols are defined to yield themselves, but in Roman   #
+    #   font rather than the Italic that would otherwise be used.     #
+    #   See Knuth p. 162 and 132.  The definitions of "0" ... "9"     #
+    #   should logically appear here, but they have been moved to     #
+    #   the end since it is awkward to enter numeric lengths after    #
+    #   they are defined.                                             #
     #                                                                 #
     ###################################################################
 
+    def arccos	{ @Base "arccos"	}
+    def arcsin	{ @Base "arcsin"	}
+    def arctan	{ @Base "arctan"	}
+    def arg	{ @Base "arg"		}
+    def cos	{ @Base "cos"		}
+    def cosh	{ @Base "cosh"		}
+    def cot	{ @Base "cot"		}
+    def coth	{ @Base "coth"		}
+    def csc	{ @Base "csc"		}
+    def deg	{ @Base "deg"		}
+    def det	{ @Base "det"		}
+    def dim	{ @Base "dim"		}
+    def exp	{ @Base "exp"		}
+    def gcd	{ @Base "gcd"		}
+    def hom	{ @Base "hom"		}
+    def inf	{ @Base "inf"		}
+    def ker	{ @Base "ker"		}
+    def lg	{ @Base "lg"		}
+    def lim	{ @Base "lim"		}
+    def liminf	{ @OneCol { @Base "lim" ` @Base "inf" }	}
+    def limsup	{ @OneCol { @Base "lim" ` @Base "sup" }	}
+    def ln	{ @Base "ln"		}
+    def log	{ @Base "log"		}
+    def max	{ @Base "max"		}
+    def min	{ @Base "min"		}
+    def Pr	{ @Base "Pr"		}
+    def sec	{ @Base "sec"		}
+    def sin	{ @Base "sin"		}
+    def sinh	{ @Base "sinh"		}
+    def supr	{ @Base "sup"		}
+    def tan	{ @Base "tan"		}
+    def tanh	{ @Base "tanh"		}
+    def mod	{ @Base "mod"		}
+    def "!"	{ exclam          }
+    def "?"	{ question        }
+    def "%"	{ percent         }
+    def "("	{ parenleft       }
+    def ")"	{ parenright      }
+    def "["	{ bracketleft     }
+    def "]"	{ bracketright    }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Ordinary symbols (for atleft and atright)                     #
+    #   These are Knuth's Groups 11 and 12 - openings and closings.   #
+    #                                                                 #
+    ###################################################################
+
+    def lpar	{ parenleft				}
+    def rpar	{ parenright				}
+    def lbrack	{ bracketleft				}
+    def rbrack	{ bracketright				}
+    def lbrace	{ braceleft				}
+    def rbrace	{ braceright				}
+    def lfloor	{ ` "-0.15f" @VShift bracketleftbt	}
+    def rfloor	{   "-0.15f" @VShift bracketrightbt `	}
+    def lceil	{ ` "-0.1f"  @VShift bracketlefttp	}
+    def rceil	{   "-0.1f"  @VShift bracketrighttp `	}
+    def langle	{ angleleft				}
+    def rangle	{ angleright				}
+
+    def blpar	{ @OneRow {parenlefttp    ^/ parenleftex    / parenleftbt   } }
+    def brpar	{ @OneRow {parenrighttp   ^/ parenrightex   / parenrightbt  } }
+    def blbrack	{ @OneRow {bracketlefttp  ^/ bracketleftex  / bracketleftbt } }
+    def brbrack	{ @OneRow {bracketrighttp ^/ bracketrightex / bracketrightbt} }
+    def blbrace	{ @OneRow {bracelefttp    ^/ braceleftmid   / braceleftbt   } }
+    def brbrace	{ @OneRow {bracerighttp   ^/ bracerightmid  / bracerightbt  } }
+    def blfloor	{ @OneRow {bracketleftex  ^/ bracketleftex  / bracketleftbt } }
+    def brfloor	{ @OneRow {bracketrightex ^/ bracketrightex / bracketrightbt} }
+    def blceil	{ @OneRow {bracketlefttp  ^/ bracketleftex  / bracketleftex } }
+    def brceil	{ @OneRow {bracketrighttp ^/ bracketrightex / bracketrightex} }
+
+    def blangle
+    {
+        @HContract @VContract @BackEnd @Case {
+	    PostScript @Yield {
+	      { "xsize 0 moveto 0 ysize 2 div lineto"
+		"xsize ysize lineto 0.04 ft setlinewidth stroke"
+	      } @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+	    }
+	    PDF @Yield {
+	      { "__mul(__loutf, 0.04) w __xsize 0 m"
+		"0 __div(__ysize, 2) l __xsize __ysize l S"
+	      } @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+	    }
+	}
+    }
+
+    def brangle
+    {
+        @HContract @VContract @BackEnd @Case {
+	    PostScript @Yield {
+	      { "0 0 moveto xsize ysize 2 div lineto"
+		"0 ysize lineto 0.04 ft setlinewidth stroke"
+	      } @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+	    }
+	    PDF @Yield {
+	      { "__mul(__loutf, 0.04) w 0 0 m"
+		"__xsize __div(__ysize, 2) l 0 __ysize l S"
+	      } @Graphic { 0.5f @Wide 2f @High ^/ 2f @High }
+	    }
+	}
+    }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Ordinary symbols (miscellaneous)                              #
+    #                                                                 #
+    #   Not all of Knuth's symbols are available.  The four suits     #
+    #   (heartsuit, etc.), have definitions above.                    #
+    #                                                                 #
+    ###################################################################
+
+    def hbar         { @HContract @VContract {&0.1f @Base "-" ^/0.30fo h }}
+    def Re           { Rfraktur					}
+    def Im           { Ifraktur					}
+    def partial      { partialdiff				}
+    def infty        { infinity					}
+    def prime        { minute        				}
+   #def emptyset     { defined above				}
+    def nabla        { gradient					}
+    def surd         { radical					}
+    def top          { 180d @Rotate perpendicular		}
+    def bot          { perpendicular				}
+    def dbar         { @Base "||"                         	}
+   #def angle        { defined above				}
+    def backslash    { "\\"					}
+    def forall       { universal				}
+    def exists       { existential				}
+    def neg          { logicalnot				}
+
+    def circle
+    { @HContract @VContract @BackEnd @Case {
+	PostScript @Yield {
+	  {
+	    "xsize ysize 2 div moveto"
+	    "xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
+	    "0.04 ft setlinewidth stroke"
+	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+	PDF @Yield {
+	  #
+	  # VT: draws a counterclockwise 360 degree arc from 0 to +360
+	  # degree positions (straight right to straight right) with
+	  # centre = (xsize/2, ysize/2) and radius = xsize/2, 
+	  # implemented as two counterclockwise 180 degree arcs.
+	  # start at (xsize, ysize/2); the control points are:
+	  #
+	  #     pt1 = (xsize, ysize/2 + (4/3 * xsize/2))
+	  #     pt2 = (0, ysize/2 + (4/3 * xsize/2))
+	  #
+	  # end at (0, ysize/2).  Then start at (0, ysize/2); control points
+	  #
+	  #     pt1 = (0, ysize/2 - (4/3 * xsize/2))
+	  #     pt2 = (xsize, ysize/2 - (4/3 * xsize/2))
+	  #
+	  # and end at (xsize, ysize/2).
+
+	  {
+	    "__mul(0.04, __loutf) w"
+	    "__xsize __div(__ysize, 2) m"
+	    "__xsize __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "0 __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "0 __div(__ysize, 2) c"
+	    "0 __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "__xsize __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "__xsize __div(__ysize, 2) c S"
+	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+      }
+    }
+
+    def filledcircle
+    { @HContract @VContract @BackEnd @Case {
+	PostScript @Yield {
+	  {
+	    "xsize ysize 2 div moveto"
+	    "xsize 2 div ysize 2 div xsize 2 div 0 360 arc"
+	    "0.04 ft setlinewidth fill"
+	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+	PDF @Yield {
+	  #
+	  # JK: I don't know how to fill in PDF, so this doesn't!
+	  #
+	  # VT: draws a counterclockwise 360 degree arc from 0 to +360
+	  # degree positions (straight right to straight right) with
+	  # centre = (xsize/2, ysize/2) and radius = xsize/2, 
+	  # implemented as two counterclockwise 180 degree arcs.
+	  # start at (xsize, ysize/2); the control points are:
+	  #
+	  #     pt1 = (xsize, ysize/2 + (4/3 * xsize/2))
+	  #     pt2 = (0, ysize/2 + (4/3 * xsize/2))
+	  #
+	  # end at (0, ysize/2).  Then start at (0, ysize/2); control points
+	  #
+	  #     pt1 = (0, ysize/2 - (4/3 * xsize/2))
+	  #     pt2 = (xsize, ysize/2 - (4/3 * xsize/2))
+	  #
+	  # and end at (xsize, ysize/2).
+
+	  {
+	    "__mul(0.04, __loutf) w"
+	    "__xsize __div(__ysize, 2) m"
+	    "__xsize __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "0 __add(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "0 __div(__ysize, 2) c"
+	    "0 __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "__xsize __sub(__div(__ysize, 2), __div(__mul(2, __xsize), 3))"
+	    "__xsize __div(__ysize, 2) c S"
+	  } @Graphic { 0.7f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+      }
+    }
+
+    def square
+    { @HContract @VContract @BackEnd @Case {
+	PostScript @Yield {
+	  {
+	    "0 0 moveto xsize 0 lineto xsize ysize lineto"
+	    "0 ysize lineto closepath"
+	    "0.04 ft setlinewidth stroke"
+	  } @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+	PDF @Yield {
+	  {
+	    "__mul(__loutf, 0.04) w"
+	    "0 0 m __xsize 0 l __xsize __ysize l"
+	    "0 __ysize l s"
+	  } @Graphic { 0.6f @Wide 0.3f @High ^/ 0.3f @High }
+	}
+      }
+    }
+
+    def triangle
+    { @HContract @VContract @BackEnd @Case {
+	PostScript @Yield {
+	  {
+	    "0 0 moveto xsize 0 lineto"
+	    "xsize 2 div ysize lineto closepath"
+	    "0.04 ft setlinewidth stroke"
+	  } @Graphic { 0.3f @Wide 0.3f @High ^| ^/ 0.3f @Wide 0.3f @High }
+	}
+	PDF @Yield {
+	  {
+	    "__mul(__loutf, 0.04) w"
+	    "0 0 m __xsize 0 l"
+	    "__div(__xsize, 2) __ysize l s"
+	  } @Graphic { 0.3f @Wide 0.3f @High ^| ^/ 0.3f @Wide 0.3f @High }
+	}
+      }
+    }
+
+    # other symbols taken from TeX
     def ldots { .       &0.3f .       &0.3f .			}
     def cdots { dotmath &0.3f dotmath &0.3f dotmath		}
     def vdots { @OneRow { dotmath ^/0.3f dotmath /0.3f dotmath } }
@@ -1642,13 +1168,7 @@ def @Math
 	       }
 	      }
 
-
-    ###################################################################
-    #                                                                 #
-    #   Symbols taken from eqn (Kernighan and Cherry 1975).           #
-    #                                                                 #
-    ###################################################################
-
+    # symbols taken from eqn (Kernighan and Cherry 1975).           #
     def del	{ gradient			}
     def grad	{ gradient			}
     def "..."	{ ellipsis			}
@@ -1659,38 +1179,89 @@ def @Math
     def "''''"	{ minute minute minute minute	}
     def empty	{ emptyset			}
 
-
-
-    ###################################################################
-    #                                                                 #
-    #   Miscellaneous                                                 #
-    #                                                                 #
-    ###################################################################
-
+    # forget where these are from
     def triangleup	{ 0.8f @Font triangle	}
     def triangledown	{ 180d @Rotate 0.8f @Font triangle	}
 
+    # half and third defined later, since they use frac
+
+
     ###################################################################
     #                                                                 #
-    #   Symbols with parameters.                                      #
+    #   Variable-building symbols                                     #
     #                                                                 #
     #   These symbols are essentially those of eqn, with some         #
     #   changes and additions.                                        #
     #                                                                 #
     ###################################################################
 
-    def @OrDefault
-        left l
-        right r
+    def dot
+	precedence @HatPrec
+	left x
+	named gap { @AboveGap }
     {
-        l @Case {
-           "dft" @Yield r
-           else  @Yield l
-        }
+	x below gap { gap } skew { @SkewGap } @SuperScriptStyle .
+    }
+
+    def dotdot
+	precedence @HatPrec
+	left x
+	named gap { @AboveGap }
+    {
+	x below gap { gap } skew { @SkewGap } @SuperScriptStyle ..
+    }
+
+    def hat
+	precedence @HatPrec
+	left x
+	named gap { @AboveGap }
+    {
+	x below gap { gap } skew { @SkewGap } @SuperScriptStyle @Base "^"
+    }
+
+    def tilde
+	precedence @HatPrec
+	left x
+	named gap { @AboveGap }
+    {
+	x below gap { gap } skew { @SkewGap } @SuperScriptStyle @Base "~"
+    }
+
+    def vec
+	precedence @HatPrec
+	left x
+	named gap { @AboveGap }
+    {
+	x below gap { gap } skew { @SkewGap } @SuperScriptStyle arrowright
+    }
+
+    def dyad
+	precedence @HatPrec
+	left x
+	named gap { @AboveGap }
+    {
+	x below gap { gap } skew { @SkewGap } @SuperScriptStyle arrowboth
+    }
+
+    def overbar
+	precedence @HatPrec
+	left x
+	named gap { @AboveGap }
+    {
+	{ @WithStyle style { @CurrStyle } cramped { "Yes" } x }
+        widebelow gap { gap } @SuperScriptStyle minus
+    }
+
+    def underbar
+	precedence @HatPrec
+	left x
+	named gap { @BelowGap }
+    {
+	x wideabove gap { gap } @SuperScriptStyle minus
     }
 
     def sup
-	precedence @FactorialPrec
+	precedence @SupPrec
 	associativity left
 	left x
 	named gap { "dft" }
@@ -1703,7 +1274,7 @@ def @Math
     }
 
     def sub
-	precedence 72
+	precedence @SubPrec
 	associativity left
 	left x
 	named gap { @SubScriptGap }
@@ -1717,7 +1288,7 @@ def @Math
     }
 
     def tsub
-	precedence 72
+	precedence @SubPrec
 	associativity left
 	left x
 	named gap { @SubScriptGap }
@@ -1731,7 +1302,7 @@ def @Math
     }
 
     def supp
-	precedence @FactorialPrec
+	precedence @SupPrec
 	associativity left
 	left x
 	named gap { "dft" }
@@ -1746,7 +1317,7 @@ def @Math
     }
 
     def on
-	precedence 74
+	precedence @SubPrec
 	associativity left
 	left x
 	right y
@@ -1756,7 +1327,7 @@ def @Math
     }
 
     def ton
-	precedence 74
+	precedence @SubPrec
 	associativity left
 	left x
 	right y
@@ -1764,26 +1335,505 @@ def @Math
 	@SuperScriptStyle x ^/  /
 	&0io 0.3f @HShift @SubScriptStyle y
     }
+
 
-    def frac
-	precedence @DivisionPrec
-	associativity left
-	left x
-	named gap { 0.2f }
-	right y
+    ###################################################################
+    #                                                                 #
+    #   Large operator symbols (Knuth's Group 6 "Large" operators)    #
+    #                                                                 #
+    #   Layout of large operators differs in several ways, depending  #
+    #   on whether they are in display mode or not.                   #
+    #                                                                 #
+    #     1. The operator itself is larger in display mode.  We       #
+    #        achieve this by automatically prepending `big' to the    #
+    #        operator's symbol when in display mode.                  #
+    #                                                                 #
+    #     2. The "bounds" of these operators (i.e., `from' and `to')  #
+    #        are set as limits (i.e., above and below the operator    #
+    #        symbol) when in display mode, and displayed to the       #
+    #        right of the symbol otherwise.  Integrations are an      #
+    #        exception (the only exception?).                         #
+    #                                                                 #
+    #   See ``The TeXbook'', Chapter 17.                              #
+    #                                                                 #
+    ###################################################################
+
+    def largeop
+	named symbol { "largeop" }
+        named limits { "dft" } # whether to set `from' and `to' as limits
+	named from   { "" }
+	named to     { "" }
     {
-	@HContract @VContract
-	{ 1w @VShift { @SuperScriptStyle { x } /gap }
-          | fraction &0io
-          | 0w @VShift { |gap @SubScriptStyle { y } }
+        def @Symbol
+	{
+	    @CurrStyle @Case {
+	        "display" @Yield { big symbol }
+	        else      @Yield symbol
+	    }
+	}
+
+	def @Limits
+	{
+	    limits @OrDefault {
+		 @CurrStyle @Case {
+		    "display" @Yield "Yes"
+		     else     @Yield "No" }
+	    }
+	}
+
+        def @LimitsBody
+	{
+            @Symbol above { @SuperScriptStyle from }
+                    below { @SubScriptStyle to }
+        }
+
+        def @NoLimitsBody
+	{
+	    0.5w @VShift {
+	      1.0w @VShift @OneRow {
+		      { |  0.3w @VShift @SuperScriptStyle to }
+	      ^/0.0fo { 0w @VShift @Symbol | }
+	      }
+
+	      /0.0fo
+
+	      { | 0.7w @VShift @SubScriptStyle from }
+	    }
+	    |{ @CurrPunctSpaceGap }
+        }
+
+        @Limits @Case {
+            { "Yes" "yes" } @Yield @LimitsBody
+            { "No" "no" }   @Yield @NoLimitsBody
+        }
+    }
+
+    # Ludovic's symbol, no longer used
+    def largeoperator
+	named symbol { "largeop" }
+	named from   { "" }
+	named to     { "" }
+        named limits { "Yes" } # whether to set `from' and `to' as limits
+    {
+        def @NoLimitsBody {
+	    0.5w @VShift {
+	      1.0w @VShift @OneRow {
+		      { |  0.3w @VShift @SuperScriptStyle to }
+	      ^/0.0fo { 0w @VShift symbol | }
+	      }
+
+	      /0.0fo
+
+	      { | 0.7w @VShift @SubScriptStyle from }
+	    }
+	    |{ @CurrPunctSpaceGap }
+        }
+
+        def @LimitsBody {
+            symbol above  { @SuperScriptStyle from }
+                   below { @SubScriptStyle to }
+        }
+
+        limits @Case {
+            { "Yes" "yes" } @Yield @LimitsBody
+            { "No" "no" }   @Yield @NoLimitsBody
+        }
+    }
+
+    # Ludovic's symbol, no longer used
+    def simplelargeoperator
+        named symbol { "simplelargeop" }
+        named limits { "dft" }
+        named from   { }
+        named to     { }
+    {
+        largeoperator
+	  symbol { @CurrStyle @Case {
+	    "display" @Yield { big symbol }
+	    else      @Yield symbol }
+	  }
+	  limits { limits @OrDefault {
+	       @CurrStyle @Case {
+		  "display" @Yield "Yes"
+		   else     @Yield "No" }
+	       }
+	  }
+	  from   { from }
+	  to     { to }
+    }
+
+    def sum
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { summation } limits { limits } from { from } to { to }
+    }
+
+    def prod
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { product } limits { limits } from { from } to { to }
+    }
+
+    def coprod
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { 180d @Rotate vctr product }
+	  limits { limits } from { from } to { to }
+    }
+
+    def bcap
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { big intersection } limits { limits } from { from } to { to }
+    }
+
+    def bcup
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { big union } limits { limits } from { from } to { to }
+    }
+
+    def bvee
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { big logicalor } limits { limits } from { from } to { to }
+    }
+
+    def bwedge
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { big logicaland } limits { limits } from { from } to { to }
+    }
+
+    def circledot
+    {
+	def @PureDot   # dot with no extra space
+	{
+	    @HContract { &0io 0.4w @HShift dotmath }
+	}
+
+        @OneRow @HContract { circle /0io &0.5rt @PureDot /0io circle } 
+    }
+
+
+    def bodot
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { circledot }
+	  limits { limits } from { from } to { to }
+    }
+
+    def botimes
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { circlemultiply } limits { limits } from { from } to { to }
+    }
+
+    def boplus
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { circleplus } limits { limits } from { from } to { to }
+    }
+
+    def buplus
+	named limits { "dft" }
+        named from {}
+	named to {}
+    {
+        largeop
+	  symbol { & big @HContract { &0.5rt 0.7f @Font plus ^/0.2fo union } }
+	  limits { limits } from { from } to { to }
+    }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Integrations are slightly different in that, according to     #
+    #   Knuth (Chapter 17, p. 144), ``superscripts and subscripts     #
+    #   are not set as limits, even in display style''.   Still, as   #
+    #   in TeX, we give users the possibility to override this.       #
+    #                                                                 #
+    ###################################################################
+
+    # Ludovic's symbol, no longer used
+    def integration
+        named symbol { "integration" }
+        named limits { "No" }
+        named from   { }
+        named to     { }
+    {
+        largeoperator
+	  symbol { @CurrStyle @Case {
+	    "display" @Yield { big symbol }
+	    else      @Yield symbol }
+	  }
+	  limits { limits } from { from } to { to }
+    }
+
+    def int
+        named limits { "No" }
+        named from   { }
+        named to     { }
+    {
+        largeop
+	  symbol { vctr big integral } limits { limits } from { from } to { to }
+    }
+
+    def oint
+        named limits { "No" }
+        named from   { }
+        named to     { }
+    {
+        largeop
+	  symbol { @OneCol { vctr degree |0.015fo big integral } }
+	  limits { limits } from { from } to { to }
+    }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Unary operator symbols                                        #
+    #                                                                 #
+    ###################################################################
+
+    def sqrt
+	precedence @UnaryOpPrec
+	named gap { @AboveGap }
+	right x
+    {
+	@BackEnd @Case {
+	  PostScript @Yield {
+	    @HContract @VContract
+		{
+		    @VScale surd | @OneRow
+		    {
+			@HLine line { "0.03 ft setlinewidth 2 setlinecap" }
+			^//gap  |gap  @SquareRootStyle @Strut x # //gap
+		    }
+		}
+	  }
+	  PDF @Yield {
+		@HContract @VContract
+		{
+#
+#	VT: this PDF is correct but it renders badly in Acrobat (?problem
+#	    with scaling by fractional factors)
+#	In other words, the @VScale value comes through correctly but it
+#	    looks ugly; GhostScript's translation actually expands the
+#	    "draw surd" instruction into raw moveto's and lineto's which
+#	    it presumably gets from the font's definition of the glyph!
+#
+		    @VScale surd | @OneRow
+		    {
+			@HLine line { "__mul(__loutf, 0.03) w 2 J" }
+			^//gap  |gap  @SquareRootStyle @Strut x # //gap
+		    }
+		}
+	  }
 	}
     }
 
-    def half { 1 frac 2 }
-    def third { 1 frac 3 }
+    def root
+	precedence @UnaryOpPrec
+	associativity left
+	left x
+	right y
+    {
+	"" sup x &0io sqrt y
+    }
+
+    def zroot
+	precedence @UnaryOpPrec
+	associativity left
+	left x
+	right y
+    {
+	def zsup right x { "+0.3f" @VShift 0.5f @Font x }
+
+	"-0.4f" @HShift { 1w @HShift { zsup x } }  &0co sqrt y
+    }
+
+    export row axisrow col lcol ccol rcol mcol
+    def matrix
+	precedence @UnaryOpPrec
+	named gap { @CurrBinarySpaceGap }
+	named strut
+	    named no  { }
+	    named No  { }
+	    named yes { 0.5f }
+	    named Yes { 0.5f }
+	{ No }
+	named atleft {}
+	named atright {}
+	named userow { No }
+	named shiftdelim { Yes }
+	body x
+    { 
+	def @Strut
+	{
+	    strut @Case {
+		"" @Yield {}
+		else @Yield { @OneRow { strut @High ^/ strut @High } }
+	    }
+	}
+
+	def newrow
+	    precedence @HelperRowPrec
+	    associativity left
+	    left x
+	    right y
+	{
+	    x @Case {
+		"" @Yield { y | @Strut }
+		else @Yield { x /@RowGap y | @Strut }
+	    }
+	}
+
+	macro row { newrow "" }
+
+	def newaxisrow
+	    precedence @HelperRowPrec
+	    associativity left
+	    left x
+	    right y
+	{
+	    x @Case {
+		"" @Yield { y | @Strut }
+		else @Yield { x ^/@RowGap y | @Strut }
+	    }
+	}
+
+	macro axisrow { newaxisrow "" }
+
+	def col
+	    precedence @HelperColPrec
+	    associativity left
+	    left x
+	    named indent { 0.5rt }
+	    right y
+	{
+	    x @Case {
+		""   @Yield {            &indent @OneCol y }
+		else @Yield { x |@ColGap &indent @OneCol y }
+	    }
+	}
+
+	def lcol
+	    precedence @HelperColPrec
+	    associativity left
+	    left x
+	    right y
+	{
+	    x col indent { 0i } y
+	}
+
+	def ccol
+	    precedence @HelperColPrec
+	    associativity left
+	    left x
+	    right y
+	{
+	    x col indent { 0.5rt } y
+	}
+
+	def rcol
+	    precedence @HelperColPrec
+	    associativity left
+	    left x
+	    right y
+	{
+	    x col indent { 1rt } y
+	}
+
+	def mcol
+	    precedence @HelperColPrec
+	    associativity left
+	    left x
+	    right y
+	{
+	    x @Case {
+		""   @Yield {            @OneCol y }
+		else @Yield { x |@ColGap @OneCol y }
+	    }
+	}
+
+	def delim right x
+	{
+	    x @Case
+	    {
+		""   @Yield @Null
+		else @Yield
+		{
+		    shiftdelim @Case {
+		    { Yes yes } @Yield { @VScale x }
+		    else        @Yield { @VCover x }
+		    }
+		}
+	    }
+	}
+
+	@HContract @VContract {
+	    delim atleft &@CurrPunctSpaceGap
+	    userow @Case {
+		{Yes yes} @Yield @HContract @VContract {^//gap @OneRow x //gap}
+		else      @Yield vctr @HContract @VContract { //gap x //gap }
+	    }
+	    &@CurrPunctSpaceGap delim atright
+	}
+    }
+
+    macro pmatrix  { matrix atleft {1.5f @Font (} atright {1.5f @Font )} }
+    macro bmatrix  { matrix atleft { blbrack } atright { brbrack } }
+    macro brmatrix { matrix atleft { blbrace } atright { brbrace } }
+    macro fmatrix  { matrix atleft { blfloor } atright { brfloor } }
+    macro cmatrix  { matrix atleft { blceil  } atright { brceil  } }
+    macro amatrix  { matrix atleft { blangle } atright { brangle } }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Binary operator symbols                                       #
+    #                                                                 #
+    ###################################################################
+
+    ###################################################################
+    #                                                                 #
+    #  over and frac (also half and third)                            #
+    #                                                                 #
+    ###################################################################
 
     def over
-	precedence @DivisionPrec
+	precedence @BinaryOpDividePrec
 	associativity left
 	left x
 	named gap { "dft" }
@@ -1823,267 +1873,1019 @@ def @Math
 	}
     }
 
-
-    def dot
-	precedence @FactorialPrec
+    def frac
+	precedence @BinaryOpDividePrec
+	associativity left
 	left x
-	named gap { @AboveGap }
-    {
-	x below gap { gap } skew { @SkewGap } .
-    }
-
-    def dotdot
-	precedence @FactorialPrec
-	left x
-	named gap { @AboveGap }
-    {
-	x below gap { gap } skew { @SkewGap } ..
-    }
-
-    def hat
-	precedence @FactorialPrec
-	left x
-	named gap { @AboveGap }
-    {
-	x below gap { gap } skew { @SkewGap } @Base "^"
-    }
-
-    def tilde
-	precedence @FactorialPrec
-	left x
-	named gap { @AboveGap }
-    {
-	x below gap { gap } skew { @SkewGap } @Base "~"
-    }
-
-    def vec
-	precedence @FactorialPrec
-	left x
-	named gap { @AboveGap }
-    {
-	x below gap { gap } skew { @SkewGap } arrowright
-    }
-
-    def dyad
-	precedence @FactorialPrec
-	left x
-	named gap { @AboveGap }
-    {
-	x below gap { gap } skew { @SkewGap } arrowboth
-    }
-
-    def overbar
-	precedence @FactorialPrec
-	left x
-	named gap { @AboveGap }
-    {
-	{ @WithStyle style { @CurrStyle } cramped { "Yes" } x }
-        widebelow gap { gap } minus
-    }
-
-    def underbar
-	precedence @FactorialPrec
-	left x
-	named gap { @BelowGap }
-    {
-	x wideatop gap { gap } minus
-    }
-
-    def sqrt
-	precedence @ExponentPrec
-	named gap { @AboveGap }
-	right x
-    {
-	@BackEnd @Case {
-	  PostScript @Yield {
-	    @HContract @VContract
-		{
-		    @VScale surd | @OneRow
-		    {
-			@HLine line { "0.03 ft setlinewidth 2 setlinecap" }
-			^//gap  |gap  @SquareRootStyle @Strut x # //gap
-		    }
-		}
-	  }
-	  PDF @Yield {
-		@HContract @VContract
-		{
-#
-#	VT: this PDF is correct but it renders badly in Acrobat (?problem
-#	    with scaling by fractional factors)
-#	In other words, the @VScale value comes through correctly but it
-#	    looks ugly; GhostScript's translation actually expands the
-#	    "draw surd" instruction into raw moveto's and lineto's which
-#	    it presumably gets from the font's definition of the glyph!
-#
-		    @VScale surd | @OneRow
-		    {
-			@HLine line { "__mul(__loutf, 0.03) w 2 J" }
-			^//gap  |gap  @SquareRootStyle @Strut x # //gap
-		    }
-		}
-	  }
-	}
-    }
-
-    def root
-	precedence @ExponentPrec
-	left x
+	named gap { 0.2f }
 	right y
     {
-	"" sup x &0io sqrt y
-    }
-
-    def zroot
-	precedence @ExponentPrec
-	left x
-	right y
-    {
-	def zsup right x { "+0.3f" @VShift 0.5f @Font x }
-
-	"-0.4f" @HShift { 1w @HShift { zsup x } }  &0co sqrt y
-    }
-
-    export row axisrow col lcol ccol rcol mcol
-    def matrix
-	precedence 100
-	named gap { @CurrBinarySpaceGap }
-	named strut
-	    named no  { }
-	    named No  { }
-	    named yes { 0.5f }
-	    named Yes { 0.5f }
-	{ No }
-	named atleft {}
-	named atright {}
-	named userow { No }
-	named shiftdelim { Yes }
-	body x
-    { 
-	def @Strut
-	{
-	    strut @Case {
-		"" @Yield {}
-		else @Yield { @OneRow { strut @High ^/ strut @High } }
-	    }
-	}
-
-	def newrow
-	    precedence 50
-	    associativity left
-	    left x
-	    right y
-	{
-	    x @Case {
-		"" @Yield { y | @Strut }
-		else @Yield { x /@RowGap y | @Strut }
-	    }
-	}
-
-	macro row { newrow "" }
-
-	def newaxisrow
-	    precedence 50
-	    associativity left
-	    left x
-	    right y
-	{
-	    x @Case {
-		"" @Yield { y | @Strut }
-		else @Yield { x ^/@RowGap y | @Strut }
-	    }
-	}
-
-	macro axisrow { newaxisrow "" }
-
-	def col
-	    precedence 52
-	    associativity left
-	    left x
-	    named indent { 0.5rt }
-	    right y
-	{
-	    x @Case {
-		""   @Yield {            &indent @OneCol y }
-		else @Yield { x |@ColGap &indent @OneCol y }
-	    }
-	}
-
-	def lcol
-	    precedence 52
-	    associativity left
-	    left x
-	    right y
-	{
-	    x col indent { 0i } y
-	}
-
-	def ccol
-	    precedence 52
-	    associativity left
-	    left x
-	    right y
-	{
-	    x col indent { 0.5rt } y
-	}
-
-	def rcol
-	    precedence 52
-	    associativity left
-	    left x
-	    right y
-	{
-	    x col indent { 1rt } y
-	}
-
-	def mcol
-	    precedence 52
-	    associativity left
-	    left x
-	    right y
-	{
-	    x @Case {
-		""   @Yield {            @OneCol y }
-		else @Yield { x |@ColGap @OneCol y }
-	    }
-	}
-
-	def delim right x
-	{
-	    x @Case
-	    {
-		""   @Yield @Null
-		else @Yield
-		{
-		    shiftdelim @Case {
-		    { Yes yes } @Yield { @VScale x }
-		    else        @Yield { @VCover x }
-		    }
-		}
-	    }
-	}
-
-	@HContract @VContract {
-	    delim atleft &@CurrPunctSpaceGap
-	    userow @Case {
-		{Yes yes} @Yield @HContract @VContract {^//gap @OneRow x //gap}
-		else      @Yield vctr @HContract @VContract { //gap x //gap }
-	    }
-	    &@CurrPunctSpaceGap delim atright
+	@HContract @VContract
+	{ 1w @VShift { @SuperScriptStyle { x } /gap }
+          | fraction &0io
+          | 0w @VShift { |gap @SubScriptStyle { y } }
 	}
     }
 
-    macro pmatrix  { matrix atleft { "1.5f" @Font ( } atright { "1.5f" @Font ) }}
-    macro bmatrix  { matrix atleft { blbrack } atright { brbrack } }
-    macro brmatrix { matrix atleft { blbrace } atright { brbrace } }
-    macro fmatrix  { matrix atleft { blfloor } atright { brfloor } }
-    macro cmatrix  { matrix atleft { blceil  } atright { brceil  } }
-    macro amatrix  { matrix atleft { blangle } atright { brangle } }
+    def half { one frac two }
+    def third { one frac three }
 
 
     ###################################################################
     #                                                                 #
-    #   Group 5 (digits)                                              #
+    #   Knuth's Group 7 (binary operations)                           #
+    #                                                                 #
+    #   All of Knuth's symbols are available except \star, \diamond   #
+    #   and \bullet; a few have been given more mnemonic names.       #
+    #                                                                 #
+    ###################################################################
+
+    def bin
+        precedence @BinaryOpPrec
+        associativity left
+        left l
+        named op { "binop" }
+        right r
+    {
+        l &@CurrBinarySpaceGap op &@CurrBinarySpaceGap r
+    }
+
+    def "+"
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { plus } r
+    }
+
+    def "-"
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { minus } r
+    }
+
+    def "+-"
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { plusminus } r
+    }
+
+    def "-+"
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { 180d @Rotate plusminus } r
+    }
+
+    def setminus
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { backslash } r
+    }
+
+    def cdot
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { dotmath } r
+    }
+
+    def times
+        precedence @BinaryOpTimesPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { multiply } r
+    }
+
+    def "*"
+        precedence @BinaryOpTimesPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { asteriskmath } r
+    }
+
+    #def diamond { name used above }
+
+    def circ
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { circle } r
+    }
+
+    #def bullet	{ name used above }
+
+    def div
+        precedence @BinaryOpDividePrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { divide } r
+    }
+
+    def cap
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { intersection } r
+    }
+
+    def cup
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { union } r
+    }
+
+    def uplus
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op {@OneRow @HContract { &0.5rt 0.7f @Font plus ^/0.2fo union}} r
+    }
+
+    def sqcapshape
+    {
+        @HContract @VContract @BackEnd @Case {
+	    PostScript @Yield {
+	      {	"0 0 moveto 0 ysize lineto xsize ysize lineto"
+		  "xsize 0 lineto 0.04 ft setlinewidth stroke"
+	      }
+	      @Graphic { 0.3f @Wide 0.3f @High ^| ^/ 0.3f @Wide 0.3f @High }
+	    }
+	    PDF @Yield {
+	      {	"__mul(__loutf, 0.04) w"
+		  "0 0 m 0 __ysize l __xsize __ysize l __xsize 0 l s"
+	      }
+	      @Graphic { 0.3f @Wide 0.3f @High ^| ^/ 0.3f @Wide 0.3f @High }
+	    }
+	}
+    }
+
+    def sqcap
+        precedence @BinaryOpPrec
+	associativity left
+	left l
+	right r
+    {
+        l bin op { sqcapshape } r
+    }
+
+    def sqcup
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { "180d" @Rotate sqcapshape } r
+    }
+
+    def triangleleft
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+       l bin op { "90d" @Rotate 0.8f @Font triangle } r
+    }
+
+    def triangleright
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { "-90d" @Rotate 0.8f @Font triangle } r
+    }
+
+    def wr
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { vctr {90d @Rotate similar } } r
+    }
+
+    def bigcirc
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { 1.2f @Font circle} r
+    }
+
+    def bigtriangleup
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { 1.2f @Font triangle } r
+    }
+
+    def bigtriangledown
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { 180d @Rotate 1.2f @Font triangle } r
+    }
+
+    def vee
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { logicalor } r
+    }
+
+    def wedge
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { logicaland } r
+    }
+
+    def oplus
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { circleplus } r
+    }
+
+    def ominus
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { @OneRow @HContract { circle /0io &0.5rt minus } } r
+    }
+
+    def otimes
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { circlemultiply } r
+    }
+
+    def oslash
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        #l bin op { `vctr 60d @Rotate @HContract {circle /0io &0.5rt minus`} } r
+        l bin op {@OneRow @HContract {circle /0io &0.5rt "-0.1f" @VShift slash}} r
+    }
+
+    def odot
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { circledot } r
+    }
+
+    def dagger
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { @Base @Char "dagger" } r
+    }
+
+    def daggerdbl
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { @Base @Char "daggerdbl" } r
+    }
+
+    def amalg
+        precedence @BinaryOpPrec
+	associativity left
+       	left l
+	right r
+    {
+        l bin op { 180d @Rotate vctr product } r
+    }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Group 8 (relations)                                           #
+    #                                                                 #
+    #   All Knuth's operators are available, but many have been       #
+    #   given different, more mnemonic names.  Also included is       #
+    #   a not operator for negating the relations.                    #
+    #                                                                 #
+    ###################################################################
+
+    # "not" done by an option now
+    # def not right x	{ @HContract {@OneCol x /0co &0.5rt slash}}
+
+    def rel
+        precedence @RelationPrec
+        associativity left
+        left l
+        named op { "relop" }
+	named neg { "no" }
+        right r
+    {
+
+        def @Op
+	{
+	  neg @Case {
+	      { "No" "no" } @Yield op
+	      { "Yes" "yes"   } @Yield
+	        { @HContract {@OneCol { & op } /0co &0.5rt slash} }
+	  }
+	}
+
+        l &@CurrRelSpaceGap @Op &@CurrRelSpaceGap r 
+    }
+
+    def "<"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { less } r
+    }
+
+    def ">"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { greater } r
+    }
+
+    def "="
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { equal } r
+    }
+
+    def "<="
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { lessequal } r
+    }
+
+    def precsym
+    {
+        0i @HShift 0.45f @Font "-90d" @Rotate {parenrighttp ^| parenlefttp}
+    }
+
+    def prec
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { precsym } r
+    }
+
+    def preceq
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { @VContract { precsym /0.1f minus } } r
+    }
+
+    def "<<"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { less less } r
+    }
+
+    def subset
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { propersubset } r
+    }
+
+    def subseteq
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { reflexsubset } r
+    }
+
+    def sqsubsetshape
+    {
+        @HContract @VContract @BackEnd @Case {
+	    PostScript @Yield {
+	        { "xsize 0 moveto 0 0 lineto 0 ysize lineto"
+		  "xsize ysize lineto 0.04 ft setlinewidth stroke"
+		}
+		@Graphic { 0.5f @Wide 0.25f @High ^/ 0.25f @High }
+		/0.1f minus
+	    }
+	    PDF @Yield {
+		{ "__mul(__loutf, 0.04) w __xsize 0 m 0 0 l"
+		  "0 __ysize l __xsize __ysize l s"
+		}
+		@Graphic { 0.5f @Wide 0.25f @High ^/ 0.25f @High }
+		/0.1f minus
+	    }
+	}
+    }
+
+    def sqsubseteq
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { sqsubsetshape } r
+    }
+
+    def in
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { element } r
+    }
+
+    def vdash
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { vctr {"-90d" @Rotate perpendicular} } r
+    }
+
+    def smile
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { vctr 90d @Rotate parenleft } r
+    }
+
+    def frown
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { vctr 90d @Rotate parenright } r
+    }
+
+    def ">="
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { greaterequal } r
+    }
+
+    def succsym
+    {
+        0.45f @Font 90d @Rotate { parenrighttp ^| parenlefttp }
+    }
+
+    def succ
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { succsym } r
+    }
+
+    def succeq
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { @OneRow non succ /0.1f minus } r
+    }
+
+    def ">>"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { greater greater } r
+    }
+
+    def supset
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { propersuperset } r
+    }
+
+    def supseteq
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { reflexsuperset } r
+    }
+
+    def sqsupseteqshape
+    {
+        @HContract @VContract @BackEnd @Case {
+	    PostScript @Yield {
+	     	{ "0 0 moveto xsize 0 lineto xsize ysize lineto"
+		   "0 ysize lineto 0.04 ft setlinewidth stroke"
+	        } @Graphic { 0.5f @Wide 0.25f @High ^/ 0.25f @High }
+	        /0.1f minus
+	    }
+	    PDF @Yield {
+	     	{ "__mul(__loutf, 0.04) w 0 0 m __xsize 0 l"
+		  "__xsize __ysize l 0 __ysize l s"
+		} @Graphic { 0.5f @Wide 0.25f @High ^/ 0.25f @High }
+	        /0.1f minus
+	     }
+	}
+    }
+
+    def sqsupseteq
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { sqsupseteqshape } r
+    }
+
+    def ni
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { 180d @Rotate element } r
+    }
+
+    def dashv
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { vctr {90d @Rotate perpendicular} } r
+    }
+
+    def mid
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { @Base "|" } r
+    }
+
+    def parallel
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { @Base "||" } r
+    }
+
+    def "=="
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { equivalence } r
+    }
+
+    def "~"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { similar } r
+    }
+
+    def "-~"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { @OneRow { similar ^/0.07f /0.07f minus } } r
+    }
+
+    def asymp
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {  l
+       rel neg { neg } op { 0.7f @Font @OneRow
+		   { 90d @Rotate parenleft ^/0.008f
+		   /0.008f 90d @Rotate parenright } }
+       r
+    }
+
+    def "~~"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { approxequal } r
+    }
+
+    def "=~"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { congruent } r
+    }
+
+    def bowtie
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { non triangleright non triangleleft } r
+    }
+
+    def propto
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { proportional } r
+    }
+
+    def models
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { @Base vctr "|" &0.05fo vctr equal } r
+    }
+
+    def trieqsym
+    {
+        @OneRow @HContract {&0.5rt small triangle^/0.15f equal}
+    }
+
+    def trieq
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { trieqsym } r
+    }
+
+    def doteqsym
+    {
+        @OneRow @HContract { &0.5rt dotmath^/0.15f equal }
+    }
+
+    def doteq
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { doteqsym } r
+    }
+
+    def perp
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { perpendicular } r
+    }
+
+    def notsub
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { notsubset } r
+    }
+
+    def notin
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { notelement } r
+    }
+
+    def "!="
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { notequal } r
+    }
+
+    def "<->"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowboth } r
+    }
+
+    def "<--"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowleft } r
+    }
+
+    def "-->"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowright } r
+    }
+
+    def up
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowup } r
+    }
+
+    def down
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowdown } r
+    }
+
+    def "<=>"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowdblboth } r
+    }
+
+    def "<=="
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowdblleft } r
+    }
+
+    def "==>"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowdblright } r
+    }
+
+    def dblup
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowdblup } r
+    }
+
+    def dbldown
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { arrowdbldown } r
+    }
+
+    def ":"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { colon } r
+    }
+
+    def "::"
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { @OneCol {colon ` colon} } r
+    }
+
+    def ":="
+        precedence @RelationPrec
+	associativity left
+       	left l
+	named neg { "no" }
+	right r
+    {
+        l rel neg { neg } op { colon{ //0.05fo equal } } r
+    }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Punctuation symbols (Knuth's Group 13)                        #
+    #                                                                 #
+    ###################################################################
+
+    def punct
+       precedence @PunctuationPrec
+       associativity left
+       left l
+       named symbol { "punct" }
+       right r
+    {
+        l &0.0ce symbol &@CurrPunctSpaceGap r
+    }
+
+    def ";"
+        precedence @PunctuationPrec
+	associativity left
+	left l
+	right r
+    {
+        l punct symbol { semicolon } r
+    }
+
+    def ","
+        precedence @PunctuationPrec
+	associativity left
+	left l
+	right r
+    {
+        l punct symbol { comma } r
+    }
+
+    def col
+        precedence @PunctuationPrec
+	associativity left
+	left l
+	right r
+    {
+        l punct symbol { colon } r
+    }
+
+
+    ###################################################################
+    #                                                                 #
+    #   Ordinary symbols (to get Roman font) - continued              #
     #                                                                 #
     ###################################################################
 
@@ -2099,6 +2901,11 @@ def @Math
     def "9" { nine            }
 
 
+    ###################################################################
+    #                                                                 #
+    #   The result object                                             #
+    #                                                                 #
+    ###################################################################
 
     basefont @Font
     { Slope xheight2mark nostrut } @Font { initialspace } @Space
@@ -2110,5 +2917,11 @@ def @Math
 
 @End @Math
 
-# In-line equations.
+
+###############################################################################
+#                                                                             #
+#   In-line equations                                                         #
+#                                                                             #
+###############################################################################
+
 macro @M { @HContract @VContract @Math initialstyle { "text" } }

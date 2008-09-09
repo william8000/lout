@@ -6,29 +6,10 @@
 This chapter describes how to typeset computer program text using Lout
 programs. @Index { programs }
 computer.programs. @RawIndex { computer programs @I see programs }
-in conjunction with the @Code prg2lout
+along with the @Code prg2lout
 prg2lout. @Index { @Code prg2lout filter program }
 filter program, which is always installed wherever Lout is.
-# @FootNote {
-# Prior to Version 3.18 of Lout, this chapter described how to typeset
-# programs written in the C programming language using the
-# @Code c2lout filter, and Eiffel programs using the @Code eif2lout
-# filter.  These have now been withdrawn and replaced by {@Code prg2lout},
-# which handles multiple languages.  Ordinary Lout documents require no
-# modifications as a result of this change.
-# }
-@PP
-It is possible to simply print out one or more program files independently
-of any document.  Alternatively, the program text may be printed as part of
-a larger Lout document.  Either way, Lout does not lay out the programs in
-the sense of choosing line breaks and indenting; it uses whatever line
-breaks and indenting you give to the program.  What Lout does do is cope
-with characters in the program text that it would ordinarily either reject
-or interpret in some way (braces and so on), ensuring that you can include
-program texts with absolutely no modifications; plus, if you wish, Lout
-will print keywords in bold, identifiers in italics, add line numbers, etc.
-@PP
-At the time of writing, the available programming languages are:
+The available languages are:
 blue. @Index { Blue program printing }
 c. @Index { C and C++ program printing }
 eiffel. @Index { Eiffel program printing }
@@ -127,12 +108,29 @@ way to make comments.  Whenever we mention C from now on, we mean
 both C and C++.  See Section {@NumberOf prg_perl} for more on Perl
 and its handmaiden Pod.  The second to fifth columns of this table will be
 explained at various points later in this chapter.
+# @FootNote {
+# Prior to Version 3.18 of Lout, this chapter described how to typeset
+# programs written in the C programming language using the
+# @Code c2lout filter, and Eiffel programs using the @Code eif2lout
+# filter.  These have now been withdrawn and replaced by {@Code prg2lout},
+# which handles multiple languages.  Ordinary Lout documents require no
+# modifications as a result of this change.
+# }
 @PP
-The list of languages is likely to expand, because the @Code "prg2lout"
-program has been designed to make it relatively easy to add new languages
-(you don't have to write executable code, just declare a lot of records
-describing your language).  Consult the instructions at the top of the
-source file of that program ({@I prg2lout.c}) if you want to try it yourself.
+It is possible to simply print out one or more program files independently
+of any document.  Alternatively, the program text may be printed as part of
+a larger Lout document.  Either way, Lout does not lay out the programs in
+the sense of choosing line breaks and indenting; it uses whatever line
+breaks and indenting you give to the program.  What Lout does do is cope
+with characters in the program text that it would ordinarily either reject
+or interpret in some way (braces and so on), ensuring that you can include
+program texts with absolutely no modifications; plus, if you wish, Lout
+will print keywords in bold, identifiers in italics, add line numbers, etc.
+@PP
+It is relatively easy to add new languages, since you don't have to write
+executable code, just declare a lot of records describing your language.
+Consult the instructions at the top of file {@I prg2lout.c} if you want
+to try it yourself.
 @BeginSections
 @Include { prg_lone }
 @Include { prg_embe }

@@ -20,14 +20,18 @@ a table of contents in any type of document.
 Section @NumberOf setup describes setup files in general and how to
 change the options within them.  The options relevant to tables of
 contents and their default values are:
-@ID @OneRow @Code {
-"@MakeContents { No }"
-"@ContentsGap { 0.20v }"
-"@ContentsGapAbove { 0.80v }"
-"@ContentsGapBelow { 0.00v }"
-"@ContentsLeader { .. }"
-"@ContentsLeaderGap { 4s }"
-"@ContentsRightWidth { 3f }"
+@ID @OneRow @Code @Verbatim {
+@MakeContents { No }
+@ContentsGap { 0.2v }
+@ContentsGapAbove { 0.8v }
+@ContentsGapBelow { 0.0v }
+@ContentsFont { Bold }
+@ContentsPartGapAbove { 1.0v }
+@ContentsPartGapBelow { 0.0v }
+@ContentsFormat { number @DotSep title }
+@ContentsLeader { .. }
+@ContentsLeaderGap { 4s }
+@ContentsRightWidth { 3f }
 }
 The @Code "@MakeContents" option may be @Code Yes or {@Code No}, and
 makecontents. @Index @Code "@MakeContents"
@@ -39,7 +43,7 @@ file.
 contentsgap. @Index @Code "@ContentsGap"
 above each line of the table of contents, in addition to the usual
 single line spacing; its value may be any length (Section
-{@NumberOf objects}).  The default value, {@Code "0.20v"}, is twenty
+{@NumberOf objects}).  The default value, {@Code "0.2v"}, is twenty
 percent of the current inter-line spacing.
 @PP
 Some entries, such as those for chapters and appendices in books, are
@@ -48,7 +52,22 @@ entries; instead, @Code "@ContentsGapAbove" and @Code "@ContentsGapBelow"
 contentsgapabove. @Index @Code "@ContentsGapAbove"
 contentsgapbelow. @Index @Code "@ContentsGapBelow"
 are used above and below each of them, again in addition to the usual
-single line spacing.
+single line spacing.  @Code "@ContentsFont" also applies only to these
+`major entries', and determines their font.  The default value causes
+them to appear in Bold.
+@PP
+@Code "@ContentsPartGapAbove" and @Code "@ContentsPartGapBelow" are
+like @Code "@ContentsGapAbove" and @Code "@ContentsGapBelow", except
+that they are used before and after contents entries that denote
+book parts.
+@PP
+@Code "@ContentsFormat" determines the format of each entry of
+contentsformat. @Index @Code "@ContentsFormat"
+the table of contents.  Within it, @Code number stands for the
+number of the chapter, section, or whatever, and @Code title
+for its title.  The default value, {@Code "number @DotSep title"},
+produces the number followed by a dot, two spaces, and the title,
+or just the title if there is no number.
 @PP
 @Code "@ContentsLeader" is the object which is repeated across the page
 contentsleader. @Index @Code "@ContentsLeader"

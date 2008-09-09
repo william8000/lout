@@ -489,4 +489,56 @@ Changes and new features introduced in Version 3.36 [July 2007]
    &- after "/" now hyphenates without inserting a hyphen, like &- after -
    New @Math symbol (Courtes), will obsolete @Eq next release
 
+Changes and new features introduced in Version 3.37 [September 2008]
+
+   Bug fixes:
+      LinkDest x coordinate (reported by Man and Stott) fixed
+      @PipeRawVerbatim (reported by Summerfield) fixed
+      @Figure PageFoot location (reported by Summerfield) fixed
+      Rounding error in some uses of @Scale (reported by Courtes) reduced
+      Problem with null chars in EPS files reported & fixed by Cichelli/Bader 
+      In @Graph, problems with symbolsize option (reported by Garcia) fixed
+      Gap before inserted hyphens in Palatino (reported by van den Hoff) fixed
+      PostScript file %%BoundingBox problem (reported by van den Hoff) fixed
+   @BypassWord option for @Chapter added (Courtes)
+   @FontDef outside a database works now (but not recommended)
+   New @PageParityOf symbol like @PageOf but returns "Odd" or "Even"
+   New @PageNumberFormat setup file option (Courtes/Kingston)
+   New @InitialBackgroundColour setup file option (Courtes)
+   Updates to prg2lout.c for Haskell (Greif)
+   New @TitleFormat, @AuthorFormat, @InstitutionFormat, @DateLineFormat
+     slides setup file options (Courtes)
+   In @Diag, path { doubleline } now looks right with arrowstyles open,
+     halfopen, curvedopen and curvedhalfopen (problem reported by Carroll)
+   @ShadowBox still has no option for changing the colour of the shadow,
+     but the User's Guide now has an example showing how to simulate it
+   Increased z08.c/MAX_DEPTH to 2000 (Forkl hit previous limit)
+   @ContentsFormat setup file option now documented in User's Guide
+   Preface of User's Guide now advertises the Lout web page
+   Increased externs.h/MAX_LEX_STACK to 20 (Summerfield hit previous limit)
+   New symbollinewidth option in @Graph (line width for data points)
+   Inclusion of EPS files with previews now supported (Bader)
+   @TitleOf symbol now returns figure captions as well as chapter titles
+   Hyphenation on in programming languages, using new "Programming @Language"
+   New @DocInfo symbol (see User's Guide, Section 3.7)
+   @Math symbol (Courtes) has now replaced @Eq in User's Guide; @Eq is
+     still available for backward compatibility
+
+   I had one report that prg2lout was returning non-zero intermittently
+   during the formatting of the User's Guide.  I have not observed this
+   myself.  Presumably there is an uninitialized variable somewhere.
+   It's hard to do anything about this unless someone can get a core
+   dump so we can find out where in prg2lout.c the crash occurred.
+
+   Cichelli and Bader offered a patch to include PDF files by calling
+   a freeware program to convert them to EPS files and including the
+   EPS files.  I declined to include this in the standard release
+   because I felt that it could be done outside Lout, and because the
+   PDF support in Lout is not maintained and generally deprecated.
+
+   Strictly speaking, turning hyphenation on in programming languages
+   is not backward compatible.  I've done it because I have not been
+   able to think of a case where it would cause trouble.  If you find
+   a problem with it, please let me know.
+
 Jeff Kingston

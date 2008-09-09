@@ -1,7 +1,7 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -135,6 +135,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
+	OBJECT		FontDefSym;		/* symtab entry for @FontDef */
 	int		font_curr_page;		/* current page number       */
 	FONT_INFO	*finfo;			/* all the font table info   */
 static	int		finfo_size;		/* current finfo array size  */
@@ -142,7 +143,6 @@ static	OBJECT		font_root;		/* root of tree of fonts     */
 static	OBJECT		font_used;		/* fonts used on this page   */
 static	FONT_NUM	font_count;		/* number of sized fonts     */
 static	int		font_seqnum;		/* unique number for a font  */
-static	OBJECT		FontDefSym;		/* symtab entry for @FontDef */
 static	OBJECT		fd_tag;			/* @FontDef @Tag entry       */
 static	OBJECT		fd_family;		/* @FontDef @Family entry    */
 static	OBJECT		fd_face;		/* @FontDef @Face entry      */
@@ -409,7 +409,7 @@ static void ReadCompositeMetrics(OBJECT face, OBJECT Extrafilename,
 		&& StringBeginsWith(buff, AsciiToFull("CC")) )
   {
     (*lnum)++;
-    debug1(DFT, D, "  composite: %s", buff);
+    debug1(DFT, DD, "  composite: %s", buff);
 
     /* read CC <charname> <number_of_pieces> ; and move i to after it */
     if( sscanf((char *)buff, "CC %s %d ", composite_name, &composite_num) != 2 )
@@ -548,62 +548,64 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   Extrafilename = LCMfilename = recode = nilobj;
   for( ylink=Down(fontdef_obj);  ylink != fontdef_obj;  ylink=NextDown(ylink) )
   { Child(y, ylink);
-    assert( type(y) == PAR, "FontRead: type(y) != PAR!" );
-    if( actual(y) == fd_tag )
+    if( type(y) == PAR )
     {
-      /* do nothing with this one */
+      assert( type(y) == PAR, "FontRead: type(y) != PAR!" );
+      if( actual(y) == fd_tag )
+      {
+	/* do nothing with this one */
+      }
+      else if( actual(y) == fd_family )
+      { Child(family, Down(y));
+	if( !is_word(type(family)) || !StringEqual(string(family), family_name) )
+	  Error(37, 12, "font family name %s incompatible with %s value %s",
+	    FATAL, &fpos(fontdef_obj), string(family), KW_TAG, tag);
+      }
+      else if( actual(y) == fd_face )
+      { Child(face, Down(y));
+	if( !is_word(type(face)) || !StringEqual(string(face), face_name) )
+	  Error(37, 13, "font face name %s incompatible with %s value %s",
+	    FATAL, &fpos(fontdef_obj), string(face), KW_TAG, tag);
+      }
+      else if( actual(y) == fd_name )
+      { Child(font_name, Down(y));
+	font_name = ReplaceWithTidy(font_name, WORD_TIDY);
+	if( !is_word(type(font_name)) )
+	  Error(37, 14, "illegal font name (quotes needed?)",
+	      FATAL, &fpos(font_name));
+      }
+      else if( actual(y) == fd_metrics )
+      { Child(AFMfilename, Down(y));
+	AFMfilename = ReplaceWithTidy(AFMfilename, WORD_TIDY);
+	if( !is_word(type(AFMfilename)) )
+	  Error(37, 15, "illegal font metrics file name (quotes needed?)",
+	    FATAL, &fpos(AFMfilename));
+      }
+      else if( actual(y) == fd_extra_metrics )
+      { Child(Extrafilename, Down(y));
+	Extrafilename = ReplaceWithTidy(Extrafilename, WORD_TIDY);
+	if( !is_word(type(Extrafilename)) )
+	  Error(37, 16, "illegal font extra metrics file name (quotes needed?)",
+	    FATAL, &fpos(Extrafilename));
+      }
+      else if( actual(y) == fd_mapping )
+      { Child(LCMfilename, Down(y));
+	LCMfilename = ReplaceWithTidy(LCMfilename, WORD_TIDY);
+	if( !is_word(type(LCMfilename)) )
+	  Error(37, 17, "illegal mapping file name (quotes needed?)",
+	    FATAL, &fpos(LCMfilename));
+      }
+      else if( actual(y) == fd_recode )
+      { Child(recode, Down(y));
+	recode = ReplaceWithTidy(recode, WORD_TIDY);
+	if( !is_word(type(recode)) )
+	  Error(37, 18, "illegal value of %s", FATAL, &fpos(recode),
+	    SymName(fd_recode));
+      }
+      else
+      { assert(FALSE, "FontRead: cannot identify component of FontDef")
+      }
     }
-    else if( actual(y) == fd_family )
-    { Child(family, Down(y));
-      if( !is_word(type(family)) || !StringEqual(string(family), family_name) )
-	Error(37, 12, "font family name %s incompatible with %s value %s",
-	  FATAL, &fpos(fontdef_obj), string(family), KW_TAG, tag);
-    }
-    else if( actual(y) == fd_face )
-    { Child(face, Down(y));
-      if( !is_word(type(face)) || !StringEqual(string(face), face_name) )
-	Error(37, 13, "font face name %s incompatible with %s value %s",
-	  FATAL, &fpos(fontdef_obj), string(face), KW_TAG, tag);
-    }
-    else if( actual(y) == fd_name )
-    { Child(font_name, Down(y));
-      font_name = ReplaceWithTidy(font_name, WORD_TIDY);
-      if( !is_word(type(font_name)) )
-	Error(37, 14, "illegal font name (quotes needed?)",
-	    FATAL, &fpos(font_name));
-    }
-    else if( actual(y) == fd_metrics )
-    { Child(AFMfilename, Down(y));
-      AFMfilename = ReplaceWithTidy(AFMfilename, WORD_TIDY);
-      if( !is_word(type(AFMfilename)) )
-	Error(37, 15, "illegal font metrics file name (quotes needed?)",
-	  FATAL, &fpos(AFMfilename));
-    }
-    else if( actual(y) == fd_extra_metrics )
-    { Child(Extrafilename, Down(y));
-      Extrafilename = ReplaceWithTidy(Extrafilename, WORD_TIDY);
-      if( !is_word(type(Extrafilename)) )
-	Error(37, 16, "illegal font extra metrics file name (quotes needed?)",
-	  FATAL, &fpos(Extrafilename));
-    }
-    else if( actual(y) == fd_mapping )
-    { Child(LCMfilename, Down(y));
-      LCMfilename = ReplaceWithTidy(LCMfilename, WORD_TIDY);
-      if( !is_word(type(LCMfilename)) )
-	Error(37, 17, "illegal mapping file name (quotes needed?)",
-	  FATAL, &fpos(LCMfilename));
-    }
-    else if( actual(y) == fd_recode )
-    { Child(recode, Down(y));
-      recode = ReplaceWithTidy(recode, WORD_TIDY);
-      if( !is_word(type(recode)) )
-	Error(37, 18, "illegal value of %s", FATAL, &fpos(recode),
-	  SymName(fd_recode));
-    }
-    else
-    { assert(FALSE, "FontRead: cannot identify component of FontDef")
-    }
-
   }
 
   /* check that all the compulsory ones were found */
@@ -1015,7 +1017,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 
     while( ReadOneLine(extra_fp, buff, MAX_BUFF) != 0 )
     {
-      debug1(DFT, D, "  Extra: %s", buff);
+      debug1(DFT, DD, "  Extra: %s", buff);
       lnum++;
       sscanf( (char *) buff, "%s", command);
       if( command[0] == 'S' )
@@ -1023,14 +1025,14 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	if( StringEqual(command, AsciiToFull("StartExtraCharMetrics")) )
 	{
 	  /* get extra character metrics, just like the others */
-	  debug0(DFT, D, "  StartExtraCharMetrics calling ReadCharMetrics");
+	  debug0(DFT, DD, "  StartExtraCharMetrics calling ReadCharMetrics");
 	  ReadCharMetrics(face, fixed_pitch, xheight2, lig, &ligtop,
 	    extra_fnum, fnt, &lnum, extra_fp);
 	}
 	else if( StringEqual(command, AsciiToFull("StartBuildComposites")) )
 	{ 
 	  /* build composites */
-	  debug0(DFT, D, "  StartBuildComposites");
+	  debug0(DFT, DD, "  StartBuildComposites");
 	  ReadCompositeMetrics(face, Extrafilename, extra_fnum, &lnum,
 	    composite, cmp, &cmptop, extra_fp);
 	}
@@ -1063,7 +1065,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   finfo[font_count].kern_sizes = ks;
 
   ifdebug(DFT, DD, DebugKernTable(font_count));
-  debug4(DFT, D, "FontRead returning: %d, name %s, fs %d, xh2 %d",
+  debug4(DFT, DD, "FontRead returning: %d, name %s, fs %d, xh2 %d",
     font_count, string(first_size), font_size(first_size), xheight2);
   return face;
 
@@ -1195,7 +1197,7 @@ void FontChange(STYLE *style, OBJECT x)
 	      debug0(DFT, D, "FontChange returning: ACAT children");
 	      return;
 	    }
-	    debug2(DFT, D, "  par[%d]++ = %s", num, string(y));
+	    debug2(DFT, DD, "  par[%d]++ = %s", num, string(y));
 	    par[num++] = y; 
 	  }
         }
@@ -1355,7 +1357,7 @@ void FontChange(STYLE *style, OBJECT x)
 	Error(37, 45, "font family name %s must be followed by a face name",
 	  WARN, &fpos(requested_face), string(requested_face));
       else
-	Error(37, 46, "there is no font with family name %s and face name %s",
+	Error(37, 46, "no database contains a font with family name %s and face name %s",
 	  WARN, &fpos(requested_face), string(requested_family),
 	  string(requested_face));
       debug0(DFT, D, "FontChange returning (unable to set face)");
@@ -1491,7 +1493,7 @@ void FontChange(STYLE *style, OBJECT x)
     if( newcmp[i].char_code != (FULL_CHAR) '\0' )
     { newcmp[i].x_offset = (oldcmp[i].x_offset*font_size(new)) / font_size(old);
       newcmp[i].y_offset = (oldcmp[i].y_offset*font_size(new)) / font_size(old);
-      debug5(DFT, D, "FontChange scales composite %d from (%d, %d) to (%d, %d)",
+      debug5(DFT, DD, "FontChange scales composite %d from (%d, %d) to (%d, %d)",
 	(int) newcmp[i].char_code, oldcmp[i].x_offset, oldcmp[i].y_offset,
 	newcmp[i].x_offset, newcmp[i].y_offset);
     }
@@ -1607,7 +1609,7 @@ void FontWordSize(OBJECT x)
 { FULL_CHAR *p, *q, *a, *b, *lig, *unacc, *acc;  OBJECT tmp;
   FULL_CHAR buff[MAX_BUFF];  MAPPING m;
   int r, u, d, ksize; struct metrics *fnt;
-  debug2(DFT, D, "FontWordSize( %s ), font = %d", string(x), word_font(x));
+  debug2(DFT, DD, "FontWordSize( %s ), font = %d", string(x), word_font(x));
   assert( is_word(type(x)), "FontWordSize: !is_word(type(x))!" );
 
   p = string(x);
@@ -1628,7 +1630,7 @@ void FontWordSize(OBJECT x)
     do
     { 
       /* check for missing glyph (lig[] == 1) or ligatures (lig[] > 1) */
-      debug2(DFT, D, "  examining `%c' lig = %d", *p, lig[*p]);
+      debug2(DFT, DD, "  examining `%c' lig = %d", *p, lig[*p]);
       if( lig[*q = *p++] )
       {
 	if( lig[*q] == 1 )
@@ -1637,7 +1639,7 @@ void FontWordSize(OBJECT x)
 	  /* bug fix: unaccented version exists if unacc differs from self */
 	  if( unacc[*q] != *q )
 	  {
-	    debug2(DFT, D, "  unacc[%c] = `%c'", *q, unacc[*q]);
+	    debug2(DFT, DD, "  unacc[%c] = `%c'", *q, unacc[*q]);
 	    fnt[*q].up = fnt[unacc[*q]].up;
 	    fnt[*q].down = fnt[unacc[*q]].down;
 	    fnt[*q].left = fnt[unacc[*q]].left;
@@ -1647,7 +1649,7 @@ void FontWordSize(OBJECT x)
 	  }
 	  else
 	  {
-	    debug1(DFT, D, "  unacc[%c] = 0, replacing by space", *q);
+	    debug1(DFT, DD, "  unacc[%c] = 0, replacing by space", *q);
 	    Error(37, 60, "character %s replaced by space (it has no glyph in font %s)",
 	      WARN, &fpos(x),
 	      StringQuotedWord(tmp), FontFamilyAndFace(word_font(x)));
@@ -1657,7 +1659,7 @@ void FontWordSize(OBJECT x)
 	}
 	else if( word_ligatures(x) )
 	{
-	  debug1(DFT, D, "  processing ligature beginning at %c", *q);
+	  debug1(DFT, DD, "  processing ligature beginning at %c", *q);
 	  a = &lig[ lig[*(p-1)] + MAX_CHARS ];
 	  while( *a++ == *(p-1) )
 	  { b = p;
@@ -1674,7 +1676,7 @@ void FontWordSize(OBJECT x)
 	  }
 	}
 	else
-	  debug1(DFT, D, "  ignoring ligature beginning at %c", *q);
+	  debug1(DFT, DD, "  ignoring ligature beginning at %c", *q);
       }
 
       /* accumulate size of *q */
@@ -1690,7 +1692,7 @@ void FontWordSize(OBJECT x)
     /* add kern lengths to r */
     for( p = buff, q = p+1;  *q;  p++, q++ )
     { ksize = FontKernLength(word_font(x), unacc, *p, *q);
-      debugcond3(DFT, D, ksize != 0, "  FontKernLength(fnum, %c, %c) = %d",
+      debugcond3(DFT, DD, ksize != 0, "  FontKernLength(fnum, %c, %c) = %d",
 	*p, *q, ksize);
       r += ksize;
     }
@@ -1718,7 +1720,7 @@ void FontWordSize(OBJECT x)
     }
   } 
   else back(x, COLM) = fwd(x, COLM) = back(x, ROWM) = fwd(x, ROWM) = 0;
-  debug4(DFT, D, "FontWordSize returning %hd %hd %hd %hd",
+  debug4(DFT, DD, "FontWordSize returning %hd %hd %hd %hd",
 	  back(x, COLM), fwd(x, COLM), back(x, ROWM), fwd(x, ROWM));
 } /* end FontWordSize */
 

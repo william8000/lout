@@ -1,0 +1,63 @@
+@Section
+   @Title { Getting started }
+@Begin
+@PP
+The Lout definitions for the @Code "@Math" symbol are accessed via a setup
+file called {@Code "math"}, which you must include at the start of your
+document if
+math.file @Index { @Code "math" file }
+you want mathematics, like this:
+@ID @OneRow @Code {
+"@SysInclude { tbl }"
+"@SysInclude { math }"
+"@SysInclude { doc }"
+"@Doc @Text @Begin"
+"..."
+"@End @Text"
+}
+This shows what to do if you want both tables and mathematics, but you
+may leave out the line for tables if you don't want them.  Setup files
+for specialized packages, such as {@Code "tbl"} and {@Code "math"},
+are best included before the main setup file, but may be included in
+any order.
+@PP
+With the @Code "math" file included, you may write
+@ID @Code "@Math { ... }"
+at any point in your document, and the symbols of @Code "@Math" will be
+available between the braces.  Any symbols available outside continue
+to be available inside, which means that mathematics may be freely mixed
+with other symbols.
+@PP
+The @Code "@Math" symbol may appear anywhere; its job is to produce
+an object containing mathematics, and it neither knows nor cares where
+that object goes.  To display mathematics, use a display symbol
+like @Code "@IndentedDisplay" or @Code "@CentredDisplay"
+(Section {@NumberOf displays}).  For example,
+@ID @Code "@CentredDisplay @Math { int from { 0 } to { pi } sin ` x = 0 }"
+produces
+@CentredDisplay @Math { int from { 0 } to { pi } sin ` x = 0 }
+There are also symbols for aligned and numbered displays
+(Section {@NumberOf mathdisplays}).
+@PP
+The @Code "@Math" symbol sets the mathematics in @I { display style },
+mathematics.display.style @SubIndex { display style }
+display.style @Index { display style (mathematics) }
+a style suited to displays.  To get mathematics within a paragraph,
+it is best to use a variant of @Code "@Math" called {@Code "@M"}.  The
+mathematics.maaa @SubIndex { @Code "@M" }
+maaa. @Index { @Code "@M" (mathematics) }
+value of @Code "@M { ... }" will be kept together on one line, and it
+will appear in @I { text style }, a more compact style suited to
+mathematics.text.style @SubIndex { text style }
+text.style @Index { text style (mathematics) }
+mathematics within paragraphs.
+@PP
+Throughout this chapter we show the Lout input at the left, and its
+result at the right:
+@ID {
+@Code "@Math { {x sup 2 + y sup 2} over 2 }"
+|7ct
+@Math { {x sup 2 + y sup 2} over 2 }
+}
+Subsequent examples will omit the enclosing {@Code "@Math { ... }"}.
+@End @Section

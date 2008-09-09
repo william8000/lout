@@ -13,6 +13,7 @@ langdef	Italian Italiano it			{ italian				  }
 langdef Norwegian Norsk no			{ norweg	. : ! ? .) ?) !) .' !' ?' }
 langdef Polish Polski pl			{ polish	. : ! ? .) ?) !) .' !' ?' }
 langdef Portuguese "Português" pt		{ portugal	. : ! ? .) ?) !) .' !' ?' }
+langdef Programming pr				{ programming				  }
 langdef Russian "\362\325\323\323\313\311\312" ru { russian	. : ! ? .) ?) !) .' !' ?' }
 langdef Slovak Slovensky Slovencina sk		{ slovak	. : ! ? .) ?) !) .' !' ?' }
 langdef Slovenian Slovenia Slovenija sl		{ slovenia	. : ! ? .) ?) !) .' !' ?' }

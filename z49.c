@@ -1,7 +1,7 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -487,7 +487,96 @@ static void PS_PrintMapping(MAPPING m)
 
 /*****************************************************************************/
 /*                                                                           */
+/*  PS_BtoI(const unsigned char *buf)                                        */
+/*                                                                           */
+/*  Decode a 4 byte value from an EPSF header                                */
+/*  in a machine independent way.                                            */
+/*                                                                           */
+/*****************************************************************************/
+
+static long PS_BtoI(const unsigned char *buf)
+{
+  return ((buf[ 0 ] & 0xFF)) |
+         ((buf[ 1 ] & 0xFF) << 8) |
+         ((buf[ 2 ] & 0xFF) << 16) |
+         ((buf[ 3 ] & 0xFF) << 24);
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  PS_FindEPSSegment(FILE *fp, long *len)                                   */
+/*                                                                           */
+/*  Find the EPS segment of an EPS file                                      */
+/*    If the file is an EPSF with a EPS segment                              */
+/*      skip to the start of the EPS segment                                 */
+/*      set the length to the length of the EPS segment                      */
+/*    Otherwise if the file is plain EPS                                     */
+/*      leave the file pointer at the start of the file                      */
+/*      set the length to -1                                                 */
+/*                                                                           */
+/*****************************************************************************/
+
+static void PS_FindEPSSegment(FILE *fp, long *len)
+{
+  enum epsf_header_enum {
+    HEADER_LEN = 30,           /* length of header */
+    HEADER_MAGIC_0 = 0xC5,     /* E */
+    HEADER_MAGIC_1 = 0xD0,     /* P */
+    HEADER_MAGIC_2 = 0xD3,     /* S */
+    HEADER_MAGIC_3 = 0xC6,     /* F */
+    HEADER_EPS_START_OFFSET = 4, /* offset of eps start */
+    HEADER_EPS_LENGTH_OFFSET = 8 /* offset of eps length */
+  };
+
+  unsigned char epsf_header[ HEADER_LEN ];
+  long original_position;
+  long eps_start;
+
+  *len = -1;
+
+  /* check for a valid file pointer */
+  if( fp == NULL )
+  {
+    return;
+  }
+
+  /* save the original file position */
+  original_position = ftell(fp);
+  if( original_position < 0 )
+  {
+    original_position = 0;
+  }
+
+  /* read and parse the header */
+  rewind(fp);
+  if( fread(epsf_header, 1, HEADER_LEN, fp) == HEADER_LEN &&
+      epsf_header[0] == HEADER_MAGIC_0 &&
+      epsf_header[1] == HEADER_MAGIC_1 &&
+      epsf_header[2] == HEADER_MAGIC_2 &&
+      epsf_header[3] == HEADER_MAGIC_3 &&
+      (eps_start = PS_BtoI( &epsf_header[ HEADER_EPS_START_OFFSET ] )) > 0 &&
+      (*len = PS_BtoI( &epsf_header[ HEADER_EPS_LENGTH_OFFSET ] )) >= 0 &&
+      fseek(fp, eps_start, SEEK_SET) != -1 )
+  {
+    /* success locating the EPS segment */
+  }
+  else
+  {
+    /* this file has no preview */
+    /* reset the file pointer */
+    *len = -1;
+    fseek(fp, original_position, SEEK_SET);
+  }
+}
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  void PS_PrintEPSFile(FILE *fp, FILE_POS *pos, BOOLEAN strip_all)         */
+/*                                                                           */
+/*  Original by Jeff Kingston, modified Jul 2008 by William Bader mainly     */
+/*  to allow EPS files to contain null characters.                           */
 /*                                                                           */
 /*  Print EPS file fp to out_fp.                                             */
 /*                                                                           */
@@ -508,12 +597,14 @@ static BOOLEAN strip_out(FULL_CHAR *buff, BOOLEAN strip_all)
 } /* end strip_out */
 
 static void PS_PrintEPSFile(FILE *fp, FILE_POS *pos, BOOLEAN strip_all)
-{ int state, x;  OBJECT y;
+{ int state, x, count;  OBJECT y;  long len;
   FULL_CHAR buff[MAX_LINE];
-  debug0(DPO, D, "[ PS_PrintEPSFile");
+  debug0(DPO, DD, "[ PS_PrintEPSFile");
 
   assert( fp != NULL, "PS_PrintEPSFile: fp!" );
-  state = (ReadOneLine(fp, buff, MAX_LINE) == 0) ? FINISHED : SKIPPING;
+  /* state = (ReadOneLine(fp, buff, MAX_LINE) == 0) ? FINISHED : SKIPPING; */
+  state = (ReadOneBinaryLine(fp, buff, MAX_LINE, &count, &len) == 0) ?
+    FINISHED : SKIPPING;
   while( state != FINISHED ) switch(state)
   {
     case SKIPPING:
@@ -523,7 +614,11 @@ static void PS_PrintEPSFile(FILE *fp, FILE_POS *pos, BOOLEAN strip_all)
       { y = MakeWord(WORD, &buff[StringLength("%%DocumentNeededResources:")],
 	      no_fpos);
         Link(needs, y);
+	/* ***
 	state = (ReadOneLine(fp, buff, MAX_LINE) == 0) ? FINISHED : READING_DNR;
+	*** */
+	state = (ReadOneBinaryLine(fp, buff, MAX_LINE, &count, &len) == 0) ?
+	  FINISHED : READING_DNR;
       }
       else
       { if( StringBeginsWith(buff, AsciiToFull("%%LanguageLevel:")) )
@@ -535,10 +630,17 @@ static void PS_PrintEPSFile(FILE *fp, FILE_POS *pos, BOOLEAN strip_all)
 	  Error(49, 11, "ignoring Extensions comment in EPS file", WARN, pos);
 	if( !strip_out(buff, strip_all) )
 	{
+	  /* ***
 	  StringFPuts(buff, out_fp);
 	  pnl;
+	  *** */
+	  fwrite(buff, 1, count, out_fp);
 	}
+	/* ***
 	state = (ReadOneLine(fp, buff, MAX_LINE) == 0) ? FINISHED : SKIPPING;
+	*** */
+	state = (ReadOneBinaryLine(fp, buff, MAX_LINE, &count, &len) == 0) ?
+	  FINISHED : SKIPPING;
       }
       break;
 
@@ -547,20 +649,32 @@ static void PS_PrintEPSFile(FILE *fp, FILE_POS *pos, BOOLEAN strip_all)
       if( StringBeginsWith(buff, AsciiToFull("%%+")) )
       {	y = MakeWord(WORD, &buff[StringLength(AsciiToFull("%%+"))], no_fpos);
 	Link(needs, y);
+	/* ***
 	state = (ReadOneLine(fp, buff, MAX_LINE) == 0) ? FINISHED : READING_DNR;
+	*** */
+	state = (ReadOneBinaryLine(fp, buff, MAX_LINE, &count, &len) == 0) ?
+	  FINISHED : READING_DNR;
       }
       else
       { if( !strip_out(buff, strip_all) )
 	{
+	  /* ***
 	  StringFPuts(buff, out_fp);
 	  pnl;
+	  *** */
+	  fwrite(buff, 1, count, out_fp);
 	}
+	/* ***
 	state = (ReadOneLine(fp, buff, MAX_LINE) == 0) ? FINISHED : SKIPPING;
+	*** */
+	state = (ReadOneBinaryLine(fp, buff, MAX_LINE, &count, &len) == 0) ?
+	  FINISHED : SKIPPING;
       }
       break;
   }
+  pnl; /* in case the last line does not end with a line terminator */
   fclose(fp);
-  debug0(DPO, D, "] PS_PrintEPSFile returning.");
+  debug0(DPO, DD, "] PS_PrintEPSFile returning.");
 } /* end PS_PrintEPSFile */
 
 
@@ -653,7 +767,7 @@ static const char *MediaName(int h, int v)
 static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   FULL_CHAR *label)
 { FILE_NUM fnum;  FULL_CHAR *p;
-  debug2(DPO, DD, "PrintBeforeFirst(%d, %d)", h, v);
+  debug2(DPO, DD, "PrintBeforeFirst(%s, %s)", EchoLength(h), EchoLength(v));
 
   /* print header comments for PostScript DSC 3.0 output */
   p0(encapsulated ? "%!PS-Adobe-3.0 EPSF-3.0" : "%!PS-Adobe-3.0");
@@ -1200,10 +1314,10 @@ static void PS_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
 /*****************************************************************************/
 
 static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)
-{ debug1(DPO, D, "PrintComposite(cp, %s, fp)", bool(outline));
+{ debug1(DPO, DD, "PrintComposite(cp, %s, fp)", bool(outline));
   while( cp->char_code != '\0' )
   {
-    debug4(DPO, D, "  cp = %d printing code %d (%d, %d)", (int) cp,
+    debug4(DPO, DD, "  cp = %d printing code %d (%d, %d)", (int) cp,
       cp->char_code, cp->x_offset, cp->y_offset);
     fprintf(fp, "%d %d (%c)%s ", cp->x_offset, cp->y_offset,
       cp->char_code, outline ? "co" : "c");
@@ -1225,7 +1339,7 @@ static void PS_PrintWord(OBJECT x, int hpos, int vpos)
   int ksize;  char *command;  MAPPING m;
   unsigned short *composite; COMPOSITE *cmp;
 
-  debug7(DPO, DD, "PrintWord( %s, %d, %d ) font %d colour %d texture %d%s",
+  debug7(DPO, D, "PrintWord( %s, %d, %d ) font %d colour %d texture %d%s",
     string(x), hpos, vpos, word_font(x), word_colour(x), word_texture(x),
     word_outline(x) ? " outline":"");
   TotalWordCount++;
@@ -1286,7 +1400,7 @@ static void PS_PrintWord(OBJECT x, int hpos, int vpos)
   if( composite[*p] )
   {
     fprintf(out_fp, ")%s ", command);
-    debug3(DPO, D,
+    debug3(DPO, DD,
       "  calling PrintComposite(&cmp[composite[%d] = %d]); cmp_top = %d",
       (int) *p, composite[*p], finfo[word_font(x)].cmp_top);
     PrintComposite(&cmp[composite[*p]], word_outline(x), out_fp);
@@ -1307,7 +1421,7 @@ static void PS_PrintWord(OBJECT x, int hpos, int vpos)
     }
     if( composite[*p] )
     { fprintf(out_fp, ")%s ", command);
-      debug3(DPO, D,
+      debug3(DPO, DD,
 	"  calling PrintComposite(&cmp[composite[%d] = %d]); cmp_top = %d",
 	(int) *p, composite[*p], finfo[word_font(x)].cmp_top);
       PrintComposite(&cmp[composite[*p]], word_outline(x), out_fp);
@@ -1322,7 +1436,7 @@ static void PS_PrintWord(OBJECT x, int hpos, int vpos)
     wordcount = 0;
   }
   else fprintf(out_fp, ")%s ", command);
-  debug0(DPO, DDD, "PrintWord returning");
+  debug0(DPO, DD, "PrintWord returning");
 } /* end PS_PrintWord */
 
 
@@ -1374,11 +1488,11 @@ static void PS_PrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
 /*****************************************************************************/
 
 static void PS_CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
-{ debug2(DPO, D, "PS_CoordTranslate(%s, %s)",
+{ debug2(DPO, DD, "PS_CoordTranslate(%s, %s)",
     EchoLength(xdist), EchoLength(ydist));
   p2("%d %d translate", xdist, ydist);
   cpexists = FALSE;
-  debug0(DPO, D, "PS_CoordTranslate returning.");
+  debug0(DPO, DD, "PS_CoordTranslate returning.");
 } /* end PS_CoordTranslate */
 
 
@@ -1391,10 +1505,10 @@ static void PS_CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
 /*****************************************************************************/
 
 static void PS_CoordRotate(FULL_LENGTH amount)
-{ debug1(DPO, D, "PS_CoordRotate(%.1f degrees)", (float) amount / DG);
+{ debug1(DPO, DD, "PS_CoordRotate(%.1f degrees)", (float) amount / DG);
   p1("%.4f rotate", (float) amount / DG);
   cpexists = FALSE;
-  debug0(DPO, D, "CoordRotate returning.");
+  debug0(DPO, DD, "CoordRotate returning.");
 } /* end PS_CoordRotate */
 
 
@@ -1411,11 +1525,11 @@ static void PS_CoordScale(float hfactor, float vfactor)
 #if DEBUG_ON
   char buff[20];
 #endif
-  ifdebug(DPO, D, sprintf(buff, "%.3f, %.3f", hfactor, vfactor));
-  debug1(DPO, D, "CoordScale(%s)", buff);
+  ifdebug(DPO, DD, sprintf(buff, "%.3f, %.3f", hfactor, vfactor));
+  debug1(DPO, DD, "CoordScale(%s)", buff);
   p2("%.4f %.4f scale", hfactor, vfactor);
   cpexists = FALSE;
-  debug0(DPO, D, "CoordScale returning.");
+  debug0(DPO, DD, "CoordScale returning.");
 } /* end PS_CoordScale */
 
 
@@ -1429,10 +1543,10 @@ static void PS_CoordScale(float hfactor, float vfactor)
 
 static void PS_CoordHMirror(void)
 {
-  debug0(DPO, D, "CoordHMirror()");
+  debug0(DPO, DD, "CoordHMirror()");
   cpexists = FALSE;
   p0("[-1 0 0 1 0 0] concat");
-  debug0(DPO, D, "CoordHMirror returning.");
+  debug0(DPO, DD, "CoordHMirror returning.");
 }
 
 
@@ -1446,10 +1560,10 @@ static void PS_CoordHMirror(void)
 
 static void PS_CoordVMirror(void)
 {
-  debug0(DPO, D, "CoordVMirror()");
+  debug0(DPO, DD, "CoordVMirror()");
   cpexists = FALSE;
   p0("[1 0 0 -1 0 0] concat");
-  debug0(DPO, D, "CoordVMirror returning.");
+  debug0(DPO, DD, "CoordVMirror returning.");
 }
 
 
@@ -1463,7 +1577,7 @@ static void PS_CoordVMirror(void)
 /*****************************************************************************/
 
 static void PS_SaveGraphicState(OBJECT x)
-{ debug0(DPO, D, "SaveGraphicState()");
+{ debug0(DPO, DD, "SaveGraphicState()");
   p0("gsave");
   gs_stack_top++;
   if( gs_stack_top >= MAX_GS )
@@ -1476,7 +1590,7 @@ static void PS_SaveGraphicState(OBJECT x)
   gs_stack[gs_stack_top].gs_cpexists	= cpexists;
   gs_stack[gs_stack_top].gs_currenty	= currenty;
   gs_stack[gs_stack_top].gs_xheight2	= currentxheight2;
-  debug0(DPO, D, "PS_SaveGraphicState returning.");
+  debug0(DPO, DD, "PS_SaveGraphicState returning.");
 } /* end PS_SaveGraphicState */
 
 
@@ -1492,7 +1606,7 @@ static void PS_SaveGraphicState(OBJECT x)
 /*****************************************************************************/
 
 static void PS_RestoreGraphicState(void)
-{ debug0(DPO, D, "PS_RestoreGraphicState()");
+{ debug0(DPO, DD, "PS_RestoreGraphicState()");
   pnl;
   p0("grestore");
   currentfont	  = gs_stack[gs_stack_top].gs_font;
@@ -1503,7 +1617,7 @@ static void PS_RestoreGraphicState(void)
   currenty	  = gs_stack[gs_stack_top].gs_currenty;
   currentxheight2 = gs_stack[gs_stack_top].gs_xheight2;
   gs_stack_top--;
-  debug0(DPO, D, "PS_RestoreGraphicState returning.");
+  debug0(DPO, DD, "PS_RestoreGraphicState returning.");
 } /* end PS_RestoreGraphicState */
 
 
@@ -1517,7 +1631,7 @@ static void PS_RestoreGraphicState(void)
 
 void PS_PrintGraphicObject(OBJECT x)
 { OBJECT y, link;
-  debug3(DPO, D, "PS_PrintGraphicObject(%s %s %s)",
+  debug3(DPO, DD, "PS_PrintGraphicObject(%s %s %s)",
     EchoFilePos(&fpos(x)), Image(type(x)), EchoObject(x));
   switch( type(x) )
   {
@@ -1546,8 +1660,8 @@ void PS_PrintGraphicObject(OBJECT x)
 	else
 	{ Error(49, 8, "error in left parameter of %s",
 	    WARN, &fpos(x), KW_GRAPHIC);
-	  debug1(DPO, D, "  type(y) = %s, y =", Image(type(y)));
-	  ifdebug(DPO, D, DebugObject(y));
+	  debug1(DPO, DD, "  type(y) = %s, y =", Image(type(y)));
+	  ifdebug(DPO, DD, DebugObject(y));
 	}
       }
       break;
@@ -1556,12 +1670,12 @@ void PS_PrintGraphicObject(OBJECT x)
     default:
     
       Error(49, 9, "error in left parameter of %s", WARN, &fpos(x), KW_GRAPHIC);
-      debug1(DPO, D, "  type(x) = %s, x =", Image(type(x)));
-      ifdebug(DPO, D, DebugObject(x));
+      debug1(DPO, DD, "  type(x) = %s, x =", Image(type(x)));
+      ifdebug(DPO, DD, DebugObject(x));
       break;
 
   }
-  debug0(DPO, D, "PS_PrintGraphicObject returning");
+  debug0(DPO, DD, "PS_PrintGraphicObject returning");
 } /* end PS_PrintGraphicObject */
 
 
@@ -1575,7 +1689,7 @@ void PS_PrintGraphicObject(OBJECT x)
 
 void PS_DefineGraphicNames(OBJECT x)
 { assert( type(x) == GRAPHIC, "PrintGraphic: type(x) != GRAPHIC!" );
-  debug1(DPO, D, "PS_DefineGraphicNames( %s )", EchoObject(x));
+  debug1(DPO, DD, "PS_DefineGraphicNames( %s )", EchoObject(x));
   debug1(DPO, DD, "  style = %s", EchoStyle(&save_style(x)));
 
   SetBaseLineMarkAndFont(baselinemark(save_style(x)), font(save_style(x)));
@@ -1587,7 +1701,7 @@ void PS_DefineGraphicNames(OBJECT x)
     currentfont <= 0 ? 12*PT : FontSize(currentfont, x),
     width(line_gap(save_style(x))), width(space_gap(save_style(x))),
     (char *) STR_NEWLINE);
-  debug0(DPO, D, "PS_DefineGraphicNames returning.");
+  debug0(DPO, DD, "PS_DefineGraphicNames returning.");
 } /* end PS_DefineGraphicNames */
 
 
@@ -1670,6 +1784,7 @@ static void PS_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist,
 BOOLEAN PS_FindBoundingBox(FILE *fp, FILE_POS *pos, FULL_LENGTH *llx,
   FULL_LENGTH *lly, FULL_LENGTH *urx, FULL_LENGTH *ury)
 { FULL_CHAR buff[MAX_LINE];
+  long len;
   float fllx, flly, furx, fury;
   *llx = *lly = *urx = *ury = 0;
 
@@ -1679,6 +1794,9 @@ BOOLEAN PS_FindBoundingBox(FILE *fp, FILE_POS *pos, FULL_LENGTH *llx,
     Error(49, 17, "EPS file ignored (cannot open file)", WARN, pos);
     return FALSE;
   }
+
+  /* skip to the EPS if this file has a preview */
+  PS_FindEPSSegment(fp, &len);
 
   /* if the file is empty, say so and return failure */
   if( ReadOneLine(fp, buff, MAX_LINE) == 0 )
@@ -1749,7 +1867,7 @@ BOOLEAN PS_FindBoundingBox(FILE *fp, FILE_POS *pos, FULL_LENGTH *llx,
 static void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
   FULL_LENGTH rowmark)
 { OBJECT y, full_name;  FILE *fp;  BOOLEAN compressed;  int fnum;
-  debug0(DPO, D, "PS_PrintGraphicInclude(x)");
+  debug0(DPO, DD, "PS_PrintGraphicInclude(x)");
 
   assert(type(x)==INCGRAPHIC || type(x)==SINCGRAPHIC, "PrintGraphicInclude!");
   assert(incgraphic_ok(x), "PrintGraphicInclude: !incgraphic_ok(x)!");
@@ -1799,7 +1917,7 @@ static void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
   cpexists = FALSE;
   currentfont = NO_FONT;  /* added by JeffK 31/10/06 */
   wordcount = 0;
-  debug0(DPO, D, "PS_PrintGraphicInclude returning.");
+  debug0(DPO, DD, "PS_PrintGraphicInclude returning.");
 } /* end PS_PrintGraphicInclude */
 
 
@@ -1850,7 +1968,7 @@ char *ConvertToPDFName(OBJECT name)
 
 static void PS_LinkSource(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
   FULL_LENGTH urx, FULL_LENGTH ury)
-{ debug5(DPO, D, "PS_LinkSource(%s, %d, %d, %d, %d)", EchoObject(name),
+{ debug5(DPO, DD, "PS_LinkSource(%s, %d, %d, %d, %d)", EchoObject(name),
     llx, lly, urx, ury);
 
   /* print the link source point */
@@ -1862,7 +1980,7 @@ static void PS_LinkSource(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
 
   /* remember it so that at end of run can check if it has an dest point */
   Link(link_source_list, name);
-  debug0(DPO, D, "PS_LinkSource returning.");
+  debug0(DPO, DD, "PS_LinkSource returning.");
 } /* end PS_LinkSource */
 
 
@@ -1909,7 +2027,7 @@ static void PS_LinkDest(OBJECT name, FULL_LENGTH llx, FULL_LENGTH lly,
 
 static void PS_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
   FULL_LENGTH urx, FULL_LENGTH ury)
-{ debug5(DPO, D, "PS_LinkURL(%s, %d, %d, %d, %d)", EchoObject(url),
+{ debug5(DPO, DD, "PS_LinkURL(%s, %d, %d, %d, %d)", EchoObject(url),
     llx, lly, urx, ury);
 
   if( is_word(type(url)) )
@@ -1924,7 +2042,7 @@ static void PS_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
     Error(49, 22, "%s ignored; left parameter not a simple word",
       WARN, &fpos(url), KW_LINK_URL);
 
-  debug0(DPO, D, "PS_LinkURL returning.");
+  debug0(DPO, DD, "PS_LinkURL returning.");
 } /* end PS_LinkSource */
 
 
@@ -1939,7 +2057,7 @@ static void PS_LinkURL(OBJECT url, FULL_LENGTH llx, FULL_LENGTH lly,
 
 static void PS_LinkCheck(void)
 { OBJECT y, link;
-  debug0(DPO, D, "PS_LinkCheck()");
+  debug0(DPO, DD, "PS_LinkCheck()");
 
   for( link=Down(link_source_list); link!=link_source_list; link=NextDown(link) )
   { Child(y, link);
@@ -1949,7 +2067,7 @@ static void PS_LinkCheck(void)
 	string(y));
   }
 
-  debug0(DPO, D, "PS_LinkCheck returning.");
+  debug0(DPO, DD, "PS_LinkCheck returning.");
 } /* end PS_LinkCheck */
 
 

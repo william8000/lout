@@ -1,7 +1,7 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -78,7 +78,7 @@ static OBJECT insert_split(OBJECT x, OBJECT bthr[2], OBJECT fthr[2])
   for( dim = COLM;  dim <= ROWM;  dim++ )
   { if( bthr[dim] || fthr[dim] )
     {
-      debug0(DGP, D, "  calling New(thread) from Manifest now");
+      debug0(DGP, DD, "  calling New(thread) from Manifest now");
       New(new_op, dim == COLM ? COL_THR : ROW_THR);
       thr_state(new_op) = NOTSIZED;
       fwd(new_op, 1-dim) = 0;	/* will hold max frame_size */
@@ -895,7 +895,7 @@ OBJECT *enclose, BOOLEAN fcr)
 /*  UNDER_UNDEF.                                                             */
 /*                                                                           */
 /*****************************************************************************/
-#define MAX_DEPTH 1000
+#define MAX_DEPTH 2000
 
 OBJECT Manifest(OBJECT x, OBJECT env, STYLE *style, OBJECT bthr[2],
 OBJECT fthr[2], OBJECT *target, OBJECT *crs, BOOLEAN ok, BOOLEAN need_expand,
@@ -2164,6 +2164,7 @@ OBJECT *enclose, BOOLEAN fcr)
     case LINK_DEST:
     case LINK_URL:
 
+      /* save_mark(x) = 0; */
       Child(y, LastDown(x));
       y = Manifest(y, env, style, nbt, nft, target, crs, ok,FALSE,enclose,fcr);
       StyleCopy(save_style(x), *style);

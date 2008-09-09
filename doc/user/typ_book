@@ -209,7 +209,22 @@ No @Code "@BeginChapters" or @Code "@EndChapters" symbols are
 beginchapters. @Index @Code "@BeginChapters"
 endchapters. @Index @Code "@EndChapters"
 needed, because these chapters are not inside any other large-scale
-structure symbol.  Within a chapter, there may be a sequence of sections,
+structure symbol.
+@PP
+In addition to all the usual options for large-scale structure symbols,
+@Code "@Chapter" offers {@Code "@BypassWord"}, which may be used to
+replace the `Chapter' word for this chapter only.  For example,
+@ID @OneRow @Code {
+"@Chapter"
+"    @BypassWord { Appendix }"
+"..."
+}
+could be used to place (what appears to the reader to be) an Appendix
+at the end of a part, or indeed anywhere at all.  The chapter numbers
+are not affected.  To change this word in all chapters, the
+@Code "@ChapterWord" setup file option is preferred.
+@PP
+Within a chapter, there may be a sequence of sections,
 each introduced by {@Code "@Section"}, all bracketed
 section.books @SubIndex { in books }
 by @Code "@BeginSections" and {@Code "@EndSections"}:

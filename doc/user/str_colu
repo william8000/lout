@@ -23,7 +23,7 @@ value 1 as shown, and @Code "@ColumnGap" may be any length (Section
 column.width @RawIndex { column width }
 column.width.in.pages @SubIndex { in pages }
 using the obvious formula
-@ID @Eq { columnwidth = { pagewidth - margins -
+@ID @Math { columnwidth = { pagewidth - margins -
 ({@Code "@ColumnNumber"} - 1) times {@Code "@ColumnGap"} }
 over @Code "@ColumnNumber"
 }

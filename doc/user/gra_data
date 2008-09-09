@@ -43,21 +43,33 @@ point:
     C { filledtriangle }
     D { @GraphFilledTriangle }
 }
-If the @Code "points" option is omitted or empty, nothing is printed.  The
-symbols are centred over the data point.  There is a @Code "symbolsize"
+Filled and open squares have exactly the same size, filled and open
+diamonds have exactly the same size, and so on.  If the @Code "points"
+option is omitted or empty, nothing is printed.  The symbols are
+centred over the data point.  There is a @Code "symbolsize"
 graphs. @RawIndex { graphs (statistical) }
 graphs.symbolsize @SubIndex { @Code symbolsize option }
 symbolsize.graph @Index { @Code "symbolsize" option (graphs) }
-option which controls the size (radius) of all these symbols:
+option which controls the size (radius) of all these symbols,
+and a @Code "symbollinewidth" option
+@FootNote {
+The @Code "symbollinewidth" option was introduced in Version 3.37,
+as part of a bug fix which also caused the printed size of some
+symbols to change slightly.
+}
+which controls their line width:
 @ID @OneRow @Code {
 "@Data"
 "    symbolsize { 0.15f }"
+"    symbollinewidth { 0.5p }"
 }
-shows the default, 0.15 times the current font size.  More
-precisely, the default value is taken from an option
-to the @Code "@Graph" symbol, also called {@Code "symbolsize"}.  By
-setting that option you can therefore set the symbol size of all data
-points in the graph at once; its default value is {@Code "0.15f"}.
+shows their default values, 0.15 times the current font size and half
+a point.  More precisely, these default values are taken from options
+to the @Code "@Graph" symbol with the same names.  By setting those
+options you can therefore control all data points in the graph at
+once.  The @Code "symbollinewidth" option does not affect the
+appearance of @Code { filledsquare }, @Code { filleddiamond },
+@Code { filledcircle }, or @Code { filledtriangle }.
 @PP
 The @Code "@Data" symbol also has a @Code "pairs" option which
 graphs. @RawIndex { graphs (statistical) }
@@ -366,6 +378,6 @@ the original input was
 Similarly, {@Code "xonly"} inserts y values 1, 2, and so on.  The
 default value, {@Code "xandy"}, gives the usual interpretation, and
 {@Code "swapxandy"} exchanges adjacent pairs of numbers:  the data
-is interpreted as @E { (y, x) } pairs rather than @E { (x, y) }
+is interpreted as @M { (y, x) } pairs rather than @M { (x, y) }
 pairs.  The layout of data on lines has no effect on the interpretation.
 @End @Section

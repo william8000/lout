@@ -1,0 +1,40 @@
+@Chapter
+   @Title { Mathematics }
+   @Tag { mathematics }
+@Begin
+@LP
+This chapter explains how to produce mathematics in Lout,
+equations. @RawIndex { equations @I see mathematics }
+mathematics. @Index mathematics
+mathematics.math @SubIndex { @Code "@Math" }
+math. @Index { @Code "@Math" (mathematics) }
+using the @Code "@Math" symbol
+@FootNote {
+@Code "@Math" follows the equation formatting rules of D. E. Knuth's
+knuth @Index { Knuth, D. E. }
+tex. @Index { @TeX }
+@TeX system.  Prior to Version 3.37 of Lout, this chapter described
+a symbol called
+eq. @Index @Code "@Eq"
+{@Code "@Eq"} which was similar to {@Code "@Math"} but less faithful
+to those rules.  For backward compatibility the @Code "@Eq" symbol
+is still available and still works exactly as described in the old
+documentation, but there is no reason to use it in new documents.
+}
+like this:
+@ID @Code @Verbatim {
+@Math { int from { 0 } to { 1 } dx over sqrt {1 - x sup 2} = pi over 2 }
+}
+This example produces
+@ID @Math { int from { 0 } to { 1 } dx over sqrt {1 - x sup 2} = pi over 2 }
+The @Code "@Math" symbol looks after all the details of spacing for
+you, and it provides several hundred mathematical symbols.
+@BeginSections
+@Include { mat_intr }
+@Include { mat_comm }
+@Include { mat_matr }
+@Include { mat_disp }
+@Include { mat_defs }
+@Include { mat_summ }
+@EndSections
+@End @Chapter

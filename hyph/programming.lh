@@ -1,0 +1,16 @@
+Lout hyphenation information
+%
+%  Created by Jeff Kingston, 30 August 2008, from scratch
+%  Used for hyphenating programming language identifiers
+%
+
+Classes:
+@!$%^&*()-+=~`{[}]:;'|<,.>?/0123456789
+_
+abcdefghijklmnopqrstuvwxyz
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+Patterns:
+a1A
+_1a
+_1A

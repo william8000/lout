@@ -196,6 +196,10 @@ automatic }
     A { symbolsize }
     B { 0.15f }
     C { any @I distance }
+@Rowa
+    A { symbollinewidth }
+    B { 0.5p }
+    C { any @I distance }
 }
 @I Number means an ordinary decimal number; @I distance means a number
 with a unit of measurement (Section {@NumberOf objects}), such as
@@ -273,6 +277,9 @@ their possible values are:
 @Rowa
     A { symbolsize }
     C { any @I distance }
+@Rowa
+    A { symbollinewidth }
+    C { any @I distance }
 @Rowb
     A { @Code "{" @I sequence @Code "}" }
     C { any @I sequence }
@@ -341,7 +348,7 @@ the precedence, if relevant, at right):
     A { @I expression @Code "rand" @I expression }
     B { 36 }
 @Rowa
-    A { @I expression @Eq { non * } @I expression }
+    A { @I expression @M { non * } @I expression }
     B { 35 }
 @Rowa
     A { @I expression @Code "/" @I expression }
@@ -353,10 +360,10 @@ the precedence, if relevant, at right):
     A { @I expression @Code "mod" @I expression }
     B { 34 }
 @Rowa
-    A { @I expression @Eq { non - } @I expression }
+    A { @I expression @M { non - } @I expression }
     B { 33 }
 @Rowa
-    A { @Eq { non - } @I expression }
+    A { @M { non - } @I expression }
     B { 33 }
 @Rowa
     A { @I expression @Code "+" @I expression }
@@ -368,7 +375,7 @@ the precedence, if relevant, at right):
    A { @Code "if cond {" @I boolean @Code "} then {" @I expression
 @Code "} else {" @I expression @Code "}" }
 }
-A @Eq { non - } immediately followed by a digit or decimal point is
+A @M { non - } immediately followed by a digit or decimal point is
 always taken to be a minus sign, never a subtraction.  The left
 parameter of @Code "exp" and @Code "log" is the base of the
 exponentiation and logarithm respectively; @Code "idiv" is integer

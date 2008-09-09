@@ -7,26 +7,26 @@ examples, and claims }
 @PP
 theorem. @Index @Code "@Theorem"
 A theorem is created like this:
-@ID @OneRow @Code {
-"@LD @Theorem"
-"    @Title { Fermat's Last Theorem }"
-"{"
-"@Eq { a sup n + b sup n != c sup n } for all positive integers @Eq { a },"
-"@Eq { b }, @Eq { c } and @Eq { n } when @Eq { n > 2 }."
-"@LP"
-"@Proof I have a proof of this theorem, but the margin"
-"is too small to contain it. @EndProof"
-"}"
+@ID @OneRow @Code @Verbatim {
+@LD @Theorem
+    @Title { Fermat's Last Theorem }
+{
+@M { a sup n + b sup n != c sup n } for all positive integers @M { a },
+@M { b }, @M { c } and @M { n } when @M { n > 2 }.
+@LP
+@Proof I have a proof of this theorem, but the margin
+is too small to contain it. @EndProof
+}
 }
 where we have used the @Code "@LD" `left display' symbol from
 Section {@NumberOf displays} to get a left-justified display,
-and the @Code "@Eq" symbol from Chapter {@NumberOf equations}
+and the @Code "@M" symbol from Chapter {@NumberOf mathematics}
 for the equations.  The result is
 @ID @Theorem
     @Title { Fermat's Last Theorem }
 {
-@Eq { a sup n + b sup n != c sup n } for all positive integers @Eq { a },
-@Eq { b }, @Eq { c } and @Eq { n } when @Eq { n > 2 }.
+@M { a sup n + b sup n != c sup n } for all positive integers @M { a },
+@M { b }, @M { c } and @M { n } when @M { n > 2 }.
 @LP
 @Proof I have a proof of this theorem, but the margin
 is too small to contain it. @EndProof

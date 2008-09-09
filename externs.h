@@ -1,7 +1,7 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.36 (July 2007)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.37 (September 2008)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -206,7 +206,7 @@ If you're compiling this, you've got the wrong settings in the makefile!
 /*                      and are subsequently reduced to MAX_FULL_LENGTH.     */
 /*                      For example, some intermediate results may exceed    */
 /*                      MAX_FULL_LENGTH by a factor of SF, which is defined  */
-/*                      below to be 128 (2**7).  The value given is 2**23-1, */
+/*                      below to be 256 (2**8).  The value given is 2**23-1, */
 /*                      which is about 148 metres in Lout's precision.       */
 /*                                                                           */
 /*  MAX_FILES           The maximum number of files.  This could only be     */
@@ -272,7 +272,7 @@ If you're compiling this, you've got the wrong settings in the makefile!
 #define MAX_COLOUR	65535
 #define MAX_TEXTURE	65535
 #define	MAX_LANGUAGE	64
-#define	MAX_LEX_STACK	10
+#define	MAX_LEX_STACK	20
 #define	MAX_CHARS	256
 #define MAX_HCOPIES	3
 
@@ -2361,7 +2361,7 @@ typedef struct back_end_rec {
 #define	PT		    20		/* 1 point (= 1/72 inch)             */
 #define	FR	          4096		/* virtual unit for frame units      */
 #define	DG	           128		/* virtual unit for degrees          */
-#define	SF	           128		/* virtual unit for @Scale factors   */
+#define	SF	           256		/* virtual unit for @Scale factors   */
                                         /* including blankline scale         */
 
 /* default size of characters for the PLAINTEXT back end */
@@ -3415,6 +3415,7 @@ extern	BOOLEAN	  ReadHyphTable(LANGUAGE_NUM lnum);
 extern	OBJECT	  Hyphenate(OBJECT x);
 
 /*****  z37.c	  Font Service           *************************************/
+extern	OBJECT	  FontDefSym;
 extern	FONT_INFO *finfo;
 extern	int	  font_curr_page;
 extern	void	  FontInit(void);
@@ -3509,6 +3510,8 @@ extern	OBJECT	  BuildEnclose(OBJECT hd);
 
 /*****  z45.c	  External Sort         **************************************/
 extern	int	  ReadOneLine(FILE *fp, FULL_CHAR *buff, int buff_len);
+extern	int	  ReadOneBinaryLine(FILE *fp, FULL_CHAR *buff, int buff_len,
+                    int *count, long *remaining_len);
 extern	LINE	  *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, int *len);
 extern	void	  WriteLines(FILE *fp, LINE *lines, int len);
 extern	void	  SortLines(LINE *lines, int lines_len);

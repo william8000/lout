@@ -1,0 +1,1314 @@
+@Section
+   @Title { Summary }
+   @Tag { mat_summ }
+@Begin
+@PP
+This section is a complete list of the symbols provided by
+{@Code "@Math"}.  We divide them into @I { helper }, @I { ordinary },
+@I { variable-building }, @I { large operator }, @I { unary operator },
+@I { binary operator }, @I { relation }, and @I { punctuation } symbols.
+mathematics.precedence @SubIndex { precedence of symbols }
+precedence.mathematics @Index { precedence of symbols (mathematics) }
+The precedences of these symbols, where relevant, are as follows:
+@ID @OneRow @Tbl
+    mv { 0.5vx }
+    aformat { @Cell ml { 0i } A | @Cell indent { ctr } B | @Cell mr { 0i } C }
+    afont { Italic }
+    bformat { @Cell ml { 0i } A | @Cell indent { ctr } B | @Cell mr { 0i } C }
+{
+@Rowa
+   ma { 0i }
+   A { Symbol type }
+   B { Precedence }
+   C { Symbols }
+   rb { yes }
+@Rowb
+   A { Helper }
+   B { 100 }
+   C { @Code { "big" } @Code { "small" } @Code { "vctr" }
+@Code { "@SuperScriptStyle" } etc.
+# @Code { "@SubScriptStyle" }
+# @Code { "@NumeratorStyle" } @Code { "@DenominatorStyle" }
+# @Code { "@SquareRootStyle" }
+}
+@Rowb
+    A { Variable-building }
+    B { 84 }
+    C { @Code { "dot" } @Code { "dotdot" } @Code { "hat" }
+@Code { "tilde" } @Code { "vec" } @Code { "dyad" }
+@Code { "overbar" } @Code { "underbar" }
+}
+@Rowb
+    A { Variable-building }
+    B { 82 }
+    C { @Code { "sub" } @Code { "on" } @Code { "ton" } }
+@Rowb
+    A { Variable-building }
+    B { 80 }
+    C { @Code { "sup" } @Code { "supp" } }
+@Rowb
+    A { Unary operator }
+    B { 70 }
+    C { @Code { sqrt } @Code { root } @Code { zroot } @Code { matrix } etc. }
+@Rowb
+    A { Binary operator }
+    B { 64 }
+    C { @Code { "times" } @Code { "*" } }
+@Rowb
+    A { Binary operator }
+    B { 62 }
+    C { @Code { "div" } @Code { "frac" } @Code { "over" } }
+@Rowb
+    A { Binary operator }
+    B { 60 }
+    C { @Code { "bin" } @Code { "+" } @Code { "-" } and
+all other binary operator symbols }
+@Rowb
+    A { Relation }
+    B { 50 }
+    C { @Code "rel" and all other relation symbols }
+@Rowb
+    A { Punctuation }
+    B { 40 }
+    C { @Code { "punct" }  @Code { ";" }  @Code { "," }  @Code { "col" } }
+@Rowb
+    A { Helper }
+    B { 26 }
+    C { @Code "non" }
+@Rowb
+    A { Helper }
+    B { 24 }
+    C { @Code { "above" } @Code { "below" } @Code { "wideabove" }
+@Code { "widebelow" }
+}
+@Rowb
+    A { Helper }
+    B { 22 }
+    C { @Code { "col" } @Code { "lcol" } @Code { "ccol" }
+@Code { "rcol" } @Code { "mcol" } }
+@Rowb
+    A { Helper }
+    B { 20 }
+    C { @Code { "row" } @Code { "axisrow" } }
+    rb { yes }
+    mb { 0i }
+}
+Results are shown in display style in this section; the other styles
+give more compressed results.
+@BeginSubSections
+
+@SubSection
+    @Title { Helper symbols }
+@Begin
+@LP
+The full list of helper symbols is
+@ID @OneRow @Tbl
+     mv { 0.5vx }
+     aformat { @Cell ml { 0i } A | @Cell mr { 0i } B }
+{
+@Rowa
+    ma { 0i }
+    A { @Code "`" }
+    B { Thin space, as after punctuation symbols }
+@Rowa
+    A { @Code "``" }
+    B { Medium space, as around binary operator symbols }
+@Rowa
+    A { @Code "```" }
+    B { Thick space, as around relation symbols }
+@Rowa
+    A { @Code "big x"
+mathematics.big. @SubIndex { @Code "big" symbol }
+big. @Index { @Code "big" symbol (mathematics) }
+}
+    B { Make @Code x larger }
+@Rowa
+    A { @Code "small x"
+mathematics.small. @SubIndex { @Code "small" symbol }
+small. @Index { @Code "small" symbol (mathematics) }
+}
+    B { Make @Code x smaller }
+@Rowa
+    A { @Code "vctr x"
+mathematics.vctr. @SubIndex { @Code "vctr" symbol }
+vctr. @Index { @Code "vctr" symbol (mathematics) }
+}
+    B { Centre @Code x vertically }
+@Rowa
+    A { @Code "@SuperScriptStyle x"
+mathematics.superscriptstyle. @SubIndex { @Code "@SuperScriptStyle" }
+superscriptstyle. @Index { @Code "@SuperScriptStyle" (mathematics) }
+}
+    B { Set @Code x in the style of a superscript }
+@Rowa
+    A { @Code "@SubScriptStyle x"
+mathematics.subscriptstyle. @SubIndex { @Code "@SubScriptStyle" }
+subscriptstyle. @Index { @Code "@SubScriptStyle" (mathematics) }
+}
+    B { Set @Code x in the style of a subscript }
+@Rowa
+    A { @Code "@NumeratorStyle x"
+mathematics.numeratorstyle. @SubIndex { @Code "@NumeratorStyle" }
+numeratorstyle. @Index { @Code "@NumeratorStyle" (mathematics) }
+}
+    B { Set @Code x in the style of a numerator }
+@Rowa
+    A { @Code "@DenominatorStyle x"
+mathematics.denominatorstyle. @SubIndex { @Code "@DenominatorStyle" }
+denominatorstyle. @Index { @Code "@DenominatorStyle" (mathematics) }
+}
+    B { Set @Code x in the style of a denominator }
+@Rowa
+    A { @Code "@SquareRootStyle x"
+mathematics.squarerootstyle. @SubIndex { @Code "@SquareRootStyle" }
+squarerootstyle. @Index { @Code "@SquareRootStyle" (mathematics) }
+}
+    B { Set @Code x in the style of a square root }
+@Rowa
+    A { @Code { above } @Code { below } @Code { wideabove }
+@Code { widebelow } }
+    B { Vertical stacking (see below) }
+@Rowa
+    A { @Code { "col" } @Code { "lcol" } @Code { "ccol" }
+@Code { "rcol" } @Code { "mcol" } @Code { "row" } @Code { "axisrow" } }
+    B { Used only within matrices (Section {@NumberOf matrices}) }
+@Rowa
+    A { @Code "non x" }
+    B { Remove spaces from @Code x (see below) }
+    mb { 0i }
+}
+where @Code "x" is arbitrary as usual.  The @Code "above" symbol prints
+mathematics.above. @SubIndex { @Code "above" symbol }
+above. @Index { @Code "above" symbol (mathematics) }
+the preceding object above the following object, while the @Code "below"
+mathematics.below. @SubIndex { @Code "below" symbol }
+below. @Index { @Code "below" symbol (mathematics) }
+symbol prints it below:
+@ID { 
+@Code @Verbatim { { a above f } + { z below b } }
+|7ct
+@Math { { a above f } + { z below b } }
+}
+Here is a larger example:
+@ID { @Code @Verbatim {
+sum from { { 1 <= i <= p } above
+   { 1 <= j <= q } above { 1 <= k <= r } }
+{ a sub ij b sub jk c sub ki }
+}
+||7ct
+@Math {
+  sum from { { 1 <= i <= p } above
+             { 1 <= j <= q } above
+             { 1 <= k <= r } }
+  { a sub { ij } b sub { jk } c sub { ki } }
+}
+}
+The @Code "wideabove" and @Code "widebelow" symbols are like @Code "above"
+mathematics.wideabove. @SubIndex { @Code "wideabove" symbol }
+wideabove. @Index { @Code "wideabove" symbol (mathematics) }
+mathematics.widebelow. @SubIndex { @Code "widebelow" symbol }
+widebelow. @Index { @Code "widebelow" symbol (mathematics) }
+and @Code "below" except that they horizontally scale the right parameter
+to the width of the left:
+@IL
+
+@LI {
+@Code @Verbatim {
+{a, ... , z} wideabove
+{90d @Rotate blbrace}
+}
+||7ct
+@Math { {a, ... , z} wideabove {90d @Rotate blbrace} }
+}
+
+@LI {
+@Code "{a, ... , z} widebelow minus"
+|7ct
+@Math { {a, ... , z} widebelow minus }
+}
+@EL
+The @Code "non" symbol prints the following object without the
+mathematics.non. @SubIndex { @Code "non" symbol }
+non. @Index { @Code "non" symbol (mathematics) }
+horizontal spacing it would usually contain.  It has low precedence
+so that, in examples like
+@ID @Code @Verbatim {
+The `@M { non <= }' operation is reflexive and transitive.
+}
+which produces
+@ID {
+The `@M { non <= }' operation is reflexive and transitive.
+}
+it is easy to use the familiar symbolic names for relations and
+operators without getting the usual surrounding spaces, saving
+the trouble of looking up the names of the characters.
+@End @SubSection
+
+@SubSection
+    @Title { Ordinary symbols }
+@Begin
+@LP
+Ordinary symbols are the simplest symbols.  They do not take objects
+mathematics.ordinary. @SubIndex { ordinary symbols }
+ordinary. @Index { ordinary symbols (mathematics) }
+to their left or right, and they always look the same except for the
+usual change of size in certain contexts (superscripts, subscripts, etc.).
+There are hundreds of these symbols, so they are presented here in groups.
+@PP
+The first group consists of all the symbols from the Adobe Symbol font;
+these are as for the @Code "@Sym" symbol of Section {@NumberOf characters},
+but within @Code "@Math" you don't type {@Code "@Sym"}:
+@DP
+@Tbl
+  mv { 0.5vx }
+  aformat { @Cell ml {@DisplayIndent} indent {right} w {@LCodeWidth} @Code A |
+            @Cell w {@ResultWidth} B |
+            @Cell indent {right} w {@CodeWidth} @Code C |
+            @Cell w {@ResultWidth} D |
+            @Cell indent {right} w {@CodeWidth} @Code E |
+            @Cell w {@ResultWidth} mr { 0i } F }
+{
+@Rowa
+  ma { 0i }
+  A { "space" } B { @Math { space } }
+  C { "exclam" } D { @Math { exclam } }
+  E { "universal" } F { @Math { universal } }
+@Rowa
+  A { "numbersign" } B { @Math { numbersign } }
+  C { "existential" } D { @Math { existential } }
+  E { "percent" } F { @Math { percent } }
+@Rowa
+  A { "ampersand" } B { @Math { ampersand } }
+  C { "suchthat" } D { @Math { suchthat } }
+  E { "parenleft" } F { @Math { parenleft } }
+@Rowa
+  A { "parenright" } B { @Math { parenright } }
+  C { "asteriskmath" } D { @Math { asteriskmath } }
+  E { "plus" } F { @Math { plus } }
+@Rowa
+  A { "comma" } B { @Math { comma } }
+  C { "minus" } D { @Math { minus } }
+  E { "period" } F { @Math { period } }
+@Rowa
+  A { "slash" } B { @Math { slash } }
+  C { "zero" } D { @Math { zero } }
+  E { "one" } F { @Math { one } }
+@Rowa
+  A { "two" } B { @Math { two } }
+  C { "three" } D { @Math { three } }
+  E { "four" } F { @Math { four } }
+@Rowa
+  A { "five" } B { @Math { five } }
+  C { "six" } D { @Math { six } }
+  E { "seven" } F { @Math { seven } }
+@Rowa
+  A { "eight" } B { @Math { eight } }
+  C { "nine" } D { @Math { nine } }
+  E { "colon" } F { @Math { colon } }
+@Rowa
+  A { "semicolon" } B { @Math { semicolon } }
+  C { "less" } D { @Math { less } }
+  E { "equal" } F { @Math { equal } }
+@Rowa
+  A { "greater" } B { @Math { greater } }
+  C { "question" } D { @Math { question } }
+  E { "congruent" } F { @Math { congruent } }
+@Rowa
+  A { "Alpha" } B { @Math { Alpha } }
+  C { "Beta" } D { @Math { Beta } }
+  E { "Chi" } F { @Math { Chi } }
+@Rowa
+  A { "Delta" } B { @Math { Delta } }
+  C { "Epsilon" } D { @Math { Epsilon } }
+  E { "Phi" } F { @Math { Phi } }
+@Rowa
+  A { "Gamma" } B { @Math { Gamma } }
+  C { "Eta" } D { @Math { Eta } }
+  E { "Iota" } F { @Math { Iota } }
+@Rowa
+  A { "thetaone" } B { @Math { thetaone } }
+  C { "Kappa" } D { @Math { Kappa } }
+  E { "Lambda" } F { @Math { Lambda } }
+@Rowa
+  A { "Mu" } B { @Math { Mu } }
+  C { "Nu" } D { @Math { Nu } }
+  E { "Omicron" } F { @Math { Omicron } }
+@Rowa
+  A { "Pi" } B { @Math { Pi } }
+  C { "Theta" } D { @Math { Theta } }
+  E { "Rho" } F { @Math { Rho } }
+@Rowa
+  A { "Sigma" } B { @Math { Sigma } }
+  C { "Tau" } D { @Math { Tau } }
+  E { "Upsilon" } F { @Math { Upsilon } }
+@Rowa
+  A { "sigmaone" } B { @Math { sigmaone } }
+  C { "Omega" } D { @Math { Omega } }
+  E { "Xi" } F { @Math { Xi } }
+@Rowa
+  A { "Psi" } B { @Math { Psi } }
+  C { "Zeta" } D { @Math { Zeta } }
+  E { "bracketleft" } F { @Math { bracketleft } }
+@Rowa
+  A { "therefore" } B { @Math { therefore } }
+  C { "bracketright" } D { @Math { bracketright } }
+  E { "perpendicular" } F { @Math { perpendicular } }
+@Rowa
+  A { "underscore" } B { @Math { underscore } }
+  C { "radicalex" } D { @Math { radicalex } }
+  E { "alpha" } F { @Math { alpha } }
+@Rowa
+  A { "beta" } B { @Math { beta } }
+  C { "chi" } D { @Math { chi } }
+  E { "delta" } F { @Math { delta } }
+@Rowa
+  A { "epsilon" } B { @Math { epsilon } }
+  C { "phi" } D { @Math { phi } }
+  E { "gamma" } F { @Math { gamma } }
+@Rowa
+  A { "eta" } B { @Math { eta } }
+  C { "iota" } D { @Math { iota } }
+  E { "phione" } F { @Math { phione } }
+@Rowa
+  A { "kappa" } B { @Math { kappa } }
+  C { "lambda" } D { @Math { lambda } }
+  E { "mu" } F { @Math { mu } }
+@Rowa
+  A { "nu" } B { @Math { nu } }
+  C { "omicron" } D { @Math { omicron } }
+  E { "pi" } F { @Math { pi } }
+@Rowa
+  A { "theta" } B { @Math { theta } }
+  C { "rho" } D { @Math { rho } }
+  E { "sigma" } F { @Math { sigma } }
+@Rowa
+  A { "tau" } B { @Math { tau } }
+  C { "upsilon" } D { @Math { upsilon } }
+  E { "omegaone" } F { @Math { omegaone } }
+@Rowa
+  A { "omega" } B { @Math { omega } }
+  C { "xi" } D { @Math { xi } }
+  E { "psi" } F { @Math { psi } }
+@Rowa
+  A { "zeta" } B { @Math { zeta } }
+  C { "braceleft" } D { @Math { braceleft } }
+  E { "bar" } F { @Math { bar } }
+@Rowa
+  A { "braceright" } B { @Math { braceright } }
+  C { "similar" } D { @Math { similar } }
+  E { "Upsilonone" } F { @Math { Upsilonone } }
+@Rowa
+  A { "minute" } B { @Math { minute } }
+  C { "lessequal" } D { @Math { lessequal } }
+  E { "fraction" } F { @Math { fraction } }
+@Rowa
+  A { "infinity" } B { @Math { infinity } }
+  C { "florin" } D { @Math { florin } }
+  E { "club" } F { @Math { club } }
+@Rowa
+  A { "diamond" } B { @Math { diamond } }
+  C { "heart" } D { @Math { heart } }
+  E { "spade" } F { @Math { spade } }
+@Rowa
+  A { "arrowboth" } B { @Math { arrowboth } }
+  C { "arrowleft" } D { @Math { arrowleft } }
+  E { "arrowup" } F { @Math { arrowup } }
+@Rowa
+  A { "arrowright" } B { @Math { arrowright } }
+  C { "arrowdown" } D { @Math { arrowdown } }
+  E { "degree" } F { @Math { degree } }
+@Rowa
+  A { "plusminus" } B { @Math { plusminus } }
+  C { "second" } D { @Math { second } }
+  E { "greaterequal" } F { @Math { greaterequal } }
+@Rowa
+  A { "multiply" } B { @Math { multiply } }
+  C { "proportional" } D { @Math { proportional } }
+  E { "partialdiff" } F { @Math { partialdiff } }
+@Rowa
+  A { "bullet" } B { @Math { bullet } }
+  C { "divide" } D { @Math { divide } }
+  E { "notequal" } F { @Math { notequal } }
+@Rowa
+  A { "equivalence" } B { @Math { equivalence } }
+  C { "approxequal" } D { @Math { approxequal } }
+  E { "ellipsis" } F { @Math { ellipsis } }
+@Rowa
+  A { "arrowvertex" } B { @Math { arrowvertex } }
+  C { "arrowhorizex" } D { @Math { arrowhorizex } }
+  E { "carriagereturn" } F { @Math { carriagereturn } }
+@Rowa
+  A { "aleph" } B { @Math { aleph } }
+  C { "Ifraktur" } D { @Math { Ifraktur } }
+  E { "Rfraktur" } F { @Math { Rfraktur } }
+@Rowa
+  A { "weierstrass" } B { @Math { weierstrass } }
+  C { "circlemultiply" } D { @Math { circlemultiply } }
+  E { "circleplus" } F { @Math { circleplus } }
+@Rowa
+  A { "emptyset" } B { @Math { emptyset } }
+  C { "intersection" } D { @Math { intersection } }
+  E { "union" } F { @Math { union } }
+@Rowa
+  A { { 0.92 1.0 } @Scale "propersuperset" } B { @Math { propersuperset } }
+  C { "reflexsuperset" } D { @Math { reflexsuperset } }
+  E { "notsubset" } F { @Math { notsubset } }
+@Rowa
+  A { "propersubset" } B { @Math { propersubset } }
+  C { "reflexsubset" } D { @Math { reflexsubset } }
+  E { "element" } F { @Math { element } }
+@Rowa
+  A { "notelement" } B { @Math { notelement } }
+  C { "angle" } D { @Math { angle } }
+  E { "gradient" } F { @Math { gradient } }
+@Rowa
+  A { "registerserif" } B { @Math { registerserif } }
+  C { "copyrightserif" } D { @Math { copyrightserif } }
+  E { "trademarkserif" } F { @Math { trademarkserif } }
+@Rowa
+  A { "product" } B { @Math { product } }
+  C { "radical" } D { @Math { radical } }
+  E { "dotmath" } F { @Math { dotmath } }
+@Rowa
+  A { "logicalnot" } B { @Math { logicalnot } }
+  C { "logicaland" } D { @Math { logicaland } }
+  E { "logicalor" } F { @Math { logicalor } }
+@Rowa
+  A { "arrowdblboth" } B { @Math { arrowdblboth } }
+  C { "arrowdblleft" } D { @Math { arrowdblleft } }
+  E { "arrowdblup" } F { @Math { arrowdblup } }
+@Rowa
+  A { "arrowdblright" } B { @Math { arrowdblright } }
+  C { "arrowdbldown" } D { @Math { arrowdbldown } }
+  E { "lozenge" } F { @Math { lozenge } }
+@Rowa
+  A { "angleleft" } B { @Math { angleleft } }
+  C { "registersans" } D { @Math { registersans } }
+  E { "copyrightsans" } F { @Math { copyrightsans } }
+@Rowa
+  A { { 0.92 1.0 } @Scale "trademarksans" } B { @Math { trademarksans } }
+  C { "summation" } D { @Math { summation } }
+  E { "parenlefttp" } F { @Math { parenlefttp } }
+@Rowa
+  A { "parenleftex" } B { @Math { parenleftex } }
+  C { "parenleftbt" } D { @Math { parenleftbt } }
+  E { "bracketlefttp" } F { @Math { bracketlefttp } }
+@Rowa
+  A { "bracketleftex" } B { @Math { bracketleftex } }
+  C { "bracketleftbt" } D { @Math { bracketleftbt } }
+  E { "bracelefttp" } F { @Math { bracelefttp } }
+@Rowa
+  A { "braceleftmid" } B { @Math { braceleftmid } }
+  C { "braceleftbt" } D { @Math { braceleftbt } }
+  E { "braceex" } F { @Math { braceex } }
+@Rowa
+  A { "angleright" } B { @Math { angleright } }
+  C { "integral" } D { @Math { integral } }
+  E { "integraltp" } F { @Math { integraltp } }
+@Rowa
+  A { "integralex" } B { @Math { integralex } }
+  C { "integralbt" } D { @Math { integralbt } }
+  E { "parenrighttp" } F { @Math { parenrighttp } }
+@Rowa
+  A { "parenrightex" } B { @Math { parenrightex } }
+  C { "parenrightbt" } D { @Math { parenrightbt } }
+  E { "bracketrighttp" } F { @Math { bracketrighttp } }
+@Rowa
+  A { "bracketrightex" } B { @Math { bracketrightex } }
+  C { "bracketrightbt" } D { @Math { bracketrightbt } }
+  E { "bracerighttp" } F { @Math { bracerighttp } }
+@Rowa
+  A { "bracerightmid" } B { @Math { bracerightmid } }
+  C { "bracerightbt" } D { @Math { bracerightbt } }
+  mb { 0i }
+}
+@DP
+The symbols that produce the Symbol font characters @Code { theta1 },
+@Code { sigma1 }, @Code { phi1 }, @Code { omega1 }, and @Code { Upsilon1 }
+are called @Code { thetaone }, @Code { sigmaone }, @Code { phione },
+@Code { omegaone }, and @Code { Upsilonone }, since Lout symbol names
+cannot contain both letters and digits.  The second group of ordinary
+symbols produces arrows:
+@ID @OneRow @Tbl
+  mv { 0.5vx }
+  aformat { @Cell ml{0i} indent{right} w{@LCodeWidth} @Code A |
+            @Cell w {@ResultWidth} B |
+            @Cell indent {right} w {@CodeWidth} @Code C |
+            @Cell w {@ResultWidth} D |
+            @Cell indent {right} w {@CodeWidth} @Code E |
+            @Cell w {@ResultWidth} mr { 0i } F }
+{
+@Rowa
+  ma { 0i }
+  A { "leftarrow" } B { @Math { leftarrow } }
+  C { "longleftarrow" } D { @Math { longleftarrow } }
+  E { "dblleftarrow" } F { @Math { dblleftarrow } }
+@Rowa
+  A { "dbllongleftarrow" } B { @Math { dbllongleftarrow } }
+  C { "rightarrow" } D { @Math { rightarrow } }
+  E { "longrightarrow" } F { @Math { longrightarrow } }
+@Rowa
+  A { "dblrightarrow" } B { @Math { dblrightarrow } }
+  C { "dbllongrightarrow" } D { @Math { dbllongrightarrow } }
+  E { "leftrightarrow" } F { @Math { leftrightarrow } }
+@Rowa
+  A { "longleftrightarrow" } B { @Math { longleftrightarrow } }
+  C { "dblleftrightarrow" } D { @Math { dblleftrightarrow } }
+  E { { 0.85 1.0 } @Scale "dbllongleftrightarrow" }
+  F { @Math { dbllongleftrightarrow } }
+@Rowa
+  A { "mapsto" } B { @Math { mapsto } }
+  C { "longmapsto" } D { @Math { longmapsto } }
+  E { "hookleftarrow" } F { @Math { hookleftarrow } }
+@Rowa
+  A { "hookrightarrow" } B { @Math { hookrightarrow } }
+  C { "leadsto" } D { @Math { leadsto } }
+  E { "leftharpoonup" } F { @Math { leftharpoonup } }
+@Rowa
+  A { "rightharpoonup" } B { @Math { rightharpoonup } }
+  C { "leftharpoondown" } D { @Math { leftharpoondown } }
+  E { { 0.95 1.0 } @Scale "rightharpoondown" } F { @Math { rightharpoondown } }
+@Rowa
+  A { "rightleftharpoons" } B { @Math { rightleftharpoons } }
+  C { "uparrow" } D { @Math { uparrow } }
+  E { "dbluparrow" } F { @Math { dbluparrow } }
+@Rowa
+  A { "downarrow" } B { @Math { downarrow } }
+  C { "dbldownarrow" } D { @Math { dbldownarrow } }
+  E { "updownarrow" } F { @Math { updownarrow } }
+@Rowa
+  A { "dblupdownarrow" } B { @Math { dblupdownarrow } }
+  C { "nearrow" } D { @Math { nearrow } }
+  E { "searrow" } F { @Math { searrow } }
+@Rowa
+  A { "swarrow" } B { @Math { swarrow } }
+  C { "nwarrow" } D { @Math { nwarrow } }
+  mb { 0i }
+}
+The members of the third group of ordinary symbols stand for themselves,
+but in Roman font rather than the Italic which is the default in
+mathematics:
+@ID @OneRow @Tbl
+  mv { 0.45vx }
+  aformat { @Cell ml {0i} indent {right} w {@LCodeWidth} @Code A |
+            @Cell w {@ResultWidth} B |
+            @Cell indent {right} w {@CodeWidth} @Code C |
+            @Cell w {@ResultWidth} D |
+            @Cell indent {right} w {@CodeWidth} @Code E |
+            @Cell w {@ResultWidth} mr { 0i } F }
+{
+@Rowa
+  ma { 0i }
+  A { "arccos" } B { @Math { arccos } }
+  C { "arcsin" } D { @Math { arcsin } }
+  E { "arctan" } F { @Math { arctan } }
+@Rowa
+  A { "arg" } B { @Math { arg } }
+  C { "cos" } D { @Math { cos } }
+  E { "cosh" } F { @Math { cosh } }
+@Rowa
+  A { "cot" } B { @Math { cot } }
+  C { "coth" } D { @Math { coth } }
+  E { "csc" } F { @Math { csc } }
+@Rowa
+  A { "deg" } B { @Math { deg } }
+  C { "det" } D { @Math { det } }
+  E { "dim" } F { @Math { dim } }
+@Rowa
+  A { "exp" } B { @Math { exp } }
+  C { "gcd" } D { @Math { gcd } }
+  E { "hom" } F { @Math { hom } }
+@Rowa
+  A { "inf" } B { @Math { inf } }
+  C { "ker" } D { @Math { ker } }
+  E { "lg" } F { @Math { lg } }
+@Rowa
+  A { "lim" } B { @Math { lim } }
+  C { "liminf" } D { @ZeroWidth @Math { liminf } }
+  E { "limsup" } F { @Math { limsup } }
+@Rowa
+  A { "ln" } B { @Math { ln } }
+  C { "log" } D { @Math { log } }
+  E { "max" } F { @Math { max } }
+@Rowa
+  A { "min" } B { @Math { min } }
+  C { "Pr" } D { @Math { Pr } }
+  E { "sec" } F { @Math { sec } }
+@Rowa
+  A { "sin" } B { @Math { sin } }
+  C { "sinh" } D { @Math { sinh } }
+  E { "supr" } F { @Math { supr } }
+@Rowa
+  A { "tan" } B { @Math { tan } }
+  C { "tanh" } D { @Math { tanh } }
+  E { "mod" } F { @Math { mod } }
+@Rowa
+  A { "0" } B { @Math { 0 } }
+  C { "1" } D { @Math { 1 } }
+  E { "2" } F { @Math { 2 } }
+@Rowa
+  A { "3" } B { @Math { 3 } }
+  C { "4" } D { @Math { 4 } }
+  E { "5" } F { @Math { 5 } }
+@Rowa
+  A { "6" } B { @Math { 6 } }
+  C { "7" } D { @Math { 7 } }
+  E { "8" } F { @Math { 8 } }
+@Rowa
+  A { "9" } B { @Math { 9 } }
+  C { "!" } D { @Math { ! } }
+  E { "?" } F { @Math { ? } }
+@Rowa
+  A { "%" } B { @Math { % } }
+  C { "(" } D { @Math { ( } }
+  E { ")" } F { @Math { ) } }
+@Rowa
+  A { "[" } B { @Math { [ } }
+  C { "]" } D { @Math { ] } }
+  mb { 0i }
+}
+The fourth group make good values for the @Code "atleft" and
+@Code "atright" options of @Code { matrix }:
+@ID @OneRow @Tbl
+  mv { 0.5vx }
+  aformat { @Cell ml { 0i } indent { right } w {@LCodeWidth} @Code A | @Cell B | @Cell |
+            @Cell           indent { right } @Code C | @Cell D | @Cell |
+            @Cell           indent { right } @Code E | @Cell F | @Cell |
+            @Cell           indent { right } @Code G | @Cell mr { 0i } H }
+{
+@Rowa
+  ma { 0i }
+  strut { 1.2f }
+  A { "lpar" } B { @Math { lpar } }
+  C { "rpar" } D { @Math { rpar } }
+  E { "lbrack" } F { @Math { lbrack } }
+  G { "rbrack" } H { @Math { rbrack } }
+@Rowa
+  strut { 1.2f }
+  A { "lbrace" } B { @Math { lbrace } }
+  C { "rbrace" } D { @Math { rbrace } }
+  E { "lfloor" } F { @Math { lfloor } }
+  G { "rfloor" } H { @Math { rfloor } }
+@Rowa
+  strut { 1.2f }
+  A { "lceil" } B { @Math { lceil } }
+  C { "rceil" } D { @Math { rceil } }
+  E { "langle" } F { @Math { langle } }
+  G { "rangle" } H { @Math { rangle } }
+@Rowa
+  strut { 3.5f }
+  A { "blpar" } B { @Math { blpar } }
+  C { "brpar" } D { @Math { brpar } }
+  E { "blbrack" } F { @Math { blbrack } }
+  G { "brbrack" } H { @Math { brbrack } }
+@Rowa
+  strut { 3.5f }
+  A { "blbrace" } B { @Math { blbrace } }
+  C { "brbrace" } D { @Math { brbrace } }
+  E { "blfloor" } F { @Math { blfloor } }
+  G { "brfloor" } H { @Math { brfloor } }
+@Rowa
+  strut { 3.5f }
+  A { "blceil" } B { @Math { blceil } }
+  C { "brceil" } D { @Math { brceil } }
+  E { "blangle" } F { @Math { blangle } }
+  G { "brangle" } H { @Math { brangle } }
+  mb { 0i }
+}
+The last group is miscellaneous:
+@DP
+@RID @OneRow @Tbl
+  mv { 0.5vx }
+  aformat { @Cell ml {0i} indent {right} w {@LCodeWidth} @Code A |
+            @Cell w {@ResultWidth} B |
+            @Cell indent {right} w {@CodeWidth} @Code C |
+            @Cell w {@ResultWidth} D |
+            @Cell indent {right} w {@CodeWidth} @Code E |
+            @Cell w {@ResultWidth} mr { 0i } F }
+{
+@Rowa
+  ma { 0i }
+  A { "hbar" } B { @Math { hbar } }
+  C { "Re" } D { @Math { Re } }
+  E { "Im" } F { @Math { Im } }
+@Rowa
+  A { "partial" } B { @Math { partial } }
+  C { "infty" } D { @Math { infty } }
+  E { "prime" } F { @Math { prime } }
+@Rowa
+  A { "nabla" } B { @Math { nabla } }
+  C { "surd" } D { @Math { surd } }
+  E { "top" } F { @Math { top } }
+@Rowa
+  A { "bot" } B { @Math { bot } }
+  C { "dbar" } D { @Math { dbar } }
+  E { "triangle" } F { @Math { triangle } }
+@Rowa
+  A { "backslash" } B { @Math { backslash } }
+  C { "forall" } D { @Math { forall } }
+  E { "exists" } F { @Math { exists } }
+@Rowa
+  A { "neg" } B { @Math { neg } }
+  C { "circle" } D { @Math { circle } }
+  E { "filledcircle" } F { @Math { filledcircle } }
+@Rowa
+  A { "square" } B { @Math { square } }
+  C { "ldots" } D { @Math { ldots } }
+  E { "cdots" } F { @Math { cdots } }
+@Rowa
+  A { "vdots" } B { @Math { vdots } }
+  C { "ddots" } D { @Math { ddots } }
+  E { "del" } F { @Math { del } }
+@Rowa
+  A { "grad" } B { @Math { grad } }
+  C { "..." } D { @Math { ... } }
+  E { ",...," } F { @Math { ,..., } }
+@Rowa
+  A { "'" } B { @Math { ' } }
+  C { "''" } D { @Math { '' } }
+  E { "'''" } F { @Math { ''' } }
+@Rowa
+  A { "''''" } B { @Math { '''' } }
+  C { "empty" } D { @Math { empty } }
+  E { "triangleup" } F { @Math { triangleup } }
+@Rowa
+  A { "triangledown" } B { @Math { triangledown } }
+  C { "half" } D { @Math { half } }
+  E { "third" } F { @Math { third } }
+  mb { 0i }
+}
+@End @SubSection
+
+@SubSection
+    @Title { Variable-building symbols }
+@Begin
+@LP
+Under this category are symbols that are mainly used to build
+mathematics.variablebuilding. @SubIndex { variable-building symbols }
+variablebuilding. @Index { variable-building symbols (mathematics) }
+variables.  However, as usual in Lout, the objects they link
+together may in fact be arbitrary.  First we have symbols that
+place a mark over or under an object:
+mathematics.dot. @SubIndex { @Code "dot" symbol }
+dot. @Index { @Code "dot" symbol (mathematics) }
+mathematics.dotdot. @SubIndex { @Code "dotdot" symbol }
+dotdot. @Index { @Code "dotdot" symbol (mathematics) }
+mathematics.hat. @SubIndex { @Code "hat" symbol }
+hat. @Index { @Code "hat" symbol (mathematics) }
+mathematics.tilde. @SubIndex { @Code "tilde" symbol }
+tilde. @Index { @Code "tilde" symbol (mathematics) }
+mathematics.vec. @SubIndex { @Code "vec" symbol }
+vec. @Index { @Code "vec" symbol (mathematics) }
+mathematics.dyad. @SubIndex { @Code "dyad" symbol }
+dyad. @Index { @Code "dyad" symbol (mathematics) }
+mathematics.overbar. @SubIndex { @Code "overbar" symbol }
+overbar. @Index { @Code "overbar" symbol (mathematics) }
+mathematics.underbar. @SubIndex { @Code "underbar" symbol }
+underbar. @Index { @Code "underbar" symbol (mathematics) }
+@ID @Tbl
+  mv { 0.5vx }
+  aformat { @Cell ml{0i} indent{right} w{@LCodeWidth} @Code A |
+            @Cell w {@ResultWidth} B |
+            @Cell indent {right} w {@CodeWidth} @Code C |
+            @Cell w {@ResultWidth} D |
+            @Cell indent {right} w {@CodeWidth} @Code E |
+            @Cell w {@ResultWidth} mr { 0i } F }
+{
+@Rowa
+  ma { 0i }
+  A { "x dot" } B { @Math { x dot } }
+  C { "x dotdot" } D { @Math { x dotdot } }
+  E { "x hat" } F { @Math { x hat } }
+@Rowa
+  A { "x tilde" } B { @Math { x tilde } }
+  C { "x vec" } D { @Math { x vec } }
+  E { "x dyad" } F { @Math { x dyad } }
+@Rowa
+  A { "{x + y} overbar" } B { @Math { {x + y} overbar } }
+  C { "{x + y} underbar" } D { @Math { {x + y} underbar } }
+  mb { 0i }
+}
+These marks are centred, with a small skew to allow for italic
+slant, except the last two which are extended to the width of
+the object.
+@PP
+The remaining variable-building symbols produce superscripts and
+subscripts:
+# These differ in appearance depending on the style,
+mathematics.sup. @SubIndex { @Code "sup" symbol }
+sup. @Index { @Code "sup" symbol (mathematics) }
+mathematics.sub. @SubIndex { @Code "sub" symbol }
+sub. @Index { @Code "sub" symbol (mathematics) }
+mathematics.tsub. @SubIndex { @Code "tsub" symbol }
+tsub. @Index { @Code "tsub" symbol (mathematics) }
+mathematics.supp. @SubIndex { @Code "supp" symbol }
+supp. @Index { @Code "supp" symbol (mathematics) }
+mathematics.on. @SubIndex { @Code "on" symbol }
+on. @Index { @Code "on" symbol (mathematics) }
+mathematics.ton. @SubIndex { @Code "ton" symbol }
+ton. @Index { @Code "ton" symbol (mathematics) }
+so the results are shown in both display and text style:
+@ID @Tbl
+    mv { 0.6vx }
+  # aformat { @Cell ml {0i} indent {right} @Code A | @Cell B | @Cell C | @Cell |
+  #           @Cell         indent {right} @Code D | @Cell E | @Cell F | @Cell |
+  #           @Cell         indent {right} @Code G | @Cell H | @Cell mr {0i} I }
+    aformat { @Cell ml {0i} indent {right} @Code A | @Cell B | @Cell |
+              @Cell         indent {right} @Code D | @Cell E |  @Cell |
+              @Cell         indent {right} @Code G | @Cell mr {0i} H }
+{
+@Rowa
+  ma { 0i }
+  A { "x sup y" } B { @Math { x sup y } } C { @M { x sup y } }
+  D { "x sub y" } E { @Math { x sub y } } F { @M { x sub y } }
+  G { "W tsub y" } H { @Math { W tsub y } } I { @M { W tsub y } }
+@Rowa
+  A { "x supp y on z"  } B { @Math {x supp y on z } } C { @M {x supp y on z } }
+  D { "W supp y ton z" } E { @Math {W supp y ton z} } F { @M {W supp y ton z} }
+  mb { 0i }
+}
+The @Code "supp" and @Code "on" (or {@Code "ton"}) symbols must be
+used together as shown; @Code "tsub" and @Code "ton" are exactly like
+@Code "sub" and @Code "on" except that the subscript is tucked in.
+@End @SubSection
+
+@SubSection
+    @Title { Large operator symbols }
+@Begin
+@LP
+Large operator symbols have @Code "from" and @Code "to"
+mathematics.large.operators. @SubIndex { large operators }
+large.operators. @Index { large operators (mathematics) }
+options which work as described for the @Code "sum" symbol
+in Section {@NumberOf mat_comm}.  Here they all are, with
+their results in both display style and text style:
+@CD @OneRow @Tbl
+  mv { 0.7vx }
+  strut { 2.5f }
+  aformat { @Cell ml {0i} indent {right} @Code A | @Cell B | @Cell C | @Cell |
+            @Cell         indent {right} @Code D | @Cell E | @Cell mr {0i} F }
+{
+@Rowa
+  ma { 0i }
+  A { "sum from { a } to { b } x" }
+  B { @Math { sum from { a } to { b } x } }
+  C { @M { sum from { a } to { b } x } }
+  D { "prod from { a } to { b } x" }
+  E { @Math { prod from { a } to { b } x } }
+  F { @M { prod from { a } to { b } x } }
+@Rowa
+  A { "coprod from { a } to { b } x" }
+  B { @Math { coprod from { a } to { b } x } }
+  C { @M { coprod from { a } to { b } x } }
+  D { "bcap from { a } to { b } x" }
+  E { @Math { bcap from { a } to { b } x } }
+  F { @M { bcap from { a } to { b } x } }
+@Rowa
+  A { "bcup from { a } to { b } x" }
+  B { @Math { bcup from { a } to { b } x } }
+  C { @M { bcup from { a } to { b } x } }
+  D { "bvee from { a } to { b } x" }
+  E { @Math { bvee from { a } to { b } x } }
+  F { @M { bvee from { a } to { b } x } }
+@Rowa
+  A { "bwedge from { a } to { b } x" }
+  B { @Math { bwedge from { a } to { b } x } }
+  C { @M { bwedge from { a } to { b } x } }
+  D { "bodot from { a } to { b } x" }
+  E { @Math { bodot from { a } to { b } x } }
+  F { @M { bodot from { a } to { b } x } }
+@Rowa
+  A { "botimes from { a } to { b } x" }
+  B { @Math { botimes from { a } to { b } x } }
+  C { @M { botimes from { a } to { b } x } }
+  D { "boplus from { a } to { b } x" }
+  E { @Math { boplus from { a } to { b } x } }
+  F { @M { boplus from { a } to { b } x } }
+@Rowa
+  A { "buplus from { a } to { b } x" }
+  B { @Math { buplus from { a } to { b } x } }
+  C { @M { buplus from { a } to { b } x } }
+  D { "int from { a } to { b } x" }
+  E { @Math { int from { a } to { b } x } }
+  F { @M { int from { a } to { b } x } }
+@Rowa
+  A { "oint from { a } to { b } x" }
+  B { @Math { oint from { a } to { b } x } }
+  C { @M { oint from { a } to { b } x } }
+  mb { 0i }
+}
+All these symbols also have a @Code "limits" option; when set to
+@Code "yes" it causes the limits to be shown above and below the
+symbol, when @Code "no" it causes them to be shown as superscripts and
+subscripts, and when omitted it defaults to @Code "yes" in display style
+and @Code "no" otherwise, except for integrals, where the default is
+uniformly @Code "no" as required by mathematical convention.
+@PP
+The @Code "largeop" symbol causes an arbitrary object to be treated
+mathematics.largeop. @SubIndex { @Code "largeop" symbol }
+largeop. @Index { @Code "largeop" symbol (mathematics) }
+options which work as described for the @Code "sum" symbol
+as a large operator:
+@ID {
+@Code @Verbatim { largeop symbol { diamond } from { a } to { b } x }
+|10ct
+@Math { largeop symbol { diamond } from { a } to { b } x }
+}
+In addition to {@Code "limits"}, {@Code "from"}, and {@Code "to"}
+options, @Code "largeop" has a @Code "symbol" option holding the
+object to be made into a large operator.  In display style, this
+object is enlarged using the @Code "big" helper function.
+@End @SubSection
+
+@SubSection
+    @Title { Unary operator symbols }
+@Begin
+@LP
+This category mainly contains symbols that take one object on the right
+mathematics.unaryoperator. @SubIndex { unary operators }
+unaryoperator. @Index { unary operators (mathematics) }
+and transform it.
+@IL
+
+@LI {
+@Code "sqrt {x over y}"
+|7ct
+@Math { sqrt {x over y} }
+mathematics.sqrt. @SubIndex { @Code "sqrt" symbol }
+sqrt. @Index { @Code "sqrt" symbol (mathematics) }
+}
+
+@LI {
+@Code "3 root {x over y}"
+|7ct
+@Math { 3 root {x over y} }
+mathematics.root @SubIndex { @Code "root" symbol }
+root.mathematics @Index { @Code "root" symbol (mathematics) }
+}
+
+@LI {
+@Code @Verbatim { matrix atleft { ( } atright { ) } { x } }
+|7ct @Math { matrix atleft { ( } atright { ) } { x } }
+}
+
+@EL
+As usual, any object may appear to the left of {@Code "root"}.
+The @Code "matrix" symbol produces matrices, as explained in
+detail in Section {@NumberOf matrices}.  Its following object
+must be enclosed in braces.
+@PP
+There are symbols which produce `matrices' with commonly needed
+@Code atleft and @Code atright options already set for you.  Here are
+these symbols, on the left, with the equivalent @Code matrix symbol
+and, on the right, the result produced:
+@ID @Tbl
+    aformat { @Cell ml { 0i } @Code A | @Cell | @Cell @Code B |
+    @Cell | @Cell mr { 0i }  C }
+{
+@Rowa
+    ma { 0i }
+    A { "pmatrix { M }" }
+    B { "matrix atleft { ( } atright { ) } { M }" }
+    C { @Math { pmatrix { M } }
+mathematics.pmatrix @SubIndex { @Code "pmatrix" symbol }
+pmatrix.mathematics @Index { @Code "pmatrix" symbol (mathematics) }
+}
+@Rowa
+    A { "bmatrix { M }" }
+    B { "matrix atleft { blbrack } atright { brbrack } { M }" }
+    C { @Math { bmatrix { M } }
+mathematics.bmatrix @SubIndex { @Code "bmatrix" symbol }
+bmatrix.mathematics @Index { @Code "bmatrix" symbol (mathematics) }
+}
+@Rowa
+    A { "brmatrix { M }" }
+    B { "matrix atleft { blbrace } atright { brbrace } { M }" }
+    C { @Math { brmatrix { M } }
+mathematics.brmatrix @SubIndex { @Code "brmatrix" symbol }
+brmatrix.mathematics @Index { @Code "brmatrix" symbol (mathematics) }
+}
+@Rowa
+    A { "fmatrix { M }" }
+    B { "matrix atleft { blfloor } atright { brfloor } { M }" }
+    C { @Math { fmatrix { M } }
+mathematics.fmatrix @SubIndex { @Code "fmatrix" symbol }
+fmatrix.mathematics @Index { @Code "fmatrix" symbol (mathematics) }
+}
+@Rowa
+    A { "cmatrix { M }" }
+    B { "matrix atleft { blceil } atright { brceil } { M }" }
+    C { @Math { cmatrix { M } }
+mathematics.cmatrix @SubIndex { @Code "cmatrix" symbol }
+cmatrix.mathematics @Index { @Code "cmatrix" symbol (mathematics) }
+}
+@Rowa
+    A { "amatrix { M }" }
+    B { "matrix atleft { blangle } atright { brangle } { M }" }
+    C { @Math { amatrix { M } }
+mathematics.amatrix @SubIndex { @Code "amatrix" symbol }
+amatrix.mathematics @Index { @Code "amatrix" symbol (mathematics) }
+}
+    mb { 0i }
+}
+These are very useful for getting large scaled delimiters around things
+that aren't necessarily matrices at all.
+@End @SubSection
+
+@SubSection
+    @Title { Binary operator symbols }
+@Begin
+@LP
+The symbols in this category take an object on the left and on
+mathematics.binary.operators. @SubIndex { binary operators }
+binary.operators. @Index { binary operators (mathematics) }
+the right.  The first two produce built-up fractions:
+mathematics.over. @SubIndex { @Code "over" symbol }
+over. @Index { @Code "over" symbol (mathematics) }
+mathematics.frac @SubIndex { @Code "frac" symbol }
+frac.mathematics @Index { @Code "frac" symbol (mathematics) }
+@ID @Tbl
+    aformat { @Cell ml { 0i } indent { right } @Code A | @Cell B | @Cell |
+              @Cell           indent { right } @Code C | @Cell mr { 0i } D }
+{
+@Rowa
+    ma { 0i }
+    A { "x over y" } B { @Math { x over y } }
+    C { "x frac y" } D { @Math { x frac y } }
+    mb { 0i }
+}
+The remaining binary operator symbols print the objects to the
+left and right separated by the operator with a medium-width
+space on each side.  Most have precedence 80, but a few (those
+representing multiplication and division operations) have higher
+precedence in accordance with mathematical convention.  Here is
+the full list of these operators:
+@ID @Tbl
+  mv { 0.5vx }
+  aformat { @Cell ml{0i} indent{right} w{@LCodeWidth} @Code A |
+            @Cell w {@ResultWidth} B |
+            @Cell indent {right} w {@CodeWidth} @Code C |
+            @Cell w {@ResultWidth} D |
+            @Cell indent {right} w {@CodeWidth} @Code E |
+            @Cell w {@ResultWidth} mr { 0i } F }
+{
+@Rowa
+  ma { 0i }
+  A { "x + y" } B { @Math { x + y } }
+  C { "x - y" } D { @Math { x - y } }
+  E { "x +- y" } F { @Math { x +- y } }
+@Rowa
+  A { "x -+ y" } B { @Math { x -+ y } }
+  C { "x setminus y" } D { @Math { x setminus y } }
+  E { "x cdot y" } F { @Math { x cdot y } }
+@Rowa
+  A { "x times y" } B { @Math { x times y } }
+  C { "x * y" } D { @Math { x * y } }
+  E { "x circ y" } F { @Math { x circ y } }
+@Rowa
+  A { "x div y" } B { @Math { x div y } }
+  C { "x cap y" } D { @Math { x cap y } }
+  E { "x cup y" } F { @Math { x cup y } }
+@Rowa
+  A { "x uplus y" } B { @Math { x uplus y } }
+  C { "x sqcap y" } D { @Math { x sqcap y } }
+  E { "x sqcup y" } F { @Math { x sqcup y } }
+@Rowa
+  A { "x triangleleft y" } B { @Math { x triangleleft y } }
+  C { "x triangleright y" } D { @Math { x triangleright y } }
+  E { "x wr y" } F { @Math { x wr y } }
+@Rowa
+  A { "x bigcirc y" } B { @Math { x bigcirc y } }
+  C { "x bigtriangleup y" } D { @Math { x bigtriangleup y } }
+  E { { 0.85 1.0 } @Scale "x bigtriangledown y" }
+  F { @Math { x bigtriangledown y } }
+@Rowa
+  A { "x vee y" } B { @Math { x vee y } }
+  C { "x wedge y" } D { @Math { x wedge y } }
+  E { "x oplus y" } F { @Math { x oplus y } }
+@Rowa
+  A { "x ominus y" } B { @Math { x ominus y } }
+  C { "x otimes y" } D { @Math { x otimes y } }
+  E { "x oslash y" } F { @Math { x oslash y } }
+@Rowa
+  A { "x odot y" } B { @Math { x odot y } }
+  C { "x dagger y" } D { @Math { x dagger y } }
+  E { "x daggerdbl y" } F { @Math { x daggerdbl y } }
+@Rowa
+  A { "x amalg y" } B { @Math { x amalg y } }
+  mb { 0i }
+}
+The @Code "bin" symbol causes an arbitrary object to be treated
+mathematics.bin @SubIndex { @Code "bin" symbol }
+bin.mathematics @Index { @Code "bin" symbol (mathematics) }
+as a binary operator:
+@ID {
+@Code @Verbatim { x bin op { diamond } y }
+|7ct
+@Math { x bin op { diamond } y }
+}
+The @Code "op" option following @Code "bin" contains the object
+to be treated as a binary operator; its two parameters precede
+and follow @Code "bin" as usual.
+@End @SubSection
+
+@SubSection
+    @Title { Relation symbols }
+@Begin
+@LP
+These symbols represent relations.  They take an object on
+mathematics.relation. @SubIndex { relation symbols }
+relation.symbols. @Index { relation symbols (mathematics) }
+the left and on the right, and print them separated by the
+relation symbol, with a slightly wider space on each side than
+is used for binary operators.  They have lower precedence than
+binary operators, in accordance with mathematical convention.  Here
+is the full list of these relations:
+@ID @Tbl
+  mv { 0.5vx }
+  aformat { @Cell ml{0i} indent{right} w{@LCodeWidth} @Code A |
+            @Cell w {@ResultWidth} B |
+            @Cell indent {right} w {@CodeWidth} @Code C |
+            @Cell w {@ResultWidth} D |
+            @Cell indent {right} w {@CodeWidth} @Code E |
+            @Cell w {@ResultWidth} mr { 0i } F }
+{
+@Rowa
+  ma { 0i }
+  A { "x < y" } B { @Math { x < y } }
+  C { "x > y" } D { @Math { x > y } }
+  E { "x = y" } F { @Math { x = y } }
+@Rowa
+  A { "x <= y" } B { @Math { x <= y } }
+  C { "x prec y" } D { @Math { x prec y } }
+  E { "x preceq y" } F { @Math { x preceq y } }
+@Rowa
+  A { "x << y" } B { @Math { x << y } }
+  C { "x subset y" } D { @Math { x subset y } }
+  E { "x subseteq y" } F { @Math { x subseteq y } }
+@Rowa
+  A { "x sqsubseteq y" } B { @Math { x sqsubseteq y } }
+  C { "x in y" } D { @Math { x in y } }
+  E { "x vdash y" } F { @Math { x vdash y } }
+@Rowa
+  A { "x smile y" } B { @Math { x smile y } }
+  C { "x frown y" } D { @Math { x frown y } }
+  E { "x >= y" } F { @Math { x >= y } }
+@Rowa
+  A { "x succ y" } B { @Math { x succ y } }
+  C { "x succeq y" } D { @Math { x succeq y } }
+  E { "x >> y" } F { @Math { x >> y } }
+@Rowa
+  A { "x supset y" } B { @Math { x supset y } }
+  C { "x supseteq y" } D { @Math { x supseteq y } }
+  E { "x sqsupseteq y" } F { @Math { x sqsupseteq y } }
+@Rowa
+  A { "x ni y" } B { @Math { x ni y } }
+  C { "x dashv y" } D { @Math { x dashv y } }
+  E { "x mid y" } F { @Math { x mid y } }
+@Rowa
+  A { "x parallel y" } B { @Math { x parallel y } }
+  C { "x == y" } D { @Math { x == y } }
+  E { "x ~ y" } F { @Math { x ~ y } }
+@Rowa
+  A { "x -~ y" } B { @Math { x -~ y } }
+  C { "x asymp y" } D { @Math { x asymp y } }
+  E { "x ~~ y" } F { @Math { x ~~ y } }
+@Rowa
+  A { "x =~ y" } B { @Math { x =~ y } }
+  C { "x bowtie y" } D { @Math { x bowtie y } }
+  E { "x propto y" } F { @Math { x propto y } }
+@Rowa
+  A { "x models y" } B { @Math { x models y } }
+  C { "x trieq y" } D { @Math { x trieq y } }
+  E { "x doteq y" } F { @Math { x doteq y } }
+@Rowa
+  A { "x perp y" } B { @Math { x perp y } }
+  C { "x notsub y" } D { @Math { x notsub y } }
+  E { "x notin y" } F { @Math { x notin y } }
+@Rowa
+  A { "x != y" } B { @Math { x != y } }
+  C { "x <-> y" } D { @Math { x <-> y } }
+  E { "x <-- y" } F { @Math { x <-- y } }
+@Rowa
+  A { "x --> y" } B { @Math { x --> y } }
+  C { "x up y" } D { @Math { x up y } }
+  E { "x down y" } F { @Math { x down y } }
+@Rowa
+  A { "x <=> y" } B { @Math { x <=> y } }
+  C { "x <== y" } D { @Math { x <== y } }
+  E { "x ==> y" } F { @Math { x ==> y } }
+@Rowa
+  A { "x dblup y" } B { @Math { x dblup y } }
+  C { "x dbldown y" } D { @Math { x dbldown y } }
+  E { "x : y" } F { @Math { x : y } }
+@Rowa
+  A { "x :: y" } B { @Math { x :: y } }
+  C { "x := y" } D { @Math { x := y } }
+  mb { 0i }
+}
+All of these symbols have a @Code "neg" option which, when set
+to {@Code "yes"}, causes a slash to overstrike the relation
+symbol:
+@ID {
+@Code @Verbatim { x ==> neg { yes } y }
+|7ct
+@Math { x ==> neg { yes } y }
+}
+The slash is horizontally centred over the relation symbol,
+which is not always best.
+@PP
+The @Code "rel" symbol causes an arbitrary object to be treated
+mathematics.rel @SubIndex { @Code "rel" symbol }
+rel.mathematics @Index { @Code "rel" symbol (mathematics) }
+as a relation:
+@ID {
+@Code @Verbatim { x rel op { diamond } y }
+|7ct
+@Math { x rel op { diamond } y }
+}
+The @Code "op" option following @Code "rel" contains the object
+to be treated as a relation; @Code "rel" also has the @Code "neg"
+option, plus the left and right parameters as usual.
+@End @SubSection
+
+@SubSection
+    @Title { Punctuation symbols }
+@Begin
+@LP
+These symbols represent punctuation.  They take an object on
+mathematics.punctuation. @SubIndex { punctuation symbols }
+punctuation.mathematics @Index { punctuation symbols (mathematics) }
+the left and on the right, and print them separated by the
+punctuation symbol, with no space to the left and a thin
+space to the right.  Here is the full list of these symbols:
+@ID @Tbl
+  aformat { @Cell ml{0i} indent{right} w{@LCodeWidth} @Code A |
+            @Cell w {@ResultWidth} B |
+            @Cell indent {right} w {@CodeWidth} @Code C |
+            @Cell w {@ResultWidth} D |
+            @Cell indent {right} w {@CodeWidth} @Code E |
+            @Cell w {@ResultWidth} mr { 0i } F }
+{
+@Rowa
+  ma { 0i }
+  A { "x ; y" } B { @Math { x ; y } }
+  C { "x , y" } D { @Math { x , y } }
+  E { "x col y" } F { @Math { x col y } }
+  mb { 0i }
+}
+The @Code "punct" symbol causes an arbitrary object to be treated
+mathematics.punct @SubIndex { @Code "punct" symbol }
+punct.mathematics @Index { @Code "punct" symbol (mathematics) }
+as punctuation:
+@ID {
+@Code @Verbatim { x punct symbol { diamond } y }
+|7ct
+@Math { x punct symbol { diamond } y }
+}
+The @Code "symbol" option following @Code "punct" contains the object
+to be treated as punctuation; its two parameters precede and follow
+@Code "punct" as usual.
+@End @SubSection
+
+@EndSubSections
+@End @Section

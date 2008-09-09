@@ -107,18 +107,22 @@
      }
    }
 
-   import @Eq
+   import @Math
    def epi { p sub i ` log sub 2 ` p sub i }
  
-   import @Eq
+   import @Math
    def ep right x { p sub x ` log sub 2 ` p sub x }
  
-   def @Dbl left x right y
-   { 1.95i @Wide
-     { 1.25i @Wide { |1rt @Code x } |0.2i @Eq {non y} }
-   }
+# def @Dbl left x right y
+# { 1.95i @Wide
+# { 1.25i @Wide { |1rt @Code x } |0.2i @Eq {non y} }
+# }
  
-   import @Eq
+   def @LCodeWidth { 3.5c }
+   def @CodeWidth { 4.0c }
+   def @ResultWidth { 1.6c }
+
+   import @Math
    def @ExA { 1 over sqrt { 1 - 4 x sup 2 } }
 
    def @@Diag { @Code "@Diag" }

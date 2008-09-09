@@ -448,6 +448,7 @@ def @DocumentSetup
     named @IntroPageNumbers	{  Roman		} # intro page numbers
     named @IntroFirstPageNumber	{  1			} # number of first intro page 
     named @StructPageNums	{  No			} # structured page numbers
+    named @PageNumberFormat right number { number	} # format of page numbers
 
     named @OddTop	      right @PageNum { @Centre { - @PageNum - }	}
     named @OddFoot	      right @PageNum { @Null                    }
@@ -745,8 +746,8 @@ def @DocumentSetup
 
 	@PageHeaders.@StructPageNums @Case {
 	    { Titles.Yes NoTitles.Yes } @Yield {
-		prefix @Join { numbers @Num @StructNum } }
-	    else @Yield { numbers @Num rawnum }
+		prefix @Join @PageNumberFormat { numbers @Num @StructNum } }
+	    else @Yield @PageNumberFormat { numbers @Num rawnum }
 	}
     }
 
@@ -862,6 +863,13 @@ def @DocumentSetup
       } @Graphic x
     }
 
+    def @ColouriseBackground left color right x
+    {
+      color @Colour
+      @Box margin { 0c } paint { color } linewidth { 0c }
+      @InitialColour @Colour x
+    }
+
     def @MargSet
 	left parity
 	right x
@@ -880,6 +888,7 @@ def @DocumentSetup
 	right x
     {
 	@PageSet
+	@InitialBackgroundColour @ColouriseBackground
 	{ @OrientationAngle @Orient } @Rotate
 	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
 	{   //@TopMargin ||@OddLeftMargin
@@ -896,6 +905,7 @@ def @DocumentSetup
 	right x
     {
 	@PageSet
+	@InitialBackgroundColour @ColouriseBackground
 	{ @OrientationAngle @Orient } @Rotate
 	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
 	{   //@TopMargin ||@EvenLeftMargin
@@ -1684,7 +1694,7 @@ def @DocumentSetup
 	def @OrdinaryOddPage
 	{
 		{@PageHeaders.{@SStart @PageNum}} @OddTopHeader
-		    { @PageNumbers @Num @PageNum }
+		    @PageNumberFormat { @PageNumbers @Num @PageNum }
 		//@MidGap
 		@OddBodyMargins {
 			@AtTop
@@ -1694,18 +1704,18 @@ def @DocumentSetup
 		//1rt @OneRow
 		{  //         @OddBodyMargins @PageFootSection
 		   //@MidGap {@PageHeaders.{@SStart @PageNum}} @OddFootHeader
-				 { @PageNumbers @Num @PageNum }
+				 @PageNumberFormat { @PageNumbers @Num @PageNum }
 		}
 	}
 
 	def @FullPageOddPage
 	{
 		{@PageHeaders.{@SStart @PageNum}} @OddTopHeader
-		    { @PageNumbers @Num @PageNum }
+		    @PageNumberFormat { @PageNumbers @Num @PageNum }
 		//@MidGap @OddBodyMargins @OddFullPageSection
 		//1rt @OneRow
 		{ //@MidGap {@PageHeaders.{@SStart @PageNum}} @OddFootHeader
-				 { @PageNumbers @Num @PageNum }
+				 @PageNumberFormat { @PageNumbers @Num @PageNum }
 		}
 	}
 
@@ -1719,7 +1729,7 @@ def @DocumentSetup
 	    def @OrdinaryEvenPage
 	    {
 		@PageHeaders.NonStart @EvenTopHeader
-		    { @PageNumbers @Num @PageNum }
+		    @PageNumberFormat { @PageNumbers @Num @PageNum }
 		//@MidGap
 		@EvenBodyMargins {
 			@PageEvenTopSection @Orient
@@ -1728,24 +1738,25 @@ def @DocumentSetup
 		//1rt @OneRow
 		{  //        @EvenBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @EvenFootHeader
-			     { @PageNumbers @Num @PageNum }
+			     @PageNumberFormat { @PageNumbers @Num @PageNum }
 		}
 	    }
 
 	    def @FullPageEvenPage
 	    {
 		@PageHeaders.NonStart @EvenTopHeader
-		    { @PageNumbers @Num @PageNum }
+		    @PageNumberFormat { @PageNumbers @Num @PageNum }
 		//@MidGap @EvenBodyMargins @EvenFullPageSection
 		//1rt @OneRow
 		{ //@MidGap @PageHeaders.NonStart @EvenFootHeader
-			     { @PageNumbers @Num @PageNum }
+			     @PageNumberFormat { @PageNumbers @Num @PageNum }
 		}
 	    }
 
 	        @PageMarker
 		    rawnum { @PageNum }
 		    num { @PageNumbers @Num @PageNum }
+		    parity { "Even" }
 	    //  @FootNoteThrough @NoDo @BeginFootNoteCounter
 	    //  {} @EvenPage @Orient { @Orient }
 	        {
@@ -1761,6 +1772,7 @@ def @DocumentSetup
 	    @PageMarker
 		rawnum { @PageNum }
 		num { @PageNumbers @Num @PageNum }
+		parity { "Odd" }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
 	//  { extra @Then @OddBodyMargins @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
@@ -1783,11 +1795,12 @@ def @DocumentSetup
 	    @PageMarker
 		num { @IntroPageNumbers @Num @PageNum }
 		rawnum { @PageNum }
+		parity { "Odd" }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
 	//  { extra @Then @OddBodyMargins @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
 		{@PageHeaders.{@SStart @PageNum}} @IntroOddTopHeader
-		    { @IntroPageNumbers @Num @PageNum }
+		    @PageNumberFormat { @IntroPageNumbers @Num @PageNum }
 		//@MidGap
 		@OddBodyMargins {
 			@AtTop
@@ -1798,17 +1811,18 @@ def @DocumentSetup
 		{  //        @OddBodyMargins @PageFootSection
 		   //@MidGap
 		       {@PageHeaders.{@SStart @PageNum}} @IntroOddFootHeader
-			   { @IntroPageNumbers @Num @PageNum }
+			   @PageNumberFormat { @IntroPageNumbers @Num @PageNum }
 		}
 	    }
 	//  @PageMarker
 		num { @IntroPageNumbers @Num @Next @PageNum }
 		rawnum { @Next @PageNum }
+		parity { "Even" }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
 	//  {} @EvenPage @Orient { @Orient }
 	    @Runner&&following @Open
 	    {
-		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @Next @PageNum }
+		@PageHeaders.NonStart @IntroEvenTopHeader @PageNumberFormat { @IntroPageNumbers @Num @Next @PageNum }
 		//@MidGap
 		@EvenBodyMargins {
 			@PageIntroEvenTopSection @Orient
@@ -1817,7 +1831,7 @@ def @DocumentSetup
 		//1rt @OneRow
 		{  //        @EvenBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @IntroEvenFootHeader
-				{ @IntroPageNumbers @Num @Next @PageNum }
+				@PageNumberFormat { @IntroPageNumbers @Num @Next @PageNum }
 		}
 	    }
 	//  @SimpleIntroPageList
@@ -1848,11 +1862,12 @@ def @DocumentSetup
 	    @PageMarker
 		num { @IntroPageNumbers @Num @PageNum }
 		rawnum { @PageNum }
+		parity { "Even" }
 	 // @FootNoteThrough @NoDo @BeginFootNoteCounter
 	 // {} @EvenPage @Orient { @Orient }
 	    @Runner&&following @Open
 	    {
-		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @PageNum }
+		@PageHeaders.NonStart @IntroEvenTopHeader @PageNumberFormat { @IntroPageNumbers @Num @PageNum }
 		//@MidGap
 		@EvenBodyMargins {
 			@PageIntroEvenTopSection @Orient
@@ -1861,7 +1876,7 @@ def @DocumentSetup
 		//1rt @OneRow
 		{  //        @EvenBodyMargins @PageFootSection
 		   //@MidGap @PageHeaders.NonStart @IntroEvenFootHeader
-				{ @IntroPageNumbers @Num @PageNum }
+				@PageNumberFormat { @IntroPageNumbers @Num @PageNum }
 		}
 	    }
 	 // @SimpleOddOrEvenIntroPageList
@@ -1873,11 +1888,12 @@ def @DocumentSetup
 	    @PageMarker
 		num { @IntroPageNumbers @Num @PageNum }
 		rawnum { @PageNum }
+		parity { "Odd" }
 	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
 	//  { extra @Then @OddBodyMargins @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
 	    {
 		{@PageHeaders.{@SStart @PageNum}} @IntroOddTopHeader
-		    { @IntroPageNumbers @Num @PageNum }
+		    @PageNumberFormat { @IntroPageNumbers @Num @PageNum }
 		//@MidGap
 		@OddBodyMargins {
 			@AtTop
@@ -1888,7 +1904,7 @@ def @DocumentSetup
 		{  //        @OddBodyMargins @PageFootSection
 		   //@MidGap
 		       {@PageHeaders.{@SStart @PageNum}} @IntroOddFootHeader
-			   { @IntroPageNumbers @Num @PageNum }
+			   @PageNumberFormat { @IntroPageNumbers @Num @PageNum }
 		}
 	    }
 	//  @SimpleEvenIntroPageList
@@ -1918,6 +1934,7 @@ def @DocumentSetup
 				prefix  { @Prefix }
 				owner   { @Owner } }
 		    rawnum { @PageNum }
+		    parity { "Odd" }
 		// @PageHeaders.@Start @RunningOddTopHeader
 		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -1961,6 +1978,7 @@ def @DocumentSetup
 				prefix  { @Prefix }
 				owner   { @Owner } }
 		    rawnum { @PageNum }
+		    parity { "Odd" }
 		// @PageHeaders.@Start @RunningOddTopHeader
 		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -2009,6 +2027,7 @@ def @DocumentSetup
 				prefix  { @Prefix }
 				owner   { @Owner } }
 			rawnum { @PageNum }
+			parity { "Even" }
 		    // @PageHeaders.@Start @RunningEvenTopHeader
 			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -2051,6 +2070,7 @@ def @DocumentSetup
 				prefix  { @Prefix }
 				owner   { @Owner } }
 			rawnum { @PageNum }
+			parity { "Even" }
 		    // @PageHeaders.@Start @RunningEvenTopHeader
 			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -2121,6 +2141,7 @@ def @DocumentSetup
 			    prefix  { @Prefix }
 			    owner   { @Owner } }
 		    rawnum { @PageNum }
+		    parity { "Odd" }
 		// @PageHeaders.@Start @RunningIntroOddTopHeader
 			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -2162,6 +2183,7 @@ def @DocumentSetup
 			    prefix  { @Prefix }
 			    owner   { @Owner } }
 		    rawnum { @Next @PageNum }
+		    parity { "Even" }
 		// @PageHeaders.@Start @RunningIntroEvenTopHeader
 			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
 			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
@@ -3856,6 +3878,7 @@ def @DocumentSetup
 		    title { @InitialLanguage @Language @ContentsCaption }
 		    pagenum { @PageOf @Tag }
 		// @FigureCounterIncrement @Tag
+		// @TitleMarker @Tag { @Tag } @Value { @Caption }
 		// @Body
 		// @PageMark @Tag
 	    }
@@ -3901,13 +3924,13 @@ def @DocumentSetup
 	def @EvenFullPageSend into { @EvenFullPagePlace&&following }
 	    right x
 	{
-	    @OneRow x
+	    @OneRow @HExpand x
 	}
 
 	def @EvenPageSend into { @EvenPagePlace&&following }
 	    right x
 	{
-	    @OneRow x
+	    @OneRow @HExpand x
 	}
 
 	def @RawFigureVal
@@ -3928,13 +3951,13 @@ def @DocumentSetup
 	  @OnePg.@CaptionState @Case
 	  {
 	    Yes.Below @Yield {
-		@Send @OneRow { @Format @FigureVal @DP @CaptionVal // @DupRunner}
+		@Send @OneRow @HExpand { @Format @FigureVal @DP @CaptionVal // @DupRunner}
 	    }
 	    Yes.Above @Yield {
-		@Send @OneRow { @CaptionVal @DP @Format @FigureVal // @DupRunner}
+		@Send @OneRow @HExpand { @CaptionVal @DP @Format @FigureVal // @DupRunner}
 	    }
 	    Yes.None @Yield {
-		@Send @OneRow { @Format @FigureVal // @DupRunner }
+		@Send @OneRow @HExpand { @Format @FigureVal // @DupRunner }
 	    }
 	    No.Below @Yield {
 		@SendEncl { @FigureVal // @Send { @CaptionVal // @DupRunner } }
@@ -4091,6 +4114,7 @@ def @DocumentSetup
 		    title { @InitialLanguage @Language @ContentsCaption }
 		    pagenum { @PageOf @Tag }
 		// @TableCounterIncrement @Tag
+		// @TitleMarker @Tag { @Tag } @Value { @Caption }
 		// @Body
 		// @PageMark @Tag
 	    }
@@ -4136,13 +4160,13 @@ def @DocumentSetup
 	def @EvenFullPageSend into { @EvenFullPagePlace&&following }
 	    right x
 	{
-	    @OneRow x
+	    @OneRow @HExpand x
 	}
 
 	def @EvenPageSend into { @EvenPagePlace&&following }
 	    right x
 	{
-	    @OneRow x
+	    @OneRow @HExpand x
 	}
 
 	def @RawTableVal
@@ -4163,13 +4187,13 @@ def @DocumentSetup
 	  @OnePg.@CaptionState @Case
 	  {
 	    Yes.Below @Yield {
-		@Send @OneRow { @Format @TableVal @DP @CaptionVal // @DupRunner}
+		@Send @OneRow @HExpand { @Format @TableVal @DP @CaptionVal // @DupRunner}
 	    }
 	    Yes.Above @Yield {
-		@Send @OneRow { @CaptionVal @DP @Format @TableVal // @DupRunner}
+		@Send @OneRow @HExpand { @CaptionVal @DP @Format @TableVal // @DupRunner}
 	    }
 	    Yes.None @Yield {
-		@Send @OneRow { @Format @TableVal // @DupRunner }
+		@Send @OneRow @HExpand { @Format @TableVal // @DupRunner }
 	    }
 	    No.Below @Yield {
 		@SendEncl { @TableVal // @Send { @CaptionVal // @DupRunner } }
@@ -4326,6 +4350,7 @@ def @DocumentSetup
 		    title { @InitialLanguage @Language @ContentsCaption }
 		    pagenum { @PageOf @Tag }
 		// @FloaterCounterIncrement @Tag
+		// @TitleMarker @Tag { @Tag } @Value { @Caption }
 		// @Body
 		// @PageMark @Tag
 	    }
@@ -4371,13 +4396,13 @@ def @DocumentSetup
 	def @EvenFullPageSend into { @EvenFullPagePlace&&following }
 	    right x
 	{
-	    @OneRow x
+	    @OneRow @HExpand x
 	}
 
 	def @EvenPageSend into { @EvenPagePlace&&following }
 	    right x
 	{
-	    @OneRow x
+	    @OneRow @HExpand x
 	}
 
 	def @RawFloaterVal
@@ -4398,13 +4423,13 @@ def @DocumentSetup
 	  @OnePg.@CaptionState @Case
 	  {
 	    Yes.Below @Yield {
-		@Send @OneRow { @Format @FloaterVal @DP @CaptionVal // @DupRunner}
+		@Send @OneRow @HExpand { @Format @FloaterVal @DP @CaptionVal // @DupRunner}
 	    }
 	    Yes.Above @Yield {
-		@Send @OneRow { @CaptionVal @DP @Format @FloaterVal // @DupRunner}
+		@Send @OneRow @HExpand { @CaptionVal @DP @Format @FloaterVal // @DupRunner}
 	    }
 	    Yes.None @Yield {
-		@Send @OneRow { @Format @FloaterVal // @DupRunner }
+		@Send @OneRow @HExpand { @Format @FloaterVal // @DupRunner }
 	    }
 	    No.Below @Yield {
 		@SendEncl { @FloaterVal // @Send { @CaptionVal // @DupRunner } }

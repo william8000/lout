@@ -11,23 +11,23 @@ available everywhere that x and y coordinates are required:  within
 the @Code xticks and @Code yticks options, within the points within
 the @Code "objects" option, and within the right parameter of the
 @Code "@Data" symbol.  For example,
-@ID @OneRow @Code {
-"@Data"
-"    pairs { solid }"
-"{"
-"    0 0  pi sin { pi/2 }"
-"}"
+@ID @OneRow @Code @Verbatim {
+@Data
+    pairs { solid }
+{
+    0 0  pi sin { pi/2 }
 }
-draws a solid line from @Eq {(0, 0)} to @Eq {(pi, sin(pi "/" 2))}.  Section
+}
+draws a solid line from @M {(0, 0)} to @M {(pi, sin(pi "/" 2))}.  Section
 {@NumberOf grsummary} lists all the functions; they include the four
-arithmetical operators @Eq { non + }, @Eq { non - }, @Eq { non * }, and
-@Eq { "/" }, as well as {@Code "sin"}, {@Code "cos"}, {@Code "sqrt"}, and
+arithmetical operators @M { non + }, @M { non - }, @M { non * }, and
+@M { "/" }, as well as {@Code "sin"}, {@Code "cos"}, {@Code "sqrt"}, and
 many others.  Braces are used for grouping, never parentheses.
 @PP
 For plotting functions there are three looping symbols, {@Code "xloop"},
 {@Code "yloop"}, and {@Code "zloop"}.  For example, the following plots
-the two functions @Eq { y = 2 } and @Eq { y = sqrt { pi x "/" 4 } + 1 }
-for @Eq { x } from 10 to 500:
+the two functions @M { y = 2 } and @M { y = sqrt { pi x "/" 4 } + 1 }
+for @M { x } from 10 to 500:
 @ID -1px @Break @OneRow @Code @Verbatim {
 -2p @Font @Graph
     style { axes }
@@ -109,7 +109,7 @@ xloop from { -5 } to { +5 } by { 0.2 } do
     if cond { abs { x } > 0.1 } then { x 1/x } else {}
 }
 }
-This plots the function @Eq { y = 1 "/" x }, skipping points near
+This plots the function @M { y = 1 "/" x }, skipping points near
 zero.  Actually the @Code "else" part could be omitted since its default
 value is empty.
 @PP

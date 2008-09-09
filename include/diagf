@@ -4825,7 +4825,6 @@ def @DiagSetup
 		  @BackEnd @Case {
 		    PostScript @Yield {
 		    "ldiagsolidarrowhead"
-		    # 0 0 xsize ysize * 0.5 0 ysize
 		    }
 		    PDF @Yield {}
 		  }
@@ -4849,7 +4848,6 @@ def @DiagSetup
 		  @BackEnd @Case {
 		    PostScript @Yield {
 		    pathwidth "ldiagsolidwithbararrowhead"
-		    # 0 0 xsize ysize * 0.5 0 ysize
 		    }
 		    PDF @Yield {}
 		  }
@@ -4863,6 +4861,7 @@ def @DiagSetup
 	    named width { arrowwidth }
 	    named length { arrowlength }
 	    named pathwidth { pathwidth }
+	    named pathgap { pathgap }
 	{
 	    @InsulatedNode
 		outlinewidth { pathwidth }
@@ -4872,21 +4871,7 @@ def @DiagSetup
 		outline {
 		  @BackEnd @Case {
 		    PostScript @Yield {
-		    pathwidth "ldiagopenarrowhead"
-
-		    # PSW := { 0 0 }
-		    # PNW := { 0 ysize }
-		    # PE  := { xsize ysize*0.5 }
-		    # REL := pathwidth atangle { PE angleto PNW + 90d }
-		    # PNA := { 0 ysize*0.5 + pathwidth*0.5 }
-		    # PSA := { 0 ysize*0.5 - pathwidth*0.5 }
-		    # PNI := {
-		    #   PNA PNA ++ { xsize 0 }
-		    #   PNW ++ REL PE ++ REL ldiaglineintersect
-		    # }
-		    # PSI := PNI -- { 0 pathwidth }
-		    #
-		    # PSW PE PNW PNI PNA PSA PSI PSW
+		    pathwidth pathgap "ldiagopenarrowhead"
 		    }
 		    PDF @Yield {}
 		  }
@@ -4900,6 +4885,7 @@ def @DiagSetup
 	    named width { arrowwidth }
 	    named length { arrowlength }
 	    named pathwidth { pathwidth }
+	    named pathgap { pathgap }
 	{
 	    @InsulatedNode
 		paint { nochange }
@@ -4909,16 +4895,7 @@ def @DiagSetup
 		outline {
 		  @BackEnd @Case {
 		    PostScript @Yield {
-		    pathwidth "ldiaghalfopenarrowhead"
-
-		    # 0 0
-		    # xsize ysize * 0.5
-		    # 0 ysize
-		    # xsize*0.3 ysize*0.5 + pathwidth*0.5
-		    # 0         ysize*0.5 + pathwidth*0.5
-		    # 0         ysize*0.5 - pathwidth*0.5
-		    # xsize*0.3 ysize*0.5 - pathwidth*0.5
-		    # 0 0
+		    pathwidth pathgap "ldiaghalfopenarrowhead"
 		    }
 		    PDF @Yield {}
 		  }
@@ -4942,13 +4919,6 @@ def @DiagSetup
 		  @BackEnd @Case {
 		    PostScript @Yield {
 		    "ldiagsolidcurvedarrowhead"
-		    # 0 0
-		    # [0 0 xsize ysize * 0.5 "ldiaglinebetween"
-		    #  xsize 0 xsize ysize "ldiaglineintersect" clockwise]
-		    # xsize ysize * 0.5
-		    # [xsize ysize * 0.5 0 ysize "ldiaglinebetween"
-		    #  xsize 0 xsize ysize "ldiaglineintersect" clockwise]
-		    # 0 ysize
 		    }
 		    PDF @Yield {}
 		  }
@@ -4962,6 +4932,7 @@ def @DiagSetup
 	    named width { arrowwidth }
 	    named length { arrowlength }
 	    named pathwidth { pathwidth }
+	    named pathgap { pathgap }
 	{
 	    @InsulatedNode
 		outlinestyle { noline }
@@ -4971,28 +4942,7 @@ def @DiagSetup
 		outline {
 		  @BackEnd @Case {
 		    PostScript @Yield {
-		    pathwidth "ldiagopencurvedarrowhead"
-		    # LR:= { 0 0 xsize ysize * 0.5 "ldiaglinebetween"
-		    #    xsize 0 xsize ysize "ldiaglineintersect" }
-		    # UR:= { xsize ysize * 0.5 0 ysize "ldiaglinebetween"
-		    #      xsize 0 xsize ysize "ldiaglineintersect" }
-		    # PW2  := pathwidth * 0.5
-		    # UMID := {
-		    # 0 ysize * 0.5 + PW2  xsize ysize * 0.5 + PW2
-		    # {0 ysize} ++ 1f atangle { UR angleto {0 ysize} + 90d }
-		    # { 0 ysize } ldiaglineintersect
-		    # }
-		    # LMID := UMID -- { 0 pathwidth }
-		    # 0 0
-		    # [LR clockwise]
-		    # xsize ysize * 0.5
-		    # [UR clockwise]
-		    # 0 ysize
-		    # UMID
-		    # 0 ysize * 0.5 + PW2
-		    # 0 ysize * 0.5 - PW2
-		    # LMID
-		    # 0 0
+		    pathwidth pathgap "ldiagopencurvedarrowhead"
 		    }
 		    PDF @Yield {}
 		  }
@@ -5006,6 +4956,7 @@ def @DiagSetup
 	    named width { arrowwidth }
 	    named length { arrowlength }
 	    named pathwidth { pathwidth }
+	    named pathgap { pathgap }
 	{
 	    @InsulatedNode
 		outlinestyle { noline }
@@ -5015,29 +4966,7 @@ def @DiagSetup
 		outline {
 		  @BackEnd @Case {
 		    PostScript @Yield {
-		    pathwidth "ldiaghalfopencurvedarrowhead"
-		    # LR:= { 0 0 xsize ysize * 0.5 "ldiaglinebetween"
-		    #      xsize 0 xsize ysize "ldiaglineintersect" }
-		    # UR:= { xsize ysize * 0.5 0 ysize "ldiaglinebetween"
-		    #      xsize 0 xsize ysize "ldiaglineintersect" }
-		    # BR:= { 0 0 LR 0 ysize UR "ldiaglineintersect" }
-		    # BRAD := { 0 0 } distance BR
-		    # PW2  := pathwidth * 0.5
-		    # XDIST := sqrt { BRAD*BRAD - PW2*PW2 }
-		    # UMID := BR ++ { XDIST PW2 }
-		    # LMID := BR ++ { XDIST 0 - PW2 }
-		    # 0 0
-		    # [LR clockwise]
-		    # xsize ysize * 0.5
-		    # [UR clockwise]
-		    # 0 ysize
-		    # [BR clockwise ]
-		    # UMID
-		    # 0 ysize * 0.5 + PW2
-		    # 0 ysize * 0.5 - PW2
-		    # LMID
-		    # [BR clockwise ]
-		    # 0 0
+		    pathwidth pathgap "ldiaghalfopencurvedarrowhead"
 		    }
 		    PDF @Yield {}
 		  }
@@ -5099,6 +5028,7 @@ def @DiagSetup
 	    named width { arrowwidth }
 	    named length { arrowlength }
 	    named pathwidth { pathwidth }
+	    named pathgap { pathgap }
 	{
 	    style @Case {
 		solid          @Yield @SolidArrowHead
@@ -5109,19 +5039,19 @@ def @DiagSetup
 				  pathwidth { pathwidth }
 		halfopen       @Yield @HalfOpenArrowHead
 				  width { width } length { length }
-				  pathwidth { pathwidth }
+				  pathwidth { pathwidth } pathgap { pathgap }
 		open           @Yield @OpenArrowHead
 				  width { width } length { length }
-				  pathwidth { pathwidth }
+				  pathwidth { pathwidth } pathgap { pathgap }
 		curvedsolid    @Yield @SolidCurvedArrowHead
 				  width { width } length { length }
 				  pathwidth { pathwidth }
 		curvedhalfopen @Yield @HalfOpenCurvedArrowHead
 				  width { width } length { length }
-				  pathwidth { pathwidth }
+				  pathwidth { pathwidth } pathgap { pathgap }
 		curvedopen     @Yield @OpenCurvedArrowHead
 				  width { width } length { length }
-				  pathwidth { pathwidth }
+				  pathwidth { pathwidth } pathgap { pathgap }
 		circle         @Yield @CircleArrowHead
 				  width { width } length { length }
 				  pathwidth { pathwidth }
@@ -5172,6 +5102,7 @@ def @DiagSetup
 						    frompt { frompt }
 						    topt { topt }
 						    arrow { arrow }
+						    arrowlength { arrowlength }
 						    backarrowlength { backarrowlength }
 						}
             import @Geometry named from		{ from			}
@@ -5334,6 +5265,14 @@ def @DiagSetup
 		    labeladjust	{ zlabeladjust	     @Else linklabeladjust	}
 	    }
 
+	    def @PathGap
+	    {
+	      path @Case {
+		doubleline @Yield { pathgap }
+		else       @Yield { "0" }
+	      }
+	    }
+
 	    def @FromArrow
 	    {
 		arrow @Case {
@@ -5343,6 +5282,7 @@ def @DiagSetup
 			    width { backarrowwidth }
 			    length { backarrowlength }
 			    pathwidth { pathwidth }
+			    pathgap { @PathGap }
 		    }
 		    else @Yield ""
 		}
@@ -5357,6 +5297,7 @@ def @DiagSetup
 			    width { arrowwidth }
 			    length { arrowlength }
 			    pathwidth { pathwidth }
+			    pathgap { @PathGap }
 		    }
 		    else @Yield ""
 		}

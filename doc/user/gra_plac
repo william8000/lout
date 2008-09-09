@@ -13,14 +13,14 @@ objects.graph @Index { @Code "objects" option (graphs) }
 @ID @OneRow @Code @Verbatim {
 @Graph
     objects {
-        @CTR at {2.5  6.0}  @Eq { y = x sup 2 }
-        @CTR at {4.5  7.0}  @Eq { y = x sup 3 }
+        @CTR at {2.5  6.0}  @Math { y = x sup 2 }
+        @CTR at {4.5  7.0}  @Math { y = x sup 3 }
     }
 }
-where we have used the @Code "@Eq" symbol from Chapter {@NumberOf equations}
-to place two equations onto the graph at the points {@Code "2.5  6.0"}
-and {@Code "4.5 7.0"} respectively.  An example result appears in the next
-section.
+where we have used the @Code "@Math" symbol from
+Chapter {@NumberOf mathematics} to place two equations onto the graph
+at the points {@Code "2.5  6.0"} and {@Code "4.5 7.0"} respectively.  An
+example result appears in the next section.
 @PP
 In addition to {@Code "@CTR"}, there are eight other symbols which may
 be used within the @Code "objects" option in the same way:  {@Code "@NW"},
@@ -49,6 +49,6 @@ other decorations.
 @PP
 The @Code "objects" option may contain @Code "@Graph" symbols, but in
 that case, owing to a deficiency in the implementation, those symbols
-will need to have their @Code save options (Section {@NumberOf grerrors})
-set to {@Code yes}.
+must have their @Code save options (Section {@NumberOf grerrors}) set
+to {@Code yes}.
 @End @Section

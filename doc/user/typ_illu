@@ -44,6 +44,7 @@ with their default values:
 "    @InitialSpace { lout }"
 "    @InitialLanguage { English }"
 "    @InitialColour { black }"
+"    @InitialBackgroundColour { white }"
 "{"
 "    ..."
 "}"

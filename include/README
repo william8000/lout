@@ -18,8 +18,7 @@ Setup files (containing mainly lists of options settable by the user)
    Setup files for special-purpose packages (choose any combination):
 
        diag             Diag diagram drawing package
-       eq               Eq equation formatting package
-       math             Math, an alternative equation formatting package
+       math             Math, a mathematics formatting package
        graph            Graph graph drawing package
        latin2           Latin2 (Eastern European characters) package
        pie              Pie pie graph drawing package
@@ -58,8 +57,7 @@ Source files containing Lout and PostScript source code for the packages
        diagf            Diag diagram drawing package
        diagf.etc        A file included by diagf
        diagf.lpg        A PostScript prepend file needed by diagf
-       eqf              Eq equation formatting package
-       mathf            Math, an alternative equation formatting package
+       mathf            Math, a mathematics formatting package
        graphf           Graph graph drawing package
        graphf.etc       A file included by graphf
        graphf.lpg       A PostScript prepend file needed by graphf
@@ -85,12 +83,14 @@ Source files containing Lout and PostScript source code for the packages
 Obsolete source files retained for backward compatibility
 ---------------------------------------------------------
 
-       tab              Tab table formatting package (OBSOLETE, use tbl)
-       tabf             Tab table formatting package (OBSOLETE)
-       tabf.lpg         A PostScript prepend file needed by tabf (OBSOLETE)
-       fig              Fig advanced graphics package (OBSOLETE, use diag)
-       figf             Fig advanced graphics package (OBSOLETE)
-       figf.lpg         A PostScript prepend file needed by figf (OBSOLETE)
+       eq               Eq equation formatting package (obsolete, use math)
+       eqf              Eq equation formatting package
+       tab              Tab table formatting package (obsolete, use tbl)
+       tabf             Tab table formatting package
+       tabf.lpg         A PostScript prepend file needed by tabf
+       fig              Fig advanced graphics package (obsolete, use diag)
+       figf             Fig advanced graphics package
+       figf.lpg         A PostScript prepend file needed by figf
 
 Miscellaneous source files
 --------------------------
@@ -104,4 +104,4 @@ Miscellaneous source files
 
 
 Jeffrey H. Kingston
-12 April 2007
+19 September 2008

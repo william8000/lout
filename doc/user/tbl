@@ -17,12 +17,12 @@ tables. @Index { tables }
    X { Value of mathematical formulae (millions of dollars) }
 @Rowb
    A { Quadratic formula }
-   B { @Eq { x ^= { minus b +- sqrt { b sup 2 - 4ac } } over 2a } }
+   B { @M { x ^= { minus b +- sqrt { b sup 2 - 4ac } } over 2a } }
    C { 3^.5 }
 @Rowb
    A { Binomial theorem }
-   B { @Eq { ( a + b ) sup n ^= big sum from k=0 to infty
-matrix atleft { ( } atright { ) } { n above k } a sup k b sup n-k
+   B { @M { ( a + b ) sup n ^= sum from { k=0 } to { infty }
+pmatrix { row ccol n row ccol k } a sup k b sup n-k
 } }
    C { 12^ }
 }

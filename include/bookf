@@ -849,10 +849,10 @@ def @BookSetup
 
 		No  @Yield {
 		        Yes @BeginAllCounters {}
-		        Yes @BeginDisplayCounter {}
-		        Yes @BeginFigureCounter {}
-		        Yes @BeginTableCounter {}
-		        Yes @BeginFloaterCounter {}
+		    //  Yes @BeginDisplayCounter {}
+		    //  Yes @BeginFigureCounter {}
+		    //  Yes @BeginTableCounter {}
+		    //  Yes @BeginFloaterCounter {}
 		    //	@PageList
 			    @ColumnNumber { @ColumnNumber }
 			    @PageHeaders { @PageHeaders }
@@ -869,10 +869,10 @@ def @BookSetup
 
 		Yes @Yield {
 		        Yes @BeginAllCounters {}
-		        Yes @BeginDisplayCounter {}
-		        Yes @BeginFigureCounter {}
-		        Yes @BeginTableCounter {}
-		        Yes @BeginFloaterCounter {}
+		    //  Yes @BeginDisplayCounter {}
+		    //  Yes @BeginFigureCounter {}
+		    //  Yes @BeginTableCounter {}
+		    //  Yes @BeginFloaterCounter {}
 		    //  @IntroPageList
 			    @ColumnNumber { 1 }
 			    @PageHeaders { @PageHeaders }
@@ -1137,6 +1137,7 @@ def @BookSetup
 	named @PartTitle {}
 	named @PartText {}
         named @BypassNumber { dft }
+	named @BypassWord { dft }
         body @Body
     {
 
@@ -1162,7 +1163,8 @@ def @BookSetup
 	def @MajorNum
 	{
 	    @ChapterNumbers @Then @InitialLanguage @Language {
-		chapter @WordVal @ChapterWord @ChapterShortNum
+               # chapter @WordVal @ChapterWord @ChapterShortNum
+	       @BypassWord @Dft {chapter @WordVal @ChapterWord} @ChapterShortNum
 	    }
 	}
 
@@ -1374,7 +1376,8 @@ def @BookSetup
 	    headingformat { @Num @ChapterHeadingFormat @Body }
 	    incontents { @ChapterInContents }
 	    contentsindent { @ChapterContentsIndent }
-	    word { chapter @WordVal @ChapterWord }
+            # word { chapter @WordVal @ChapterWord }
+	    word { @BypassWord @Dft { chapter @WordVal @ChapterWord } }
 	    numbers { @ChapterNumbers }
 	    attachnum { @ChapterList&&preceding @Tagged @Tag }
 	    retrievenum { @ChapterList&&@Tag @Open { num } }

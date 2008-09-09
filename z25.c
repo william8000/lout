@@ -1,7 +1,7 @@
 /*@z25.c:Object Echo:aprint(), cprint(), printnum()@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -1061,8 +1061,7 @@ void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
       debug2(ANY, D, "++ %d %s ", (int) y, Image(type(y)));
       DebugObject(y);
     }
-    else
-    if( type(y) == GAP_OBJ )
+    else if( type(y) == GAP_OBJ )
     {
       debug4(ANY, D, "| %d %-7s %20s %s", (int) y, "gap_obj",
 	Image(type(y)), EchoGap(&gap(y)));
@@ -1095,8 +1094,15 @@ void DebugGalley(OBJECT hd, OBJECT pinpt, int indent)
     }
     else if( is_definite(type(y)) )
     {
-      debug4(ANY, D, "| %d %-7s %20s %s", (int) y, "def_obj",
-	Image(type(y)), is_word(type(y)) ? string(y):STR_EMPTY);
+      debug5(ANY, D, "| %d %-7s %20s %s width %s", (int) y, "def_obj",
+	Image(type(y)), is_word(type(y)) ? string(y):STR_EMPTY,
+	EchoLength(size(y, COLM)));
+      if( size(y, COLM) > 25 * CM )
+      {
+	debug0(ANY, D, "wide object: {");
+	DebugObject(y);
+	debug0(ANY, D, "}");
+      }
     }
     else if( is_indefinite(type(y)) )
     {

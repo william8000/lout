@@ -151,7 +151,20 @@ produce other kinds of boxes:
 These also have {@Code "margin"}, {@Code "linewidth"}, {@Code "paint"},
 and @Code "texture" options, and @Code "@ShadowBox" has a @Code "shadow"
 option which determines the thickness of the shadow (its default value
-is {@Code "0.2f"}).
+is {@Code "0.2f"}).  There is no option to change the colour of the
+shadow, but it is quite easy to combine two boxes to get that effect:
+@ID @OneRow @Code @Verbatim {
+lightgrey @Colour @ShadowBox margin { 0c } black @Colour @Box
+{
+   A shadow box
+}
+}
+produces
+@CD lightgrey @Colour @ShadowBox margin { 0c } black @Colour @Box
+{
+   A shadow box
+}
+in which the shadow, and only the shadow, is coloured light grey.
 @PP
 Boxes are quite at home inside paragraphs, as @Box { a box },
 @CurveBox { a curve box }, and @ShadowBox { a shadow box }

@@ -25,6 +25,86 @@ errordict begin
    } def
 end
 
+/lgraphdebugposy 432 def
+/lgraphdebugposx 72 def
+
+% - lgraphdebugnextline -
+/lgraphdebugnextline
+{
+  lgraphdebugposy 72 lt
+  { /lgraphdebugposx lgraphdebugposx 144 add store
+    /lgraphdebugposy 432 store
+  }
+  {
+    /lgraphdebugposy lgraphdebugposy 12 sub store
+  } ifelse
+  lgraphdebugposx lgraphdebugposy moveto
+} def
+
+% - lgraphdebugbeginindent -
+/lgraphdebugbeginindent
+{
+  /lgraphdebugposx lgraphdebugposx 12 add store
+} def
+
+% - lgraphdebugendindent -
+/lgraphdebugendindent
+{
+  /lgraphdebugposx lgraphdebugposx 12 sub store
+} def
+
+% <string> <int> lgraphdebugprint -
+% must be defined outside lgraphdict since used in arbitrary places
+% print <string> plus count or <int> stack entries, whichever is the smaller
+/lgraphdebugprint
+{
+  exch
+  gsave
+  initgraphics
+  lgraphdebugnextline
+  /Times-Roman findfont 10 scalefont setfont
+  0 setgray show
+  lgraphdebugbeginindent
+  count 1 sub 2 copy lt { pop } { exch pop } ifelse 1 sub
+  0 exch 1 exch
+  {
+    lgraphdebugnextline
+    index
+    dup type (dicttype) eq
+    {
+      (begin dict) show
+      lgraphdebugbeginindent
+      {
+	lgraphdebugnextline
+	pop 100 string cvs show
+      } forall
+      lgraphdebugendindent
+      lgraphdebugnextline
+      (end dict) show
+    }
+    {
+      dup type (arraytype) eq
+      {
+        (begin array) show
+        lgraphdebugbeginindent
+	{
+	  lgraphdebugnextline
+	  100 string cvs show
+	} forall
+	lgraphdebugendindent
+	lgraphdebugnextline
+        (end array) show
+      }
+      {
+        100 string cvs show
+      } ifelse
+    } ifelse
+  } for
+  lgraphdebugendindent
+  grestore
+} def
+
+
 /lgraphdict 200 dict def
 lgraphdict begin
 
@@ -319,103 +399,187 @@ lgraphdict begin
 } def
 
 
-% cross: show a small cross
-/cross
-{ newpath
-  xcurr ycurr trpoint moveto
-  symbolsize neg symbolsize neg rmoveto
-  symbolsize 2 mul symbolsize 2 mul rlineto
-  0 symbolsize -2 mul rmoveto
-  symbolsize -2 mul symbolsize 2 mul rlineto
-  [] 0 setdash stroke
+% docross: show a cross with a given symbolsize and symbollinewidth
+% <x> <y> <symbolsize> <symbollinewidth> docross -
+/docross
+{
+  setlinewidth
+  /ss exch def
+  newpath
+  moveto
+  ss neg ss neg rmoveto
+  ss 2 mul ss 2 mul rlineto
+  0 ss -2 mul rmoveto
+  ss -2 mul ss 2 mul rlineto
+  [] 0 setdash 0 setlinecap stroke
 } def
 
-% plus: show a small plus
-/plus
-{ newpath
-  xcurr ycurr trpoint moveto
-  symbolsize neg 0 rmoveto
-  symbolsize 2 mul 0 rlineto
-  symbolsize neg symbolsize neg rmoveto
-  0 symbolsize 2 mul rlineto
-  [] 0 setdash stroke
+% cross: show a cross
+% - cross -
+/cross { xcurr ycurr trpoint symbolsize symbollinewidth docross } def
+
+% doplus: show a plus with a given symbolsize and symbollinewidth
+% <x> <y> <symbolsize> <symbollinewidth> doplus -
+/doplus
+{
+  setlinewidth
+  /ss exch def
+  newpath
+  moveto
+  ss neg 0 rmoveto
+  ss 2 mul 0 rlineto
+  ss neg ss neg rmoveto
+  0 ss 2 mul rlineto
+  [] 0 setdash 0 setlinecap stroke
 } def
 
-% square: show a small square
-/square
-{ newpath
-  xcurr ycurr trpoint moveto
-  symbolsize neg symbolsize neg rmoveto
-  symbolsize 2 mul 0 rlineto
-  0 symbolsize 2 mul rlineto
-  symbolsize -2 mul 0 rlineto
+% plus: show a plus
+% - plus -
+/plus { xcurr ycurr trpoint symbolsize symbollinewidth doplus } def
+
+% dosquare: show an open square with a given symbolsize and symbollinewidth
+% NB symbolsize is reduced by half the line width to get size exactly right
+% <x> <y> <symbolsize> <symbollinewidth> dosquare -
+/dosquare
+{
+  dup setlinewidth
+  0.5 mul sub 0 max /ss exch def
+  newpath
+  moveto
+  ss neg ss neg rmoveto
+  ss 2 mul 0 rlineto
+  0 ss 2 mul rlineto
+  ss -2 mul 0 rlineto
   closepath [] 0 setdash stroke
 } def
 
-% filledsquare: show a small filled square
-/filledsquare
-{ newpath
-  xcurr ycurr trpoint moveto
-  symbolsize neg symbolsize neg rmoveto
-  symbolsize 2 mul 0 rlineto
-  0 symbolsize 2 mul rlineto
-  symbolsize -2 mul 0 rlineto
-  closepath gsave [] 0 setdash stroke grestore fill
+% square: show an open square
+% - square -
+/square { xcurr ycurr trpoint symbolsize symbollinewidth dosquare } def
+
+% dofilledsquare: show filled square with given symbolsize and symbollinewidth
+% NB symbollinewidth is not used
+% <x> <y> <symbolsize> <symbollinewidth> dofilledsquare -
+/dofilledsquare
+{
+  pop /ss exch def
+  newpath
+  moveto
+  ss neg ss neg rmoveto
+  ss 2 mul 0 rlineto
+  0 ss 2 mul rlineto
+  ss -2 mul 0 rlineto
+  closepath fill
 } def
 
-% diamond: show a small diamond
-/diamond
-{ newpath
-  xcurr ycurr trpoint moveto
-  symbolsize neg 0 rmoveto
-  symbolsize symbolsize neg rlineto
-  symbolsize symbolsize rlineto
-  symbolsize neg symbolsize rlineto
+% filledsquare: show a filled square
+% - filledsquare -
+/filledsquare { xcurr ycurr trpoint symbolsize symbollinewidth dofilledsquare } def
+
+% dodiamond: show an open diamond with a given symbolsize and symbollinewidth
+% NB symbolsize is reduced by half the line width to get size exactly right
+% <x> <y> <symbolsize> <symbollinewidth> dodiamond -
+/dodiamond
+{
+  dup setlinewidth
+  0.5 mul sub 0 max /ss exch def
+  newpath
+  moveto
+  ss neg 0 rmoveto
+  ss ss neg rlineto
+  ss ss rlineto
+  ss neg ss rlineto
   closepath [] 0 setdash stroke
 } def
 
-% filleddiamond: show a small filled diamond
-/filleddiamond
-{ newpath
-  xcurr ycurr trpoint moveto
-  symbolsize neg 0 rmoveto
-  symbolsize symbolsize neg rlineto
-  symbolsize symbolsize rlineto
-  symbolsize neg symbolsize rlineto
-  closepath gsave [] 0 setdash stroke grestore fill
+% diamond: show an open diamond
+% - diamond -
+/diamond { xcurr ycurr trpoint symbolsize symbollinewidth dodiamond } def
+
+% dofilleddiamond: show filled diamond with given symbolsize and symbollinewidth
+% NB symbollinewidth is not used
+% <x> <y> <symbolsize> <symbollinewidth> dofilleddiamond -
+/dofilleddiamond
+{
+  pop /ss exch def
+  newpath
+  moveto
+  ss neg 0 rmoveto
+  ss ss neg rlineto
+  ss ss rlineto
+  ss neg ss rlineto
+  closepath fill
 } def
 
-% circle: show a small circle
-/circle
-{ newpath
-  xcurr ycurr trpoint symbolsize 0 360 arc [] 0 setdash stroke
+% filleddiamond: show a filled diamond
+% - filleddiamond -
+/filleddiamond { xcurr ycurr trpoint symbolsize symbollinewidth dofilleddiamond } def
+
+% docircle: show an open circle with a given symbolsize and symbollinewidth
+% NB symbolsize is reduced by half the line width to get size exactly right
+% <x> <y> <symbolsize> <symbollinewidth> docircle -
+/docircle
+{
+  dup setlinewidth
+  0.5 mul sub 0 max /ss exch def
+  newpath
+  ss 0 360 arc [] 0 setdash stroke
 } def
 
-% filledcircle: show a small filled circle
-/filledcircle
-{ newpath
-  xcurr ycurr trpoint symbolsize 0 360 arc gsave [] 0 setdash stroke grestore fill
+% circle: show an open circle
+% - circle -
+/circle { xcurr ycurr trpoint symbolsize symbollinewidth docircle } def
+
+% dofilledcircle: show filled circle with given symbolsize and symbollinewidth
+% NB symbollinewidth is not used
+% <x> <y> <symbolsize> <symbollinewidth> dofilledcircle -
+/dofilledcircle
+{
+  pop /ss exch def
+  newpath
+  ss 0 360 arc fill
 } def
 
-% triangle: show a small triangle
-/triangle
-{ newpath
-  xcurr ycurr trpoint moveto
-  0 symbolsize 1.5 mul rmoveto
-  symbolsize neg symbolsize -2.5 mul rlineto
-  symbolsize 2 mul 0 rlineto
+% filledcircle: show a filled circle
+% - filledcircle -
+/filledcircle { xcurr ycurr trpoint symbolsize symbollinewidth dofilledcircle } def
+
+% dotriangle: show an open triangle with a given symbolsize and symbollinewidth
+% NB symbolsize is reduced by half the line width to get size exactly right
+% <x> <y> <symbolsize> <symbollinewidth> dotriangle -
+/dotriangle
+{
+  dup setlinewidth
+  0.5 mul sub 0 max /ss exch def
+  newpath
+  moveto
+  0 ss 1.5 mul rmoveto
+  ss neg ss -2.5 mul rlineto
+  ss 2 mul 0 rlineto
   closepath [] 0 setdash stroke
 } def
 
-% filledtriangle: show a small filled triangle
-/filledtriangle
-{ newpath
-  xcurr ycurr trpoint moveto
-  0 symbolsize 1.5 mul rmoveto
-  symbolsize neg symbolsize -2.5 mul rlineto
-  symbolsize 2 mul 0 rlineto
-  closepath gsave [] 0 setdash stroke grestore fill
+% triangle: show an open triangle
+% - triangle -
+/triangle { xcurr ycurr trpoint symbolsize symbollinewidth dotriangle } def
+
+% dofilledtriangle: show filled triangle with symbolsize and symbollinewidth
+% NB symbollinewidth is not used
+% <x> <y> <symbolsize> <symbollinewidth> dofilledtriangle -
+/dofilledtriangle
+{
+  pop /ss exch def
+  newpath
+  moveto
+  0 ss 1.5 mul rmoveto
+  ss neg ss -2.5 mul rlineto
+  ss 2 mul 0 rlineto
+  closepath fill
 } def
+
+% filledtriangle: show a filled triangle
+% - filledtriangle -
+/filledtriangle { symbolsize symbollinewidth dofilledtriangle } def
 
 
 %plog: like log only with a base, and protected from failing if <= 0

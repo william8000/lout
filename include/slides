@@ -46,6 +46,7 @@
   # @InitialSpace	{ lout			} # initial space style
   # @InitialLanguage	{ English		} # initial language
   # @InitialColour	{ black			} # initial colour
+  # @InitialBackgroundColour { white		} # initial background colour
   # @OptimizePages	{ No			} # optimize page breaks?
   # @HeadingFont	{ Bold			} # font for @Heading
   # @FixedWidthFont	{ Courier Base -1p	} # font for @F
@@ -295,6 +296,7 @@
   # @IntroPageNumbers	{ Roman			} # intro page numbers
   # @IntroFirstPageNumber{ 1			} # number of first intro page 
   # @StructPageNums	{ No			} # make structured page numbers
+  # @PageNumberFormat   { number                } # format of all page numbers
 
   # @OddTop		{ @Centre{- @PageNum -}	} # Simple page headers
   # @OddFoot		{ @Null			}
@@ -357,6 +359,10 @@
   # @OverheadNumbers		{ Arabic	} # kind of overhead numbers
   # @FirstOverheadNumber	{ 1		} # first overhead num
   # @TitlePageFont		{ Helvetica Base 1.5f 	} # title page font
+  # @TitleFormat		{ @Center clines @Break title } # title line
+  # @AuthorFormat		{ @Center clines @Break author } # author line
+  # @InstitutionFormat		{ @Center clines @Break @I institution } # inst
+  # @DateLineFormat		{ @Center date          } # date line
   # @AboveTitleGap		{ 0.5i			} # gap above title
   # @AboveAuthorGap		{ 1.0i			} # gap above author
   # @AboveInstitutionGap	{ 0.5i			} # gap above inst

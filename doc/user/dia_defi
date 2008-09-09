@@ -16,17 +16,17 @@ symbols that @@Diag offers for helping you create complex shapes.
 As explained earlier, a node outline is drawn over its {@I base}, which
 is a rectangle containing the following object plus margins.  The base
 defines a coordinate system with the point (0, 0) at the bottom left
-corner, and @Eq { (xsize, ysize) } at the top right:
+corner, and @M { (xsize, ysize) } at the top right:
 @CD @OneRow @Diag {
 @Box
     nodelabelmargin { 0.3f }
-    blabel { @Eq { ysize } }
+    blabel { @M { ysize } }
     blabelprox { E }
-    clabel { @Eq { 0 } }
+    clabel { @M { 0 } }
     clabelprox { E }
-    dlabel { @Eq { xsize } }
+    dlabel { @M { xsize } }
     dlabelprox { N }
-    alabel { @Eq { 0 } }
+    alabel { @M { 0 } }
     alabelpos { SW }
     alabelprox { N }
     paint { lightgrey }
@@ -144,11 +144,11 @@ arc goes anticlockwise; to get a clockwise arc, use
 {@Code "["}{@I point}{@Code " clockwise]"}.
 @PP
 Two points may be separated by
-@Eq { [x sub 1 ``` y sub 1 ```  x sub 2 ``` y sub 2 & ] }, which requests
+@M { [x sub 1 ``` y sub 1 ```  x sub 2 ``` y sub 2 ] }, which requests
 that a Bezier curve be drawn between them with control points
 bezier.curve @Index { Bezier curve }
-@Eq { (x sub 1 & , y sub 1 & ) } and
-@Eq { (x sub 2 & , y sub 2 & ) }:
+@M { (x sub 1 , y sub 1 ) } and
+@M { (x sub 2 , y sub 2 ) }:
 @CD @Diag {
 @Node
     outline {
@@ -167,10 +167,10 @@ bezier.curve @Index { Bezier curve }
     clabelprox { SW }
     dlabelprox { NW }
     outlinestyle { cdashed cdashed cdashed noline }
-    alabel { @Eq { ( x sub 0 , y sub 0 ) } }
-    blabel { @Eq { ( x sub 1 , y sub 1 ) } }
-    clabel { @Eq { ( x sub 2 , y sub 2 ) } }
-    dlabel { @Eq { ( x sub 3 , y sub 3 ) } }
+    alabel { @M { ( x sub 0 , y sub 0 ) } }
+    blabel { @M { ( x sub 1 , y sub 1 ) } }
+    clabel { @M { ( x sub 2 , y sub 2 ) } }
+    dlabel { @M { ( x sub 3 , y sub 3 ) } }
 { 6c @Wide 2c @High }
 //
 @Link

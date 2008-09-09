@@ -108,7 +108,7 @@ def @Texture
 export
 
     @InitialFont @InitialBreak @InitialOutdent @InitialSpace @InitialLanguage
-    @InitialColour @OptimizePages @HeadingFont
+    @InitialColour @InitialBackgroundColour @OptimizePages @HeadingFont
     @ParaGap @ParaIndent @DisplayGap @DisplayIndent @DefaultIndent
     @DisplayNumStyle @WideIndent @VeryWideIndent
     @ListGap @ListIndent @ListRightIndent
@@ -132,8 +132,9 @@ export
     @NoDotSep @NoDotJoin @Join @Sep @DotSep @ColonSep @DotJoin @DashJoin
     @NumSep @VStrut @ZeroWidth @ZeroHeight @OverStrike @Sup @Sub @HClip @VClip
     @FullWidthRule @LocalWidthRule @Box @CurveBox @ShadowBox @BoundaryMarks
-    @NumberMarker @NumberOf @TitleMarker @TitleOf
-    @PageMarker @PageMark @NoLinkPageMark @PageOf @CrossLink @ExternalLink
+    @DocInfo @NumberMarker @NumberOf @TitleMarker @TitleOf
+    @PageMarker @PageMark @NoLinkPageMark @PageOf @PageParityOf
+    @CrossLink @ExternalLink
 
     @BeginDisplayCounter
 
@@ -263,6 +264,7 @@ def @BasicSetup
     named @InitialSpace	  { lout		} # initial space style
     named @InitialLanguage{ English		} # initial language
     named @InitialColour  { black		} # initial colour
+    named @InitialBackgroundColour { white	} # initial background colour
     named @OptimizePages  { No			} # optimize page breaks?
     named @HeadingFont	  { Bold		} # font for @Heading
     named @FixedWidthFont { Courier Base -1p	} # font for @F
@@ -343,7 +345,7 @@ def @BasicSetup
 	right x
     {
 	def @Filter {
-	  "(echo @RawVerbatim @Begin ; (cat" @FilterIn "|" command "); echo @End @Verbatim ) >" @FilterOut }
+	  "(echo @RawVerbatim @Begin ; (cat" @FilterIn "|" command "); echo @End @RawVerbatim ) >" @FilterOut }
 
 	x
     }
@@ -1136,8 +1138,38 @@ def @BasicSetup
 
     ##########################################################################
     #                                                                        #
+    #  @DocInfo                                                              #
+    #                                                                        #
+    ##########################################################################
+
+    def @DocInfo
+      named author {}
+      named title {}
+      named keywords {}
+    {
+      { @BackEnd @Case {
+	PostScript @Yield
+	{
+	  "[" author @Case {
+	    "" @Yield ""
+	    else @Yield { "/Author ("author")" } }
+	  title @Case {
+	    "" @Yield ""
+	    else @Yield { "/Title ("title")" } }
+	  keywords @Case {
+	    "" @Yield ""
+	    else @Yield { "/Keywords ("keywords")" } }
+	  "/DOCINFO pdfmark"
+	}
+	else @Yield @Null
+      } } @Graphic { }
+    }
+
+
+    ##########################################################################
+    #                                                                        #
     #  @NumberMarker, @NumberOf, @TitleMarker, @TitleOf,                     #
-    #  @PageMark, @PageOf, @CrossLink, @ExternalLink                         #
+    #  @PageMark, @PageOf, @PageparityOf, @CrossLink, @ExternalLink          #
     #                                                                        #
     #  NB the default value ?? is desperately important for unsorted         #
     #  reference lists numbered by first appearance (@NumberOf @Tag),        #
@@ -1177,11 +1209,12 @@ def @BasicSetup
     }
 
 
-    export num rawnum @Tag
+    export @Tag num rawnum parity
     def @PageMarker
 	named @Tag {}
 	named num {}
 	named rawnum {}
+	named parity {}
     {
 	@PageLabel num
     }
@@ -1202,6 +1235,12 @@ def @BasicSetup
 	right tag
     {
 	@PageMarker&&tag @Open { num }
+    }
+
+    def @PageParityOf
+	right tag
+    {
+	@PageMarker&&tag @Open { parity }
     }
 
     def @CrossLink

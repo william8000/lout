@@ -2,9 +2,9 @@
 /*****************************************************************************/
 /*                                                                           */
 /*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
-/*  COPYRIGHT (C) 2000, 2006 Jeffrey H. Kingston                             */
+/*  COPYRIGHT (C) 2000, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Part of Lout Version 3.36, July 2007                                     */
+/*  Part of Lout Version 3.37, September 2008                                */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -784,8 +784,6 @@ TOKEN HaskellCharacterToken = {
 };
 
 
-
-
 /*****************************************************************************/
 /*                                                                           */
 /*  Identifiers, in the form common to most programming languages.           */
@@ -1082,9 +1080,8 @@ TOKEN HaskellCommentToken = {
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
-
-
 
+
 /*****************************************************************************/
 /*                                                                           */
 /*  Tokens defining escape comments in various languages.                    */
@@ -1205,25 +1202,25 @@ TOKEN PythonCommentEscapeToken = {
 };
 
 TOKEN HaskellCommentEscapeToken = {
-	U "Lout escape",
-	PRINT_NODELIMS_UNQUOTED,
-	U "",
-	U "",
-	U "",
-	FALSE,
-	{ U "{-@" },
-	{ NULL },
-	{ NULL },
-	{ NULL },
-	AllPrintablePlusTab,
-	U "",
-	U "",
-	U "",
-	U "",
-	U "",
-	U "-}",
-	FALSE,
-	FALSE,
+  U "Lout escape",
+  PRINT_NODELIMS_UNQUOTED,
+  U "",
+  U "",
+  U "",
+  FALSE,
+  { U "{-@" },
+  { NULL },
+  { NULL },
+  { NULL },
+  AllPrintablePlusTab,
+  U "",
+  U "",
+  U "",
+  U "",
+  U "",
+  U "-}",
+  FALSE,
+  FALSE,
 };
 
 TOKEN HaskellLineCommentEscapeToken = {
@@ -1247,9 +1244,7 @@ TOKEN HaskellLineCommentEscapeToken = {
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
-
 
-
 
 /*****************************************************************************/
 /*                                                                           */
@@ -1318,6 +1313,7 @@ TOKEN DollarToken		= FixedToken("$",  "@PO");
 TOKEN ImpliesToken		= FixedToken("=>","@A sym {arrowdblright} @PO");
 TOKEN LeftArrowToken		= FixedToken("<-", "@A sym {arrowleft} @PO");
 TOKEN HaskellLambdaToken	= FixedToken("\\", "@PLAMBDA");
+TOKEN HaskellAtPatternToken	= FixedToken("@", "@PO");
 TOKEN DoubleColonToken		= FixedToken("::",  "@PDOUBLECOLON");
 TOKEN FunctionCompositionToken	= FixedToken(" . ",  "@PCIRC");
 TOKEN HaskellEquivalenceToken	= FixedToken("==",  "@A sym {equivalence} @PO");
@@ -1325,7 +1321,7 @@ TOKEN HaskellConcatenationToken = FixedToken("++", "@PPLUSPLUS");
 TOKEN EqvToken			= FixedToken("<=>","@A sym {arrowdblboth} @PO");
 TOKEN HaskellOrToken		= FixedToken("||", "@PO");
 TOKEN HaskellAndToken		= FixedToken("&&", "@PO");
-TOKEN HaskellBacktickToken	= FixedToken("`", "@PO");
+/* TOKEN HaskellBacktickToken	= FixedToken("`", "@PO"); unused */
 TOKEN PythonPowerToken          = FixedToken( "**",  "@PO" );
 TOKEN PythonBitLeftShiftToken   = FixedToken( "<<",  "@PO" );
 TOKEN PythonBitRightShiftToken  = FixedToken( ">>",  "@PO" );
@@ -1485,7 +1481,6 @@ TOKEN RSLApplyToken      = FixedToken("#",  "@A sym{degree} @PO" ) ;
 TOKEN RSLImplExprToken   = FixedToken("[=",  "@Eq { sqsubseteq } @FA @PO" ) ;
 TOKEN RSLPrimeToken      = NoParameterToken( "'", "{'}" ) ;
 TOKEN RSLExistsOneToken  = FixedToken("exists!",  "{@Sym existential}! @FA @PO" );
-
 
 
 /*****************************************************************************/
@@ -2946,6 +2941,7 @@ LANGUAGE PythonLanguage = {
        or part of the language per-se. */
   }
 };
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -2986,7 +2982,6 @@ LANGUAGE RubyLanguage = {
   }
 };
 
-
 
 /*****************************************************************************/
 /*                                                                           */
@@ -3043,7 +3038,6 @@ LANGUAGE BlueLanguage = {
 };
 
 
-
 /*****************************************************************************/
 /*                                                                           */
 /*  Java                                                                     */
@@ -3076,6 +3070,7 @@ LANGUAGE JavaLanguage = {
     "volatile", "while",
   }
 };
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -3121,7 +3116,7 @@ LANGUAGE NonpareilLanguage = {
     "false", "true", "self", "and", "or", "not"
   }
 };
-
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -3148,19 +3143,20 @@ LANGUAGE HaskellLanguage = {
     &LeftParenToken, &RightParenToken, &LeftBracketToken, &RightBracketToken,
     &LeftBraceToken, &RightBraceToken, &EiffelNotEqualToken, &LessEqualToken,
     &ImpliesToken, &GreaterEqualToken, &HaskellConcatenationToken,
-    &HaskellOperatorToken, &HaskellOrToken, &HaskellAndToken 
+    &HaskellOperatorToken, &HaskellOrToken, &HaskellAndToken,
+    &HaskellAtPatternToken
   },
   {
     "case", "class", "data", "default", "deriving", "do",
     "else", "if", "import", "in", "infix", "infixl", "infixr", "instance",
-    "let", "module", "newtype", "of", "then", "type", "where",
+    "let", "mdo", "module", "newtype", "of", "then", "type", "where",
 
     "as", "hiding", "qualified",
 
     "True", "False"
   }
 };
-
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -3205,7 +3201,7 @@ LANGUAGE RSLLanguage = {
     "write", "is", "exists", "all"
   }
 };
-
+
 
 /*****************************************************************************/
 /*                                                                           */

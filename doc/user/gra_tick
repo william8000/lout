@@ -152,7 +152,7 @@ y ticks:
     @Data
         pairs { filledyhisto }
         colour { blue }
-        linewidth { 1 pt }
+        linewidth { 1p }
     {
         0 340
         1 410
@@ -205,7 +205,7 @@ y ticks:
     @Data
         pairs { solid }
         colour { red }
-        linewidth { 1 pt }
+        linewidth { 1p }
     {
         0.0 24
         1.0 24
@@ -250,7 +250,7 @@ come to yet, but anyway its source is:
     rticks { 0@ 50@ 100@ 150@ 200@ 250@ 300@ 350@ 400@ 450@ }
     yticks {}
 {
-    @Data pairs { filledyhisto } colour { blue } linewidth { 1 pt }
+    @Data pairs { filledyhisto } colour { blue } linewidth { 1p }
     {
         0 340 1 410 2 430 3 340 4 290 5 175 6 140
         7 125 8 110 9 100 10 85 11 175 12 0
@@ -279,7 +279,7 @@ come to yet, but anyway its source is:
     xticklength { 0c }
     yticks { -30@ -20@ -10@ 0@ 10@ 20@ 30@ 40@ }
 {
-    @Data pairs { solid } colour { red } linewidth { 1 pt }
+    @Data pairs { solid } colour { red } linewidth { 1p }
     {
         0.0 24 1.0 24 2.0 25 3.0 26 4.0 26 5.0 26 6.0
        26 7.0 27 8.0 26 9.0 27 10.0 28 11.0 28 12.0 26

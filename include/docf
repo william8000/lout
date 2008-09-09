@@ -412,10 +412,10 @@ def @OrdinarySetup
 	{ @ColourCommand @InitialColour } @SetColour
         {
 		Yes @BeginAllCounters {}
-		Yes @BeginDisplayCounter {}
-		Yes @BeginFigureCounter {}
-		Yes @BeginTableCounter {}
-		Yes @BeginFloaterCounter {}
+	    //  Yes @BeginDisplayCounter {}
+	    //  Yes @BeginFigureCounter {}
+	    //  Yes @BeginTableCounter {}
+	    //  Yes @BeginFloaterCounter {}
             //  @BackEnd @Case {
 
 		    PlainText @Yield {

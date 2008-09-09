@@ -316,4 +316,15 @@ probably best to set @Code "@SectionGap" and some similar options to
 {@Code "2b"} (meaning new page) as well.  The @Code "@NumberSeparator"
 setup file option (Section {@NumberOf largescale}) affects the format
 of the structured page numbers.
+@PP
+There is a @Code "@PageNumberFormat" setup file option that
+pagenumberformat. @Index @Code "@PageNumberFormat"
+allows a uniform format to be applied to every page number.
+Its default value,
+@ID @Code "@PageNumberFormat { number }"
+just produces the number.  To change the format, change the
+object within the braces.  For example,
+@ID @Code "@PageNumberFormat { (number) }"
+will cause parentheses to be printed around every page number, and so
+on.
 @End @Section

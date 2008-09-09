@@ -18,7 +18,7 @@ gnu. @Index { GNU Public License }
 primary source is directory
 @ID @Code "ftp://ftp.it.usyd.edu.au/jeff/lout"
 containing a gzipped tar file of the current version
-(currently {@Code "lout-3.36.tar.gz"}), and various other things including
+(currently {@Code "lout-3.37.tar.gz"}), and various other things including
 a PostScript version of this guide.  The distribution contains source code,
 libraries, documentation, license, and installation instructions.
 @PP
@@ -27,7 +27,8 @@ Lout.  To subscribe (or unsubscribe), visit
 @ID @Code "http://lists.planix.com/mailman/options.cgi/lout-users/"
 After subscribing, to post an item send email to
 {@Code "lout-users@lists.planix.com"}; it will be forwarded to all
-subscribers via email.
+subscribers via email.  There is also a Lout web
+site at {@Code "http://lout.wiki.sourceforge.net/"}.
 @PP
 Lout began in 1984 as a research project into the design of a high-level
 language for document formatting.  At that time my name for the subject

@@ -139,15 +139,15 @@ stubsub.diagrams @Index { @Code "@StubSub" symbol (diagrams) }
 @ID @OneRow {
 @Code @Verbatim {
 @Tree {
-@Circle @Eq { a }
-@StubSub @Eq { T tsub a }
+@Circle @Math { a }
+@StubSub @Math { T tsub a }
 }
 }
 ||7ct
 @Diag {
 @Tree {
-@Circle @Eq { a }
-@StubSub @Eq { T tsub a }
+@Circle @Math { a }
+@StubSub @Math { T tsub a }
 }
 }
 }
@@ -238,19 +238,19 @@ end of the stub path:
 @ID @OneRow {
 @Code @Verbatim {
 @Tree {
-@Circle @Eq { a }
+@Circle @Math { a }
 @StubSub from { SW } to { SE }
 @Box outlinestyle { noline }
-    @Eq { T tsub a }
+    @Math { T tsub a }
 }
 }
 ||7ct
 @Diag {
 @Tree {
-@Circle @Eq { a }
+@Circle @Math { a }
 @StubSub from { SW } to { SE }
 @Box outlinestyle { noline }
-    @Eq { T tsub a }
+    @Math { T tsub a }
 }
 }
 }

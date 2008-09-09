@@ -134,8 +134,11 @@ example, right now @@CurrFamily is @CurrFamily and @@CurrFace is
 @CurrFace.
 @PP
 To inform Lout that certain fonts exist, it is necessary to create a
-database of @Code "@FontDef" symbols.  A typical entry in such a
-database looks like this:
+database of @Code "@FontDef" symbols.  (It is possible to have a
+@Code "@FontDef" symbol in an ordinary source file; it enters the
+cross-reference database in the usual way and is retrieved from there
+by the font machinery, but only from the second run, which is not
+convenient.)  A typical entry in such a database looks like this:
 @ID @OneRow @Code @Verbatim {
 { @FontDef
     @Tag { Times-Base }

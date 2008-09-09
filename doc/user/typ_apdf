@@ -25,4 +25,23 @@ the results are disappointing.  The only way to get the best of everything
 is to produce PostScript, and then either pass it through a `distillation'
 program to produce PDF, or else view it with a PostScript viewer that
 understands links.
+@PP
+When generating PostScript for subsequent distillation to PDF, the
+docinfo. @Index @Code "@DocInfo"
+@Code "@DocInfo" symbol may be useful.  Placed anywhere in the
+document, it generates PostScript which causes the subsequent PDF to
+contain a `document info dictionary' containing the author of the
+document, its title, and some keywords:
+@ID @Code @Verbatim {
+@DocInfo
+    author { Jeffrey H. Kingston }
+    title { A User's Guide to the Lout Document Formatting System }
+    keywords { Lout, PostScript, PDF }
+}
+The values of the options are restricted to sequences of simple words,
+as shown, since this is all that PDF document info dictionaries may
+contain.  All three options are optional; if one is omitted, the
+dictionary will simply not have the corresponding entry, which is
+legal in PDF.  There is no way to have the author and title taken
+automatically from @Code "@Author" and @Code "@Title" options.
 @End @Section

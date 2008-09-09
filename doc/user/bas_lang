@@ -33,30 +33,33 @@ At the time of writing, the following languages were available:
     B { Portuguese Português pt }
 @Rowa
     A { English en }
-    B { Russian ru }
+    B { Programming }
 @Rowa
     A { EnglishUK en-GB }
-    B { Slovak Slovensky Slovencina }
+    B { Russian ru }
 @Rowa
     A { Esperanto eo }
-    B { Slovenian Slovenia Slovenija sl }
+    B { Slovak Slovensky Slovencina }
 @Rowa
     A { Finnish Suomi fi }
-    B { Spanish Espa{@Char ntilde}ol es }
+    B { Slovenian Slovenia Slovenija sl }
 @Rowa
     A { French Francais Fran{@Char ccedilla}ais fr }
-    B { Swedish Svenska sv }
+    B { Spanish Espa{@Char ntilde}ol es }
 @Rowa
     A { German Deutsch de }
-    B { UpperSorbian hornjoserbsce serbsce }
+    B { Swedish Svenska sv }
 @Rowa
     A { Hungarian Magyar hu }
+    B { UpperSorbian hornjoserbsce serbsce }
 }
 File @Code "include/langdefs" in the distribution always has the exact
 list of known languages.  As shown, most languages have alternative
 names, all equally acceptable to the @Code "@Language"
 symbol.  @Code "EnglishUK" differs from @Code "English" only by applying
-hyphenation rules said to be more appropriate for British English.
+hyphenation rules said to be more appropriate for British English;
+@Code "Programming" is for programming languages and is used by the 
+symbols of Chapter {@NumberOf cprint}.
 @PP
 Since accented characters (Section {@NumberOf characters}) are always
 available irrespective of the language, at first sight it might seem

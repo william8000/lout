@@ -1,7 +1,7 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -647,7 +647,13 @@ OBJECT LexGetToken(void)
 	  }
 	}
 	else if( predefined(res) == 0 )
-	{ res = NewToken(CLOSURE, &file_pos, 0, 0, precedence(res), res);
+	{
+	  /* nice try but does not work for @Database @FontDef { ... } !! ***
+	  if( res == FontDefSym && ftype != DATABASE_FILE )
+	    Error(2, 26, "%s may only appear in a database file", FATAL,
+	      &file_pos, KW_FONTDEF);
+	  *** */
+	  res = NewToken(CLOSURE, &file_pos, 0, 0, precedence(res), res);
 	}
 	else if( predefined(res) == INCLUDE || predefined(res) == SYS_INCLUDE )
 	{ OBJECT t, fname;  FILE_NUM fnum;  int len;  BOOLEAN scope_suppressed;

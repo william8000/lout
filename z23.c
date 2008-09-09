@@ -1,7 +1,7 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -681,6 +681,14 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
     case LINK_DEST_NULL:
     case LINK_URL:
     
+      ifdebug(DGP, D,
+	Child(z, Down(x));
+	debug7(DGP, D, "[ FixAndPrintObject(%s %s%s, %s, %s, %s, %s, -)",
+	Image(type(x)),
+	((type(x)==LINK_DEST || type(x)==LINK_DEST_NULL) ? string(z):STR_EMPTY),
+	type(x)==LINK_DEST_NULL ? " (indef)" : "",
+	EchoLength(xmk), EchoLength(xb), EchoLength(xf), dimen(dim));
+      );
       CountChild(y, LastDown(x), count);
       if( dim == COLM )
 	save_mark(x) = xmk;
@@ -711,6 +719,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
 	    &aback, &afwd);
       *actual_back = xb;  *actual_fwd = xf;
+      debug0(DGP, D, "] FixAndPrintObject returning");
       break;
 
 
@@ -1012,6 +1021,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	if( link == x )
 	{
 	  *actual_back = back(x, dim); *actual_fwd = fwd(x, dim);
+	  FirstDefiniteLDN(x, link, y, jn, xmk, dim, NO_SUPPRESS, pg);
 	  break;  /* no definite children, nothing to print */
 	}
 
@@ -1177,8 +1187,8 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 				break;
 	  }
 
-	  debug2(DGP, DD, "ACAT %s %s",
-	    EchoStyle(&save_style(x)), EchoObject(x));
+	  debug1(DGP, DD, "ACAT COLM %s", EchoObject(x));
+	    /* EchoStyle(&save_style(x)), EchoObject(x)); */
 	  debug2(DGP, DD, "frame_size = %s, actual_size = %s",
 	    EchoLength(frame_size), EchoLength(actual_size));
 
@@ -1212,7 +1222,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    /* check for underlining */
 	    if( underline(prev) == UNDER_ON )
 	    {
-	      debug3(DGP, D, "  FAPO/ACAT1 underline() := %s for %s %s",
+	      debug3(DGP, DD, "  FAPO/ACAT1 underline() := %s for %s %s",
 	        bool(FALSE), Image(type(prev)), EchoObject(prev));
 	      if( !underlining )
 	      {
@@ -1237,7 +1247,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	      if( underline(g) == UNDER_OFF )
 	      {
 	        /* underlining ends here */
-	        debug2(DGP, D, "underlining ends at %s %s",
+	        debug2(DGP, DD, "underlining ends at %s %s",
 		  Image(type(prev)), EchoObject(prev));
 	        New(urec, UNDER_REC);
 	        back(urec, COLM) = underline_xstart;
@@ -1286,7 +1296,7 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    "FixAndPrint: underline(prev)!" );
 	  if( underline(prev) == UNDER_ON )
 	  {
-	    debug3(DGP, D, "  FAPO/ACAT1 underline() := %s for %s %s",
+	    debug3(DGP, DD, "  FAPO/ACAT1 underline() := %s for %s %s",
 	      bool(FALSE), Image(type(prev)), EchoObject(prev));
 	    if( !underlining )
 	    {
@@ -1329,20 +1339,24 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 
         }
       }
-      else for( link = Down(x);  link != x;  link = NextDown(link) )
-      {	Child(y, link);
-	if( !is_definite(type(y)) && type(y) != LINK_DEST_NULL )
-	{
-	  if( type(y) == UNDER_REC )   /* generate an underline now */
-	  { BackEnd->PrintUnderline(word_font(y),word_underline_colour(y),
-              word_texture(y), back(y, COLM), fwd(y, COLM), pg - xmk);
-	    link = PrevDown(link);     /* remove all trace of underlining */
-	    DisposeChild(Up(y));       /* in case we print this object again */
+      else
+      {
+	debug1(DGP, DD, "ACAT ROWM %s", EchoObject(x));
+	for( link = Down(x);  link != x;  link = NextDown(link) )
+	{ Child(y, link);
+	  if( !is_definite(type(y)) && type(y) != LINK_DEST_NULL )
+	  {
+	    if( type(y) == UNDER_REC )   /* generate an underline now */
+	    { BackEnd->PrintUnderline(word_font(y),word_underline_colour(y),
+		word_texture(y), back(y, COLM), fwd(y, COLM), pg - xmk);
+	      link = PrevDown(link);     /* remove all trace of underlining */
+	      DisposeChild(Up(y));       /* in case we print this again */
+	    }
+	    continue;
 	  }
-	  continue;
+	  y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
+		&aback, &afwd);
 	}
-	y = FixAndPrintObject(y, xmk, xb, xf, dim, NO_SUPPRESS, pg, count,
-	      &aback, &afwd);
       }
       *actual_back = xb;  *actual_fwd = xf;
       break;
@@ -1384,28 +1398,28 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       /* convert everyone to FIXED_COL_THR or FIXED_ROW_THR as appropriate */
       /* *** old code
       if( thr_state(x) == FINALSIZE )
-	debug1(DGP, D, "thr_state(%d)", (int) x);
+	debug1(DGP, DD, "thr_state(%d)", (int) x);
       assert(thr_state(x) != FINALSIZE, "FAPO/COL_THR: thr_state(x)!");
-      ifdebug(DGP, D,
+      ifdebug(DGP, DD,
 	link = Down(x);
 	uplink = Up(x);
 	while( link != x && uplink != x )
 	{
 	  Parent(tmp, uplink);
-	  debug1(DGP, D, "parnt: %s", EchoObject(tmp));
+	  debug1(DGP, DD, "parnt: %s", EchoObject(tmp));
 	  Child(tmp, link);
-	  debug1(DGP, D, "child: %s", EchoObject(tmp));
+	  debug1(DGP, DD, "child: %s", EchoObject(tmp));
 	  link = NextDown(link);
 	  uplink = NextUp(uplink);
 	}
 	while( uplink != x )
 	{ Parent(tmp, uplink);
-	  debug1(DGP, D, "extra parnt: %s", EchoObject(tmp));
+	  debug1(DGP, DD, "extra parnt: %s", EchoObject(tmp));
 	  uplink = NextUp(uplink);
 	}
 	while( link != x )
 	{ Child(tmp, link);
-	  debug1(DGP, D, "extra child: %s", EchoObject(tmp));
+	  debug1(DGP, DD, "extra child: %s", EchoObject(tmp));
 	  link = NextDown(link);
 	}
       )
@@ -1423,16 +1437,16 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
       }
       if( Up(x) != x || Down(x) != x )
       {
-	debug2(DGP, D, "links problem at %s %d:", Image(type(x)), (int) x);
+	debug2(DGP, DD, "links problem at %s %d:", Image(type(x)), (int) x);
 	if( Up(x) != x )
 	{
 	  Parent(tmp, Up(x));
-	  debug1(DGP, D, "first parent is %s", EchoObject(tmp));
+	  debug1(DGP, DD, "first parent is %s", EchoObject(tmp));
 	}
 	if( Down(x) != x )
 	{
 	  Child(tmp, Down(x));
-	  debug1(DGP, D, "first child is %s", EchoObject(tmp));
+	  debug1(DGP, DD, "first child is %s", EchoObject(tmp));
 	}
       }
       assert( Up(x) == x && Down(x) == x, "FAPO/COL_THR: x links!" );

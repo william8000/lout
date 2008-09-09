@@ -24,8 +24,8 @@ example, {@Code "@Bullet"} produces {@Code "o"}.  However, the @Code "@Char"
 and @Code "@Sym" symbols often produce unprintable characters, and are best
 avoided; }
 @LI { All font and size changes are ignored, since plain text has only
-one font and size.  Every character is taken to be @Eq { 1 frac 10 } inch
-wide and @Eq { 1 frac 6 } inch high; }
+one font and size.  Every character is taken to be @M { 1 frac 10 } inch
+wide and @M { 1 frac 6 } inch high; }
 @LI { No underlines are printed; }
 @LI { No margin notes are printed; }
 @LI { Scaled objects are not printed unless the scale factor happens to be 1; }
@@ -43,9 +43,9 @@ The worst problem with plain text is that characters cannot be placed at
 arbitrary points on the page.  A superscript, for example, is impossible to
 place correctly, so Lout uses a different layout for footnote labels (and
 makes a mess of equations, which are best avoided).  Because of this problem
-it's best to make all horizontal lengths multiples of @Eq {1 frac 10} inch
+it's best to make all horizontal lengths multiples of @M {1 frac 10} inch
 (conveniently expressed as {@Code 1s}), and all vertical lengths multiples
-of @Eq { 1 frac 6 } inch (conveniently expressed as {@Code 1f}).  To help
+of @M { 1 frac 6 } inch (conveniently expressed as {@Code 1f}).  To help
 you do this, the setup files contain many entries that look like this
 example:
 @ID @Code "# @InitialBreak { {adjust 1.2fx hyphen} @OrIfPlain {ragged 1fx nohyphen} }"

@@ -9,9 +9,6 @@ appropriate to your language, like this:
 @ID @OneRow @Code {
 "@SysInclude { cprint }"
 "@SysInclude { doc }"
-"@Doc @Text @Begin"
-"..."
-"@End @Text"
 }
 The @Code cprint setup file includes everything needed to set up for C
 program formatting; for the other languages, consult the second column
@@ -24,8 +21,7 @@ this for the C language:
 @IndentedDisplay @CP {
 #include <stdio.h>
 
-treeprint(p)        /* print tree p recursively */
-struct tnode *p;
+treeprint(struct tnode *p)        /* print tree p recursively */
 {
         if (p != NULL) {
                 treeprint(p->left);
@@ -42,8 +38,7 @@ modifications.  The result is
 @ID @OneRow @CP {
 #include <stdio.h>
 
-treeprint(p)        /* print tree p recursively */
-struct tnode *p;
+treeprint(struct tnode *p)        /* print tree p recursively */
 {
         if (p != NULL) {
                 treeprint(p->left);
@@ -56,9 +51,21 @@ We have chosen to use the @Code "@IndentedDisplay" symbol from Section
 {@NumberOf displays} to obtain an indented display, but in fact
 {@Code "@CP"}, {@Code "@Eiffel"} and the rest may appear anywhere at
 all:  the result is an object in the usual way, which may go
-anywhere.  When including a program text within a paragraph, use
-@Code "@OneCol @CP { ... }" (or @Code "@OneCol @Eiffel { ... }" etc. for
-other languages) to prevent it being broken across two lines, if desired.
+anywhere.
+@PP
+It is quite normal to include fragments of programs, particularly
+identifiers, within paragraphs; this is done in the obvious way:
+@ID @OneRow @Code @Verbatim {
+Calling @CP { remove_cooling_rods() } without checking @CP { temp } first
+is not recommended since it may cause the reactor to melt down.
+}
+Use @Code "@OneCol @CP { ... }" (or @Code "@OneCol @Eiffel { ... }" etc. for
+other languages) to prevent the program text being broken across two lines,
+if desired.  Hyphenation is on by default in computer programs; however,
+the current language is changed from @Code English or whatever to
+{@Code Programming}, whose hyhenation rules permit hyphenation after
+an underscore character or between a preceding lower-case letter
+and a following upper-case letter, but not elsewhere.
 @PP
 In cases where the program text has unbalanced braces, it is necessary to
 programs. @RawIndex { programs }
@@ -77,8 +84,8 @@ simply add one @Code "@SysInclude" line for each of them and proceed
 as before.  If your programming language is not currently supported,
 a viable alternative is
 @ID @Code "@F @Verbatim { ... }"
-These symbols cause the text between braces to be set verbatim in
-a fixed-width font, as explained elsewhere in this guide.  This fallback
+This causes the text between braces to be set verbatim in
+a fixed-width font, as explained elsewhere in this guide.  This
 method will not handle tab and formfeed characters very well.  Again,
 use @Code "@Verbatim @Begin ... @End @Verbatim" if your program text
 contains unbalanced braces.

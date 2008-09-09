@@ -1,7 +1,7 @@
 /*@z22.c:Galley Service:Interpose()@******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -576,7 +576,8 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
   FULL_CHAR *label_string, buff[MAX_LINE];
   FULL_LENGTH aback, afwd;
   int dim, pnval;
-  debug1(DGS, DD, "[ Promote(%s, stop_link):", SymName(actual(hd)));
+  debug2(DGS, DD, "[ Promote(%s width %s, stop_link):",
+    SymName(actual(hd)), EchoLength(size(hd, COLM)));
   ifdebug(DGS, DD, DebugGalley(hd, stop_link, 2));
 
   assert( type(hd) == HEAD, "Promote: hd!" );
@@ -893,6 +894,8 @@ void Promote(OBJECT hd, OBJECT stop_link, OBJECT dest_index, BOOLEAN join_after)
 	  {
 	    /* fix horizontally; work out which fonts needed */
 	    SetLengthDim(COLM);
+	    debug3(DGP,D, "  Promote calling FixAndPrint %s %s,%s", dimen(COLM),
+	      EchoLength(back(y,COLM)), EchoLength(fwd(y, COLM)));
 	    FixAndPrintObject(y, back(y, COLM), back(y, COLM), fwd(y, COLM),
 	      COLM, FALSE, 0, 0, &aback, &afwd);
 

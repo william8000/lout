@@ -182,12 +182,12 @@ format the overall document as though the object in question had
 zero width or height, but it will still print the entire object.
 @PP
 For example, you might have an inline equation that causes the
-line spacing to increase to accommodate it -- @E { 2 sup 2 sup N } say --
+line spacing to increase to accommodate it -- @M { 2 sup 2 sup N } say --
 but you would rather it didn't.  Writing
-@ID @Code "@ZeroHeight @E { 2 sup 2 sup N }"
+@ID @Code "@ZeroHeight @M { 2 sup 2 sup N }"
 causes Lout to pretend that the object has zero height, and so
 it will not increase the line spacing around this version of
-{@ZeroHeight @E { 2 sup 2 sup N }}, as you can see.
+{@ZeroHeight @M { 2 sup 2 sup N }}, as you can see.
 @PP
 The @Code "@HShift" and @Code "@VShift" symbols provide a way to move
 the printed object with respect to the zero-width one:

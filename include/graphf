@@ -47,13 +47,17 @@ def @GraphObj
 
 def @GraphCross
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath 0 0 moveto xsize ysize lineto 0 ysize moveto"
-	  "xsize 0 lineto [] 0 setdash stroke"
+	{
+	   # "newpath 0 0 moveto xsize ysize lineto 0 ysize moveto"
+	   # "xsize 0 lineto [] 0 setdash stroke"
+	   "lgraphdict begin xmark ymark xmark" symbollinewidth "docross"
+	   // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -72,13 +76,17 @@ def @GraphCross
 
 def @GraphPlus
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath xmark 0 moveto xmark ysize lineto 0 ymark moveto"
-	  "xsize ymark lineto [] 0 setdash stroke"
+	{
+	  # "newpath xmark 0 moveto xmark ysize lineto 0 ymark moveto"
+	  # "xsize ymark lineto [] 0 setdash stroke"
+	  "lgraphdict begin xmark ymark xmark" symbollinewidth "doplus"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -97,13 +105,17 @@ def @GraphPlus
 
 def @GraphSquare
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
-	  "0 ysize lineto closepath [] 0 setdash stroke"
+	{
+          # "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
+          # "0 ysize lineto closepath [] 0 setdash stroke"
+	  "lgraphdict begin xmark ymark xmark" symbollinewidth "dosquare"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -121,13 +133,17 @@ def @GraphSquare
 
 def @GraphFilledSquare
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
-	  "0 ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+	{
+	  # "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
+          # "0 ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+	  "lgraphdict begin xmark ymark xmark" symbollinewidth "dofilledsquare"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -145,13 +161,17 @@ def @GraphFilledSquare
 
 def @GraphDiamond
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
-	  "xmark ysize lineto closepath [] 0 setdash stroke"
+	{
+          # "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
+          # "xmark ysize lineto closepath [] 0 setdash stroke"
+	  "lgraphdict begin xmark ymark xmark" symbollinewidth "dodiamond"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -169,13 +189,17 @@ def @GraphDiamond
 
 def @GraphFilledDiamond
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
-	  "xmark ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+	{
+          # "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
+          # "xmark ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+	  "lgraphdict begin xmark ymark xmark" symbollinewidth "dofilleddiamond"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -194,13 +218,17 @@ def @GraphFilledDiamond
 
 def @GraphCircle
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath xmark ymark xmark 0 360 arc"
-	  "[] 0 setdash stroke"
+	{
+          # "newpath xmark ymark xmark 0 360 arc"
+          # "[] 0 setdash stroke"
+	  "lgraphdict begin xmark ymark xmark" symbollinewidth "docircle"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -244,12 +272,16 @@ def @GraphCircle
 
 def @GraphFilledCircle
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath xmark ymark xmark 0 360 arc"
-	  "gsave [] 0 setdash stroke grestore fill"
+	{
+          # "newpath xmark ymark xmark 0 360 arc"
+          # "gsave [] 0 setdash stroke grestore fill"
+	  "lgraphdict begin xmark ymark xmark" symbollinewidth "dofilledcircle"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -297,13 +329,17 @@ def @GraphFilledCircle
 
 def @GraphTriangle
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
-	  "closepath [] 0 setdash stroke"
+	{
+          # "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
+          # "closepath [] 0 setdash stroke"
+	  "lgraphdict begin xmark ymark xmark" symbollinewidth "dotriangle"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -321,13 +357,17 @@ def @GraphTriangle
 
 def @GraphFilledTriangle
     import @LoutLengths named symbolsize { 0.15f }
+    import @PSLengths named symbollinewidth { 0.5p }
 {
   @BackEnd @Case {
 
     PostScript @Yield {
 	@HContract @VContract
-	{ "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
-	  "closepath gsave [] 0 setdash stroke grestore fill"
+	{
+          # "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
+          # "closepath gsave [] 0 setdash stroke grestore fill"
+	 "lgraphdict begin xmark ymark xmark" symbollinewidth "dofilledtriangle"
+	  // "end"
 	}
 	@Graphic
 	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
@@ -579,6 +619,7 @@ def @Graph
     import @PSLengths named dashlength			{ 0.2f		}
     import @PSLengths named linewidth			{ "currentlinewidth" }
     import @PSLengths named symbolsize			{ 0.15f		}
+    import @PSLengths named symbollinewidth		{ "currentlinewidth" }
     body @Body
 @Begin
 
@@ -657,6 +698,7 @@ def @Graph
 	import @PSLengths named dashlength              { dashlength }
 	import @PSLengths named linewidth               { linewidth  }
 	import @PSLengths named symbolsize              { symbolsize }
+	import @PSLengths named symbollinewidth         { symbollinewidth }
 	named dataformat                                { dataformat }
 	body data
     {
@@ -799,7 +841,8 @@ def @Graph
 	  "{" @Pairs "}"
 	  "{ /dashlength" dashlength "def"
 	  "  /linewidth"  linewidth  "def" @ColourCommand colour
-	  "  /symbolsize" symbolsize "def }"
+	  "  /symbolsize" symbolsize "def"
+	  "  /symbollinewidth" symbollinewidth "def }"
 	  "{" @Paint "}"
 	  "{" texture "}"
        "]"

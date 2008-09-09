@@ -85,6 +85,7 @@ options, consult Section {@NumberOf setup}; here we just explain how
 the relevant options work.  The options and their default values are
 paragap @Index @Code "@ParaGap"
 paraindent @Index @Code "@ParaIndent"
+displaygap @Index @Code "@DisplayGap"
 @ID @OneRow @Code {
 "@ParaGap { 1.30vx }"
 "@ParaIndent { 2.00f }"

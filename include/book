@@ -43,6 +43,7 @@
   # @InitialSpace	{ lout			} # initial space style
   # @InitialLanguage	{ English		} # initial language
   # @InitialColour	{ black			} # initial colour
+  # @InitialBackgroundColour { white		} # initial background colour
   # @OptimizePages	{ No			} # optimize page breaks?
   # @HeadingFont	{ Bold			} # font for @Heading
   # @FixedWidthFont	{ Courier Base -1p	} # font for @F
@@ -299,6 +300,7 @@
   # @IntroPageNumbers	{ Roman			} # intro page numbers
   # @IntroFirstPageNumber{ 1			} # number of first intro page 
   # @StructPageNums	{ No			} # make structured page numbers
+  # @PageNumberFormat   { number                } # format of all page numbers
 
   # @OddTop		{ @Centre{- @PageNum -}	} # Simple page headers
   # @OddFoot		{ @Null			}

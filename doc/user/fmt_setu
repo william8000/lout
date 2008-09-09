@@ -92,6 +92,7 @@ use. @Index @Code "@Use"
   # @InitialSpace { lout }
   # @InitialLanguage { English }
   # @InitialColour { black }
+  # @InitialBackgroundColour { white }
   # @OptimizePages { No }
   # @HeadingFont { Bold }
   # @ParaGap { 1.3vx @OrIfPlain 1f }

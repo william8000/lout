@@ -1976,28 +1976,28 @@ with the symbols' precedences in parentheses.
 @Rowh
 @Rowa
   A { @I number @Code "=" @I number }
-  B { @Eq { non = }; also between lengths (79) }
+  B { @M { non = }; also between lengths (79) }
 @Rowa
   A { @I number @Code "!=" @I number }
-  B { @Eq { non != }; also between lengths (79) }
+  B { @M { non != }; also between lengths (79) }
 @Rowa
   A { @I number @Code "==" @I number }
-  B { @Eq { non = } between angles (79) }
+  B { @M { non = } between angles (79) }
 @Rowa
   A { @I number @Code "!==" @I number }
-  B { @Eq { non != } between angles (79) }
+  B { @M { non != } between angles (79) }
 @Rowa
   A { @I number @Code "<=" @I number }
-  B { @Eq { non <= }; also between lengths (79) }
+  B { @M { non <= }; also between lengths (79) }
 @Rowa
   A { @I number @Code "<" @I number }
-  B { @Eq { non < }; also between lengths (79) }
+  B { @M { non < }; also between lengths (79) }
 @Rowa
   A { @I number @Code ">=" @I number }
-  B { @Eq { non >= }; also between lengths (79) }
+  B { @M { non >= }; also between lengths (79) }
 @Rowa
   A { @I number @Code ">" @I number }
-  B { @Eq { non > }; also between lengths (79) }
+  B { @M { non > }; also between lengths (79) }
 @Rowa
   A { @Code "not" @I boolean }
   B { Logical not (78) }

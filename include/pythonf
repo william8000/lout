@@ -424,8 +424,9 @@ def @PythonSetup
 
         def "''" { "''" }
 
+	Programming @Language
 	{ @InitFontFamily Base @InitSize } @Font @InitSpace @Space
-	{ @InitLine lines nohyphen "blanklinescale" @InitBLS } @Break @Body
+	{ @InitLine lines "blanklinescale" @InitBLS } @Break @Body
 
     @End @Python
 

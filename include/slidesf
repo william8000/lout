@@ -21,6 +21,14 @@ def @OverheadSetup
     named @OverheadNumbers		{ Arabic		}
     named @FirstOverheadNumber		{ 1			}
     named @TitlePageFont		{ Helvetica Base      	}
+    named @TitleFormat
+            right title                 { @Center clines @Break title }
+    named @AuthorFormat
+            right author                { @Center clines @Break author }
+    named @InstitutionFormat
+            right institution           { @Center clines @Break @I institution }
+    named @DateLineFormat
+            right date                  { @Center date          }
     named @AboveTitleGap		{ 0.5i			}
     named @AboveAuthorGap		{ 1.0i			}
     named @AboveInstitutionGap		{ 0.5i			}
@@ -144,9 +152,9 @@ def @OverheadSetup
 	def @DatePart
 	{
 	    @DateLine @Case {
-		No	@Yield { @Null		    }
-		Yes	@Yield { |0.5rt @Date     | }
-		else	@Yield { |0.5rt @DateLine | }
+		No	@Yield { @Null	    }
+		Yes	@Yield { @Date      }
+		else	@Yield { @DateLine  }
 	    }
 	}
 
@@ -155,11 +163,11 @@ def @OverheadSetup
 	    @TitlePageFont @Font @InitialBreak @Break
 	    @InitialSpace @Space clines @Break {
 		//0.5i
-	        //@AboveTitleGap       |0.5rt 1.5f @Font @InitialBreak @Break
-			           @InitialSpace @Space clines @Break @Title |
-		//@AboveAuthorGap      |0.5rt clines @Break @Author |
-		//@AboveInstitutionGap |0.5rt clines @Break @I @Institution |
-		//@AboveDateLineGap    @DatePart
+               //@AboveTitleGap   1.5f @Font @InitialBreak @Break
+                                  @InitialSpace @Space @TitleFormat @Title |
+               //@AboveAuthorGap      @AuthorFormat @Author |
+               //@AboveInstitutionGap @InstitutionFormat @Institution |
+               //@AboveDateLineGap    @DateLineFormat @DatePart |
 	    }
 	}
 

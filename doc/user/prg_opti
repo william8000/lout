@@ -31,9 +31,7 @@ section was in @Code fixed style; we can switch styles like this:
     style { varying }
 {
 #include <stdio.h>
-
-treeprint(p)        /* print tree p recursively */
-struct tnode *p;
+treeprint(struct tnode *p)        /* print tree p recursively */
 {
         if (p != NULL) {
                 treeprint(p->left);
@@ -47,9 +45,7 @@ The result in this case will be
 @ID @OneRow @CP style { varying }
 {
 #include <stdio.h>
-
-treeprint(p)        /* print tree p recursively */
-struct tnode *p;
+treeprint(struct tnode *p)        /* print tree p recursively */
 {
         if (p != NULL) {
                 treeprint(p->left);
@@ -62,9 +58,7 @@ If we use @Code "style { symbol }" we get this:
 @ID @OneRow @CP style { symbol }
 {
 #include <stdio.h>
-
-treeprint(p)        /* print tree p recursively */
-struct tnode *p;
+treeprint(struct tnode *p)        /* print tree p recursively */
 {
         if (p != NULL) {
                 treeprint(p->left);
@@ -121,9 +115,8 @@ receive line numbers or not.  It has three acceptable values:  {@Code "Yes"},
 the default value, meaning that blank lines are printed with line numbers,
 just like other lines; {@Code No}, meaning that blank lines are not
 assigned line numbers; and {@Code NoPrint}, meaning that blank lines
-are assigned line numbers but these numbers are not printed, so that
-the line numbers printed before and after a single blank line will
-differ by 2.
+are assigned line numbers but these are not printed, so that the line
+numbers printed before and after a blank line will differ by 2.
 @PP
 The {@Code "style"} option is already familiar.  Next comes {@Code "font"},
 which determines the font family to use, {@Code "size"},

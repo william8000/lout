@@ -72,7 +72,7 @@ the limits of a sum are laid out differently depending on the context:
 @CAND {
   @Math { { sum from { i = 0 } to { n } { i sup 2 } } over { x + y } } }
 @CAND {
-  @Math { sum from { i = 0 } to { n } { i sup 2 } } }
+  @Math { sum from { i = 0 } to { n } } }
 @EndAlignedDisplays
 
 Similarly, the @Code { "big" } symbol that is used in @Code { "@Eq" } to
@@ -145,24 +145,24 @@ equation layout.
 
 @PP
 Besides, @Code "@Math" provides several new symbols.  Symbols @Code
-"atop" and @Code "below" behave similarly to @Code "from" and @Code
-"to" in @Code "@Eq", respectively.  In other words, @Code "atop" prints
+"above" and @Code "below" behave similarly to @Code "from" and @Code
+"to" in @Code "@Eq", respectively.  In other words, @Code "above" prints
 its left parameter on top of its right parameter, while @Code "below"
 does the opposite operation:
 
-@ID { @Code { "@M { { a atop f } + { z below b } }" }
+@ID { @Code { "@M { { a above f } + { z below b } }" }
 |8ct
-@M { { a atop f } + { z below b } } }
+@M { { a above f } + { z below b } } }
 
 @ID {
 { @Code {
-"@Math { sum from { { 1 <= i <= p } atop"
-"                 { 1 <= j <= q } atop"
+"@Math { sum from { { 1 <= i <= p } above"
+"                 { 1 <= j <= q } above"
 "                 { 1 <= k <= r } }"
 "        { a sub { ij } b sub { jk } c sub { ki } } }" }
 |8ct
-@Math { sum from { { 1 <= i <= p } atop
-                 { 1 <= j <= q } atop
+@Math { sum from { { 1 <= i <= p } above
+                 { 1 <= j <= q } above
                  { 1 <= k <= r } }
         { a sub { ij } b sub { jk } c sub { ki } } } } }
 
@@ -190,12 +190,12 @@ situations such as the one illustrated below:
 
 @ID { @Code {
 "@Math {"
-"  lim atop @SubScriptStyle { i --> infinity }"
+"  lim above @SubScriptStyle { i --> infinity }"
 "     f(x) = { g(x) } over { h(x) } }"
 }
 |8ct
 @Math {
-  lim atop @SubScriptStyle { i --> infinity }
+  lim above @SubScriptStyle { i --> infinity }
       f(x) = { g(x) } over { h(x) } }
 }
 

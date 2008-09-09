@@ -1012,10 +1012,10 @@ ldiagdict begin
    setmatrix
 } def
 
-% arrow head styles
-/ldiagopen     0.0 def
-/ldiaghalfopen 0.5 def
-/ldiagclosed   1.0 def
+% arrow head styles (unused)
+% /ldiagopen     0.0 def
+% /ldiaghalfopen 0.5 def
+% /ldiagclosed   1.0 def
 
 % stroke no arrows, forward, back, and both
 /ldiagnoarrow { pop pop pop pop pop pop pop pop                        } def
@@ -3199,35 +3199,66 @@ ldiagdict begin
 } def
 
 % shape and labels of the @OpenArrowHead symbol
-% <pathwidth> ldiagopenarrowhead -
+% <pathwidth> <pathgap> ldiagopenarrowhead -
 /ldiagopenarrowhead
 {
+  /pathgap exch def
   /pathwidth exch def
   /PSW [ 0 0 ] cvx def
   /PNW [ 0 ysize ] cvx def
   /PE  [ xsize ysize 0.5 mul ] cvx def
   /REL [ 0 0 pathwidth PE PNW ldiagangleto 90 add ldiagatangle ] cvx def
-  /PNA [ 0 ysize 0.5 mul pathwidth 0.5 mul add ] cvx def
-  /PSA [ 0 ysize 0.5 mul pathwidth 0.5 mul sub ] cvx def
-  /PNI [ PNA PNA xsize 0 ldiagpadd PNW REL ldiagpadd
-	 PE REL ldiagpadd ldiaglineintersect ] cvx def
-  /PSI [ 0 pathwidth PNI ldiagpsub ] cvx def
+  pathgap 0 eq
+  {
+    /PNA [ 0 ysize 0.5 mul pathwidth 0.5 mul add ] cvx def
+    /PSA [ 0 ysize 0.5 mul pathwidth 0.5 mul sub ] cvx def
+    /PNI [ PNA PNA xsize 0 ldiagpadd PNW REL ldiagpadd
+	   PE REL ldiagpadd ldiaglineintersect ] cvx def
+    /PSI [ 0 pathwidth PNI ldiagpsub ] cvx def
 
-  PSW PE PNW PNI PNA PSA PSI PSW
+    PSW PE PNW PNI PNA PSA PSI PSW
+  }
+  {
+    /PNA [ 0 ysize 0.5 mul pathgap 0.5 mul add pathwidth 0.5 mul add ] cvx def
+    /PSA [ 0 ysize 0.5 mul pathgap 0.5 mul sub pathwidth 0.5 mul sub ] cvx def
+    /PNI [ PNA PNA xsize 0 ldiagpadd PNW REL ldiagpadd
+	   PE REL ldiagpadd ldiaglineintersect ] cvx def
+    /PSI [ 0 pathwidth pathgap add PNI ldiagpsub ] cvx def
+    /PXA [ 0 pathwidth PNA ldiagpsub ] cvx def
+    /PXI [ 0 pathwidth PNI ldiagpsub ] cvx def
+    /PYA [ 0 pathwidth PSA ldiagpadd ] cvx def
+    /PYI [ 0 pathwidth PSI ldiagpadd ] cvx def
+
+    PSW PE PNW PNI PNA PXA PXI PYI PYA PSA PSI PSW
+  } ifelse
 } def
 
 % shape and labels of the @HalfOpenArrowHead symbol
-% <pathwidth> ldiaghalfopenarrowhead -
+% <pathwidth> <pathgap> ldiaghalfopenarrowhead -
 /ldiaghalfopenarrowhead
 {
+  /pathgap exch def
   /pathwidth exch def
   0 0
   xsize ysize 0.5 mul
   0 ysize
-  xsize 0.3 mul ysize 0.5 mul pathwidth 0.5 mul add
-  0             ysize 0.5 mul pathwidth 0.5 mul add
-  0             ysize 0.5 mul pathwidth 0.5 mul sub
-  xsize 0.3 mul ysize 0.5 mul pathwidth 0.5 mul sub
+  pathgap 0 eq
+  {
+    xsize 0.3 mul ysize 0.5 mul pathwidth 0.5 mul add
+    0             ysize 0.5 mul pathwidth 0.5 mul add
+    0             ysize 0.5 mul pathwidth 0.5 mul sub
+    xsize 0.3 mul ysize 0.5 mul pathwidth 0.5 mul sub
+  }
+  {
+    xsize 0.3 mul ysize 0.5 mul pathgap 0.5 mul add pathwidth 0.5 mul add
+    0             ysize 0.5 mul pathgap 0.5 mul add pathwidth 0.5 mul add
+    0             ysize 0.5 mul pathgap 0.5 mul add pathwidth 0.5 mul sub
+    xsize 0.3 mul ysize 0.5 mul pathgap 0.5 mul add pathwidth 0.5 mul sub
+    xsize 0.3 mul ysize 0.5 mul pathgap 0.5 mul sub pathwidth 0.5 mul add
+    0             ysize 0.5 mul pathgap 0.5 mul sub pathwidth 0.5 mul add
+    0             ysize 0.5 mul pathgap 0.5 mul sub pathwidth 0.5 mul sub
+    xsize 0.3 mul ysize 0.5 mul pathgap 0.5 mul sub pathwidth 0.5 mul sub
+  } ifelse
   0 0
 } def
 
@@ -3245,9 +3276,10 @@ ldiagdict begin
 } def
 
 % shape and labels of the @OpenCurvedArrowHead symbol
-% <pathwidth> ldiagopencurvedarrowhead -
+% <pathwidth> <pathgap> ldiagopencurvedarrowhead -
 /ldiagopencurvedarrowhead
 {
+  /pathgap exch def
   /pathwidth exch def
   /LR [ 0 0 xsize ysize 0.5 mul ldiaglinebetween
 	xsize 0 xsize ysize ldiaglineintersect
@@ -3256,29 +3288,52 @@ ldiagdict begin
 	xsize 0 xsize ysize ldiaglineintersect
       ] cvx def
   /PW2 [ pathwidth 0.5 mul ] cvx def
-  /UMID [
-      0 ysize 0.5 mul PW2 add
-      xsize ysize 0.5 mul PW2 add
-      0 ysize 0 0 1 ft UR 0 ysize ldiagangleto 90 add ldiagatangle
-      ldiagpadd 0 ysize ldiaglineintersect
-      ] cvx def
-  /LMID [ 0 pathwidth UMID ldiagpsub ] cvx def
   0 0
   [LR clockwise]
   xsize ysize 0.5 mul
   [UR clockwise]
   0 ysize
-  UMID
-  0 ysize 0.5 mul PW2 add
-  0 ysize 0.5 mul PW2 sub
-  LMID
+  pathgap 0 eq
+  {
+    /UMID [
+	0 ysize 0.5 mul PW2 add
+	xsize ysize 0.5 mul PW2 add
+	0 ysize 0 0 1 ft UR 0 ysize ldiagangleto 90 add ldiagatangle
+	ldiagpadd 0 ysize ldiaglineintersect
+    ] cvx def
+    /LMID [ 0 pathwidth UMID ldiagpsub ] cvx def
+    UMID
+    0 ysize 0.5 mul PW2 add
+    0 ysize 0.5 mul PW2 sub
+    LMID
+  }
+  {
+    /UMIDU [
+	0 ysize 0.5 mul PW2 add pathgap 0.5 mul add
+	xsize ysize 0.5 mul PW2 add pathgap 0.5 mul add
+	0 ysize 0 0 1 ft UR 0 ysize ldiagangleto 90 add ldiagatangle
+	ldiagpadd 0 ysize ldiaglineintersect
+    ] cvx def
+    /UMIDL [ 0 pathwidth UMIDU ldiagpsub ] cvx def
+    /LMIDL [ 0 pathgap 0 pathwidth UMIDU ldiagpsub ldiagpsub ] cvx def
+    /LMIDU [ 0 pathwidth LMIDL ldiagpadd ] cvx def
+    UMIDU
+    0 UMIDU exch pop
+    0 UMIDL exch pop
+    UMIDL
+    LMIDU
+    0 LMIDU exch pop
+    0 LMIDL exch pop
+    LMIDL
+  } ifelse
   0 0
 } def
 
 % shape and labels of the @HalfOpenCurvedArrowHead symbol
-% <pathwidth> ldiaghalfopencurvedarrowhead -
+% <pathwidth> <pathgap> ldiaghalfopencurvedarrowhead -
 /ldiaghalfopencurvedarrowhead
 {
+  /pathgap exch def
   /pathwidth exch def
   /LR [ 0 0 xsize ysize 0.5 mul ldiaglinebetween
 	xsize 0 xsize ysize ldiaglineintersect
@@ -3289,19 +3344,37 @@ ldiagdict begin
   /BR [ 0 0 LR 0 ysize UR ldiaglineintersect ] cvx def
   /BRAD [ 0 0 BR ldiagdistance ] cvx def
   /PW2 [ pathwidth 0.5 mul ] cvx def
-  /XDIST [ BRAD dup mul PW2 dup mul sub sqrt ] cvx def
-  /UMID [ BR XDIST PW2 ldiagpadd ] cvx def
-  /LMID [ BR XDIST 0 PW2 sub ldiagpadd ] cvx def
   0 0
   [LR clockwise]
   xsize ysize 0.5 mul
   [UR clockwise]
   0 ysize
   [BR clockwise]
-  UMID
-  0 ysize 0.5 mul PW2 add
-  0 ysize 0.5 mul PW2 sub
-  LMID
+  pathgap 0 eq
+  {
+    /XDIST [ BRAD dup mul PW2 dup mul sub sqrt ] cvx def
+    /UMID [ BR XDIST PW2 ldiagpadd ] cvx def
+    /LMID [ BR XDIST 0 PW2 sub ldiagpadd ] cvx def
+    UMID
+    0 ysize 0.5 mul PW2 add
+    0 ysize 0.5 mul PW2 sub
+    LMID
+  }
+  {
+    /XDIST [ BRAD dup mul PW2 dup mul sub sqrt ] cvx def
+    /UMIDU [ BR XDIST PW2 pathgap 0.5 mul add ldiagpadd ] cvx def
+    /UMIDL [ 0 pathwidth UMIDU ldiagpsub ] cvx def
+    /LMIDL [ BR XDIST 0 PW2 sub pathgap 0.5 mul sub ldiagpadd ] cvx def
+    /LMIDU [ 0 pathwidth LMIDL ldiagpadd ] cvx def
+    UMIDU
+    0 UMIDU exch pop
+    0 UMIDL exch pop
+    UMIDL
+    LMIDU
+    0 LMIDU exch pop
+    0 LMIDL exch pop
+    LMIDL
+  } ifelse
   [BR clockwise]
   0 0
 } def

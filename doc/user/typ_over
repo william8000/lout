@@ -221,6 +221,10 @@ are some of these options and their default values:
   # @LectureNumbers { Arabic }
   # @OverheadNumbers { Arabic }
   # @TitlePageFont { Helvetica Base }
+  # @TitleFormat { @Center clines @Break title }
+  # @AuthorFormat { @Center clines @Break author }
+  # @InstitutionFormat { @Center clines @Break @I institution }
+  # @DateLineFormat { @Center date }
   # @AboveTitleGap { 0.5i }
   # @AboveAuthorGap { 1.0i }
   # @AboveInstitutionGap { 0.5i }
@@ -242,7 +246,8 @@ produces `Contents' in the current language.  @Code "@LectureNumbers"
 and @Code "@OverheadNumbers" determine the style of numbering of lectures
 and overheads, and may be {@Code None}, {@Code Arabic}, {@Code Roman},
 {@Code UCRoman}, {@Code Alpha}, or {@Code UCAlpha} as usual.  Next come
-options for setting the font of the overall title page, the gap
+options for setting the font of the overall title page, the format of
+the title, author, institution, and dateline parts of it, the gap
 above the title, author, institution, and dateline that appear on that
 page; then options controlling the appearance of the headings at the
 start of each lecture and overhead, and finally options which determine

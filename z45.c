@@ -1,7 +1,7 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.36)                       */
-/*  COPYRIGHT (C) 1991, 2007 Jeffrey H. Kingston                             */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
 /*  School of Information Technologies                                       */
@@ -98,6 +98,115 @@ int ReadOneLine(FILE *fp, FULL_CHAR *buff, int buff_len)
   buff[count++] = '\0';
   return 1;
 } /* end ReadOneLine */
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  int ReadOneBinaryLine(FILE *fp, char *buff, int buff_len, int *count)    */
+/*                                                                           */
+/*  Contributed by William Bader, July 2008, mainly to allow included EPS    */
+/*  files to contain null characters.                                        */
+/*                                                                           */
+/*  Read one line of fp, up to and including the following newline           */
+/*  sequence, which may be a CH_LF/CH_CR pair as well as singleton.          */
+/*  Place the contents of the line into *buff including the line ending.     */
+/*  Set count to the total number of characters written into *buff.          */
+/*  Adds a terminating null (not included in count).                         */
+/*                                                                           */
+/*  If remaining_len is >= 0, then read at most that many characters and     */
+/*  decrement remaining_len by the number of characters read.                */
+/*                                                                           */
+/*  The buffer has space for buff_len characters.                            */
+/*  If space runs out, terminate the read early; the unread portion          */
+/*  will be read by the next call to ReadOneLine().  This code assumes       */
+/*  that buff_len is at least 3.                                             */
+/*                                                                           */
+/*  Return values are as follows:                                            */
+/*                                                                           */
+/*     0   Did not read a line because EOF was encountered immediately       */
+/*     1   Successfully read a line, empty or otherwise, into *buff          */
+/*     2   Read a line but had to stop early owing to buffer overflow        */
+/*                                                                           */
+/*****************************************************************************/
+
+int ReadOneBinaryLine(FILE *fp, FULL_CHAR *buff, int buff_len, int *count_ptr,
+  long *remaining_len)
+{ int ch;
+  int len1 = buff_len - 3;
+
+  /* read characters up to the end of line or file or remaining_len */
+  int count = 0;
+  while( (ch = getc(fp)) != EOF && ch != CH_LF && ch != CH_CR )
+  {
+    if( *remaining_len >= 0 )
+    {
+      if( *remaining_len == 0 )
+      {
+       ch = EOF;
+       break;
+      }
+      (*remaining_len)--;
+    }
+    buff[count++] = ch;
+    if( count >= len1 )
+    {
+      *count_ptr = count;
+      return 2;
+    }
+  }
+
+  /* terminate gracefully depending what character we stopped at */
+  if( ch == EOF )
+  {
+    if( count == 0 ) {
+      *count_ptr = 0;
+      return 0;
+    }
+  }
+  else if( ch == CH_LF )
+  {
+    /* consume any immediately following CH_CR too */
+    if( *remaining_len > 0 )
+    {
+      (*remaining_len)--;
+    }
+    buff[count++] = ch;
+    ch = getc(fp);
+    if( ch != CH_CR )
+      ungetc(ch, fp);
+    else
+    {
+      if( *remaining_len > 0 )
+      {
+        (*remaining_len)--;
+      }
+      buff[count++] = ch;
+    }
+  }
+  else /* ch == CH_CR */
+  {
+    /* consume any immediately following CH_LF too */
+    if( *remaining_len > 0 )
+    {
+      (*remaining_len)--;
+    }
+    buff[count++] = ch;
+    ch = getc(fp);
+    if( ch != CH_LF )
+      ungetc(ch, fp);
+    else
+    {
+      if( *remaining_len > 0 )
+      {
+        (*remaining_len)--;
+      }
+      buff[count++] = ch;
+    }
+  }
+  buff[count] = '\0';
+  *count_ptr = count;
+  return 1;
+} /* end ReadOneBinaryLine */
 
 
 /*****************************************************************************/
