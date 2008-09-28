@@ -1,6 +1,6 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.38)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -148,7 +148,7 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
   }
   else
   {
-    /* execute the command, echo error messages, and exit if status problem */
+    /* execute the command, echo error messages, and check status */
     status = system( (char *) command);
     err_fp = StringFOpen(FILTER_ERR, READ_FILE);
     if( err_fp != NULL )
@@ -157,24 +157,30 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
       fclose(err_fp);
       StringRemove(FILTER_ERR);
     }
-    if( status != 0 )
-      Error(40, 4, "failure (non-zero status) of filter: %s",
-        FATAL, &fpos(x), command);
-
-    /* read in output of system command as a Lout object */
-    Child(scope_snapshot, LastDown(x));
-    LoadScopeSnapshot(scope_snapshot);
-    debug0(DFS, D, "  calling DefineFile from FilterExecute");
-    filter_out_file =
-      DefineFile(string(sym_body(FilterOutSym)), STR_EMPTY, &fpos(x),
-        FILTER_FILE, SOURCE_PATH);
-    LexPush(filter_out_file, 0, FILTER_FILE, 1, FALSE);
-    t = NewToken(BEGIN, &fpos(x), 0, 0, BEGIN_PREC, FilterOutSym);
-    res = Parse(&t, nilobj, FALSE, FALSE);
-    LexPop();
-    ClearScopeSnapshot(scope_snapshot);
-    StringRemove(string(sym_body(FilterOutSym)));
-    sym_body(FilterOutSym) = filter_out_filename;
+    if( status == 0 )
+    {
+      /* system command succeeded; read in its output as a Lout object */
+      Child(scope_snapshot, LastDown(x));
+      LoadScopeSnapshot(scope_snapshot);
+      debug0(DFS, D, "  calling DefineFile from FilterExecute");
+      filter_out_file =
+	DefineFile(string(sym_body(FilterOutSym)), STR_EMPTY, &fpos(x),
+	  FILTER_FILE, SOURCE_PATH);
+      LexPush(filter_out_file, 0, FILTER_FILE, 1, FALSE);
+      t = NewToken(BEGIN, &fpos(x), 0, 0, BEGIN_PREC, FilterOutSym);
+      res = Parse(&t, nilobj, FALSE, FALSE);
+      LexPop();
+      ClearScopeSnapshot(scope_snapshot);
+      StringRemove(string(sym_body(FilterOutSym)));
+      sym_body(FilterOutSym) = filter_out_filename;
+    }
+    else
+    {
+      /* system command failed; print warning message and substitute "??" */
+      Error(40, 4, "failure (status %d) of filter: %s", WARN, &fpos(x),
+	status, command);
+      res = MakeWord(WORD, STR_NOCROSS, &fpos(x));  /* i.e. "??" */
+    }
   }
 
   debug1(DFH, D, "FilterExecute returning %s", EchoObject(res));

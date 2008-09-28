@@ -4,7 +4,7 @@
 /*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
 /*  COPYRIGHT (C) 2000, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Part of Lout Version 3.37, September 2008                                */
+/*  Part of Lout Version 3.38, September 2008                                */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -3563,7 +3563,8 @@ void NextChar()
   else if( curr_line[line_pos+1] != '\0' )
   {
     /* we've already read in the next line; it's at &curr_line[line_pos+1] */
-    strcpy((char *) &curr_line[1], (char *) &curr_line[line_pos+1]);
+    int len = strlen((char *) &curr_line[line_pos+1]);
+    memmove(&curr_line[1], &curr_line[line_pos+1], len + 1);
     line_num++;
     line_pos = 1;
   }
@@ -4677,6 +4678,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token,
 	else
 	{
 	  fprintf(err_fp, "%s internal error: lang->no_match\n", ErrorHeader());
+	  exit(1);
 	}
 	break;
 
@@ -5029,7 +5031,7 @@ int main(int argc, char *argv[])
   /* read command line */
   in_fp = out_fp = (FILE *) NULL;
   err_fp = stderr;
-  line_num = 0;
+  line_num = line_pos = 0;
   stdin_seen = raw_seen = FALSE;
   tab_by_spacing = TRUE;
   tab_in = 8;
@@ -5039,8 +5041,8 @@ int main(int argc, char *argv[])
   blanknumbered = BLANKNUMBERED_YES;
   numbered_option = NULL;
   headers_option = TRUE;
-  font_option = size_option = line_option = bls_option = tabin_option =
-    tabout_option = setup_option = language_option = (char *) NULL;
+  style_option = font_option = size_option = line_option = bls_option =
+    tabin_option = tabout_option = setup_option = language_option =(char *)NULL;
   if( argc == 1 )
   { PrintUsage();
     exit(1);
@@ -5067,7 +5069,7 @@ int main(int argc, char *argv[])
      
 	/* read name of input file */
 	if( !raw_seen )
-	{ fprintf(err_fp, "%s: -i illegal with -r\n", ErrorHeader());
+	{ fprintf(err_fp, "%s: -i illegal without -r\n", ErrorHeader());
 	  exit(1);
 	}
 	if( in_fp != NULL )
@@ -5307,8 +5309,7 @@ int main(int argc, char *argv[])
 	{
 	  if( languages[i]->names[j] == (char *) NULL )
 	    i++, j = 0;
-	  else if( strcmp( (char *) languages[i]->names[j],
-		(char *) language_option) == 0 )
+	  else if( strcmp(languages[i]->names[j], language_option) == 0 )
 	    lang = languages[i];
 	  else
 	    j++;
@@ -5366,6 +5367,7 @@ int main(int argc, char *argv[])
     SetupLanguage(lang);
     line_pos = 1;
     curr_line[line_pos] = '\n';  /* forces line read */
+    curr_line[line_pos + 1] = '\0';
     line_num = 0;
     NextChar();
     Process(lang, (TOKEN *) NULL, U "");

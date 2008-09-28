@@ -229,26 +229,26 @@
 #                                                                             #
 # (18) If the usual language at your site is not English, you might like to   #
 #      now change the default value of the @InitialLanguage option on line    #
-#      251 of file $(LOUTLIBDIR)/include/bsf.  This will mean that by default #
-#      the date and words like Chapter and July will appear in a different    #
-#      language, and hyphenation will be carried out according to patterns    #
-#      designed for that language.  You can find the list of known languages  #
-#      in the User's Guide, or in file $(LOUTLIBDIR)/include/langdefs; if     #
-#      yours is not on the list, let me know and we can work together to      #
-#      add it.  This has nothing to do with locales and USELOC.               #
+#      265 (or thereabouts) of file $(LOUTLIBDIR)/include/bsf.  This will     #
+#      mean that by default the date and words like Chapter and July will     #
+#      appear in a different language, and hyphenation will be carried out    #
+#      according to patterns designed for that language.  You can find the    #
+#      list of known languages in file $(LOUTLIBDIR)/include/langdefs, or in  #
+#      the User's Guide; if yours is not there, let me know and we can work   #
+#      together to add it.  This has nothing to do with locales and USELOC.   #
 #                                                                             #
 # (19) If the usual size of a piece of paper at your site is not A4, you      #
 #      might like to now change the default value of the @PageType option     #
-#      on line 65 of file $(LOUTLIBDIR)/include/dsf:                          #
+#      on line 65 (or thereabouts) of file $(LOUTLIBDIR)/include/dsf:         #
 #                                                                             #
 #          named @PageType { A4 @OrIfPlain Other }                            #
 #                                                                             #
-#      This is saying that the page type is to be A4 by default, unless       #
-#      plain text output is in effect (lout -p), in which case the page       #
-#      type is Other, which means that the page dimensions come from the      #
-#      @PageWidth and @PageHeight options.  Just change the A4, not the rest. #
-#      You can find the list of known page types, alternative to A4, in the   #
-#      User's Guide, or at line 738 in $(LOUTLIBDIR)/include/dsf.             #
+#      This says that the page type is to be A4 by default, unless plain      #
+#      text output is in effect (lout -p), in which case the page type is     #
+#      Other, which means that the page dimensions come from the @PageWidth   #
+#      and @PageHeight options.  Just change the A4, not the rest.  You can   #
+#      find the list of known page types, alternative to A4, in the User's    #
+#      Guide, or at line 764 (or thereabouts) in $(LOUTLIBDIR)/include/dsf.   #
 #                                                                             #
 #  Mail jeff@it.usyd.edu.au if you have any problems.                         #
 #                                                                             #

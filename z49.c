@@ -1,6 +1,6 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.37)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.38)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -603,6 +603,7 @@ static void PS_PrintEPSFile(FILE *fp, FILE_POS *pos, BOOLEAN strip_all)
 
   assert( fp != NULL, "PS_PrintEPSFile: fp!" );
   /* state = (ReadOneLine(fp, buff, MAX_LINE) == 0) ? FINISHED : SKIPPING; */
+  PS_FindEPSSegment(fp, &len);   /* left out by Jeff's mistake in 3.37 */
   state = (ReadOneBinaryLine(fp, buff, MAX_LINE, &count, &len) == 0) ?
     FINISHED : SKIPPING;
   while( state != FINISHED ) switch(state)

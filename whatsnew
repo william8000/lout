@@ -541,4 +541,13 @@ Changes and new features introduced in Version 3.37 [September 2008]
    able to think of a case where it would cause trouble.  If you find
    a problem with it, please let me know.
 
+Changes and new features introduced in Version 3.38 [October 2008]
+
+   Bug fixes:
+     Fixed my bungled installation of Bader's patch allowing EPS previews
+     Fiddled with prg2lout.c hoping to fix its intermittent crash bug
+   Converted "non-zero exit status of filter" from a fatal error to a
+     warning, so the unfixed prg2lout error has fewer repercussions
+
+
 Jeff Kingston

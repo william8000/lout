@@ -18,7 +18,7 @@ gnu. @Index { GNU Public License }
 primary source is directory
 @ID @Code "ftp://ftp.it.usyd.edu.au/jeff/lout"
 containing a gzipped tar file of the current version
-(currently {@Code "lout-3.37.tar.gz"}), and various other things including
+(currently {@Code "lout-3.38.tar.gz"}), and various other things including
 a PostScript version of this guide.  The distribution contains source code,
 libraries, documentation, license, and installation instructions.
 @PP
