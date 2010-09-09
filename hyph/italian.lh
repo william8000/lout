@@ -1,5 +1,22 @@
 Lout hyphenation information
 %
+%  COPYRIGHT (C) 1999 Jeffrey H. Kingston
+%  with contributions by Daniele Giacomini and Claudio Beccari (see below)
+%
+%  This program is free software; you can redistribute it and/or modify
+%  it under the terms of the GNU General Public License as published by
+%  the Free Software Foundation; either Version 3, or (at your option)
+%  any later version.
+%
+%  This program is distributed in the hope that it will be useful,
+%  but WITHOUT ANY WARRANTY; without even the implied warranty of
+%  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%  GNU General Public License for more details.
+%
+%  You should have received a copy of the GNU General Public License
+%  along with this program; if not, write to the Free Software
+%  Foundation, Inc., 59 Temple Place, Suite 330, Boston MA 02111-1307 USA
+
 % This is an Italian hyphenation file constructed by Daniele Giacomini
 % (daniele@evo.it) on 03 February 1999 from a TeX file supplied by
 % Claudio Beccari (beccari@polito.it).

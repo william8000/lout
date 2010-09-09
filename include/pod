@@ -2,13 +2,15 @@
 #                                                                             #
 #   Lout setup file for Pod documentation printing                            #
 #                                                                             #
-#   Note: although Pod is treated like a programming language in some         #
-#   respects, the setup file options below are largely unrelated to           #
-#   the setup file options for other languages.                               #
-#                                                                             #
 #   Version 3.0                                                               #
 #   Jeffrey H. Kingston                                                       #
 #   5 April 2000                                                              #
+#                                                                             #
+#   This file has been placed in the public domain by its author.             #
+#                                                                             #
+#   Note: although Pod is treated like a programming language in some         #
+#   respects, the setup file options below are largely unrelated to           #
+#   the setup file options for other languages.                               #
 #                                                                             #
 ###############################################################################
 

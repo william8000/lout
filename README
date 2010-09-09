@@ -1,4 +1,4 @@
-THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.38)
+THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.39)
 BASSER LOUT VERSION 3 COPYRIGHT (C) 1994, 2008 Jeffrey H. Kingston
 
 Jeffrey H. Kingston
@@ -19,7 +19,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-(file gnu.gpl in this directory); if not, write to the Free Software
+(file COPYING in this directory); if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 This directory contains everything needed to install the Lout document
@@ -39,8 +39,8 @@ and the following files:
 
     blurb           A news blurb describing Lout
     blurb.short     A short news blurb describing Lout
+    COPYING         A copy of the GNU General Public License
     externs.h z*.c  Lout source code
-    gpl.txt         A copy of the GNU General Public License
     maillist        Information about a public mailing list about Lout
     makefile        A makefile for installing Lout
     notes_dsc       Notes on the degree of Lout's conformance with the

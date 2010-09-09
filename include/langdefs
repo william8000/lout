@@ -1,3 +1,12 @@
+###############################################################################
+#                                                                             #
+#   Language definitions                                                      #
+#   Jeffrey H. Kingston                                                       #
+#                                                                             #
+#   This file has been placed in the public domain by its author.             #
+#                                                                             #
+###############################################################################
+
 langdef Croatian Hrvatski hr			{ croatian	. : ! ? .) ?) !) .' !' ?' }
 langdef Czech Cesky Cestina cs			{ czech		. : ! ? .) ?) !) .' !' ?' }
 langdef Danish Dansk da				{ danish	. : ! ? .) ?) !) .' !' ?' }

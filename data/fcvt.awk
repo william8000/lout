@@ -1,4 +1,6 @@
 # convert old fontdefs file to new font database
+# this program has been placed in the public domain by
+# its author, Jeffrey H. Kingston
 NR==1	{
 print "###########################################################################"
 print "#                                                                         #"

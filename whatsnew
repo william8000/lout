@@ -549,5 +549,23 @@ Changes and new features introduced in Version 3.38 [October 2008]
    Converted "non-zero exit status of filter" from a fatal error to a
      warning, so the unfixed prg2lout error has fewer repercussions
 
+Changes and new features introduced in Version 3.39 [September 2010]
+
+   Bug fixes:
+     Fixed a problem with @IndexBText
+   Added copyright notices to many files, to satisfy the Savannah
+     people.  There is no change in what is permitted.  Files that
+     go to make up an output file are either public domain or else
+     carry this additional wording, supplied by the Savannah people:
+     "As a special exception, when this file is read by Lout when
+     processing a Lout source document, you may use the result
+     without restriction."
+
+   Things not done
+
+   It was suggested that using a version control system (in
+     particular, svn) would be a good idea.  I thought about
+     it but decided that there was too little change going on
+     to make it worth my while, at the moment anyway.
 
 Jeff Kingston

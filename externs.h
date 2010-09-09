@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.38)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.39)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.38 (September 2008)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.39 (September 2010)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -187,7 +187,7 @@ extern nl_catd MsgCat;
 #define	WRITE_FILE	"w"
 #define	APPEND_FILE	"a"
 #define	STR_NEWLINE	AsciiToFull("\r")
-#define	STR_DIR		AsciiToFull(":")
+#define	STR_DIR		AsciiToFull("/")
 #define	UNCOMPRESS_COM	"gunzip -c %s > %s"
 #define	LOUT_EPS	"lout.eps"
 #else

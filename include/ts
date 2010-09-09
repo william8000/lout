@@ -3,6 +3,8 @@
 #                                                                             #
 #  Lout @ToySetup package (Jeff Kingston, July 1993, updated October 1994)    #
 #                                                                             #
+#   This file has been placed in the public domain by its author.             #
+#                                                                             #
 #  In response to a user request I have put together this tiny package for    #
 #  people to play with who want to start learning how to do page layout and   #
 #  galleys with Lout.  It produces a very simple sequence of pages.  To       #

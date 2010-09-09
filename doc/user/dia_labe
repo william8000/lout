@@ -220,7 +220,7 @@ these options, in the usual way, and they are extremely useful there:
 @Code @Verbatim {
 @Diag
     nodelabelfont { Slope -2p }
-    linklabelformat { \/\@Body\/\ }
+    linklabelformat { "/"@Body"/" }
     hsize { 1.8c }
 {
     A:: @Ellipse alabel { a } { OK }

@@ -4,6 +4,9 @@
 %  PostScript @SysPrependGraphic file for @Diag Jeffrey H. Kingston  %
 %  Version 2.0 (includes CIRCUM label)                September 1996 %
 %                                                                    %
+%  This file has been placed in the public domain by its author,     %
+%  Jeffrey H. Kingston                                               %
+%                                                                    %
 %  To assist in avoiding name clashes, the names of all symbols      %
 %  defined here begin with "ldiag".  However, this is not feasible   %
 %  with user-defined labels and some labels used by users.           %

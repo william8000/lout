@@ -4,6 +4,9 @@
 %  PostScript @SysPrependGraphic file for @Fig  Jeffrey H. Kingston  %
 %  Version 2.0 (includes CIRCUM label)                 January 1992  %
 %                                                                    %
+%  This file has been placed in the public domain by its author,     %
+%  Jeffrey H. Kingston                                               %
+%                                                                    %
 %  Although Fig is now obsolete I have updated it 20 October 2002    %
 %  to work with textures, i.e. replacing setrgbcolor with            %
 %  LoutSetRGBColor.                                                  %

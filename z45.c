@@ -1,6 +1,6 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.38)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.39)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -273,8 +273,8 @@ LINE *ReadLines(FILE *fp, FULL_CHAR *fname, FULL_CHAR *first_line, int *len)
       (int) lines, (int) (lp-1), (int) *(lp-1), (int) lines_top -1);
     debug3(DEX, DD, " buff: [%d   bp %d   %d]",
       (int) buff, (int) bp, (int) buff_top - 1);
-    assert( (int) buff >= (int) lines_top ||
-	    (int) buff_top <= (int) lines,
+    assert( (long) buff >= (long) lines_top ||
+	    (long) buff_top <= (long) lines,
 	    "ReadLines: lines and buff overlap!" );
 
     /* get new buffer and copy current line across if out of buff space */

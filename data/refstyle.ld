@@ -6,6 +6,8 @@
 #  Jeffrey H. Kingston                                                   #
 #  August 1994 (@NumSep added in Version 3.13, February 1999).           #
 #                                                                        #
+#  This file has been placed in the public domain by its author.         #
+#                                                                        #
 ##########################################################################
 
 

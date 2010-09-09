@@ -4,7 +4,7 @@
 /*  PRG2LOUT: A PROGRAM TO CONVERT PROGRAM SOURCES INTO LOUT                 */
 /*  COPYRIGHT (C) 2000, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
-/*  Part of Lout Version 3.38, September 2008                                */
+/*  Part of Lout Version 3.39                                                */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@cs.su.oz.au)                                   */
 /*  Basser Department of Computer Science                                    */
@@ -3104,16 +3104,15 @@ LANGUAGE NonpareilLanguage = {
     &NonpareilOperatorToken,
   },
   {
-    "abstract", "as", "builtin", "case", "class", "coerce",
-    "else", "elsif", "end", "enum", "extend", "extension", "filter",
-    "function", "genesis", "if", "in", "infix", "inherit", "introduce",
-    "invariant", "is", "let", "local", "meet", "module", "noncoercive",
-    "noncreation", "norename", "predefined", "prefix", "prefun", "private",
-    "postfix", "rename", "require", "system", "then", "typeobj", "upto",
-    "use", "when", "yield",
+    "abstract", "as", "builtin", "case", "class", "coerce", "else",
+    "elsif", "end", "enum", "extend", "extension", "filter", "fun",
+    "if", "import", "infix", "inherit", "introduce", "invariant",
+    "is", "meet", "module", "noncreation", "operators", "predefined",
+    "prefix", "prefun", "private", "postfix", "rename", "require",
+    "system", "then", "typeobj", "upto", "when", "yield",
 
     /* not keywords, but conventionally set like them */
-    "false", "true", "self", "and", "or", "not"
+    "false", "true", "self", "and", "or", "not", "div", "mod"
   }
 };
 

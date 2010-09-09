@@ -1,6 +1,6 @@
 /*@z34.c:Rotation Service:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.38)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.39)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */

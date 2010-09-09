@@ -1,3 +1,6 @@
+#  This file has been placed in the public domain by its author, #
+#  Jeffrey H. Kingston                                           #
+
 { @Reference
      @Tag { knuth1984tex }
      @Type { Book }

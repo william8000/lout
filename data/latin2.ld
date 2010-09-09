@@ -18,6 +18,8 @@
 #  Jeffrey H. Kingston                                                    #
 #  6 May 20000                                                            #
 #                                                                         #
+#  This file has been placed in the public domain by its author.          #
+#                                                                         #
 ###########################################################################
 
 

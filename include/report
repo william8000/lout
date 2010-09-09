@@ -4,6 +4,8 @@
 #                                                                             #
 #   Jeffrey H. Kingston                                                       #
 #                                                                             #
+#   This file has been placed in the public domain by its author.             #
+#                                                                             #
 #   Note: this version, released with Lout Version 3.13, is not upwardly      #
 #   compatible with previous versions:  the @Abstract symbol must now         #
 #   be placed before the //, not after.                                       #

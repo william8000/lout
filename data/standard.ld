@@ -23,6 +23,9 @@
 #    @ShortMeriDiem  am or pm                        #
 #    @DateTimeFormat format of date and time.        #
 #                                                    #
+#  This file has been placed in the public domain    #
+#  by its author.                                    #
+#                                                    #
 ######################################################
 
 { contents @Word @CurrLang @Case {

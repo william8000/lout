@@ -1,4 +1,12 @@
 %%BeginResource: procset LoutBasicSetup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                    %
+%  PostScript @SysPrependGraphic file for @BasicSetup                %
+%                                                                    %
+%  This file has been placed in the public domain by its author,     %
+%  Jeffrey H. Kingston                                               %
+%                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % width height linethickness louteuro -
 % draw a Euro symbol of this width and height with this line thickness
