@@ -13,17 +13,17 @@ has result
 Space is inserted automatically above and below the display; no
 paragraph symbols are needed.
 @PP
-To make the display appear at the left margin instead of centred, use
+To display at the left margin instead of centred, use
 leftdisplay. @Index @Code "@LeftDisplay"
-{@Code "@LeftDisplay"} instead of {@Code "@Display"}.  To make an indented
-display, use {@Code "@IndentedDisplay"} or {@Code "@QuotedDisplay"};
+{@Code "@LeftDisplay"} instead of {@Code "@Display"}.  To indent
+the display, use {@Code "@IndentedDisplay"} or {@Code "@QuotedDisplay"};
 indenteddisplay. @Index @Code "@IndentedDisplay"
 quoteddisplay. @Index @Code "@QuotedDisplay"
 the latter indents at the right margin as well as at the left. There are
 also @Code "@CentredDisplay" and @Code "@CenteredDisplay" symbols which
 centreddisplay. @Index @Code "@CentredDisplay"
 centereddisplay. @Index @Code "@CenteredDisplay"
-centre the display just like {@Code "@Display"} does, and
+centre the display (like {@Code "@Display"}), and
 rightdisplay. @Index @Code "@RightDisplay"
 @Code "@RightDisplay" which right-justifies the display.
 @PP
@@ -88,7 +88,7 @@ default.indent @Index @Code "@DefaultIndent"
 so is beyond our scope
 @Cite { $kingston1995lout.expert }.  @Code "@DisplayIndent" is the
 display.indent. @Index @Code "@DisplayIndent"
-indent for {@Code "@IndentedDisplay"}, and used at both margins by
+indent for {@Code "@IndentedDisplay"}, and (at both margins) for
 {@Code "@QuotedDisplay"}.  Its default value, {@Code "2.00f"}, is twice
 the current font size.
 @End @Section

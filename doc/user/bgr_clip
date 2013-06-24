@@ -15,7 +15,6 @@ produces
 The following object may be arbitrary as usual; for example, it
 could be an illustration included using @Code "@IncludeGraphic"
 (Section {@NumberOf include}).
-@PP
 We have used the @Code "@Wide" symbol from Section {@NumberOf precise}
 to make clear what the available width is in this small example (one
 centimetre), but @Code "@HClip" will work in any context; for example,
@@ -45,6 +44,6 @@ produces
 @ID {
 @Box 1c @Wide 0.2c @High @HClip @VClip WARNING!
 }
-The @Code "shift" options may be used as usual to determine which part of
-the two-dimensional area is displayed.
+The @Code "shift" options to determine which part of the two-dimensional
+area is displayed, as usual.
 @End @Section

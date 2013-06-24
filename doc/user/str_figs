@@ -12,10 +12,10 @@ figures. @Index { figures }
 "    @HTree { @Box Lout @FirstSub arrow { yes } @Box PostScript }"
 "}"
 }
-The @Code "@Figure" symbol places the following object (which in this example is
+The @Code "@Figure" symbol places the following object (which in this
 figure. @Index @Code "@Figure"
-created using the advanced graphics features of Chapter {@NumberOf diagrams})
-at the top of the following column or page,
+example is created using the {@Code "@Diag"} symbol from
+Chapter {@NumberOf diagrams}) at the top of the following column or page,
 @Figure
     @Tag { figex }
     @Caption { Basser Lout }
@@ -29,7 +29,7 @@ can see this example at the top of page {@PageOf figex}.  Tables are
 table. @Index @Code "@Table"
 obtained in the same way using {@Code "@Table"} instead of {@Code "@Figure"}.
 There is a third symbol called {@Code "@Floater"}.  It won't be mentioned
-again, but it works exactly like like @Code "@Figure" and {@Code "@Table"}.
+again, but it works exactly like @Code "@Figure" and {@Code "@Table"}.
 @PP
 @Code "@Figure" and @Code "@Table" each have an @Code "@InitialLanguage"
 option which determines the language of the figure or table.  If this is
@@ -50,9 +50,9 @@ If your document contains many figures, large figures, or multi-page
 figures, you are likely to encounter cases where Lout's assignment of
 figures to pages is not pleasing.  In that case, you can improve things
 by moving the figures around within the body text, and by using the
-@Code "@Location" option of the @Code "@Figure" symbol, which determines
+@Code "@Location" option of {@Code "@Figure"}, which determines
 location. @Index @Code "@Location"
-where the figure will appear.  Its possible values are
+where the figure will appear.  Its values are
 @DP @Tab
     @Fmta { @Col @Code A ! @Col B }
 {
@@ -102,7 +102,8 @@ from @Code PageFoot only in multi-column documents. }
     A { ColEnd }
     B { The figure will appear in a column at the end of the document
 (or chapter, appendix etc. in the case of books).  There is no
-@Code PageEnd value corresponding to {@Code ColEnd}. }
+corresponding @Code PageEnd value.
+}
 @Rowa
     A { AfterLine }
     B { The figure will appear as a column-width display immediately after
@@ -159,7 +160,7 @@ back to a later page than the first possible one.
 @PP
 The @I default value of the @Code "@OnePage" option for each figure or
 table depends on the value of its @Code "@Location" option as follows:
-@ID @Tab
+@ID @OneRow @Tab
     @Fmta { @Col @Code A ! @Col ! @Col @Code B }
 {
 @Rowa
@@ -177,7 +178,7 @@ are only default values and you may set @Code "@OnePage" as you wish.
 By default, the body of the figure will be centred, and this usually looks
 best, at least for small figures.  @Code "@Figure" and @Code "@Table" each
 have a @Code "@Format" option which controls this format:
-@ID @Code {
+@ID @OneRow @Code {
 "@Figure"
 "    @Format { @CurveBox @HExpand @CC @Body }"
 }

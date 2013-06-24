@@ -88,6 +88,7 @@ void Interpose(OBJECT z, int typ, OBJECT x, OBJECT y)
 void FlushInners(OBJECT inners, OBJECT hd)
 { OBJECT y, z, tmp, dest_index;
 
+  debug1(DGA, D, "[ FlushInners(%s, -)", DebugInnersNames(inners));
   ifdebug(DGF, D,
     OBJECT link;
     fprintf(stderr, "dgf: [ FlushInners(");
@@ -139,6 +140,7 @@ void FlushInners(OBJECT inners, OBJECT hd)
     Parent(dest_index, Up(hd));
     if( actual(actual(dest_index)) == PrintSym )
     { DisposeObject(inners);
+      debug0(DGA, D, "] FlushInners returning (PrintSym)");
       debug0(DGF, D, "] FlushInners returning (PrintSym)");
       return;
     }
@@ -147,6 +149,8 @@ void FlushInners(OBJECT inners, OBJECT hd)
   while( Down(inners) != inners )
   { Child(y, Down(inners));
     DeleteLink(Down(inners));
+    debug2(DGA, D, "FlushInners at %s (remainder %s)", Image(type(y)),
+      DebugInnersNames(inners));
     switch( type(y) )
     {
 
@@ -161,8 +165,11 @@ void FlushInners(OBJECT inners, OBJECT hd)
 	if( Down(y) != y )	/* bug fix (was assert before) */
 	{ assert( Down(y) != y, "FlushInners: UNATTACHED!");
 	  Child(z, Down(y));
-	  debug1(DGF,D,"  possibly calling FlushGalley %s from FlushInners (a)",
+	  debug1(DGA,D,"  possibly calling FlushGalley %s from FlushInners (a)",
 	    SymName(actual(z)));
+	  if( whereto(z) != nilobj )
+	    debug2(DGA,D,"    (whereto(z) = %s, uses_extern_target = %s)",
+	      SymName(whereto(z)), bool(uses_extern_target(whereto(z))));
 	  if( whereto(z)==nilobj || !uses_extern_target(whereto(z)) ) /* &&& */
 	    FlushGalley(z);
 	}
@@ -199,6 +206,7 @@ void FlushInners(OBJECT inners, OBJECT hd)
     }
   }
   Dispose(inners);
+  debug0(DGA, D, "] FlushInners returning");
   debug0(DGF, D, "] FlushInners returning");
 } /* end FlushInners */
 
@@ -235,11 +243,13 @@ void ExpandRecursives(OBJECT recs)
     whereto(hd) = ready_galls(hd) = nilobj;
     foll_or_prec(hd) = GALL_FOLL;
     sized(hd) = FALSE;
+    seen_nojoin(hd) = FALSE;
     tmp =  CopyObject(target, &fpos(target));  env = DetachEnv(tmp);
     Link(hd, tmp);  Link(target_index, hd);
     SizeGalley(hd, env, external_ver(target),
       gall_dir(hd) == ROWM ? threaded(target) : FALSE, FALSE, FALSE,
       &save_style(target), &non_c, nilobj, &n1, &newrecs, &inners, nilobj);
+    debug1(DGA, D, "  ExpandRecursives inners: %s", DebugInnersNames(inners));
     debug0(DCR, DDD, "    as galley:");
     ifdebug(DCR, DDD, DebugObject(hd));
     debug1(DGS, DD, "[ ExpandRecursives calling Constrained(%s, COLM)",

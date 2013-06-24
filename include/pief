@@ -114,7 +114,7 @@ def @PieSetup
     export @Slice
     def @Pie
         named save		             	{ save	           	}
-	named totalweight			{ 100			}
+	named totalweight			{ totalweight		}
         named radius				{ radius		}
         import @PSLengths named initialangle	{ initialangle		}
 	named leftextra			       	{ leftextra		}

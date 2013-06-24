@@ -99,6 +99,9 @@ void DetachGalley(OBJECT hd)
   Parent(prnt, Up(hd));
   assert( Up(prnt) != prnt, "DetachGalley: parent!" );
   New(index, UNATTACHED);
+  actual(index) = nilobj;
+  non_blocking(index) = TRUE;
+  blocked(index) = FALSE;
   pinpoint(index) = nilobj;
   MoveLink(Up(hd), index, PARENT);
   Link(NextDown(Up(prnt)), index);
@@ -124,7 +127,11 @@ void DetachGalley(OBJECT hd)
 OBJECT SearchGalley(OBJECT start, OBJECT sym, BOOLEAN forwards,
 BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
 { OBJECT y, res, z, zlink, link;
-  debug5(DGA, DD, "[ SearchGalley(start, %s, %s, %s, %s, %s)", SymName(sym),
+  ifdebug(DGA, D, Parent(y, start));
+  debug6(DGA, D, "[ SearchGalley(%s, %s, %s, %s, %s, %s)",
+        type(start) == HEAD ? (char *) SymName(actual(start)) :
+        type(y) == HEAD ? (char *) SymName(actual(y)) : "link",
+	SymName(sym),
 	forwards ? "fwd" : "back", subgalleys ? "subgalleys" : "nosubgalleys",
 	closures ? "closures" : "noclosures", input ? "input" : "noinput");
   assert( type(start) == LINK || type(start) == HEAD, "SearchGalley: start!" );
@@ -138,7 +145,7 @@ BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
       case UNATTACHED:
       case RECEIVING:
 	
-        debug1(DGA, DD, "  examining %s", EchoIndex(y));
+        debug1(DGA, D, "  examining %s", EchoIndex(y));
 	if( subgalleys )
 	for( zlink = Down(y); zlink!=y && res==nilobj; zlink=NextDown(zlink) )
 	{ Child(z, zlink);
@@ -152,7 +159,7 @@ BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
 
       case RECEPTIVE:
 	
-        debug1(DGA, DD, "  examining %s", EchoIndex(y));
+        debug1(DGA, D, "  examining %s", EchoIndex(y));
 	if( closures && type(actual(y)) == CLOSURE
 		     && SearchUses(actual(actual(y)), sym) )  res = y;
 	else if( input && actual(actual(y)) == InputSym )  res = y;
@@ -166,7 +173,7 @@ BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
     }
     link = forwards ? NextDown(link) : PrevDown(link);
   }
-  debug1(DGA, DD, "] SearchGalley returning %s", EchoIndex(res));
+  debug1(DGA, D, "] SearchGalley returning %s", EchoIndex(res));
   return res;
 } /* end SearchGalley */
 
@@ -322,16 +329,17 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     EnterErrorBlock(FALSE);
     New(target_galley, HEAD);
     force_gall(target_galley) = FALSE;
+    actual(target_galley) = actual(target);
     enclose_obj(target_galley) = limiter(target_galley) = nilobj;
     ClearHeaders(target_galley);
     opt_components(target_galley) = opt_constraints(target_galley) = nilobj;
     gall_dir(target_galley) = external_hor(target) ? COLM : ROWM;
     FposCopy(fpos(target_galley), fpos(target));
-    actual(target_galley) = actual(target);
     whereto(target_galley) = ready_galls(target_galley) = nilobj;
     foll_or_prec(target_galley) = GALL_FOLL;
     must_expand(target_galley) = FALSE;
     sized(target_galley) = FALSE;
+    seen_nojoin(target_galley) = FALSE;
 
     /* get perpendicular constraint (none if horizontal galley) */
     if( dim == ROWM )
@@ -364,7 +372,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	trigger_externs(target_index), &save_style(target),
 	&c, whereto(hd), &dest_index, &recs, &tg_inners,
 	enclose_obj(hd) != nilobj ? CopyObject(enclose_obj(hd), no_fpos):nilobj);
-    debug1(DGA, DD, "  SizeGalley tg_inners: %s", DebugInnersNames(tg_inners));
+    debug1(DGA, D, "  AttachGalley tg_inners: %s", DebugInnersNames(tg_inners));
     if( recs != nilobj )  ExpandRecursives(recs);
     dest = actual(dest_index);
     if( underline(dest) == UNDER_UNDEF )  underline(dest) = UNDER_OFF;
@@ -400,7 +408,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       SizeGalley(hd, env, TRUE, dim == ROWM ? threaded(dest) : FALSE,
 	non_blocking(target_index), TRUE, &save_style(dest), &c, nilobj,
 	&n1, &recs, &hd_inners, nilobj);
-      debug1(DGA,DD,"  SizeGalley hd_inners: %s", DebugInnersNames(hd_inners));
+      debug1(DGA, D,"  AttachGalley hd_inners: %s",DebugInnersNames(hd_inners));
       if( recs != nilobj )  ExpandRecursives(recs);
       if( need_precedes )		/* need an ordering constraint */
       {	OBJECT index1, index2;
@@ -670,7 +678,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	      debug3(DGA, D, "  reject: vsize %s,%s in %s; y=",
 		EchoLength(back(y, dim)), EchoLength(fwd(y, dim)),
 		EchoConstraint(&c));
-	      ifdebug(DGA, D, DebugObject(y));
+	      ifdebug(DGA, DD, DebugObject(y));
 	      if( size(y, dim) > 0 )
 	      { sprintf(num1, "%.1fc", (float) size(y, dim) / CM);
 	        sprintf(num2, "%.1fc", (float) bfc(c) / CM);
@@ -725,7 +733,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	      debug3(DGA, D, "  reject: vsize %s,%s in %s; y=",
 		EchoLength(perp_back), EchoLength(perp_fwd),
 		EchoConstraint(&c));
-	      ifdebug(DGA, D, DebugObject(y));
+	      ifdebug(DGA, DD, DebugObject(y));
 	      goto REJECT;
 	    }
 
@@ -748,8 +756,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	  if( !FitsConstraint(back(z, dim), fwd(z, dim), c) )
 	  { BOOLEAN scaled;
 
-	    debug2(DGA, D, "  why     = %d %s", (int) why, EchoObject(why));
-	    debug2(DGA, D, "  limiter = %d %s", (int) limiter(hd),
+	    debug2(DGA, DD, "  why     = %d %s", (int) why, EchoObject(why));
+	    debug2(DGA, DD, "  limiter = %d %s", (int) limiter(hd),
 	      EchoObject(limiter(hd)));
 
 	    /* if forcing galley doesn't fit, try scaling z */
@@ -781,7 +789,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	      debug3(DGA, D, "  reject: size was %s,%s in %s; y =",
 		EchoLength(back(z, dim)), EchoLength(fwd(z, dim)),
 		EchoConstraint(&c));
-	      ifdebug(DGA, D, DebugObject(y));
+	      ifdebug(DGA, DD, DebugObject(y));
 	      if( size(z, dim) > 0 )
 	      { sprintf(num1, "%.1fc", (float) size(z, dim) / CM);
 	        sprintf(num2, "%.1fc", (float) bfc(c) / CM);
@@ -796,7 +804,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	    }
 	  }
 	  limiter(hd) = why;
-	  debug3(DGA, D, "  set limiter(%s) = %d %s", SymName(actual(hd)),
+	  debug3(DGA, DD, "  set limiter(%s) = %d %s", SymName(actual(hd)),
 	    (int) limiter(hd), EchoObject(limiter(hd)));
 
 	  /* now check perpendicular space for target_galley in target */
@@ -836,7 +844,7 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	      debug3(DGA, D, "  reject: size was %s,%s in %s; y =",
 		EchoLength(back(z, 1-dim)), EchoLength(fwd(z, 1-dim)),
 		EchoConstraint(&c));
-	      ifdebug(DGA, D, DebugObject(y));
+	      ifdebug(DGA, DD, DebugObject(y));
 	      goto REJECT;
 	    }
 	  }
@@ -971,8 +979,12 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     ACCEPT:
 	
       /* accept first component; now committed to the attach */
-      debug3(DGA, D, "  accept %s %s %s", Image(type(y)), EchoObject(y),
+      debug2(DGA, D, "  accept first component %s %s", Image(type(y)),
 	EchoFilePos(&fpos(y)));
+      /* ***
+      debug3(DGA, DD, "  accept %s %s %s", Image(type(y)), EchoObject(y),
+	EchoFilePos(&fpos(y)));
+      *** */
       LeaveErrorBlock(TRUE);
       debug0(DYY, D, "] LeaveErrorBlock(TRUE) (ACCEPT)");
 
@@ -1019,7 +1031,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	DeleteNode(hd_inners);
 	*inners = tg_inners;
       }
-      debug0(DGA, D, "] AttachGalley returning ATTACH_ACCEPT");
+      debug1(DGA, D, "] AttachGalley returning ATTACH_ACCEPT (inners %s)",
+	DebugInnersNames(*inners));
       ifdebug(DGA, D,
 	if( dim == COLM && !external_hor(dest) )
 	{ OBJECT z;

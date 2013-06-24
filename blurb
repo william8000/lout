@@ -1,7 +1,7 @@
 
-         THE LOUT DOCUMENT FORMATTING SYSTEM, VERSION 3.39
+         THE LOUT DOCUMENT FORMATTING SYSTEM, VERSION 3.40
 
-Version 3.39 of the Lout document formatting system is now available
+Version 3.40 of the Lout document formatting system is now available
 (free of charge).  The system reads a high-level description of a
 document similar in style to LaTeX and produces a PostScript or
 plain text output file.
@@ -21,7 +21,7 @@ went back to the beginning.
 Lout is written in highly portable ANSI C.  It is distributed under the
 GNU public license and is obtainable from
 
-   ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.39.tar.gz
+   ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.40.tar.gz
 
 The distribution contains
 
@@ -37,7 +37,7 @@ The distribution contains
 
 A PostScript version of the User's Guide is available at:
 
-   ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.39-user.ps.gz
+   ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.40-user.ps.gz
 
 Lout was created by Jeffrey H. Kingston (jeff@it.usyd.edu.au) of the
 School of Information Technologies at the University of Sydney.

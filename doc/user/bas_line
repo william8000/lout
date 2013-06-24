@@ -37,7 +37,7 @@ and so on.  It is a good idea to define the initial line spacing using
 the @Code "f" unit, since then if you change the initial font size the
 line spacing will change with it.  However, any length (Section
 {@NumberOf objects}) with an @Code "x" appended will do:  @Code "14px"
-for 14 point, @Code "0.5cx" for 0.5 centimetres, etc.  Don't use the
-@Code "v" unit though, because it refers to some @I previous line
-spacing, whereas here we are defining the line spacing for the first time.
+for 14 point, @Code "0.5cx" for 0.5 centimetres, etc.  But don't use
+the @Code "v" unit, because it refers to some @I previous line spacing,
+whereas here we are defining the line spacing for the first time.
 @End @Section

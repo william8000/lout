@@ -57,7 +57,7 @@
 #       nochange                  ""                                      #
 #       ""                        ""                                      #
 #       rgb <red> <blue> <green>  "<red> <blue> <green> LoutSetRGBColor"  #
-#       cymk <c> <y> <m> <k>      "<c> <y> <m> <k> LoutSetCMYKColor"      #
+#       cmyk <c> <m> <y> <k>      "<c> <m> <y> <k> LoutSetCMYKColor"      #
 #       ------------------------------------------------------------      #
 #                                                                         #
 #   See the Expert's Guide for the use of LoutSetRGBColor and             #

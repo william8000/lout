@@ -35,8 +35,7 @@ To get this into your index, type
 at the point where you mention Galileo.  Nothing will be printed there,
 but the object following the @Code "@Index" symbol will be placed in
 index.sym @Index { @Code "@Index" symbol }
-the index, with a comma and the correct page number appended
-automatically.
+the index, plus a comma and the correct page number.
 @PP
 The object preceding the @Code "@Index" symbol is a compulsory key
 which is used for sorting the index entries,
@@ -59,8 +58,8 @@ sorting.order @Index { sorting order }
 if @Code "strcoll()" gets the sorting right for one language, there still
 remains the problem of sorting multilingual indexes.
 }
-but which is not itself printed anywhere.  It is best to construct these
-sorting keys from lower-case letters and the . character only, beginning
+but which is not itself printed.  It is best to construct these
+keys from lower-case letters and the . character only, beginning
 with a letter, although multi-word keys are allowed.  These sorting keys
 do not have to be distinct from the tags used in cross referencing;
 however, they do have to be distinct from each other, unless you want
@@ -73,9 +72,9 @@ first line of our ambitious example is obtained by
 @ID @Code "galileo @RawIndex { Galileo Galilei }"
 This could go anywhere, since no page numbers are involved.
 @PP
-Our second trick, sub-entries, is also very easy, since a sub-entry
-differs from an ordinary entry only by having an indent.  The symbol
-is {@Code "@SubIndex"}, so the second line of our ambitious example is
+Our second trick, sub-entries, is also easy, since a sub-entry
+is just an ordinary entry with an indent.  The symbol is
+{@Code "@SubIndex"}, so the second line of our ambitious example is
 subindex.sym @Index { @Code "@SubIndex" symbol }
 produced by
 @ID @Code "galileo.life @SubIndex { life of }"
@@ -107,18 +106,17 @@ same page, the @Code "to" option is ignored:  you will never get
 @PP
 Our fourth trick is the merged entry:
 @ID { trial of, 205--211, 242, 395 }
-The main thing to grasp is that this merged entry was originally three
-separate entries (sub-entries in this case):
+This merged entry was originally three separate entries (sub-entries
+in this case):
 @ID @OneRow lines @Break {
 trial of, 205--211
 trial of, 242
 trial of, 395
 }
-We already know how to produce these three entries, using three
-@Code "@SubIndex" symbols, one with a @Code "to" option.  Now we have
-discovered that Lout is able to merge several entries into one
-entry.  This raises two questions:  how does Lout know which entries
-to merge? and given those entries, what does the merging produce?
+We know how to produce these, using three @Code "@SubIndex" symbols,
+one with a @Code "to" option.  Lout is able to merge several entries
+into one entry.  This raises two questions:  how does Lout know which
+entries to merge? and given those entries, what does the merging produce?
 @PP
 The answer to the first question is that Lout merges entries whose
 sorting keys are equal.  The merged entry above is produced by these
@@ -130,8 +128,7 @@ three entries, placed in the appropriate places:
 }
 The entries are merged because they have the same sorting key
 ({@Code "galileo.trial"}), not because they happen to have the
-same content ({@Code "trial of"}).  In fact, once the page numbers are
-added the content is not the same at all.
+same content ({@Code "trial of"}).
 @PP
 Now, having decided that the three entries
 @ID @OneRow lines @Break {
@@ -257,11 +254,10 @@ is complete and an overall plan of the structure of the index can
 be made.  Place index entries for floating figures and tables within
 their captions.
 @PP
-Large indexes may benefit from {@I spacers} -- empty spaces or
+Large indexes may benefit from {@I spacers}:  empty spaces or
 spacers. @Index { spacers in indexes }
-even headings between the parts for each letter of the alphabet.  One
-simple way to get blank line spacers is with {@Code "@RawIndex"},
-like this:
+headings between the parts for each letter of the alphabet.  One
+way to get blank line spacers is with {@Code "@RawIndex"}, like this:
 @ID @OneRow @Code {
 "b @RawIndex {}"
 "c @RawIndex {}"
@@ -285,23 +281,23 @@ which letter each index entry belongs under, perhaps by symbols
 would have been too tedious.
 }
 @PP
-A more elaborate kind of spacer can be placed into the index with
+More elaborate spacers can be inserted with
 indexspacer. @Index @Code "@IndexSpacer"
 the @Code "@IndexSpacer" symbol, like this:
 @ID @Code "a @IndexSpacer A"
-This is roughly equivalent to @Code "a @RawIndex A" in that it puts
-the entry @Code A at sort position {@Code a}; but it also places
-extra space above and below it, and it includes a font change, so
-that the @Code A stands out like a heading (you can see the effect
-in the index of this document).  @Code "@IndexSpacer" also includes
-a conditional new page effect, so that the spacer never appears
-alone at the bottom of a column.
+This is similar to @Code "a @RawIndex A" in that it puts the entry
+@Code A at sort position {@Code a}; but it also places extra space
+above and below it, and it includes a font change, so that the
+@Code A stands out like a heading (you can see the effect in the
+index of this document).  @Code "@IndexSpacer" also includes a
+conditional new page, so that the spacer never appears alone at
+the bottom of a column.
 @PP
-You need to change things slightly for the first spacer:
+The first spacer needs to be slightly different, since no
+space is wanted above it:
 initialindexspacer. @Index @Code "@InitialIndexSpacer"
 @ID @Code "a @InitialIndexSpacer A"
-to tell Lout to omit the unwanted space above it.  There is an
-@Code "@IndexLetters" symbol which places the 26 spacers
+There is an @Code "@IndexLetters" symbol which places the 26 spacers
 indexletters. @Index @Code "@IndexLetters"
 @ID @OneRow @Code @Verbatim {
 a @InitialIndexSpacer A
@@ -404,15 +400,13 @@ number of index columns per page, and the gap between them, and are
 exactly analogous to the @Code "@ColumnNumber" and @Code "@ColumnGap"
 options described in Section {@NumberOf columns}.
 @PP
-The next three options work together to control the appearance of
-running headers
+The next three options control the appearance of running headers
 @FootNote {
-Owing to problems behind the scenes, if more than three copies of the
-same running header appear on the same page, their horizontal positions
-will become confused, probably resulting in the apparent disappearance of
-all but the last three.  Of course, this is highly unlikely to happen,
-since it means there must be a four-column index with a page on which
-all four columns have the same running header.
+Owing to problems behind the scenes, in the highly unlikely case
+where more than three copies of the same running header appear on
+the same page, their horizontal positions will become confused,
+probably resulting in the apparent disappearance of all but the
+last three.
 }
 in the index:
 indexctd. @Index { @Code "@IndexCtd" }
@@ -479,11 +473,11 @@ equivalent to
 Whether you will ever need to vary the appearance of index spacers
 individually in this way is very doubtful, but the capacity is there.
 @PP
-Lout offers the possibility of having up to three independent indexes
-(useful for author indexes, etc.).  The other two are called
-index A and index B, and they precede the main index in the
-output.  Just replace @Code Index by @Code IndexA to refer to index A,
-and by @Code IndexB to refer to index B.  For example,
+Lout offers three independent indexes (useful for author indexes,
+etc.).  The other two are called index A and index B, and they
+precede the main index in the output.  Just replace @Code Index
+by @Code IndexA to refer to index A, and by @Code IndexB to refer
+to index B.  For example,
 @ID @Code "smith.j @IndexA { Smith, John }"
 will insert an index entry to index A, and @Code "@IndexBBlanks"
 will insert the usual 25 blank entries into index B.  There are
@@ -496,8 +490,8 @@ be done by placing
 "import @DocumentSetup"
 "macro @AuthorIndex { @IndexA }"
 }
-in the @Code mydefs file.  See Section {@NumberOf definitions} for
-an introduction to the @Code "mydefs" file; the word @Code macro
-is needed here instead of @Code "def" because we are introducing
-a new name for an existing symbol, not defining a new symbol.
+in the @Code mydefs file (Section {@NumberOf definitions}).  The
+word @Code macro is needed here instead of @Code "def" because we
+are introducing a new name for an existing symbol, not defining
+a new symbol.
 @End @Section

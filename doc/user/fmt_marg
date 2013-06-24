@@ -44,8 +44,8 @@ for ordinary margins, the total (left plus right) page body margin must
 be the same on odd and even pages.  Margin notes
 (Section {@NumberOf marginnotes}) occupy body margin space.
 @PP
-You can have a box drawn around each page if you wish.  Here are the
-relevant options and their default values:
+You can draw a box around each page.  The relevant options and their
+default values are
 @ID @OneRow @Code @Verbatim {
 @PageBoxType { None }
 @PageBoxMargin { 1.00c }
@@ -93,30 +93,28 @@ centimetre margin between its boundary and the page contents.  If the
 left margin is 2.5 centimetres, say, this gives a total left margin
 from the page edge to the page contents of 3.5 centimetres.
 @PP
-More generally, you can enclose each page in any object at all, by
-means of the @Code "@PageEnclose" option:
+More generally, you can enclose each page in any object at all,
+using @Code "@PageEnclose":
 @ID @Code {
 "@PageEnclose { @Body }"
 }
-Within this option, @Code "@Body" stands for the page, and it must
-occur exactly once.  You could place a curved box around each page,
-for example, by writing
+Within the @Code "@PageEnclose" option, @Code "@Body" stands for the
+page, and it must occur exactly once.  You could place a curved box
+around each page, for example, by writing
 @ID @Code {
 "@PageEnclose { @CurveBox @Body }"
 }
-This is of course also available from the @Code "@PageBox" symbols, but
-with @Code "@PageEnclose" there are infinitely many other possibilities.
+This could be done with {@Code "@PageBox"}, but @Code "@PageEnclose"
+offers infinitely many possibilities.
 @PP
-Finally, it is possible to have something other than the usual white
-background on the page, using the @Code "@PageBackground" option:
+@Code "@PageBackground" replaces the usual white background of the page:
 page.background @Index @Code "@PageBackground"
 @ID @Code {
 "@PageBackground { @Scale 60d @Rotate lightgrey @Colour DRAFT }"
 }
-The value of the option is an object which is drawn on each page,
-within the margins, before the page contents are drawn.  This
-example draws a large word DRAFT in light grey diagonally across each
-page:
+Its value is an object which is drawn on each page, within the
+margins, before the page contents are drawn.  This example draws
+a large word DRAFT in light grey diagonally across each page:
 @ID @Box margin { 0c } 0.2 @Scale @IncludeGraphic draft.eps
 You have to find a suitable angle by experiment.  As Section
 {@NumberOf scaling} explains, @Code "@Scale" with no scale factor

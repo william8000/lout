@@ -3,8 +3,8 @@
    @Tag { fonts }
 @Begin
 @PP
-A @I font is a collection of characters that may be printed.  For
-example, here is the Times Roman font:
+A @I font is a collection of printable characters.  For example, here
+is the Times Roman font:
 @ID @OneRow { Times Base } @Font 0.05c @Space {
 { @Char space }
 { @Char exclam }
@@ -609,10 +609,10 @@ alignment through the baseline, you can get it, with the @Code baselinemark
 option to the @Code "@Font" symbol:
 @ID @Code "baselinemark @Font { Here's a 20p @Font big word }"
 which produces
-@ID @Code { baselinemark @Font { Here's a 20p @Font big word } }
-If you want it this way throughout your document, you can put
-@Code { baselinemark } in your initial font (see below).  Lout's
-equation formatter contains the opposite option, which is
+@ID baselinemark @Font { Here's a 20p @Font big word }
+If you want it this way throughout your document, you can get it by
+putting @Code { baselinemark } in your initial font (see below).
+Lout's equation formatter contains the opposite option, which is
 @Code "xheight2mark @Font { ... }"
 (which aligns through a point half the height of
 an x character) so you won't disrupt equation formatting if you do
@@ -654,10 +654,9 @@ has result
 However for consistency most people would use @Code "setsmallcaps" only in
 {@Code "@InitialFont"}, if at all.
 @PP
-There are two features that make fonts look better on the
-page.  @I Ligatures are pairs of letters run together; the most
+@I Ligatures are sequences of two or more letters run together; the
 ligatures. @Index { ligatures }
-common ligatures are `fi' and `fl.'  @I Kerning is moving adjacent
+most common ligatures are `fi' and `fl.'  @I Kerning is moving adjacent
 kerning. @Index { kerning }
 letters closer together, for example in `VA.'  Lout considers
 ligatures and kerning to be integral parts of each font; you can prevent

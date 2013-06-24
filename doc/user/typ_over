@@ -3,20 +3,19 @@
    @Tag { overheads }
 @Begin
 @PP
-To produce overhead transparencies
-@FootNote {
-In Version 3.15 overhead transparencies were updated and brought into line
-with the other document types.  Although existing source files do not need
-to be modified, their printed appearance may change (spacing, running
-headers).  There are some new setup file options, and some changes to
-existing setup file options.
-}
-(hereafter called overheads), start off
+To produce overhead transparencies (hereafter called overheads), start off
 overheads. @Index { overhead transparencies }
 slides. @RawIndex { slides @I see overhead transparencies }
 with the @Code slides setup file and the @Code "@OverheadTransparencies"
 overhead.transparencies. @Index @Code "@OverheadTransparencies"
 symbol:
+# @FootNote {
+# In Version 3.15 overhead transparencies were updated and brought into line
+# with the other document types.  Although existing source files do not need
+# to be modified, their printed appearance may change (spacing, running
+# headers).  There are some new setup file options, and some changes to
+# existing setup file options.
+# }
 @ID @OneRow @Code {
 "@SysInclude { slides }"
 "@OverheadTransparencies"

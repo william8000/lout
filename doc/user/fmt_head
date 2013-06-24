@@ -107,7 +107,7 @@ it means that the last one is empty. }
 @EndList
 These classifications are quite independent of each other:  a page
 could be a non-intro start odd page, or an intro non-start even page,
-and so on.  This makes eight (@Eq { 2 times 2 times 2 }) possibilities
+and so on.  This makes eight (@M { 2 times 2 times 2 }) possibilities
 altogether.  Depending on the type of document there may also be pages
 that Lout will never place a page header or footer on (e.g. pages
 containing part titles in books).
@@ -181,9 +181,9 @@ Arabic, Roman, etc. as specified by the @Code "@PageNumbers" or
 within page header and footer options.
 @PP
 To get the @I last page into a header, so that you can have page
-headers like `Page 5 of 8', you need @Code "@NumberOf last.page" as
+headers like `Page 5 of 8', you need @Code "@PageOf last.page" as
 described in Section {@NumberOf cross}.  You might have
-@ID @Code "@Centre { Page @PageNum of @NumberOf last.page }"
+@ID @Code "@Centre { Page @PageNum of @PageOf last.page }"
 as the value of @Code "@EvenTop" and the rest.
 @PP
 At this point you might like to pause and verify that the default

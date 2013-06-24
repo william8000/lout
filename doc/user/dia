@@ -6,22 +6,22 @@
 This chapter describes how to use the @@Diag symbol
 diagrams. @RawIndex { diagrams }
 diag.diagrams @Index { @Code "@Diag" (diagrams) }
-@FootNote {
-Starting with Version 3.18 of Lout, the @@Diag symbol was enhanced with
-the {@Code "@ANode"}, {@Code "@BNode"}, and {@Code "@CNode"} symbols
-described in Section {@NumberOf dia_node}, and with the symbols for
-syntax diagrams described in Section {@NumberOf dia_synt}.
+# @FootNote {
+# Starting with Version 3.18 of Lout, the @@Diag symbol was enhanced with
+# the {@Code "@ANode"}, {@Code "@BNode"}, and {@Code "@CNode"} symbols
+# described in Section {@NumberOf dia_node}, and with the symbols for
+# syntax diagrams described in Section {@NumberOf dia_synt}.
 #These
 #enhancements are upwardly compatible, unless the user has defined
 #symbols with these same names and used them within diagrams.
-@LP
-Prior to Version 3.09 of Lout, this chapter described a symbol called
-fig. @Index @Code "@Fig"
-{@Code "@Fig"} which was similar to but more primitive than
-{@Code "@Diag"}.  For backward compatibility the @Code "@Fig" symbol
-is still available and still works exactly as described in the old
-documentation, but there is no reason to use it in new documents.
-}
+# @LP
+# Prior to Version 3.09 of Lout, this chapter described a symbol called
+# fig. @Index @Code "@Fig"
+# {@Code "@Fig"} which was similar to but more primitive than
+# {@Code "@Diag"}.  For backward compatibility the @Code "@Fig" symbol
+# is still available and still works exactly as described in the old
+# documentation, but there is no reason to use it in new documents.
+# }
 to make diagrams like this one:
 diag. @Index @Code "@Diag"
 @CD @Diag

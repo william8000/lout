@@ -26,11 +26,11 @@ is to produce PostScript, and then either pass it through a `distillation'
 program to produce PDF, or else view it with a PostScript viewer that
 understands links.
 @PP
-When generating PostScript for subsequent distillation to PDF, the
+When generating PostScript for distillation to PDF, the
 docinfo. @Index @Code "@DocInfo"
 @Code "@DocInfo" symbol may be useful.  Placed anywhere in the
-document, it generates PostScript which causes the subsequent PDF to
-contain a `document info dictionary' containing the author of the
+document, it generates PostScript which causes the PDF to contain
+a `document info dictionary' containing the author of the
 document, its title, and some keywords:
 @ID @Code @Verbatim {
 @DocInfo

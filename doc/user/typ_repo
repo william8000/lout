@@ -50,8 +50,8 @@ but disaster will ensue if it is forgotten.
 @PP
 The @Code "@Title" option holds the title of the report.  It will be
 printed using the @Code clines paragraph breaking style (Section
-{@NumberOf paras}), which centres each line, so it makes sense
-to have multi-line titles:
+{@NumberOf paras}), which centres each line, so multi-line titles
+make sense:
 @ID @OneRow @Code {
 "@Report"
 "    @Title {"
@@ -338,9 +338,9 @@ for sections, and also for all large-scale structure symbols except
 appendices, for which it is {@Code UCAlpha}.  This produces the appendices
 numbered in upper-case letters (A, B, C, etc.) that were mentioned earlier.
 @PP
-@Code "@SectionHeadingFont" is the font used for section headings.  The
-default value shown above produces the bold face from the family of the
-initial font.  A family name and size is acceptable here as well:
+@Code "@SectionHeadingFont" is the font of section headings.  The
+default value shown above produces the bold face from the family
+of the initial font.  A family name and size is acceptable:
 @ID @Code "@SectionHeadingFont { Helvetica Base +2p }"
 produces section headings in the Helvetica font, two points larger
 than the initial font size.

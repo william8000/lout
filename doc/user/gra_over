@@ -6,7 +6,16 @@
 The overall appearance of the graph is controlled by options to the
 @Code "@Graph" symbol.  As usual, these options follow the @Code "@Graph"
 symbol, with their values enclosed in braces; they may appear in any order,
-and if omitted are assigned some sensible default value.
+and if omitted are assigned some sensible default value.  The default
+values may be changed by setting options in the setup file as usual.
+@PP
+There is a @Code "font" option for changing the font throughout the
+graph, whose value is anything suitable for passing to Lout's
+@Code "@Font" symbol.  Indeed, you can get the same effect by
+placing a @Code "@Font" symbol immediately before @Code "@Graph"
+in the usual way.  However, the @Code "font" option is useful
+because it can be set in the setup file, where it applies to
+every graph in your document.
 @PP
 There is a @Code "style" option for controlling the overall style of the
 graphs. @RawIndex { graphs (statistical) }
@@ -32,7 +41,8 @@ graphs. @RawIndex { graphs (statistical) }
 graphs.yorigin @SubIndex { @Code yorigin option }
 yorigin.graph @Index { @Code "yorigin" option (graphs) }
 @ID @OneRow @Code @Verbatim {
--2p @Font @Graph
+@Graph
+    font { -2p }
     style { axes }
     xorigin { 0 }
     yorigin { 0 }
@@ -59,9 +69,7 @@ yorigin.graph @Index { @Code "yorigin" option (graphs) }
     }
 }
 }
-We have requested a smaller font size for this graph as a whole by
-preceding it with {@Code "-2p @Font"}, meaning two points smaller, and
-we have used some other options which will be explained shortly.  The
+We have used some other options which will be explained shortly.  The
 resulting graph has an x axis and a y axis instead of a frame, like this:
 @CD -2p @Font @Graph
     style { axes }

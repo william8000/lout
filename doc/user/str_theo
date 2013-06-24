@@ -83,19 +83,19 @@ are with their default values:
 "@TheoremTitleFormat { (title) }"
 "@TheoremFormat { { @B { word @NumSep number title: } &2s } @Insert body }"
 }
-The first option is used only when a @Code "@Title" is given to the
-theorem, and it determines how the title is formatted:  the @Code title
-symbol within the option stands for the @Code "@Title" option.  The default
-value shown places parentheses around the title.  The second option
-determines the format of the entire theorem.  Within it, @Code word
-stands for the value of {@Code "@TheoremWord"};
+@Code "@TheoremTitleFormat" is used only when the theorem has a
+{@Code "@Title"}.  It determines how the title is formatted:  the
+@Code title symbol within it stands for the @Code "@Title" option.
+The default value shown places parentheses around the title.
+@Code "@TheoremFormat" determines the format of the entire theorem.
+Within it, @Code word stands for the value of {@Code "@TheoremWord"};
 @Code "number" is the number of the theorem; @Code "title" is the title
 of the theorem after formatting by {@Code "@TheoremFormat"} (if there
 is a title; otherwise @Code title is {@Code "@Null"}, which prints as
-nothing and even deletes the preceding space as required); and
+nothing and even deletes preceding space as required); and
 @Code body is the body of the theorem.  The default value prints the
 word, number and title with a colon in bold, and inserts them and two
-spaces into the first paragraph of the body; another value might be
+spaces into the first paragraph of the body.  Another good value is
 @ID @Code { "@TheoremFormat { @B { word @NumSep number title } @LP body }" }
 which places the header in bold on a line by itself, separated from the
 body by a paragraph break.  For @Code "@NumSep" see page {@PageOf numsep}.

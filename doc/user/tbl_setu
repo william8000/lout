@@ -9,14 +9,10 @@ tables.setup @SubIndex { setup file }
 setup.files. @RawIndex { setup files }
 setup.files.for.tables @SubIndex { for tables }
 in the @Code { tbl } setup file, in which case the new values become
-the default values for every table in the document.  This section
-explains how to do it.  Changing options in the setup file can save a
-lot of time, but its more important purposes are to promote consistency
-and to allow document-wide formatting changes to be carried out easily.
-@PP
-The first step is to obtain your own copy of the setup file, @Code { tbl },
-from the Lout system include directory.  You can find out where that
-is by typing
+the default values for every table in the document, which promotes
+consistency and can save you a lot of time.  The first step is to
+obtain your own copy of the setup file, @Code { tbl }, from the Lout
+system include directory.  You can find out where that is by typing
 @ID @Code { lout -V }
 This prints out various things about Lout.  Supposing that it says
 that the Lout system include directory is @Code { "/usr/lout/include" }, for
@@ -45,10 +41,9 @@ the @Code "@TblSetup" @Code "@Use" clause, which looks like this:
     # break { }
 }
 }
-Only a few of the options are shown here.  To change a setup file
-option, delete the @Code "#" in front of it and change the value.  For
-example, suppose you want all table entries two points smaller than the
-surrounding text:
+Only a few of the options are shown here.  To change an option, delete
+the @Code "#" and change the value.  For example, suppose you want all
+table entries two points smaller than the surrounding text:
 @ID @OneRow @Code @Verbatim {
 @Use { @TblSetup
     # paint { none }
@@ -56,8 +51,8 @@ surrounding text:
     # break { }
 }
 }
-This relative specification of font size is available anywhere, not
-just in setup files (Section {@NumberOf fonts}).
+Relative font sizes are available anywhere, not just in setup files
+(Section {@NumberOf fonts}).
 @PP
 Some setup file options contain values which use the @Code "@OrIfPlain"
 symbol:

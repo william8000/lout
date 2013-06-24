@@ -1,31 +1,36 @@
 Directory lout/doc/user
 
-This directory contains the Lout source files for the User's Guide
-to the Lout Document Formatting System.  To produce the Guide,
-type the command
+This directory contains the Lout source files for the User's
+Guide to the Lout Document Formatting System.  A copy of the
+final PostScript output file (A4 paper size) is stored at
+"ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.40.user.ps.gz".
+To produce the Guide yourself, type the command
 
-    lout -r6 all > user.ps
+    lout -r5 all > user.ps
 
-in this directory.  The -r6 flag causes Lout to run over the
-document six times.  This is needed to completely resolve all
+in this directory.  The -r5 flag causes Lout to run over the
+document five times.  This is needed to completely resolve all
 cross references, although a readable PostScript file would be
 produced after one run if -r was omitted.  Auxiliary files with
-.li and .ld suffixes will be created in this directory.  Six runs
-is an unusually large number; it is owing to some unfortunate page
-breaks in the early runs that so many runs are needed.
+.li and .ld suffixes will be created in this directory.
+
+Slight changes (e.g. to Letter paper size) could easily cause
+the number of required runs to increase.  I've kept it down
+to 5 by rewriting to eliminate cases where the number of pages
+consumed by a chapter varies from run to run.
 
 The first run will produce a large number of error messages,
 nearly all beginning with "unresolved cross reference".  These
 should gradually go away on later runs.  The following shows the
-error message output on the last run for A4 size printing:
+error message output on the fifth run for A4 size printing:
 
 lout:
-        : lout -r beginning run 6:
+        : lout -r beginning run 5:
 lout file "gra_tick" (from "gra" line 38, from "all" line 46):
-   234,1: 23.7c object too high for 23.7c space; @Scale inserted
+   234,1: 23.7c object too high for 23.6c space; @Scale inserted
 lout file "gra_summ" (from "gra" line 44, from "all" line 46):
     10,1: 25.7c object too high for 23.6c space; @Scale inserted
-lout file "prg_tabs" (from "prg" line 139, from "all" line 48):
+lout file "prg_tabs" (from "prg" line 152, from "all" line 48):
    66,23: prg2lout 2,1: program text ended within comment
    68,35: prg2lout 2,1: program text ended within comment
 
@@ -36,11 +41,8 @@ these cases was deliberate.  If you set the document in Letter size
 paper, you will get a somewhat different set of warning messages.
 
 Optimal page breaking has been turned off for this document owing to
-repeated failure to converge, caused by footnotes and floating figures
-close to large unbreakable displays.
-
-A copy of the final PostScript output file (A4 paper size) is
-stored at "ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.39.user.ps.gz".
+failure to converge, caused by footnotes and floating figures close
+to large unbreakable displays.
 
 Jeffrey H. Kingston
-21 September 2010
+26 June 2013

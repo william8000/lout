@@ -21,10 +21,10 @@ To prevent page breaks within a table, precede the @Code "@Tbl"
 symbol by {@Code "@OneRow"}:
 @ID @Code "@CD @OneRow @Tbl ..."
 @Code "@OneRow" is a general Lout symbol which binds the following
-object into a single, unbreakable row.  Make sure your table is
-small enough to fit on one page when you do this, otherwise an error
-message will be printed and it will be scaled to fit.  Display symbols
-like @Code "@CD" often have this effect anyway.
+object into a single, unbreakable row.  The table must be small
+enough to fit on one page when you do this, otherwise an error
+will be printed and it will be scaled to fit.  Display symbols
+like @Code "@CD" may have this effect anyway.
 @PP
 To prevent a page break between two particular rows, but not in
 general, replace the @Code "@Row" symbol of the second row with
@@ -44,18 +44,16 @@ to fit on one page, and it will go wrong on a table containing
 @Code "@Table" symbols, because these symbols have been set up to accept
 multi-page objects.  Or they can go into the body text of the document
 at full width with a paragraph symbol before and after, like this:
-@ID @Code @Verbatim {
+@ID -1px @Break @OneRow @Code @Verbatim {
 @DP
 @Tbl ...
 @DP
 }
-An example of this kind of multi-page table appears in
-Section {@NumberOf tbl_summ}.  You can simulate an indent by means of an
-empty cell at the left of each row format, although in the author's opinion
-a multi-page table looks better at full width anyway.  Lout will expand the
-rightmost column to the full page width; one way to prevent this is to add
-a @Code "|" after the last cell within each {@Code format} option, creating
-an empty extra column.
+An example appears in Section {@NumberOf tbl_summ}.  You can simulate
+an indent by an empty cell at the left of each row format.  Lout will
+expand the rightmost column to the full page width; to prevent this,
+add a @Code "|" after the last cell within each {@Code format} option,
+creating an empty extra column.
 @PP
 One practical problem in multi-page tables is getting the rules
 right.  The simplest way to do this is to set @Code "rulehorizontal"
@@ -67,15 +65,15 @@ you to insert a rule after the last line of each page, but not
 elsewhere.  (However, if you are using the @Code "@Table"
 symbol, its @Code "@Format" option can be used to do this.)
 @PP
-Another practical problem with multi-page tables is that of getting a
-heading over every page after the first.  This is easy if you know where
-the page breaks are going to fall (if you are using {@Code "@NP"}, for
-example), but you usually don't.  To solve this problem, @Code {"@Tbl"}
-offers the @Code "@HeaderRowa" ... @Code "@HeaderRowh" and
+Another problem is getting a heading over every page after
+the first.  This is easy if you know where the page breaks are going
+to fall (if you are using {@Code "@NP"}, for example), but you usually
+don't.  To solve this problem, @Code {"@Tbl"} offers the
+@Code "@HeaderRowa" ... @Code "@HeaderRowh" and
 tables. @RawIndex { tables }
 tables.headerrow @SubIndex { @Code "@HeaderRow" symbols }
 headerrow.tables @Index { @Code "@HeaderRow" symbols (tables) }
-@Code "@EndHeaderRow" symbols.  For example, the multi-page table in
+@Code "@EndHeaderRow" symbols.  The multi-page table in
 Section {@NumberOf tbl_summ} is arranged like this:
 @ID -1px @Break @OneRow @Code @Verbatim {
 @Tbl

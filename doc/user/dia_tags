@@ -55,7 +55,7 @@ A tag may only be used later in the text of the diagram than the place
 where it is defined.
 @PP
 Standard tags like @Code N and @Code S are not much use as they are,
-since in general there will be many nodes and hence many @Code N and
+since in general there will be many nodes and so many @Code N and
 @Code S tags.  The retagging symbol, {@Code "::"}, solves this problem:
 @ID {
 @Code {
@@ -134,7 +134,7 @@ better to avoid the whole problem by not using digits.)
 @PP
 When a tag lies within the object following some node, it is
 automatically retagged in this way with tag {@Code IN}.  For example, in
-@ID @Code @Verbatim {
+@ID @OneRow @Code @Verbatim {
 @Square
 @Circle Hello
 }
@@ -149,10 +149,10 @@ effects on the positioning of labels of the outer node if inner tags are
 not retagged.
 @PP
 Although @Code from and @Code to are just two of several options within
-@Code "@Diag" where a point is expected, and hence where a tag may be
-given, they have a special virtue not shared by any other options.  It is
-possible to give the name of an entire node, not just a tag denoting one
-point, to them:
+@Code "@Diag" where a point is expected, and so where a tag may be given,
+they have a special virtue not shared by other options.  It is possible
+to give the name of an entire node, not just a tag denoting one point,
+to them:
 @ID {
 @Code @Verbatim {
 A:: @Circle

@@ -24,11 +24,7 @@ Change this to
 This provides everything you need for making diagrams.
 @PP
 The result of the @@Diag symbol is an object in the usual way.  A diagram
-is commonly made into a centred display, like this:
-@ID @OneRow @Code {
-"@CentredDisplay @Diag { ... }"
-}
-or into a floating figure, like this:
+is commonly made into a floating figure, like this:
 @ID @OneRow @Code {
 "@Figure"
 "    @Caption { ... }"
@@ -36,10 +32,15 @@ or into a floating figure, like this:
 "    ..."
 "}"
 }
+or into a centred display, like this:
+@ID @OneRow @Code {
+"@CentredDisplay @Diag { ... }"
+}
 but it could be an entry in a table, a word in a paragraph, or anything
 else.
 @PP
-Most uses of @@Diag contain a @I { nodes part } and a @I { links part }:
+Although it is not compulsory, most uses of @@Diag contain a
+@I { nodes part } and a @I { links part }:
 @ID @OneRow lines @Break {
 @Code "@Diag {"
     @I { nodes part }

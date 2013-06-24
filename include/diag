@@ -52,6 +52,7 @@
   # outlinestyle	{ solid			}
   # outlinedashlength	{ 0.2f			}
   # outlinewidth	{ thin			}
+  # outlinecolour	{ nochange		}
   # paint		{ none			}
   # texture		{ solid			}
   # font		{			}
@@ -137,6 +138,7 @@
   # aoutlinestyle	{ solid			}
   # aoutlinedashlength	{ 0.2f			}
   # aoutlinewidth	{ thin			}
+  # aoutlinecolour	{ nochange		}
   # apaint		{ none			}
   # atexture		{ solid			}
   # afont		{			}
@@ -222,6 +224,7 @@
   # boutlinestyle	{ solid			}
   # boutlinedashlength	{ 0.2f			}
   # boutlinewidth	{ thin			}
+  # boutlinecolour	{ nochange		}
   # bpaint		{ none			}
   # btexture		{ solid			}
   # bfont		{			}
@@ -307,6 +310,7 @@
   # coutlinestyle	{ solid			}
   # coutlinedashlength	{ 0.2f			}
   # coutlinewidth	{ thin			}
+  # coutlinecolour	{ nochange		}
   # cpaint		{ none			}
   # ctexture		{ solid			}
   # cfont		{			}
@@ -392,6 +396,7 @@
   # doutlinestyle	{ solid			}
   # doutlinedashlength	{ 0.2f			}
   # doutlinewidth	{ thin			}
+  # doutlinecolour	{ nochange		}
   # dpaint		{ none			}
   # dtexture		{ solid			}
   # dfont		{			}
@@ -477,6 +482,7 @@
   # eoutlinestyle	{ solid			}
   # eoutlinedashlength	{ 0.2f			}
   # eoutlinewidth	{ thin			}
+  # eoutlinecolour	{ nochange		}
   # epaint		{ none			}
   # etexture		{ solid			}
   # efont		{			}
@@ -569,6 +575,7 @@
   # pathstyle		{ solid			}
   # pathdashlength	{ 0.2f			}
   # pathwidth		{ thin			}
+  # pathcolour		{ nochange		}
   # pathgap		{ thin			}
   # arrow		{ no			}
   # arrowstyle		{ solid			}

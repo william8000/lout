@@ -117,13 +117,30 @@ arrowheads to links:
     tolabel { @SolidArrowHead }
 }
 }
-@Code "@SolidArrowHead" is a symbol available for use anywhere whose value
-is an object in the shape of a small solid arrowhead.  The arrowhead
+@Code "@SolidArrowHead" is a symbol, available for use anywhere, whose
+value is an object in the shape of a small solid arrowhead.  The arrowhead
 options of Section {@NumberOf dia_link} work by setting {@Code fromlabel}
 and {@Code tolabel} in exactly this way.  Usually it is best to forget
 about {@Code fromlabel} and {@Code tolabel}, and think of links as having
-three labels:  {@Code xlabel} near the start, {@Code ylabel} in the
-middle, and {@Code zlabel} near the end.
+just {@Code xlabel} near the start, {@Code ylabel} in the middle, and
+{@Code zlabel} near the end; but when you need different arrowheads, or
+arrowheads in a different colour from the rest of the arrow:
+@ID {
+@Code @Verbatim {
+@Link
+    tolabel { red @Colour @SolidArrowHead }
+}
+||9ct
+@VContract @Diag {
+3c @Wide 1c @High
+//
+@Link
+    from { 0 0 }
+    to { 1,1 }
+    tolabel { red @Colour @SolidArrowHead }
+}
+}
+{@Code fromlabel} and {@Code tolabel} are the answer.
 @PP
 Adding a label will not change the size of the diagram or the position
 of any node, link, or other label.  Although a label may be an arbitrary

@@ -8,8 +8,8 @@ them relative to each other.  If your problem is to place objects precisely
 at some unusual point on the page, you probably need a margin note or the
 @Code "@Place" symbol, for which see Section {@NumberOf marginnotes}.
 @PP
-Precise object placement is not a subject with any clear boundaries, so
-this section is mainly a list of examples, covering the use of the
+Precise object placement is not a subject with clear boundaries, so
+this section is mainly a list of examples, covering the
 @Code {"@OneCol"}, @Code {"@OneRow"}, @Code {"@Wide"}, @Code {"@High"},
 @Code {"@HExpand"}, @Code {"@VExpand"}, @Code {"@HShift"}, @Code {"@VShift"},
 @Code {"@VStrut"}, @Code {"@OverStrike"}, @Code {"@ZeroHeight"},

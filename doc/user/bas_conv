@@ -56,9 +56,9 @@ complicated.  Lout looks for a word, not necessarily at the end
 of an input line, which ends as described for @Code "troff" but
 in addition has a lower-case letter preceding that.
 @PP
-In all cases you must use a paragraph symbol, such as @Code "@PP" or
-{@Code "@LP"}, to separate your paragraphs.  The common convention of
-other systems, that a blank line marks a paragraph, is never true of Lout.
+You must use a paragraph symbol, such as @Code "@PP" or {@Code "@LP"},
+to separate paragraphs.  The common convention of other systems,
+that a blank line marks a paragraph, is never true of Lout.
 @PP
 Whatever rule is adopted, there are occasional exceptions where you
 will have to indicate explicitly whether you want an ordinary space
@@ -69,7 +69,7 @@ space).  For example,
 will produce an ordinary space between the two words, even with
 @Code "tex" which would otherwise consider that spot to be the end
 of a sentence.  Spaces adjacent to these two symbols have no effect on
-the result.  Please note however that @Code "~" produces an
-unbreakable space (that is, one that will never be replaced by the end of
-a line) in contrast to just leaving a space, which is breakable.
+the result.  However, @Code "~" produces an unbreakable space (that
+is, one that will never be replaced by the end of a line) in contrast
+to just leaving a space, which is breakable.
 @End @Section

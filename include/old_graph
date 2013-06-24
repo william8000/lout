@@ -1,0 +1,29 @@
+###############################################################################
+#                                                                             #
+#   Lout setup file for graph drawing (old version)                           #
+#                                                                             #
+#   Jeffrey H. Kingston                                                       #
+#   5 February 1999                                                           #
+#                                                                             #
+#   This file has been placed in the public domain by its author.             #
+#                                                                             #
+###############################################################################
+
+
+###############################################################################
+#                                                                             #
+#  The @SysInclude { old_graphf } line                                        #
+#                                                                             #
+#  This line causes Lout to read the definitions for graphs, and should       #
+#  not be touched.                                                            #
+#                                                                             #
+###############################################################################
+
+@SysInclude { old_graphf }
+
+
+###############################################################################
+#                                                                             #
+#  This package does not offer default options that can be changed.           #
+#                                                                             #
+###############################################################################

@@ -4,6 +4,7 @@
 #                                                                             #
 #   Jeffrey H. Kingston                                                       #
 #   5 February 1999                                                           #
+#   21 June 2013                                                              #
 #                                                                             #
 #   This file has been placed in the public domain by its author.             #
 #                                                                             #
@@ -24,6 +25,88 @@
 
 ###############################################################################
 #                                                                             #
-#  This package does not offer default options that can be changed.           #
+#  The @GraphSetup @Use clause                                                #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
 #                                                                             #
 ###############################################################################
+
+@Use { @GraphSetup
+
+  #############################################################################
+  #                                                                           #
+  #  Options for @Graph only                                                  #
+  #                                                                           #
+  #############################################################################
+
+  # style		{ frame			}
+  # font		{ 			}
+  # named xorigin  	{ none			}
+  # named yorigin  	{ none			}
+  # named xlog     	{ none			}
+  # named ylog     	{ none			}
+  # width		{ 6.0c			}
+  # height		{ 4.0c			}
+  # xextra		{ auto			}
+  # yextra		{ auto			}
+  # xdecreasing		{ no			}
+  # ydecreasing		{ no			}
+  # leftcaption		{			}
+  # rightcaption	{			}
+  # abovecaption	{			}
+  # belowcaption	{			}
+  # leftgap		{ 1.5c			}
+  # rightgap		{ 0.5c			}
+  # abovegap		{ 0.5c			}
+  # belowgap		{ 0.5c			}
+  # hidecaptions	{ yes			}
+  # xmin		{ none			}
+  # xmax		{ none			}
+  # ymin		{ none			}
+  # ymax 		{ none			}
+  # xticksep 		{ none			}
+  # yticksep 		{ none			}
+  # rticksep 		{ none			}
+  # xticks		{ auto 			}
+  # yticks		{ auto 			}
+  # rticks		{			}
+  # xticklength		{ 0.5f			}
+  # yticklength		{ 0.5f			}
+  # rticklength		{ 0.5f			}
+  # objects		{			}
+  # save		{ no			}
+
+  #############################################################################
+  #                                                                           #
+  #  Options for @Graph and @Data                                             #
+  #                                                                           #
+  #############################################################################
+
+  # points   		{ none			}
+  # symbolsize		{ 0.15f			}
+  # symbollinewidth	{ currentlinewidth	}
+  # pairs    		{ none			}
+  # dashlength		{ 0.2f			}
+  # linewidth		{ currentlinewidth	}
+  # colour		{ none			}
+  # paint		{ no			}
+  # texture		{ solid			}
+  # dataformat		{ xandy			}
+
+  #############################################################################
+  #                                                                           #
+  #  Options for @GraphCross etc. and @GraphNoLine etc.                       #
+  #                                                                           #
+  #  Owing to clashes the names of these options differ slightly from the     #
+  #  names of the corresponding options of @GraphCross etc. and @GraphNoLine  #
+  #  etc. whose default values they are, in being prefixed by an "o".         #
+  #                                                                           #
+  #############################################################################
+
+  # osymbolsize		{ 0.15f			}
+  # osymbollinewidth	{ currentlinewidth	}
+  # odashlength		{ 0.2f			}
+  # olinewidth		{ currentlinewidth	}
+  # olength		{ 1.0f			}
+}

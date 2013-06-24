@@ -58,10 +58,9 @@ explains why this circle is too high for the space allowed
 it.  Section {@NumberOf dia_summ} shows how each of the standard
 outlines is positioned over its base.
 @PP
-The @Code "@Node" symbol has many options, but all of them without
-exception share the following very useful property:  they may be given
-to the @Code "@Diag" symbol as well, where they apply to every node in
-the diagram:
+The @Code "@Node" symbol has many options.  They all share a very
+useful property:  they may be given to the @Code "@Diag" symbol
+as well, where they apply to every node in the diagram:
 @ID @OneRow {
 @Code @Verbatim {
 @Diag
@@ -147,14 +146,13 @@ in this section for the @Code font option):
     @BNode keyword
 }
 }
-Note that when giving an option directly to {@Code "@ANode"},
-{@Code "@BNode"}, {@Code "@CNode"}, {@Code "@DNode"}, and
-{@Code "@ENode"}, the initial @Code { a }, @Code { b },
-@Code { c }, @Code { d }, or @Code { e } used with @Code "@Diag"
-and in the setup file is omitted.
+When giving an option directly to {@Code "@ANode"}, {@Code "@BNode"},
+{@Code "@CNode"}, {@Code "@DNode"}, and {@Code "@ENode"}, the initial
+@Code { a }, @Code { b }, @Code { c }, @Code { d }, or @Code { e }
+used with @Code "@Diag" and in the setup file is omitted.
 @PP
 To save time in simple cases, @Code "@Diag" provides nine other
-node symbols called
+node symbols:
 {@Code "@Box"},
 diagrams. @RawIndex { diagrams }
 diagrams.box @SubIndex { @Code "@Box" symbol }
@@ -190,8 +188,8 @@ diagrams. @RawIndex { diagrams }
 diagrams.circle @SubIndex { @Code "@Circle" symbol }
 circle.diagrams @Index { @Code "@Circle" symbol (diagrams) }
 and {@Code "@Circle"}.  These are just abbreviations for @Code "@Node"
-with the appropriate value of {@Code outline}, nothing more.  They take
-the same options as {@Code "@Node"} (except that @Code outline is
+with its {@Code outline} option set, nothing more.  They take the
+same options as {@Code "@Node"} (except that @Code outline is
 already fixed), and everything works in the same way.
 @PP
 There is a @Code shadow option which determines the depth of the shadow
@@ -265,7 +263,8 @@ given to any node, and also to {@Code "@Diag"} and in the setup file,
 where they apply to every node as usual.  However, they only affect the
 appearance of shadow boxes and polygons, respectively.
 @PP
-The {@Code outlinestyle}, {@Code outlinedashlength}, and {@Code outlinewidth}
+The {@Code outlinestyle}, {@Code outlinedashlength}, {@Code outlinewidth},
+and {@Code outlinecolour} (alternative name {@Code outlinecolor})
 diagrams. @RawIndex { diagrams }
 diagrams.outlinestyle @SubIndex { @Code "outlinestyle" option }
 outlinestyle. @RawIndex { @Code "outlinestyle" option }
@@ -278,6 +277,8 @@ diagrams. @RawIndex { diagrams }
 diagrams.outlinewidth @SubIndex { @Code "outlinewidth" option }
 outlinewidth. @RawIndex { @Code "outlinewidth" option }
 outlinewidth.in.diagrams @SubIndex { in diagrams }
+outlinecolour. @RawIndex { @Code "outlinecolour" option }
+outlinecolour.in.diagrams @SubIndex { in diagrams }
 options apply to any node and affect the appearance of the outline:
 @ID @OneRow {
 @Code @Verbatim {
@@ -285,6 +286,7 @@ options apply to any node and affect the appearance of the outline:
    outlinestyle { solid }
    outlinedashlength { 0.2f }
    outlinewidth { thin }
+   outlinecolour { nochange }
 { Hello, world }
 }
 ||7ct
@@ -293,6 +295,7 @@ options apply to any node and affect the appearance of the outline:
    outlinestyle { solid }
    outlinedashlength { 0.2f }
    outlinewidth { thin }
+   outlinecolour { nochange }
 { Hello, world }
 }
 }
@@ -336,11 +339,7 @@ segment, which usually looks better:
 }
 The length of dashes is {@Code outlinedashlength}, and the distance
 between dashes or dots is at most {@Code outlinedashlength},
-reduced to make the dashes or dots fit evenly.  The @Code outlinewidth
-option determines the width of the line, dashes, or dots, and may be
-{@Code thin}, {@Code medium}, {@Code thick}, or any length.  The values
-used for {@Code thin}, {@Code medium}, and {@Code thick} are
-{@Code 0.04f}, {@Code 0.08f}, and {@Code 0.12f}.
+reduced to make the dashes or dots fit evenly.
 @PP
 The {@Code outlinestyle} option may contain a sequence of the values
 mentioned above, meaning that they are to be applied in turn to each
@@ -362,6 +361,31 @@ If there are more segments than values, {@Code outlinestyle} cycles back
 to the first value again; this is why a single value is applied to all
 segments.  Section {@NumberOf dia_summ} shows how each of the
 standard shapes is divided into segments.
+@PP
+The @Code outlinewidth option gives the width of the line, dashes,
+or dots, and may be {@Code thin}, {@Code medium}, {@Code thick}, or
+any length.  The values used for {@Code thin}, {@Code medium}, and
+{@Code thick} are {@Code 0.04f}, {@Code 0.08f}, and {@Code 0.12f}.
+@PP
+The {@Code outlinecolour} (alternatively {@Code outlinecolor}) option
+determines the colour of the outline:
+@ID @OneRow {
+@Code @Verbatim {
+@CurveBox
+   outlinestyle { cdashed }
+   outlinecolour { red }
+{ Hello, world }
+}
+||7ct
+@Diag {
+@CurveBox
+   outlinestyle { cdashed }
+   outlinecolour { red }
+{ Hello, world }
+}
+}
+It may be {@Code nochange} (or empty) for the colour currently in
+use, or any colour from Section {@NumberOf colour}.
 @PP
 The node symbols of @Code "@Diag" are quite separate symbols from the
 three basic box symbols of Section {@NumberOf boxes}.  Although much
@@ -398,7 +422,7 @@ paint.in.diagrams @SubIndex { in diagrams }
 }
 In this example the object following @Code "@Box" is a diamond containing
 {@Code "Hello, world"}.  The default value of @Code "paint" is {@Code none},
-a special value (not a colour) meaning don't use any paint.  There is
+a special value (not a colour) meaning `don't apply any paint'.  There is
 also a @Code "texture" option which causes this paint to be applied with a
 diagrams. @RawIndex { diagrams }
 diagrams.texture @SubIndex { @Code "texture" option }
@@ -407,10 +431,10 @@ texture.option.in.diagrams @SubIndex { in diagrams }
 given texture.  This works exacly like the @Code texture option described
 in Section {@NumberOf boxes}, so we'll say no more about it here.
 @PP
-When painting it is important to know what order things are done in, because
-anything put down earlier will disappear under the paint.  This is why
-@Code none and @Code white are different.  Painting is done first, then
-boundaries, and finally the following object.
+When painting it is important to know what order things are done in,
+because anything put down earlier will disappear under the paint.
+This is why @Code none and @Code white are different.  Painting is
+done first, then outlines, and finally the following object.
 @PP
 Each node symbol has 
 @Code "font" and @Code "break" options which may be used to
@@ -544,11 +568,11 @@ other.  For example,
 }
 }
 causes the feet of the boxes to be aligned.  In this example it is
-applied to all nodes at once, but of course it can be applied
-to individual nodes as well.  The value of {@Code valign} can be a
-length, which means that the point of alignment is
-to be that far down from the top of the base (including margins); or
-it may be {@Code top}, {@Code ctr}, or {@Code foot}, meaning alignment
+applied to all nodes at once, but, as usual, it can be applied to
+individual nodes as well.  The value of {@Code valign} can be a
+length, which means that the point of alignment is to be that far
+down from the top of the base (including margins); or it may be
+{@Code top}, {@Code ctr}, or {@Code foot}, meaning alignment
 through the top, centre (the default value), or foot.
 @PP
 The {@Code vsize} option specifies a particular
@@ -606,7 +630,7 @@ is to appear:
 }
 The value may be {@Code top} for at the top, {@Code ctr} (the default
 value) for in the centre, {@Code foot} for at the foot, or a length,
-meaning that distance down from the top.  These values are the same as
+meaning that far down from the top.  These values are the same as
 for the @Code valign option.
 @PP
 Small discrepancies in the size of nodes can be very annoying,
@@ -689,8 +713,8 @@ hindent.diagrams @Index { @Code "hindent" option (diagrams) }
 diagrams. @RawIndex { diagrams }
 diagrams.hstrut @SubIndex { @Code "hstrut" option }
 hstrut.diagrams @Index { @Code "hstrut" option (diagrams) }
-options which work horizontally exactly as {@Code valign}, {@Code vsize},
-{@Code vindent}, and {@Code vstrut} work vertically, except that they
+options that do horizontally exactly what {@Code valign}, {@Code vsize},
+{@Code vindent}, and {@Code vstrut} do vertically, except that they
 use {@Code left} and {@Code right} where the vertical ones use
 {@Code top} and {@Code foot}.  The best way to fix horizontal size
 discrepancies is with {@Code hsize}, not {@Code hstrut}.

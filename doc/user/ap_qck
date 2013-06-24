@@ -27,7 +27,6 @@
 "    @InitialFont { Times Base 12p }"
 "    @InitialBreak { adjust 1.2fx hyphen }"
 "    @InitialLanguage { English }"
-"    @PageHeaders { Simple }"
 "    @FirstPageNumber { 1 }"
 "    @ColumnNumber { 1 }"
 "    @PageOrientation { Portrait }"
@@ -69,7 +68,6 @@ B {
 @LI @Code {
 "@Section"
 "    @Title { ... }"
-"    @RunningTitle { ... }"
 "    @Tag { ... }"
 "@Begin"
 "@PP"

@@ -93,8 +93,8 @@ at the start of their documents in order to get access to the
 Latin2 versions of the fonts.
 @FootNote { Prior to Version 3.21 of Lout, some accented characters
 were missing from these Latin2 fonts, but this deficiency has now
-been corrected by getting Lout to generate output for these characters
-which prints their base letter and accent separately. }  These have
+been corrected.  Lout generates output for these characters which
+prints their base letter and accent separately. }  These have
 family names such as TimesCE, CourierCE, HelveticaCE, and so on (CE
 standing for Central European), to distinguish them from the same
 fonts encoded in Latin1.  The face names are unchanged.  A typical

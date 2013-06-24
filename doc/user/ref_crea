@@ -3,13 +3,11 @@
     @Tag { refstyles }
 @Begin
 @PP
-Although the set of options to the @Code "@Reference" symbol
-({@Code "@Tag"}, {@Code "@Type"}, {@Code "@Author"}, etc.) is fixed, you
-can add your own reference types and change the formatting of existing types.
-@PP
-To do this you must be using your own setup file, as explained in
-Section {@NumberOf setup}.  At the end of the setup file you will find
-this line:
+Although the options of @Code "@Reference" ({@Code "@Tag"},
+{@Code "@Type"}, {@Code "@Author"}, etc.) are fixed, you can add your
+own reference types and change the formatting of existing types.  To
+do this you must use your own setup file, as explained in
+Section {@NumberOf setup}.  At the end of the setup file is this line:
 references. @RawIndex { references }
 references.refstyle @SubIndex { @Code "@RefStyle" }
 refstyle.references @Index { @Code "@RefStyle" (references) }
@@ -34,11 +32,11 @@ Unix command
 Then, supposing that the Lout system database directory is
 {@Code "/usr/lout/data"}, type
 @ID @Code "cp /usr/lout/data/refstyle.ld mystyle.ld"
-to place a copy of the @Code "refstyle.ld" database file in your
+to copy @Code "refstyle.ld" into your
 mystyle.ld.file @Index { @Code "mystyle.ld" file}
-directory, renaming it {@Code "mystyle.ld"}.  Since @Code "refstyle.ld"
-is read-only, you may also need to change the mode of @Code "mystyle.ld"
-to be writable (by @Code "chmod +w mystyle.ld" in Unix).  Now replace
+directory, renamed {@Code "mystyle.ld"}.  Since @Code "refstyle.ld"
+is read-only, you may need to change @Code "mystyle.ld"
+to be writable (@Code "chmod +w mystyle.ld" in Unix).  Now replace
 @ID @Code "@SysDatabase @RefStyle { refstyle }"
 at the end of your setup file by
 @ID @Code "@Database @RefStyle { mystyle }"
@@ -67,27 +65,26 @@ might look something like this:
   }
 }
 }
-The meaning of the first two lines is beyond our scope, except that
-@Code "Book" on the first line means that this is the entry which
-defines how references of type @Code Book will be printed.  Fortunately,
-apart from this one word these two lines are the same in every
-reference style entry so you don't need to understand them.  The
-important part is in the middle:
+The first two lines are beyond our scope, except that @Code "Book"
+identifies this as the entry defining how references of type
+@Code Book appear.  Apart from this one word these lines are the
+same in every reference style, so you don't need to understand
+them.  The important part is in the middle:
 @ID @Code "@Author.  @I @Title.  @Publisher, @Year."
 The meaning should be clear:  first print the author option and a full
 stop, then the title option and another full stop in italics, and so
-on.  To change the formatting of books, change this object.  To create
-a new reference type, copy the entire database entry, change @Code Book
-to a new name of your choice, and change the middle part.  Don't forget
-to delete the index file @Code "mystyle.li" afterwards, if there is one,
-so that Lout knows to generate it afresh.
+on.  To change the @Code Book format, change this object.  To create
+a new reference type, copy the whole entry, change @Code Book to a
+new name of your choice, and change the middle part.  Delete index
+file @Code "mystyle.li" (if there is one) so that Lout knows to
+regenerate it.
 @PP
 Although the entry shown above is perfectly viable, the real entry for
 @Code Book is much more complicated, in part because there are more
 options than those basic four, but mainly because the real entry goes
 to great lengths to do the right thing when options are omitted:
 @ID @Tab
-    vmargin { 0.45vx }
+    vmargin { 0.5vx }
     @Fmta { @Col @Code A ! @Col @Code B }
 {
 @Rowa A { "{ Book @RefStyle @Style" }
@@ -124,9 +121,9 @@ and meaning.  Sub-conditions may be enclosed in braces if desired, although
 it is best to keep the conditions as simple as possible given the
 complexity of the whole setup.
 @PP
-The objects subject to @Code "@If" are printed with no space preceding
-them; any space in the final print will be the result of space within
-them, not between them.  This is why @Code "@If @True" is not redundant.
+The objects subject to @Code "@If" are printed with no preceding space;
+any space in the result will be from space within them, not between
+them.  This is why @Code "@If @True" is not redundant.
 @PP
 The object @Code "@Word&&notitle" produces @Code "No title" in the
 current language; @Code "@Word&&pages" produces {@Code pages} in the

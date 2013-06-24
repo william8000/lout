@@ -29,22 +29,21 @@ reference list only once.  The references will ordinarily be sorted by
 tag and labelled with Arabic numbers, although this can be changed by
 setting options in the setup file (Section {@NumberOf changeref}).
 @PP
-If you are making a book, there is a @Code "@ChapCite" symbol which is
+In books, there is a @Code "@ChapCite" symbol which is
 references. @RawIndex { references }
 references.chap.cite @SubIndex { @Code "@ChapCite" }
 chap.cite.references @Index { @Code "@ChapCite" (references) }
 the same as @Code "@Cite" except that its references come out at the
-end of the current preface, introduction, chapter, or appendix, rather
-than at the end of the document.
+end of the current preface, introduction, chapter, or appendix.
 @PP
-It is quite all right to cite a reference from within a footnote, figure,
-table, or index entry.  The reference will appear in the closest
-reference list following the citation point in the final printed document,
-or if there is no such list, the closest preceding reference list.  This
-is fine in documents with just one reference list; but when using
-@Code "@ChapCite" in books, if the citation point appears after the intended
-reference list (because the footnote or figure has floated past the reference
-list at the end of the chapter), the reference will come out in the wrong list.
+A citation may appear in a footnote, figure, table, or index entry.
+The reference will appear in the first reference list after the
+citation point, or if none, in the closest preceding reference list.
+This is fine in documents with just one reference list; but when
+using @Code "@ChapCite" in books, if the citation point appears
+after the intended reference list (because the footnote or figure
+has floated past the reference list at the end of the chapter),
+the reference will come out in the wrong list.
 @PP
 Although it is frowned upon by the authorities, some people include
 references which are not cited anywhere in the body of their document.  For
@@ -60,8 +59,8 @@ produces
 ... our scope @NoCite { $kingston1995lout.expert $kingston1993lout.design }.
 }
 with the @Code "@NoCite" symbol and any preceding space removed.  The
-references will nevertheless appear in the reference list as usual.  Note
-that if you put commas between the references inside @Code "@NoCite" you
+references nevertheless appear in the reference list as usual.  If
+you put commas between the references inside @Code "@NoCite" you
 will get commas in the output (so don't).  There
 is a @Code "@NoChapCite" symbol that combines @Code "@NoCite" and
 references. @RawIndex { references }

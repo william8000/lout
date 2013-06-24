@@ -445,9 +445,14 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	{
 	  /* galley is following, make UNATTACHED */
 	  New(z, UNATTACHED);  Link(z, x);
+	  actual(z) = nilobj;
+	  non_blocking(z) = TRUE;
+	  blocked(z) = FALSE;
 	  pinpoint(z) = y;
 	  Link(*extras, z);
 	  debug1(DCR, DDD, "  MinSize: %s", EchoObject(z));
+	  debug2(DGA, D, "  MinSize UNATTACHED %s at %s",
+	    SymName(actual(x)), EchoFilePos(&fpos(x)));
 	}
 	x = y;	/* now sizing y, not x */
 	back(x, COLM) = fwd(x, COLM) = 0;  /* fix non-zero size @Null bug!! */

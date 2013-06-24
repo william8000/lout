@@ -29,10 +29,10 @@ in Unix.  This causes Lout to print out various facts about itself.  Then,
 supposing that this tells you that the Lout system include directory
 is @Code { "/usr/lout/include" }, type the Unix command
 @ID @Code "cp  /usr/lout/include/doc  mydoc"
-to place a copy of the @Code doc setup file in your directory,
+to copy the @Code doc setup file into your directory,
 mydoc.file @Index { @Code "mydoc" file }
 renaming it @Code {mydoc}.  Since @Code "doc" is read-only, you may
-also need to change the mode of @Code mydoc to be writable (by
+need to change the mode of @Code mydoc to be writable (by
 @Code "chmod +w mydoc" in Unix).  Now replace
 @ID @Code "@SysInclude { doc }"
 at the beginning of your document by

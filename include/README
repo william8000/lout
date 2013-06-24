@@ -33,6 +33,7 @@ Setup files (containing mainly lists of options settable by the user)
        eiffel           Eiffel
        haskell          Haskell
        java             Java
+       javascript       JavaScript
        modula           Modula-2 (quick hack, does not use prg2lout)
        np               Nonpareil
        pas              Pascal (quick hack, does not use prg2lout)
@@ -41,6 +42,7 @@ Setup files (containing mainly lists of options settable by the user)
        python           Python
        rsl              RSL
        ruby             Ruby
+       tcl              Tcl
 
 Source files containing Lout and PostScript source code for the packages
 ------------------------------------------------------------------------
@@ -71,6 +73,7 @@ Source files containing Lout and PostScript source code for the packages
        eiffelf          Eiffel
        haskellf         Haskell
        javaf            Java
+       javascriptf      JavaScript
        modulaf          Modula-2
        npf              Nonpareil
        pasf             Pascal
@@ -79,6 +82,7 @@ Source files containing Lout and PostScript source code for the packages
        pythonf          Python
        rslf             RSL
        rubyf            Ruby
+       tclf             Tcl
 
 Obsolete source files retained for backward compatibility
 ---------------------------------------------------------
@@ -91,6 +95,8 @@ Obsolete source files retained for backward compatibility
        fig              Fig advanced graphics package (obsolete, use diag)
        figf             Fig advanced graphics package
        figf.lpg         A PostScript prepend file needed by figf
+       old_graph        Old setup file for Graph package
+       old_graphf       Old version of Graph package
 
 Miscellaneous source files
 --------------------------
@@ -104,4 +110,4 @@ Miscellaneous source files
 
 
 Jeffrey H. Kingston
-19 September 2008
+26 June 2013

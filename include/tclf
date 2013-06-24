@@ -1,10 +1,11 @@
 
 ###############################################################################
 #                                                                             #
-#  Lout @NonpareilSetup package for formatting Nonpareil programs             #
+#  Lout @TclSetup package for formatting Tcl programs                         #
 #                                                                             #
+#  Version 3.0                                                                #
 #  Jeffrey H. Kingston                                                        #
-#  3 December 2002                                                            #
+#  6 April 2001                                                               #
 #                                                                             #
 #  This package uses a filtered body parameter to convert program source      #
 #  code into Lout source.  The filter program is prg2lout, which is           #
@@ -30,11 +31,11 @@
 #                                                                             #
 ###############################################################################
 
-export @Nonpareil
-def @NonpareilSetup
-    named pipe					{	}  # pipe through this
-    named numbered				{ No	}  # numbered lines?
-    named blanknumbered				{ Yes	}  # blanks numbered?
+export @Tcl
+def @TclSetup
+    named pipe			{	}  # pipe through this first
+    named numbered		{ No	}  # want lines numbered?
+    named blanknumbered		{ Yes	}  # blank lines numbered?
     named style
 	named @OrIfPlain left x right y
 	{ @BackEnd @Case { PlainText @Yield y else @Yield x } }
@@ -47,7 +48,7 @@ def @NonpareilSetup
     named fixedblanklinescale			{ 1.0	}  # blank-line scale
     named fixedspace				{ lout	}  # spacing mode
     named fixedtabin				{ 8	}  # tab interval
-    named fixedtabout				{ 4s	}  # tab width
+    named fixedtabout				{ 8s	}  # tab width
 
     named fixedidentifiers			{ Base	}  # identifier face
     named fixedkeywords				{ Base	}  # keyword face
@@ -119,10 +120,10 @@ def @NonpareilSetup
 
     export
     
-	@PI @PK @PO @PN @PS @PC @PL @PA @PM @PD @PDD
+	@PI @PK @PO @PN @PS @PC @PL @PA @PM @PD
 	@A "$>"
 
-    def @Nonpareil
+    def @Tcl
 	named style          { style         }  # style
 	named numbered       { numbered      }  # want numbered lines?
 	named blanknumbered  { blanknumbered }  # numbered blank lines?
@@ -214,13 +215,13 @@ def @NonpareilSetup
 
 	    pipe @Case {
 		"" @Yield {
-	    	    "prg2lout -r -lNonpareil" wantblanknumbered wantnumbered
+	    	    "prg2lout -r -lTcl" wantblanknumbered wantnumbered
 		    -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
 		    -t{@InitTab} -T{@InitTabWidth}
 		}
 		else @Yield {
 	    	    "cat" @FilterIn "|" pipe "|"
-		    "prg2lout -r -lNonpareil" wantblanknumbered wantnumbered
+		    "prg2lout -r -lTcl" wantblanknumbered wantnumbered
 		    -o{@FilterOut} -e{@FilterErr}
 		    -t{@InitTab} -T{@InitTabWidth}
 		}
@@ -417,22 +418,7 @@ def @NonpareilSetup
 	{
 	    @PO @BackEnd @Case {
 		PlainText @Yield "."
-		else @Yield style @Case {
-		  fixed @Yield "."
-		  else @Yield { "1.4f" @Font "+0.04f" @VShift "." &"0.05f" }
-		}
-	    }
-	}
-
-
-	def @PDD	# for formatting double dots, if wanted larger
-	{
-	    @PO @BackEnd @Case {
-		PlainText @Yield ".."
-		else @Yield style @Case {
-		    fixed @Yield ".."
-		    else  @Yield { "1.4f" @Font "+0.04f" @VShift ".." &"0.05f" }
-		}
+		else @Yield { "1.4f" @Font "+0.04f" @VShift "." &"0.05f" }
 	    }
 	}
 
@@ -455,6 +441,6 @@ def @NonpareilSetup
 	{ @InitFontFamily Base @InitSize } @Font @InitSpace @Space
 	{ @InitLine lines "blanklinescale" @InitBLS } @Break @Body
 
-    @End @Nonpareil
+    @End @Tcl
 
-@End @NonpareilSetup
+@End @TclSetup

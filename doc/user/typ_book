@@ -365,6 +365,12 @@ also {@Code "@ColophonInContents"} and {@Code "@ColophonPrefix"}
 options for determining whether the colophon appears in the table
 of contents, and its prefix when structured page numbers are used.
 @PP
+In rare combinations of circumstances, another problem behind the
+scenes sometimes causes the title of the Colophon to appear,
+bizarrely, on the second page of the colophon.  If this happens
+you can work around it by starting off the body of the colophon
+with {@Code "@NP"}.
+@PP
 The features described in other chapters are all available within
 books.  A table of contents and index will appear automatically, and
 you will need to change the setup file to avoid them.  Endnotes will

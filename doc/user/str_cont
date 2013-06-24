@@ -57,9 +57,8 @@ single line spacing.  @Code "@ContentsFont" also applies only to these
 them to appear in Bold.
 @PP
 @Code "@ContentsPartGapAbove" and @Code "@ContentsPartGapBelow" are
-like @Code "@ContentsGapAbove" and @Code "@ContentsGapBelow", except
-that they are used before and after contents entries that denote
-book parts.
+like @Code "@ContentsGapAbove" and @Code "@ContentsGapBelow", only
+used before and after contents entries that denote book parts.
 @PP
 @Code "@ContentsFormat" determines the format of each entry of
 contentsformat. @Index @Code "@ContentsFormat"

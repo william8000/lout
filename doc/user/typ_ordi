@@ -43,8 +43,8 @@ may be given in any order, and only the ones that need to be changed
 need be given at all.  Notice the @Code "//" after the last option.  Its
 meaning is beyond our
 scope, but total disaster will ensue if it is forgotten.  The @Code "@Doc"
-symbol is an abbreviation for {@Code "@Document //"}, which is why you don't
-need @Code "//" with {@Code "@Doc"}.
+symbol is an abbreviation for {@Code "@Document //"}.
+# , which is why you don't need @Code "//" with {@Code "@Doc"}.
 @PP
 The eight options are a selection of setup file options (Section
 {@NumberOf setup}) that frequently need to be changed.  If your changes
@@ -111,9 +111,7 @@ of @Code "@FullWidth" because (regrettably) any space here will appear
 before @Code Trespassers in the output.  Alternatively you could use
 a paragraph symbol:
 @ID @OneRow @Code {
-"@FullWidth {"
-"@CentredDisplay @Heading { NOTICE TO TRESPASSERS }"
-"}"
+"@FullWidth { @CentredDisplay @Heading { NOTICE TO TRESPASSERS } }"
 "@PP"
 "Trespassers are hereby notified that, ..."
 }

@@ -3,12 +3,11 @@
    @Tag { definitions }
 @Begin
 @PP
-Whenever you find yourself typing the same thing repeatedly, you can
+Whenever you find yourself typing something repeatedly, you can
 definitions. @Index definitions
-save a lot of time by defining your own personal symbol to stand for that
-thing.  For example, suppose you type your company's name, @Batlow,
-frequently.  You can define your own symbol, {@Code "@Batlow"} say,
-so that
+save time by defining your own personal symbol to stand for that
+thing.  For example, suppose you type `@Batlow' frequently.  You
+can define your own symbol, {@Code "@Batlow"} say, so that
 @ID @Code {
 "Concerning your crate supply contract with @Batlow, @Batlow wishes to ..."
 }
@@ -18,7 +17,7 @@ Concerning your crate supply contract with @Batlow, @Batlow wishes to ...
 }
 You will never have to type @Batlow again.
 @PP
-The method is to create a file called @Code "mydefs" in your current
+Create a file called @Code "mydefs" in your current
 mydefs.file @Index { @Code mydefs file }
 directory, containing definitions like this:
 @ID @OneRow @Code {
@@ -55,13 +54,12 @@ these symbols available to the definition, and can actually be omitted
 before definitions like the one for @Code "@Batlow" which do not use
 any symbols.  However it does no harm, so we place it in front of every
 definition as a matter of course.
-@FootNote {
+@PP
 Later chapters of this guide introduce specialized symbols for producing
 tables, equations, diagrams, graphs, and computer programs.  You need a
 different @Code "import" clause when using those symbols within a
 definition, because they are not from the BasicSetup package.  Examples
 may be found in the chapters concerned.
-}
 @PP
 Now suppose you frequently need a grey box, but enclosing different
 things:  @GreyBox ENTRY one moment, @GreyBox EXIT the next.  You could
@@ -94,8 +92,7 @@ is for, rather than how it does what it does.  Here is a good example:
 "import @BasicSetup"
 "def @Poetry right x { lines @Break @I x }"
 }
-This kind of name is very pleasant to use, since it allows you to
-forget about what is going on behind the scenes:
+This kind of name is very pleasant to use:
 @ID @OneRow @Code {
 "@IndentedDisplay @Poetry {"
 "Teach me to hear Mermaides singing,"
@@ -116,8 +113,8 @@ and {@Code "@Colour"} symbols do:
 "{  @Box { @CentredDisplay @Heading x y }"
 "}"
 }
-This definition occupies several lines only because it is long; as
-usual, end of line is the same as one space.  Now
+This takes three lines only because it is long; as usual, end of
+line is the same as a space.  Now
 @ID @OneRow @Code {
 "Cheating @HeadingBox {"
 "The Department uses assignments ... of that student alone."
@@ -132,6 +129,5 @@ requires that all programs, exercises etc. handed in bearing an
 individual student's name be the work of that student alone.
 }
 Do not use a paragraph, display, or list symbol at the beginning or end
-of a definition, since the result is not what people who do it are
-hoping for.
+of a definition.  The result is not what people who do it are hoping for.
 @End @Section

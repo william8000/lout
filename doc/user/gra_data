@@ -50,14 +50,13 @@ centred over the data point.  There is a @Code "symbolsize"
 graphs. @RawIndex { graphs (statistical) }
 graphs.symbolsize @SubIndex { @Code symbolsize option }
 symbolsize.graph @Index { @Code "symbolsize" option (graphs) }
-option which controls the size (radius) of all these symbols,
-and a @Code "symbollinewidth" option
-@FootNote {
-The @Code "symbollinewidth" option was introduced in Version 3.37,
-as part of a bug fix which also caused the printed size of some
-symbols to change slightly.
-}
-which controls their line width:
+option which controls the size (radius) of all these symbols, and
+a @Code "symbollinewidth" option which controls their line width:
+# @FootNote {
+# The @Code "symbollinewidth" option was introduced in Version 3.37,
+# as part of a bug fix which also caused the printed size of some
+# symbols to change slightly.
+# }
 @ID @OneRow @Code {
 "@Data"
 "    symbolsize { 0.15f }"

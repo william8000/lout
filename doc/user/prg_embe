@@ -20,7 +20,6 @@ this for the C language:
 @ID @OneRow @Code @Verbatim {
 @IndentedDisplay @CP {
 #include <stdio.h>
-
 treeprint(struct tnode *p)        /* print tree p recursively */
 {
         if (p != NULL) {
@@ -37,7 +36,6 @@ allowing the program text to be incorporated with absolutely no
 modifications.  The result is
 @ID @OneRow @CP {
 #include <stdio.h>
-
 treeprint(struct tnode *p)        /* print tree p recursively */
 {
         if (p != NULL) {

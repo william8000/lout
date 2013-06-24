@@ -84,6 +84,7 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
+    named outlinecolour outlinecolor	{ nochange		}
     named paint                 	{ none		       	}
     import @TextureImport named texture	{ solid			}
     named font				{			}
@@ -203,6 +204,7 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
+    named aoutlinecolour aoutlinecolor	{ nochange		}
     named apaint                 	{ none		       	}
     import @TextureImport named atexture{ solid			}
     named afont				{			}
@@ -322,6 +324,7 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
+    named boutlinecolour boutlinecolor	{ nochange		}
     named bpaint                 	{ none		       	}
     import @TextureImport named btexture{ solid			}
     named bfont				{			}
@@ -441,6 +444,7 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
+    named coutlinecolour coutlinecolor	{ nochange		}
     named cpaint                 	{ none		       	}
     import @TextureImport named ctexture{ solid			}
     named cfont				{			}
@@ -560,6 +564,7 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
+    named doutlinecolour doutlinecolor	{ nochange		}
     named dpaint                 	{ none		       	}
     import @TextureImport named dtexture{ solid			}
     named dfont				{			}
@@ -679,6 +684,7 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
+    named eoutlinecolour eoutlinecolor	{ nochange		}
     named epaint                 	{ none		       	}
     import @TextureImport named etexture{ solid			}
     named efont				{			}
@@ -816,6 +822,7 @@ def @DiagSetup
 	named medium { 0.08 ft }
 	named thick  { 0.12 ft }
 					{ thin	         	}
+    named pathcolour pathcolor		{ nochange		}
     import @Geometry named pathgap
 	named thin   { 0.08 ft }
 	named medium { 0.16 ft }
@@ -1010,6 +1017,7 @@ def @DiagSetup
 	    named medium { 0.08 ft }
 	    named thick  { 0.12 ft }
 						{ outlinewidth     	}
+        named outlinecolour outlinecolor	{ outlinecolour		}
         named paint                 		{ paint         	}
 	import @TextureImport named texture	{ texture		}
 	named font				{ font			}
@@ -1078,6 +1086,7 @@ def @DiagSetup
 	    named medium { 0.08 ft }
 	    named thick  { 0.12 ft }
 						{ aoutlinewidth     	}
+        named aoutlinecolour aoutlinecolor	{ aoutlinecolour	}
         named apaint                 		{ apaint         	}
 	import @TextureImport named atexture	{ atexture		}
 	named afont				{ afont			}
@@ -1146,6 +1155,7 @@ def @DiagSetup
 	    named medium { 0.08 ft }
 	    named thick  { 0.12 ft }
 						{ boutlinewidth     	}
+        named boutlinecolour boutlinecolor	{ boutlinecolour	}
         named bpaint                 		{ bpaint         	}
 	import @TextureImport named btexture	{ btexture		}
 	named bfont				{ bfont			}
@@ -1214,6 +1224,7 @@ def @DiagSetup
 	    named medium { 0.08 ft }
 	    named thick  { 0.12 ft }
 						{ coutlinewidth     	}
+        named coutlinecolour coutlinecolor	{ coutlinecolour	}
         named cpaint                 		{ cpaint         	}
 	import @TextureImport named ctexture	{ ctexture		}
 	named cfont				{ cfont			}
@@ -1282,6 +1293,7 @@ def @DiagSetup
 	    named medium { 0.08 ft }
 	    named thick  { 0.12 ft }
 						{ doutlinewidth     	}
+        named doutlinecolour doutlinecolor	{ doutlinecolour	}
         named dpaint                 		{ dpaint         	}
 	import @TextureImport named dtexture	{ dtexture		}
 	named dfont				{ dfont			}
@@ -1350,6 +1362,7 @@ def @DiagSetup
 	    named medium { 0.08 ft }
 	    named thick  { 0.12 ft }
 						{ eoutlinewidth     	}
+        named eoutlinecolour eoutlinecolor	{ eoutlinecolour	}
         named epaint                 		{ epaint         	}
 	import @TextureImport named etexture	{ etexture		}
 	named efont				{ efont			}
@@ -1446,6 +1459,7 @@ def @DiagSetup
 	    named medium { 0.08 ft }
 	    named thick  { 0.12 ft }
 						{ pathwidth     	}
+        named pathcolour pathcolor		{ pathcolour		}
         import @Geometry named pathgap
 	    named thin   { 0.08 ft }
 	    named medium { 0.16 ft }
@@ -2739,6 +2753,7 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ outlinewidth     	}
+	    named outlinecolour outlinecolor	{ outlinecolour		}
             named paint				{ paint         	}
             import @TextureImport named texture	{ texture         	}
 	    named font				{ font			}
@@ -2992,9 +3007,10 @@ def @DiagSetup
 		@HContract @VContract
 		{
 		    {
-			"ldiagnodebegin [" @OutLine "]"
-			outlinedashlength "[" outlinestyle "]"
-			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
+			"ldiagnodebegin [" @OutLine "]" outlinedashlength
+			"[" outlinestyle "]" outlinewidth
+			"{" @ColourCommand outlinecolour "}"
+			paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -3089,6 +3105,7 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ aoutlinewidth     	}
+	    named outlinecolour outlinecolor	{ aoutlinecolour	}
             named paint				{ apaint         	}
             import @TextureImport named texture	{ atexture         	}
 	    named font				{ afont			}
@@ -3342,9 +3359,10 @@ def @DiagSetup
 		@HContract @VContract
 		{
 		    {
-			"ldiagnodebegin [" @OutLine "]"
-			outlinedashlength "[" outlinestyle "]"
-			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
+			"ldiagnodebegin [" @OutLine "]" outlinedashlength
+			"[" outlinestyle "]" outlinewidth
+			"{" @ColourCommand outlinecolour "}"
+			paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -3439,6 +3457,7 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ boutlinewidth     	}
+	    named outlinecolour outlinecolor	{ boutlinecolour	}
             named paint				{ bpaint         	}
             import @TextureImport named texture	{ btexture         	}
 	    named font				{ bfont			}
@@ -3692,9 +3711,10 @@ def @DiagSetup
 		@HContract @VContract
 		{
 		    {
-			"ldiagnodebegin [" @OutLine "]"
-			outlinedashlength "[" outlinestyle "]"
-			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
+			"ldiagnodebegin [" @OutLine "]" outlinedashlength
+			"[" outlinestyle "]" outlinewidth
+			"{" @ColourCommand outlinecolour "}"
+			paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -3789,6 +3809,7 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ coutlinewidth     	}
+	    named outlinecolour outlinecolor	{ coutlinecolour	}
             named paint				{ cpaint         	}
             import @TextureImport named texture	{ ctexture         	}
 	    named font				{ cfont			}
@@ -4042,9 +4063,10 @@ def @DiagSetup
 		@HContract @VContract
 		{
 		    {
-			"ldiagnodebegin [" @OutLine "]"
-			outlinedashlength "[" outlinestyle "]"
-			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
+			"ldiagnodebegin [" @OutLine "]" outlinedashlength
+			"[" outlinestyle "]" outlinewidth
+			"{" @ColourCommand outlinecolour "}"
+			paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -4139,6 +4161,7 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ doutlinewidth     	}
+	    named outlinecolour outlinecolor	{ doutlinecolour	}
             named paint				{ dpaint         	}
             import @TextureImport named texture	{ dtexture         	}
 	    named font				{ dfont			}
@@ -4392,9 +4415,10 @@ def @DiagSetup
 		@HContract @VContract
 		{
 		    {
-			"ldiagnodebegin [" @OutLine "]"
-			outlinedashlength "[" outlinestyle "]"
-			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
+			"ldiagnodebegin [" @OutLine "]" outlinedashlength
+			"[" outlinestyle "]" outlinewidth
+			"{" @ColourCommand outlinecolour "}"
+			paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -4489,6 +4513,7 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ eoutlinewidth     	}
+	    named outlinecolour outlinecolor	{ eoutlinecolour	}
             named paint				{ epaint         	}
             import @TextureImport named texture	{ etexture         	}
 	    named font				{ efont			}
@@ -4742,9 +4767,10 @@ def @DiagSetup
 		@HContract @VContract
 		{
 		    {
-			"ldiagnodebegin [" @OutLine "]"
-			outlinedashlength "[" outlinestyle "]"
-			outlinewidth paint @PSAddPaint texture "ldiagnodeend"
+			"ldiagnodebegin [" @OutLine "]" outlinedashlength
+			"[" outlinestyle "]" outlinewidth
+			"{" @ColourCommand outlinecolour "}"
+			paint @PSAddPaint texture "ldiagnodeend"
 			"(IN) ldiagpushtagdict"
 			//
 			"ldiagpopuptagdict"
@@ -4826,6 +4852,9 @@ def @DiagSetup
 		vsize {}
 		vstrut { no }
 		hstrut { no }
+		paint { nochange }
+		texture { solid }
+		outlinestyle { noline }
 	}
 
 	def @SolidArrowHead
@@ -4834,9 +4863,6 @@ def @DiagSetup
 	    named pathwidth { pathwidth }
 	{
 	    @InsulatedNode
-		paint { nochange }
-		texture { solid }
-		outlinestyle { noline }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -4857,9 +4883,6 @@ def @DiagSetup
 	    named pathwidth { pathwidth }
 	{
 	    @InsulatedNode
-		paint { nochange }
-		texture { solid }
-		outlinestyle { noline }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -4882,9 +4905,6 @@ def @DiagSetup
 	{
 	    @InsulatedNode
 		outlinewidth { pathwidth }
-		outlinestyle { noline }
-		paint { nochange }
-		texture { solid }
 		outline {
 		  @BackEnd @Case {
 		    PostScript @Yield {
@@ -4905,9 +4925,6 @@ def @DiagSetup
 	    named pathgap { pathgap }
 	{
 	    @InsulatedNode
-		paint { nochange }
-		texture { solid }
-		outlinestyle { noline }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -4928,9 +4945,6 @@ def @DiagSetup
 	    named pathwidth { pathwidth }
 	{
 	    @InsulatedNode
-		outlinestyle { noline }
-		paint { nochange }
-		texture { solid }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -4952,9 +4966,6 @@ def @DiagSetup
 	    named pathgap { pathgap }
 	{
 	    @InsulatedNode
-		outlinestyle { noline }
-		paint { nochange }
-		texture { solid }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -4976,9 +4987,6 @@ def @DiagSetup
 	    named pathgap { pathgap }
 	{
 	    @InsulatedNode
-		outlinestyle { noline }
-		paint { nochange }
-		texture { solid }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -4999,9 +5007,6 @@ def @DiagSetup
 	    named pathwidth { pathwidth }
 	{
 	    @InsulatedNode
-		outlinestyle { noline }
-		paint { nochange }
-		texture { solid }
 		outlinewidth { pathwidth }
 		outline { circle }
 	    { length @Wide length @High }
@@ -5013,9 +5018,6 @@ def @DiagSetup
 	    named pathwidth { pathwidth }
 	{
 	    @InsulatedNode
-		outlinestyle { noline }
-		paint { nochange }
-		texture { solid }
 		outlinewidth { pathwidth }
 		outline { box }
 	    { length @Wide width @High }
@@ -5027,9 +5029,6 @@ def @DiagSetup
 	    named pathwidth { pathwidth }
 	{
 	    @InsulatedNode
-		outlinestyle { noline }
-		paint { nochange }
-		texture { solid }
 		outlinewidth { pathwidth }
 		outline {
 		  @BackEnd @Case {
@@ -5045,9 +5044,10 @@ def @DiagSetup
 	    named width { arrowwidth }
 	    named length { arrowlength }
 	    named pathwidth { pathwidth }
+	    named pathcolour { pathcolour }
 	    named pathgap { pathgap }
 	{
-	    style @Case {
+	    {@ColourCommand pathcolour} @SetColour style @Case {
 		solid          @Yield @SolidArrowHead
 				  width { width } length { length }
 				  pathwidth { pathwidth }
@@ -5153,6 +5153,7 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ pathwidth		}
+            named pathcolour pathcolor		{ pathcolour		}
             import @Geometry named pathgap
 		named thin   { 0.08 ft }
 		named medium { 0.16 ft }
@@ -5299,6 +5300,7 @@ def @DiagSetup
 			    width { backarrowwidth }
 			    length { backarrowlength }
 			    pathwidth { pathwidth }
+			    pathcolour { pathcolour }
 			    pathgap { @PathGap }
 		    }
 		    else @Yield ""
@@ -5314,6 +5316,7 @@ def @DiagSetup
 			    width { arrowwidth }
 			    length { arrowlength }
 			    pathwidth { pathwidth }
+			    pathcolour { pathcolour }
 			    pathgap { @PathGap }
 		    }
 		    else @Yield ""
@@ -6466,8 +6469,8 @@ def @DiagSetup
 
 	    @Null & # so that preceding space gets chewed up
             {
-	      @Direct "ldiaglinkbegin [" @Path "]" pathdashlength
-	      "[" pathstyle "]" pathwidth "ldiaglinkend"
+	      @Direct "ldiaglinkbegin" @ColourCommand pathcolour
+	      "[" @Path "]" pathdashlength "[" pathstyle "]" pathwidth "ldiaglinkend"
             }
             @Graphic
             {
@@ -6563,6 +6566,7 @@ def @DiagSetup
 		named medium { 0.08 ft }
 		named thick  { 0.12 ft }
 						{ pathwidth		}
+            named pathcolour			{ pathcolour		}
             import @Geometry named pathgap
 		named thin   { 0.08 ft }
 		named medium { 0.16 ft }
@@ -6700,6 +6704,7 @@ def @DiagSetup
 			pathstyle	{ pathstyle		}
 			pathdashlength	{ pathdashlength	}
 			pathwidth	{ pathwidth		}
+			pathcolour	{ pathcolour		}
 			pathgap 	{ pathgap		}
 			arrow		{ arrow			}
 			arrowstyle	{ arrowstyle		}

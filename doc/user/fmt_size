@@ -35,6 +35,10 @@ the @Code "@PageType" option to the name of the paper you use:
 @Rowa A { A3 }		B {  842p }  C { 1190p }
 @Rowa A { A4 }		B {  595p }  C {  842p }
 @Rowa A { A5 }		B {  420p }  C {  595p }
+@Rowa A { ISOB4 }	B {  709p }  C { 1001p }
+@Rowa A { ISOB5 }	B {  499p }  C {  709p }
+@Rowa A { JISB4 }	B {  729p }  C { 1032p }
+@Rowa A { JISB5 }	B {  516p }  C {  729p }
 @Rowa A { B4 }		B {  729p }  C { 1032p }
 @Rowa A { B5 }		B {  516p }  C {  729p }
 @Rowa A { Folio }	B {  612p }  C {  936p }
@@ -43,9 +47,11 @@ the @Code "@PageType" option to the name of the paper you use:
 }
 This will automatically assign the widths and heights shown above to
 the @Code "@PageWidth" and @Code "@PageHeight" options, so you don't
-have to worry about those options.  If your paper size is not on this
-list, set @Code "@PageType" to @Code Other and supply your own width
-and height:
+have to worry about those options.  It is recommended that {@Code ISOB4}
+or {@Code JISB4} be used instead of {@Code B4}, and that {@Code ISOB5}
+or {@Code JISB5} be used instead of {@Code B5}.  If your paper size
+is not on this list, set @Code "@PageType" to @Code Other and supply
+your own width and height:
 page.width @Index @Code "@PageWidth"
 page.height @Index @Code "@PageHeight"
 @ID @Tab
@@ -89,8 +95,9 @@ the basic ones:
     A { "@PageOrientation { ReverseLandscape }" }
     B { @Box 1.4c @Wide 1.0c @High { //1rt &1rt 180d @Rotate Hello } }
 }
-@Code ReverseLandscape might be useful when post-processing the PostScript
-output to print two landscape pages per sheet.  The @Code "@PageOrientation"
-symbol is available at the start of a document, as well as in the setup
-file, like {@Code "@InitialFont"} and {@Code "@PageHeaders"}.
+# @Code ReverseLandscape might be useful when post-processing the
+# PostScript output to print two landscape pages per sheet.
+The @Code "@PageOrientation" symbol is available at the start of a
+document, as well as in the setup file, like {@Code "@InitialFont"}
+and {@Code "@PageHeaders"}.
 @End @Section

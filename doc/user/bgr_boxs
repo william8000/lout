@@ -55,9 +55,9 @@ produces
 }
 Lout does not take the line width into account when working out how
 large everything is:  as far as Lout is concerned, the line always
-has width zero.  If you draw really thick lines you might need a larger
+has width zero.  If you draw very thick lines you might need a larger
 margin and more space near the box.  The default value of @Code linewidth
-is empty, which means to use whatever width the PostScript interpreter
+is empty, which produces whatever width the PostScript interpreter
 in your output device thinks is a good default value.  The special
 value @Code "none" for @Code "linewidth" ensures that no line is drawn
 around the box at all.
@@ -76,8 +76,8 @@ Section {@NumberOf colour}; its default value is {@Code "none"}, which
 is a special value (not a colour) which means no painting.  White paint
 comes into its own inside painted boxes:
 @ID @Code "@Box paint { nochange } white @Colour { Hello world }"
-produces a box painted in whatever colour we happen to be using at
-the moment, with white text inside:
+makes a box painted in whatever colour we are using at the moment,
+with white text inside:
 @ID @Box paint { nochange } white @Colour { Hello world }
 This works because the box is painted before the object it encloses
 is drawn on the page.
@@ -131,11 +131,11 @@ black @Colour striped @Texture angle { 45d }
 darkgrey @Colour striped @Texture scale { 2 } 50p @Font ABC
 } 
 The outline colour and texture are the colour and texture from outside
-the box; the background colour and texture are always determined by the
+the box; the background colour and texture are determined by the
 @Code paint and @Code texture options; and the colour and texture of
 the contents are inherited from outside the box, but can be changed as
-shown if desired.  Notice what happens when two textures overstrike:  the
-lower one shows through the unpainted parts of the upper one.
+shown if desired.  When two textures overstrike, the lower one shows
+through the unpainted parts of the upper one.
 @PP
 There are @Code "@CurveBox" and @Code "@ShadowBox" symbols that
 curvebox. @Index @Code "@CurveBox"
@@ -172,15 +172,15 @@ show.  Simply proceed as usual:
 @ID @Code "... paragraphs, as @Box { a box }, @CurveBox { a curve box }, ..."
 Boxes within paragraphs are never broken across two lines.
 @PP
-There are two symbols for producing horizontal rules.  @Code "@FullWidthRule"
+Two symbols make horizontal rules.  @Code "@FullWidthRule"
 fullwidthrule. @Index @Code "@FullWidthRule"
 rules. @Index rules
-produces a rule which occupies the full page (or column) width:
+makes a rule which occupies the full page (or column) width,
+or (more precisely) as much horizontal space as it legally can:
 @DP @FullWidthRule @DP
-More precisely, the rule occupies as much horizontal space as it
-legally can.  @Code "@FullWidthRule" produces an object in the usual
-way, so you will need paragraph or display symbols to separate it from
-preceding and following things.
+@Code "@FullWidthRule" produces an object in the usual way, so you
+will need paragraph or display symbols to separate it from preceding
+and following things.
 @PP
 A variant called @Code "@LocalWidthRule" is more timid about zooming
 localwidthrule. @Index @Code "@LocalWidthRule"

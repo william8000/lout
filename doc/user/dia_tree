@@ -347,10 +347,9 @@ and its subtrees:
 }
 }
 }
-These options may also be given to individual subtree symbols, although
-@Code "treevsep" works as expected only with @Code "@LeftSub" and
-{@Code "@FirstSub"}, since these determine the vertical separation of
-all children of their parent.
+These may also be given to individual subtree symbols; @Code "treevsep"
+works only with @Code "@LeftSub" and {@Code "@FirstSub"}, since these
+determine the vertical separation of all children of their parent.
 @PP
 The @Code "treehindent" option determines where the root of a non-binary
 diagrams. @RawIndex { diagrams }

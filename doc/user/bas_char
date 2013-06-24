@@ -575,7 +575,7 @@ author's viewer has this problem, for example, but his printer doesn't.
 The easiest way to get a dingbat is to write, for example,
 @ID @Code "@Ding a123"
 which produces the dingbat with the given name from the table
-above.  This is just a shorthand for
+above.  This is just a short for
 @ID @Code @Verbatim {
 { Dingbats Base } @Font { @Char a123 }
 }
@@ -598,6 +598,6 @@ symbol, although they aren't ISO-LATIN-1 characters.
 @Rowa A { fl } B { endash } C { emdash } D { bullet }
 @Rowa A { dagger } B { daggerdbl } C { florin } D { fraction }
 }
-Most of these characters are also in the list of `characters important
-enough to deserve their own symbols' given above.
+Most of these are also listed as `characters important enough to
+deserve their own symbols'.
 @End @Section

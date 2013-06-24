@@ -218,9 +218,9 @@ the {@Code nodelabel} options except for {@Code nodelabelpos}.
   hmargin { 1s }
   # vmargin { 0.6vx }
   @Fmth { @Col @Code A ! @Col @Code " " ! @Col @Code B ! @Col @Code " " !
-	  @Col 1.0c @Wide ! @Col C }
+	  @Col 0.3c @Wide ! @Col C }
   @Fmta { @Col @Code A ! @Col @Code "{" ! @Col @Code B ! @Col @Code "}" !
-	  @Col 1.0c @Wide ! @Col C }
+	  @Col 0.3c @Wide ! @Col C }
 {
 @FirstRowh
   A { "@Node" }
@@ -256,7 +256,7 @@ any outline }
   C { {@Code solid}, {@Code dashed}, {@Code cdashed}, {@Code dotted},
 {@Code dotdashed}, {@Code dotcdashed}, {@Code dotdotdashed},
 {@Code dotdotcdashed}, {@Code dotdotdotdashed}, {@Code dotdotdotcdashed},
-{@Code noline}, or any sequence of one or more of these values }
+{@Code noline}, or any sequence of one or more of these }
 @Rowa
   A { "   outlinedashlength"}
   B { 0.2f }
@@ -265,6 +265,10 @@ any outline }
   A { "   outlinewidth" }
   B { thin }
   C { {@Code thin}, {@Code medium}, {@Code thick}, or any @I length }
+@Rowa
+  A { "   outlinecolour" }
+  B { nochange }
+  C { @Code nochange or any colour from  Section {@NumberOf colour} }
 @Rowa
   A { "   paint"     }
   B { none }
@@ -1243,9 +1247,9 @@ have been omitted where they are the same as the {@Code linklabel} options.
   hmargin { 1s }
   # vmargin { 0.6vx }
   @Fmth { @Col @Code A ! @Col @Code " " ! @Col @Code B ! @Col @Code " " !
-	  @Col 1.0c @Wide ! @Col C }
+	  @Col 0.3c @Wide ! @Col C }
   @Fmta { @Col @Code A ! @Col @Code "{" ! @Col @Code B ! @Col @Code "}" !
-	  @Col 1.0c @Wide ! @Col C }
+	  @Col 0.3c @Wide ! @Col C }
 {
 @Rowh
   A { "@Link" }
@@ -1323,6 +1327,10 @@ have been omitted where they are the same as the {@Code linklabel} options.
   A { "   pathwidth" }
   B { thin }
   C { {@Code thin}, {@Code medium}, {@Code thick}, or any @I length }
+@Rowa
+  A { "   pathcolour" }
+  B { nochange }
+  C { @Code nochange or any colour from  Section {@NumberOf colour} }
 @Rowa
   A { "   pathgap" }
   B { thin }

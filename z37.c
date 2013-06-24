@@ -1091,7 +1091,7 @@ void FontChange(STYLE *style, OBJECT x)
   OBJECT par[3], family, face, fsize, y = nilobj, link, new, old, tmpf;
   GAP gp;  FULL_LENGTH flen = 0;  int num, c;  unsigned inc;
   struct metrics *newfnt, *oldfnt;
-  FULL_CHAR *lig;
+  FULL_CHAR *lig, *old_lig;
   int cmptop;
   COMPOSITE *oldcmp, *newcmp;
   FULL_LENGTH *oldks, *newks;  int klen;
@@ -1467,7 +1467,16 @@ void FontChange(STYLE *style, OBJECT x)
   if( finfo[font_count].size_table == (struct metrics *) NULL )
     Error(37, 53, "run out of memory when changing font or font size",
       FATAL, &fpos(x));
-  finfo[font_count].lig_table  = lig = finfo[font_num(old)].lig_table;
+
+  /* copy lig_table (sharing it is not safe) bug fix JeffK 25/06/13 */
+  lig = (FULL_CHAR *) malloc(2*MAX_CHARS*sizeof(FULL_CHAR));
+  old_lig = finfo[font_num(old)].lig_table;
+  if( lig == (FULL_CHAR *) NULL )
+    Error(37, 54, "run out of memory when changing font or font size",
+      FATAL, &fpos(x));
+  for( i = 0;  i < 2*MAX_CHARS;  i++ )
+    lig[i] = old_lig[i];
+  finfo[font_count].lig_table = lig;
 
   /* scale old font to new size */
   newfnt = finfo[font_num(new)].size_table;

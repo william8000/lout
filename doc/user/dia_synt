@@ -67,8 +67,8 @@ The basic components of syntax diagrams are @I { category cells },
 shown as boxes in the example above and obtained with the
 @Code "@ACell" symbol; @I { keyword cells }, shown as curved boxes
 and obtained with {@Code "@BCell"}; and @I { punctuation cells },
-containing punctuation symbols small enough to be enclosed in circles,
-and obtained with {@Code "@CCell"}.  After each symbol, place whatever
+containing symbols small enough to be enclosed in circles, and
+obtained with {@Code "@CCell"}.  After each symbol, place whatever
 has to go inside the cell:
 @ID @OneRow {
 @Code @Verbatim { @StartRight @BCell loop }

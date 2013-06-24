@@ -62,9 +62,6 @@ for @M { x } from 10 to 500:
 The @Code "do" option of @Code xloop is replicated repeatedly with each
 occurrence of @Code x replaced by 10, 30, 50, ... up to 490.  The
 result is
-@FootNote { Source:  Jeffrey H. Kingston, Analysis of tree algorithms
-for the simulation event list.  @I { Acta Informatica } {@B 22},
-pp. 15--33 (1985). }
 @CD -2p @Font @Graph
     style { axes }
     xorigin { 0 }
@@ -96,7 +93,9 @@ pp. 15--33 (1985). }
         }
     }
 }
-The points are connected by straight line segments as usual, but a
+(Jeffrey H. Kingston, Analysis of tree algorithms for the simulation
+event list.  @I { Acta Informatica } {@B 22}, pp. 15--33 1985).  The
+points are connected by straight line segments as usual, but a
 smallish @Code "by" option of about one-twentieth of the range creates
 the illusion of a smooth curve quite well.
 @PP
@@ -167,7 +166,7 @@ the document, and we do not want the literal word @Code "tan" to be
 taken as a symbol.
 @PP
 Next comes the symbol's precedence, in this case the same as @Code "sin" and
-@Code "cos" (see Section {@NumberOf dia_summ} for the precedence of
+@Code "cos" (see Section {@NumberOf grsummary} for the precedence of
 each symbol).  Next is a list of the formal parameters, in this case
 just one, called {@Code "x"}, that is to be passed on the right.
 @PP

@@ -3,7 +3,22 @@
     @Tag { tbl_plai }
 @Begin
 @PP
-Tables work well with plain text output (Section {@NumberOf plain}):
+@Code "@Tbl" changes the default values of several options when
+printing plain text (Section {@NumberOf plain}):
+@ID @OneRow @Code @Verbatim {
+@Tbl
+    marginvertical { 2f }
+    marginhorizontal { 2s }
+    rulehorizontalwidth { 1f }
+    ruleverticalwidth { 1s }
+    rulehorizontalgap { 0f }
+    ruleverticalgap { 0s }
+}
+When using plain text it is best to make vertical distances whole
+multiples of {@Code "1f"}, and horizontal distances whole multiples of
+{@Code "1s"}, since this avoids fractional spacing which cannot be
+successful in plain text files and produces quite messy results.
+If this is done, the results can be good:
 tables. @RawIndex { tables }
 tables.plaintext @SubIndex { plain text output }
 plain.text.tables @Index { plain text tables }
@@ -48,22 +63,7 @@ plain.text.tables @Index { plain text tables }
 This table was produced by a separate run of Lout and pasted into this
 document.
 @PP
-@Code "@Tbl" changes the default values of several options when used
-in a plain text document:
-@ID @OneRow @Code @Verbatim {
-@Tbl
-    marginvertical { 2f }
-    marginhorizontal { 2s }
-    rulehorizontalwidth { 1f }
-    ruleverticalwidth { 1s }
-    rulehorizontalgap { 0f }
-    ruleverticalgap { 0s }
-}
-When using plain text it is advisable to make vertical distances whole
-multiples of {@Code "1f"}, and horizontal distances whole multiples of
-{@Code "1s"}, since this avoids fractional spacing which cannot be successful
-in plain text files and produces quite messy results.  There is also a
-@Code ruleplainchar option for changing the character used to
+A @Code ruleplainchar option for changing the character used to
 tables. @RawIndex { tables }
 tables.ruleplainchar @SubIndex { @Code "ruleplainchar" option }
 ruleplainchar.tables @Index { @Code "ruleplainchar" option (tables) }
@@ -72,13 +72,13 @@ draw rules.  For example,
 @Tbl
     ruleplainchar { - }
 }
-would be a good choice if you plan to draw only horizontal rules.  This
-option can be set anywhere as usual.
+would be good if you draw only horizontal rules.  This option can be
+set anywhere as usual.
 @PP
-If you do use rules it is worth pondering the implications of the last
-part of Section {@NumberOf tbl_rule}.  Right and below rules are drawn
-outside the boundary of the cell, which is unimportant
-in ordinary output, but means that they will appear one space to the
+If you use rules it is worth pondering the implications of the last
+part of Section {@NumberOf tbl_rule}.  Right and below rules are
+drawn outside the boundary of the cell, which is unimportant in
+ordinary output, but means that they will appear one space to the
 right and one line below the cell in plain text output.  This explains
 the slight asymmetry in the example above; you can correct it with
 @ID @Code @Verbatim {
@@ -86,9 +86,9 @@ the slight asymmetry in the example above; you can correct it with
     marginright { 1s }
     marginbelow { 1f }
 }
-but you still have to worry about rules at the extreme right of the
-page going off the edge, and rules below the last line bumping into
-whatever follows the table.  The first can be fixed by not using
-full width tables with right rules; the second by inserting an extra
-@Code "@DP" after a table that ends with a below rule.
+but rules at the extreme right of the page will still go off the edge,
+and rules below the last line will bump into whatever follows the table.
+The first can be fixed by not using full width tables with right rules;
+the second by inserting an extra @Code "@DP" after a table that ends
+with a below rule.
 @End @Section

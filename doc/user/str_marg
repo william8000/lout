@@ -76,14 +76,13 @@ bottom of the page, if it is very long or if preceding notes obstruct
 it.  Again, it is up to you to avoid this problem by keeping your notes
 small and not too close together.
 @PP
-Margin notes inside footnotes, figures and tables work well.  Margin
-notes in multi-column documents are disastrous unless used very
-sparingly.  Margin notes do not appear in plain text output
-(Section {@NumberOf plain}).
+Margin notes work well inside footnotes, figures, and tables, but
+badly in multi-column documents unless used sparingly.  They do
+not appear in plain text output (Section {@NumberOf plain}).
 @PP
-A more radical way to place objects at arbitrary points on the current
+The @Code "@Place" symbol can place objects at arbitrary points on
+the current page:
 place. @Index @Code "@Place"
-page is provided by the @Code "@Place" symbol:
 @ID @OneRow @Code {
 "@Place"
 "    x { right - 1c - xsize }"
@@ -156,5 +155,6 @@ where the coordinate system's origin is; this is true of the examples
 above.  At the point where @Code "@Place" occurs, the result is an
 empty object.  As with margin notes, Lout does not know what is
 happening and will not lay out the rest of the page around the
-placed object.
+placed object.  @Code "@Place" does not take account of the value
+of any @Code "@PageOrientation" option.
 @End @Section

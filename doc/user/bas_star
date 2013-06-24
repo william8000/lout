@@ -105,9 +105,9 @@ errors. @Index { errors }
 @Code "intro" above, but on more complicated ones (anything with a footnote,
 for example).  These just mean that you have to run the @Code "lout" command
 again to finish off the complicated things (Section {@NumberOf cross}), and
-they will gradually go away.  Of course, if you see error messages about
-missing braces, unknown symbols, and so on, you need to revise your file.  Lout
-will tell you the line number of the problem, and how far along the line it is.
+they will gradually go away.  Of course, if you see messages about missing
+braces, unknown symbols, and so on, you need to revise your file.  Lout will
+give the line number of the problem, and how far along the line it is.
 @PP
 @BI { WARNING: }  Lout allows documents to cause arbitrary system commands
 to be executed.  These typically do useful things such as format computer

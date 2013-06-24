@@ -265,6 +265,7 @@ static void PDF_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v,
 /*                                                                           */
 /*****************************************************************************/
 
+/* ***
 static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)
 { debug1(DPF, D, "PrintComposite(cp, %s, fp)", bool(outline));
   while( cp->char_code != '\0' )
@@ -275,7 +276,8 @@ static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)
       cp->char_code, outline ? "co" : "c");
     cp++;
   }
-} /* end PrintComposite */
+} ** end PrintComposite **
+*** */
 
 
 /*****************************************************************************/

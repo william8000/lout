@@ -780,7 +780,7 @@ ldiagdict begin
 } def
 
 % ldiagsetpath: convert a Diag path into a PostScript path
-% [ shape ] ldiagsetpath 
+% [ shape ] ldiagsetpath -
 /ldiagsetpath
 {
   10 dict begin
@@ -971,15 +971,17 @@ ldiagdict begin
 } def
 
 % ldiagnodeend: end of node parameters (so do the node)
-% <outline> <dashlength> <style> <linewidth> <paint> ldiagnodeend -
+% <outline> <dashlength> <style> <linewidth> <colour> <paint> ldiagnodeend -
 /ldiagnodeend
 {
   % (Entering ldiagnodeend) 0 ldiagdebugprint
   end % matches begin in ldiagnodebegin
-  4 index gsave ldiagpaintpath grestore
-  3 index ldiagsetpath clip newpath
-  2 mul setlinewidth
-  3 -1 roll ldiagdosegpath
+  5 index gsave ldiagpaintpath grestore         % <outline> <dl> <st> <lw> <cl>
+  4 index ldiagsetpath clip newpath             % <outline> <dl> <st> <lw> <cl>
+  exec						% <outline> <dl> <st> <lw>
+  2 mul setlinewidth                            % <outline> <dl> <st>
+  3 -1 roll                                     % <dashlength> <st> <outline>
+  ldiagdosegpath                                % -
   % (Leaving ldiagnodeend) 0 ldiagdebugprint
 } def
 

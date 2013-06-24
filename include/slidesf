@@ -373,7 +373,7 @@ def @OverheadSetup
 		majortitle { @GetTitle }
 		minortitle { @SaveTitle }
 		intheorems { @OverheadNumInTheorems }
-		indisplays { OverheadNumInDisplays }
+		indisplays { @OverheadNumInDisplays }
 		infigures { @OverheadNumInFigures }
 		inrunners { @OverheadNumInRunners }
 		@Format @Body

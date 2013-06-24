@@ -15,12 +15,14 @@ c. @Index { C and C++ program printing }
 eiffel. @Index { Eiffel program printing }
 haskell. @Index { Haskell program printing }
 java. @Index { Java program printing }
+javascript. @Index { Javascript program printing }
 nonpareil. @Index { Nonpareil program printing }
 perl. @Index { Perl program printing }
 pod. @Index { Pod (for Perl) printing }
 python. @Index { Python program printing }
 rsl. @Index { RSL program printing }
 ruby. @Index { Ruby program printing }
+tcl. @Index { Tcl program printing }
 @CD @Tbl
     mv { 0.5vx }
     af { Italic }
@@ -65,6 +67,12 @@ ruby. @Index { Ruby program printing }
     D { fixed }
     E { No }
 @Rowb
+    A { Javascript }
+    B { javascript }
+    C { "@JavaScript" }
+    D { fixed }
+    E { No }
+@Rowb
     A { Nonpareil }
     B { np }
     C { "@Nonpareil" }
@@ -100,6 +108,12 @@ ruby. @Index { Ruby program printing }
     C { "@Ruby" }
     D { fixed }
     E { No }
+@Rowb
+    A { Tcl }
+    B { tcl }
+    C { "@Tcl" }
+    D { fixed }
+    E { No }
     rb { yes }
 }
 C and C++ are handled together since, for formatting purposes, they
@@ -127,10 +141,9 @@ or interpret in some way (braces and so on), ensuring that you can include
 program texts with absolutely no modifications; plus, if you wish, Lout
 will print keywords in bold, identifiers in italics, add line numbers, etc.
 @PP
-It is relatively easy to add new languages, since you don't have to write
-executable code, just declare a lot of records describing your language.
-Consult the instructions at the top of file {@I prg2lout.c} if you want
-to try it yourself.
+It is fairly easy to add new languages:  you don't have to write
+executable code, just declare records describing your language.
+There are instructions at the top of file {@I prg2lout.c}.
 @BeginSections
 @Include { prg_lone }
 @Include { prg_embe }

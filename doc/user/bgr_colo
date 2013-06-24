@@ -53,8 +53,8 @@ produces
 Wherever in this document it says that that you can use any colour
 from this section, it means any of the names above, or {@Code nochange},
 or an object beginning with @Code "rgb" or @Code "cmyk" as shown.
-@PP
-Whether the colours produced by @Code "@Colour" actually
-correspond with the names depends on the output device; the same
-nominal colour can look quite different on screen and on paper.
+# @PP
+# Whether the colours produced by @Code "@Colour" actually
+# correspond with the names depends on the output device; the same
+# nominal colour can look quite different on screen and on paper.
 @End @Section

@@ -19,7 +19,7 @@ given by a {@Code path} option:
 diagrams. @RawIndex { diagrams }
 diagrams.path @SubIndex { @Code "path" option }
 path.diagrams @Index { @Code "path" option (diagrams) }
-@ID @Code @Verbatim {
+@ID @OneRow @Code @Verbatim {
 @Link
     path { ... }
     from { ... }
@@ -30,9 +30,11 @@ Unlike {@Code "@Node"}, {@Code "@Link"} has no following object.
 The @Code "path" option may be used to produce a link of any shape, as
 Section {@NumberOf dia_defi} explains.  There are also values
 that produce standard paths.  These are listed in full in the summary
-(Section {@NumberOf dia_summ}); here is a sample:
+(Section {@NumberOf dia_summ}).  Here is a sample:
 @ID @Tab
-    @Fmta { @Col @Code { path "{" A "}" } ! @Col ! @Col B }
+    @Fmta { @Col @Code { path "{" A "}" } ! @Col ! @Col B !
+    @Col 0.5c @Wide ! @Col @Code { path "{" C "}" } ! @Col ! @Col D
+    }
 {
 
 @Rowa
@@ -43,22 +45,11 @@ A:: @Circle //1c ||2c B:: @Circle
 // @Link from { A } to { B } path { line } arrow { yes }
 }
 }
-
-@Rowa
-    A { acurve }
-    B {
+    C { acurve }
+    D {
 @Diag {
 A:: @Circle //1c ||2c B:: @Circle
 // @Link from { A } to { B } path { acurve } arrow { yes }
-}
-}
-
-@Rowa
-    A { ccurve }
-    B {
-@Diag {
-A:: @Circle //1c ||2c B:: @Circle
-// @Link from { A } to { B } path { ccurve } arrow { yes }
 }
 }
 
@@ -70,17 +61,24 @@ A:: @Circle //1c ||2c B:: @Circle
 // @Link from { A } to { B } path { rvlcurve } arrow { yes }
 }
 }
+    C { ccurve }
+    D {
+@Diag {
+A:: @Circle //1c ||2c B:: @Circle
+// @Link from { A } to { B } path { ccurve } arrow { yes }
+}
+}
 
 }
-The name of the last one is a reminder that it goes right, then vertically,
-then left, with curved corners.  The @Code acurve and @Code ccurve values
-produce circular arcs, anticlockwise and clockwise respectively, lying on
-the circle passing through the endpoints, or through the centres of the
-endpoints when they are tags denoting nodes.  There is also @Code "curve"
-which is an abbreviation for {@Code "acurve"}.  All these standard paths
-are defined in a way that makes sense no matter where the two nodes are
-relative to each other, except that no promise of a sensible result is
-made for two nodes very close together.
+The name @Code rvlcurve is a reminder that the curve goes right, then
+vertically, then left, with curved corners.  The @Code acurve and
+@Code ccurve values produce circular arcs, anticlockwise or clockwise,
+lying on the circle passing through the endpoints, or through the
+centres of the endpoints when they are tags denoting nodes.  There
+is also @Code "curve" which is an abbreviation for {@Code "acurve"}.
+All these standard paths are defined in a way that makes sense no matter
+where the two nodes are relative to each other, except that no promise
+of a sensible result is made for two nodes very close together.
 @PP
 @Code "@Link" has two options, @Code bias and {@Code radius}, that may be
 diagrams. @RawIndex { diagrams }
@@ -128,26 +126,27 @@ account when placing a diagram on the page:
 @ID {
 @Code @Verbatim {
 @Link
-    path { ccurve }
+    path { acurve }
     bias { 2c }
 }
 ||7ct
 @Diag vstrut { no } {
 A:: @Circle &3c B:: @Circle
 //
-@Link path { ccurve } bias { 2c } from { A } to { B }
+@Link path { acurve } bias { 2c } from { A } to { B }
 }
 }
 In such cases you have to arrange for the extra space yourself, by adding
 an extra paragraph symbol, blank row or column in a table, or whatever.
 @PP
-As with the options of {@Code "@Node"}, the options of {@Code "@Link"}
-may all be given to {@Code "@Diag"} as well, where they apply to every
-link in the diagram, unless overridden in the usual way.  They also appear
-in the setup file, where they apply to every link in every diagram of the
-document, unless overridden.
+As with {@Code "@Node"} options, {@Code "@Link"} options may all be
+given to {@Code "@Diag"} as well, where they apply to every link in
+the diagram, unless overridden in the usual way.  They also appear
+in the setup file, where they apply to every link in every diagram
+of the document, unless overridden.
 @PP
-There are {@Code pathstyle}, {@Code pathdashlength} and {@Code pathwidth}
+There are {@Code pathstyle}, {@Code pathdashlength}, {@Code pathwidth},
+and {@Code pathcolour} (alternative name {@Code pathcolor})
 diagrams. @RawIndex { diagrams }
 diagrams.pathstyle @SubIndex { @Code "pathstyle" option }
 pathstyle.diagrams @Index { @Code "pathstyle" option (diagrams) }
@@ -157,13 +156,26 @@ pathdashlength.diagrams @Index { @Code "pathdashlength" option (diagrams) }
 diagrams. @RawIndex { diagrams }
 diagrams.pathwidth @SubIndex { @Code "pathwidth" option }
 pathwidth.diagrams @Index { @Code "pathwidth" option (diagrams) }
-options which affect the appearance of the path in the same way as the
-{@Code outlinestyle}, {@Code outlinedashlength} and {@Code outlinewidth}
-options of {@Code "@Node"} affect the outline.  When {@Code pathstyle}
-contains just one value (as opposed to a sequence of values) @Code "@Diag"
-tries to divide the path into fewer segments than it would otherwise, to
-make dashed and dotted paths look as good as possible.  There is also
-a {@Code pathgap} option which affects only @Code doubleline paths; it
+diagrams.pathcolour @SubIndex { @Code "pathcolour" option }
+pathcolour.diagrams @Index { @Code "pathcolour" option (diagrams) }
+options which affect the path's appearance like the
+{@Code outlinestyle}, {@Code outlinedashlength}, {@Code outlinewidth},
+and {@Code outlinecolour} options of {@Code "@Node"} affect its outline.
+Here they are with their default values:
+@ID {
+@Code @Verbatim {
+@Link
+    pathstyle { solid }
+    pathdashlength { 0.2f }
+    pathwidth { thin }
+    pathcolour { nochange }
+}
+}
+When {@Code pathstyle} contains just one value (as opposed to a sequence
+of values) @Code "@Diag" tries to divide the path into fewer segments
+than it would otherwise, to make dashed and dotted paths look as good
+as possible.  There is also a {@Code pathgap} option which affects only
+@Code doubleline paths; it
 diagrams. @RawIndex { diagrams }
 diagrams.pathgap @SubIndex { @Code "pathgap" option }
 pathgap.diagrams @Index { @Code "pathgap" option (diagrams) }
@@ -195,6 +207,7 @@ Its value may be {@Code no} (the default), {@Code yes}, {@Code forward}
 @Code @Verbatim {
 @Link
     arrow { both }
+    pathcolour { green }
 }
 ||7ct
 @Diag {
@@ -204,11 +217,17 @@ Its value may be {@Code no} (the default), {@Code yes}, {@Code forward}
     from { 0,0 }
     to { 1,1 }
     arrow { both }
+    pathcolour { green }
 }
 }
-@Code "@Link" has three options for controlling the appearance of
-arrowheads:  {@Code arrowstyle}, {@Code arrowwidth}, and
-{@Code arrowlength}.  Although every link symbol has these options, for
+To colour the arrowheads differently you need {@Code fromlabel} and
+{@Code tolabel}, described in Section {@NumberOf dia_labe}.  Colouring
+a link using `{@Code "green @Colour @Link ..."}' works too; it also
+colours the link's labels.
+@PP
+@Code "@Link" offers {@Code arrowstyle}, {@Code arrowwidth}, and
+{@Code arrowlength} options for changing the appearance of the
+arrowheads.  For
 diagrams. @RawIndex { diagrams }
 diagrams.arrowstyle @SubIndex { @Code "arrowstyle" option }
 arrowstyle.diagrams @Index { @Code "arrowstyle" option (diagrams) }
@@ -218,10 +237,10 @@ arrowwidth.diagrams @Index { @Code "arrowwidth" option (diagrams) }
 diagrams. @RawIndex { diagrams }
 diagrams.arrowlength @SubIndex { @Code "arrowlength" option }
 arrowlength.diagrams @Index { @Code "arrowlength" option (diagrams) }
-consistency it is almost always better to set the corresponding options
-to the @Code "@Diag" symbol, which applies them to every arrow in the
+consistency it is usually best to set the corresponding options to
+the @Code "@Diag" symbol, which applies them to every arrow in the
 diagram:
-@ID @Code @Verbatim {
+@ID @OneRow @Code @Verbatim {
 @Diag
     arrowstyle { solid }
     arrowwidth { 0.3f }
@@ -292,7 +311,7 @@ the point; the arrowhead itself is responsible for continuing the link
 path, at the appropriate width (although never dashed or dotted), from its
 base to its point, and hence can and does ensure that the link path does
 not overstrike and thicken the point of the arrow.
-}
+} &2s
 The arrow with style @Code solidwithbar has a bar at the tip of the
 arrowhead, whose length equals the width of the arrow and whose
 width is {@Code pathwidth}, like this:
@@ -341,9 +360,9 @@ It is also possible to place an arbitrary object at the beginning or
 end of a link, using the @Code "fromlabel" and @Code "tolabel" options
 of Section {@NumberOf dia_labe}.
 @PP
-To save time in common cases, @Code "@Diag" provides link symbols,
-each of which is just @Code "@Link" with one of the standard paths
-already set:  {@Code "@Line"}, {@Code "@Curve"}, {@Code "@CCurve"},
+@Code "@Diag" offers link symbols which are just @Code "@Link" with
+one of the standard paths already set:  {@Code "@Line"},
+{@Code "@Curve"}, {@Code "@CCurve"},
 diagrams. @RawIndex { diagrams }
 diagrams.line @SubIndex { @Code "@Line" symbol }
 line.diagrams @Index { @Code "@Line" symbol (diagrams) }
@@ -351,7 +370,7 @@ diagrams. @RawIndex { diagrams }
 diagrams.curve @SubIndex { @Code "@Curve" symbol }
 curve.diagrams @Index { @Code "@Curve" symbol (diagrams) }
 {@Code "@RVLCurve"}, and so on.  There are also symbols in which
-the @Code "arrow" option is set to @Code yes in addition:  {@Code "@Arrow"},
+the @Code "arrow" option is set to @Code yes as well:  {@Code "@Arrow"},
 diagrams. @RawIndex { diagrams }
 diagrams.arrow.sym @SubIndex { @Code "@Arrow" symbol }
 arrow.sym.diagrams @Index { @Code "@Arrow" symbol (diagrams) }

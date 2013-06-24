@@ -568,4 +568,40 @@ Changes and new features introduced in Version 3.39 [September 2010]
      it but decided that there was too little change going on
      to make it worth my while, at the moment anyway.
 
+Changes and new features introduced in Version 3.40 [June 2013]
+
+   Bug fixes:
+     MAX_STACK in z06.c increased (again) to 250.
+     Rare crash at "env = SetEnv(res, env);" given truly horrible patch.
+     @Pie totalweight default was not inherited from @PieSetup; fixed now.
+     @DefinitionTitleFormat, @ClaimTitleFormat, @PropositionTitleFormat,
+       @LemmaTitleFormat, @CorollaryTitleFormat, @ExampleTitleFormat fixed.
+     Problem with eogonek in titles (Kamil Rytarowski, Uwe) fixed.
+   JavaScript and Tcl languages added to prg2lout.c (Mark Summerfield).
+   @Place symbol now available when setting setup file options.
+   New version of @Graph with @GraphSetup symbol in setup file.  Should
+     be 100% backward compatible, if not use @SysInclude { old_graph }.
+   New ISOB4, ISOB5, JISB4, and JISB5 paper sizes.  The old B4 and B5
+     sizes are still available unchanged, though now deprecated.
+   New @Diag options: outlinecolour for nodes, pathcolour for links.
+   I've also lightly revised the User's Guide, to remove some bad
+     line and page breaks that had crept into the A4 version.
+
+   Things not done
+
+   Still no move to a version control system.  It just isn't worth my
+     time.  If anyone wants to take it on, you have my blessing, but
+     be warned that the copyright of hyphenation files is a swamp.
+
+   Forematter (@Preface etc.) in books.  I have a suggestion from
+     Joerg Jung about moving the @Abbreviations section into the
+     forematter, and another from Mark Summerfield for a generic
+     scheme (@ForeMatterA ... @ForeMatterE with user-selectable
+     titles).  Rather than do that I would prefer one @ForeMatter
+     symbol but allow a sequence of invocations of it, like we
+     have now for @Chapter and @Appendix.  There is already an
+     @AfterTitlePage symbol that can be used as a workaround.  I'm
+     a bit at a loss so I've decided to do nothing for now.  However
+     this could be looked at again.  Some discussion might help.
+
 Jeff Kingston

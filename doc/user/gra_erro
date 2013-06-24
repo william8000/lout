@@ -21,10 +21,10 @@ everything may be correct but the graph is too large in some
 way:  too much data, expression too deeply nested, and so on.
 @PP
 When an error is detected, @Code "@Graph" arranges for the offending page
-to be printed up to the point where the error occurred, with a message
-nearby describing the error.  Printing of the document is then
-aborted.  The problem is usually easy to locate since it lies in whatever
-should have been printed next.
+to be printed up to where the error occurred, with a message describing
+the error.  Printing of the document is then aborted.  The problem is
+usually easy to locate since it lies in whatever should have been printed
+next.
 @PP
 If you see @Code VMerror in an error message, it means that the printer
 has run out of memory.  All the data is stored in the printer while the
@@ -41,8 +41,8 @@ save.in.graphs @SubIndex { in graphs }
 ...
 }
 This causes the memory used by the graph to be reclaimed as soon as
-the graph is printed, which might well solve your problem if you have
-several graphs on one page.  However, if the graph is nested
-inside some other major Lout package, notably {@Code "@Diag"}, this
-option could cause PostScript errors in that package.
+the graph is printed, which might solve your problem if you have
+several graphs on one page.  However, if the graph is inside some
+other major package, notably {@Code "@Diag"}, this could cause
+PostScript errors in that package.
 @End @Section

@@ -22,7 +22,7 @@ at the end of the document, immediately before any index.
 @PP
 To make an entry in the glossary, place something like this in
 your main text at the point you are defining the term:
-@ID @Code @Verbatim {
+@ID @OneRow @Code @Verbatim {
 Object @Glossary {
 Part of a document occupying a rectangular area;
 may be a simple word, or a collection of smaller

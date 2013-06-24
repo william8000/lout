@@ -101,11 +101,16 @@ void TransferInit(OBJECT InitEnv)
 
   /* construct destination for root galley */
   New(up_hd, HEAD);
+  FposCopy(fpos(up_hd), *no_fpos);
   force_gall(up_hd) = FALSE;
   actual(up_hd) = enclose_obj(up_hd) = limiter(up_hd) = nilobj;
   ClearHeaders(up_hd);
   opt_components(up_hd) = opt_constraints(up_hd) = nilobj;
   gall_dir(up_hd) = ROWM;
+  ready_galls(up_hd) = nilobj;
+  seen_nojoin(up_hd) = must_expand(up_hd) = sized(up_hd) = FALSE;
+  foll_or_prec(up_hd) = GALL_FOLL;
+  whereto(up_hd) = nilobj;
   New(dest_index, RECEIVING);
   New(dest, CLOSURE);  actual(dest) = PrintSym;
   actual(dest_index) = dest;
@@ -119,20 +124,23 @@ void TransferInit(OBJECT InitEnv)
 
   /* construct root galley */
   New(root_galley, HEAD);
+  FposCopy(fpos(root_galley), *no_fpos);
   force_gall(root_galley) = FALSE;
+  actual(root_galley) = nilobj;
   enclose_obj(root_galley) = limiter(root_galley) = nilobj;
   ClearHeaders(root_galley);
   opt_components(root_galley) = opt_constraints(root_galley) = nilobj;
   gall_dir(root_galley) = ROWM;
-  FposCopy(fpos(root_galley), *no_fpos);
-  actual(root_galley) = whereto(root_galley) = nilobj;
   ready_galls(root_galley) = nilobj;
   must_expand(root_galley) = sized(root_galley) =FALSE;
   foll_or_prec(root_galley) = GALL_FOLL;
+  whereto(root_galley) = nilobj;
+  seen_nojoin(root_galley) = FALSE;
   New(x, CLOSURE);  actual(x) = InputSym;
   Link(root_galley, x);
   SizeGalley(root_galley, InitEnv, TRUE, FALSE, FALSE, FALSE, &InitialStyle,
     &initial_constraint, nilobj, &nothing, &recs, &inners, nilobj);
+  debug1(DGA, D, "  TransferInit inners: %s", DebugInnersNames(inners));
   assert( recs   == nilobj , "TransferInit: recs   != nilobj!" );
   assert( inners == nilobj , "TransferInit: inners != nilobj!" );
   Link(dest_index, root_galley);
@@ -199,6 +207,9 @@ OBJECT TransferBegin(OBJECT x)
 
   /* convert x into an unsized galley called hd */
   New(index, UNATTACHED);
+  actual(index) = nilobj;
+  non_blocking(index) = TRUE;
+  blocked(index) = FALSE;
   pinpoint(index) = nilobj;
   New(hd, HEAD);
   FposCopy(fpos(hd), fpos(x));
@@ -208,6 +219,7 @@ OBJECT TransferBegin(OBJECT x)
   ready_galls(hd) = nilobj;
   must_expand(hd) = TRUE;
   sized(hd) = FALSE;
+  seen_nojoin(hd) = FALSE;
   Link(index, hd);
   Link(hd, x);
   AttachEnv(env, x);
@@ -311,21 +323,23 @@ void TransferComponent(OBJECT x)
 
   /* make the component into a galley */
   New(hd, HEAD);
+  FposCopy(fpos(hd), fpos(x));
   force_gall(hd) = FALSE;
   ClearHeaders(hd);
   enclose_obj(hd) = limiter(hd) = nilobj;
   opt_components(hd) = opt_constraints(hd) = nilobj;
   gall_dir(hd) = ROWM;
-  FposCopy(fpos(hd), fpos(x));
   actual(hd) = whereto(hd) = ready_galls(hd) = nilobj;
-  foll_or_prec(hd) = GALL_FOLL;
   must_expand(hd) = sized(hd) = FALSE;
+  seen_nojoin(hd) = FALSE;
+  foll_or_prec(hd) = GALL_FOLL;
   Link(hd, x);
   dest = actual(dest_index);
   env = GetEnv(dest);
   debug1(DGT, DD, "  current env chain: %s", EchoObject(env));
   SizeGalley(hd, env, TRUE, threaded(dest), FALSE, TRUE, &save_style(dest),
 	&constraints[itop], nilobj, &nothing, &recs, &inners, nilobj);
+  debug1(DGA, D, "  TransferComponent inners: %s", DebugInnersNames(inners));
   if( recs != nilobj )  ExpandRecursives(recs);
   debug3(DSA, D, "after SizeGalley, hd width is (%s,%s), constraint was %s",
     EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)),
@@ -423,12 +437,13 @@ void TransferEnd(OBJECT x)
   gall_dir(hd) = ROWM;
   actual(hd) = whereto(hd) = ready_galls(hd) = nilobj;
   foll_or_prec(hd) = GALL_FOLL;
-  must_expand(hd) = sized(hd) = FALSE;
+  seen_nojoin(hd) = must_expand(hd) = sized(hd) = FALSE;
   Link(hd, x);  dest = actual(dest_index);  env = GetEnv(dest);
   debug1(DGT, DD, "  current env chain: %s", EchoObject(env));
   SizeGalley(hd, env, external_ver(dest), threaded(dest), FALSE, TRUE,
     &save_style(dest), &constraints[itop], nilobj, &nothing, &recs, &inners,
     nilobj);
+  debug1(DGA, D, "  TransferEnd inners: %s", DebugInnersNames(inners));
   if( recs != nilobj )  ExpandRecursives(recs);
   debug3(DSA, D, "after SizeGalley, hd width is (%s,%s), constraint was %s",
     EchoLength(back(hd, COLM)), EchoLength(fwd(hd, COLM)),

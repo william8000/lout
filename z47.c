@@ -48,7 +48,7 @@ static OBJECT tab[TAB_SIZE];
 
 #define hash1(pos, env, fnum)						\
 {									\
-  pos = ( (unsigned int) env + fnum ) % TAB_SIZE;			\
+  pos = ( (unsigned long) env + fnum ) % TAB_SIZE;			\
 }
 
 #define hash2(pos, fnum, offset)					\

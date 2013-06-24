@@ -6,7 +6,7 @@
 Here is the complete, fixed list of options that you may give to the
 @Code "@Reference" symbol:
 @ID @Tab
-   vmargin { 0.5vx }
+   vmargin { 0.47vx }
    @Fmta { @Col @Code A ! @Col B }
 {
 @Rowa
@@ -293,8 +293,8 @@ similar to {@Code InBook}.
 @PP
 A database usually has a long life, and some day it might find itself
 used in a document whose language is not the one its original compiler
-had in mind.  For this reason, a truly meticulous compiler of database
-entries would enclose @I all language-specific options in
+had in mind.  So a truly meticulous compiler of database entries would
+enclose @I all language-specific options in
 @Code "@Language" symbols:
 @ID @OneRow @Code @Verbatim {
 { @Reference

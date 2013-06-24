@@ -86,12 +86,10 @@ without slowing Lout down very much.  However, whenever you change your
 database file @I { you must remove its corresponding index file }, so
 that Lout knows to create it afresh.
 @FootNote {
-Depending on how it was installed on your system, Lout may be able to
-use the time of last modification of the database file and its index
-file to determine automatically whether the index file needs to be
-created afresh, thus saving you the trouble of removing it.  You can
-find out whether this is true of your system by typing the command
-{@Code "lout -V"}.
+Lout may be able to use the last modification times of the database
+and index files to decide whether the index file needs to be created
+afresh, saving you the trouble of removing it.  Type {@Code "lout -V"}
+to find out whether this is true of your system.
 }
  The index file is stored in the
 same directory as the database file, and it has the same name except

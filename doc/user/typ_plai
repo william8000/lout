@@ -66,11 +66,11 @@ right.
 The @Code "@Document" symbol (Section {@NumberOf ordinary}) has an
 unpaginated. @Index @Code "@Unpaginated"
 @Code "@Unpaginated" option which, when set to {@Code "Yes"}, causes
-the plain text output to appear unpaginated, that is, in one long
-continous stream with no page breaks.  Its value is ignored if plain text
-output is not in effect, so it can be safely set to @Code "Yes" in
-documents intended for formatting both ways.  The usual margins apply;
-footnotes appear at the end; floating figures and tables do not work.  Lout
-stupidly reads the entire document before producing any output when
-this option is used, so if the document is long you might run out of memory.
+the plain text output to appear unpaginated, that is, in one continous
+stream with no page breaks.  It is ignored if plain text output is
+not in effect, so it can be set to @Code "Yes" in documents intended
+for formatting both ways.  The usual margins apply; footnotes appear
+at the end; floating figures and tables do not work.  Lout stupidly
+reads the entire document before producing any output when this
+option is used, so if the document is long you might run out of memory.
 @End @Section

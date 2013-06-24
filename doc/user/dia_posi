@@ -3,18 +3,18 @@
     @Title { Positioning }
 @Begin
 @PP
-Once the nodes of the diagram are in place, @@Diag can be trusted to look
+Once the nodes are in place, @@Diag can be trusted to look
 diagrams. @RawIndex { diagrams }
 diagrams.positioning @SubIndex { positioning nodes }
 positioning.diagrams @Index { positioning nodes in diagrams }
 after the rest:  links to standard outlines will terminate neatly on their
 boundaries, labels will not overstrike links no matter what direction they
 are heading, and so on.  The great weakness of @@Diag is in positioning
-the nodes.  This is partly because `what pleases the eye' is the
-positioning rule in many diagrams, and an interactive system is really
-needed in such cases; and partly because, even when the rule is more formal
-(for example, when the nodes are to be laid out in a grid), @@Diag does not
-have symbols to produce it anyway.
+the nodes.  This is partly because `what pleases the eye' is often the
+rule, and an interactive system is really needed in such cases; and
+partly because, even when the rule is more formal (for example, when
+the nodes are to be laid out in a grid), @@Diag does not have symbols
+to produce it anyway.
 @PP
 Previous examples have used @Code "@DP" for getting nodes one under
 another, and white space between nodes for getting them side by side, but
@@ -23,8 +23,8 @@ this is very primitive.  This section suggests three better ways:  using
 following section adds a fourth, using @@Diag's tree-drawing symbols.  It's
 a bit of a jumble.
 @PP
-The {@Code "@Tbl"} symbol (Chapter {@NumberOf tables}) is a good choice when
-the nodes have any kind of grid-like arrangement:
+{@Code "@Tbl"} (Chapter {@NumberOf tables}) is a good choice when
+the nodes have any grid-like arrangement:
 @ID @OneRow {
 @Code @Verbatim {
 @Diag {
@@ -72,8 +72,8 @@ the nodes have any kind of grid-like arrangement:
 @Arrow from { A } to { D }
 }
 }
-The table occupies the nodes part.  Tags may have the same name
-as columns; the two can never conflict.
+The table lies in the nodes part.  Tags may share names
+with columns; the two cannot conflict.
 @PP
 Similarly, the @Code "@Graph" symbol from Chapter {@NumberOf graphs}
 has an @Code "objects" option which can place arbitrary objects,

@@ -5,9 +5,9 @@
 @PP
 The @Code "@Rotate" symbol rotates the following object by any positive
 rotate. @Index @Code "@Rotate"
-or negative angle, measured in degrees:
+or negative angle:
 @ID @Code "45d @Rotate @Box WARNING!"
-has result
+The angle is measured in degrees.  The result here is
 @ID { 45d @Rotate @Box WARNING! }
 As usual, the object to be rotated may be arbitrary.  However, it is
 difficult for Lout to choose appropriate column widths for paragraphs
@@ -17,14 +17,14 @@ using the @Code "@Wide" symbol from Section {@NumberOf precise}:
 wide. @RawIndex { @Code "@Wide" }
 wide.rotate @SubIndex { with @Code "@Rotate" }
 @ID @OneRow @Code @Verbatim {
--90d @Rotate 4.5c @Wide {
+-90d @Rotate 4c @Wide {
 Papal initiatives and influence from the crowning of
 Charlemagne to the First Crusade
 }
 }
 The result here is
 @ID {
--90d @Rotate 4.5c @Wide {
+-90d @Rotate 4c @Wide {
 Papal initiatives and influence from the crowning of
 Charlemagne to the First Crusade
 }

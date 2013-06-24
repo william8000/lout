@@ -20,6 +20,26 @@ their possible values are:
     B { frame }
     C { {@Code frame}, {@Code grid}, {@Code axes}, or {@Code none} }
 @Rowa
+    A { font }
+    B {  }
+    C { Any value suitable for {@Code "@Font"} }
+@Rowa
+    A { xorigin }
+    B { none }
+    C { {@Code none} or any @I number }
+@Rowa
+    A { yorigin }
+    B { none }
+    C { {@Code none} or any @I number }
+@Rowa
+    A { xlog }
+    B { none }
+    C { {@Code none} or any @I number greater than 1 }
+@Rowa
+    A { ylog }
+    B { none }
+    C { {@Code none} or any @I number greater than 1 }
+@Rowa
     A { width }
     B { 6.0c }
     C { any @I distance }
@@ -29,12 +49,12 @@ their possible values are:
     C { any @I distance }
 @Rowa
     A { xextra }
-    B { 0.5c }
-    C { any @I distance ({@Code axes} and {@Code none} default is {@Code "0c"}) }
+    B { auto }
+    C { any @I distance ({@Code auto} means @Code "0.5c" for {@Code frame} else {@Code "0c"}) }
 @Rowa
     A { yextra }
-    B { 0.5c }
-    C { any @I distance ({@Code axes} and {@Code none} default is {@Code "0c"}) }
+    B { auto }
+    C { any @I distance ({@Code auto} means @Code "0.5c" for {@Code frame} else {@Code "0c"}) }
 @Rowa
     A { xdecreasing }
     B { no }
@@ -80,22 +100,6 @@ their possible values are:
     B { yes }
     C { @Code yes or @Code no }
 @Rowa
-    A { xorigin }
-    B { none }
-    C { {@Code none} or any @I number }
-@Rowa
-    A { yorigin }
-    B { none }
-    C { {@Code none} or any @I number }
-@Rowa
-    A { xlog }
-    B { none }
-    C { {@Code none} or any @I number greater than 1 }
-@Rowa
-    A { ylog }
-    B { none }
-    C { {@Code none} or any @I number greater than 1 }
-@Rowa
     A { xmin }
     B { none }
     C { @Code none or any {@I number} }
@@ -126,18 +130,15 @@ their possible values are:
 @Rowa
     A { xticks }
     B { auto  }
-    C { @I sequence (of numbers and strings), or @Code auto meaning
-automatic }
+    C { @I sequence (of numbers and strings), or @Code auto (automatic) }
 @Rowa
     A { yticks }
     B { auto }
-    C { @I sequence (of numbers and strings), or @Code auto meaning
-automatic }
+    C { @I sequence (of numbers and strings), or @Code auto (automatic) }
 @Rowa
     A { rticks }
     B { }
-    C { @I sequence (of numbers and strings), or @Code auto meaning
-automatic }
+    C { @I sequence (of numbers and strings), or @Code auto (automatic) }
 @Rowa
     A { xticklength }
     B { 0.5f }
@@ -156,11 +157,23 @@ automatic }
     C { sequence of {@Code "@CTR"}, {@Code "@NW"}, {@Code "@SW"}, {@Code "@SE"},
 {@Code "@NE"}, {@Code "@N"}, {@Code "@W"}, {@Code "@S"}, {@Code "@E"} symbols }
 @Rowa
+    A { save }
+    B { no }
+    C { {@Code no} or {@Code yes} }
+@Rowa
     A { points }
     B { none }
     C { {@Code none}, {@Code plus}, {@Code cross}, {@Code square},
 {@Code filledsquare}, {@Code diamond}, {@Code filleddiamond},
 {@Code circle}, {@Code filledcircle}, {@Code triangle}, {@Code filledtriangle} }
+@Rowa
+    A { symbolsize }
+    B { 0.15f }
+    C { any @I distance }
+@Rowa
+    A { symbollinewidth }
+    B { 0.5p }
+    C { any @I distance }
 @Rowa
     A { pairs }
     B { none }
@@ -168,22 +181,6 @@ automatic }
 {@Code dotdashed}, {@Code dotdotdashed}, {@Code dotdotdotdashed}, 
 {@Code yhisto}, {@Code xhisto}, {@Code filledyhisto}, {@Code filledxhisto},
 {@Code surfaceyhisto}, {@Code surfacexhisto} }
-@Rowa
-    A { "colour/color" }
-    B { none }
-    C { {@Code none} or any colour from Section {@NumberOf colour}}
-@Rowa
-    A { paint }
-    B { no }
-    C { {@Code no} or {@Code yes} }
-@Rowa
-    A { texture }
-    B { solid }
-    C { any texture from Section {@NumberOf textures} }
-@Rowa
-    A { dataformat }
-    B { xandy }
-    C { {@Code xandy}, {@Code yonly}, {@Code xonly}, {@Code swapxandy} }
 @Rowa
     A { dashlength }
     B { 0.2f }
@@ -193,13 +190,21 @@ automatic }
     B { 0.5p }
     C { any @I distance }
 @Rowa
-    A { symbolsize }
-    B { 0.15f }
-    C { any @I distance }
+    A { "colour/color" }
+    B { none }
+    C { {@Code none} or any colour from Section {@NumberOf colour}}
 @Rowa
-    A { symbollinewidth }
-    B { 0.5p }
-    C { any @I distance }
+    A { paint }
+    B { no }
+    C { {@Code none}, {@Code no}, or {@Code yes} }
+@Rowa
+    A { texture }
+    B { solid }
+    C { any texture from Section {@NumberOf textures} }
+@Rowa
+    A { dataformat }
+    B { xandy }
+    C { {@Code xandy}, {@Code yonly}, {@Code xonly}, {@Code swapxandy} }
 }
 @I Number means an ordinary decimal number; @I distance means a number
 with a unit of measurement (Section {@NumberOf objects}), such as
@@ -251,11 +256,23 @@ their possible values are:
 {@Code circle}, {@Code filledcircle},
 {@Code triangle}, {@Code filledtriangle} }
 @Rowa
+    A { symbolsize }
+    C { any @I distance }
+@Rowa
+    A { symbollinewidth }
+    C { any @I distance }
+@Rowa
     A { pairs }
     C { {@Code none}, {@Code solid}, {@Code dashed}, {@Code dotted},
 {@Code dotdashed}, {@Code dotdotdashed}, {@Code dotdotdotdashed}, 
 {@Code yhisto}, {@Code xhisto}, {@Code filledyhisto}, {@Code filledxhisto},
 {@Code surfaceyhisto}, {@Code surfacexhisto} }
+@Rowa
+    A { dashlength }
+    C { any @I distance }
+@Rowa
+    A { linewidth }
+    C { any @I distance }
 @Rowa
     A { "colour/color" }
     C { {@Code none}, or any colour name from Section {@NumberOf colour} }
@@ -268,24 +285,23 @@ their possible values are:
 @Rowa
     A { dataformat }
     C { {@Code xandy}, {@Code yonly}, {@Code xonly} }
-@Rowa
-    A { dashlength }
-    C { any @I distance }
-@Rowa
-    A { linewidth }
-    C { any @I distance }
-@Rowa
-    A { symbolsize }
-    C { any @I distance }
-@Rowa
-    A { symbollinewidth }
-    C { any @I distance }
 @Rowb
     A { @Code "{" @I sequence @Code "}" }
     C { any @I sequence }
 }
 @I Inherited means that the default value is taken from the
 @Code "@Graph" option with the same name.
+Furthermore, every option of {@Code "@Graph"} and {@Code "@Data"},
+as well as of {@Code "@GraphPlus"}, {@Code "@GraphNoLine"}, and the
+other symbols from Section {@NumberOf key}, appears in the setup file,
+and giving a value to an option there makes that value the default
+value for every {@Code "@Graph"} in your document.  For example,
+if you want every data set in every graph to use {@Code "dashed"}
+for {@Code "pairs"}, you can set the @Code "pairs" option in the
+setup file to {@Code "dashed"}, and then all your data sets will
+have dashed lines unless you override the setup file value by
+some other value to the {@Code "pairs"} option of a {@Code "@Graph"}
+or @Code "@Data" symbol.
 @PP
 The right parameter of @Code "@Data" contains a @I sequence of zero
 or more {@I expressions}.  The {@Code xticks}, {@Code yticks}, and

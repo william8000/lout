@@ -38,7 +38,7 @@
 static	OBJECT		cross_name;	/* name of the cr database   */
 
 
-#define	MAX_STACK	200			/* size of parser stacks     */
+#define	MAX_STACK	250			/* size of parser stacks     */
 static	OBJECT		obj_stack[MAX_STACK];	/* stack of objects          */
 static	int		otop;			/* top of obj_stack          */
 static	OBJECT		tok_stack[MAX_STACK];	/* stack of tokens           */
@@ -1233,7 +1233,8 @@ BOOLEAN defs_allowed, BOOLEAN transfer_allowed)
 	env = Parse(&t, encl, FALSE, FALSE);
 	t = LexGetToken();
 	res = Parse(&t, encl, FALSE, FALSE);
-	env = SetEnv(res, env);
+	/* env = SetEnv(res, env); fails sometimes, below is yukky patch JK */
+	env = SetEnv(res, type(env) == ENV ? env : NULL);
 	ShiftObj(env, PREV_OBJ);
 	t = LexGetToken();
 	EnvReadInsert(file_num(fpos(t)), offset, env);

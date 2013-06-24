@@ -51,6 +51,7 @@ FULL_CHAR *DebugInnersNames(OBJECT inners)
 
 
         case PRECEDES:
+        case GALL_FOLL_OR_PREC:
         case GALL_PREC:
         case DEAD:
       
@@ -907,6 +908,9 @@ void FlushGalley(OBJECT hd)
 	  FATAL, &fpos(y), FileName(eg_fnum(eg)));
       assert( type(val) == CLOSURE, "AttachG: db CLOSURE!" );
       New(index2, UNATTACHED);
+      actual(index2) = nilobj;
+      non_blocking(index2) = TRUE;
+      blocked(index2) = FALSE;
       pinpoint(index2) = nilobj;
       New(hd2, HEAD);
       FposCopy(fpos(hd2), fpos(val));
@@ -914,9 +918,10 @@ void FlushGalley(OBJECT hd)
       limiter(hd2) = nilobj;
       opt_components(hd2) = opt_constraints(hd2) = nilobj;
       gall_dir(hd2) = horiz_galley(actual(val));
-      sized(hd2) = FALSE;
       ready_galls(hd2) = nilobj;
+      sized(hd2) = FALSE;
       must_expand(hd2) = TRUE;
+      seen_nojoin(hd2) = FALSE;
       Link(index2, hd2);
       Link(hd2, val);
       SetTarget(hd2);

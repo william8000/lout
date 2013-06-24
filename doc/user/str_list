@@ -3,7 +3,7 @@
    @Tag { lists }
 @Begin
 @PP
-The @Code "@IndentedList" symbol introduces a sequence of items to be
+The @Code "@IndentedList" symbol introduces items to be
 indentedlist. @Index @Code "@IndentedList"
 il. @Index @Code "@IL"
 lists. @Index { lists }
@@ -457,9 +457,8 @@ the influence of that symbol.  For more information, including
 another way to insert struts, consult Section {@NumberOf precise}.
 @PP
 The @Code "break" option defines a break style (suitable for the
-@Code "@Break" symbol) which is to be applied to each item.  If
-you wanted each item in a ragged style, for example, you could
-just write
+@Code "@Break" symbol) to be applied to each item.  If you want
+each item in a ragged style, for example, you could just write
 @ID @OneRow @Code @Verbatim {
 @NumberedList
     break { ragged }

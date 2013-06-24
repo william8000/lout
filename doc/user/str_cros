@@ -220,8 +220,7 @@ Once again the result is the object to the right, modified by any
 setup file option that works in the same way as
 {@Code "@CrossLinkFormat"}.  This time, though, the effect is to
 jump right out of your document to the given place on the World
-Wide Web, assuming that the software you are using to display your
-document is capable of such a thing.
+Wide Web, if the software displaying your document is capable of it.
 @PP
 At present, the @Code "@CrossLink" and @Code "@ExternalLink" symbols
 behave as though a @Code "@OneCol" symbol encloses the object to their

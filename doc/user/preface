@@ -15,20 +15,20 @@ with the software.
 @PP
 Lout is distributed free of charge under the GNU Public License.  The
 gnu. @Index { GNU Public License }
-primary source is directory
+primary source is
 @ID @Code "ftp://ftp.it.usyd.edu.au/jeff/lout"
-containing a gzipped tar file of the current version
-(currently {@Code "lout-3.39.tar.gz"}), and various other things including
-a PostScript version of this guide.  The distribution contains source code,
-libraries, documentation, license, and installation instructions.
+containing a gzipped tar file of the current version, and various
+other things including a PostScript version of this guide.  The
+distribution contains source code, libraries, documentation,
+license, and installation instructions.
 @PP
 A mailing list has been set up for discussion of all topics related to
 Lout.  To subscribe (or unsubscribe), visit
 @ID @Code "http://lists.nongnu.org/mailman/listinfo/lout-users"
 After subscribing, to post an item send email to
 {@Code "lout-users@nongnu.org"}; it will be forwarded to all
-subscribers via email.  There is also a Lout web
-site at {@Code "http://lout.wiki.sourceforge.net/"}.
+subscribers via email.  There is also a web
+site at {@Code "http://savannah.nongnu.org/projects/lout"}.
 @PP
 Lout began in 1984 as a research project into the design of a high-level
 language for document formatting.  At that time my name for the subject
@@ -43,7 +43,7 @@ Scribe system @Cite { $reid1980scribe }.  That
 scribe. @RawIndex { Scribe }
 scribe.influence @SubIndex { influence on Lout }
 reid.b @Index { Reid, Brian K. }
-research phase ended in October 1991 with the first public release of Lout.
+research phase ended in October 1991 with the first public release.
 @PP
 Since then the system has been steadily improved and extended.  Optimal
 paragraph breaking and automatic hyphenation were copied from Donald

@@ -17,6 +17,8 @@
 /*  Ruby by Michael Piotrowski                                               */
 /*  Haskell by Thorsten Seitz (Nov 2002), mods by Gabor Greif                */
 /*  RSL by Darren Bane (February 2003)                                       */
+/*  JavaScript by Mark Summerfield (Nov 2010)                                */
+/*  Tcl by Mark Summerfield (Nov 2010)					     */
 /*                                                                           */
 /*  This program is free software; you can redistribute it and/or modify     */
 /*  it under the terms of the GNU General Public License as published by     */
@@ -238,7 +240,7 @@ unsigned char Letter_Digit_Quotes[] =
 
 unsigned char HaskellOpCharacters[] = "!#$%&*+./<=>?^|:-~";
 
-unsigned char NonpareilOperatorPunct[] = "@$%^&*=+|;<>/?`";
+unsigned char NonpareilOperatorPunct[] = "@$%^&*=+|<>/?`";
 
 unsigned char Ruby_Methodname[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789?!=" ;
@@ -280,7 +282,7 @@ U "~", U "'", U "@", U "?",  U ".", U "`"
 
 #define SepNonpareilOperatorPunct					\
 U "@", U "$", U "%",  U "^", U "&", U "*", U "=", U "+", U "|",		\
-U ";", U "<", U ">",  U "/", U "?", U "`"
+U "<", U ">",  U "/", U "?", U "`"
 
 #define HaskellOpChars 							\
 U "!", U "#", U "$", U "%", U "&", U "*", U "+", U ".", U "/",		\
@@ -3084,7 +3086,7 @@ LANGUAGE NonpareilLanguage = {
   NO_MATCH_ERROR,
   {
     &CStringToken, &CCharacterToken, &IdentifierToken, &NumberToken,
-    &NonpareilCommentToken, &PythonCommentEscapeToken,
+    &CCommentToken, &CPPCommentToken, &PythonCommentEscapeToken,
     &MinusToken,
     &LeftBraceToken,
     &RightBraceToken,
@@ -3102,17 +3104,22 @@ LANGUAGE NonpareilLanguage = {
     &NonpareilDotDotToken,
     &DotDotDotToken,
     &NonpareilOperatorToken,
+    &SemicolonToken
   },
   {
-    "abstract", "as", "builtin", "case", "class", "coerce", "else",
-    "elsif", "end", "enum", "extend", "extension", "filter", "fun",
-    "if", "import", "infix", "inherit", "introduce", "invariant",
-    "is", "meet", "module", "noncreation", "operators", "predefined",
-    "prefix", "prefun", "private", "postfix", "rename", "require",
-    "system", "then", "typeobj", "upto", "when", "yield",
+    "abstract", "break", "builtin", "case",
+    "class", "coerce", "cometo", "continue", "default",
+    "do", "else", "enum", "extension",
+    "filter", "for", "fun", "goto",
+    "if", "import", "include", "infix",
+    "inherit", "is", "meet",
+    "methods", "module", "operator", "postfix",
+    "predefined", "prefix", "prefun", "private",
+    "renames", "return", "self", "switch",
+    "typedef", "typeobj", "upto", "while",
 
     /* not keywords, but conventionally set like them */
-    "false", "true", "self", "and", "or", "not", "div", "mod"
+    "false", "true",
   }
 };
 
@@ -3380,6 +3387,91 @@ LANGUAGE PodLanguage = {
   { NULL },
 };
 
+/*****************************************************************************/
+/*                                                                           */
+/*  JavaScript                                                               */
+/*                                                                           */
+/*  Based on ECMA-262 5th Edition December 2009                              */
+/*                                                                           */
+/*****************************************************************************/
+
+LANGUAGE JavaScriptLanguage = {
+  { "JavaScript", "javascript"  },
+  "javascript", "@JavaScript",
+  NO_MATCH_ERROR,
+  {
+    &CStringToken, /* "..." strings */
+    &PythonSnglStringToken, /* '...' strings */
+    &IdentifierToken, &MinusToken,
+    &NumberToken, &CCommentToken, &CPPCommentToken,
+    &CPPCommentEscapeToken, &AmpersandToken,
+    &ExclamationToken, &PercentToken, &HatToken, &SlashToken,
+    &BackSlashToken, &LeftParenToken, &RightParenToken, &LeftBraceToken,
+    &RightBraceToken, &BarToken, &LeftBracketToken, &RightBracketToken,
+    &SemicolonToken, &ColonToken, &CommaToken, &DotToken, &DollarToken,
+    &PythonBitLeftShiftToken, &PythonBitRightShiftToken,
+    &PlusToken, &EqualToken, &LessToken, &GreaterToken, &LessEqualToken,
+    &GreaterEqualToken, &CNotEqualToken, &QuestionToken,
+  },
+
+  /* This includes Future Reserved Words */
+  {"break", "case", "catch", "class", "const", "continue", "debugger", "default",
+   "delete", "do", "else", "enum", "export", "extends", "finally", "for",
+   "function", "if", "implements", "import", "in", "instanceof", "interface",
+   "let", "new", "package", "private", "protected", "public", "return", "static",
+   "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while",
+   "with", "yield",
+  }
+};
+
+
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Tcl                                                               */
+/*                                                                           */
+/*****************************************************************************/
+
+LANGUAGE TclLanguage = {
+  { "Tcl", "tcl"  },
+  "tcl", "@Tcl",
+  NO_MATCH_ERROR,
+  {
+    &CStringToken, /* "..." strings */
+    &PythonSnglStringToken, /* '...' strings */
+    &IdentifierToken, &MinusToken,
+    &NumberToken, &PythonCommentToken, &PythonCommentEscapeToken,
+    &ExclamationToken, &PercentToken, &HatToken, &AmpersandToken,
+    &SlashToken, &BackSlashToken, &LeftParenToken, &RightParenToken,
+    &LeftBraceToken, &RightBraceToken,
+    &BarToken, &CircumToken, &LeftBracketToken, &RightBracketToken,
+    &DollarToken, &CommaToken,
+    &PlusToken, &EqualToken, &LessToken, &GreaterToken, &LessEqualToken,
+    &GreaterEqualToken, &CNotEqualToken, &QuestionToken, &ColonToken,
+    &DotToken,
+  },
+
+  /* Tcl has no reserved words, so we'll colour the same ones vim does */
+  {"after", "append", "apply", "array", "auto_execok", "auto_import",
+   "auto_load", "auto_mkindex", "auto_mkindex_old", "auto_qualify",
+   "auto_reset", "bgerror", "binary", "catch", "cd", "chan", "clock",
+   "close", "concat", "coroutine", "dde", "dict", "encoding", "eof",
+   "error", "eval", "exec", "exit", "expr", "fblocked", "fconfigure",
+   "fcopy", "file", "fileevent", "filename", "flush", "format", "gets",
+   "glob", "global", "history", "incr", "info", "interp", "join",
+   "lappend", "lassign", "lindex", "linsert", "list", "llength", "load",
+   "lrange", "lrepeat", "lreplace", "lreverse", "lsearch", "lset", "lsort",
+   "memory", "my", "namespace", "oo::copy", "oo::define", "oo::objdefine",
+   "open", "package", "parray", "pid", "proc", "puts", "pwd", "read",
+   "regexp", "registry", "regsub", "rename", "return", "scan", "seek",
+   "self", "set", "socket", "source", "split", "string", "subst",
+   "tailcall", "tcl_endOfWord", "tcl_findLibrary", "tcl_startOfNextWord",
+   "tcl_startOfPreviousWord", "tcl_wordBreakAfter", "tcl_wordBreakBefore",
+   "tell", "throw", "time", "trace", "unknown", "unload", "unset",
+   "update", "uplevel", "upvar", "variable", "vwait", "yield",}
+};
+
+
 
 /*****************************************************************************/
 /*                                                                           */
@@ -3394,12 +3486,14 @@ LANGUAGE *languages[] = {
   & EiffelLanguage,
   & HaskellLanguage,
   & JavaLanguage,
+  & JavaScriptLanguage,
   & NonpareilLanguage,
   & PerlLanguage,
   & PodLanguage,
   & PythonLanguage,
   & RSLLanguage,
   & RubyLanguage,
+  & TclLanguage,
   NO_LANGUAGE
 };
 

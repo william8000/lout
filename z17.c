@@ -150,7 +150,7 @@ int GetWidth(OBJECT x, STYLE *style)
     case CH_UNIT_DG:
 			
       Error(17, 17, "'%c' unit not allowed in width (5c substituted)",
-	WARN, &fpos(x), *--str);
+	WARN, &fpos(x), *str);
       res = 5 * CM;
       break;
 

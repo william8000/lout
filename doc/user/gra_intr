@@ -14,9 +14,9 @@ you want graphs, like this:
 "..."
 "@End @Text"
 }
-Setup files for specialized packages, such as {@Code "graph"}, should be
-included before the main setup file.  Once this is done, the @Code "@Graph"
-symbol used below will then be available for use anywhere within your document.
+Setup files like {@Code "graph"} are best included before the main
+setup file.  Once this is done, the @Code "@Graph" symbol will be
+available for use anywhere within your document.
 @PP
 @Code "@Graph" distinguishes between the overall graph, produced by the
 @Code "@Graph" symbol itself, and the data sets to be placed within it,
@@ -47,5 +47,5 @@ per line, for example.  The result of this example is
 We have used the @Code "@CentredDisplay" symbol from Section
 {@NumberOf displays} to produce a centred display, but the
 @Code "@Graph" symbol produces an object which may appear anywhere
-at all -- in a figure, for example, or as an entry in a table.
+at all.
 @End @Section

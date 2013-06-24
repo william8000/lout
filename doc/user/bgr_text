@@ -194,7 +194,7 @@ The characters to be displayed
 
 }
 This last example seems like a good one for experimenting with
-the {@Code hshift} and {@Code vshift} options, so here goes:
+the {@Code hshift} and {@Code vshift} options:
 texture.sym.hshift @SubIndex { @Code "hshift" option }
 texture.sym.vshift @SubIndex { @Code "vshift" option }
 @ID @OneRow @Tbl

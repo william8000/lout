@@ -769,6 +769,7 @@ OBJECT *enclose, BOOLEAN fcr)
     ready_galls(hd) = nilobj;
     must_expand(hd) = TRUE;
     sized(hd) = FALSE;
+    seen_nojoin(hd) = FALSE;
     ReplaceNode(hd, x);
     Link(hd, x);
     AttachEnv(env, x);
@@ -778,6 +779,9 @@ OBJECT *enclose, BOOLEAN fcr)
     x = hd;
     threaded(x) = bthr[COLM] != nilobj || fthr[COLM] != nilobj;
     ReplaceWithSplit(x, bthr, fthr);
+    debug3(DGA, D, "  manifesting %sgalley %s at %s",
+      force_gall(hd) ? "force " : "", SymName(actual(hd)),
+      EchoFilePos(&fpos(hd)));
   }
   else if(
 	    *target == sym			  ? (*target = nilobj, TRUE) :

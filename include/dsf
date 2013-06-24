@@ -49,7 +49,7 @@ export
 	
     @Figure @Table @Floater
     @FootNote @AnotherFootNote @EndNote
-    @LeftNote @RightNote @OuterNote @InnerNote @Place
+    @LeftNote @RightNote @OuterNote @InnerNote # @Place
     @Theorem @Proof @EndProof
     @Definition @Claim @Proposition @Lemma @Corollary @Example
     @Reference @RefStyle @RefPrint
@@ -434,27 +434,33 @@ def @DocumentSetup
     named @TheoremFormat named word {} named number {} named title {} named body {} # theorem format
 				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @DefinitionWord	{  definition		} # "Definition" word, etc.
-    named @DefinitionTitleFormat{  (title)              } # Definition title format if present
+    named @DefinitionTitleFormat right title
+				{  (title)              } # Definition title format if present
     named @DefinitionFormat named word {} named number {} named title {} named body {} # definition format
 				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @ClaimWord		{  claim		} # "Claim" word, etc.
-    named @ClaimTitleFormat	{  (title)              } # Claim title format if present
+    named @ClaimTitleFormat right title
+				{  (title)              } # Claim title format if present
     named @ClaimFormat named word {} named number {} named title {} named body {} # claim format
 				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @PropositionWord	{  proposition		} # "Proposition" word, etc.
-    named @PropositionTitleFormat{  (title)             } # Proposition title format if present
+    named @PropositionTitleFormat right title
+				{  (title)             } # Proposition title format if present
     named @PropositionFormat named word {} named number {} named title {} named body {} # proposition format
 				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @LemmaWord		{  lemma		} # "Lemma" word, etc.
-    named @LemmaTitleFormat	{  (title)              } # Lemma title format if present
+    named @LemmaTitleFormat right title
+				{  (title)              } # Lemma title format if present
     named @LemmaFormat named word {} named number {} named title {} named body {} # lemma format
 				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @CorollaryWord	{  corollary		} # "Corollary" word, etc.
-    named @CorollaryTitleFormat	{  (title)              } # Corollary title format if present
+    named @CorollaryTitleFormat right title
+				{  (title)              } # Corollary title format if present
     named @CorollaryFormat named word {} named number {} named title {} named body {} # corollary format
 				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @ExampleWord		{  example		} # "Example" word, etc.
-    named @ExampleTitleFormat	{  (title)              } # Example title format if present
+    named @ExampleTitleFormat right title
+				{  (title)              } # Example title format if present
     named @ExampleFormat named word {} named number {} named title {} named body {} # example format
 				{  { @B { word @NumSep number title: } &2s } @Insert body }
     named @ProofWord		{  proof		} # "Proof" word, etc.
@@ -791,6 +797,10 @@ def @DocumentSetup
 	    A3          @Yield  842p
 	    A4          @Yield  595p
 	    A5          @Yield  420p
+	    ISOB4       @Yield  709p
+	    ISOB5       @Yield  499p
+	    JISB4       @Yield  729p
+	    JISB5       @Yield  516p
 	    B4          @Yield  729p
 	    B5          @Yield  516p
 	    Folio       @Yield  612p
@@ -815,6 +825,10 @@ def @DocumentSetup
 	    A3          @Yield 1190p
 	    A4          @Yield  842p
 	    A5          @Yield  595p
+	    ISOB4       @Yield 1001p
+	    ISOB5       @Yield  709p
+	    JISB4       @Yield 1032p
+	    JISB5       @Yield  729p
 	    B4          @Yield 1032p
 	    B5          @Yield  729p
 	    Folio       @Yield  936p
@@ -2747,10 +2761,11 @@ def @DocumentSetup
     #                                                                         #
     ###########################################################################
 
-    def @ZeroSize right x
-    {
-	@HContract @VContract { ^/0io |0io @OneCol @OneRow x |0io /0io }
-    }
+    # moved to bsf
+    #def @ZeroSize right x
+    #{
+    #   @HContract @VContract { ^/0io |0io @OneCol @OneRow x |0io /0io }
+    #}
 
     def @MargPut
 	left parity
@@ -2792,7 +2807,7 @@ def @DocumentSetup
 # they should be modified in the way the "named c { " cm" }" blocks were modified above
 # but since the point of @Place is to output a matrix (?), I have not implemented this change
 #
-    def @Place
+    def @OldPlace
       import @PSLengths named x
 	named "+" precedence 96 associativity left left a right b { a b "add" }
 	named "-" precedence 96 associativity left left a right b { a b "sub" }
@@ -2950,7 +2965,7 @@ def @DocumentSetup
 	{
 	   @Title @Case {
 		""   @Yield @Null
-		else @Yield (@Title)
+		else @Yield @DefinitionTitleFormat @Title
 	   }
 	}
 
@@ -3005,7 +3020,7 @@ def @DocumentSetup
 	{
 	   @Title @Case {
 		""   @Yield @Null
-		else @Yield (@Title)
+		else @Yield @ClaimTitleFormat @Title
 	   }
 	}
 
@@ -3060,7 +3075,7 @@ def @DocumentSetup
 	{
 	   @Title @Case {
 		""   @Yield @Null
-		else @Yield (@Title)
+		else @Yield @PropositionTitleFormat @Title
 	   }
 	}
 
@@ -3115,7 +3130,7 @@ def @DocumentSetup
 	{
 	   @Title @Case {
 		""   @Yield @Null
-		else @Yield (@Title)
+		else @Yield @LemmaTitleFormat @Title
 	   }
 	}
 
@@ -3170,7 +3185,7 @@ def @DocumentSetup
 	{
 	   @Title @Case {
 		""   @Yield @Null
-		else @Yield (@Title)
+		else @Yield @CorollaryTitleFormat @Title
 	   }
 	}
 
@@ -3225,7 +3240,7 @@ def @DocumentSetup
 	{
 	   @Title @Case {
 		""   @Yield @Null
-		else @Yield (@Title)
+		else @Yield @ExampleTitleFormat @Title
 	   }
 	}
 

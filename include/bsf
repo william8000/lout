@@ -52,6 +52,53 @@ def @OrIfPlain
     }
 }
 
+
+def @ZeroSize right x
+{
+    @HContract @VContract { ^/0io |0io @OneCol @OneRow x |0io /0io }
+}
+
+
+###########################################################################
+#                                                                         #
+#  @Place: places an object at an arbitrary point on the page.            #
+#                                                                         #
+###########################################################################
+
+#
+# VT: the expressions in the braces will work for PostScript but not for PDF
+# they should be modified in the way the "named c { " cm" }" blocks were modified above
+# but since the point of @Place is to output a matrix (?), I have not implemented this
+#
+def @Place
+  import @PSLengths named x
+    named "+" precedence 96 associativity left left a right b { a b "add" }
+    named "-" precedence 96 associativity left left a right b { a b "sub" }
+    named "/" precedence 97 associativity left left a right b { a b "div" }
+    named "*" precedence 98 associativity left left a right b { a b "mul" }
+    { 0 }
+  import @PSLengths named y
+    named "+" precedence 96 associativity left left a right b { a b "add" }
+    named "-" precedence 96 associativity left left a right b { a b "sub" }
+    named "/" precedence 97 associativity left left a right b { a b "div" }
+    named "*" precedence 98 associativity left left a right b { a b "mul" }
+    { 0 }
+  right val
+{
+    @ZeroSize {
+      @BackEnd @Case {
+	PlainText @Yield ""
+	PostScript @Yield {
+	    { "LoutPageDict begin matr setmatrix" x y "translate end gsave"
+	      // "grestore" } @Graphic val
+	}
+	else @Yield { { "% @Place UNIMPLEMENTED" } @Graphic val	# VT: PDF currently has no output
+	}
+      }
+    }
+}
+
+
 ###########################################################################
 #                                                                         #
 #   @Colour, @Color                                                       #
@@ -77,7 +124,6 @@ def @ColouredUnderline @ColoredUnderline left col right y {
 #   @Texture                                                              #
 #                                                                         #
 ###########################################################################
-
 
 def @Texture
     left type
