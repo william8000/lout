@@ -355,7 +355,7 @@ install: lout prg2lout
 	chmod 755 $(BINDIR)/prg2lout
 	@echo ""
 	@echo "(b) Installing library files into LOUTLIBDIR $(LOUTLIBDIR)"
-	mkdir $(LOUTLIBDIR)
+	mkdir -p $(LOUTLIBDIR)
 	chmod 755 $(LOUTLIBDIR)
 	@echo ""
 	mkdir $(LOUTLIBDIR)/$(LIBINCL)
@@ -387,7 +387,7 @@ install: lout prg2lout
 	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)
 	@echo ""
 	@echo "(c) Initializing run (should be silent, no errors expected)"
-	$(BINDIR)/lout -x -s $(LOUTLIBDIR)/$(LIBINCL)/init
+	$(BINDIR)/lout -x -s $(LOUTLIBDIR)/$(LIBINCL)/init -I $(LOUTLIBDIR)/$(LIBINCL) -H $(LOUTLIBDIR)/$(LIBHYPH) -D $(LOUTLIBDIR)/$(LIBDATA)
 	@echo ""
 	@echo "(d) Changing mode of files just created by initializing run"
 	chmod 644 $(LOUTLIBDIR)/$(LIBDATA)/*
