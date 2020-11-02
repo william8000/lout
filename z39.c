@@ -79,11 +79,13 @@ int strcollcmp(char *a, char *b)
 int strcollcmp(char *a, char *b)
 { char a1[MAX_BUFF], a2[MAX_BUFF], a3[MAX_BUFF];
   char b1[MAX_BUFF], b2[MAX_BUFF], b3[MAX_BUFF];
+  char format[MAX_FORMAT];
   int order;
+  sprintf(format, "%%%d[^\t]\t%%%d[^\t]\t%%%d[^\t]", MAX_BUFF-1, MAX_BUFF-1, MAX_BUFF-1);
   a1[0] = a2[0] = a3[0] = '\0';
-  sscanf(a, "%[^\t]\t%[^\t]\t%[^\t]", a1, a2, a3);
+  sscanf(a, format, a1, a2, a3);
   b1[0] = b2[0] = b3[0] = '\0';
-  sscanf(b, "%[^\t]\t%[^\t]\t%[^\t]", b1, b2, b3);
+  sscanf(b, format, b1, b2, b3);
   order = strcoll(a1, b1);
   if( order == 0 )
   {
@@ -251,7 +253,7 @@ FULL_CHAR *StringQuotedWord(OBJECT x)
   *q++ = CH_QUOTE;
   for( p = string(x);  *p != '\0';  p++ )
   { 
-    for( r = (FULL_CHAR *) quoted_string[*p];  *r != '\0';  *q++ = *r++ );
+    for( r = (FULL_CHAR *) quoted_string[*p];  *r != '\0' && q < &buff[MAX_BUFF-2];  *q++ = *r++ );
   }
   *q++ = CH_QUOTE;
   *q++ = '\0';

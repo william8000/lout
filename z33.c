@@ -847,6 +847,7 @@ BOOLEAN DbRetrieve(OBJECT db, BOOLEAN gall, OBJECT sym, FULL_CHAR *tag,
 BOOLEAN DbRetrieveNext(OBJECT db, BOOLEAN *gall, OBJECT *sym, FULL_CHAR *tag,
   FULL_CHAR *seq, FILE_NUM *dfnum, long *dfpos, int *dlnum, long *cont)
 { FULL_CHAR line[MAX_BUFF], *cline, fname[MAX_BUFF]; int symnum;
+  char format[MAX_FORMAT];
   ifdebug(DPP, D, ProfileOn("DbRetrieveNext"));
   debug2(DBS, DD, "DbRetrieveNext( %s, %ld )", string(db), *cont);
   assert(reading(db), "DbRetrieveNext: not reading");
@@ -858,6 +859,8 @@ BOOLEAN DbRetrieveNext(OBJECT db, BOOLEAN *gall, OBJECT *sym, FULL_CHAR *tag,
     return FALSE;
   }
 
+  sprintf(format, "%%d&%%%d[^\t]\t%%%d[^\t]\t%%*[^\t]\t%%ld\t%%d\t%%%d[^\n\f]", MAX_BUFF-1, MAX_BUFF-1, MAX_BUFF-1);
+
   if( in_memory(db) )
   {
     /* get next entry from internal database */
@@ -868,7 +871,7 @@ BOOLEAN DbRetrieveNext(OBJECT db, BOOLEAN *gall, OBJECT *sym, FULL_CHAR *tag,
     }
     cline = (FULL_CHAR *) db_lines(db)[*cont];
     *gall = (cline[0] == '0' ? 1 : 0);
-    sscanf((char *)&cline[*gall], "%d&%[^\t]\t%[^\t]\t%*[^\t]\t%ld\t%d\t%[^\n\f]",
+    sscanf((char *)&cline[*gall], format,
       &symnum, tag, seq, dfpos, dlnum, fname);
     *cont = *cont + 1;
   }
@@ -882,7 +885,7 @@ BOOLEAN DbRetrieveNext(OBJECT db, BOOLEAN *gall, OBJECT *sym, FULL_CHAR *tag,
       return FALSE;
     }
     *gall = (line[0] == '0' ? 1 : 0);
-    sscanf((char *)&line[*gall], "%d&%[^\t]\t%[^\t]\t%*[^\t]\t%ld\t%d\t%[^\n\f]",
+    sscanf((char *)&line[*gall], format,
       &symnum, tag, seq, dfpos, dlnum, fname);
     *cont = ftell(db_filep(db));
   }

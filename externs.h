@@ -260,6 +260,9 @@ If you're compiling this, you've got the wrong settings in the makefile!
 /*                      that can appear correctly on one page.  Can be       */
 /*                      increased to any small positive integer.             */
 /*                                                                           */
+/*  MAX_FORMAT          The maximum number of characters for sscanf formats  */
+/*                      for splitting strings with tab-delimited fields.     */
+/*                                                                           */
 /*****************************************************************************/
 
 #define	MAX_FULL_LENGTH	8388607	/* 2**23 - 1, about 148 metres */
@@ -275,6 +278,7 @@ If you're compiling this, you've got the wrong settings in the makefile!
 #define	MAX_LEX_STACK	20
 #define	MAX_CHARS	256
 #define MAX_HCOPIES	3
+#define MAX_FORMAT	100
 
 /*****************************************************************************/
 /*                                                                           */

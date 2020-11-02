@@ -378,7 +378,7 @@ static void srcnext(void)
   if( blksize != 0 && chpt < limit )
   { debugcond0(DLA, DD, stack_free <= 1, "srcnext: transferring.");
     col = buf;
-    while( chtbl[(*--col = *--limit)] != NEWLINE );
+    while( col > mem_block && chtbl[(*--col = *--limit)] != NEWLINE );
     frst = col + 1;  limit++;  blksize = 0;
   }
 
