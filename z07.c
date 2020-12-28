@@ -1,6 +1,6 @@
 /*@z07.c:Object Service:SplitIsDefinite(), DisposeObject()@*******************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -112,12 +112,13 @@ static void DisposeSplitObject(OBJECT x)
 int DisposeObject(OBJECT x)
 { debug2(DOS,DDD,"[DisposeObject( %ld ), type = %s, x =", (long) x, Image(type(x)));
   ifdebug(DOS, DDD, DebugObject(x));
+  if ( x == NULL ) return 0;
   assert( Up(x) == x, "DisposeObject: x has a parent!" );
   if( type(x) == SPLIT )
     DisposeSplitObject(x);
   else
-  { while( Down(x) != x )  DisposeChild(Down(x));
-    Dispose(x);
+  { while( x != NULL && Down(x) != x )  DisposeChild(Down(x));
+    if ( x != NULL ) Dispose(x);
   }
   debug0(DOS, DDD, "]DisposeObject returning.");
   return 0;
@@ -317,6 +318,7 @@ OBJECT CopyObject(OBJECT x, FILE_POS *pos)
     case ENV_OBJ:
     
       New(res, type(x));
+      back(res, COLM) = back(res, ROWM) = fwd(res, COLM) = fwd(res, ROWM) = 0;
       for( link = Down(x);  link != x;  link = NextDown(link) )
       {	Child(y, link);
 	tmp = CopyObject(y, pos);

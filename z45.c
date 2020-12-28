@@ -1,6 +1,6 @@
 /*@z45.c:External Sort:SortFile()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */

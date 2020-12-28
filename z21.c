@@ -1,6 +1,6 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -333,6 +333,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
       /* calculate scaled size and adjust */
       b = (back(t, COLM) * fc(constraint(z))) / SF;
       f = (fwd(t, COLM) * fc(constraint(z))) / SF;
+      debug0(DSA, D, "  calling AdjustSize from SizeGalley for SCALE_IND COLM");
       debug3(DGM, DD, "AdjustSize(%s, %s, %s, COLM)", EchoObject(z),
 	EchoLength(b), EchoLength(f));
       AdjustSize(z, b, f, COLM);
@@ -341,6 +342,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
       if( vert_sized(z) )
       { b = (back(t, ROWM) * fc(constraint(z))) / SF;
 	f = (fwd(t, ROWM) * fc(constraint(z))) / SF;
+	debug0(DSA, D, "  calling AdjustSize from SizeGalley for SCALE_IND ROWM");
 	debug4(DGM, DD, "AdjustSize(%s, %s, %s, %s)", EchoObject(z),
 	  EchoLength(b), EchoLength(f), dimen(ROWM));
 	AdjustSize(z, b, f, ROWM);
@@ -500,6 +502,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 		{ bc(constraint(cover)) = SF;
 		  fc(constraint(cover)) = sf;
 		}
+		debug0(DSA, D, "  calling AdjustSize from SizeGalley, case COVER_IND");
 		AdjustSize(cover, b, f, dirn);
 	      }
 	      else

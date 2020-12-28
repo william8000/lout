@@ -3575,7 +3575,7 @@ static FILE	*err_fp;		/* where error messages go 	     */
 /*****************************************************************************/
 
 char *ErrorHeader()
-{ static char buff[MAX_LINE];
+{ static char buff[MAX_LINE * 2];
   if( line_num == 0 || line_pos == 0 )
     sprintf(buff, "prg2lout");
   else if( raw_seen )

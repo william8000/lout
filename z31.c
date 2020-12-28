@@ -1,6 +1,6 @@
 /*@z31.c:Memory Allocator:DebugMemory()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -53,6 +53,7 @@ static	char	*usage_strings[] = {
 			"cross reference tables",
 			"plain text output grids",
 			"database check tables",
+			"in_memory database",
 			"hyphenation pattern tables",
 			"character mappings",
 			"colour tables",
@@ -359,6 +360,72 @@ OBJECT GetMemory(int siz, FILE_POS *pos)
 
   debug1(DMA, DDD, "GetMemory( %d )", siz);
 
+#if USE_SYSTEM_MALLOC
+
+#if DEBUG_ON
+  DebugRegisterUsage(MEM_OBJECTS, 1, siz * sizeof(ALIGN));
+#endif
+
+#if USE_MALLOC_DEBUG
+
+  /* malloc + debugging */
+
+  next_free = (ALIGN *) calloc(siz + MALLOC_HEADER_SIZE + MALLOC_TRAILER_SIZE, sizeof(ALIGN));
+  if (next_free != NULL)
+  { next_free += MALLOC_HEADER_SIZE;
+    malloc_otype(next_free) = -1;
+    malloc_orec_size(next_free) = siz;
+    malloc_osentinel(next_free) = MALLOC_SENTINEL;
+  }
+#else
+
+  /* malloc, no debugging */
+
+  next_free = (ALIGN *) calloc(siz, sizeof(ALIGN));
+
+#endif
+
+  /* malloc, generic */
+
+  if( next_free == NULL )
+    Error(31, 1, "exiting now (run out of memory)", FATAL, pos);
+  ifdebug(DMA, D, no_of_calls++; )
+
+  res = (OBJECT) next_free;
+
+#else
+
+#if USE_MALLOC_DEBUG
+
+  /* built-in + debugging */
+
+  /* get memory from operating system, if not enough left here */
+  if( &next_free[ siz + MALLOC_HEADER_SIZE + MALLOC_TRAILER_SIZE ] > top_free )
+  {
+#if DEBUG_ON
+    DebugRegisterUsage(MEM_OBJECTS, 1, MEM_CHUNK * sizeof(ALIGN));
+#endif
+    next_free = (ALIGN *) calloc(MEM_CHUNK, sizeof(ALIGN));
+    ifdebug(DMA, D, no_of_calls++; )
+    if( next_free == NULL )
+      Error(31, 1, "exiting now (run out of memory)", FATAL, pos);
+    top_free = &next_free[MEM_CHUNK];
+    debug2(DMA, DD, "GetMemory: calloc returned %ld - %ld",
+      (long) next_free, (long) top_free);
+  }
+
+  res = (OBJECT) (&next_free[MALLOC_HEADER_SIZE]);
+
+  malloc_otype(res) = -1;
+  malloc_orec_size(res) = siz;
+  malloc_osentinel(res) = MALLOC_SENTINEL;
+
+  next_free = &next_free[ siz + MALLOC_HEADER_SIZE + MALLOC_TRAILER_SIZE ];
+
+#else
+
+  /* built-in, no debugging */
+
   /* get memory from operating system, if not enough left here */
   if( &next_free[siz] > top_free )
   {
@@ -376,6 +443,15 @@ OBJECT GetMemory(int siz, FILE_POS *pos)
 
   res = (OBJECT) next_free;
   next_free = &next_free[siz];
+
+#endif
+#endif
+
+  /* Uncomment the next line to test that objects initialize themselves correctly. */
+  /* Objects that are reused from the free list are not initialized. */
+  /* This memset simulates that and makes problems happen sooner. */
+  /* memset(res, 0xFF, siz * sizeof(ALIGN)); */
+
 #if DEBUG_ON
   recs_created++; bytes_created += siz * sizeof(ALIGN);
 #endif

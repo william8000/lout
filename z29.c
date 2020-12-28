@@ -1,6 +1,6 @@
 /*@z29.c:Symbol Table:Declarations, hash()@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -755,7 +755,12 @@ void CheckSymSpread(void)
 /*****************************************************************************/
 
 static void DeleteSymBody(OBJECT s)
-{ OBJECT t;
+{
+#if USE_SYSTEM_MALLOC
+  /* The sym body is an internal buffer that was not malloc'ed */
+  /* so it can't be freed. */
+#else
+  OBJECT t;
   debug1(DST, DDD, "DeleteSymBody( %s )", SymName(s));
   switch( type(s) )
   {
@@ -775,6 +780,7 @@ static void DeleteSymBody(OBJECT s)
     default:	assert1(FALSE, "DeleteSymBody:", Image(type(s)));
 		break;
   }
+#endif
   debug0(DST, DDD, "DeleteSymBody returning.");
 } /* end DeleteSymBody */
 

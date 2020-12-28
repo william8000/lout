@@ -1,0 +1,12 @@
+lout
+prg2lout
+*.ld
+*.li
+*.ps
+*.pdf
+*.o
+*.err
+*.orig
+*.rej
+*.tmp
+*-

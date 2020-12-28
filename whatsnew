@@ -605,3 +605,79 @@ Changes and new features introduced in Version 3.40 [June 2013]
      this could be looked at again.  Some discussion might help.
 
 Jeff Kingston
+
+Changes and new features introduced in Version 3.41 [Nov 2020]
+
+   Bug fixes:
+     CVE-2019-19918-srcnext in z02.c
+     CVE-2019-19917-StringQuotedWord in z39.c
+
+Changes and new features introduced in Version 3.42 [Dec 2020]
+
+   3.42 has bug fixes, some small enhancements, and updated
+     build scripts. Existing lout files should work unchanged
+     and should produce identical output, except for slightly
+     more accurate placement of some objects.
+
+   Support for embedding PDF and bitmapped images in lout.
+     Embedding postscript requires pdftops, see PDFTOPS_COM
+     in externs.h.
+     Embedding bitmapped images requires ImageMagick convert,
+     see CONVERT_COM in externs.h.
+     The embedding code is in z03.c.
+   Small images are now placed more accurately.
+     externs.h now defines ALT_SCALE_FACTOR_SHIFT for embedded
+     images. Lout rounds the scale factor of images with
+     trunc(SF * available_space / image_size).
+     If a small image needed a scale factor of 25.9, lout would
+     round it down to 25, which could leave the image short by
+     a few points on an A4 or Letter size page.
+     Increasing ALT_SCALE_FACTOR_SHIFT from 8 to 12 makes image
+     placement more accurate at the expense of reducing the
+     largest page from 148m to 9.2m.
+     The calculations are in FixAndPrintObject() in z23.c.
+   Improve accuracy of the CM unit. PS_PrintBeforeFirstPage() in
+     z49.c now writes its value to 3 decimal places instead of
+     rounded to an integer.
+   Running 'make install' no longer requires creating or removing
+     directories. The makefile now works cleanly on Linux with
+     'make all' and repeated runs of 'make allinstall'.
+   Reorganized library directory that support multiple versions of
+     lout. In the makefile, the default PREFIX is now /usr/local
+     instead of /home/jeff. The default lib, doc, and man directories
+     are now under $(PREFIX)/share/lout-$(VERSION)
+   The makefile now adds more warnings in COPTS.
+   The makefile now adds $(CFLAGS) to the lout link line.
+   externs.h has USE_SYSTEM_MALLOC to use the operating system's
+     malloc and USE_MALLOC_DEBUG to enabled malloc debugging.
+     Both should normally be disabled (set to 0) but can be
+     turned on to help locate memory allocation errors.
+     Memory allcation in z29.c and in z31.c checks USE_SYSTEM_MALLOC.
+   Add an 'al' debug option to enable all debug flags
+     in DebugInit() in z27.c.
+   Add support for segmented postscript files in z03.c by including
+     a graphic with the syntax @name@start:end
+     The file 'name' should have a shared postscript prolog, a null,
+     a shared postscript trailer, and then byte offsets 'start' and
+     'end' identify the postscript segment to use.
+   Add 'static' to several C functions that did not need to be global.
+   Fix bad memory accesses in DisposeObject() in z07.c.
+   Fix the fatal error "AdjustSize: Up(x) == x!".
+     Initialize column and row forward and back pointers
+     in CopyObject() in z07.c, in insert_split() in z08.c,
+     in MinSize() in z12.c, and in BreakObject() in z13.c.
+     The original code did not take into account that rotations
+     need both column and row pointers initialized.
+     The uninitialized values would trigger an assert in AdjustSize()
+     in z16.c. AdjustSize() now prints a warning instead of exiting
+     in case the initializations did not completely solve the problem.
+   Fix bad memory access to kerned_glyphs[] in z14.c.
+   Fix possible memory overwrite in prg2lout.c
+   New files:
+     .gitignore to keep generated files out of git
+     updateversion.sh to update the version number in lout source files
+     complout.bat unmaintained script to compile lout in a dos box
+     makelout.bat unmaintained script to build lout using complout.bat
+     instlout.bat unmaintained script to install lout in a dos box
+
+   William Bader

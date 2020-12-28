@@ -1,6 +1,6 @@
 /*@z51.c:Plain Text Back End:Plain_BackEnd@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -63,7 +63,7 @@ static BOOLEAN		prologue_done;	/* TRUE after prologue is printed    */
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_PrintInitialize(FILE *fp, BOOLEAN enc)
+static void Plain_PrintInitialize(FILE *fp, BOOLEAN enc)
 {
   debug0(DPT, DD, "Plain_PrintInitialize(fp)");
   assert(!enc, "Plain_PrintInitialize");
@@ -403,7 +403,7 @@ static void Plain_PrintAfterLastPage(void)
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
+static void Plain_CoordTranslate(FULL_LENGTH xdist, FULL_LENGTH ydist)
 { debug2(DPT, D, "Plain_CoordTranslate(%s, %s)",
     EchoLength(xdist), EchoLength(ydist));
   assert(FALSE, "Plain_CoordTranslate: should never be called!");
@@ -434,7 +434,7 @@ static void Plain_CoordRotate(FULL_LENGTH amount)
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_CoordScale(float hfactor, float vfactor)
+static void Plain_CoordScale(float hfactor, float vfactor)
 {
   assert(FALSE, "Plain_CoordScale: should never be called!");
 } /* end Plain_CoordScale */
@@ -449,7 +449,7 @@ void Plain_CoordScale(float hfactor, float vfactor)
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_SaveGraphicState(OBJECT x)
+static void Plain_SaveGraphicState(OBJECT x)
 { debug0(DPT, D, "Plain_SaveGraphicState()");
   assert(FALSE, "Plain_SaveGraphicState: should never be called!" );
   debug0(DPT, D, "Plain_SaveGraphicState returning.");
@@ -464,7 +464,7 @@ void Plain_SaveGraphicState(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_RestoreGraphicState(void)
+static void Plain_RestoreGraphicState(void)
 { debug0(DPT, D, "Plain_RestoreGraphicState()");
   assert(FALSE, "Plain_RestoreGraphicState: should never be called!" );
   debug0(DPT, D, "Plain_RestoreGraphicState returning.");
@@ -479,7 +479,7 @@ void Plain_RestoreGraphicState(void)
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_PrintGraphicObject(OBJECT x)
+static void Plain_PrintGraphicObject(OBJECT x)
 {
   debug3(DPT, D, "Plain_PrintGraphicObject(%s %s %s)",
     EchoFilePos(&fpos(x)), Image(type(x)), EchoObject(x));
@@ -496,7 +496,7 @@ void Plain_PrintGraphicObject(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_DefineGraphicNames(OBJECT x)
+static void Plain_DefineGraphicNames(OBJECT x)
 {
   debug1(DPT, D, "Plain_DefineGraphicNames( %s )", EchoObject(x));
   debug1(DPT, DD, "  style = %s", EchoStyle(&save_style(x)));
@@ -520,7 +520,7 @@ void Plain_DefineGraphicNames(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist,
+static void Plain_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist,
   FULL_LENGTH ydist)
 {
   assert(FALSE, "Plain_SaveTranslateDefineSave: should never be called!" );
@@ -535,7 +535,7 @@ void Plain_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist,
 /*                                                                           */
 /*****************************************************************************/
 
-void Plain_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
+static void Plain_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
   FULL_LENGTH rowmark)
 {
   debug0(DPT, D, "Plain_PrintGraphicInclude(x)");

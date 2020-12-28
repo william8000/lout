@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -538,7 +538,8 @@ static void KernWordLeftMargin(OBJECT first_on_line, OBJECT parent)
   /* It's a word: look at its first characters' glyph height.  */
   FONT_NUM font;
   FULL_CHAR *word_content, *wordp;
-  FULL_CHAR kerned_glyphs[20];
+  enum kerned_glyph_enum { MAX_KERNED_GLYPHS = 20 };
+  FULL_CHAR kerned_glyphs[ MAX_KERNED_GLYPHS + 1 ];
   FULL_LENGTH kerned_glyphs_width = 0;
   unsigned kerned_glyph_count = 0, word_len;
 
@@ -565,7 +566,7 @@ static void KernWordLeftMargin(OBJECT first_on_line, OBJECT parent)
       glyph_width = FontGlyphWidth(font, *wordp);
       if(kerned_glyphs_width + glyph_width > x_width)
        break;
-      if(kerned_glyph_count >= sizeof(kerned_glyphs))
+      if(kerned_glyph_count >= MAX_KERNED_GLYPHS)
        break;
 
       kerned_glyphs_width += glyph_width;

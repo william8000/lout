@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -748,6 +748,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       if( dim == COLM )
       {	y = MinSize(y, COLM, extras);
 	New(whereto(x), ACAT);
+	back(whereto(x), COLM) = back(whereto(x), ROWM) = fwd(whereto(x), COLM) = fwd(whereto(x), ROWM) = 0;
 	y = MinSize(y, ROWM, &whereto(x));
 	RotateSize(&back(x, COLM), &fwd(x, COLM), &back(x, ROWM), &fwd(x, ROWM),
 	  y, sparec(constraint(x)));

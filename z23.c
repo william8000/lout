@@ -1,6 +1,6 @@
 /*@z23.c:Galley Printer:ScaleFactor()@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -499,15 +499,17 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
         if( dim == COLM )
         { assert( bc(constraint(x)) > 0, "FAPO: horizontal scale factor!" );
 	  save_mark(x) = xmk;
-	  yb = xb * SF / bc(constraint(x));
-	  yf = xf * SF / bc(constraint(x));
+	  yb = (xb * SF) / bc(constraint(x));
+	  yf = (xf * SF) / bc(constraint(x));
           y = FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, pg, count,
 		&aback, &afwd);
+	  debug6(DSF, D, "FixAndPrintObject, SCALE COLM first pass, bc(constraint(x)) %d SF %d, xb %d xf %d -> yb %d yf %d",
+		bc(constraint(x)), SF, xb, xf, yb, yf);
         }
         else
         { assert( fc(constraint(x)) > 0, "FAPO: vertical scale factor!" );
-	  yb = xb * SF / fc(constraint(x));
-	  yf = xf * SF / fc(constraint(x));
+	  yb = (xb * SF) / fc(constraint(x));
+	  yf = (xf * SF) / fc(constraint(x));
 	  BackEnd->SaveGraphicState(y);
 	  BackEnd->CoordTranslate(save_mark(x), pg - xmk);
 	  BackEnd->CoordScale( (float)bc(constraint(x))/SF,
@@ -515,6 +517,8 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
           y = FixAndPrintObject(y, 0, yb, yf, dim, NO_SUPPRESS, 0, count,
 		&aback, &afwd);
 	  BackEnd->RestoreGraphicState();
+	  debug6(DSF, D, "FixAndPrintObject, SCALE ROWM final pass, bc(constraint(x)) %d SF %d, xb %d xf %d -> yb %d yf %d",
+		bc(constraint(x)), SF, xb, xf, yb, yf);
         }
       }
       else if( bc(constraint(x)) == SF && fc(constraint(x)) == SF )
@@ -645,6 +649,8 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	  fwd(x, dim)  = xf;
 	  debug2(DGP, DD, "GRAPHIC COLM storing size %s, %s",
 	    EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
+	  debug4(DSF, D, "FixAndPrintObject, GRAPHIC COLM storing size %d %d ( %s %s )",
+		xb, xf, EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
 	  save_mark(x) = xmk - back(x, COLM);
           y = FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, pg, count,
 		&aback, &afwd);
@@ -664,6 +670,8 @@ OBJECT FixAndPrintObject(OBJECT x, FULL_LENGTH xmk, FULL_LENGTH xb,
 	    pg - (xmk + fwd(x, ROWM)));
           BackEnd->PrintGraphicObject(pre);
           BackEnd->RestoreGraphicState();
+	  debug4(DSF, D, "FixAndPrintObject, GRAPHIC ROWM using size %d %d ( %s %s )",
+		xb, xf, EchoLength(back(x, dim)), EchoLength(fwd(x, dim)));
           y = FixAndPrintObject(y, xb, xb, xf, dim, NO_SUPPRESS, xb + xf,
 		count, &aback, &afwd);
           if( post != nilobj )  BackEnd->PrintGraphicObject(post);

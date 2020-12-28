@@ -1,6 +1,6 @@
 /*@z18.c:Galley Transfer:Declarations@****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -347,7 +347,7 @@ void TransferComponent(OBJECT x)
 
   /* promote the components, remembering where old spot was */
   start_search = PrevDown(Up(dest_index));
-  debug1(DSA, D, "  calling AdjustSize from TransferComponent %s",
+  debug1(DSA, D, "  calling AdjustSize from TransferComponent %s (a)",
     EchoFilePos(&fpos(hd)));
   ifdebug(DSA, D,
     Child(y, Down(hd));
@@ -361,7 +361,7 @@ void TransferComponent(OBJECT x)
     }
   );
   AdjustSize(dest, back(hd, COLM), fwd(hd, COLM), COLM);
-  debug0(DGS, D, "calling Promote(hd, hd) from TransferComponent");
+  debug0(DGS, D, "calling Promote(hd, hd) from TransferComponent (b)");
   Promote(hd, hd, dest_index, FALSE);
   DeleteNode(hd);
 

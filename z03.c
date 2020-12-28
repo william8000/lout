@@ -1,6 +1,6 @@
 /*@z03.c:File Service:Declarations, no_fpos@******************************** */
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -843,12 +843,67 @@ static char *compress_suffixes[MAX_COMPRESSED]
 
 FILE *OpenIncGraphicFile(FULL_CHAR *str, unsigned char typ,
 OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
-{ FILE *fp;  int p, i;  BOOLEAN used_source_suffix;
+{ FILE *fp = NULL;  int p, i;  BOOLEAN used_source_suffix;
+  FULL_CHAR sort_name[128];  int sort_start = 0, sort_end = 0;
+  static FULL_CHAR last_sort_name[128];  static FILE *last_ceps_fp = NULL;
   debug2(DFS, DD, "OpenIncGraphicFile(%s, %s, -)", str, Image(typ));
   assert( typ == INCGRAPHIC || typ == SINCGRAPHIC, "OpenIncGraphicFile!" );
   p = (typ == INCGRAPHIC ? INCLUDE_PATH : SYSINCLUDE_PATH);
-  fp = SearchPath(str, file_path[p], FALSE, FALSE, full_name, xfpos,
-	READ_FILE, &used_source_suffix);
+  if (str[0] == '@')
+  {
+    /* parse @name@start:end */
+    int len = 0;
+    i = 1;
+    while (str[i] != '\0' && str[i] != '@' && len < sizeof(sort_name) - 1)
+    {
+      sort_name[len++] = str[i++];
+    }
+    sort_name[len++] = '\0';
+    if (str[i] == '@')
+    {
+      i++;
+      while (str[i] >= '0' && str[i] <= '9')
+      {
+	sort_start = sort_start * 10 + str[i] - '0';
+	i++;
+      }
+    }
+    if (str[i] == ':')
+    {
+      i++;
+      while (str[i] >= '0' && str[i] <= '9')
+      {
+	sort_end = sort_end * 10 + str[i] - '0';
+	i++;
+      }
+    }
+    if (sort_start <= 0 || sort_end <= 0 || sort_start > sort_end)
+    {
+      sort_start = sort_end =0;
+    }
+    if (sort_start > 0)
+    {
+      str = sort_name;
+      if (last_ceps_fp != NULL)
+      {
+	if (strcmp((char *)sort_name, (char *)last_sort_name) == 0)
+	{
+	  fp = last_ceps_fp;
+	  *full_name = nilobj;
+	}
+	else
+	{
+	  fclose(last_ceps_fp);
+	  last_ceps_fp = NULL;
+	}
+      }
+    }
+  }
+  if ( fp == NULL )
+  {
+    fp = SearchPath(str, file_path[p], FALSE, FALSE, full_name, xfpos,
+	   READ_FILE, &used_source_suffix);
+  }
   if( *full_name == nilobj )  *full_name = MakeWord(WORD, str, xfpos);
 
   if( fp == null )
@@ -856,6 +911,81 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
     /* if file didn't open, nothing more to do */
     *compressed = FALSE;
     fp = null;
+  }
+  else if (sort_start > 0)
+  {
+    FILE *ceps_fp;
+    int ch;
+    int sort_pos, header_pos;
+    ceps_fp = fp;
+    fp = fopen(LOUT_EPS, WRITE_FILE);
+    if ( fp == NULL )
+    {
+      Error(3, 17, "Could not create %s", WARN, xfpos, LOUT_EPS);
+    }
+    else
+    {
+      fseek(ceps_fp, sort_start, SEEK_SET);
+      sort_pos = sort_start;
+      ch = fgetc(ceps_fp);
+      if (ch == '\0')
+      {
+	sort_pos++;
+	ch = fgetc(ceps_fp);
+      }
+      /* copy the document comments */
+      while (sort_pos < sort_end && ch == '%')
+      {
+	while (sort_pos < sort_end && ch != '\n' && ch != '\r' && ch != '\0' && ch != EOF)
+	{
+	  putc(ch, fp);
+	  ch = getc(ceps_fp);
+	  sort_pos++;
+	}
+	while (sort_pos < sort_end && (ch == '\n' || ch == '\r'))
+	{
+	  putc(ch, fp);
+	  ch = getc(ceps_fp);
+	  sort_pos++;
+	}
+      }
+      /* copy the header */
+      fseek(ceps_fp, 0L, SEEK_SET);
+      header_pos = 0;
+      ch = fgetc(ceps_fp);
+      while (ch != '\0' && ch != EOF)
+      {
+	putc(ch, fp);
+	ch = getc(ceps_fp);
+	header_pos++;
+      }
+      /* copy the rest of the ad */
+      fseek(ceps_fp, sort_pos, SEEK_SET);
+      ch = fgetc(ceps_fp);
+      while (sort_pos < sort_end && ch != '\0' && ch != EOF)
+      {
+	putc(ch, fp);
+	ch = getc(ceps_fp);
+	sort_pos++;
+      }
+      /* copy the trailer */
+      fseek(ceps_fp, header_pos, SEEK_SET);
+      ch = fgetc(ceps_fp);
+      while (ch != '\0' && ch != EOF)
+      {
+	putc(ch, fp);
+	ch = getc(ceps_fp);
+      }
+      /* clean up the files */
+      if (last_ceps_fp == NULL)
+      {
+        last_ceps_fp = ceps_fp;
+        strcpy((char *)last_sort_name, (char *)sort_name);
+      }
+      fclose(fp);
+      fp = fopen(LOUT_EPS, READ_FILE);
+      *compressed = TRUE;
+    }
   }
   else
   {
@@ -881,7 +1011,66 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
         *compressed = TRUE;
       }
     }
-    else *compressed = FALSE;
+    else
+    {
+      enum magic_enum { MAGIC_BUF_LEN = 4 };
+      char magic_buf[ MAGIC_BUF_LEN ];
+      int have_magic;
+      have_magic = (fread(magic_buf, 1, MAGIC_BUF_LEN, fp) == MAGIC_BUF_LEN);
+      if(  have_magic &&
+           memcmp(magic_buf, "%PDF", 4) == 0 )
+      {
+        /* process a PDF file */
+        /* treat it like a compressed file */
+        /* convert it to EPS with the pdftops program */
+        /*   from the open source xpdf package */
+        char buff[ MAX_BUFF ];
+        fclose(fp);
+        sprintf(buff, PDFTOPS_COM, (char *) string(*full_name), LOUT_EPS);
+        if( SafeExecution )
+        {
+          Error(3, 17, "safe execution prohibiting command: %s", WARN, xfpos,buff);
+          *compressed = FALSE;
+          fp = null;
+        }
+        else
+        {
+          system(buff);
+          fp = fopen(LOUT_EPS, READ_FILE);
+          *compressed = TRUE;
+        }
+      }
+      else if (  have_magic &&
+                 ((magic_buf[0] == 'I' && magic_buf[1] == 'I') || /* TIFF, Intel format */
+                  (magic_buf[0] == 'M' && magic_buf[1] == 'M') || /* TIFF, Motorola format */
+                  (magic_buf[0] == 'G' && magic_buf[1] == 'I' && magic_buf[2] == 'F') || /* GIF */
+                  ((magic_buf[0]&0xff) == 0xff && (magic_buf[1]&0xff) == 0xd8) || /* JPEG */
+                  (magic_buf[1] == 'P' && magic_buf[2] == 'N' && magic_buf[3] == 'G') /* PNG */ ) )
+      {
+	/* process bitmap files with ImageMagick convert */
+        char buff[ MAX_BUFF ];
+        fclose(fp);
+        sprintf(buff, CONVERT_COM, (char *) string(*full_name), LOUT_EPS);
+        if( SafeExecution )
+        {
+          Error(3, 17, "safe execution prohibiting command: %s", WARN, xfpos,buff);
+          *compressed = FALSE;
+          fp = null;
+        }
+        else
+        {
+          system(buff);
+          fp = fopen(LOUT_EPS, READ_FILE);
+          *compressed = TRUE;
+        }	
+      }
+      else
+      {
+        /* normal uncompressed EPS file */
+        rewind(fp);
+        *compressed = FALSE;
+      }
+    }
   }
 
   debug2(DFS, DD, "OpenIncGraphicFile returning (fp %s null, *full_name = %s)",

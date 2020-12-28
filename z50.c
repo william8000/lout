@@ -1,6 +1,6 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -494,7 +494,7 @@ static void PDF_PrintUnderline(FONT_NUM fnum, COLOUR_NUM col,
 /*                                                                           */
 /*****************************************************************************/
 
-void PDF_PrintAfterLastPage(void)
+static void PDF_PrintAfterLastPage(void)
 {
   if( prologue_done )
   { 
@@ -589,7 +589,7 @@ static void PDF_CoordScale(float hfactor, float vfactor)
 /*                                                                           */
 /*****************************************************************************/
 
-void PDF_SaveGraphicState(OBJECT x)
+static void PDF_SaveGraphicState(OBJECT x)
 { debug0(DPF, D, "PDF_SaveGraphicState()");
   PDFPage_Push(out_fp);
   gs_stack_top++;
@@ -623,7 +623,7 @@ void PDF_SaveGraphicState(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void PDF_RestoreGraphicState(void)
+static void PDF_RestoreGraphicState(void)
 { debug0(DPF, D, "PDF_RestoreGraphicState()");
   PDFPage_Pop(out_fp);
   currentfont	  = gs_stack[gs_stack_top].gs_font;
@@ -646,7 +646,7 @@ void PDF_RestoreGraphicState(void)
 /*                                                                           */
 /*****************************************************************************/
 
-void PDF_PrintGraphicObject(OBJECT x)
+static void PDF_PrintGraphicObject(OBJECT x)
 { OBJECT y, link;
   debug3(DPF, D, "PDF_PrintGraphicObject(%s %s %s)",
     EchoFilePos(&fpos(x)), Image(type(x)), EchoObject(x));
@@ -704,7 +704,7 @@ void PDF_PrintGraphicObject(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void PDF_DefineGraphicNames(OBJECT x)
+static void PDF_DefineGraphicNames(OBJECT x)
 { assert( type(x) == GRAPHIC, "PrintGraphic: type(x) != GRAPHIC!" );
   debug1(DPF, D, "DefineGraphicNames( %s )", EchoObject(x));
   debug1(DPF, DD, "  style = %s", EchoStyle(&save_style(x)));
@@ -760,7 +760,7 @@ void PDF_DefineGraphicNames(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void PDF_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
+static void PDF_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
 {
   PDF_SaveGraphicState(x);
   PDF_CoordTranslate(xdist, ydist);
@@ -777,7 +777,7 @@ void PDF_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH ydist)
 /*                                                                           */
 /*****************************************************************************/
 
-void PDF_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
+static void PDF_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
 { OBJECT y;
   debug0(DPF, D, "PDF_PrintGraphicInclude(x)");
   Child(y, Down(x));

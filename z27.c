@@ -1,6 +1,6 @@
 /*@z27.c:Debug Service:Debug flags@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -100,6 +100,12 @@ struct dbs  dbg[] = {
 void DebugInit(FULL_CHAR *str)
 { int j, urg;
   for( urg = 0;  urg < 2 && str[urg+2] == CH_FLAG_DEBUG;  urg++ );
+  if( StringEqual(AsciiToFull("al"), &str[urg+2]) )
+  { for( j = 1; !StringEqual(AsciiToFull(dbg[j].flag), STR_EMPTY); j++ )
+    { for( urg = 0; urg < 3; urg++ ) dbg[j].on[urg] = dbg[ANY].on[urg] = TRUE;
+    }
+    return;
+  }
   for( j = 1;  ;  j++ )
   { if( StringEqual(AsciiToFull(dbg[j].flag), &str[urg+2]) )  break;
     if( StringEqual(AsciiToFull(dbg[j].flag), STR_EMPTY) )

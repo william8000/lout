@@ -1,6 +1,6 @@
 /*@z08.c:Object Manifest:ReplaceWithSplit()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -73,6 +73,7 @@ static OBJECT insert_split(OBJECT x, OBJECT bthr[2], OBJECT fthr[2])
   debug1(DOM, DD, "ReplaceWithSplit(%s, -)", EchoObject(x));
   assert( type(x) != SPLIT, "ReplaceWithSplit: type(x) already SPLIT!" );
   New(res, SPLIT);
+  back(res, COLM) = back(res, ROWM) = fwd(res, COLM) = fwd(res, ROWM) = 0;
   FposCopy(fpos(res), fpos(x));
   ReplaceNode(res, x);
   for( dim = COLM;  dim <= ROWM;  dim++ )

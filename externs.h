@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.41 (Nov 2020)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.42 (Dec 2020)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -171,6 +171,8 @@ extern nl_catd MsgCat;
 #define	STR_NEWLINE	AsciiToFull("\n")
 #define	STR_DIR		AsciiToFull("/")
 #define	UNCOMPRESS_COM	"gunzip -c %s > %s"
+#define PDFTOPS_COM	"pdftops -eps '%s' '%s'"
+#define CONVERT_COM	"convert '%s' 'eps2:%s'"
 #define	LOUT_EPS	"lout.eps"
 #else
 #if OS_DOS
@@ -180,6 +182,8 @@ extern nl_catd MsgCat;
 #define	STR_NEWLINE	AsciiToFull("\r\n")
 #define	STR_DIR		AsciiToFull("/")
 #define	UNCOMPRESS_COM	"gunzip -c %s > %s"
+#define PDFTOPS_COM	"pdftops -eps %s %s"
+#define CONVERT_COM	"convert %s eps2:%s"
 #define	LOUT_EPS	"lout.eps"
 #else
 #if OS_MAC
@@ -189,6 +193,8 @@ extern nl_catd MsgCat;
 #define	STR_NEWLINE	AsciiToFull("\r")
 #define	STR_DIR		AsciiToFull("/")
 #define	UNCOMPRESS_COM	"gunzip -c %s > %s"
+#define PDFTOPS_COM	"pdftops -eps %s %s"
+#define CONVERT_COM	"convert %s eps2:%s"
 #define	LOUT_EPS	"lout.eps"
 #else
 If you're compiling this, you've got the wrong settings in the makefile!
@@ -265,7 +271,40 @@ If you're compiling this, you've got the wrong settings in the makefile!
 /*                                                                           */
 /*****************************************************************************/
 
+/*@::Significant limits@******************************************************/
+/*                                                                           */
+/* ALT_SCALE_FACTOR_SHIFT Scaling for included images is calculated by       */
+/*                      trunc(SF * available_space / image_size)             */
+/*                      The default value of SF is 256 (SHIFT of 8).         */
+/*                      When printing a document with proofs of pages that   */
+/*                      contain several pages per sheet, images might be     */
+/*                      reduced by a factor of 10.  If such an image needs a */
+/*                      a scale factor of 25.9, lout rounds it to 25.        */
+/*                      If the image was originally about 11" (792pt),       */
+/*                      it will be printed as 792*25/256 = 77.3pt instead of */
+/*                      792*25.9/256 = 80.1pt.  This difference can create a */
+/*                      visible misalignment of images in a @Graph.          */
+/*                      Increasing SF improves the scaling accuracy at the   */
+/*                      expense of reducing MAX_FULL_LENGTH, the maximum     */
+/*                      page size.                                           */
+/*			ALT_SCALE_FACTOR   8  MAX_FULL_LENGTH  148.0m        */
+/*			ALT_SCALE_FACTOR   9  MAX_FULL_LENGTH   74.0m        */
+/*			ALT_SCALE_FACTOR  10  MAX_FULL_LENGTH   37.0m        */
+/*			ALT_SCALE_FACTOR  11  MAX_FULL_LENGTH   18.5m        */
+/*			ALT_SCALE_FACTOR  12  MAX_FULL_LENGTH    9.2m        */
+/*			ALT_SCALE_FACTOR  13  MAX_FULL_LENGTH    4.6m        */
+/*			ALT_SCALE_FACTOR  14  MAX_FULL_LENGTH    2.3m        */
+/*			ALT_SCALE_FACTOR  15  MAX_FULL_LENGTH    1.2m        */
+/*                                                                           */
+/*****************************************************************************/
+
+#define ALT_SCALE_FACTOR_SHIFT	12
+
+#ifdef ALT_SCALE_FACTOR_SHIFT
+#define	MAX_FULL_LENGTH	((1 << (31 - ALT_SCALE_FACTOR_SHIFT)) - 1)
+#else
 #define	MAX_FULL_LENGTH	8388607	/* 2**23 - 1, about 148 metres */
+#endif
 #define	MAX_FILES	65535
 #define MAX_LINE        2048
 #define MAX_WORD        2048
@@ -2359,13 +2398,17 @@ typedef struct back_end_rec {
 #define	NEXT_UNIT	     5		/* w unit (inners)                   */
  
 /* units of distance as multiples of the basic unit */
-#define	CM	           567		/* 1 centimetre                      */
+#define	CM	  (72*20/2.54)		/* 1 centimetre                      */
 #define	IN	          1440		/* 1 inch                            */
 #define	EM	           120		/* 1 em (= 1/12 inch)                */
 #define	PT		    20		/* 1 point (= 1/72 inch)             */
 #define	FR	          4096		/* virtual unit for frame units      */
 #define	DG	           128		/* virtual unit for degrees          */
+#ifdef ALT_SCALE_FACTOR_SHIFT
+#define	SF (1 << ALT_SCALE_FACTOR_SHIFT) /* virtual unit for @Scale factors  */
+#else
 #define	SF	           256		/* virtual unit for @Scale factors   */
+#endif
                                         /* including blankline scale         */
 
 /* default size of characters for the PLAINTEXT back end */
@@ -2621,6 +2664,20 @@ typedef struct back_end_rec {
 /*                                                                           */
 /*****************************************************************************/
 
+/*@::Memory alllocation@******************************************************/
+/*                                                                           */
+/* USE_SYSTEM_MALLOC    Use the system malloc/free instead of lout's         */
+/*                      built-in allocator. It can be useful for debugging   */
+/*                      memory errors with tools like valgrind. Using the    */
+/*                      system malloc/free can double the lout run time.     */
+/*                                                                           */
+/* USE_MALLOC_DEBUG     Add additional memory debugging that tracks the      */
+/*                      size, type and allocation point of each object.      */
+/*****************************************************************************/
+
+#define	USE_SYSTEM_MALLOC	0
+#define	USE_MALLOC_DEBUG	0
+
 #if DEBUG_ON
 #define newcount zz_newcount++
 #define freecount zz_listcount--
@@ -2642,6 +2699,67 @@ typedef struct back_end_rec {
 #define checkmem(z, typ)
 #endif
 
+#if USE_MALLOC_DEBUG
+
+/* Add a header and trailer */
+/* The header includes the allocation point which can help identify */
+/* where an object needed to be initialized. */
+
+typedef struct
+{ short otype;				/* object type                  */
+  short orec_size;			/* object record size in ALIGNS */
+  const char *oalloc_file_name;		/* C file that called New       */
+  int oalloc_line_num;			/* line number of call          */
+} MALLOC_HEADER;
+
+#define	MALLOC_HEADER_SIZE		(ceiling(sizeof(MALLOC_HEADER), sizeof(ALIGN)))
+
+typedef struct
+{ short osentinel;			/* sentinel value */
+} MALLOC_TRAILER;
+
+#define MALLOC_SENTINEL			0x1e87	/* randomly-selected value to check for overwrites */
+
+#define MALLOC_TRAILER_SIZE		(ceiling(sizeof(MALLOC_TRAILER), sizeof(ALIGN)))
+
+#define malloc_oheader(x)		((MALLOC_HEADER *)(((ALIGN *)(x)) - MALLOC_HEADER_SIZE))
+#define	malloc_otype(x)			(malloc_oheader(x)->otype)
+#define malloc_orec_size(x)		(malloc_oheader(x)->orec_size)
+#define malloc_oalloc_file_name(x)	(malloc_oheader(x)->oalloc_file_name)
+#define malloc_oalloc_line_num(x)	(malloc_oheader(x)->oalloc_line_num)
+
+#define malloc_otrailer(x)		((MALLOC_TRAILER *)(((ALIGN *)(x)) + malloc_orec_size(x)))
+#define malloc_osentinel(x)		(malloc_otrailer(x)->osentinel)
+
+#define	setmemtype(x,typ)		malloc_otype(x) = (typ);
+
+#define mallocheadercheck(x,size)					\
+{ if (size != malloc_orec_size(x)) fprintf(stderr, "putmem, siz %d != allocated %d\n", size, malloc_orec_size(x));	\
+  if (type(x) != malloc_otype(x)) fprintf(stderr, "putmem, typ %d != orig %d\n", type(x), malloc_otype(x)); 		\
+  if (malloc_osentinel(x) != MALLOC_SENTINEL) fprintf(stderr, "putmem, invalid sentinel %x\n", malloc_osentinel(x));	\
+}
+
+#define	mallocsetfile(x)						\
+{ if (x != NULL)							\
+  { malloc_oalloc_file_name(x) = __FILE__;				\
+    malloc_oalloc_line_num(x) = __LINE__;				\
+  }									\
+}
+
+#else
+
+#define setmemtype(x,typ)
+#define mallocheadercheck(x,size)
+#define	mallocsetfile(x)
+#define malloc_oalloc_file_name(x)					""
+#define malloc_oalloc_line_num(x)					0
+
+#endif
+
+/* GetMem does not initialize objects that come from the free list.          */
+/* Clearing the object with memset() adds 30% to the lout run time.          */
+/* Callers of New should initialize everything necessary.                    */
+
 #define	GetMem(x, siz, pos)						\
 { newcount;								\
   if( (zz_size=(siz)) >= MAX_OBJECT_REC )				\
@@ -2653,12 +2771,15 @@ typedef struct back_end_rec {
     freecount;								\
     zz_free[zz_size] = pred(x, CHILD);					\
   }									\
+  mallocsetfile(x);							\
 }
 
 #define	New(x, typ)							\
 { checknew(typ);							\
   GetMem(zz_hold, zz_lengths[typ], no_fpos);				\
   type(zz_hold) = typ;							\
+  setmemtype(zz_hold, typ);						\
+  mallocheadercheck(zz_hold,zz_lengths[typ]);				\
   checkmem(zz_hold, typ);						\
   x = pred(zz_hold, CHILD) = succ(zz_hold, CHILD) =			\
   pred(zz_hold, PARENT) = succ(zz_hold, PARENT) = zz_hold;		\
@@ -2670,7 +2791,9 @@ typedef struct back_end_rec {
   GetMem(zz_hold, ceiling(zz_size, sizeof(ALIGN)), pos);		\
   checkmem(zz_hold, typ);						\
   rec_size(zz_hold) = zz_size;						\
+  setmemtype(zz_hold, typ);						\
   type(zz_hold) = typ;							\
+  mallocheadercheck(zz_hold,zz_size);					\
   x = pred(zz_hold, CHILD) = succ(zz_hold, CHILD) =			\
   pred(zz_hold, PARENT) = succ(zz_hold, PARENT) = zz_hold;		\
 }
@@ -2703,10 +2826,46 @@ typedef struct back_end_rec {
 #define	setdisposed
 #endif
 
+#if USE_SYSTEM_MALLOC
+
+#if USE_MALLOC_DEBUG
+
+#define	PutMem(x, siz)							\
+{ disposecount;								\
+  zz_hold = (x);							\
+  zz_size = (siz);							\
+  mallocheadercheck(zz_hold,zz_size);					\
+  free( malloc_oheader(x) );						\
+}
+
+#define Dispose(x)							\
+{ zz_hold = (x);							\
+  PutMem(zz_hold, is_word(type(zz_hold)) ?				\
+    rec_size(zz_hold) : zz_lengths[type(zz_hold)]);			\
+}
+
+#else
+
+#define	PutMem(x, siz)							\
+{ disposecount;								\
+  free( (x) );								\
+}
+
+#define	Dispose(x)							\
+{ zz_hold = (x);							\
+  setdisposed;								\
+  PutMem(zz_hold,0);							\
+}
+
+#endif
+
+#else
+
 #define PutMem(x, siz)							\
 { disposecount;								\
   zz_hold = (x);							\
   zz_size = (siz);							\
+  mallocheadercheck(zz_hold,zz_size);					\
   disposecheck;								\
   pred(zz_hold, CHILD) = zz_free[zz_size];				\
   zz_free[zz_size] = zz_hold;						\
@@ -2718,6 +2877,7 @@ typedef struct back_end_rec {
     rec_size(zz_hold) : zz_lengths[type(zz_hold)]);			\
   setdisposed;								\
 }
+#endif
 
 /*@::Append(), Delete()@******************************************************/
 /*                                                                           */

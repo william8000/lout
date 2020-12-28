@@ -1,6 +1,6 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -820,7 +820,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
   p0("/ul { gsave setlinewidth dup 3 1 roll");
   p0("      moveto lineto stroke grestore } bind def");
   p1("/in { %d mul } bind def", IN);
-  p1("/cm { %d mul } bind def", CM);
+  p1("/cm { %.3f mul } bind def", CM);
   p1("/pt { %d mul } bind def", PT);
   p1("/em { %d mul } bind def", EM);
   p0("/sp { louts mul } def");
@@ -1630,7 +1630,7 @@ static void PS_RestoreGraphicState(void)
 /*                                                                           */
 /*****************************************************************************/
 
-void PS_PrintGraphicObject(OBJECT x)
+static void PS_PrintGraphicObject(OBJECT x)
 { OBJECT y, link;
   debug3(DPO, DD, "PS_PrintGraphicObject(%s %s %s)",
     EchoFilePos(&fpos(x)), Image(type(x)), EchoObject(x));
@@ -1688,7 +1688,7 @@ void PS_PrintGraphicObject(OBJECT x)
 /*                                                                           */
 /*****************************************************************************/
 
-void PS_DefineGraphicNames(OBJECT x)
+static void PS_DefineGraphicNames(OBJECT x)
 { assert( type(x) == GRAPHIC, "PrintGraphic: type(x) != GRAPHIC!" );
   debug1(DPO, DD, "PS_DefineGraphicNames( %s )", EchoObject(x));
   debug1(DPO, DD, "  style = %s", EchoStyle(&save_style(x)));
@@ -1827,6 +1827,8 @@ BOOLEAN PS_FindBoundingBox(FILE *fp, FILE_POS *pos, FULL_LENGTH *llx,
 	*lly = flly;
 	*urx = furx;
 	*ury = fury;
+	debug4(DPO, D, "FindBoundingBox llx %.2f lly %.2f urx %.2f ury %.2f",
+	  fllx, flly, furx, fury);
 	return TRUE;
       }
       else
@@ -1939,7 +1941,7 @@ static void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
 #define is_digit(ch)		in_range(ch, '0', '9')
 #define is_alphanum(ch)		(is_lower(ch) || is_upper(ch) || is_digit(ch))
 
-char *ConvertToPDFName(OBJECT name)
+static char *ConvertToPDFName(OBJECT name)
 { static char buff[200];
   char *q;
   FULL_CHAR *p;

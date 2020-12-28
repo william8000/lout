@@ -1,6 +1,6 @@
 /*@z06.c:Parser:PushObj(), PushToken(), etc.@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -93,7 +93,7 @@ static void check_yield(OBJECT y, OBJECT *res_yield, BOOLEAN *all_literals)
     bool(*all_literals));
 }
 
-OBJECT OptimizeCase(OBJECT x)
+static OBJECT OptimizeCase(OBJECT x)
 { OBJECT link, s2, y, res_yield, res;  BOOLEAN all_literals;  
   debug1(DOP, DD, "OptimizeCase(%s)", EchoObject(x));
   assert( type(x) == CASE, "OptimizeCase:  type(x) != CASE!" );

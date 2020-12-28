@@ -2,7 +2,8 @@
 #                                                                             #
 #  Make file for installing Basser Lout                                       #
 #                                                                             #
-#  Jeffrey H. Kingston                                                        #
+#  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                         #
+#  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                               #
 #                                                                             #
 #     make prg2lout     Compile a small auxiliary program called prg2lout     #
 #     make lout         Compile the Lout source                               #
@@ -254,6 +255,8 @@
 #                                                                             #
 ###############################################################################
 
+VERSION = 3.42
+
 OSUNIX  = 1
 OSDOS   = 0
 OSMAC   = 0
@@ -266,14 +269,21 @@ SAFEDFT = 0
 DEBUGGING = 0
 TRACING =
 
-# DEBUGGING = 1
-# TRACING = -g
+#DEBUGGING = 1
+#TRACING = -g
+#TRACING = -g -fno-omit-frame-pointer -fsanitize=undefined
+#TRACING = -g -fno-omit-frame-pointer -fsanitize=address -fsanitize-recover
 
-PREFIX	= /home/jeff
+#PREFIX	= /home/jeff
+PREFIX	= /usr/local
 BINDIR	= $(PREFIX)/bin
-LOUTLIBDIR	= $(PREFIX)/lout.lib
-LOUTDOCDIR	= $(PREFIX)/lout.doc
-MANDIR	= $(PREFIX)/lout.man
+#LOUTLIBDIR	= $(PREFIX)/lout.lib
+#LOUTDOCDIR	= $(PREFIX)/lout.doc
+#MANDIR	= $(PREFIX)/lout.man
+LIBDIR	= $(PREFIX)/share/lout-$(VERSION)
+LOUTLIBDIR	= $(LIBDIR)/lib
+LOUTDOCDIR	= $(LIBDIR)/doc
+MANDIR	= $(LIBDIR)/man
 
 LIBFONT = font
 LIBMAPS = maps
@@ -296,10 +306,16 @@ ZLIB		=
 ZLIBPATH	=
 
 CC	= gcc
+#CC	= bgcc
 
 RCOPY	= cp -r
 
-COPTS	= -ansi -pedantic -Wall -O3
+MKDIR	= mkdir -p
+
+# Add WARN to COPTS for more checking
+WARN	= -Wpointer-arith -Wclobbered -Wempty-body -Wmissing-parameter-type -Wmissing-field-initializers -Wold-style-declaration -Wtype-limits -Wuninitialized -Winit-self -Wlogical-op -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Wbad-function-cast
+
+COPTS	= -ansi -pedantic -Wall -O3 -pipe
 
 CFLAGS	= -DOS_UNIX=$(OSUNIX)					\
 	  -DOS_DOS=$(OSDOS)					\
@@ -333,7 +349,7 @@ OBJS	= z01.o z02.o z03.o z04.o z05.o z06.o z07.o z08.o	\
 	  z49.o z50.o z51.o z52.o
 
 lout:	$(OBJS)
-	$(CC) -o lout $(OBJS) $(ZLIB) -lm
+	$(CC) $(CFLAGS) -o lout $(OBJS) $(ZLIB) -lm
 	chmod a+x lout
 
 $(OBJS): externs.h
@@ -355,35 +371,35 @@ install: lout prg2lout
 	chmod 755 $(BINDIR)/prg2lout
 	@echo ""
 	@echo "(b) Installing library files into LOUTLIBDIR $(LOUTLIBDIR)"
-	mkdir -p $(LOUTLIBDIR)
+	$(MKDIR) $(LOUTLIBDIR)
 	chmod 755 $(LOUTLIBDIR)
 	@echo ""
-	mkdir $(LOUTLIBDIR)/$(LIBINCL)
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBINCL)
 	chmod 755 $(LOUTLIBDIR)/$(LIBINCL)
 	cp include/* $(LOUTLIBDIR)/$(LIBINCL)
 	chmod 644 $(LOUTLIBDIR)/$(LIBINCL)/*
 	@echo ""
-	mkdir $(LOUTLIBDIR)/$(LIBDATA)
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBDATA)
 	chmod 755 $(LOUTLIBDIR)/$(LIBDATA)
 	cp data/* $(LOUTLIBDIR)/$(LIBDATA)
 	chmod 644 $(LOUTLIBDIR)/$(LIBDATA)/*
 	@echo ""
-	mkdir $(LOUTLIBDIR)/$(LIBHYPH)
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBHYPH)
 	chmod 755 $(LOUTLIBDIR)/$(LIBHYPH)
 	cp hyph/* $(LOUTLIBDIR)/$(LIBHYPH)
 	chmod 644 $(LOUTLIBDIR)/$(LIBHYPH)/*
 	@echo ""
-	mkdir $(LOUTLIBDIR)/$(LIBFONT)
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBFONT)
 	chmod 755 $(LOUTLIBDIR)/$(LIBFONT)
 	cp font/* $(LOUTLIBDIR)/$(LIBFONT)
 	chmod 644 $(LOUTLIBDIR)/$(LIBFONT)/*
 	@echo ""
-	mkdir $(LOUTLIBDIR)/$(LIBMAPS)
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBMAPS)
 	chmod 755 $(LOUTLIBDIR)/$(LIBMAPS)
 	cp maps/* $(LOUTLIBDIR)/$(LIBMAPS)
 	chmod 644 $(LOUTLIBDIR)/$(LIBMAPS)/*
 	@echo ""
-	mkdir $(LOUTLIBDIR)/$(LIBLOCA)
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBLOCA)
 	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)
 	@echo ""
 	@echo "(c) Initializing run (should be silent, no errors expected)"
@@ -396,6 +412,8 @@ install: lout prg2lout
 installman:
 	@echo ""
 	@echo "Installing manual entries into MANDIR $(MANDIR)"
+	if [ ! -d $(MANDIR) ] ; then $(MKDIR) $(MANDIR) ; fi
+	chmod 755 $(MANDIR)
 	sed -e "s@<BINDIR>@$(BINDIR)@" -e "s@<LIBDIR>@$(LOUTLIBDIR)@"	\
 	    -e "s@<LOUTDOCDIR>@$(LOUTDOCDIR)@" -e "s@<MANDIR>@$(MANDIR)@"	\
 	man/lout.1 > $(MANDIR)/lout.1
@@ -406,6 +424,7 @@ installman:
 installdoc:
 	@echo ""
 	@echo "Creating LOUTDOCDIR $(LOUTDOCDIR) and copying documentation into it"
+	if [ ! -d $(LOUTDOCDIR) ] ; then $(MKDIR) $(LOUTDOCDIR) ; fi
 	$(RCOPY) doc/* $(LOUTDOCDIR)
 	chmod 755 $(LOUTDOCDIR)
 	chmod 755 $(LOUTDOCDIR)/*
@@ -416,9 +435,9 @@ allinstall:	install installman installdoc
 installfr:
 	@echo ""
 	@echo "Putting French error messages into $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)"
-	mkdir $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)
 	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)
-	mkdir $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES
 	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES
 	cp locale/msgs.fr $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/msgs.$(LOC_FR)
 	gencat $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_FR)/LC_MESSAGES/errors.$(LOC_FR)	\
@@ -428,9 +447,9 @@ installfr:
 installde:
 	@echo ""
 	@echo "Putting German error messages into $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)"
-	mkdir $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)
 	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)
-	mkdir $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES
+	$(MKDIR) $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES
 	chmod 755 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES
 	cp locale/msgs.de $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/msgs.$(LOC_DE)
 	gencat $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/errors.$(LOC_DE)	\
@@ -438,10 +457,24 @@ installde:
 	chmod 644 $(LOUTLIBDIR)/$(LIBLOCA)/$(LOC_DE)/LC_MESSAGES/*
 
 uninstall:
-	-rm -f  $(BINDIR)/lout $(BINDIR)/prg2lout
-	-rm -fr $(LOUTLIBDIR)
-	-rm -fr $(LOUTDOCDIR)
-	-rm -f  $(MANDIR)/lout.1 $(MANDIR)/prg2lout.1
+	-rm -f "$(BINDIR)/lout" "$(BINDIR)/prg2lout"
+	-rm -f "$(MANDIR)/lout.1" "$(MANDIR)/prg2lout.1"
+	{ \
+		for dir in "$(LOUTLIBDIR)" "$(LOUTDOCDIR)" ; do \
+			if [ -n "$$dir" ] && [ -d "$$dir" ] ; then \
+				case "$$dir" in \
+				*lout*) rm -fr "$$dir" ;; \
+				esac ; \
+			fi ; \
+		done ; \
+		for dir in "$(MANDIR)" "$(LIBDIR)" ; do \
+			if [ -n "$$dir" ] && [ -d "$$dir" ] ; then \
+				case "$$dir" in \
+				*lout*) rmdir "$$dir" ;; \
+				esac ; \
+			fi ; \
+		done ; \
+	}
 
 clean:	
 	-rm -f lout prg2lout *.o

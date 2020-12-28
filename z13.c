@@ -1,6 +1,6 @@
 /*@z13.c:Object Breaking:BreakJoinedGroup()@**********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -493,7 +493,7 @@ OBJECT BreakObject(OBJECT x, CONSTRAINT *c)
       { Error(13, 4, "%s deleted (too wide; cannot break %s)",
 	  WARN, &fpos(x), KW_ROTATE, KW_ROTATE);
         y = MakeWord(WORD, STR_EMPTY, &fpos(x));
-        back(y, COLM) = fwd(y, COLM) = 0;
+        back(y, COLM) = back(y, ROWM) = fwd(y, COLM) = fwd(y, ROWM) = 0;
         ReplaceNode(y, x);
         DisposeObject(x);
         x = y;

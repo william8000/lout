@@ -1,6 +1,6 @@
 /*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.41)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -251,6 +251,7 @@ OBJECT y, int dim)
 void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 { OBJECT y, link, tlink, lp, rp, z, index;
   BOOLEAN ratm;  FULL_LENGTH tb, tf, cby, cfy, rby, rfy;
+  BOOLEAN is_rotate;
 
   SetLengthDim(dim);
   debug6(DSA, D, "[ AdjustSize( %s(%s,%s), %s, %s, %s ), x =",
@@ -258,11 +259,32 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 	EchoLength(back(x, dim)), EchoLength(fwd(x, dim)),
 	EchoLength(b), EchoLength(f), dimen(dim));
   ifdebug(DSA, DD, DebugObject(x) );
+  is_rotate = type(x) == ROTATE;
 
   while( b != back(x, dim) || f != fwd(x, dim) || is_indefinite(type(x)) )
   { assert( Up(x) != x, "AdjustSize: Up(x) == x!" );
-    if( b < 0 || f < 0 )
-      Error(16, 5, "cannot recover from earlier errors", FATAL, &fpos(x));
+    if (b < 0) {
+      fprintf(stderr,
+        "b %d < 0, back(x, dim %d) = %d, type(x) %d is_rotate %d, declared %s:%d\n",
+        b, dim, back(x, dim), type(x), is_rotate, malloc_oalloc_file_name(x), malloc_oalloc_line_num(x));
+      ifdebug(DSA, D, DebugObject(x));
+    }
+    if (f < 0) {
+      fprintf(stderr,
+        "f %d < 0, fwd(x, dim %d) = %d, type(x) %d is_rotate %d, declared %s:%d\n",
+        f, dim, fwd(x, dim), type(x), is_rotate, malloc_oalloc_file_name(x), malloc_oalloc_line_num(x));
+      ifdebug(DSA, D, DebugObject(x));
+    }
+    if (b < 0 || f < 0) {
+      OBJECT p;
+      Parent(p, Up(x));
+      fprintf(stderr, "  Up type %d declared %s:%d\n", type(Up(x)), malloc_oalloc_file_name(Up(x)), malloc_oalloc_line_num(Up(x)));
+      fprintf(stderr, "  Parent type %d declared %s:%d\n", type(p), malloc_oalloc_file_name(p), malloc_oalloc_line_num(p));
+    }
+    if( b < 0 && !is_rotate)
+      Error(16, 5, "back < 0; cannot recover from earlier errors", FATAL, &fpos(x));
+    if (f < 0 && !is_rotate)
+      Error(16, 5, "fwd < 0 and not rotate; cannot recover from earlier errors", FATAL, &fpos(x));
 
     /* these cases are unique because they have multiple parents */
     if( type(x) == COL_THR || type(x) == ROW_THR )
