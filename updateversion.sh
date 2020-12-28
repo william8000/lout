@@ -30,7 +30,7 @@ temp=temp
 
 # Update the line: /*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION X.XX)                       */
 
-for name in *.c *.h makefile
+for name in *.c *.h makefile README
 do
 	if [ ! -f "$name" ]
 	then
