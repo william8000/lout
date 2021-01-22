@@ -608,6 +608,10 @@ Jeff Kingston
 
 Changes and new features introduced in Version 3.41 [Nov 2020]
 
+   3.41 is 3.40 with fixes for two CVEs.
+   Download 3.41 with
+   wget https://github.com/william8000/lout/archive/3.41.tar.gz
+
    Bug fixes:
      CVE-2019-19918-srcnext in z02.c
      CVE-2019-19917-StringQuotedWord in z39.c
@@ -618,6 +622,8 @@ Changes and new features introduced in Version 3.42 [Dec 2020]
      build scripts. Existing lout files should work unchanged
      and should produce identical output, except for slightly
      more accurate placement of some objects.
+   Download 3.42 with
+   wget https://github.com/william8000/lout/archive/3.42.tar.gz
 
    Support for embedding PDF and bitmapped images in lout.
      Embedding postscript requires pdftops, see PDFTOPS_COM
