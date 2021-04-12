@@ -648,7 +648,7 @@ Changes and new features introduced in Version 3.42 [Dec 2020]
    Running 'make install' no longer requires creating or removing
      directories. The makefile now works cleanly on Linux with
      'make all' and repeated runs of 'make allinstall'.
-   Reorganized library directory that support multiple versions of
+   Reorganized library directory that supports multiple versions of
      lout. In the makefile, the default PREFIX is now /usr/local
      instead of /home/jeff. The default lib, doc, and man directories
      are now under $(PREFIX)/share/lout-$(VERSION)
@@ -658,14 +658,14 @@ Changes and new features introduced in Version 3.42 [Dec 2020]
      malloc and USE_MALLOC_DEBUG to enabled malloc debugging.
      Both should normally be disabled (set to 0) but can be
      turned on to help locate memory allocation errors.
-     Memory allcation in z29.c and in z31.c checks USE_SYSTEM_MALLOC.
+     Memory allocation in z29.c and in z31.c checks USE_SYSTEM_MALLOC.
    Add an 'al' debug option to enable all debug flags
      in DebugInit() in z27.c.
    Add support for segmented postscript files in z03.c by including
      a graphic with the syntax @name@start:end
      The file 'name' should have a shared postscript prolog, a null,
      a shared postscript trailer, and then byte offsets 'start' and
-     'end' identify the postscript segment to use.
+     'end' to identify the postscript segment to use.
    Add 'static' to several C functions that did not need to be global.
    Fix bad memory accesses in DisposeObject() in z07.c.
    Fix the fatal error "AdjustSize: Up(x) == x!".
@@ -677,7 +677,7 @@ Changes and new features introduced in Version 3.42 [Dec 2020]
      The uninitialized values would trigger an assert in AdjustSize()
      in z16.c. AdjustSize() now prints a warning instead of exiting
      in case the initializations did not completely solve the problem.
-   Fix bad memory access to kerned_glyphs[] in z14.c.
+   Fix a bad memory access to kerned_glyphs[] in z14.c.
    Fix possible memory overwrite in prg2lout.c
    New files:
      .gitignore to keep generated files out of git
