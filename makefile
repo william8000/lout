@@ -365,6 +365,8 @@ all:	lout prg2lout
 install: lout prg2lout
 	@echo ""
 	@echo "(a) Installing lout and prg2lout binaries into BINDIR $(BINDIR)"
+	$(MKDIR) $(BINDIR)
+	chmod 755 $(BINDIR)
 	cp lout $(BINDIR)/lout
 	chmod 755 $(BINDIR)/lout
 	cp prg2lout $(BINDIR)/prg2lout
