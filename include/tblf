@@ -1357,7 +1357,7 @@ def @TblSetup
 	    {
 	      @BackEnd @Case {
 		PostScript @Yield { {"LoutBox" @ColourCommand p t "fill"} @Graphic x }
-		PDF        @Yield { { @PDFBox @PDFAddPaint col "S" } @Graphic x }
+		PDF        @Yield { { @PDFBox @PDFAddPaint p "S" } @Graphic x }
 		PlainText  @Yield { x }
 	      }
 	    }
