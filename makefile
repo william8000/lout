@@ -349,6 +349,8 @@ OBJS	= z01.o z02.o z03.o z04.o z05.o z06.o z07.o z08.o	\
 	  z41.o z42.o z43.o z44.o z45.o z46.o z47.o z48.o	\
 	  z49.o z50.o z51.o z52.o
 
+.PHONY: all install installman installdoc allinstall installfr installde uninstall clean gitclean gitcleanforce restart
+
 lout:	$(OBJS)
 	$(CC) $(LDFLAGS) $(CFLAGS) -o lout $(OBJS) $(ZLIB) -lm
 
@@ -478,5 +480,12 @@ uninstall:
 
 clean:	
 	-rm -f lout prg2lout *.o
+
+gitclean:
+	git clean -Xn
+	@echo "Use 'make gitcleanforce' to remove these files."
+
+gitcleanforce:
+	git clean -Xf
 
 restart:	clean uninstall
