@@ -1,6 +1,7 @@
 lout
 prg2lout
 *.ld
+*.ldx
 *.li
 *.ps
 *.pdf

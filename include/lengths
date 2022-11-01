@@ -160,7 +160,7 @@ def @PSLengths
     def d left x {
 	@BackEnd @Case {
 	    PostScript @Yield { x" dg" }
-	    PDF        @Yield { "__mul(__loutd, "x")" }
+	    PDF        @Yield { x }
 	    PlainText  @Yield ""
 	}
     }
