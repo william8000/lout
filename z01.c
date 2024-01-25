@@ -974,7 +974,8 @@ int main(int argc, char *argv[])
   while( run_num <= runs_to_do );
 
 #if LOCALE_ON
-  catclose(MsgCat);
+  if (MsgCat != (nl_catd)-1)
+    catclose(MsgCat);
 #endif
 
   exit(0);
