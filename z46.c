@@ -1,6 +1,6 @@
 /*@z46.c:Optimal Galleys:FindOptimize()@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -50,10 +50,12 @@ BOOLEAN FindOptimize(OBJECT x, OBJECT env)
   /* search the parameter list of x for @Optimize */
   res = nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( type(y) == PAR && is_optimize(actual(y)) )
     { assert( Down(y) != y, "FindOptimize: Down(PAR)!" );
-      Child(res, Down(y));
+      Child(res, Down(y))
+        ;
       res = CopyObject(res, &fpos(x));
       break;
     }
@@ -62,7 +64,8 @@ BOOLEAN FindOptimize(OBJECT x, OBJECT env)
   /* search the children list of actual(x) for a default value of @Target */
   if( res == nilobj )
   for( link = Down(actual(x));  link != actual(x);  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( is_optimize(y) )
     { res = CopyObject(sym_body(y), &fpos(x));
       break;
@@ -129,15 +132,18 @@ void SetOptimize(OBJECT hd, STYLE *style)
     assert( type(res) == CLOSURE, "SetOptimize: type(res) != CLOSURE!" );
     assert( actual(res) == OptGallSym, "SetOptimize: actual(res) != Opt!" );
     assert( Down(res) != res, "SetOptimize: Down(res) == res!" );
-    Child(y, Down(res));
+    Child(y, Down(res))
+      ;
     assert( type(y) == PAR, "SetOptimize: type(y) != PAR!" );
-    Child(y, Down(y));
+    Child(y, Down(y))
+      ;
     assert( type(y) == ACAT, "SetOptimize: type(y) != ACAT!" );
     y = ReplaceWithTidy(y, ACAT_TIDY);
     opt_hyph(hd) = FALSE;
     assert( type(y) == ACAT, "SetOptimize: type(y) != ACAT (2)!" );
     for( link = y;  NextDown(link) != y;  link = NextDown(link) )
-    { Child(z, NextDown(link));
+    { Child(z, NextDown(link))
+        ;
       if( type(z) == GAP_OBJ )
       { DisposeChild(NextDown(link));
 	link = PrevDown(link);
@@ -167,7 +173,8 @@ void SetOptimize(OBJECT hd, STYLE *style)
 
   /* set up first opt_comps_permitted value */
   if( opt_counts(hd) != nilobj && Down(opt_counts(hd)) != opt_counts(hd) )
-  { Child(z, Down(opt_counts(hd)));
+  { Child(z, Down(opt_counts(hd)))
+      ;
     opt_comps_permitted(hd) = comp_count(z) - 1;
     DisposeChild(Up(z));
   }
@@ -210,12 +217,13 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
 
   /* record the size of this just-completed target area for hd */
   New(tmp, WIDE);
-  if( (gall_dir(hd) == COLM && external_hor(dest)) ||
-      (gall_dir(hd) == COLM && external_hor(dest)) )
+  if( (gall_dir(hd) == COLM && external_hor(dest)) /* ||
+      (gall_dir(hd) == COLM && external_hor(dest)) */ )
   { SetConstraint(constraint(tmp), MAX_FULL_LENGTH, MAX_FULL_LENGTH, MAX_FULL_LENGTH);
   }
   else
-  { Parent(prnt, Up(dest));
+  { Parent(prnt, Up(dest))
+      ;
     Constrained(prnt, &constraint(tmp), gall_dir(hd), &junk);
   }
   Link(opt_constraints(hd), tmp);
@@ -224,7 +232,8 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
 
   /* optimizing galley is being gazumped; record this as &1rt {} &1c */
   if( LastDown(opt_components(hd)) != opt_components(hd) )
-  { Child(g, LastDown(opt_components(hd)));
+  { Child(g, LastDown(opt_components(hd)))
+      ;
     assert( type(g) == GAP_OBJ, "FlushGalley: type(g) != GAP_OBJ!" );
 
     /* ***
@@ -271,7 +280,8 @@ void GazumpOptimize(OBJECT hd, OBJECT dest)
 
   /* refresh the number of comps permitted into the next target */
   if( opt_counts(hd) != nilobj && Down(opt_counts(hd)) != opt_counts(hd) )
-  { Child(tmp, Down(opt_counts(hd)));
+  { Child(tmp, Down(opt_counts(hd)))
+      ;
     opt_comps_permitted(hd) += comp_count(tmp) - 1;
     DisposeChild(Up(tmp));
   }
@@ -299,7 +309,8 @@ void CalculateOptimize(OBJECT hd)
 
   /* delete the concluding GAP_OBJ stuck in by Promote() */
   assert( LastDown(opt_components(hd)) != opt_components(hd), "CO!" );
-  Child(last, LastDown(opt_components(hd)));
+  Child(last, LastDown(opt_components(hd)))
+    ;
   assert( type(last) == GAP_OBJ, "CalculateOptimize: type(last)!" );
   DisposeChild(Up(last));
   ifdebug(DOG, D, DebugOptimize(hd));
@@ -311,7 +322,8 @@ void CalculateOptimize(OBJECT hd)
   back(opt_components(hd), COLM) = 0;
   fwd(opt_components(hd), COLM) = MAX_FULL_LENGTH;
   *** */
-  Child(y, LastDown(opt_constraints(hd)));
+  Child(y, LastDown(opt_constraints(hd)))
+    ;
   EnterErrorBlock(FALSE);
   opt_components(hd) = FillObject(opt_components(hd), &constraint(y),
     opt_constraints(hd), FALSE, FALSE, TRUE, &hyph_used);
@@ -347,13 +359,15 @@ void CalculateOptimize(OBJECT hd)
   compcount = 0;
   for( link = Down(opt_components(hd));  link != opt_components(hd);
        link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( type(y) != ACAT )  continue;
 
     /* let wd be a word containing the number of components in this target */
     count = 0;
     for( ylink = Down(y);  ylink != y;  ylink = NextDown(ylink) )
-    { Child(z, ylink);
+    { Child(z, ylink)
+        ;
       if( type(z) != GAP_OBJ ) count++;
     }
     wd = MakeWord(WORD, StringInt(count), &fpos(y));
@@ -411,7 +425,8 @@ static void DebugOptimizedAcat(OBJECT x)
 { OBJECT link, y;
   assert( type(x) == ACAT, "DebugOptimizedAcat!" );
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( type(y) == GAP_OBJ )
     { debug1(DOG, D, "  GAP_OBJ %s", EchoGap(&gap(y)));
     }
@@ -450,7 +465,8 @@ void DebugOptimize(OBJECT hd)
     for( link = Down(opt_components(hd));  link != opt_components(hd);
 	 link = NextDown(link) )
     {
-      Child(y, link);
+      Child(y, link)
+        ;
       if( type(y) == ACAT )  DebugOptimizedAcat(y);
       debug0(DOG, D, "----------------");
     }
@@ -466,7 +482,8 @@ void DebugOptimize(OBJECT hd)
   for( link = Down(opt_constraints(hd));  link != opt_constraints(hd);
        link = NextDown(link) )
   {
-    Child(y, link);
+    Child(y, link)
+      ;
     debug1(DOG, D, "%s", EchoConstraint(&constraint(y)));
   }
   debug0(DOG, D, "");
@@ -479,7 +496,8 @@ void DebugOptimize(OBJECT hd)
       fprintf(stderr, "hyph");
     for( link = Down(opt_counts(hd));  link != opt_counts(hd);
 	 link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       fprintf(stderr, " %d", comp_count(y));
     }
     fprintf(stderr, "%s", STR_NEWLINE);

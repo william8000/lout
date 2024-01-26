@@ -1,6 +1,6 @@
 /*@z33.c:Database Service:OldCrossDb(), NewCrossDb(), SymToNum()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -88,7 +88,8 @@ static DBCHECK_TABLE dtab_rehash(DBCHECK_TABLE S, int newsize)
     { OBJECT ent = dtab_item(S, i);
       assert( type(ent) == ACAT, "dtab_rehash: ACAT!" );
       for( link = Down(ent);  link != ent;  link = NextDown(link) )
-      { Child(z, link);
+      { Child(z, link)
+          ;
 	dtab_insert(z, &NewS);
       }
       DisposeObject(ent);
@@ -109,7 +110,8 @@ static void dtab_insert(OBJECT x, DBCHECK_TABLE *S)
   if( dtab_item(*S, pos) == nilobj )  New(dtab_item(*S, pos), ACAT);
   z = dtab_item(*S, pos);
   for( link = Down(z);  link != z;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( db_checksym(x) == db_checksym(y) && StringEqual(string(x), string(y)) )
     { assert(FALSE, "Dbcheck: entry inserted twice");
     }
@@ -123,7 +125,8 @@ static OBJECT dtab_retrieve(OBJECT sym, FULL_CHAR *tag, DBCHECK_TABLE S)
   x = dtab_item(S, pos);
   if( x == nilobj )  return nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( sym == db_checksym(y) && StringEqual(tag, string(y)) )
       return y;
   }
@@ -143,7 +146,8 @@ static void dtab_debug(DBCHECK_TABLE S, FILE *fp)
     else if( type(x) != ACAT )
       fprintf(fp, " not ACAT!");
     else for( link = Down(x);  link != x;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       fprintf(fp, " %s&&%s",
 	is_word(type(y)) ? SymName(db_checksym(y)) : AsciiToFull("?"),
 	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
@@ -200,7 +204,8 @@ void DbInit(void)
 { OBJECT link, yy;  int count;						\
   count = 0;								\
   for( link = Down(db);  link != db;  link = NextDown(link) )		\
-  { Child(yy, link);							\
+  { Child(yy, link)							\
+      ;									\
     assert(type(yy)==CROSS_SYM || type(yy)==ACAT, "SymToNum: yy!");	\
     if( type(yy) != CROSS_SYM )  continue;				\
     if( symb(yy) == sym )  break;					\
@@ -230,7 +235,8 @@ void DbInit(void)
 #define NumToSym(db, num, sym)						\
 { OBJECT link, y = nilobj;						\
   for( link = Down(db);  link != db;  link = NextDown(link) )		\
-  { Child(y, link);							\
+  { Child(y, link)							\
+      ;									\
     if( type(y) == CROSS_SYM && number(link) == num )  break;		\
   }									\
   assert( link != db, "NumToSym: no sym");				\
@@ -294,7 +300,7 @@ BOOLEAN check)
   assert( seq[0] != '\0', "DbInsert: null seq!" );
   ifdebug(DPP, D, ProfileOn("DbInsert"));
   debug6(DBS, DD, "DbInsert(%s, %s, %s, %s, %s, %s, dlnum, dfpos)",
-	string(db), bool(gall), SymName(sym), tag, seq,
+	string(db), bool_str(gall), SymName(sym), tag, seq,
 	dfnum == NO_FILE ? AsciiToFull(".") : FileName(dfnum));
   assert(!reading(db), "DbInsert: insert into reading database");
 
@@ -379,7 +385,8 @@ void DbConvert(OBJECT db, BOOLEAN full_name)
     fprintf(db_filep(db), "00 %s %s%s", LOUT_VERSION, "database index file",
       (char *) STR_NEWLINE);
     for( link = Down(db);  link != db;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       assert( type(y) == CROSS_SYM || type(y) == ACAT, "DbConvert: y!" );
       if( type(y) != CROSS_SYM )  continue;
       fprintf(db_filep(db), "%s %d %s%s",
@@ -438,7 +445,7 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs,
   FILE_NUM index_fnum, dfnum;  long dfpos;
   BOOLEAN gall;  FULL_CHAR line[MAX_BUFF], sym_name[MAX_BUFF]; int status;
   ifdebug(DPP, D, ProfileOn("DbLoad"));
-  debug3(DBS, DD, "[ DbLoad(%s, %d, %s, -)", string(stem), fpath, bool(create));
+  debug3(DBS, DD, "[ DbLoad(%s, %d, %s, -)", string(stem), fpath, bool_str(create));
 
   /* open or else create index file fp */
   debug0(DFS, D, "  calling DefineFile from DbLoad (1)");
@@ -473,7 +480,8 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs,
       assert( symbs != nilobj, "DbLoad: create && symbs == nilobj!" );
       if( symbs != nilobj )
       {	for( link = Down(symbs);  link != symbs;  link = NextDown(link) )
-	{ Child(y, link);
+	{ Child(y, link)
+	    ;
 	  if( type(y) == CLOSURE && actual(y) == actual(res) )  break;
 	}
 	if( link == symbs )
@@ -481,9 +489,11 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs,
 	    FATAL, &fpos(res), SymName(actual(res)), KW_DATABASE);
       }
       for( tag = nilobj, link = Down(res); link != res; link = NextDown(link) )
-      {	Child(par, link);
+      {	Child(par, link)
+          ;
 	if( type(par) == PAR && is_tag(actual(par)) && Down(par) != par )
-	{ Child(tag, Down(par));
+	{ Child(tag, Down(par))
+	    ;
 	  break;
 	}
       }
@@ -575,7 +585,8 @@ OBJECT DbLoad(OBJECT stem, int fpath, BOOLEAN create, OBJECT symbs,
       sym = nilobj;
       sscanf( (char *) &line[i+1], "%s", sym_name);
       for( link = Down(symbs);  link != symbs;  link = NextDown(link) )
-      {	Child(y, link);
+      {	Child(y, link)
+          ;
 	assert( type(y) == CLOSURE, "DbLoad: type(y) != CLOSURE!" );
 	if( StringEqual(sym_name, SymName(actual(y))) )
 	{ sym = actual(y);
@@ -706,7 +717,7 @@ FULL_CHAR *str, FULL_CHAR *line)
     res = StringEqual(str, buff);
   }
   else res = FALSE;
-  debug1(DBS, D, "SearchFile returning %s", bool(res));
+  debug1(DBS, D, "SearchFile returning %s", bool_str(res));
   ifdebug(DPP, D, ProfileOff("SearchFile"));
   return res;
 } /* end SearchFile */

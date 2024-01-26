@@ -1,6 +1,6 @@
 /*@z15.c:Size Constraints:MinConstraint(), EnlargeToConstraint()@*************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -202,7 +202,7 @@ CONSTRAINT *hc, CONSTRAINT *vc, int dim)
 
   /* determine theta, c1, and c2 depending on which quadrant we are in */
   if( theta <= M_PI / 2.0 )   /* first quadrant */
-  { theta = theta;
+  { /* theta = theta; */
     CopyConstraint(c1, *hc);
     CopyConstraint(c2, *vc);
   }
@@ -468,7 +468,8 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
   /* find y, the parent of x */
   link = UpDim(x, dim);  ratm = FALSE;
   for( tlink = NextDown(link);  type(tlink) == LINK;  tlink = NextDown(tlink) )
-  { Child(g, tlink);
+  { Child(g, tlink)
+      ;
     if( type(g) == GAP_OBJ && mark(gap(g)) )  ratm = TRUE;
   }
   y = tlink;
@@ -691,11 +692,13 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 	/* let lp and rp be the links of the gaps delimiting */
 	/* the components joined to x (or parent if no such) */
 	for( lp = PrevDown(link);  lp != y;  lp = PrevDown(lp) )
-	{ Child(z, lp);
+	{ Child(z, lp)
+	    ;
 	  if( type(z) == GAP_OBJ && !join(gap(z)) )  break;
 	}
 	for( rp = NextDown(link);  rp != y;  rp = NextDown(rp) )
-	{ Child(z, rp);
+	{ Child(z, rp)
+	    ;
 	  if( type(z) == GAP_OBJ && !join(gap(z)) )  break;
 	}
 	if( lp == y && rp == y && !(type(y) == HEAD && seen_nojoin(y)) )
@@ -712,7 +715,8 @@ void Constrained(OBJECT x, CONSTRAINT *xc, int dim, OBJECT *why)
 	  /* if // or || is present, do this */
 	  xback = xfwd = 0;
 	  for(link = NextDown(lp); link != rp;  link = NextDown(link) )
-	  { Child(z, link);
+	  { Child(z, link)
+	      ;
 	    if( type(z) == GAP_OBJ || is_index(type(z)) )  continue;
 	    xback = find_max(xback, back(z, dim));
 	    xfwd = find_max(xfwd, fwd(z, dim));
@@ -811,7 +815,9 @@ void DebugConstrained(OBJECT x)
 
     case SPLIT:
     
-      link = DownDim(x, COLM);  Child(y, link);
+      link = DownDim(x, COLM);
+      Child(y, link)
+        ;
       DebugConstrained(y);
       break;
 
@@ -835,7 +841,9 @@ void DebugConstrained(OBJECT x)
     case WIDE:
     case HIGH:
     
-      link = Down(x);  Child(y, link);
+      link = Down(x);
+      Child(y, link)
+        ;
       DebugConstrained(y);
       break;
 
@@ -846,7 +854,8 @@ void DebugConstrained(OBJECT x)
     case ACAT:
     
       for( link = Down(x);  link != x;  link =NextDown(link) )
-      {	Child(y, link);
+      {	Child(y, link)
+      	  ;
 	if( type(y) != GAP_OBJ && !is_index(type(y)) )  DebugConstrained(y);
       }
       break;

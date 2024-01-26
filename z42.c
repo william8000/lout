@@ -1,6 +1,6 @@
 /*@z42.c:Colour Service:ColourChange, ColourCommand@**************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -122,7 +122,8 @@ static OBJECT ctab_retrieve(FULL_CHAR *str, COLOUR_TABLE S)
   x = ctab_name(S, pos);
   if( x == nilobj )  return nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( StringEqual(str, string(y)) )  return y;
   }
   return nilobj;
@@ -148,7 +149,8 @@ static void ctab_debug(COLOUR_TABLE S, FILE *fp)
     else if( type(x) != ACAT )
       fprintf(fp, " not ACAT!");
     else for( link = Down(x);  link != x;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       fprintf(fp, " %s",
 	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
     }

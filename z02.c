@@ -1,6 +1,6 @@
 /*@z02.c:Lexical Analyser:Declarations@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -129,7 +129,7 @@ BOOLEAN LexLegalName(FULL_CHAR *str)
       break;
 
   }
-  debug1(DLA, DDD, "LexLegalName returning %s", bool(res));
+  debug1(DLA, DDD, "LexLegalName returning %s", bool_str(res));
   return res;
 } /* end LexLegalName */
 
@@ -143,8 +143,7 @@ BOOLEAN LexLegalName(FULL_CHAR *str)
 /*                                                                           */
 /*****************************************************************************/
 
-static void initchtbl(val, str)
-int val;  FULL_CHAR *str;
+static void initchtbl(int val, FULL_CHAR *str)
 { int i;
   for( i = 0;  str[i] != '\0';  i++ )
     chtbl[ str[i] ] = val;
@@ -201,7 +200,7 @@ void LexPush(FILE_NUM x, int offs, int ftyp, int lnum, BOOLEAN same)
 { int i;
   debug5(DLA, DD, "LexPush(%s, %d, %s, %d, %s)", FileName(x), offs,
     ftyp==SOURCE_FILE ? "source" : ftyp==INCLUDE_FILE ? "include":"database",
-    lnum, bool(same));
+    lnum, bool_str(same));
   if( stack_free >= MAX_LEX_STACK - 1 )
   { if( ftyp == INCLUDE_FILE )
       Error(2, 1, "too many open files when opening include file %s; open files are:",
@@ -629,7 +628,9 @@ OBJECT LexGetToken(void)
       case LETTER:
       
 	col_num(file_pos) = (startpos = p-1) - startline;
-	while( chtbl[*p++] == LETTER );  --p;
+	while( chtbl[*p++] == LETTER )
+	  ;
+	--p;
 	res = SearchSym(startpos, p - startpos);
 
 	MORE: if( res == nilobj )
@@ -692,7 +693,7 @@ OBJECT LexGetToken(void)
 	  {
 	    /* need to define and read this include file */
 	    debug4(DFS, D, "  calling DefineFile %s from LexGetToken (%s, %d, %d)",
-	      string(fname), bool(InDefinitions),
+	      string(fname), bool_str(InDefinitions),
 	        FileNum(string(fname), STR_EMPTY),
 		FileNum(string(fname), SOURCE_SUFFIX));
 	    fnum = DefineFile(string(fname), STR_EMPTY, &fpos(fname),
@@ -933,8 +934,7 @@ static OBJECT BuildLines(OBJECT current, FULL_CHAR *buff, int *bufftop, int ladj
   return res;
 }
 
-OBJECT LexScanVerbatim(fp, end_stop, err_pos, lessskip)
-FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
+OBJECT LexScanVerbatim(FILE *fp, BOOLEAN end_stop,  FILE_POS *err_pos, BOOLEAN lessskip)
 {
   register FULL_CHAR *p;		/* pointer to current input char     */
   int depth;				/* depth of nesting of { ... }       */
@@ -948,7 +948,7 @@ FILE *fp;  BOOLEAN end_stop;  FILE_POS *err_pos;  BOOLEAN lessskip;
   OBJECT res = nilobj;			/* result object if not to file      */
 
   debug3(DLA, D, "LexScanVerbatim(fp, %s, %s, %s)",
-    bool(end_stop), EchoFilePos(err_pos), bool(lessskip));
+    bool_str(end_stop), EchoFilePos(err_pos), bool_str(lessskip));
   if( next_token != nilobj )
   { Error(2, 16, "filter parameter in macro", FATAL, err_pos);
   }

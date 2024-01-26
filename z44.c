@@ -1,6 +1,6 @@
 /*@z44.c:Vertical Hyphenation:VerticalHyphenate()@****************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -59,7 +59,8 @@
   while( link != x && type(y) == VCAT )					\
   { FirstDefinite(y, ylink, z, jn);					\
     if( ylink != y && PrevDown(ylink) != y )				\
-    { Child(yg, PrevDown(ylink));					\
+    { Child(yg, PrevDown(ylink))					\
+        ;								\
       assert( type(yg)==GAP_OBJ && mode(gap(yg)) != NO_MODE, "NDWGC!");	\
       MoveLink(PrevDown(ylink), Up(g), PARENT);				\
       MoveLink(Up(g), ylink, PARENT);					\
@@ -155,7 +156,8 @@ static OBJECT WhichComponent(OBJECT target)
 { OBJECT prnt;
   debug1(DVH, DD, "WhichComponent(%s)", EchoObject(target));
   while( Up(target) != target )
-  { Parent(prnt, Up(target));
+  { Parent(prnt, Up(target))
+      ;
     if( type(prnt) == HEAD )
     { debug1(DVH, DD, "WhichComponent returning %s", EchoObject(target));
       return target;
@@ -193,7 +195,8 @@ static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
   fwd(new_row_thread, ROWM) = fwd(new_y, ROWM);
   thr_state(new_row_thread) = SIZED;
   for( link = Down(y);  link != y;  link = NextDown(link) )
-  { Child(s1, link);
+  { Child(s1, link)
+      ;
     if( type(s1) == GAP_OBJ )
     { New(new_s1, GAP_OBJ);
       FposCopy(fpos(new_s1), fpos(s1));
@@ -204,10 +207,12 @@ static OBJECT EncloseInHcat(OBJECT nxt, OBJECT y, OBJECT replace)
       continue;
     }
     if( type(s1) == WIDE || type(s1) == ONE_COL )
-      Child(s2, Down(s1));
+      Child(s2, Down(s1))
+        ;
     else s2 = s1;
     assert( type(s2) == SPLIT, "EncloseInHcat: type(s2) != SPLIT!" );
-    Child(sh, DownDim(s2, COLM));
+    Child(sh, DownDim(s2, COLM))
+      ;
     New(new_s2, SPLIT);
     FposCopy(fpos(new_s2), fpos(s2));
     if( s2 != s1 )
@@ -276,7 +281,8 @@ BOOLEAN VerticalHyphenate(OBJECT y)
   rump_fwd = 0;
   assert( type(y) == HCAT, "VerticalHyphenate: type(y) != HCAT!" );
   for( link = Down(y);  link != y;  link = NextDown(link) )
-  { Child(s1, link);
+  { Child(s1, link)
+      ;
     if( type(s1) == GAP_OBJ )
     { if( !join(gap(s1)) )
       { debug0(DVH, D, "] VerticalHyphenate returning FALSE (not joined)");
@@ -287,14 +293,17 @@ BOOLEAN VerticalHyphenate(OBJECT y)
 
     /* check that s2 is a SPLIT object whose children look right */
     if( type(s1) == WIDE || type(s1) == ONE_COL )
-      Child(s2, Down(s1));
+      Child(s2, Down(s1))
+        ;
     else s2 = s1;
     if( type(s2) != SPLIT )
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (child not SPLIT)");
       return FALSE;
     }
-    Child(sh, DownDim(s2, COLM));
-    Child(sv, DownDim(s2, ROWM));
+    Child(sh, DownDim(s2, COLM))
+      ;
+    Child(sv, DownDim(s2, ROWM))
+      ;
     if( type(sv) != ROW_THR )
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (no ROW_THR)");
       return FALSE;
@@ -304,7 +313,8 @@ BOOLEAN VerticalHyphenate(OBJECT y)
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (different ROW_THR)");
       return FALSE;
     }
-    Parent(shp, UpDim(sh, ROWM));
+    Parent(shp, UpDim(sh, ROWM))
+      ;
     if( shp != row_thread )
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (sh parent)");
       return FALSE;
@@ -352,7 +362,8 @@ BOOLEAN VerticalHyphenate(OBJECT y)
 
   /* check that large_comp has no joins */
   for( link = Down(large_comp);  link != large_comp;  link = NextDown(link) )
-  { Child(z, link);
+  { Child(z, link)
+      ;
     if( type(z) == GAP_OBJ && mode(gap(z)) != NO_MODE && join(gap(z)) )
     { debug0(DVH, D, "] VerticalHyphenate returning FALSE (VCAT: joined)");
       return FALSE;
@@ -361,7 +372,8 @@ BOOLEAN VerticalHyphenate(OBJECT y)
 
   /* enclose all definite components after the first in HCATs */
   for( link = NextDown(Up(prev));  link != large_comp;  link = NextDown(link) )
-  { Child(nxt, link);
+  { Child(nxt, link)
+      ;
     if( type(nxt) == GAP_OBJ )  continue;
     if( is_definite(type(nxt)) )
       nxt = EncloseInHcat(nxt, y, large_comp);
@@ -376,13 +388,15 @@ BOOLEAN VerticalHyphenate(OBJECT y)
 
   /* set link to the link of the first thing before y which is not an index */
   for( link = PrevDown(Up(y));  type(link) == LINK;  link = PrevDown(link) )
-  { Child(index, link);
+  { Child(index, link)
+      ;
     if( !is_index(type(index)) )  break;
   }
 
   /* for each index, find where it's pointing and possibly move it */
   while( NextDown(link) != Up(y) )
-  { Child(index, NextDown(link));
+  { Child(index, NextDown(link))
+      ;
     assert( is_index(type(index)), "MoveIndexes: is_index!" );
     z = FindTarget(index);
     if( z != nilobj )
@@ -420,7 +434,8 @@ static OBJECT BuildMergeTree(int n, OBJECT x, OBJECT *lenv, OBJECT *lact)
 
   if( n == 1 )
   { New(res, ENV_OBJ);
-    Child(y, Down(x));
+    Child(y, Down(x))
+      ;
     MoveLink(Down(x), res, PARENT);
     assert(type(y)==CLOSURE && has_merge(actual(y)), "BuildMergeTree: has_m!");
     *lact = actual(y);
@@ -435,7 +450,8 @@ static OBJECT BuildMergeTree(int n, OBJECT x, OBJECT *lenv, OBJECT *lact)
 
     /* set merge to new @Merge closure */
     for( link = Down(act);  link != act;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       if( is_merge(y) )  break;
     }
     assert( y != act, "BuildMergeTree: y!" );
@@ -477,8 +493,10 @@ static OBJECT BuildMergeTree(int n, OBJECT x, OBJECT *lenv, OBJECT *lact)
 OBJECT ConvertGalleyList(OBJECT x)
 { OBJECT res, y, link, junk1, junk2, obj;  int n;
   debug1(DHY, DD, "ConvertGalleyList(%s)", EchoObject(x));
-  Child(res, Down(x));
-  Child(y, Down(res));
+  Child(res, Down(x))
+    ;
+  Child(y, Down(res))
+    ;
   MoveLink(Down(x), y, CHILD);
   DeleteLink(Down(res));
   MoveLink(Up(x), res, CHILD);
@@ -486,7 +504,8 @@ OBJECT ConvertGalleyList(OBJECT x)
   y = BuildMergeTree(n, x, &junk1, &junk2);
   assert( Down(x) == x && Up(x) == x, "ConvertGalleyList: x!" );
   Dispose(x);
-  Child(obj, Down(y));
+  Child(obj, Down(y))
+    ;
   MoveLink(Down(y), res, PARENT);
   MoveLink(LastDown(y), obj, PARENT);
   assert( Down(y) == y && Up(y) == y, "ConvertGalleyList: y!" );
@@ -511,13 +530,15 @@ OBJECT BuildEnclose(OBJECT hd)
 
   /* find @Enclose symbol and check that it has just one parameter */
   for( link = Down(actual(hd));  link != actual(hd);  link = NextDown(link) )
-  { Child(sym, link);
+  { Child(sym, link)
+      ;
     if( is_enclose(sym) )  break;
   }
   assert( link != actual(hd), "BuildEnclose: no enclose!" );
   parsym = nilobj;
   for( link = Down(sym);  link != sym;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     switch( type(y) )
     {
 	case LPAR:
@@ -558,7 +579,8 @@ OBJECT BuildEnclose(OBJECT hd)
 
   /* set env to the appropriate environment for this symbol */
   /* strictly speaking y should not be included if sym is a parameter */
-  Child(y, Down(hd));
+  Child(y, Down(hd))
+    ;
   assert(type(y) == CLOSURE, "BuildEnclose:  hd child!");
   y = CopyObject(y, &fpos(hd));
   env = SetEnv(y, nilobj);

@@ -1,6 +1,6 @@
 /*@z40.c:Filter Handler:FilterInit()@*****************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -66,8 +66,8 @@ void FilterInit(void)
 /*****************************************************************************/
 
 OBJECT FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos)
-{ FULL_CHAR buff[MAX_LINE];  FILE *fp;  OBJECT x, res, junk;
-  debug3(DFH, D, "FilterCreate(%s, %s, %s)", bool(use_begin),
+{ FULL_CHAR buff[MAX_LINE];  FILE *fp;  OBJECT x, res; /* OBJECT junk; */
+  debug3(DFH, D, "FilterCreate(%s, %s, %s)", bool_str(use_begin),
     SymName(act), EchoFilePos(xfpos));
   New(res, FILTERED);
   FposCopy(fpos(res), *xfpos);
@@ -81,7 +81,7 @@ OBJECT FilterCreate(BOOLEAN use_begin, OBJECT act, FILE_POS *xfpos)
   filter_actual(x) = act;
   Link(res, x);
   Link(filter_active, x);
-  junk = LexScanVerbatim(fp, use_begin, xfpos, FALSE);
+  /* junk = */ LexScanVerbatim(fp, use_begin, xfpos, FALSE);
   fclose(fp);
   sprintf( (char *) buff, "%s%d", FILTER_OUT, filter_count);
   x = MakeWord(WORD, buff, xfpos);
@@ -109,10 +109,12 @@ void FilterSetFileNames(OBJECT x)
   assert( type(x) == FILTERED, "FilterSetFileNames: type(x)!" );
   assert( Down(x) != x, "FilterSetFileNames: x has no children!" );
   debug2(DFH, D, "FilterSetFileNames(%d %s)", (int) x, EchoObject(x));
-  Child(y, Down(x));
+  Child(y, Down(x))
+    ;
   assert( type(y) == WORD, "FilterSetFileNames: type(y)!" );
   sym_body(FilterInSym) = y;
-  Child(y, NextDown(Down(x)));
+  Child(y, NextDown(Down(x)))
+    ;
   assert( type(y) == WORD, "FilterSetFileNames: type(y) (2)!" );
   sym_body(FilterOutSym) = y;
   debug0(DFH, D, "FilterSetFileNames returning.");
@@ -160,7 +162,8 @@ OBJECT FilterExecute(OBJECT x, FULL_CHAR *command, OBJECT env)
     if( status == 0 )
     {
       /* system command succeeded; read in its output as a Lout object */
-      Child(scope_snapshot, LastDown(x));
+      Child(scope_snapshot, LastDown(x))
+        ;
       LoadScopeSnapshot(scope_snapshot);
       debug0(DFS, D, "  calling DefineFile from FilterExecute");
       filter_out_file =
@@ -201,7 +204,8 @@ void FilterWrite(OBJECT x, FILE *fp, int *linecount)
 { FILE *in_fp;  OBJECT y;  int ch;
   assert( type(x) == FILTERED, "FilterWrite: type(x)!" );
   debug2(DFH, D, "[ FilterWrite(%d %s, fp)", (int) x, EchoObject(x));
-  Child(y, Down(x));
+  Child(y, Down(x))
+    ;
   in_fp = StringFOpen(string(y), READ_FILE);
   if( in_fp == NULL )
     Error(40, 5, "cannot read filter temporary file %s",
@@ -257,9 +261,10 @@ void FilterWrite(OBJECT x, FILE *fp, int *linecount)
 void FilterScavenge(BOOLEAN all)
 { OBJECT y, link, nextlink;
   ifdebug(DFH, D, return);
-  debug1(DFH, D, "FilterScavenge(%s)", bool(all));
+  debug1(DFH, D, "FilterScavenge(%s)", bool_str(all));
   for( link = Down(filter_active);  link != filter_active;  link = nextlink )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     nextlink = NextDown(link);
     if( all || Up(y) == LastUp(y) )
     { debug1(DFH, D, "FilterScavenge scavenging %s", string(y));

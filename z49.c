@@ -1,6 +1,6 @@
 /*@z49.c:PostScript Back End:PS_BackEnd@**************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -237,7 +237,8 @@ static LINK_DEST_TABLE ltab_rehash(LINK_DEST_TABLE S, int newsize)
     {
       for( link = Down(z);  link != z;  link = NextDown(link) )
       {
-	Child(y, link);
+	Child(y, link)
+	  ;
 	ltab_insert(y, &NewS);
       }
     }
@@ -254,7 +255,8 @@ static void ltab_insert(OBJECT x, LINK_DEST_TABLE *S)
   if( ltab_item(*S, pos) == nilobj )  New(ltab_item(*S, pos), ACAT);
   z = ltab_item(*S, pos);
   for( link = Down(z);  link != z;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( StringEqual(string(x), string(y)) )
     { Error(49, 2, "link name %s used twice (first at%s)",
 	WARN, &fpos(x), string(x), EchoFilePos(&fpos(y)));
@@ -270,7 +272,8 @@ static OBJECT ltab_retrieve(FULL_CHAR *str, LINK_DEST_TABLE S)
   x = ltab_item(S, pos);
   if( x == nilobj )  return nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( StringEqual(str, string(y)) )  return y;
   }
   return nilobj;
@@ -289,7 +292,8 @@ static void ltab_debug(LINK_DEST_TABLE S, FILE *fp)
     else if( type(x) != ACAT )
       fprintf(fp, " not ACAT!");
     else for( link = Down(x);  link != x;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       fprintf(fp, " %s",
 	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
     }
@@ -396,7 +400,8 @@ static int PS_FindIncGRepeated(OBJECT x, int typ)
   {
     for( i=1, link=Down(incg_files); link!=incg_files; i++, link=NextDown(link))
     {
-      Child(y, link);
+      Child(y, link)
+        ;
       if( StringEqual(string(x), string(y)) )
       {
 	if( typ == INCGRAPHIC && incg_type(y) == SINCGRAPHIC )
@@ -1117,7 +1122,7 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
 
   /* print one PostScript form for each @IncludeGraphicRepeated entry */
   if( incg_files != nilobj )
-  { int fnum;  FILE *fp;  BOOLEAN junk, cp;  OBJECT link, x, full_name;
+  { int fnum;  FILE *fp;  BOOLEAN /* junk, */ cp;  OBJECT link, x, full_name;
     p0("<< /MaxFormItem currentsystemparams /MaxFormCache get >> setuserparams");
     pnl;
     fnum = 1;
@@ -1127,14 +1132,15 @@ static void PS_PrintBeforeFirstPage(FULL_LENGTH h, FULL_LENGTH v,
       int llx = 0, lly = 0, urx = 0, ury = 0;
 
       /* open graphic file string(x) */
-      Child(x, link);
+      Child(x, link)
+        ;
       fp = OpenIncGraphicFile(string(x), incg_type(x), &full_name,&fpos(x),&cp);
       if( fp == null )
 	Error(49, 21, "cannot open %s file %s", FATAL, &fpos(x),
 	  KW_INCG_REPEATED, string(x));
 
       /* find its bounding box and file size */
-      junk = PS_FindBoundingBox(fp, &fpos(x), &llx, &lly, &urx, &ury);
+      /* junk = */ PS_FindBoundingBox(fp, &fpos(x), &llx, &lly, &urx, &ury);
       fseek(fp, 0L, SEEK_END);
       file_size = ftell(fp);
       rewind(fp);
@@ -1241,7 +1247,8 @@ static void PS_PrintAfterLastPage(void)
 
     /* print resource requirements (DSC 3.0 version) - included EPSFs  */
     for( link = Down(needs); link != needs; link = NextDown(link) )
-    { Child(x, link);
+    { Child(x, link)
+        ;
       assert(is_word(type(x)), "PrintAfterLast: needs!" );
       p2("%s %s", first_need ? "%%DocumentNeededResources:" : "%%+", string(x));
       first_need = FALSE;
@@ -1250,7 +1257,8 @@ static void PS_PrintAfterLastPage(void)
     /* print resources supplied */
     p1("%%%%DocumentSuppliedResources: procset %s", StartUpResource);
     for( link = Down(supplied);  link != supplied;  link = NextDown(link) )
-    { Child(x, link);
+    { Child(x, link)
+        ;
       p1("%%%%+ %s", string(x));
     }
     MapPrintPSResources(out_fp);
@@ -1315,7 +1323,7 @@ static void PS_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v, FULL_CHAR *label)
 /*****************************************************************************/
 
 static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)
-{ debug1(DPO, DD, "PrintComposite(cp, %s, fp)", bool(outline));
+{ debug1(DPO, DD, "PrintComposite(cp, %s, fp)", bool_str(outline));
   while( cp->char_code != '\0' )
   {
     debug4(DPO, DD, "  cp = %d printing code %d (%d, %d)", (int) cp,
@@ -1368,7 +1376,8 @@ static void PS_PrintWord(OBJECT x, int hpos, int vpos)
 	    break;
 	  }
 	  else
-	  { while( *++a );
+	  { while( *++a )
+	      ;
 	    a++;
 	  }
 	}
@@ -1646,7 +1655,8 @@ static void PS_PrintGraphicObject(OBJECT x)
     case ACAT:
     
       for( link = Down(x);  link != x;  link = NextDown(link) )
-      {	Child(y, link);
+      {	Child(y, link)
+          ;
 	if( type(y) == GAP_OBJ )
 	{
 	  if( vspace(y) > 0 )  pnl;
@@ -1876,7 +1886,8 @@ static void PS_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark,
   assert(incgraphic_ok(x), "PrintGraphicInclude: !incgraphic_ok(x)!");
 
   /* open the include file and get its full path name */
-  Child(y, Down(x));
+  Child(y, Down(x))
+    ;
 
   SetBaseLineMarkAndFont(baselinemark(save_style(x)), font(save_style(x)));
   SetColourAndTexture(colour(save_style(x)), texture(save_style(x)));
@@ -2063,7 +2074,8 @@ static void PS_LinkCheck(void)
   debug0(DPO, DD, "PS_LinkCheck()");
 
   for( link=Down(link_source_list); link!=link_source_list; link=NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     assert( is_word(type(y)), " PS_LinkCheck: !is_word(type(y))!");
     if( ltab_retrieve(string(y), link_dest_tab) == nilobj )
       Error(49, 14, "link name %s has no destination point", WARN, &fpos(y),

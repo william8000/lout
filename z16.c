@@ -1,6 +1,6 @@
 /*@z16.c:Size Adjustment:SetNeighbours(), CatAdjustSize()@********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -107,12 +107,15 @@ OBJECT *sg, OBJECT *sdef, int *side)
   /* find preceding definite; if it exists, set *pg */
   *pg = nilobj;
   for( plink = PrevDown(link);  type(plink) == LINK;  plink = PrevDown(plink) )
-  { Child(*pdef, plink);
+  { Child(*pdef, plink)
+      ;
     if( type(*pdef) == SPLIT ? SplitIsDefinite(*pdef) : is_definite(type(*pdef)) )
-    { Child(*pg, PrevDown(link));
+    { Child(*pg, PrevDown(link))
+        ;
       while( is_index(type(*pg)) )
       {	link = PrevDown(link);
-	Child(*pg, PrevDown(link));
+	Child(*pg, PrevDown(link))
+	  ;
       }
       assert( type(*pg) == GAP_OBJ, "SetNeighbours: type(*pg)!" );
       break;
@@ -122,12 +125,15 @@ OBJECT *sg, OBJECT *sdef, int *side)
   /* find succeeding definite; if it exists, set *sg */
   *sg = nilobj;
   for( slink = NextDown(link);  type(slink) == LINK;  slink = NextDown(slink) )
-  { Child(*sdef, slink);
+  { Child(*sdef, slink)
+      ;
     if( type(*sdef) == SPLIT ? SplitIsDefinite(*sdef) : is_definite(type(*sdef)) )
-    { Child(*sg, PrevDown(slink));
+    { Child(*sg, PrevDown(slink))
+        ;
       while( is_index(type(*sg)) )
       {	slink = PrevDown(slink);
-	Child(*sg, PrevDown(slink));
+	Child(*sg, PrevDown(slink))
+	  ;
       }
       assert( type(*sg) == GAP_OBJ, "SetNeighbours: type(*sg)!" );
       break;
@@ -137,7 +143,7 @@ OBJECT *sg, OBJECT *sdef, int *side)
   *side = ratm ? BACK : *pg == nilobj || mark(gap(*pg)) ? ON : FWD;
   debug4(DSA, DD,
     "SetNeighbours: ratm == %s, pg %s nilobj, sg %s nilobj, side == %s",
-    bool(ratm), *pg == nilobj ? "==" : "!=", *sg == nilobj ? "==" : "!=", 
+    bool_str(ratm), *pg == nilobj ? "==" : "!=", *sg == nilobj ? "==" : "!=",
     *side == BACK ? "BACK" : *side == ON ? "ON" : "FWD");
 } /* end SetNeighbours */
 
@@ -160,7 +166,7 @@ OBJECT y, int dim)
   int bb = 0, ff = 0;  /* initial values unused */
 
   debug6(DSA, DD, "CatAdjustSize(%s x, %s, %s, %s, %s y, %s)", Image(type(x)),
-    EchoLength(*b), EchoLength(*f), bool(ratm), Image(type(y)), dimen(dim));
+    EchoLength(*b), EchoLength(*f), bool_str(ratm), Image(type(y)), dimen(dim));
   debug2(DSA,DD, "x(%s,%s) =", EchoLength(back(x,dim)), EchoLength(fwd(x,dim)));
   ifdebug(DSA, DD, DebugObject(x));
   debug2(DSA,DD, "y(%s,%s) =", EchoLength(back(y,dim)), EchoLength(fwd(y,dim)));
@@ -179,12 +185,12 @@ OBJECT y, int dim)
   { ifdebug(DSA, DD,
     if( pg != nilobj && mode(gap(pg)) == NO_MODE )
     { debug1(DSA, DD, "NO_MODE gap pg, is_indefinite(x) == %s, y =",
-	bool(is_indefinite(type(x))) );
+	bool_str(is_indefinite(type(x))) );
       ifdebug(DSA, DD, DebugObject(y));
     }
     if( sg != nilobj && mode(gap(sg)) == NO_MODE )
     { debug1(DSA, DD, "NO_MODE gap sg, is_indefinite(x) == %s, y =",
-	bool(is_indefinite(type(x))) );
+	bool_str(is_indefinite(type(x))) );
       ifdebug(DSA, DD, DebugObject(y));
     }
   ); }
@@ -277,7 +283,8 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
     }
     if (b < 0 || f < 0) {
       OBJECT p;
-      Parent(p, Up(x));
+      Parent(p, Up(x))
+        ;
       fprintf(stderr, "  Up type %d declared %s:%d\n", type(Up(x)), malloc_oalloc_file_name(Up(x)), malloc_oalloc_line_num(Up(x)));
       fprintf(stderr, "  Parent type %d declared %s:%d\n", type(p), malloc_oalloc_file_name(p), malloc_oalloc_line_num(p));
     }
@@ -291,7 +298,8 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
     { assert( (type(x)==COL_THR) == (dim==COLM), "AdjustSize: COL_THR!" );
       back(x, dim) = b;  fwd(x, dim) = f;
       for( link = Up(x);  link != x;  link = NextUp(link) )
-      { Parent(y, link);
+      { Parent(y, link)
+          ;
 	assert( type(y) == SPLIT, "AdjustSize: type(y) != SPLIT!") ;
 	AdjustSize(y, b, f, dim);
       }
@@ -301,7 +309,8 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 
     link = UpDim(x, dim);  ratm = FALSE;
     for( tlink=NextDown(link);  type(tlink) == LINK;  tlink=NextDown(tlink) )
-    { Child(y, tlink);
+    { Child(y, tlink)
+        ;
       if( type(y) == GAP_OBJ && mark(gap(y)) )  ratm = TRUE;
     }
     y = tlink;
@@ -331,11 +340,13 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 	  /* let lp and rp be the gaps delimiting the          */
 	  /* components joined to x                            */
 	  for( lp = PrevDown(link);  lp != y;  lp = PrevDown(lp) )
-	  { Child(z, lp);
+	  { Child(z, lp)
+	      ;
 	    if( type(z) == GAP_OBJ && !join(gap(z)) )  break;
 	  }
 	  for( rp = NextDown(link);  rp != y;  rp = NextDown(rp) )
-	  { Child(z, rp);
+	  { Child(z, rp)
+	      ;
 	    if( type(z) == GAP_OBJ && !join(gap(z)) )  break;
 	  }
 
@@ -355,7 +366,8 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 	      SymName(actual(y)));
 	    tb = tf = 0;
 	    for( link = NextDown(lp);  link != rp;  link = NextDown(link) )
-	    { Child(z, link);
+	    { Child(z, link)
+	        ;
 	      debugcond1(DSA, D, type(z) == GAP_OBJ,
 		"    gap %s", EchoCatOp(VCAT, mark(gap(z)), join(gap(z))));
 	      if( type(z) == GAP_OBJ || is_index(type(z)) )  continue;
@@ -386,7 +398,8 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 	    debug0(DSA, D, "] AdjustSize ret. at HEAD (no parent)" );
 	    return;
 	  }
-	  Parent(index, Up(y));
+	  Parent(index, Up(y))
+	    ;
 	  if( type(index) != RECEIVING )
 	  {
 	    debug1(DSA,D, "] AdjustSize ret. at HEAD (%s)", Image(type(index)));
@@ -518,7 +531,8 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 	if( (type(y) == HLIMITED) == (dim == COLM) )
 	{
 	  /* ***
-          Parent(z, UpDim(y, dim));
+          Parent(z, UpDim(y, dim))
+            ;
           if( type(z) == ROW_THR || type(z) == COL_THR )
           {
             SetConstraint(constraint(y), back(z,dim), size(z,dim), fwd(z,dim));
@@ -575,11 +589,13 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 	{
 	  /* let lp and rp be the gaps bracketing the components joined to x */
 	  for( lp = PrevDown(link);  lp != y;  lp = PrevDown(lp) )
-	  { Child(z, lp);
+	  { Child(z, lp)
+	      ;
 	    if( type(z) == GAP_OBJ && !join(gap(z)) )  break;
 	  }
 	  for( rp = NextDown(link);  rp != y;  rp = NextDown(rp) )
-	  { Child(z, rp);
+	  { Child(z, rp)
+	      ;
 	    if( type(z) == GAP_OBJ && !join(gap(z)) )  break;
 	  }
 
@@ -594,7 +610,8 @@ void AdjustSize(OBJECT x, FULL_LENGTH b, FULL_LENGTH f, int dim)
 	  { /* if // or || is present, do this */
 	    tb = tf = 0;
 	    for( link = NextDown(lp); link != rp;  link = NextDown(link) )
-	    { Child(z, link);
+	    { Child(z, link)
+	        ;
 	      if( type(z) == GAP_OBJ || is_index(type(z)) )  continue;
 	      tb = find_max(tb, back(z, dim));
 	      tf = find_max(tf, fwd(z, dim));

@@ -1,6 +1,6 @@
 /*@z38.c:Character Mappings:Declarations@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -133,7 +133,7 @@ MAPPING MapLoad(OBJECT file_name, BOOLEAN recoded)
   int status;
   FULL_CHAR buff[MAX_BUFF], cn[MAX_BUFF], ch, mapname[MAX_BUFF],
   mapval[MAX_BUFF];
-  debug2(DCM,D, "MapLoad(%s, %s)", EchoObject(file_name), bool(recoded));
+  debug2(DCM,D, "MapLoad(%s, %s)", EchoObject(file_name), bool_str(recoded));
 
   /* if the file name is "-", it means no mapping file is supplied */
   if( StringEqual(string(file_name), AsciiToFull("-")) )
@@ -685,6 +685,6 @@ BOOLEAN MapIsLowerCase(FULL_CHAR ch, MAPPING m)
 { BOOLEAN res;
   debug2(DCM, D, "MapIsLowerCase(%c, %d)", ch, m);
   res = (MapTable[m]->map[MAP_UPPERCASE][ch] != '\0');
-  debug1(DCM, D, "MapIsLowerCase returning %s", bool(res));
+  debug1(DCM, D, "MapIsLowerCase returning %s", bool_str(res));
   return res;
 } /* end MapIsLowerCase */

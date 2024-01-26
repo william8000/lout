@@ -1,6 +1,6 @@
 /*@z47.c:Environment Table:EnvReadRetrieve()@*********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -99,8 +99,10 @@ BOOLEAN EnvWriteRetrieve(OBJECT env, FILE_NUM fnum, int *offset, int *lnum)
   if( tab[pos] != nilobj )
   {
     for( link = Down(tab[pos]);  link != tab[pos];  link = NextDown(link) )
-    { Child(y, link);
-      Child(z, Down(y));
+    { Child(y, link)
+        ;
+      Child(z, Down(y))
+        ;
       if( env_fnum(y) == fnum && z == env && !env_read(y) )
       { MoveLink(LastUp(y), env_cache, PARENT);
 	*offset = env_offset(y);
@@ -134,7 +136,8 @@ void EnvWriteInsert(OBJECT env, FILE_NUM fnum, int offset, int lnum)
   /* to limit the cache size, remove least recently used entry if full */
   if( cache_count >= MAX_CACHE )
   {
-    Child(loser, Down(env_cache));
+    Child(loser, Down(env_cache))
+      ;
     DeleteLink(Up(loser));
     DisposeChild(Up(loser));
     cache_count--;
@@ -175,11 +178,14 @@ BOOLEAN EnvReadRetrieve(FILE_NUM fnum, int offset, OBJECT *env)
   if( tab[pos] != nilobj )
   {
     for( link = Down(tab[pos]);  link != tab[pos];  link = NextDown(link) )
-    { Child(y, link);
-      Child(z, Down(y));
+    { Child(y, link)
+        ;
+      Child(z, Down(y))
+        ;
       if( env_fnum(y) == fnum && env_offset(y) == offset && env_read(y) )
       { MoveLink(LastUp(y), env_cache, PARENT);
-	Child(*env, Down(y));
+	Child(*env, Down(y))
+	  ;
 	stat_read_hits++;
         debug1(DET, DD, "EnvReadRetrieve returning env %d", (int) *env);
 	  return TRUE;
@@ -208,7 +214,8 @@ void EnvReadInsert(FILE_NUM fnum, int offset, OBJECT env)
   /* to limit the cache size, remove least recently used entry if full */
   if( cache_count >= MAX_CACHE )
   {
-    Child(loser, Down(env_cache));
+    Child(loser, Down(env_cache))
+      ;
     DeleteLink(Up(loser));
     DisposeChild(Up(loser));
     cache_count--;

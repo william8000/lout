@@ -1,6 +1,6 @@
 /*@z10.c:Cross References:CrossInit(), CrossMake()@***************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -291,11 +291,13 @@ void CrossAddTag(OBJECT x)
 
   /* search the parameter list of x for a @Tag parameter */
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(par, link);
+  { Child(par, link)
+      ;
     if( type(par) == PAR && is_tag(actual(par)) )
     {
       /* has tag, but if value is empty object, delete it */
-      Child(y, Down(par));
+      Child(y, Down(par))
+        ;
       if( is_word(type(y)) && StringEqual(string(y), STR_EMPTY) )
       { DisposeChild(link);
 	link = x;
@@ -308,7 +310,8 @@ void CrossAddTag(OBJECT x)
       /* search the definition of x for name of its @Tag parameter */
       ppar = nilobj;
       for( link=Down(actual(x));  link != actual(x);  link = NextDown(link) )
-      {	Child(y, link);
+      {	Child(y, link)
+          ;
 	if( is_par(type(y)) && is_tag(y) )
 	{ ppar = y;
 	  break;
@@ -330,14 +333,16 @@ void CrossAddTag(OBJECT x)
 
 	  case NPAR:	link = Down(x);
 			if( Down(x) != x )
-			{ Child(y, Down(x));
+			{ Child(y, Down(x))
+			    ;
 			  if( type(y) == PAR && type(actual(y)) == LPAR )
 				link = NextDown(link);
 			}
 			break;
 
 	  case RPAR:	for( link = Down(x); link != x; link = NextDown(link) )
-			{ Child(y, link);
+			{ Child(y, link)
+			    ;
 			  if( type(y) != PAR )  break;
 			}
 			break;
@@ -372,7 +377,8 @@ OBJECT *crs, OBJECT *res_env)
   assert( NextDown(Down(x)) == LastDown(x), "CrossExpand: #args!" );
 
   /* manifest and tidy the right parameter */
-  Child(tag, LastDown(x));
+  Child(tag, LastDown(x))
+    ;
   debug0(DOM, D, "  [ calling Manifest from CrossExpand");
   ntarget = nenclose = nilobj;
   nbt[COLM] = nft[COLM] = nbt[ROWM] = nft[ROWM] = nilobj;
@@ -381,7 +387,8 @@ OBJECT *crs, OBJECT *res_env)
   tag = ReplaceWithTidy(tag, WORD_TIDY);   /* && */
 
   /* extract sym (the symbol name) and tag (the tag value) from x */
-  Child(y, Down(x));
+  Child(y, Down(x))
+    ;
   assert( type(y) == CLOSURE, "ClosureExpand: type(y) != CLOSURE!" );
   sym = actual(y);
   ctype = !is_word(type(tag)) ? 1 :
@@ -424,7 +431,8 @@ OBJECT *crs, OBJECT *res_env)
 	  tagerror = TRUE;
 	}
 	for( link = NextUp(Up(cs));  link != cs;  link = NextUp(link) )
-        { Parent(db, link);
+        { Parent(db, link)
+            ;
 	  assert( is_word(type(db)), "CrossExpand: db!" );
 	  if( DbRetrieve(db, FALSE, sym, string(tag), seq, &dfnum, &dfpos,
 	      &dlnum, &cont) )
@@ -581,7 +589,8 @@ void CrossSequence(OBJECT x)
   ifdebugcond(DCR, DD, !is_cross(type(x)), DebugObject(x));
   assert( is_cross(type(x)), "CrossSequence: type(x)!" );
   ctype = cross_type(x);
-  Child(tmp, Down(x));
+  Child(tmp, Down(x))
+    ;
   assert( type(tmp) == CLOSURE, "CrossSequence: type(tmp)!" );
   sym = actual(tmp);
   if( cross_sym(sym) == nilobj )  CrossInit(sym);
@@ -594,7 +603,8 @@ void CrossSequence(OBJECT x)
   ifdebug(DCR, D, DebugObject(cs));
 
   /* delete as much of x as possible */
-  Child(tag, NextDown(Down(x)));
+  Child(tag, NextDown(Down(x)))
+    ;
   DeleteLink(NextDown(Down(x)));
   if( Up(x) == x )  DisposeObject(x);
 
@@ -609,7 +619,8 @@ void CrossSequence(OBJECT x)
       assert( type(val) == CLOSURE, "CrossSequence/GALL_FOLL: type(val)!" );
       if( has_key(actual(val)) )
       { for( link=Down(actual(val)); link != actual(val); link=NextDown(link) )
-	{ Child(y, link);
+	{ Child(y, link)
+	    ;
 	  if( is_key(y) )
 	  { OBJECT nbt[2], nft[2], crs, ntarget, nenclose;
 	    nbt[COLM] = nft[COLM] = nbt[ROWM] = nft[ROWM] = nilobj;
@@ -706,7 +717,8 @@ void CrossSequence(OBJECT x)
       debug2(DCR, D, "  have new %s gall_targ %s", SymName(sym),
 	  EchoObject(gall_tag(cs)));
       for( link = Down(cs);  link != cs;  link = NextDown(link) )
-      {	Child(y, link);
+      {	Child(y, link)
+          ;
 	assert( is_word(type(y)) && !StringEqual(string(y), STR_EMPTY),
 				"CrossSequence: GALL_TARG y!" );
 	switch( cs_type(y) )
@@ -719,7 +731,8 @@ void CrossSequence(OBJECT x)
 	    debug4(DCR, D, "  inserting galley (%s) %s&%s %s",
 	      Image(cs_type(y)), SymName(sym), string(gall_tag(cs)), string(y));
 	    if( Down(y) != y )
-	      Child(val, Down(y));
+	      Child(val, Down(y))
+	        ;
             else
 	      val = nilobj;
 	    DbInsert(NewCrossDb, TRUE, sym, string(gall_tag(cs)), no_fpos,
@@ -822,14 +835,16 @@ void CrossSequence(OBJECT x)
       assert( type(target_val(cs)) == CLOSURE, "CrossSequence: target_val!" );
       link = Down(target_val(cs));
       for( ;  link != target_val(cs);  link = NextDown(link) )
-      {	Child(par, link);
+      {	Child(par, link)
+      	  ;
 	if( type(par) == PAR )
 	{
 	  assert( Down(par) != par, "CrossSequence: Down(PAR)!" );
 	  if( is_tag(actual(par)) )
 	  {
 	    /* sort out the value of this tag now */
-	    Child(tag, Down(par));
+	    Child(tag, Down(par))
+	      ;
 	    tag = ReplaceWithTidy(tag, WORD_TIDY);  /* && */
 	    if( !is_word(type(tag)) )
 	    { Error(10, 15, "tag of %s is not a simple word",
@@ -853,7 +868,8 @@ void CrossSequence(OBJECT x)
 	  else if( type(actual(par)) == RPAR )
 	  {
 	    /* replace any oversized right parameter by question marks */
-	    Child(y, Down(par));
+	    Child(y, Down(par))
+	      ;
 	    switch( type(y) )
 	    {
 	      case WORD:
@@ -893,7 +909,8 @@ void CrossSequence(OBJECT x)
 	DisposeObject(target_val(cs));
 	target_val(cs) = nilobj;
 	for( link = Down(cs);  link != cs;  link = NextDown(link) )
-	{ Child(tag, link);
+	{ Child(tag, link)
+	    ;
 	  assert( is_word(type(tag)) && !StringEqual(string(tag), STR_EMPTY),
 			"CrossSeq: non-WORD or empty tag!" );
 	  switch( cs_type(tag) )
@@ -968,12 +985,14 @@ void CrossClose(void)
   /* check for dangling forward references and dispose cross ref structures */
   if( RootCross != nilobj )
   { for( link = Down(RootCross);  link != RootCross;  link = NextDown(link) )
-    { Child(cs, link);
+    { Child(cs, link)
+        ;
       sym = symb(cs);
       assert( type(cs) == CROSS_SYM, "CrossClose: type(cs)!" );
       count = 0;
       for( ylink = Down(cs);  ylink != cs;  ylink = NextDown(ylink) )
-      {	Child(y, ylink);
+      {	Child(y, ylink)
+      	  ;
 	assert( is_word(type(y)) && !StringEqual(string(y), STR_EMPTY),
 				"CrossClose: GALL_TARG y!" );
 	switch( cs_type(y) )

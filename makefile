@@ -2,7 +2,7 @@
 #                                                                             #
 #  Make file for installing Basser Lout                                       #
 #                                                                             #
-#  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                         #
+#  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                         #
 #  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                               #
 #                                                                             #
 #     make prg2lout     Compile a small auxiliary program called prg2lout     #
@@ -255,7 +255,7 @@
 #                                                                             #
 ###############################################################################
 
-VERSION = 3.42
+VERSION = 3.43
 
 OSUNIX  = 1
 OSDOS   = 0
@@ -307,15 +307,18 @@ ZLIBPATH	=
 
 CC	= gcc
 #CC	= bgcc
+#CC	= clang
 
 RCOPY	= cp -r
 
 MKDIR	= mkdir -p
 
 # Add WARN to CFLAGS for more checking
-WARN	= -Wpointer-arith -Wclobbered -Wempty-body -Wmissing-parameter-type -Wmissing-field-initializers -Wold-style-declaration -Wtype-limits -Wuninitialized -Winit-self -Wlogical-op -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Wbad-function-cast
+WARN	= -Wpointer-arith -Wclobbered -Wempty-body -Wmissing-parameter-type -Wold-style-declaration -Wtype-limits -Wuninitialized -Winit-self -Wlogical-op -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Wbad-function-cast
+# Add FED_WARN to CFLAGS for preview gcc 14 / fedora 40 warnings
+FED_WARN = -Werror=implicit-function-declaration -Werror=implicit-int -Werror=int-conversion -std=gnu2x -Werror=old-style-definition
 
-CFLAGS ?= -ansi -pedantic -Wall -O3 -pipe
+CFLAGS ?= -ansi -std=c99 -pedantic -Wall -O3 -pipe
 
 
 CFLAGS	+= -DOS_UNIX=$(OSUNIX)					\

@@ -1,6 +1,6 @@
 /*@z12.c:Size Finder:MinSize()@***********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -57,7 +57,8 @@ static BOOLEAN BuildSpanner(OBJECT x)
   debug1(DSF, DD, "BuildSpanner(%s)", EchoObject(x));
   assert( type(x) == START_HVSPAN || type(x) == START_HSPAN ||
 	  type(x) == START_VSPAN , "BuildSpanner: type(x) != SPAN!" );
-  Child(spanobj, Down(x));
+  Child(spanobj, Down(x))
+    ;
   assert(Up(spanobj) == LastUp(spanobj), "BuildSpanner: spanobj!" );
   DeleteLink(Up(spanobj));
 
@@ -65,7 +66,8 @@ static BOOLEAN BuildSpanner(OBJECT x)
   if( need_hspanner )
   {
     /* check that column context is legal, if not exit with FALSE */
-    Parent(hprnt, UpDim(x, COLM));
+    Parent(hprnt, UpDim(x, COLM))
+      ;
     if( type(hprnt) != COL_THR )
     {
       Error(12, 10, "%s deleted (not in column)", WARN,&fpos(x),Image(type(x)));
@@ -82,7 +84,8 @@ static BOOLEAN BuildSpanner(OBJECT x)
     /* link later members of the spanner on the same row mark to hspanner    */
     /* by definition this is every member across to the last @HSpan before a */
     /* @StartHVSpan or @StartHSpan or @StartVSpan or @VSpan or end of row    */
-    Parent(prnt, UpDim(x, ROWM));
+    Parent(prnt, UpDim(x, ROWM))
+      ;
     if( type(prnt) != ROW_THR )
     {
       Error(12, 11, "%s symbol out of place", FATAL, &fpos(x), Image(type(x)));
@@ -92,7 +95,8 @@ static BOOLEAN BuildSpanner(OBJECT x)
     spanner_count(hspanner) = 1;
     end_link = NextDown(UpDim(x, ROWM));
     for( link = NextDown(UpDim(x, ROWM)); link != prnt; link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       debug2(DSF, DD, "  examining ver %s %s", Image(type(y)), EchoObject(y));
       if( type(y) == HSPAN )
         end_link = NextDown(link);
@@ -103,7 +107,8 @@ static BOOLEAN BuildSpanner(OBJECT x)
     for( link = NextDown(UpDim(x,ROWM)); link!=end_link; link = NextDown(link) )
     {
       /* each of these components becomes @HSpan and is added to hspanner */
-      Child(y, link);
+      Child(y, link)
+        ;
       New(t, HSPAN);
       FposCopy(fpos(t), fpos(y));
       ReplaceNode(t, y);
@@ -118,7 +123,8 @@ static BOOLEAN BuildSpanner(OBJECT x)
   if( need_vspanner )
   {
     /* check that row context is legal, if not exit with FALSE */
-    Parent(vprnt, UpDim(x, ROWM));
+    Parent(vprnt, UpDim(x, ROWM))
+      ;
     if( type(vprnt) != ROW_THR )
     {
       Error(12, 12, "%s deleted (not in row)", WARN, &fpos(x), Image(type(x)));
@@ -135,13 +141,15 @@ static BOOLEAN BuildSpanner(OBJECT x)
     /* link later members of the spanner on the same column mark to vspanner */
     /* by definition this is every member down to the last @VSpan before a   */
     /* @StartHVSpan or @StartHSpan or @StartVSpan or @HSpan or end of column */
-    Parent(prnt, UpDim(x, COLM));
+    Parent(prnt, UpDim(x, COLM))
+      ;
     assert(type(prnt) == COL_THR, "BuildSpanner: type(prnt)!");
     spanner_sized(vspanner) = spanner_fixed(vspanner) = 0;
     spanner_count(vspanner) = 1;
     end_link = NextDown(UpDim(x, COLM));
     for( link = NextDown(UpDim(x, COLM)); link != prnt; link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       debug2(DSF, DD, "  examining hor %s %s", Image(type(y)), y);
       if( type(y) == VSPAN )
         end_link = NextDown(link);
@@ -152,7 +160,8 @@ static BOOLEAN BuildSpanner(OBJECT x)
     for( link = NextDown(UpDim(x,COLM)); link!=end_link; link = NextDown(link) )
     {
       /* each of these components becomes @VSpan and is added to vspanner */
-      Child(y, link);
+      Child(y, link)
+        ;
       New(t, VSPAN);
       FposCopy(fpos(t), fpos(y));
       ReplaceNode(t, y);
@@ -188,19 +197,23 @@ static BOOLEAN FindSpannerGap(OBJECT thr, unsigned dim, unsigned cat_op,
 
   /* find nearest enclosing cat_op that we aren't the first element of */
   link = UpDim(thr, dim);
-  Parent(x, link);
+  Parent(x, link)
+    ;
   while( (type(x) != cat_op || type(PrevDown(link)) != LINK) && Up(x) != x )
   { link = UpDim(x, dim);
-    Parent(x, link);
+    Parent(x, link)
+      ;
   }
 
   /* if found and a gap precedes thr's component of it, return that gap */
   if( type(x) == cat_op && type(PrevDown(link)) == LINK )
-  { Child(*res, PrevDown(link));
+  { Child(*res, PrevDown(link))
+      ;
     assert(type(*res) == GAP_OBJ, "FindSpannerGap: type(*res)!" );
   }
   else if( type(x) == HEAD && gall_dir(x)==dim && type(PrevDown(link))==LINK )
-  { Child(*res, PrevDown(link));
+  { Child(*res, PrevDown(link))
+      ;
     assert(type(*res) == GAP_OBJ, "FindSpannerGap (HEAD): type(*res)!" );
     nobreak(gap(*res)) = TRUE;
   }
@@ -245,8 +258,10 @@ void SpannerAvailableSpace(OBJECT y, int dim, FULL_LENGTH *resb,
   /*                                                           */
   prevthr = nilobj;
   for( slink = Up(y);  slink != y;  slink = NextUp(slink) )
-  { Parent(s, slink);
-    Parent(thr, UpDim(s, dim));
+  { Parent(s, slink)
+      ;
+    Parent(thr, UpDim(s, dim))
+      ;
     if( type(thr) == thr_type )
     {
       assert( thr_state(thr) == SIZED, "SpannerAvailableSpace: thr_state!" );
@@ -435,7 +450,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	  /* galley is sorted, make insinuated cross-reference */
 	  New(z, foll_or_prec(x));
 	  pinpoint(z) = y;
-	  Child(t, Down(x));
+	  Child(t, Down(x))
+	    ;
 	  actual(z) = CrossMake(whereto(x), t, (int) type(z));
 	  Link(*extras, z);
 	  DisposeObject(x);
@@ -504,7 +520,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case HLIMITED:
     case VLIMITED:
     
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       back(x, dim) = back(y, dim);
       fwd(x, dim)  = fwd(y, dim);
@@ -513,9 +530,11 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case BACKGROUND:
 
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
-      Child(y, LastDown(x));
+      Child(y, LastDown(x))
+        ;
       y = MinSize(y, dim, extras);
       back(x, dim) = back(y, dim);
       fwd(x, dim)  = fwd(y, dim);
@@ -547,7 +566,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       { CONSTRAINT c;
  
         /* find the HSPANNER */
-	Child(t, DownDim(x, COLM));
+	Child(t, DownDim(x, COLM))
+	  ;
         assert( type(t) == HSPANNER, "MinSize/SPAN: type(t) != HSPANNER!" );
  
         /* find the available space for this HSPANNER and break it */
@@ -560,7 +580,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
  
       /* make sure that HSPAN links to HSPANNER, VSPAN to VSPANNER      */
       /* NB must follow breaking since that could affect the value of y */
-      Child(y, DownDim(x, dim));
+      Child(y, DownDim(x, dim))
+        ;
       if( (type(x) == HSPAN && type(y) != HSPANNER) ||
 	  (type(x) == VSPAN && type(y) != VSPANNER) )
       {
@@ -612,7 +633,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case VSPANNER:
 
       assert( (type(x) == HSPANNER) == (dim == COLM), "MinSize: SPANNER!" );
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       back(x, dim) = back(y, dim);
       fwd(x, dim)  = fwd(y, dim);
@@ -622,7 +644,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case HEXPAND:
     case VEXPAND:
 
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       back(x, dim) = back(y, dim);
       fwd(x, dim)  = fwd(y, dim);
@@ -643,7 +666,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
       /* remember, these have a dummy child for threads to attach to */
       back(x, dim) = fwd(x, dim) = 0;
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       back(y, dim) = fwd(y, dim) = 0;
       break;
 
@@ -654,13 +678,15 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
       /* remember, there are multiple copies of each header */
       for( link = NextDown(Down(x));  link != x;  link = NextDown(link) )
       {
-        Child(y, link);
+        Child(y, link)
+          ;
         New(catch_extras, ACAT);
         y = MinSize(y, dim, &catch_extras);
         if( Down(catch_extras) != catch_extras )
         {
 	  /* we can't handle things that generate extras inside headers */
-	  Child(z, Down(catch_extras));
+	  Child(z, Down(catch_extras))
+	    ;
 	  Error(12, 16, "%s contains object of illegal type: %s",
 	    FATAL, &fpos(x), Image(type(x)), IndexType(z));
         }
@@ -680,7 +706,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case LINK_DEST_NULL:
     case LINK_URL:
     
-      Child(y, LastDown(x));
+      Child(y, LastDown(x))
+        ;
       y = MinSize(y, dim, extras);
       back(x, dim) = back(y, dim);
       fwd(x, dim)  = fwd(y, dim);
@@ -691,7 +718,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case VCOVER:
 
       /* work out size and set to 0 if parallel */
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       if( (dim == COLM) == (type(x) == HCOVER) )
 	back(x, dim) = fwd(x, dim) = 0;
@@ -714,7 +742,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case HMIRROR:
     case VMIRROR:
 
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       if( (dim == COLM) == (type(x) == HMIRROR) )
       {	back(x, dim) = fwd(y, dim);
@@ -731,7 +760,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case VSCALE:
 
       /* work out size and set to 0 if parallel */
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       if( (dim == COLM) == (type(x) == HSCALE) )
 	back(x, dim) = fwd(x, dim) = 0;
@@ -744,7 +774,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case ROTATE:
     
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       if( dim == COLM )
       {	y = MinSize(y, COLM, extras);
 	New(whereto(x), ACAT);
@@ -762,7 +793,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case SCALE:
 
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       if( dim == COLM )
       { back(x, dim) = (back(y, dim) * bc(constraint(x))) / SF;
@@ -786,7 +818,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case KERN_SHRINK:
 
 
-      Child(y, LastDown(x));
+      Child(y, LastDown(x))
+        ;
       y = MinSize(y, dim, extras);
       if( dim == COLM )
       { FULL_CHAR ch_left, ch_right;  FULL_LENGTH ksize;
@@ -800,17 +833,21 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
 	/* find first character of left parameter */
 	ch_right = (FULL_CHAR) '\0';
-	Child(y, Down(x));
+	Child(y, Down(x))
+	  ;
 	while( type(y) == ACAT )
-	{ Child(y, Down(y));
+	{ Child(y, Down(y))
+	    ;
 	}
 	if( is_word(type(y)) )  ch_right = string(y)[0];
 
 	/* find last character of right parameter */
 	ch_left = (FULL_CHAR) '\0';
-	Child(y, LastDown(x));
+	Child(y, LastDown(x))
+	  ;
 	while( type(y) == ACAT )
-	{ Child(y, LastDown(y));
+	{ Child(y, LastDown(y))
+	    ;
 	}
 	if( is_word(type(y)) )  ch_left = string(y)[StringLength(string(y))-1];
 
@@ -836,7 +873,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case WIDE:
 
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       if( dim == COLM )
       { y = BreakObject(y, &constraint(x));
@@ -855,7 +893,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case HIGH:
     
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       if( dim == ROWM )
       { if( !FitsConstraint(back(y, dim), fwd(y, dim), constraint(x)) )
@@ -879,7 +918,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
     case HSHIFT:
     case VSHIFT:
 
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       y = MinSize(y, dim, extras);
       if( (dim == COLM) == (type(x) == HSHIFT) )
       { f = FindShift(x, y, dim);
@@ -895,7 +935,9 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
     case SPLIT:
     
-      link = DownDim(x, dim);  Child(y, link);
+      link = DownDim(x, dim);
+      Child(y, link)
+        ;
       y = MinSize(y, dim, extras);
       back(x, dim) = back(y, dim);
       fwd(x, dim)  = fwd(y, dim);
@@ -910,7 +952,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	/* convert ACAT to VCAT of lines if more than one line */
 	/* first, compress all ACAT children                   */
 	for( link = x;  NextDown(link) != x;  link = NextDown(link) )
-	{ Child(y, NextDown(link));
+	{ Child(y, NextDown(link))
+	    ;
 	  if( type(y) == ACAT )
 	  {
 	    TransferLinks(Down(y), y, NextDown(link));
@@ -945,7 +988,7 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	      adjust_cat(new_line) = padjust(save_style(x));
 	      Link(res, new_line);
 	      debug2(DSF, D, "  new_line(adjust_cat %s) = %s",
-		bool(adjust_cat(new_line)), EchoObject(new_line));
+		bool_str(adjust_cat(new_line)), EchoObject(new_line));
 
 	      /* may need to insert space at start of remainder */
 	      if( hspace(g)>0 || display_style(save_style(x))==DISPLAY_ORAGGED )
@@ -1028,7 +1071,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
 	prev = g = nilobj;  will_expand = FALSE;  must_expand(x) = FALSE;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ Child(y, link)
+	    ;
 	  if( is_index(type(y)) )
 	  { if( dim == ROWM )
 	    { link = PrevDown(link);
@@ -1178,7 +1222,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
 	dble_found = found = FALSE;  dble_fwd = 0;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ Child(y, link)
+	    ;
 	  debug4(DSF, DD, "  %s in %s, y = %s %s", dimen(dim),
 	    Image(type(x)), Image(type(y)), EchoObject(y));
 	  if( is_index(type(y)) )
@@ -1251,7 +1296,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	debug1(DSF, DD,  "[[ starting sizing %s", Image(type(x)));
 	b = f = 0;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ Child(y, link)
+	    ;
 	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
 	  if( type(y) != START_HVSPAN && type(y) != START_HSPAN &&
 	      type(y) != HSPAN && type(y) != VSPAN )
@@ -1269,7 +1315,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	/* now size all the spanning members of the thread           */
 	/* these will use back(x, dim) and fwd(x, dim) during sizing */
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ Child(y, link)
+	    ;
 	  assert( type(y) != GAP_OBJ, "MinSize/COL_THR: GAP_OBJ!" );
 	  if( type(y) == START_HVSPAN || type(y) == START_HSPAN ||
 	      type(y) == HSPAN || type(y) == VSPAN )
@@ -1296,7 +1343,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	debug1(DSF, DD,  "[[ starting sizing %s", Image(type(x)));
 	b = f = 0;
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ Child(y, link)
+	    ;
 	  assert( type(y) != GAP_OBJ, "MinSize/ROW_THR: GAP_OBJ!" );
 	  if( type(y) != START_HVSPAN && type(y) != START_VSPAN &&
 	      type(y) != HSPAN        && type(y) != VSPAN )
@@ -1317,7 +1365,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 	/* now size all the spanning members of the thread           */
 	/* these will use back(x, dim) and fwd(x, dim) during sizing */
 	for( link = Down(x);  link != x;  link = NextDown(link) )
-	{ Child(y, link);
+	{ Child(y, link)
+	    ;
 	  assert( type(y) != GAP_OBJ, "MinSize/ROW_THR: GAP_OBJ!" );
 	  if( type(y) == START_HVSPAN || type(y) == START_VSPAN ||
 	      type(y) == HSPAN ||        type(y) == VSPAN )
@@ -1340,7 +1389,8 @@ OBJECT MinSize(OBJECT x, int dim, OBJECT *extras)
 
       /* open file and hunt for %%BoundingBox line */
       if( dim == ROWM )  break;
-      Child(y, Down(x));
+      Child(y, Down(x))
+        ;
       fp = OpenIncGraphicFile(string(y), type(x), &full_name, &fpos(y), &cp);
       incgraphic_ok(x) = PS_FindBoundingBox(fp, &fpos(y),
 	  &back(y, COLM), &back(y, ROWM), &fwd(y, COLM), &fwd(y, ROWM));

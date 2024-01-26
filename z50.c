@@ -1,6 +1,6 @@
 /*@z50.c:PDF Back End:PDF_BackEnd@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -267,7 +267,7 @@ static void PDF_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v,
 
 /* ***
 static void PrintComposite(COMPOSITE *cp, BOOLEAN outline, FILE *fp)
-{ debug1(DPF, D, "PrintComposite(cp, %s, fp)", bool(outline));
+{ debug1(DPF, D, "PrintComposite(cp, %s, fp)", bool_str(outline));
   while( cp->char_code != '\0' )
   {
     debug4(DPF, D, "  cp = %d printing code %d (%d, %d)", (int) cp,
@@ -295,8 +295,8 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
   unsigned short *composite; COMPOSITE *cmp;
   *** */
   static int last_hpos;	/* does not need to be initialised */
-  static int next_hpos = -1;
 #if 0
+  static int next_hpos = -1;
   struct metrics *fnt;
 #endif
 
@@ -378,7 +378,8 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
 	    break;
 	  }
 	  else
-	  { while( *++a );
+	  { while( *++a )
+	      ;
 	    a++;
 	  }
 	}
@@ -393,7 +394,7 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
 
       PDFText_OpenXY(out_fp, hpos, vpos);
       last_hpos = hpos;
-      next_hpos = hpos + fwd(x, COLM);	/* fwd(x, COLM) = width of wd */
+      /* next_hpos = hpos + fwd(x, COLM); */	/* fwd(x, COLM) = width of wd */
       break;
 
 
@@ -405,7 +406,7 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
       PDFText_OpenX(out_fp, hpos - last_hpos);
 #endif
       last_hpos = hpos;
-      next_hpos = hpos + fwd(x, COLM);	/* fwd(x, COLM) = width of wd */
+      /* next_hpos = hpos + fwd(x, COLM); */	/* fwd(x, COLM) = width of wd */
       break;
 #if 0
 
@@ -419,7 +420,7 @@ static void PDF_PrintWord(OBJECT x, int hpos, int vpos)
 #else
       PDFPage_Write(out_fp, EightBitToPrintForm[' ']);
 #endif
-      next_hpos += fwd(x, COLM) + fnt[' '].right;	/* width of space ch */
+      /* next_hpos += fwd(x, COLM) + fnt[' '].right; */	/* width of space ch */
       break;
 #endif
 
@@ -662,7 +663,8 @@ static void PDF_PrintGraphicObject(OBJECT x)
     case ACAT:
     
       for( link = Down(x);  link != x;  link = NextDown(link) )
-      {	Child(y, link);
+      {	Child(y, link)
+          ;
 	if( type(y) == GAP_OBJ )
 	{
 	  if( vspace(y) > 0 )  PDFPage_Write(out_fp, (char *) STR_NEWLINE);
@@ -780,7 +782,8 @@ static void PDF_SaveTranslateDefineSave(OBJECT x, FULL_LENGTH xdist, FULL_LENGTH
 static void PDF_PrintGraphicInclude(OBJECT x, FULL_LENGTH colmark, FULL_LENGTH rowmark)
 { OBJECT y;
   debug0(DPF, D, "PDF_PrintGraphicInclude(x)");
-  Child(y, Down(x));
+  Child(y, Down(x))
+    ;
   Error(50, 4, "cannot include EPS file in PDF output; EPS file %s ignored",
       WARN, &fpos(x), string(y));
   debug0(DPF, D, "PDF_PrintGraphicInclude returning.");

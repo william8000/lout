@@ -1,6 +1,6 @@
 /*@z37.c:Font Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -214,15 +214,18 @@ static void FontDebug(void)
 { OBJECT family, face, link, flink, zlink, z;  int i;
   assert(font_root!=nilobj && type(font_root)==ACAT, "FontDebug: font_root!");
   for( link = Down(font_root);  link != font_root;  link = NextDown(link) )
-  { Child(family, link);
+  { Child(family, link)
+      ;
     assert( is_word(type(family)), "FontDebug: family!" );
     debug1(DFS, D, "family %s:", string(family));
     for( flink = Down(family);  flink != family;  flink = NextDown(flink) )
-    { Child(face, flink);
+    { Child(face, flink)
+        ;
       assert( is_word(type(face)), "FontDebug: face!" );
       debug1(DFS, D, "   face %s:", string(face));
       for( zlink = Down(face);  zlink != face;  zlink = NextDown(zlink) )
-      { Child(z, zlink);
+      { Child(z, zlink)
+          ;
 	if( is_word(type(z)) )
 	{ debug2(DFS, D, "      %s%s", string(z), Down(z) != z ? " child" : "");
 	}
@@ -285,7 +288,8 @@ static void ReadCharMetrics(OBJECT face, BOOLEAN fixed_pitch, int xheight2,
   BOOLEAN wxfound, bfound;
   OBJECT AFMfilename;
 
-  Child(AFMfilename, NextDown(Down(face)));
+  Child(AFMfilename, NextDown(Down(face)))
+    ;
   while( ReadOneLine(fp, buff, MAX_BUFF) != 0 &&
 	 !StringBeginsWith(buff, AsciiToFull("EndCharMetrics")) &&
 	 !StringBeginsWith(buff, AsciiToFull("EndExtraCharMetrics")) )
@@ -518,7 +522,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   /* search the databases for @FontDef @Tag { family-face } */
   sprintf( (char *) tag, "%s-%s", family_name, face_name);
   for( link = NextUp(Up(cs));  link != cs;  link = NextUp(link) )
-  { Parent(db, link);
+  { Parent(db, link)
+      ;
     if( DbRetrieve(db, FALSE, FontDefSym,tag,seq,&dfnum,&dfpos,&dlnum,&cont) )
       break;
   }
@@ -547,7 +552,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
   family = face = font_name = AFMfilename = nilobj;
   Extrafilename = LCMfilename = recode = nilobj;
   for( ylink=Down(fontdef_obj);  ylink != fontdef_obj;  ylink=NextDown(ylink) )
-  { Child(y, ylink);
+  { Child(y, ylink)
+      ;
     if( type(y) == PAR )
     {
       assert( type(y) == PAR, "FontRead: type(y) != PAR!" );
@@ -556,47 +562,54 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	/* do nothing with this one */
       }
       else if( actual(y) == fd_family )
-      { Child(family, Down(y));
+      { Child(family, Down(y))
+          ;
 	if( !is_word(type(family)) || !StringEqual(string(family), family_name) )
 	  Error(37, 12, "font family name %s incompatible with %s value %s",
 	    FATAL, &fpos(fontdef_obj), string(family), KW_TAG, tag);
       }
       else if( actual(y) == fd_face )
-      { Child(face, Down(y));
+      { Child(face, Down(y))
+          ;
 	if( !is_word(type(face)) || !StringEqual(string(face), face_name) )
 	  Error(37, 13, "font face name %s incompatible with %s value %s",
 	    FATAL, &fpos(fontdef_obj), string(face), KW_TAG, tag);
       }
       else if( actual(y) == fd_name )
-      { Child(font_name, Down(y));
+      { Child(font_name, Down(y))
+          ;
 	font_name = ReplaceWithTidy(font_name, WORD_TIDY);
 	if( !is_word(type(font_name)) )
 	  Error(37, 14, "illegal font name (quotes needed?)",
 	      FATAL, &fpos(font_name));
       }
       else if( actual(y) == fd_metrics )
-      { Child(AFMfilename, Down(y));
+      { Child(AFMfilename, Down(y))
+          ;
 	AFMfilename = ReplaceWithTidy(AFMfilename, WORD_TIDY);
 	if( !is_word(type(AFMfilename)) )
 	  Error(37, 15, "illegal font metrics file name (quotes needed?)",
 	    FATAL, &fpos(AFMfilename));
       }
       else if( actual(y) == fd_extra_metrics )
-      { Child(Extrafilename, Down(y));
+      { Child(Extrafilename, Down(y))
+          ;
 	Extrafilename = ReplaceWithTidy(Extrafilename, WORD_TIDY);
 	if( !is_word(type(Extrafilename)) )
 	  Error(37, 16, "illegal font extra metrics file name (quotes needed?)",
 	    FATAL, &fpos(Extrafilename));
       }
       else if( actual(y) == fd_mapping )
-      { Child(LCMfilename, Down(y));
+      { Child(LCMfilename, Down(y))
+          ;
 	LCMfilename = ReplaceWithTidy(LCMfilename, WORD_TIDY);
 	if( !is_word(type(LCMfilename)) )
 	  Error(37, 17, "illegal mapping file name (quotes needed?)",
 	    FATAL, &fpos(LCMfilename));
       }
       else if( actual(y) == fd_recode )
-      { Child(recode, Down(y));
+      { Child(recode, Down(y))
+          ;
 	recode = ReplaceWithTidy(recode, WORD_TIDY);
 	if( !is_word(type(recode)) )
 	  Error(37, 18, "illegal value of %s", FATAL, &fpos(recode),
@@ -626,7 +639,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 
   /* insert family into font tree if not already present */
   for( link = Down(font_root);  link != font_root;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( StringEqual(string(y), string(family)) )
     { family = y;
       break;
@@ -637,7 +651,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 
   /* insert face into family, or error if already present */
   for( link = Down(family);  link != family;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( StringEqual(string(y), string(face)) )
     { Error(37, 19, "font %s %s already defined, at%s", WARN, &fpos(face),
 	string(family), string(face), EchoFilePos(&fpos(y)));
@@ -672,7 +687,7 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 
   /* get a new number for this (default) font size */
   if( ++font_count >= finfo_size )
-  { if( font_count > MAX_FONT )
+  { if( font_count >= MAX_FONT )
       Error(37, 21, "too many different fonts and sizes (maximum is %d)",
 	FATAL, &fpos(err),MAX_FONT);
     ifdebug(DMA, D,
@@ -827,7 +842,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	  { Error(37, 30, "FontName empty in font file %s (line %d)",
 	      FATAL, &fpos(AFMfilename), FileName(fnum), lnum);
 	  }
-	  Child(y, Down(face));
+	  Child(y, Down(face))
+	    ;
 	  if( !StringEqual(command, string(y)) )
 	  Error(37, 31, "FontName in font file (%s) and %s (%s) disagree",
 	    WARN, &fpos(AFMfilename), command, KW_FONTDEF, string(y));
@@ -1146,7 +1162,8 @@ void FontChange(STYLE *style, OBJECT x)
     case ACAT:
 
       for( link = Down(x);  link != x;  link = NextDown(link) )
-      { Child(y, link);
+      { Child(y, link)
+          ;
         debug1(DFT, DDD, "  pars examining y = %s", EchoObject(y));
         if( type(y) == GAP_OBJ || type(y)  == NULL_CLOS )  continue;
         if( is_word(type(y)) ) 
@@ -1174,7 +1191,8 @@ void FontChange(STYLE *style, OBJECT x)
 	        WARN, &fpos(x), STR_SMALL_CAPS_SET, KW_FONT);
 	    else
 	    { float tmpf;
-	      Child(y, NextDown(NextDown(link)));
+	      Child(y, NextDown(NextDown(link)))
+	        ;
 	      if( !is_word(type(y)) )
 	        Error(37, 66, "%s in %s must be followed by a word",
 		  WARN, &fpos(x), STR_SMALL_CAPS_SET, KW_FONT);
@@ -1296,7 +1314,8 @@ void FontChange(STYLE *style, OBJECT x)
   {
     /* search for this family */
     for( link = Down(font_root);  link != font_root;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       if( StringEqual(string(requested_family), string(y)) )  break;
     }
     if( link != font_root )
@@ -1307,10 +1326,12 @@ void FontChange(STYLE *style, OBJECT x)
     /* preserve current family */
     assert( Up(finfo[font(*style)].font_table)!=finfo[font(*style)].font_table,
       "FontChange: Up(finfo[font(*style)].font_table) !" );
-    Parent(tmpf, Up(finfo[font(*style)].font_table));
+    Parent(tmpf, Up(finfo[font(*style)].font_table))
+      ;
     assert( is_word(type(tmpf)), "FontChange: type(tmpf)!" );
     assert( Up(tmpf) != tmpf, "FontChange: Up(tmpf)!" );
-    Parent(family, Up(tmpf));
+    Parent(family, Up(tmpf))
+      ;
     assert( is_word(type(family)), "FontChange: type(family)!" );
   }
 
@@ -1322,7 +1343,8 @@ void FontChange(STYLE *style, OBJECT x)
     {
       /* search for this face in family */
       for( link = Down(family);  link != family;  link = NextDown(link) )
-      {	Child(y, link);
+      {	Child(y, link)
+      	  ;
 	if( StringEqual(string(requested_face), string(y)) )  break;
       }
       if( link != family )
@@ -1331,7 +1353,8 @@ void FontChange(STYLE *style, OBJECT x)
     else
     {
       /* preserve current face */
-      Parent(face, Up(finfo[font(*style)].font_table));
+      Parent(face, Up(finfo[font(*style)].font_table))
+        ;
       assert( is_word(type(face)), "FontChange: type(face)!" );
       assert( Up(face) != face, "FontChange: Up(face)!" );
     }
@@ -1350,7 +1373,8 @@ void FontChange(STYLE *style, OBJECT x)
     {
       /* missing face name error; check whether a family name was intended */
       for( link = Down(font_root); link != font_root; link = NextDown(link) )
-      { Child(y, link);
+      { Child(y, link)
+          ;
 	if( StringEqual(string(y), string(requested_face)) )  break;
       }
       if( link != font_root )
@@ -1408,7 +1432,8 @@ void FontChange(STYLE *style, OBJECT x)
   /* search fonts of face for desired size; return if already present */
   if( !(BackEnd->uses_font_metrics) )  flen = PlainCharHeight;
   for( link=NextDown(NextDown(Down(face))); link!=face; link = NextDown(link) )
-  { Child(fsize, link);
+  { Child(fsize, link)
+      ;
     if( font_size(fsize) == flen )
     { font(*style) = font_num(fsize);
       SetGap(space_gap(*style), nobreak(space_gap(*style)), FALSE, TRUE,
@@ -1427,7 +1452,7 @@ void FontChange(STYLE *style, OBJECT x)
 
   /* get a new number for this new size */
   if( ++font_count >= finfo_size )
-  { if( font_count > MAX_FONT )
+  { if( font_count >= MAX_FONT )
       Error(37, 51, "too many different fonts and sizes (max is %d)",
 	FATAL, &fpos(x), MAX_FONT);
     ifdebug(DMA, D, DebugRegisterUsage(MEM_FONTS, -1,
@@ -1442,7 +1467,8 @@ void FontChange(STYLE *style, OBJECT x)
   }
 
   /* create a new sized font record */
-  Child(old, NextDown(NextDown(Down(face))));
+  Child(old, NextDown(NextDown(Down(face))))
+    ;
   assert( is_word(type(old)), "FontChange: old!" );
   new = MakeWord(WORD, string(old), no_fpos);
   Link(face, new);
@@ -1615,7 +1641,7 @@ FULL_LENGTH FontKernLength(FONT_NUM fnum, FULL_CHAR *unacc_map,
 /*****************************************************************************/
 
 void FontWordSize(OBJECT x)
-{ FULL_CHAR *p, *q, *a, *b, *lig, *unacc, *acc;  OBJECT tmp;
+{ FULL_CHAR *p, *q, *a, *b, *lig, *unacc /*, *acc */;  OBJECT tmp;
   FULL_CHAR buff[MAX_BUFF];  MAPPING m;
   int r, u, d, ksize; struct metrics *fnt;
   debug2(DFT, DD, "FontWordSize( %s ), font = %d", string(x), word_font(x));
@@ -1634,7 +1660,7 @@ void FontWordSize(OBJECT x)
     lig = finfo[word_font(x)].lig_table;
     m = font_mapping(finfo[word_font(x)].font_table);
     unacc = MapTable[m]->map[MAP_UNACCENTED];
-    acc   = MapTable[m]->map[MAP_ACCENT];
+    /* acc   = MapTable[m]->map[MAP_ACCENT]; */
     d = u = r = 0;
     do
     { 
@@ -1679,13 +1705,16 @@ void FontWordSize(OBJECT x)
 	      break;
 	    }
 	    else
-	    { while( *++a );
+	    { while( *++a )
+	        ;
 	      a++;
 	    }
 	  }
 	}
 	else
+	{
 	  debug1(DFT, DD, "  ignoring ligature beginning at %c", *q);
+	}
       }
 
       /* accumulate size of *q */
@@ -1818,8 +1847,10 @@ FULL_CHAR *FontFamily(FONT_NUM fnum)
 { OBJECT face, family;
   debug1(DFT, D, "FontFamily( %d )", fnum);
   assert( fnum <= font_count, "FontFamiliy!" );
-  Parent(face, Up(finfo[fnum].font_table));
-  Parent(family, Up(face));
+  Parent(face, Up(finfo[fnum].font_table))
+    ;
+  Parent(family, Up(face))
+    ;
   debug1(DFT, D, "FontFamily returning %s", string(family));
   return string(family);
 } /* end FontFamilyAndFace */
@@ -1829,8 +1860,10 @@ FULL_CHAR *FontFace(FONT_NUM fnum)
 { OBJECT face, family;
   debug1(DFT, D, "FontFacec( %d )", fnum);
   assert( fnum <= font_count, "FontFamiliy!" );
-  Parent(face, Up(finfo[fnum].font_table));
-  Parent(family, Up(face));
+  Parent(face, Up(finfo[fnum].font_table))
+    ;
+  Parent(family, Up(face))
+    ;
   debug1(DFT, D, "FontFace returning %s", string(face));
   return string(face);
 } /* end FontFamilyAndFace */
@@ -1848,8 +1881,10 @@ FULL_CHAR *FontFamilyAndFace(FONT_NUM fnum)
 { OBJECT face, family; static FULL_CHAR buff[80];
   debug1(DFT, D, "FontFamilyAndFace( %d )", fnum);
   assert( fnum <= font_count, "FontName!" );
-  Parent(face, Up(finfo[fnum].font_table));
-  Parent(family, Up(face));
+  Parent(face, Up(finfo[fnum].font_table))
+    ;
+  Parent(family, Up(face))
+    ;
   if( StringLength(string(family)) + StringLength(string(face)) + 1 > 80 )
     Error(37, 63, "family and face names %s %s are too long",
       FATAL, no_fpos, string(family), string(face));
@@ -1874,16 +1909,20 @@ void FontPrintAll(FILE *fp)
   assert(font_root!=nilobj && type(font_root)==ACAT, "FontDebug: font_root!");
   debug0(DFT, DD, "FontPrintAll(fp)");
   for( link = Down(font_root);  link != font_root;  link = NextDown(link) )
-  { Child(family, link);
+  { Child(family, link)
+      ;
     assert( is_word(type(family)), "FontPrintAll: family!" );
     for( flink = Down(family);  flink != family;  flink = NextDown(flink) )
-    { Child(face, flink);
+    { Child(face, flink)
+        ;
       assert( is_word(type(face)), "FontPrintAll: face!" );
       assert( Down(face) != face && NextDown(Down(face)) != face &&
 	NextDown(NextDown(Down(face))) != face, "FontDebug: Down(face)!");
-      Child(ps_name, Down(face));
+      Child(ps_name, Down(face))
+        ;
       assert( is_word(type(ps_name)), "FontPrintAll: ps_name!" );
-      Child(first_size, NextDown(NextDown(Down(face))));
+      Child(first_size, NextDown(NextDown(Down(face))))
+        ;
       assert( is_word(type(first_size)), "FontPrintAll: first_size!" );
       if( font_recoded(face) )
       { fprintf(fp, "/%s%s %s /%s LoutRecode%s",
@@ -1917,14 +1956,17 @@ void FontPrintPageSetup(FILE *fp)
   debug0(DFT, DD, "FontPrintPageSetup(fp)");
   for( link = Down(font_used);  link != font_used;  link = NextDown(link) )
   {
-    Child(face, link);
+    Child(face, link)
+      ;
     assert( is_word(type(face)), "FontPrintPageSetup: face!" );
     assert( Down(face) != face, "FontDebug: Down(face)!");
 
     /* print font encoding command */
-    Child(first_size, NextDown(NextDown(Down(face))));
+    Child(first_size, NextDown(NextDown(Down(face))))
+      ;
     assert( is_word(type(first_size)), "FontPrintPageSetup: first_size!" );
-    Child(ps_name, Down(face));
+    Child(ps_name, Down(face))
+      ;
     assert( is_word(type(ps_name)), "FontPrintPageSetup: ps_name!" );
     BackEnd->PrintPageSetupForFont(face, font_curr_page,
       string(ps_name), string(first_size));
@@ -1950,10 +1992,12 @@ void FontPrintPageResources(FILE *fp)
   first = TRUE;
   for( link = Down(font_used);  link != font_used;  link = NextDown(link) )
   {
-    Child(face, link);
+    Child(face, link)
+      ;
     assert( is_word(type(face)), "FontPrintPageResources: face!" );
     assert( Down(face) != face, "FontDebug: Down(face)!");
-    Child(ps_name, Down(face));
+    Child(ps_name, Down(face))
+      ;
     assert( is_word(type(ps_name)), "FontPrintPageResources: ps_name!" );
 
     /* make sure this ps_name has not been printed before (ugly, I know). */
@@ -1962,8 +2006,10 @@ void FontPrintPageResources(FILE *fp)
     /* Italic and Slope, or perhaps because of different encoding vectors */
     for( plink = Down(font_used);  plink != link;  plink = NextDown(plink) )
     {
-      Child(pface, plink);
-      Child(pname, Down(pface));
+      Child(pface, plink)
+        ;
+      Child(pname, Down(pface))
+        ;
       if( StringEqual(string(pname), string(ps_name)) )
 	break;
     }
@@ -2025,10 +2071,13 @@ BOOLEAN FontNeeded(FILE *fp)
 { BOOLEAN first_need = TRUE;
   OBJECT link, flink, family, face, ps_name;
   for( link = Down(font_root); link != font_root; link = NextDown(link) )
-  { Child(family, link);
+  { Child(family, link)
+      ;
     for( flink = Down(family);  flink != family;  flink = NextDown(flink) )
-    { Child(face, flink);
-      Child(ps_name, Down(face));
+    { Child(face, flink)
+        ;
+      Child(ps_name, Down(face))
+        ;
       assert( is_word(type(ps_name)), "FontPrintPageResources: ps_name!" );
       fprintf(fp, "%s font %s%s",
 	first_need ? "%%DocumentNeededResources:" : "%%+", string(ps_name),

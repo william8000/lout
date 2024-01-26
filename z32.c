@@ -1,6 +1,6 @@
 /*@z32.c:Counter Service:Next()@**********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -41,7 +41,7 @@
 OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
 { OBJECT y, link;  int l, r, n, len;
   FULL_CHAR buff[MAX_BUFF];
-  debug3(DCS, DD, "Next( %s, %d, %s )", EchoObject(x), inc, bool(*done));
+  debug3(DCS, DD, "Next( %s, %d, %s )", EchoObject(x), inc, bool_str(*done));
   switch( type(x) )
   {
     case WORD:
@@ -130,7 +130,8 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     case SET_CONTEXT:
     case GET_CONTEXT:
     
-      Child(y, LastDown(x));
+      Child(y, LastDown(x))
+        ;
       y = Next(y, inc, done);
       break;
 
@@ -140,7 +141,8 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
       /* *** seems identical!
       link = LastDown(x);
       while( link != x && !*done )
-      {	Child(y, link);
+      {	Child(y, link)
+      	  ;
 	if( is_index(type(y)) )  continue;
 	y = Next(y, inc, done);
 	if( !*done )  link = PrevDown(link);
@@ -156,7 +158,8 @@ OBJECT Next(OBJECT x, int inc, BOOLEAN *done)
     
       link = LastDown(x);
       while( link != x && !*done )
-      {	Child(y, link);
+      {	Child(y, link)
+      	  ;
 	if( is_index(type(y)) )  continue;
 	y = Next(y, inc, done);
 	if( !*done )  link = PrevDown(link);

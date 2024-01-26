@@ -1,6 +1,6 @@
 /*@z36.c:Hyphenation: Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -675,7 +675,7 @@ FULL_CHAR *fname, int hline_num)
 /*****************************************************************************/
 
 #define BeGetChar(fp, pv)  ( (c = getc(fp)) == EOF ? -1 : (*pv = c & 0xFF, 0) )
-#define BePutChar(fp, v)   ( putc( (char) (v & 0xFF), fp), 0 )
+#define BePutChar(fp, v)   ( putc( (char) (v & 0xFF), fp) )
 
 #define BeGetShort(fp, pv)						\
 (  (c = getc(fp)) == EOF ? -1 :						\
@@ -685,7 +685,7 @@ FULL_CHAR *fname, int hline_num)
 )
 
 #define BePutShort(fp, v)						\
-( putc((v >> 8) & 0xFF, fp), putc(v & 0xFF, fp), 0 )
+( putc((v >> 8) & 0xFF, fp), putc(v & 0xFF, fp) )
 
 static int BeGetInt(FILE *fp, int *pv)
 { int c;
@@ -1052,7 +1052,7 @@ BOOLEAN ReadHyphTable(LANGUAGE_NUM lnum)
   assert(HyphTables[lnum]==(TRIE) NULL && !TriedFile[lnum], "ReadHyphTable!");
   HyphTables[lnum] = TrieRead(lnum, &res);
   TriedFile[lnum] = TRUE;
-  debug2(DHY, DD, "ReadHyphTable(%d) returning %s", lnum, bool(res));
+  debug2(DHY, DD, "ReadHyphTable(%d) returning %s", lnum, bool_str(res));
   return res;
 } /* end ReadHyphTable */
 
@@ -1076,13 +1076,15 @@ OBJECT Hyphenate(OBJECT x)
 
   /* for each word y of x, try to hyphenate it */
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( is_word(type(y)) && word_hyph(y) )
     {
       /* don't hyphenate a word preceding &<len>h */
       if( NextDown(link) != x )
       {
-	Child(z, NextDown(link));
+	Child(z, NextDown(link))
+	  ;
 	if( type(z) == GAP_OBJ && mode(gap(z)) == HYPH_MODE )
 	  word_hyph(y) = FALSE;
       }
@@ -1096,7 +1098,8 @@ OBJECT Hyphenate(OBJECT x)
 	/* don't hyphenate a word following &<len>h */
 	if( NextDown(link) != x )
 	{
-	  Child(z, NextDown(link));
+	  Child(z, NextDown(link))
+	    ;
 	  if( is_word(type(z)) )
 	    word_hyph(z) = FALSE;
 	}
@@ -1243,7 +1246,8 @@ OBJECT Hyphenate(OBJECT x)
             break;
           }
           else
-          { while( *++a );
+          { while( *++a )
+              ;
             a++;
           }
         }

@@ -686,4 +686,10 @@ Changes and new features introduced in Version 3.42 [Dec 2020]
      makelout.bat unmaintained script to build lout using complout.bat
      instlout.bat unmaintained script to install lout in a dos box
 
+Changes and new features introduced in Version 3.43 [Jan 2024]
+
+   Apply ismaell's fix for crashes from calling catclose() with a bad argument
+     when catopen() can't find the locale's message catalog.
+   Fix compile warnings for both gcc 13 and clang 17.
+
    William Bader

@@ -1,6 +1,6 @@
 /*@z14.c:Fill Service:Declarations@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -97,7 +97,8 @@ typedef struct {
   }									\
   else									\
   { col_width = (I.cwid!=nilobj) ? bfc(constraint(I.cwid)) : etc_width;	\
-    Child(g, I.llink);							\
+    Child(g, I.llink)							\
+      ;									\
     I.badness = save_badness(g);					\
   }									\
 									\
@@ -105,7 +106,8 @@ typedef struct {
   if( I.tab_count > 0 )							\
   { OBJECT glink = NextDown(NextDown(I.llink));				\
     assert( type(glink) == LINK, "SIB: glink!");			\
-    Child(g, glink);							\
+    Child(g, glink)							\
+      ;									\
     if( type(g) == GAP_OBJ && mode(gap(g)) == TAB_MODE &&		\
 	units(gap(g)) == AVAIL_UNIT && width(gap(g)) == 1*FR )		\
       I.badness += WIDOW_BAD_INCR;					\
@@ -169,7 +171,8 @@ typedef struct {
   debug0(DOF, DDD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
 									\
   /* search onwards to find newg, the next true breakpoint */		\
-  Child(tmp, rlink);							\
+  Child(tmp, rlink)							\
+    ;									\
   debug2(DOF, DDD, "NextDefiniteWithGap(%s, %s)", EchoObject(x),	\
     EchoObject(tmp));							\
   NextDefiniteWithGap(x, rlink, foll, newg, jn);			\
@@ -195,7 +198,8 @@ typedef struct {
     ifdebug(DOF, DDD,							\
       if( Down(newg) != newg )						\
       { OBJECT tmp;							\
-	Child(tmp, Down(newg));						\
+	Child(tmp, Down(newg))						\
+	  ;								\
 	debug5(DOF, DDD, "newg %s: %s %s, gap = %s, save_space = %s",	\
 	Image(type(newg)), Image(type(tmp)), EchoObject(tmp),		\
 	EchoGap(&gap(newg)), EchoLength(save_space(newg)));		\
@@ -278,6 +282,10 @@ typedef struct {
   debug0(DOF, DDD, "IntervalInit(I, x, -, -, hyph_word)");		\
   I.llink = x;								\
 									\
+  I.tab_pos = 0;							\
+  I.width_to_tab = 0;							\
+  I.badness = 0;							\
+									\
   FirstDefinite(x, rlink, right, jn);					\
   if( rlink == x )  I.class = AT_END, I.rlink = x;			\
   else									\
@@ -314,7 +322,8 @@ typedef struct {
   else									\
   {									\
     /* I is optimal here so save its badness and left endpoint */	\
-    Child(g, rlink);							\
+    Child(g, rlink)							\
+      ;									\
     assert( type(g) == GAP_OBJ, "IntervalShiftRightEnd: type(g)!" );	\
     save_badness(g) = I.badness;					\
     save_prev(g) = I.llink;						\
@@ -462,13 +471,15 @@ static FULL_CHAR *IntervalPrint(INTERVAL I, OBJECT x)
   g = nilobj;
   for( link = NextDown(I.llink);  link != I.rlink;  link = NextDown(link) )
   { assert(link != x, "IntervalPrint: link == x!");
-    Child(y, link);
+    Child(y, link)
+      ;
     debug2(DOF, DDD, "IntervalPrint at %s %s", Image(type(y)), EchoObject(y));
     assert(y != x, "IntervalPrint: y == x!");
     if( type(y) == GAP_OBJ )
     { g = y;
       if( Down(g) != g )
-      {	Child(z, Down(g));
+      {	Child(z, Down(g))
+      	  ;
 	StringCat(res, STR_SPACE);
 	StringCat(res, EchoCatOp(ACAT, mark(gap(g)), join(gap(g)))),
 	StringCat(res, is_word(type(z)) ? string(z) : Image(type(z)));
@@ -783,7 +794,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   assert( type(x) == ACAT, "FillObject: type(x) != ACAT!" );
 
   debug4(DOF, D, "FillObject(x, %s, can_hyph = %s, %s); %s",
-    EchoConstraint(c), bool(can_hyphenate),
+    EchoConstraint(c), bool_str(can_hyphenate),
     multi == nilobj ? "nomulti" : "multi", EchoStyle(&save_style(x)));
   ifdebug(DOF, DD, DebugObject(x));
 
@@ -955,7 +966,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
     debug1(DOF, DD, "%s", IntervalPrint(BestI, x));
     while( BestI.llink != x )
     { BestI.rlink = BestI.llink;
-      Child(gp, BestI.rlink);
+      Child(gp, BestI.rlink)
+        ;
       BestI.llink = save_prev(gp);
       debug1(DOF, DD, "%s", IntervalPrint(BestI, x));
     }
@@ -1014,7 +1026,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 
        /* Get the first object on this line.  */
        parent = NextDown(llink);
-       Child(first_on_line, parent);
+       Child(first_on_line, parent)
+         ;
 
        if( is_word( type(first_on_line) ) )
          KernWordLeftMargin(first_on_line, parent);
@@ -1055,21 +1068,25 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
       TransferLinks(NextDown(llink), x, y);
 
       /* add hyphen to end of previous line, if lgap is ADD_HYPH */
-      Child(lgap, llink);
+      Child(lgap, llink)
+        ;
       if( mode(gap(lgap)) == ADD_HYPH )
       { OBJECT z, tmp;
-	FONT_NUM font;
-        FULL_CHAR *unacc = NULL, *word_content;
-        unsigned word_len;
+	/* FONT_NUM font; */
+        /* FULL_CHAR *word_content; */
+        /* FULL_CHAR *unacc = NULL; */
+        /* unsigned word_len; */
 
 	/* find word hyphen attaches to, since need its underline and font */
-	Child(tmp, PrevDown(LastDown(x)));  /* last is lgap, so one before */
+	Child(tmp, PrevDown(LastDown(x)))  /* last is lgap, so one before */
+	  ;
 	debug2(DOF, D, "tmp = %s %s", Image(type(tmp)), EchoObject(tmp));
 	assert(is_word(type(tmp)), "FillObject: !is_word(type(tmp))!");
-	word_content = string(tmp);
-        word_len = StringLength(word_content);
+	/* word_content = string(tmp); */
+        /* word_len = StringLength(word_content); */
 
         /* get font information */
+        /* ***
         font = word_font(tmp);
         if (finfo[font].font_table)
 	{
@@ -1077,6 +1094,7 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 	  m = font_mapping(finfo[font].font_table);
 	  unacc = MapTable[m]->map[MAP_UNACCENTED];
 	}
+	*** */
 
 	/* add zero-width gap object */
         New(z, GAP_OBJ);
@@ -1123,7 +1141,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
         OBJECT last_on_line;
 
         /* Get the last object on this line.  */
-        Child(last_on_line, PrevDown(LastDown(x)));
+        Child(last_on_line, PrevDown(LastDown(x)))
+          ;
         if( is_word(type(last_on_line)) )
           KernWordRightMargin(last_on_line, x);
       }
@@ -1150,7 +1169,8 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 
     /* if last line contains only the {} from final &1rt {}, delete the line */
     /* and the preceding gap                                                 */
-    Child(y, LastDown(res));
+    Child(y, LastDown(res))
+      ;
     if( Down(y) == LastDown(y) )
     { DisposeChild(LastDown(res));
       assert( Down(res) != LastDown(res), "almost empty paragraph!" );
@@ -1159,29 +1179,34 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
 
     /* else delete the final &1rt {} from the last line, to help clines */
     else
-    { Child(z, LastDown(y));
+    { Child(z, LastDown(y))
+        ;
       assert( type(z)==WORD && string(z)[0]=='\0', "FillObject: last word!" );
       DisposeChild(LastDown(y));
-      Child(z, LastDown(y));
+      Child(z, LastDown(y))
+        ;
       assert( type(z) == GAP_OBJ, "FillObject: last gap_obj!" );
       DisposeChild(LastDown(y));
     }
 
     /* set unbreakable bit of first and last inter-line gaps, if required */
     if( nobreakfirst(save_style(x)) && Down(res) != LastDown(res) )
-    { Child(gp, NextDown(Down(res)));
+    { Child(gp, NextDown(Down(res)))
+        ;
       assert( type(gp) == GAP_OBJ, "FillObject: type(gp) != GAP_OBJ (a)!" );
       nobreak(gap(gp)) = TRUE;
     }
     if( nobreaklast(save_style(x)) && Down(res) != LastDown(res) )
-    { Child(gp, PrevDown(LastDown(res)));
+    { Child(gp, PrevDown(LastDown(res)))
+        ;
       assert( type(gp) == GAP_OBJ, "FillObject: type(gp) != GAP_OBJ (b)!" );
       nobreak(gap(gp)) = TRUE;
     }
 
     /* recalculate the width of the last line, since it may now be smaller */
     assert( LastDown(res) != res, "FillObject: empty paragraph!" );
-    Child(y, LastDown(res));
+    Child(y, LastDown(res))
+      ;
     FirstDefinite(y, link, z, jn);
     assert( link != y, "FillObject: last line is empty!" );
     f = back(z, COLM);  prev = z;
@@ -1201,16 +1226,20 @@ OBJECT FillObject(OBJECT x, CONSTRAINT *c, OBJECT multi, BOOLEAN can_hyphenate,
   /* rejoin unused hyphenated gaps so that kerning will work across them */
   if( *hyph_used && type(res) == VCAT )
   { for( link = Down(res);  link != res;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       if( type(y) == ACAT )
       { for( ylink = Down(y);  ylink != y;  ylink = NextDown(ylink) )
-        { Child(gp, ylink);
+        { Child(gp, ylink)
+            ;
 	  if( type(gp) == GAP_OBJ && width(gap(gp)) == 0 &&
 	      mode(gap(gp)) == ADD_HYPH )
 	  {
 	    /* possible candidate for joining, look into what's on each side */
-	    Child(prev, PrevDown(ylink));
-	    Child(next, NextDown(ylink));
+	    Child(prev, PrevDown(ylink))
+	      ;
+	    Child(next, NextDown(ylink))
+	      ;
 	    if( is_word(type(prev)) && is_word(type(next)) &&
 	        word_font(prev) == word_font(next) &&
 	        word_colour(prev) == word_colour(next) &&

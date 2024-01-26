@@ -1,6 +1,6 @@
 /*@z51.c:Plain Text Back End:Plain_BackEnd@***********************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -201,7 +201,8 @@ static void Plain_PrintBetweenPages(FULL_LENGTH h, FULL_LENGTH v,
   );
   for( i = vsize - 1;  i >= 0;  i-- )
   { ifdebug(DPT, D, putc('|', out_fp));
-    for( jmax = hsize-1;  jmax >= 0 && page[i*hsize+jmax] == ' ';  jmax--);
+    for( jmax = hsize-1;  jmax >= 0 && page[i*hsize+jmax] == ' ';  jmax--)
+      ;
     ifdebug(DPT, D, jmax = hsize - 1);
     for( j = 0;  j <= jmax;  j++ )
       putc(page[i*hsize + j], out_fp);
@@ -378,7 +379,8 @@ static void Plain_PrintAfterLastPage(void)
     );
     for( i = vsize - 1;  i >= 0;  i-- )
     { ifdebug(DPT, D, putc('|', out_fp));
-      for( jmax = hsize-1;  jmax >= 0 && page[i*hsize+jmax] == ' ';  jmax--);
+      for( jmax = hsize-1;  jmax >= 0 && page[i*hsize+jmax] == ' ';  jmax--)
+        ;
       ifdebug(DPT, D, jmax = hsize - 1);
       for( j = 0;  j <= jmax;  j++ )
         putc(page[i*hsize + j], out_fp);

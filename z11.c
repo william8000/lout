@@ -1,6 +1,6 @@
 /*@z11.c:Style Service:EchoStyle()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -155,7 +155,8 @@ void SpaceChange(STYLE *style, OBJECT x)
 
 
     case ACAT:	for( link = Down(x);  link != x;  link = NextDown(link) )
-		{ Child(y, link);
+		{ Child(y, link)
+		    ;
 		  if( type(y) == GAP_OBJ || type(y) == NULL_CLOS )  continue;
 		  else if( is_word(type(y)) )
 		  { if( !StringEqual(string(y), STR_EMPTY) )
@@ -273,7 +274,8 @@ void BreakChange(STYLE *style, OBJECT x)
 
 
     case ACAT:	for( link = Down(x);  link != x;  link = NextDown(link) )
-		{ Child(y, link);
+		{ Child(y, link)
+		    ;
 		  if( type(y) == GAP_OBJ || type(y) == NULL_CLOS )  continue;
 		  else if( is_word(type(y)) )
 		  { if( !StringEqual(string(y), STR_EMPTY) )
@@ -290,7 +292,8 @@ void BreakChange(STYLE *style, OBJECT x)
 			else
 			{
 			  link = NextDown(NextDown(link));
-			  Child(y, link);
+			  Child(y, link)
+			    ;
 			  GetGap(y, style, &res_gap, &gap_inc);
 			  outdent_len(*style) = gap_inc == GAP_ABS ?
 			    width(res_gap) : gap_inc == GAP_INC ?
@@ -310,7 +313,8 @@ void BreakChange(STYLE *style, OBJECT x)
 			{
 			  float val;
 			  link = NextDown(NextDown(link));
-			  Child(y, link);
+			  Child(y, link)
+			    ;
 			  val = GetScaleFactor(y);
 			  blanklinescale(*style) = (int) (val * SF);
 			}

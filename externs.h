@@ -1,6 +1,6 @@
 /*@externs.h:External Declarations:Directories and file conventions@**********/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -95,7 +95,7 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
-#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.42 (Dec 2020)")
+#define	LOUT_VERSION   AsciiToFull("Basser Lout Version 3.43 (Jan 2024)")
 #define	CROSS_DB	   AsciiToFull("lout")
 #define	SOURCE_SUFFIX	   AsciiToFull(".lt")
 #define	INDEX_SUFFIX	   AsciiToFull(".li")
@@ -328,7 +328,7 @@ If you're compiling this, you've got the wrong settings in the makefile!
 #define	BOOLEAN		unsigned
 #define	FALSE		0
 #define	TRUE		1
-#define	bool(x)		(x ? AsciiToFull("TRUE") : AsciiToFull("FALSE") )
+#define	bool_str(x)	(x ? AsciiToFull("TRUE") : AsciiToFull("FALSE") )
 #define	CHILD		0
 #define	PARENT		1
 #define	COLM		0
@@ -1663,7 +1663,14 @@ typedef union rec
      FIRST_UNION	ou1;
      SECOND_UNION	ou2;
      THIRD_UNION	ou3;
-     FULL_CHAR		ostring[4];
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+#  define OSTRING_SIZE 0
+#  define OSTRING_DECL
+#else
+#  define OSTRING_SIZE 4
+#  define OSTRING_DECL OSTRING_SIZE
+#endif
+     FULL_CHAR		ostring[ OSTRING_DECL ]; /* flexible array member */
   } os1;
 
   struct closure_type	/* all fields of CLOSURE, both as token and object */
@@ -2786,7 +2793,7 @@ typedef struct
 }
 
 #define NewWord(x, typ, len, pos)					\
-{ zz_size = sizeof(struct word_type) - 4 + ((len)+1)*sizeof(FULL_CHAR);	\
+{ zz_size = sizeof(struct word_type) - OSTRING_SIZE + ((len)+1)*sizeof(FULL_CHAR); \
   /* NB the following line RESETS zz_size */				\
   GetMem(zz_hold, ceiling(zz_size, sizeof(ALIGN)), pos);		\
   checkmem(zz_hold, typ);						\
@@ -2928,14 +2935,14 @@ typedef struct
 #define	LastUp(x)	pred(x, PARENT)
 #define	PrevUp(x)	pred(x, PARENT)
 
-#define	Child(y, link)							\
-for( y = pred(link, PARENT);  type(y) == LINK;  y = pred(y, PARENT) )
+#define	Child(y, link)	\
+	for( y = pred(link, PARENT);  type(y) == LINK;  y = pred(y, PARENT) )
 
-#define CountChild(y, link, i)                                          \
-for( y=pred(link, PARENT), i=1; type(y)==LINK;  y = pred(y, PARENT), i++ )
+#define CountChild(y, link, i)	\
+	for( y=pred(link, PARENT), i=1; type(y)==LINK;  y = pred(y, PARENT), i++ )
 
-#define	Parent(y, link)							\
-for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
+#define	Parent(y, link)	\
+	for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 
 
 /*@::UpDim(), DownDim(), Link(), DeleteLink(), etc.@**************************/
@@ -3104,7 +3111,8 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 #define FirstDefinite(x, link, y, jn)					\
 { jn = TRUE;								\
   for( link = Down(x);  link != x;  link = NextDown(link) )		\
-  { Child(y, link);							\
+  { Child(y, link)							\
+      ;									\
     if( type(y) == GAP_OBJ )  jn = jn && join(gap(y));			\
     else if( type(y)==SPLIT ? SplitIsDefinite(y) : is_definite(type(y)))\
       break;								\
@@ -3129,7 +3137,8 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 
 #define NextDefinite(x, link, y)					\
 { for( link = NextDown(link);  link != x;  link = NextDown(link) )	\
-  { Child(y, link);							\
+  { Child(y, link)							\
+      ;									\
     if( type(y) == SPLIT ? SplitIsDefinite(y) : is_definite(type(y)) )	\
 	break;								\
   }									\
@@ -3157,7 +3166,8 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 #define NextDefiniteWithGap(x, link, y, g, jn)				\
 { g = nilobj;  jn = TRUE;						\
   for( link = NextDown(link);  link != x;  link = NextDown(link) )	\
-  { Child(y, link);							\
+  { Child(y, link)							\
+      ;									\
     if( type(y) == GAP_OBJ )  g = y, jn = jn && join(gap(y));		\
     else if( type(y)==SPLIT ? SplitIsDefinite(y):is_definite(type(y)) )	\
     {									\
@@ -3187,7 +3197,8 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 
 #define LastDefinite(x, link, y)					\
 { for( link = LastDown(x);  link != x;  link = PrevDown(link) )		\
-  { Child(y, link);							\
+  { Child(y, link)							\
+      ;									\
     if( type(y) == SPLIT ? SplitIsDefinite(y) : is_definite(type(y)) )	\
 	break;								\
   }									\
@@ -3211,7 +3222,8 @@ for( y = pred(link, CHILD);   type(y) == LINK;  y = pred(y, CHILD) )
 
 #define PrevDefinite(x, link, y)					\
 { for( link = PrevDown(link);  link != x;  link = PrevDown(link) )	\
-  { Child(y, link);							\
+  { Child(y, link)							\
+      ;									\
     if( type(y) == SPLIT ? SplitIsDefinite(y) : is_definite(type(y)) )	\
 	break;								\
   }									\

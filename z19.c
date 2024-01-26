@@ -1,6 +1,6 @@
 /*@z19.c:Galley Attaching:DetachGalley()@*************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -96,7 +96,8 @@ void DetachGalley(OBJECT hd)
 { OBJECT prnt, index;
   assert( type(hd) == HEAD && Up(hd) != hd, "DetachGalley: precondition!" );
   debug1(DGA, D, "DetachGalley( %s )", SymName(actual(hd)));
-  Parent(prnt, Up(hd));
+  Parent(prnt, Up(hd))
+    ;
   assert( Up(prnt) != prnt, "DetachGalley: parent!" );
   New(index, UNATTACHED);
   actual(index) = nilobj;
@@ -139,7 +140,8 @@ BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
   link = forwards ? NextDown(start) : PrevDown(start);
   res = nilobj;
   while( res == nilobj && type(link) != HEAD )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     switch( type(y) )
     {
       case UNATTACHED:
@@ -148,7 +150,8 @@ BOOLEAN subgalleys, BOOLEAN closures, BOOLEAN input)
         debug1(DGA, D, "  examining %s", EchoIndex(y));
 	if( subgalleys )
 	for( zlink = Down(y); zlink!=y && res==nilobj; zlink=NextDown(zlink) )
-	{ Child(z, zlink);
+	{ Child(z, zlink)
+	    ;
 	  res = SearchGalley(z, sym, TRUE, TRUE, TRUE, input);
 	}
 	if( res == nilobj && input && type(y) == RECEIVING &&
@@ -247,7 +250,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	SymName(actual(hd)), SymName(whereto(hd)));
   ifdebug(DGA, DD, DebugGalley(hd, nilobj, 4));
   assert( Up(hd) != hd, "AttachGalley: no index!" );
-  Parent(hd_index, Up(hd));
+  Parent(hd_index, Up(hd))
+    ;
   assert( type(hd_index) == UNATTACHED, "AttachGalley: not UNATTACHED!" );
   hd_inners = tg_inners = nilobj;
   was_sized = sized(hd);
@@ -274,8 +278,11 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       {	
 	/* search failed to find any new target, so kill the galley */
 	for( link = Down(hd); link != hd; link = NextDown(link) )
-	{ Child(y, link);
-	  if( type(y) == SPLIT )  Child(y, DownDim(y, dim));
+	{ Child(y, link)
+	    ;
+	  if( type(y) == SPLIT )
+	    Child(y, DownDim(y, dim))
+	      ;
 	  if( is_definite(type(y)) )  break;
 	}
 	if( link != hd )
@@ -364,8 +371,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     Link(target_galley, tmp);
     env = DetachEnv(tmp);
     debug4(DGM, D, "  external_ver(%s) = %s, external_hor(%s) = %s",
-      SymName(actual(target)), bool(external_ver(target)),
-      SymName(actual(target)), bool(external_hor(target)));
+      SymName(actual(target)), bool_str(external_ver(target)),
+      SymName(actual(target)), bool_str(external_hor(target)));
     SizeGalley(target_galley, env,
 	external_ver(target) || external_hor(target),
 	threaded(target), non_blocking(target_index),
@@ -399,7 +406,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	SymName(actual(hd)), SymName(whereto(hd)));
       EnterErrorBlock(TRUE);
       n1 = nilobj;
-      Child(y, Down(hd));
+      Child(y, Down(hd))
+        ;
       env = DetachEnv(y);
       /*** threaded() only defined in ROWM case
       SizeGalley(hd, env, TRUE, threaded(dest), non_blocking(target_index),
@@ -441,9 +449,12 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     ifdebug(DGA, DDD, DebugObject(hd));
     for( link = Down(hd);  link != hd;  link = NextDown(link) )
     {
-      Child(y, link);
+      Child(y, link)
+        ;
       debug1(DGA, DDD, "  examining %s", EchoIndex(y));
-      if( type(y) == SPLIT )  Child(y, DownDim(y, dim));
+      if( type(y) == SPLIT )
+        Child(y, DownDim(y, dim))
+          ;
       switch( type(y) )
       {
 
@@ -486,14 +497,16 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 
 	case FOLLOWS:
 	    
-	  Child(tmp, Down(y));
+	  Child(tmp, Down(y))
+	    ;
 	  if( Up(tmp) == LastUp(tmp) )
 	  { link = pred(link, CHILD);
 	    debug0(DGA, DD, "  disposing FOLLOWS");
 	    DisposeChild(NextDown(link));
 	    break;
 	  }
-	  Parent(tmp, Up(tmp));
+	  Parent(tmp, Up(tmp))
+	    ;
 	  assert(type(tmp) == PRECEDES, "Attach: PRECEDES!");
 	  switch( CheckComponentOrder(tmp, target_index) )
 	  {
@@ -589,7 +602,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	  {
 	    /* make sure y is not joined to a target below (vertical only) */
 	    for( zlink = NextDown(link); zlink != hd; zlink = NextDown(zlink) )
-	    { Child(z, zlink);
+	    { Child(z, zlink)
+	        ;
 	      switch( type(z) )
 	      {
 	        case RECEPTIVE:
@@ -610,7 +624,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 		  if( non_blocking(z) )
 		  { zlink = PrevDown(zlink);
 		    while( Down(z) != z )
-		    { Child(tmp, Down(y));
+		    { Child(tmp, Down(y))
+		        ;
 		      if( opt_components(tmp) != nilobj )
 		      { DisposeObject(opt_components(tmp));
 		        opt_components(tmp) = nilobj;
@@ -750,7 +765,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	  Constrained(target, &c, dim, &why);
 	  debug3(DGF, DD, "  target parallel Constrained(%s, %s) = %s",
 	    EchoObject(target), dimen(dim), EchoConstraint(&c));
-	  Child(z, LastDown(target_galley));  /* works in all cases? */
+	  Child(z, LastDown(target_galley))  /* works in all cases? */
+	    ;
 	  assert( !is_index(type(z)), "AttachGalley: is_index(z)!" );
 	  assert( back(z, dim)>=0 && fwd(z, dim)>=0, "AttachGalley: z size!" );
 	  if( !FitsConstraint(back(z, dim), fwd(z, dim), c) )
@@ -811,7 +827,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	  Constrained(target, &c, 1-dim, &junk);
 	  debug3(DGF, DD, "  target perpendicular Constrained(%s, %s) = %s",
 	    EchoObject(target), dimen(1-dim), EchoConstraint(&c));
-	  Child(z, LastDown(target_galley));  /* works in all cases? */
+	  Child(z, LastDown(target_galley))  /* works in all cases? */
+	    ;
 	  assert( !is_index(type(z)), "AttachGalley: is_index(z)!" );
 	  assert( back(z, 1-dim)>=0 && fwd(z, 1-dim)>=0,
 	    "AttachGalley: z size (perpendicular)!" );
@@ -865,7 +882,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	  else
 	  {
 	    /* adjust both directions, using z (last component) */
-	    Child(z, LastDown(target_galley));
+	    Child(z, LastDown(target_galley))
+	      ;
 	    debug0(DSA, D, "AttachGalley AdjustSize using z =");
 	    ifdebug(DSA, D, DebugObject(z));
 	    debug0(DSA, D, "calling AdjustSize from AttachGalley (e)");
@@ -895,7 +913,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
     /* kill off any null objects within the galley, then transfer it */
     /* don't use Promote() since it does extra unwanted things here  */
     for( link = Down(hd);  link != hd;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       switch( type(y) )
       {
 
@@ -999,7 +1018,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
 	Interpose(dest, VCAT, hd, y);
       else if( dim == COLM && !external_hor(dest) )
       { Interpose(dest, ACAT, y, y);
-	Parent(junk, Up(dest));
+	Parent(junk, Up(dest))
+	  ;
 	assert( type(junk) == ACAT, "AttachGalley: type(junk) != ACAT!" );
 	StyleCopy(save_style(junk), save_style(dest));
 	adjust_cat(junk) = padjust(save_style(junk));
@@ -1011,7 +1031,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       /* move target_galley into target */
       /* nb Interpose must be done after all AdjustSize calls */
       if( !(external_ver(target) || external_hor(target)) )
-      {	Child(z, LastDown(target_galley));
+      {	Child(z, LastDown(target_galley))
+          ;
 	Interpose(target, VCAT, z, z);
       }
       debug0(DGS, D, "calling Promote(target_galley) from AttachGalley/ACCEPT");
@@ -1036,7 +1057,8 @@ int AttachGalley(OBJECT hd, OBJECT *inners, OBJECT *suspend_pt)
       ifdebug(DGA, D,
 	if( dim == COLM && !external_hor(dest) )
 	{ OBJECT z;
-	  Parent(z, Up(dest));
+	  Parent(z, Up(dest))
+	    ;
 	  debug2(DGA, D, "  COLM dest_encl on exit = %s %s",
 	    Image(type(z)), EchoObject(z));
 	}

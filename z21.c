@@ -1,6 +1,6 @@
 /*@z21.c:Galley Maker:SizeGalley()@*******************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -68,13 +68,14 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
   assert( type(hd) == HEAD && Down(hd) != hd, "SizeGalley: precondition!" );
   assert( !sized(hd), "SizeGalley: already sized!" );
   debug6(DGM, D, "SizeGalley(%s, -, %s, %s, %s, %s, -, %s, -, -, -), hd =",
-	SymName(actual(hd)), bool(rows), bool(joined), bool(nonblock),
-	bool(trig), EchoConstraint(c));
+	SymName(actual(hd)), bool_str(rows), bool_str(joined), bool_str(nonblock),
+	bool_str(trig), EchoConstraint(c));
   debug1(DGM, DD, "  env = %s", EchoObject(env));
   ifdebug(DGM, D, DebugObject(hd));
 
   /* manifest the child of hd, making sure it is simply joined if required */
-  Child(y, Down(hd));
+  Child(y, Down(hd))
+    ;
   tmp1 = target;
   tmp2 = enclose;
   crs = nilobj;
@@ -96,7 +97,10 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
       &tmp2, FALSE);
     assert( Down(bt[COLM]) != bt[COLM] && Down(ft[COLM]) != ft[COLM],
 	"SizeGalley: threads!" );
-    Child(tmp1, Down(bt[COLM]));  Child(tmp2, Down(ft[COLM]));
+    Child(tmp1, Down(bt[COLM]))
+      ;
+    Child(tmp2, Down(ft[COLM]))
+      ;
     if( Down(bt[COLM]) != LastDown(bt[COLM]) ||
 	  Down(ft[COLM]) != LastDown(ft[COLM]) || tmp1 != tmp2 )
       Error(21, 1, "galley %s must have just one column mark",
@@ -158,7 +162,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
   { /* OBJECT prev_gap = nilobj; */
     debug0(DGM, DD, "SizeGalley cleaning up rows of hd:");
     for( link = hd;  NextDown(link) != hd;  link = NextDown(link) )
-    { Child(y, NextDown(link));
+    { Child(y, NextDown(link))
+        ;
       switch( type(y) )
       {
 	case GAP_OBJ:
@@ -197,7 +202,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
           debug1(DGM, DD, "  cleaning %s:", Image(type(y)));
           ifdebug(DGM, DD, DebugObject(y));
 	  assert(Up(y)==LastUp(y), "SizeGalley COL_THR: Up(y)!=LastUp(y)!");
-	  Child(z, DownDim(y, ROWM));
+	  Child(z, DownDim(y, ROWM))
+	    ;
 	  if( is_indefinite(type(z)) )
 	  {
 	    debug1(DGT, D, "SizeGalley setting external_ver(%s) to TRUE (a)",
@@ -206,14 +212,17 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 	  }
 	  else if( type(z) == VCAT )
 	  { OBJECT hor, thor, clink, dlink;
-	    Child(hor, DownDim(y, COLM));
+	    Child(hor, DownDim(y, COLM))
+	      ;
 	    assert( type(hor) == COL_THR, "SizeGalley: missing COL_THR!" );
-	    Parent(thor, UpDim(z, COLM));
+	    Parent(thor, UpDim(z, COLM))
+	      ;
 	    assert( hor == thor, "SizeGalley/SPLIT: hor != thor!" );
 	    clink = DownDim(y, COLM);
 	    dlink = UpDim(z, COLM);
 	    for( tlink = LastDown(z);  tlink != z;  tlink = PrevDown(tlink) )
-	    { Child(t, tlink);
+	    { Child(t, tlink)
+	        ;
 	      if( type(t) == GAP_OBJ )
 	      { Link(NextDown(link), t);
 	      }
@@ -261,7 +270,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
   /* determine a scale factor for {} @Scale objects */
   /* NB AdjustSize cannot be done correctly until after seen_nojoin is set */
   for( link = Down(extras);  link != extras;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( type(y) == SCALE_IND )
     {
       /* check that all is in order */
@@ -270,7 +280,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
       assert( type(z) == SCALE, "SizeObject: type(z) != SCALE!" );
       assert( bc(constraint(z)) == 0, "SizeObject: bc(constraint(z)) != 0" );
       assert( Down(z) != z, "SizeObject SCALE: Down(z) == z!" );
-      Child(t, Down(z));
+      Child(t, Down(z))
+        ;
 
       /* use @Scale COLM size constraint to determine a suitable scale factor */
       /* check that @Scale is not in a horizontal galley */
@@ -358,7 +369,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
   *recs = *inners = *dest_index = nilobj;
   after_target = FALSE;
   for( link = Down(hd);  link != hd;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
 
     if( type(y) == GAP_OBJ || is_index(type(y)) )  continue;
     debug0(DGM, DDD, "  ROWM sizing:");
@@ -372,7 +384,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 
     /* now attach indexes in front of y */
     for( zlink = Down(extras);  zlink != extras;  zlink = NextDown(zlink) )
-    { Child(z, zlink);
+    { Child(z, zlink)
+        ;
       blocked(z) = FALSE;
       /* debug1(DCR, DD, "  extra: %s", EchoObject(z)); */
       debug2(DGM, DD, "  extra%s: %s",
@@ -382,7 +395,7 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 	case RECEPTIVE:
 
 	  /* debug2(DCR, DD, "  ... uses_ext  = %s, trig = %s",
-	    bool(uses_extern_target(actual(actual(z)))), bool(trig)); */
+	    bool_str(uses_extern_target(actual(actual(z)))), bool_str(trig)); */
 	  trigger_externs(z) = uses_extern_target(actual(actual(z))) && trig;
 	  non_blocking(z) = nonblock;
 	  if( actual(actual(z)) == GalleySym || actual(actual(z)) == ForceGalleySym )
@@ -406,7 +419,8 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 	  { if( *inners == nilobj )  New(*inners, ACAT);
 	    Link(*inners, z);
 	  }
-	  Child(tmp, Down(z));
+	  Child(tmp, Down(z))
+	    ;
 	  debug2(DGA, D, "SizeGalley %s%s", actual(tmp) == NULL ? "null" :
 	    SymName(actual(tmp)), after_target ? " (after_target)" : "");
 	  break;
@@ -450,10 +464,13 @@ OBJECT *dest_index, OBJECT *recs, OBJECT *inners, OBJECT enclose)
 	      subst = VSCALE;
 	      esubst = ONE_ROW;
 	    }
-	    Parent(prnt, UpDim(cover, dirn));
+	    Parent(prnt, UpDim(cover, dirn))
+	      ;
 	    while( type(prnt) == SPLIT || type(prnt) == thr_type )
-	      Parent(prnt, UpDim(prnt, dirn));
-	    Child(chld, Down(cover));
+	      Parent(prnt, UpDim(prnt, dirn))
+	        ;
+	    Child(chld, Down(cover))
+	      ;
 	    if( type(prnt) != ok1 && type(prnt) != ok2 )
 	    {
 	      Error(21, 8, "%s replaced by %s (mark not shared)",

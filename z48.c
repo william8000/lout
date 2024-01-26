@@ -1,6 +1,6 @@
 /*@z48.c:PDF back end@********************************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -1042,17 +1042,18 @@ static PDF_OBJECT_NUM PDFFont_FindFontEncoding(
 void PDFFont_AddFont(FILE* in_fp, const FULL_CHAR* in_short_font_name,
   const FULL_CHAR* in_real_font_name, const FULL_CHAR* in_font_encoding_name)
 {
-  t_font_list_entry_ptr entry = PDFFont_FindListEntry(in_real_font_name);
+  /* t_font_list_entry_ptr entry; */
+  /* entry = */ PDFFont_FindListEntry(in_real_font_name);
   debug4(DPD, D, "PDFFont_AddFont(-, %s, %s, %s) [new = %s]",
     in_short_font_name, in_real_font_name,
     (in_font_encoding_name != (FULL_CHAR *) NULL ? in_font_encoding_name : (const FULL_CHAR*) ""),
-    bool(entry == NULL));
+    0 /* bool_str(entry == NULL) */ );
   /* *** this attempted bug fix by Jeff K. problem may be multiple font
 	 entries for the same font
   if (entry == NULL)
   *** */
   if (TRUE)
-    entry = PDFFont_NewListEntry(in_short_font_name, in_real_font_name,
+    /* entry = */ PDFFont_NewListEntry(in_short_font_name, in_real_font_name,
       PDFFont_FindFontEncoding(in_font_encoding_name));
 
   /* ***
@@ -2790,7 +2791,7 @@ static FULL_CHAR *PDFPage_CollectExpr(FULL_CHAR* charPtr, BOOLEAN* outHasResult,
       if (g_expr_depth == 0)
       {
 	g_expr[g_expr_index] = '\0';	/* terminate the string */
-	(char*) PDFPage_EvalExpr(g_expr, outResult);
+	PDFPage_EvalExpr(g_expr, outResult);
 	*outHasResult = TRUE;
 	break;	/* exit while */
       }
@@ -3579,7 +3580,7 @@ void PDFFile_Cleanup(FILE* in_fp)
   form, this is the name of the application that created the original document.
   Producer string (Optional) The name of the application that converted the document from its native
   format to PDF.
-  Title string (Optional) The document’s title.
+  Title string (Optional) The document's title.
   Subject string (Optional) The subject of the document.
   Keywords string (Optional) Keywords associated with the document.
 

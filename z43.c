@@ -1,6 +1,6 @@
 /*@z43.c:Language Service:LanguageChange, LanguageString@*********************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -98,7 +98,8 @@ static void ltab_insert(OBJECT x, LANGUAGE_TABLE *S)
   if( ltab_item(*S, pos) == nilobj )  New(ltab_item(*S, pos), ACAT);
   z = ltab_item(*S, pos);
   for( link = Down(z);  link != z;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( StringEqual(string(x), string(y)) )
     { Error(43, 2, "language name %s used twice (first at%s)",
 	FATAL, &fpos(x), string(x), EchoFilePos(&fpos(y)));
@@ -113,7 +114,8 @@ static OBJECT ltab_retrieve(FULL_CHAR *str, LANGUAGE_TABLE S)
   x = ltab_item(S, pos);
   if( x == nilobj )  return nilobj;
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( StringEqual(str, string(y)) )  return y;
   }
   return nilobj;
@@ -132,7 +134,8 @@ static void ltab_debug(LANGUAGE_TABLE S, FILE *fp)
     else if( type(x) != ACAT )
       fprintf(fp, " not ACAT!");
     else for( link = Down(x);  link != x;  link = NextDown(link) )
-    { Child(y, link);
+    { Child(y, link)
+        ;
       fprintf(fp, " %s",
 	is_word(type(y)) ? string(y) : AsciiToFull("not-WORD!"));
     }
@@ -196,7 +199,7 @@ void LanguageInit(void)
 /*****************************************************************************/
 
 void LanguageDefine(OBJECT names, OBJECT inside)
-{ OBJECT link, y, hyph_file;  BOOLEAN junk;  FULL_CHAR ch;
+{ OBJECT link, y, hyph_file;  /* BOOLEAN junk; */  FULL_CHAR ch;
   int len;
   assert( names != nilobj && type(names) == ACAT, "LanguageDefine: names!");
   assert( Down(names) != names, "LanguageDefine: names is empty!");
@@ -221,14 +224,16 @@ void LanguageDefine(OBJECT names, OBJECT inside)
 
   /* insert each language name into names_tab */
   for( link = Down(names);  link != names;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     assert( is_word(type(y)), "LanguageDefine: type(y) != WORD!" );
     word_language(y) = lang_count;
     ltab_insert(y, &names_tab);
   }
 
   /* initialize canonical language name entry */
-  Child(y, Down(names));
+  Child(y, Down(names))
+    ;
   canonical_tab[lang_count] = y;
 
   /* make inside an ACAT if it isn't already */
@@ -240,7 +245,8 @@ void LanguageDefine(OBJECT names, OBJECT inside)
   }
 
   /* initialize hyphenation file entry (first child of inside) */
-  Child(hyph_file, Down(inside));
+  Child(hyph_file, Down(inside))
+    ;
   DeleteLink(Down(inside));
   if( !is_word(type(hyph_file)) )
     Error(43, 3, "hyphenation file name expected here",
@@ -255,7 +261,8 @@ void LanguageDefine(OBJECT names, OBJECT inside)
   /* initialize sentence ends */
   lang_ends[lang_count] = inside;
   for( link = Down(inside);  link != inside;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( type(y) == GAP_OBJ )
     { link = PrevDown(link);
       DisposeChild(NextDown(link));
@@ -276,7 +283,7 @@ void LanguageDefine(OBJECT names, OBJECT inside)
   /* if initializing run, initialize the hyphenation table */
   if( InitializeAll )
   { if( hyph_tab[lang_count] != nilobj )
-    junk = ReadHyphTable(lang_count);
+    /* junk = */ ReadHyphTable(lang_count);
   }
 
   debug0(DLS, D, "LanguageDefine returning.");
@@ -301,7 +308,8 @@ BOOLEAN LanguageWordEndsSentence(OBJECT wd, BOOLEAN lc_prec)
     word_language(wd), EchoObject(wd));
   x = lang_ends[word_language(wd)];
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( StringEndsWith(string(wd), string(y)) )
     {
       if( !lc_prec )

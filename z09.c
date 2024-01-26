@@ -1,6 +1,6 @@
 /*@z09.c:Closure Expansion:SearchEnv()@***************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -50,7 +50,8 @@ OBJECT SearchEnv(OBJECT env, OBJECT sym)
     { debug0(DCE, DD, "] SearchEnv returning <nilobj>");
       return nilobj;
     }
-    Child(y, Down(env));
+    Child(y, Down(env))
+      ;
     assert( type(y) == CLOSURE, "SearchEnv: type(y) != CLOSURE!" );
     if( actual(y) == sym )
     { debug1(DCE, DD, "] SearchEnv returning %s", EchoObject(y));
@@ -58,7 +59,8 @@ OBJECT SearchEnv(OBJECT env, OBJECT sym)
     }
     assert( LastDown(y) != y, "SearchEnv: LastDown(y) == y!" );
     link = LastDown(env) != Down(env) ? LastDown(env) : LastDown(y);
-    Child(env, link);
+    Child(env, link)
+      ;
   }
 } /* end SearchEnv */
 
@@ -113,7 +115,8 @@ OBJECT GetEnv(OBJECT x)
 { OBJECT env;
   assert( type(x) == CLOSURE, "GetEnv: type(x) != CLOSURE!" );
   assert( LastDown(x) != x, "GetEnv: LastDown(x) == x!" );
-  Child(env, LastDown(x));
+  Child(env, LastDown(x))
+    ;
   assert( type(env) == ENV, "GetEnv: type(env) != ENV!" );
   return env;
 } /* end GetEnv */
@@ -132,7 +135,8 @@ OBJECT DetachEnv(OBJECT x)
   debug1(DCE, DD, "DetachEnv( %s )", EchoObject(x));
   assert( type(x) == CLOSURE, "DetachEnv: type(x) != CLOSURE!" );
   assert( LastDown(x) != x, "DetachEnv: LastDown(x) == x!" );
-  Child(env, LastDown(x));
+  Child(env, LastDown(x))
+    ;
   DeleteLink(LastDown(x));
   assert( type(env) == ENV, "DetachEnv: type(env) != ENV!" );
   debug1(DCE, DD, "DetachEnv resturning %s", EchoObject(env));
@@ -155,7 +159,7 @@ OBJECT ClosureExpand(OBJECT x, OBJECT env, BOOLEAN crs_wanted,
 OBJECT *crs, OBJECT *res_env)
 { OBJECT link, y, res, prnt_env, par, prnt;
   debug3(DCE, D, "[ ClosureExpand( %s, %s, %s, crs, res_env )",
-    EchoObject(x), EchoObject(env), bool(crs_wanted));
+    EchoObject(x), EchoObject(env), bool_str(crs_wanted));
   assert( type(x) == CLOSURE, "ClosureExpand given non-CLOSURE!");
   assert( predefined(actual(x)) == FALSE, "ClosureExpand given predefined!" );
 
@@ -176,10 +180,12 @@ OBJECT *crs, OBJECT *res_env)
     {
       prnt_env = GetEnv(prnt);
       for( link = Down(prnt);  link != prnt;  link = NextDown(link) )
-      { Child(par, link);
+      { Child(par, link)
+          ;
         if( type(par) == PAR && actual(par) == actual(x) )
         { assert( Down(par) != par, "ExpandCLosure: Down(par)!");
-	  Child(res, Down(par));
+	  Child(res, Down(par))
+	    ;
 	  if( dirty(enclosing(actual(par))) || is_enclose(actual(par)) )
 	  { debug2(DCE, DD, "copy %s %s", SymName(actual(par)), EchoObject(res));
 	    res = CopyObject(res, no_fpos);
@@ -217,7 +223,7 @@ OBJECT *crs, OBJECT *res_env)
       if( sym_body(actual(x)) == nilobj )
       {
         debug3(DCE, D, "failing ClosureExpand( %s, crs, %s, %s, res_env )",
-	  EchoObject(x), bool(crs_wanted), EchoObject(env));
+	  EchoObject(x), bool_str(crs_wanted), EchoObject(env));
         Error(9, 2, "no value for parameter %s of symbol %s:", WARN, &fpos(x),
 	  SymName(actual(x)), SymName(enclosing(actual(x))));
         Error(9, 1, "symbol with import list misused", FATAL, &fpos(x));
@@ -267,10 +273,12 @@ OBJECT ParameterCheck(OBJECT x, OBJECT env)
   }
   prnt_env = GetEnv(prnt);
   for( link = Down(prnt);  link != prnt;  link = NextDown(link) )
-  { Child(par, link);
+  { Child(par, link)
+      ;
     if( type(par) == PAR && actual(par) == actual(x) )
     {	assert( Down(par) != par, "ParameterCheck: Down(par)!");
-	Child(y, Down(par));
+	Child(y, Down(par))
+	  ;
 	res = is_word(type(y)) ? CopyObject(y, no_fpos) : nilobj;
 	debug1(DCE, DD, "  ParameterCheck returning %s", EchoObject(res));
 	return res;

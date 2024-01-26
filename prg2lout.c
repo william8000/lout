@@ -3574,7 +3574,7 @@ static FILE	*err_fp;		/* where error messages go 	     */
 /*                                                                           */
 /*****************************************************************************/
 
-char *ErrorHeader()
+static char *ErrorHeader(void)
 { static char buff[MAX_LINE * 2];
   if( line_num == 0 || line_pos == 0 )
     sprintf(buff, "prg2lout");
@@ -3617,7 +3617,7 @@ char *ErrorHeader()
 /*                                                                           */
 /*****************************************************************************/
 
-char *EchoToken(TOKEN *t)
+static char *EchoToken(TOKEN *t)
 { static char buff[MAX_LINE];
   if( t == (TOKEN *) NULL )
     sprintf(buff, "(NULL)");
@@ -3645,7 +3645,7 @@ char *EchoToken(TOKEN *t)
 /*                                                                           */
 /*****************************************************************************/
 
-void NextChar()
+static void NextChar(void)
 {
   if( curr_line[line_pos] != '\n' )
   {
@@ -3684,7 +3684,7 @@ void NextChar()
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN InputMatches(unsigned char *pattern)
+static BOOLEAN InputMatches(unsigned char *pattern)
 { unsigned char *p, *q;
   for(p = &curr_line[line_pos], q = pattern;  *q != '\0';  p++, q++ )
   {
@@ -3730,7 +3730,7 @@ typedef struct trie_node {
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN TrieInsert(TRIE *T, unsigned char *str, TOKEN *val)
+static BOOLEAN TrieInsert(TRIE *T, unsigned char *str, TOKEN *val)
 { BOOLEAN res;
   if( DEBUG_TRIE )
     fprintf(stderr, "[ TrieInsert(T, %s, %s)\n", str, EchoToken(val));
@@ -3764,7 +3764,7 @@ BOOLEAN TrieInsert(TRIE *T, unsigned char *str, TOKEN *val)
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN *TrieRetrieve(TRIE T, unsigned char *str, int *len)
+static TOKEN *TrieRetrieve(TRIE T, unsigned char *str, int *len)
 { TOKEN *res;  int i;
   if( DEBUG_TRIE )
     fprintf(stderr, "[ TrieRetrieve(T, %s, len)\n", str);
@@ -3809,7 +3809,7 @@ static int hash(char *key)
   return res % MAX_SYM;
 } /* end hash */
 
-void HashInsert(char *str)
+static void HashInsert(char *str)
 { int i;
   if( DEBUG_SETUP )
     fprintf(stderr, "[ HashInsert(%s)\n", str);
@@ -3826,7 +3826,7 @@ void HashInsert(char *str)
     fprintf(stderr, "] HashInsert(%s)\n", str);
 }
 
-BOOLEAN HashRetrieve(char *str)
+static BOOLEAN HashRetrieve(char *str)
 { int i;
   for( i=hash(str); HashTable[i]!=(char *) NULL; i = (i+1)%MAX_SYM )
     if( strcmp( (char *) HashTable[i], (char *) str) == 0 )
@@ -3866,7 +3866,7 @@ static BOOLEAN	out_linestart = TRUE;		/* TRUE if out line start    */
 static BOOLEAN	out_formfeed = FALSE;		/* TRUE if last was formfeed */
 static int	brace_depth;			/* brace depth in verbatim   */
 
-extern void Emit(TOKEN *current_token, unsigned char ch);
+static void Emit(TOKEN *current_token, unsigned char ch);
 
 /*****************************************************************************/
 /*                                                                           */
@@ -3877,7 +3877,7 @@ extern void Emit(TOKEN *current_token, unsigned char ch);
 /*                                                                           */
 /*****************************************************************************/
 
-void EmitTab()
+static void EmitTab(void)
 {
   if( tab_by_spacing )
   { putc(' ', out_fp);
@@ -3919,7 +3919,7 @@ void EmitTab()
 /*                                                                           */
 /*****************************************************************************/
 
-void EmitRaw(unsigned char ch)
+static void EmitRaw(unsigned char ch)
 {
 
   if( DEBUG_EMIT )
@@ -4016,7 +4016,7 @@ void EmitRaw(unsigned char ch)
 /*                                                                           */
 /*****************************************************************************/
 
-void StartEmit(LANGUAGE *lang, TOKEN *current_token,
+static void StartEmit(LANGUAGE *lang, TOKEN *current_token,
   unsigned char *start_delim, int len)
 { int i;
   if( save_on )
@@ -4117,7 +4117,7 @@ void StartEmit(LANGUAGE *lang, TOKEN *current_token,
 /*****************************************************************************/
 #define at_start_line(s, i) ((i) == 0 || s[(i)-1] == '\n' || s[(i)-1] == '\f' )
 
-void EndEmit(TOKEN *current_token, unsigned char *end_delim)
+static void EndEmit(TOKEN *current_token, unsigned char *end_delim)
 { unsigned char *com;
   int i;
   BOOLEAN quoted_now = FALSE;
@@ -4289,7 +4289,7 @@ void EndEmit(TOKEN *current_token, unsigned char *end_delim)
 /*                                                                           */
 /*****************************************************************************/
 
-void Emit(TOKEN *current_token, unsigned char ch)
+static void Emit(TOKEN *current_token, unsigned char ch)
 {
   switch( current_token->print_style )
   {
@@ -4375,7 +4375,7 @@ void Emit(TOKEN *current_token, unsigned char ch)
 /*                                                                           */
 /*****************************************************************************/
 
-void EmitProtected(unsigned char ch)
+static void EmitProtected(unsigned char ch)
 {
   switch( ch )
   {
@@ -4423,7 +4423,7 @@ void EmitProtected(unsigned char ch)
 /*                                                                           */
 /*****************************************************************************/
 
-unsigned char *clone2strings(unsigned char *s1, unsigned char *s2)
+static unsigned char *clone2strings(unsigned char *s1, unsigned char *s2)
 { unsigned char *res;
   res = (unsigned char *) malloc(
     (strlen( (char *) s1) + strlen( (char *) s2) + 1) * sizeof(unsigned char));
@@ -4433,7 +4433,7 @@ unsigned char *clone2strings(unsigned char *s1, unsigned char *s2)
   return res;
 } /* end clone2strings */
 
-TOKEN *ExpandToken(TOKEN *t, int starts_pos)
+static TOKEN *ExpandToken(TOKEN *t, int starts_pos)
 { TOKEN *res; int i;
   if( DEBUG_SETUP )
     fprintf(stderr, "ExpandToken(%s, starts[0] = %s)\n", t->name, t->starts[0]);
@@ -4480,7 +4480,7 @@ TOKEN *ExpandToken(TOKEN *t, int starts_pos)
 TRIE Trie = (TRIE) NULL;		/* these tokens allowed anywhere     */
 TRIE StartLineTrie = (TRIE) NULL;	/* these allowed at line start only  */
 
-void SetupOneToken(TOKEN *t)
+static void SetupOneToken(TOKEN *t)
 { int j;
   if( DEBUG_SETUP )  fprintf(stderr, "SetupOneToken(%s)\n", t->starts[0]);
 
@@ -4542,7 +4542,7 @@ void SetupOneToken(TOKEN *t)
 /*                                                                           */
 /*****************************************************************************/
 
-void SetupLanguage(LANGUAGE *lang)
+static void SetupLanguage(LANGUAGE *lang)
 { int i, j; TOKEN *t;
   if( DEBUG_SETUP )
     fprintf(stderr, "SetupLanguage(%s)\n", lang->names[0]);
@@ -4590,7 +4590,7 @@ void SetupLanguage(LANGUAGE *lang)
 /*                                                                           */
 /*****************************************************************************/
 
-BOOLEAN Printable(unsigned char ch)
+static BOOLEAN Printable(unsigned char ch)
 { unsigned char *p;
   for( p = AllPrintable;  *p != '\0' && *p != ch;  p++ );
   return (*p == ch);
@@ -4606,7 +4606,7 @@ BOOLEAN Printable(unsigned char ch)
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN *TokenStartingHere(int *len)
+static TOKEN *TokenStartingHere(int *len)
 { TOKEN *res;
 
   if( line_pos == 1 )
@@ -4631,7 +4631,7 @@ TOKEN *TokenStartingHere(int *len)
 /*                                                                           */
 /*****************************************************************************/
 
-int Matching()
+static int Matching(void)
 { int i;
   for( i = 0; pairs[i].first != NULL && !InputMatches(pairs[i].first); i++ );
   if( DEBUG_PROCESS )
@@ -4660,7 +4660,7 @@ int Matching()
 #define	IN_TOKEN_AFTER_INNER_ESCAPE	5
 #define	STOP				6
 
-char *debug_state(int s)
+static char *debug_state(int s)
 {
   switch( s )
   {
@@ -4674,7 +4674,7 @@ char *debug_state(int s)
   }
 }
 
-void Process(LANGUAGE *lang, TOKEN *outer_token,
+static void Process(LANGUAGE *lang, TOKEN *outer_token,
   unsigned char *outer_end_delimiter)
 { TOKEN *current_token = (TOKEN *) NULL; int len, i, state;
   int end_delimiter_depth = 0, end_delimiter_count = 0;
@@ -5063,7 +5063,7 @@ void Process(LANGUAGE *lang, TOKEN *outer_token,
 /*                                                                           */
 /*****************************************************************************/
 
-void PrintUsage()
+static void PrintUsage()
 { int i;
   fprintf(err_fp, "\n");
   fprintf(err_fp, "usage: prg2lout <options> <files>\n\n");
@@ -5108,7 +5108,7 @@ void PrintUsage()
 /*****************************************************************************/
 
 int main(int argc, char *argv[])
-{ BOOLEAN stdin_seen;  int i, j, arg_pos;
+{ int i, j, arg_pos;
   char *infilename, *outfilename, *errfilename;
   LANGUAGE *lang = NO_LANGUAGE;
   char *file_names[1024];  int file_count = 0;
@@ -5125,7 +5125,7 @@ int main(int argc, char *argv[])
   in_fp = out_fp = (FILE *) NULL;
   err_fp = stderr;
   line_num = line_pos = 0;
-  stdin_seen = raw_seen = FALSE;
+  raw_seen = FALSE;
   tab_by_spacing = TRUE;
   tab_in = 8;
   tab_out = 3;

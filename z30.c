@@ -1,6 +1,6 @@
 /*@z30.c:Symbol uses:InsertUses()@********************************************/
 /*                                                                           */
-/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.42)                       */
+/*  THE LOUT DOCUMENT FORMATTING SYSTEM (VERSION 3.43)                       */
 /*  COPYRIGHT (C) 1991, 2008 Jeffrey H. Kingston                             */
 /*                                                                           */
 /*  Jeffrey H. Kingston (jeff@it.usyd.edu.au)                                */
@@ -99,7 +99,8 @@ static void GatherUses(OBJECT x, OBJECT sym)
 static void GatherAllUses(OBJECT x)
 { OBJECT link, y;
   for( link = Down(x);  link != x;  link = NextDown(link) )
-  { Child(y, link);
+  { Child(y, link)
+      ;
     if( type(y) == LOCAL )  GatherUses(y, y);
     GatherAllUses(y);
   }
