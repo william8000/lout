@@ -176,7 +176,7 @@ typedef struct {
   unsigned char *second;
 } CHAR_PAIR;
 
-CHAR_PAIR pairs[] = {
+static CHAR_PAIR pairs[] = {
   { (unsigned char *) "(", (unsigned char *) ")" },
   { (unsigned char *) "{", (unsigned char *) "}" },
   { (unsigned char *) "[", (unsigned char *) "]" },
@@ -206,52 +206,52 @@ CHAR_PAIR pairs[] = {
 #define G1_Characters	"\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377"
 
 
-unsigned char AllPrintable[] = 
+static unsigned char AllPrintable[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" G1_Characters ;
 
-unsigned char AllPrintablePlusNL[] =
+static unsigned char AllPrintablePlusNL[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n" G1_Characters ;
 
-unsigned char AllPrintablePlusTab[] =
+static unsigned char AllPrintablePlusTab[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\t" G1_Characters ;
 
-unsigned char AllPrintableTabNL[] =
+static unsigned char AllPrintableTabNL[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t" G1_Characters ;
 
-unsigned char AllPrintableTabNLFF[] =
+static unsigned char AllPrintableTabNLFF[] =
   " !\"#$%&'()*+,-./0123456789:;<=>?@[\\]^_`\\{|}~\
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\n\t\f" G1_Characters ;
 
-unsigned char Letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ;
+/* static unsigned char Letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ; */
 
-unsigned char lowercaseLetters[] = "abcdefghijklmnopqrstuvwxyz" ;
+/* static unsigned char lowercaseLetters[] = "abcdefghijklmnopqrstuvwxyz" ; */
 
-unsigned char uppercaseLetters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ;
+/* static unsigned char uppercaseLetters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ; */
 
-unsigned char Letter_Digit[] =
+static unsigned char Letter_Digit[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789" ;
 
-unsigned char Letter_Digit_Quotes[] =
+static unsigned char Letter_Digit_Quotes[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789`'" ;
 
-unsigned char HaskellOpCharacters[] = "!#$%&*+./<=>?^|:-~";
+static unsigned char HaskellOpCharacters[] = "!#$%&*+./<=>?^|:-~";
 
-unsigned char NonpareilOperatorPunct[] = "@$%^&*=+|<>/?`";
+static unsigned char NonpareilOperatorPunct[] = "@$%^&*=+|<>/?`";
 
-unsigned char Ruby_Methodname[] =
+static unsigned char Ruby_Methodname[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789?!=" ;
 
 
-#define UppercaseSepLetters 						\
+#define UppercaseSepLetters						\
 U "A", U "B", U "C", U "D", U "E", U "F", U "G", U "H", U "I", U "J",	\
 U "K", U "L", U "M", U "N", U "O", U "P", U "Q", U "R", U "S", U "T",	\
 U "U", U "V", U "W", U "X", U "Y", U "Z"
 
-#define LowercaseSepLetters 						\
+#define LowercaseSepLetters						\
 U "a", U "b", U "c", U "d", U "e", U "f", U "g", U "h", U "i", U "j",	\
 U "k", U "l", U "m", U "n", U "o", U "p", U "q", U "r", U "s", U "t",	\
 U "u", U "v", U "w", U "x", U "y", U "z"
@@ -261,9 +261,11 @@ U "u", U "v", U "w", U "x", U "y", U "z"
 #define SepDigits							\
 U "0", U "1", U "2", U "3", U "4", U "5", U "6", U "7", U "8", U "9"
 
+#if 0
 #define HexDigits							\
 U "A", U "a", U "B", U "b", U "C", U "c", U "D", U "d", U "E", U "e",	\
 U "F", U "f"
+#endif
 
 #define SepPunct							\
 U "/", U "(", U "[", U "{",  U "<", U "!", U "%", U "#", U "|", U ",",	\
@@ -284,13 +286,15 @@ U "~", U "'", U "@", U "?",  U ".", U "`"
 U "@", U "$", U "%",  U "^", U "&", U "*", U "=", U "+", U "|",		\
 U "<", U ">",  U "/", U "?", U "`"
 
-#define HaskellOpChars 							\
+#define HaskellOpChars							\
 U "!", U "#", U "$", U "%", U "&", U "*", U "+", U ".", U "/",		\
 U "<", U "=", U ">", U "?", U "^", U "|", U ":", U "-", U "~"
 
+#if 0
 #define HaskellParenOpChars						\
 U "(!", U "(#", U "($", U "(%", U "(&", U "(*", U "(+", U "(.", U "(/",	\
 U "(<", U "(=", U "(>", U "(?", U "(^", U "(|", U "(:", U "(-", U "(~"
+#endif
 
 #define	PercentLetters							\
 U "%A", U "%B", U "%C", U "%D", U "%E", U "%F", U "%G", U "%H", U "%I",	\
@@ -563,7 +567,7 @@ typedef struct token_rec {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN CStringToken = {
+static TOKEN CStringToken = {
   U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -585,7 +589,7 @@ TOKEN CStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN CCharacterToken = {
+static TOKEN CCharacterToken = {
   U "character",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting characters           */
@@ -608,7 +612,7 @@ TOKEN CCharacterToken = {
 };
 
 
-TOKEN EiffelStringToken = {
+static TOKEN EiffelStringToken = {
   U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -630,7 +634,7 @@ TOKEN EiffelStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN EiffelCharacterToken = {
+static TOKEN EiffelCharacterToken = {
   U "character",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting characters           */
@@ -653,7 +657,7 @@ TOKEN EiffelCharacterToken = {
 };
 
 
-TOKEN PythonDblStringToken = {
+static TOKEN PythonDblStringToken = {
   U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -675,7 +679,7 @@ TOKEN PythonDblStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PythonSnglStringToken = {
+static TOKEN PythonSnglStringToken = {
   U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -697,14 +701,14 @@ TOKEN PythonSnglStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PythonTriSnglStringToken = {
+static TOKEN PythonTriSnglStringToken = {
   U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
   U "",			/* no alternate command                             */
   U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
-  { U "'''" },		/* strings begin with '''                 */
+  { U "'''" },		/* strings begin with '''			    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no brackets2 either			    */
   { NULL },		/* so no end2 either				    */
@@ -714,12 +718,12 @@ TOKEN PythonTriSnglStringToken = {
   U "",			/* strings do not permit "inner escapes"            */
   U "",			/* and so there is no end innner escape either      */
   U "",			/* no bracketing delimiter			    */
-  U "'''",		/* strings end with '''                   */
+  U "'''",		/* strings end with '''				    */
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PythonTriDblStringToken = {
+static TOKEN PythonTriDblStringToken = {
   U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -741,7 +745,7 @@ TOKEN PythonTriDblStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN HaskellStringToken = {
+static TOKEN HaskellStringToken = {
   U "string",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -754,7 +758,7 @@ TOKEN HaskellStringToken = {
   { NULL },		/* so no end2 either				    */
   AllPrintable,		/* inside, any printable except " is OK             */
   U "\\",		/* within strings, \ is the escape character        */
-  AllPrintable,		/* after escape char, any printable char is OK      */ 
+  AllPrintable,		/* after escape char, any printable char is OK      */
   U "",			/* strings do not permit "inner escapes"            */
   U "",			/* and so there is no end innner escape either      */
   U "",			/* no bracketing delimiter			    */
@@ -763,7 +767,7 @@ TOKEN HaskellStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN HaskellCharacterToken = {
+static TOKEN HaskellCharacterToken = {
   U "character",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting characters           */
@@ -792,7 +796,7 @@ TOKEN HaskellCharacterToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN IdentifierToken = {
+static TOKEN IdentifierToken = {
   U "identifier",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PI",		/* Lout command for formatting identifiers          */
@@ -814,7 +818,7 @@ TOKEN IdentifierToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN HaskellIdentifierToken = {
+static TOKEN HaskellIdentifierToken = {
   U "identifier",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PI",		/* Lout command for formatting identifiers          */
@@ -843,7 +847,7 @@ TOKEN HaskellIdentifierToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN NumberToken = {
+static TOKEN NumberToken = {
   U "number",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PN",		/* Lout command for formatting numbers              */
@@ -893,10 +897,10 @@ TOKEN NumberToken = {
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
 
-TOKEN NonpareilOperatorToken =
+static TOKEN NonpareilOperatorToken =
   OperatorToken(SepNonpareilOperatorPunct, NonpareilOperatorPunct);
 
-TOKEN HaskellOperatorToken =
+static TOKEN HaskellOperatorToken =
   OperatorToken(HaskellOpChars, HaskellOpCharacters);
 
 
@@ -906,7 +910,7 @@ TOKEN HaskellOperatorToken =
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN CCommentToken = {
+static TOKEN CCommentToken = {
   U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PC",		/* Lout command for formatting comments             */
@@ -928,7 +932,7 @@ TOKEN CCommentToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN CPPCommentToken = {
+static TOKEN CPPCommentToken = {
   U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PC",		/* Lout command for formatting comments             */
@@ -951,7 +955,7 @@ TOKEN CPPCommentToken = {
 };
 
 
-TOKEN EiffelCommentToken = {
+static TOKEN EiffelCommentToken = {
   U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PC",		/* Lout command for formatting comments             */
@@ -973,7 +977,7 @@ TOKEN EiffelCommentToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN BlueCommentToken = {
+static TOKEN BlueCommentToken = {
   U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PC",		/* Lout command for formatting comments             */
@@ -995,7 +999,8 @@ TOKEN BlueCommentToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN NonpareilCommentToken = {
+#if 0
+static TOKEN NonpareilCommentToken = {
   U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PC",		/* Lout command for formatting comments             */
@@ -1016,8 +1021,9 @@ TOKEN NonpareilCommentToken = {
   FALSE,		/* end delimiter does not have to be at line start  */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
+#endif
 
-TOKEN PythonCommentToken = {
+static TOKEN PythonCommentToken = {
   U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PC",		/* Lout command for formatting comments             */
@@ -1039,7 +1045,7 @@ TOKEN PythonCommentToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN HaskellLineCommentToken = {
+static TOKEN HaskellLineCommentToken = {
   U "line comment",	/* used by error messages involving this token      */
   PRINT_NODELIMS_QUOTED,/* print this token in quotes without delimiters    */
   U "@PCL",		/* Lout command for formatting comments             */
@@ -1061,7 +1067,7 @@ TOKEN HaskellLineCommentToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN HaskellCommentToken = {
+static TOKEN HaskellCommentToken = {
   U "comment",		/* used by error messages involving this token      */
   PRINT_NODELIMS_QUOTED,/* print this token in quotes without delimiters    */
   U "@PC",		/* Lout command for formatting comments             */
@@ -1092,7 +1098,7 @@ TOKEN HaskellCommentToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN CCommentEscapeToken = {
+static TOKEN CCommentEscapeToken = {
   U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
   U "",			/* no Lout command since we are printing raw        */
@@ -1114,7 +1120,7 @@ TOKEN CCommentEscapeToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN CPPCommentEscapeToken = {
+static TOKEN CPPCommentEscapeToken = {
   U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED, /* print this token unformatted                  */
   U "",			/* no Lout command since we are printing raw        */
@@ -1137,7 +1143,7 @@ TOKEN CPPCommentEscapeToken = {
 };
 
 
-TOKEN EiffelCommentEscapeToken = {
+static TOKEN EiffelCommentEscapeToken = {
   U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
   U "",			/* no Lout command since we are printing raw        */
@@ -1159,7 +1165,7 @@ TOKEN EiffelCommentEscapeToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN BlueCommentEscapeToken = {
+static TOKEN BlueCommentEscapeToken = {
   U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
   U "",			/* no Lout command since we are printing raw        */
@@ -1181,7 +1187,7 @@ TOKEN BlueCommentEscapeToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PythonCommentEscapeToken = {
+static TOKEN PythonCommentEscapeToken = {
   U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
   U "",			/* no Lout command since we are printing raw        */
@@ -1203,7 +1209,7 @@ TOKEN PythonCommentEscapeToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN HaskellCommentEscapeToken = {
+static TOKEN HaskellCommentEscapeToken = {
   U "Lout escape",
   PRINT_NODELIMS_UNQUOTED,
   U "",
@@ -1225,7 +1231,7 @@ TOKEN HaskellCommentEscapeToken = {
   FALSE,
 };
 
-TOKEN HaskellLineCommentEscapeToken = {
+static TOKEN HaskellLineCommentEscapeToken = {
   U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* print this token unformatted                 */
   U "",			/* no Lout command since we are printing raw        */
@@ -1275,60 +1281,60 @@ TOKEN HaskellLineCommentEscapeToken = {
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
 
-TOKEN HashToken			= FixedToken("#",  "@PO");
-TOKEN ExclamationToken		= FixedToken("!",  "@PO");
-TOKEN PercentToken		= FixedToken("%",  "@PO");
-TOKEN HatToken			= FixedToken("^",  "@PO");
-TOKEN AmpersandToken		= FixedToken("&",  "@PO");
-TOKEN SlashToken		= FixedToken("/",  "@PO");
-TOKEN ArrowToken		= FixedToken("->", "@A sym {arrowright} @PO");
-TOKEN BackSlashToken		= FixedToken("\\", "@PO");
-TOKEN LeftParenToken		= FixedToken("(",  "@PO");
-TOKEN RightParenToken		= FixedToken(")",  "@PO");
-TOKEN PlusToken			= FixedToken("+",  "@A sym {plus} @PO");
-TOKEN EqualToken		= FixedToken("=",  "@A sym {equal} @PO");
-TOKEN LeftBraceToken		= FixedToken("{",  "@PO");
-TOKEN RightBraceToken		= FixedToken("}",  "@PO");
-TOKEN BarToken			= FixedToken("|",  "@PO");
-TOKEN CircumToken		= FixedToken("~",  "@PO");
-TOKEN LeftBracketToken		= FixedToken("[",  "@PO");
-TOKEN LeftBracketBarToken	= FixedToken("[|", "@PO");
-TOKEN RightBracketToken		= FixedToken("]",  "@PO");
-TOKEN RightBracketBarToken	= FixedToken("|]", "@PO");
-TOKEN SemicolonToken		= FixedToken(";",  "@PO");
-TOKEN ColonToken		= FixedToken(":",  "@PO");
-TOKEN LessToken			= FixedToken("<",  "@A sym {less} @PO");
-TOKEN GreaterToken		= FixedToken(">",  "@A sym {greater} @PO");
-TOKEN QuestionToken		= FixedToken("?",  "@PO");
-TOKEN CommaToken		= FixedToken(",",  "@PO");
-TOKEN DotToken			= FixedToken(".",  "@PO");
-TOKEN DotDotToken		= FixedToken("..", "@PO");
-TOKEN DotDotDotToken		= FixedToken("...","@PO");
-TOKEN LessEqualToken		= FixedToken("<=", "@A sym {lessequal} @PO");
-TOKEN GreaterEqualToken		= FixedToken(">=", "@A sym {greaterequal} @PO");
-TOKEN CNotEqualToken		= FixedToken("!=", "@A sym {notequal} @PO");
-TOKEN EiffelNotEqualToken	= FixedToken("/=", "@A sym {notequal} @PO");
-TOKEN BlueNotEqualToken		= FixedToken("<>", "@A sym {notequal} @PO");
-TOKEN AssignToken		= FixedToken(":=", "@PO");
-TOKEN QuestionAssignToken	= FixedToken("?=", "@PO");
-TOKEN DollarToken		= FixedToken("$",  "@PO");
-TOKEN ImpliesToken		= FixedToken("=>","@A sym {arrowdblright} @PO");
-TOKEN LeftArrowToken		= FixedToken("<-", "@A sym {arrowleft} @PO");
-TOKEN HaskellLambdaToken	= FixedToken("\\", "@PLAMBDA");
-TOKEN HaskellAtPatternToken	= FixedToken("@", "@PO");
-TOKEN DoubleColonToken		= FixedToken("::",  "@PDOUBLECOLON");
-TOKEN FunctionCompositionToken	= FixedToken(" . ",  "@PCIRC");
-TOKEN HaskellEquivalenceToken	= FixedToken("==",  "@A sym {equivalence} @PO");
-TOKEN HaskellConcatenationToken = FixedToken("++", "@PPLUSPLUS");
-TOKEN EqvToken			= FixedToken("<=>","@A sym {arrowdblboth} @PO");
-TOKEN HaskellOrToken		= FixedToken("||", "@PO");
-TOKEN HaskellAndToken		= FixedToken("&&", "@PO");
-/* TOKEN HaskellBacktickToken	= FixedToken("`", "@PO"); unused */
-TOKEN PythonPowerToken          = FixedToken( "**",  "@PO" );
-TOKEN PythonBitLeftShiftToken   = FixedToken( "<<",  "@PO" );
-TOKEN PythonBitRightShiftToken  = FixedToken( ">>",  "@PO" );
-TOKEN PythonBacktickToken       = FixedToken( "`",  "@PO" );
-TOKEN PythonDecoratorToken      = FixedToken( "@",  "@PO" );
+static TOKEN HashToken			= FixedToken("#",  "@PO");
+static TOKEN ExclamationToken		= FixedToken("!",  "@PO");
+static TOKEN PercentToken		= FixedToken("%",  "@PO");
+static TOKEN HatToken			= FixedToken("^",  "@PO");
+static TOKEN AmpersandToken		= FixedToken("&",  "@PO");
+static TOKEN SlashToken			= FixedToken("/",  "@PO");
+static TOKEN ArrowToken			= FixedToken("->", "@A sym {arrowright} @PO");
+static TOKEN BackSlashToken		= FixedToken("\\", "@PO");
+static TOKEN LeftParenToken		= FixedToken("(",  "@PO");
+static TOKEN RightParenToken		= FixedToken(")",  "@PO");
+static TOKEN PlusToken			= FixedToken("+",  "@A sym {plus} @PO");
+static TOKEN EqualToken			= FixedToken("=",  "@A sym {equal} @PO");
+static TOKEN LeftBraceToken		= FixedToken("{",  "@PO");
+static TOKEN RightBraceToken		= FixedToken("}",  "@PO");
+static TOKEN BarToken			= FixedToken("|",  "@PO");
+static TOKEN CircumToken		= FixedToken("~",  "@PO");
+static TOKEN LeftBracketToken		= FixedToken("[",  "@PO");
+static TOKEN LeftBracketBarToken	= FixedToken("[|", "@PO");
+static TOKEN RightBracketToken		= FixedToken("]",  "@PO");
+static TOKEN RightBracketBarToken	= FixedToken("|]", "@PO");
+static TOKEN SemicolonToken		= FixedToken(";",  "@PO");
+static TOKEN ColonToken			= FixedToken(":",  "@PO");
+static TOKEN LessToken			= FixedToken("<",  "@A sym {less} @PO");
+static TOKEN GreaterToken		= FixedToken(">",  "@A sym {greater} @PO");
+static TOKEN QuestionToken		= FixedToken("?",  "@PO");
+static TOKEN CommaToken			= FixedToken(",",  "@PO");
+static TOKEN DotToken			= FixedToken(".",  "@PO");
+/* static TOKEN DotDotToken		= FixedToken("..", "@PO"); */
+static TOKEN DotDotDotToken		= FixedToken("...","@PO");
+static TOKEN LessEqualToken		= FixedToken("<=", "@A sym {lessequal} @PO");
+static TOKEN GreaterEqualToken		= FixedToken(">=", "@A sym {greaterequal} @PO");
+static TOKEN CNotEqualToken		= FixedToken("!=", "@A sym {notequal} @PO");
+static TOKEN EiffelNotEqualToken	= FixedToken("/=", "@A sym {notequal} @PO");
+static TOKEN BlueNotEqualToken		= FixedToken("<>", "@A sym {notequal} @PO");
+static TOKEN AssignToken		= FixedToken(":=", "@PO");
+static TOKEN QuestionAssignToken	= FixedToken("?=", "@PO");
+static TOKEN DollarToken		= FixedToken("$",  "@PO");
+static TOKEN ImpliesToken		= FixedToken("=>","@A sym {arrowdblright} @PO");
+static TOKEN LeftArrowToken		= FixedToken("<-", "@A sym {arrowleft} @PO");
+static TOKEN HaskellLambdaToken		= FixedToken("\\", "@PLAMBDA");
+static TOKEN HaskellAtPatternToken	= FixedToken("@", "@PO");
+static TOKEN DoubleColonToken		= FixedToken("::",  "@PDOUBLECOLON");
+static TOKEN FunctionCompositionToken	= FixedToken(" . ",  "@PCIRC");
+static TOKEN HaskellEquivalenceToken	= FixedToken("==",  "@A sym {equivalence} @PO");
+static TOKEN HaskellConcatenationToken	= FixedToken("++", "@PPLUSPLUS");
+/* static TOKEN EqvToken		= FixedToken("<=>","@A sym {arrowdblboth} @PO"); */
+static TOKEN HaskellOrToken		= FixedToken("||", "@PO");
+static TOKEN HaskellAndToken		= FixedToken("&&", "@PO");
+/* TOKEN HaskellBacktickToken		= FixedToken("`", "@PO"); unused */
+static TOKEN PythonPowerToken           = FixedToken( "**",  "@PO" );
+static TOKEN PythonBitLeftShiftToken    = FixedToken( "<<",  "@PO" );
+static TOKEN PythonBitRightShiftToken   = FixedToken( ">>",  "@PO" );
+static TOKEN PythonBacktickToken        = FixedToken( "`",  "@PO" );
+static TOKEN PythonDecoratorToken       = FixedToken( "@",  "@PO" );
 
 
 /*****************************************************************************/
@@ -1358,12 +1364,12 @@ TOKEN PythonDecoratorToken      = FixedToken( "@",  "@PO" );
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
 
-TOKEN StarToken			= NoParameterToken("*",  "{@PA}");
-TOKEN MinusToken		= NoParameterToken("-",  "{@PM}");
-TOKEN EiffelDotToken		= NoParameterToken(".",  "{@PD}");
-TOKEN NonpareilDotDotToken	= NoParameterToken("..",  "{@PDD}");
-TOKEN NonpareilExclamationToken	= NoParameterToken("!",  "@PO{\"!\" &0.1f}");
-TOKEN HaskellColonToken		= NoParameterToken(":", "{@PCOLON}");
+static TOKEN StarToken			= NoParameterToken("*",  "{@PA}");
+static TOKEN MinusToken			= NoParameterToken("-",  "{@PM}");
+static TOKEN EiffelDotToken		= NoParameterToken(".",  "{@PD}");
+static TOKEN NonpareilDotDotToken	= NoParameterToken("..",  "{@PDD}");
+static TOKEN NonpareilExclamationToken	= NoParameterToken("!",  "@PO{\"!\" &0.1f}");
+/* static TOKEN HaskellColonToken	= NoParameterToken(":", "{@PCOLON}"); */
 
 
 /*****************************************************************************/
@@ -1372,7 +1378,7 @@ TOKEN HaskellColonToken		= NoParameterToken(":", "{@PCOLON}");
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN RubyIdentifierToken = {
+static TOKEN RubyIdentifierToken = {
   U "identifier",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PI",		/* Lout command for formatting identifiers          */
@@ -1395,7 +1401,7 @@ TOKEN RubyIdentifierToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN RubyGenDelimStringToken = {
+static TOKEN RubyGenDelimStringToken = {
   U "generalized string", /* used by error messages involving this token    */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -1403,7 +1409,7 @@ TOKEN RubyGenDelimStringToken = {
   U "",			/* no following command                             */
   FALSE,		/* token allowed anywhere, not just start of line   */
   { U "%", U "%q", U "%Q", U "%w",
-    U "%r", U "%x" },   /* generalized strings begin with these 	    */
+    U "%r", U "%x" },   /* generalized strings begin with these		    */
   { SepPunct },		/* start2 can be any punctuation character	    */
   { BktPunct },		/* bracketing delimiters to match SepPunct	    */
   { EndPunct },		/* end2 must match start2			    */
@@ -1425,7 +1431,7 @@ TOKEN RubyGenDelimStringToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN RSLIdentifierToken = {
+static TOKEN RSLIdentifierToken = {
   U "identifier",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PI",		/* Lout command for formatting identifiers          */
@@ -1447,42 +1453,42 @@ TOKEN RSLIdentifierToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN RSLProductToken    = FixedToken("><",  "@A sym{multiply} @PO" ) ;
-TOKEN RSLPartialMapToken = FixedToken("-~m->",  "@PartialMap @FA @PO" ) ;
-TOKEN RSLAndToken        = FixedToken("/\\",  "@A sym{logicaland} @PO" ) ;
-TOKEN RSLAlwaysToken     = FixedToken("always",  "@Eq { square } @FA @PO" ) ;
-TOKEN RSLIsInToken       = FixedToken("isin",  "@A sym{element @PO" ) ;
-TOKEN RSLSubsetToken     = FixedToken("<<=",  "@A sym{reflexsubset} @PO" ) ;
-TOKEN RSLUnionToken      = FixedToken("union", "@A sym{union} @PO" ) ;
-TOKEN RSLListStartToken  = FixedToken("<.",  "@A sym{angleleft} @PO" ) ;
-TOKEN RSLParToken        = FixedToken("@Eq { dbar } @FA @PO",  "@PO" ) ;
-TOKEN RSLIntChoiceToken  = FixedToken("|^|",  "@IntChoice @FA @PO" ) ;
-TOKEN RSLTurnstileToken  = FixedToken("|-",  "@Eq { vdash } @FA @PO" ) ;
-TOKEN RSLListToken       = NoParameterToken( "-list",  "{*}" ) ;
-TOKEN RSLPartialFnToken  = FixedToken("-~->",  "@PartialFn @FA @PO" ) ;
-TOKEN RSLRelationToken   = FixedToken("<->",  "@A sym{arrowboth} @PO" ) ;
-TOKEN RSLOrToken         = FixedToken("\\/",  "@A sym{logicalor} @PO" ) ;
-TOKEN RSLNotIsInToken    = FixedToken("~isin",  "@A sym{notelement }@PO" ) ;
-TOKEN RSLProperSuperToken= FixedToken(">>",  "@A sym{propersuperset} @PO" ) ;
-TOKEN RSLInterToken      = FixedToken("inter",  "@A sym{intersection} @PO" ) ;
-TOKEN RSLListEndToken    = FixedToken(".>",  "@A sym{angleright} @PO" ) ;
-TOKEN RSLInterlockToken  = FixedToken("++",  "@Interlock @FA @PO" ) ;
-TOKEN RSLLambdaToken     = FixedToken("-\\",  "@A sym{lambda} @PO" ) ;
-TOKEN RSLImplRelToken	 = FixedToken("{=",  "@Eq { preceq } @FA @PO" ) ;
-TOKEN RSLInfListToken    = FixedToken("-inflist",  "@InfList @FA @PO" ) ;
-TOKEN RSLMapToken        = FixedToken("-m->",  "@Map @FA @PO" ) ;
-TOKEN RSLSTToken         = FixedToken(":-",  "@A sym{dotmath} @PO" ) ;
-TOKEN RSLNotEqualToken   = FixedToken("~=",  "@A sym{notequal} @PO" ) ;
-TOKEN RSLPowerToken      = FixedToken("**",  "@A sym{arrowup} @PO" ) ;
-TOKEN RSLProperSubsetToken = FixedToken( "<<",  "@A sym{propersubset} @PO" ) ;
-TOKEN RSLSupersetToken   = FixedToken(">>=",  "@A sym{reflexsuperset} @PO" ) ;
-TOKEN RSLOverrideToken   = FixedToken("!!",  "@Dagger @FA @PO" ) ;
-TOKEN RSLMapletToken     = FixedToken("+>",  "@Eq { mapsto } @FA @PO" ) ;
-TOKEN RSLExtChoiceToken  = FixedToken("|=|",  "@ExtChoice @FA @PO" ) ;
-TOKEN RSLApplyToken      = FixedToken("#",  "@A sym{degree} @PO" ) ;
-TOKEN RSLImplExprToken   = FixedToken("[=",  "@Eq { sqsubseteq } @FA @PO" ) ;
-TOKEN RSLPrimeToken      = NoParameterToken( "'", "{'}" ) ;
-TOKEN RSLExistsOneToken  = FixedToken("exists!",  "{@Sym existential}! @FA @PO" );
+static TOKEN RSLProductToken    = FixedToken("><",  "@A sym{multiply} @PO" ) ;
+static TOKEN RSLPartialMapToken = FixedToken("-~m->",  "@PartialMap @FA @PO" ) ;
+static TOKEN RSLAndToken        = FixedToken("/\\",  "@A sym{logicaland} @PO" ) ;
+static TOKEN RSLAlwaysToken     = FixedToken("always",  "@Eq { square } @FA @PO" ) ;
+static TOKEN RSLIsInToken       = FixedToken("isin",  "@A sym{element @PO" ) ;
+static TOKEN RSLSubsetToken     = FixedToken("<<=",  "@A sym{reflexsubset} @PO" ) ;
+static TOKEN RSLUnionToken      = FixedToken("union", "@A sym{union} @PO" ) ;
+static TOKEN RSLListStartToken  = FixedToken("<.",  "@A sym{angleleft} @PO" ) ;
+static TOKEN RSLParToken        = FixedToken("@Eq { dbar } @FA @PO",  "@PO" ) ;
+static TOKEN RSLIntChoiceToken  = FixedToken("|^|",  "@IntChoice @FA @PO" ) ;
+static TOKEN RSLTurnstileToken  = FixedToken("|-",  "@Eq { vdash } @FA @PO" ) ;
+static TOKEN RSLListToken       = NoParameterToken( "-list",  "{*}" ) ;
+static TOKEN RSLPartialFnToken  = FixedToken("-~->",  "@PartialFn @FA @PO" ) ;
+static TOKEN RSLRelationToken   = FixedToken("<->",  "@A sym{arrowboth} @PO" ) ;
+static TOKEN RSLOrToken         = FixedToken("\\/",  "@A sym{logicalor} @PO" ) ;
+static TOKEN RSLNotIsInToken    = FixedToken("~isin",  "@A sym{notelement }@PO" ) ;
+static TOKEN RSLProperSuperToken= FixedToken(">>",  "@A sym{propersuperset} @PO" ) ;
+static TOKEN RSLInterToken      = FixedToken("inter",  "@A sym{intersection} @PO" ) ;
+static TOKEN RSLListEndToken    = FixedToken(".>",  "@A sym{angleright} @PO" ) ;
+static TOKEN RSLInterlockToken  = FixedToken("++",  "@Interlock @FA @PO" ) ;
+static TOKEN RSLLambdaToken     = FixedToken("-\\",  "@A sym{lambda} @PO" ) ;
+static TOKEN RSLImplRelToken	= FixedToken("{=",  "@Eq { preceq } @FA @PO" ) ;
+static TOKEN RSLInfListToken    = FixedToken("-inflist",  "@InfList @FA @PO" ) ;
+static TOKEN RSLMapToken        = FixedToken("-m->",  "@Map @FA @PO" ) ;
+static TOKEN RSLSTToken         = FixedToken(":-",  "@A sym{dotmath} @PO" ) ;
+static TOKEN RSLNotEqualToken   = FixedToken("~=",  "@A sym{notequal} @PO" ) ;
+static TOKEN RSLPowerToken      = FixedToken("**",  "@A sym{arrowup} @PO" ) ;
+static TOKEN RSLProperSubsetToken = FixedToken( "<<",  "@A sym{propersubset} @PO" ) ;
+static TOKEN RSLSupersetToken   = FixedToken(">>=",  "@A sym{reflexsuperset} @PO" ) ;
+static TOKEN RSLOverrideToken   = FixedToken("!!",  "@Dagger @FA @PO" ) ;
+static TOKEN RSLMapletToken     = FixedToken("+>",  "@Eq { mapsto } @FA @PO" ) ;
+static TOKEN RSLExtChoiceToken  = FixedToken("|=|",  "@ExtChoice @FA @PO" ) ;
+static TOKEN RSLApplyToken      = FixedToken("#",  "@A sym{degree} @PO" ) ;
+static TOKEN RSLImplExprToken   = FixedToken("[=",  "@Eq { sqsubseteq } @FA @PO" ) ;
+static TOKEN RSLPrimeToken      = NoParameterToken( "'", "{'}" ) ;
+static TOKEN RSLExistsOneToken  = FixedToken("exists!",  "{@Sym existential}! @FA @PO" );
 
 
 /*****************************************************************************/
@@ -1539,7 +1545,7 @@ TOKEN RSLExistsOneToken  = FixedToken("exists!",  "{@Sym existential}! @FA @PO" 
 /*****************************************************************************/
 
 
-TOKEN PerlSingleQuoteStringToken = {
+static TOKEN PerlSingleQuoteStringToken = {
   U "''-string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -1560,7 +1566,7 @@ TOKEN PerlSingleQuoteStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PerlDoubleQuoteStringToken = {
+static TOKEN PerlDoubleQuoteStringToken = {
   U "\"\"-string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -1581,7 +1587,7 @@ TOKEN PerlDoubleQuoteStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PerlBackQuoteStringToken = {
+static TOKEN PerlBackQuoteStringToken = {
   U "``-string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -1603,7 +1609,7 @@ TOKEN PerlBackQuoteStringToken = {
 };
 
 
-TOKEN PerlQTypeStringToken = {
+static TOKEN PerlQTypeStringToken = {
   U "q-type string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -1625,7 +1631,7 @@ TOKEN PerlQTypeStringToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PerlSTypeStringToken = {
+static TOKEN PerlSTypeStringToken = {
   U "s-type string",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PS",		/* Lout command for formatting strings              */
@@ -1684,25 +1690,25 @@ TOKEN PerlSTypeStringToken = {
 }
 
 
-TOKEN PerlRegExpLPar    = PerlREToken("(",      "@PO{\"(\"}@PS{\"/\"}@PS");
-TOKEN PerlRegExpEq      = PerlREToken("=",      "@PO{\"=\"} @PS{\"/\"}@PS");
-TOKEN PerlRegExpMatch   = PerlREToken("=~",     "@PO{\"=~\"} @PS{\"/\"}@PS");
-TOKEN PerlRegExpNoMatch = PerlREToken("!~",     "@PO{\"!~\"} @PS{\"/\"}@PS");
-TOKEN PerlRegExpSplit   = PerlREToken("split",  "@PK{split} @PS{\"/\"}@PS");
-TOKEN PerlRegExpIf      = PerlREToken("if",     "@PK{if} @PS{\"/\"}@PS");
-TOKEN PerlRegExpAnd     = PerlREToken("and",    "@PK{and} @PS{\"/\"}@PS");
-TOKEN PerlRegExpAnd2    = PerlREToken("&&",     "@PO{\"&&\"} @PS{\"/\"}@PS");
-TOKEN PerlRegExpOr      = PerlREToken("or",     "@PK{or} @PS{\"/\"}@PS");
-TOKEN PerlRegExpOr2     = PerlREToken("||",     "@PO{\"||\"} @PS{\"/\"}@PS");
-TOKEN PerlRegExpXor     = PerlREToken("xor",    "@PK{xor} @PS{\"/\"}@PS");
-TOKEN PerlRegExpNot     = PerlREToken("not",    "@PK{not} @PS{\"/\"}@PS");
-TOKEN PerlRegExpNot2    = PerlREToken("!",      "@PO{\"!\"} @PS{\"/\"}@PS");
-TOKEN PerlRegExpUnless  = PerlREToken("unless", "@PK{unless} @PS{\"/\"}@PS");
-TOKEN PerlRegExpFor     = PerlREToken("for",    "@PK{for} @PS{\"/\"}@PS");
-TOKEN PerlRegExpForEach = PerlREToken("foreach","@PK{foreach} @PS{\"/\"}@PS");
-TOKEN PerlRegExpWhile   = PerlREToken("while",  "@PK{while} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpLPar    = PerlREToken("(",      "@PO{\"(\"}@PS{\"/\"}@PS");
+static TOKEN PerlRegExpEq      = PerlREToken("=",      "@PO{\"=\"} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpMatch   = PerlREToken("=~",     "@PO{\"=~\"} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpNoMatch = PerlREToken("!~",     "@PO{\"!~\"} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpSplit   = PerlREToken("split",  "@PK{split} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpIf      = PerlREToken("if",     "@PK{if} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpAnd     = PerlREToken("and",    "@PK{and} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpAnd2    = PerlREToken("&&",     "@PO{\"&&\"} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpOr      = PerlREToken("or",     "@PK{or} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpOr2     = PerlREToken("||",     "@PO{\"||\"} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpXor     = PerlREToken("xor",    "@PK{xor} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpNot     = PerlREToken("not",    "@PK{not} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpNot2    = PerlREToken("!",      "@PO{\"!\"} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpUnless  = PerlREToken("unless", "@PK{unless} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpFor     = PerlREToken("for",    "@PK{for} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpForEach = PerlREToken("foreach","@PK{foreach} @PS{\"/\"}@PS");
+static TOKEN PerlRegExpWhile   = PerlREToken("while",  "@PK{while} @PS{\"/\"}@PS");
 
-TOKEN PerlRegExpStartLineToken =
+static TOKEN PerlRegExpStartLineToken =
 {
   U "regex",		/* used by error messages                 */
   PRINT_WHOLE_QUOTED,	/* we can print the whole thing this time */
@@ -1735,6 +1741,7 @@ TOKEN PerlRegExpStartLineToken =
 /*                                                                           */
 /*****************************************************************************/
 
+#if 0
 #define X(startstr, endstr, startcom, endcom)				\
 {									\
   "here-document",	/* used by error messages                 */	\
@@ -1755,32 +1762,33 @@ TOKEN PerlRegExpStartLineToken =
   TRUE,			/* must be found at line start		  */	\
   FALSE,		/* don't want end delimiter twice         */	\
 }
+#endif
 
-#define sEOT	"\n@PS{\"EOT\"}\n"
-#define sEOF	"\n@PS{\"EOF\"}\n"
-#define sEND	"\n@PS{\"END\"}\n"
-#define sBLA	"\n@PS{\"\"}\n"
+/* #define sEOT	"\n@PS{\"EOT\"}\n" */
+/* #define sEOF	"\n@PS{\"EOF\"}\n" */
+/* #define sEND	"\n@PS{\"END\"}\n" */
+/* #define sBLA	"\n@PS{\"\"}\n" */
 
 /* ***
-TOKEN HereEOTuq = X("<<EOT",    "EOT\n", "@PO{<<}@PS{\"EOT\"}@PS",        sEOT);
-TOKEN HereEOTdq = X("<<\"EOT\"","EOT\n", "@PO{<<}@PS{\"\\\"EOT\\\"\"}@PS",sEOT);
-TOKEN HereEOTfq = X("<<'EOT'",  "EOT\n", "@PO{<<}@PS{\"'EOT'\"}@PS",      sEOT);
-TOKEN HereEOTbq = X("<<`EOT`",  "EOT\n", "@PO{<<}@PS{\"`EOT`\"}@PS",      sEOT);
+static TOKEN HereEOTuq = X("<<EOT",    "EOT\n", "@PO{<<}@PS{\"EOT\"}@PS",        sEOT);
+static TOKEN HereEOTdq = X("<<\"EOT\"","EOT\n", "@PO{<<}@PS{\"\\\"EOT\\\"\"}@PS",sEOT);
+static TOKEN HereEOTfq = X("<<'EOT'",  "EOT\n", "@PO{<<}@PS{\"'EOT'\"}@PS",      sEOT);
+static TOKEN HereEOTbq = X("<<`EOT`",  "EOT\n", "@PO{<<}@PS{\"`EOT`\"}@PS",      sEOT);
 
-TOKEN HereEOFuq = X("<<EOF",    "EOF\n", "@PO{<<}@PS{\"EOF\"}@PS",        sEOF);
-TOKEN HereEOFdq = X("<<\"EOF\"","EOF\n", "@PO{<<}@PS{\"\\\"EOF\\\"\"}@PS",sEOF);
-TOKEN HereEOFfq = X("<<'EOF'",  "EOF\n", "@PO{<<}@PS{\"'EOF'\"}@PS",      sEOF);
-TOKEN HereEOFbq = X("<<`EOF`",  "EOF\n", "@PO{<<}@PS{\"`EOF`\"}@PS",      sEOF);
+static TOKEN HereEOFuq = X("<<EOF",    "EOF\n", "@PO{<<}@PS{\"EOF\"}@PS",        sEOF);
+static TOKEN HereEOFdq = X("<<\"EOF\"","EOF\n", "@PO{<<}@PS{\"\\\"EOF\\\"\"}@PS",sEOF);
+static TOKEN HereEOFfq = X("<<'EOF'",  "EOF\n", "@PO{<<}@PS{\"'EOF'\"}@PS",      sEOF);
+static TOKEN HereEOFbq = X("<<`EOF`",  "EOF\n", "@PO{<<}@PS{\"`EOF`\"}@PS",      sEOF);
 
-TOKEN HereENDuq = X("<<END",    "END\n", "@PO{<<}@PS{\"END\"}@PS",        sEND);
-TOKEN HereENDdq = X("<<\"END\"","END\n", "@PO{<<}@PS{\"\\\"END\\\"\"}@PS",sEND);
-TOKEN HereENDfq = X("<<'END'",  "END\n", "@PO{<<}@PS{\"'END'\"}@PS",      sEND);
-TOKEN HereENDbq = X("<<`END`",  "END\n", "@PO{<<}@PS{\"`END`\"}@PS",      sEND);
+static TOKEN HereENDuq = X("<<END",    "END\n", "@PO{<<}@PS{\"END\"}@PS",        sEND);
+static TOKEN HereENDdq = X("<<\"END\"","END\n", "@PO{<<}@PS{\"\\\"END\\\"\"}@PS",sEND);
+static TOKEN HereENDfq = X("<<'END'",  "END\n", "@PO{<<}@PS{\"'END'\"}@PS",      sEND);
+static TOKEN HereENDbq = X("<<`END`",  "END\n", "@PO{<<}@PS{\"`END`\"}@PS",      sEND);
 
-TOKEN HereBLAuq = X("<< ",      "\n",    "@PO{<<} @PS",                  sBLA);
-TOKEN HereBLAdq = X("<<\"\"",   "\n",    "@PO{<<}@PS{\"\\\"\\\"\"}@PS",   sBLA);
-TOKEN HereBLAfq = X("<<''",     "\n",    "@PO{<<}@PS{\"''\"}@PS",         sBLA);
-TOKEN HereBLAbq = X("<<``",     "\n",    "@PO{<<}@PS{\"``\"}@PS",         sBLA);
+static TOKEN HereBLAuq = X("<< ",      "\n",    "@PO{<<} @PS",                  sBLA);
+static TOKEN HereBLAdq = X("<<\"\"",   "\n",    "@PO{<<}@PS{\"\\\"\\\"\"}@PS",   sBLA);
+static TOKEN HereBLAfq = X("<<''",     "\n",    "@PO{<<}@PS{\"''\"}@PS",         sBLA);
+static TOKEN HereBLAbq = X("<<``",     "\n",    "@PO{<<}@PS{\"``\"}@PS",         sBLA);
 *** */
 
 
@@ -1814,25 +1822,25 @@ TOKEN HereBLAbq = X("<<``",     "\n",    "@PO{<<}@PS{\"``\"}@PS",         sBLA);
   FALSE,		/* don't want end delimiter twice         */	\
 }
 
-TOKEN HereEOTuq = HereToken("<<EOT",    "EOT\n");
-TOKEN HereEOTdq = HereToken("<<\"EOT\"","EOT\n");
-TOKEN HereEOTfq = HereToken("<<'EOT'",  "EOT\n");
-TOKEN HereEOTbq = HereToken("<<`EOT`",  "EOT\n");
+static TOKEN HereEOTuq = HereToken("<<EOT",    "EOT\n");
+static TOKEN HereEOTdq = HereToken("<<\"EOT\"","EOT\n");
+static TOKEN HereEOTfq = HereToken("<<'EOT'",  "EOT\n");
+static TOKEN HereEOTbq = HereToken("<<`EOT`",  "EOT\n");
 
-TOKEN HereEOFuq = HereToken("<<EOF",    "EOF\n");
-TOKEN HereEOFdq = HereToken("<<\"EOF\"","EOF\n");
-TOKEN HereEOFfq = HereToken("<<'EOF'",  "EOF\n");
-TOKEN HereEOFbq = HereToken("<<`EOF`",  "EOF\n");
+static TOKEN HereEOFuq = HereToken("<<EOF",    "EOF\n");
+static TOKEN HereEOFdq = HereToken("<<\"EOF\"","EOF\n");
+static TOKEN HereEOFfq = HereToken("<<'EOF'",  "EOF\n");
+static TOKEN HereEOFbq = HereToken("<<`EOF`",  "EOF\n");
 
-TOKEN HereENDuq = HereToken("<<END",    "END\n");
-TOKEN HereENDdq = HereToken("<<\"END\"","END\n");
-TOKEN HereENDfq = HereToken("<<'END'",  "END\n");
-TOKEN HereENDbq = HereToken("<<`END`",  "END\n");
+static TOKEN HereENDuq = HereToken("<<END",    "END\n");
+static TOKEN HereENDdq = HereToken("<<\"END\"","END\n");
+static TOKEN HereENDfq = HereToken("<<'END'",  "END\n");
+static TOKEN HereENDbq = HereToken("<<`END`",  "END\n");
 
-TOKEN HereBLAuq = HereToken("<< ",      "\n");
-TOKEN HereBLAdq = HereToken("<<\"\"",   "\n");
-TOKEN HereBLAfq = HereToken("<<''",     "\n");
-TOKEN HereBLAbq = HereToken("<<``",     "\n");
+static TOKEN HereBLAuq = HereToken("<< ",      "\n");
+static TOKEN HereBLAdq = HereToken("<<\"\"",   "\n");
+static TOKEN HereBLAfq = HereToken("<<''",     "\n");
+static TOKEN HereBLAbq = HereToken("<<``",     "\n");
 
 
 /*****************************************************************************/
@@ -1856,7 +1864,7 @@ TOKEN HereBLAbq = HereToken("<<``",     "\n");
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PerlIdentifierToken = {
+static TOKEN PerlIdentifierToken = {
   U "identifier",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PI",		/* Lout command for formatting identifiers          */
@@ -1879,7 +1887,7 @@ TOKEN PerlIdentifierToken = {
 };
 
 
-TOKEN PerlSpecialIdentifierToken = {
+static TOKEN PerlSpecialIdentifierToken = {
   U "special variable",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PI",		/* Lout command for formatting identifiers          */
@@ -1935,7 +1943,7 @@ TOKEN PerlSpecialIdentifierToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PerlLiteralNumberToken = {
+static TOKEN PerlLiteralNumberToken = {
   U "number",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PN",		/* Lout command for formatting numbers              */
@@ -1957,7 +1965,7 @@ TOKEN PerlLiteralNumberToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PerlHexNumberToken = {
+static TOKEN PerlHexNumberToken = {
   U "number",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PN",		/* Lout command for formatting numbers              */
@@ -1980,7 +1988,7 @@ TOKEN PerlHexNumberToken = {
 };
 
 
-TOKEN PerlBinaryNumberToken = {
+static TOKEN PerlBinaryNumberToken = {
   U "number",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PN",		/* Lout command for formatting numbers              */
@@ -1991,7 +1999,7 @@ TOKEN PerlBinaryNumberToken = {
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  U "01",        	/* inside, binary digits			    */
+  U "01",		/* inside, binary digits			    */
   U "",			/* no escape character within numbers               */
   U "",			/* so nothing legal after escape char either        */
   U "",			/* numbers do not permit "inner escapes"            */
@@ -2013,7 +2021,7 @@ TOKEN PerlBinaryNumberToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PerlCommentToken = {
+static TOKEN PerlCommentToken = {
   U "comment",		/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* print this token in quotes etc. as usual         */
   U "@PC",		/* Lout command for formatting comments             */
@@ -2035,7 +2043,7 @@ TOKEN PerlCommentToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PerlCommentEscapeToken = {
+static TOKEN PerlCommentEscapeToken = {
   U "Lout escape",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED, /* print this token unformatted                  */
   U "",			/* no Lout command since we are printing raw        */
@@ -2073,7 +2081,7 @@ TOKEN PerlCommentEscapeToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PerlPodToken = {
+static TOKEN PerlPodToken = {
   U "perl-pod",		/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,  /* unquoted but with a command enclosing it     */
   U "@DP @Pod",		/* Lout command for formatting Pod                  */
@@ -2104,20 +2112,20 @@ TOKEN PerlPodToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PerlIncrementToken        = FixedToken( "++",  "@PO" ) ;
-TOKEN PerlDecrementToken        = FixedToken( "--",  "@PO" ) ;
-TOKEN PerlExponentiateToken     = FixedToken( "**",  "@PO" ) ;
-TOKEN PerlMatchToken            = FixedToken( "=~",  "@PO" ) ;
-TOKEN PerlNotMatchToken         = FixedToken( "!~",  "@PO" ) ;
-TOKEN PerlEqualToken            = FixedToken( "==",  "@PO" ) ;
-TOKEN PerlAssignToken           = FixedToken( "=",   "@PO" ) ;
-TOKEN PerlBitLeftShiftToken     = FixedToken( "<<",  "@PO" ) ;
-TOKEN PerlBitRightShiftToken    = FixedToken( ">>",  "@PO" ) ;
-TOKEN PerlSpaceshipToken        = FixedToken( "<=>", "@PO" ) ;
-TOKEN PerlAndToken              = FixedToken( "&&",  "@PO" ) ;
-TOKEN PerlOrToken               = FixedToken( "||",  "@PO" ) ;
-TOKEN PerlRange2Token           = FixedToken( "..",  "@PO" ) ;
-TOKEN PerlRange3Token           = FixedToken( "...", "@PO" ) ;
+static TOKEN PerlIncrementToken        = FixedToken( "++",  "@PO" ) ;
+static TOKEN PerlDecrementToken        = FixedToken( "--",  "@PO" ) ;
+static TOKEN PerlExponentiateToken     = FixedToken( "**",  "@PO" ) ;
+static TOKEN PerlMatchToken            = FixedToken( "=~",  "@PO" ) ;
+static TOKEN PerlNotMatchToken         = FixedToken( "!~",  "@PO" ) ;
+static TOKEN PerlEqualToken            = FixedToken( "==",  "@PO" ) ;
+static TOKEN PerlAssignToken           = FixedToken( "=",   "@PO" ) ;
+static TOKEN PerlBitLeftShiftToken     = FixedToken( "<<",  "@PO" ) ;
+static TOKEN PerlBitRightShiftToken    = FixedToken( ">>",  "@PO" ) ;
+static TOKEN PerlSpaceshipToken        = FixedToken( "<=>", "@PO" ) ;
+static TOKEN PerlAndToken              = FixedToken( "&&",  "@PO" ) ;
+static TOKEN PerlOrToken               = FixedToken( "||",  "@PO" ) ;
+static TOKEN PerlRange2Token           = FixedToken( "..",  "@PO" ) ;
+static TOKEN PerlRange3Token           = FixedToken( "...", "@PO" ) ;
 
 
 /*****************************************************************************/
@@ -2136,8 +2144,8 @@ TOKEN PerlRange3Token           = FixedToken( "...", "@PO" ) ;
   FALSE,		/* token not just start of line       */	\
   { U str },		/* token begins (and ends!) with this */	\
   { U " ", U "\t" },	/* plus a white space char	      */	\
-  { U "",  U ""   },	/* no bracket2 though  		      */	\
-  { U "",  U ""   },	/* no end2 though   		      */	\
+  { U "",  U ""   },	/* no bracket2 though		      */	\
+  { U "",  U ""   },	/* no end2 though		      */	\
   U "",			/* nothing inside, since no inside    */	\
   U "", U "",		/* no escape character                */	\
   U "", U "",		/* no inner escape; no end inner esc  */	\
@@ -2147,33 +2155,33 @@ TOKEN PerlRange3Token           = FixedToken( "...", "@PO" ) ;
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
 
-TOKEN PerlFileTestrToken        = FlagToken( "-r",  "@PO" ) ;
-TOKEN PerlFileTestwToken        = FlagToken( "-w",  "@PO" ) ;
-TOKEN PerlFileTestxToken        = FlagToken( "-x",  "@PO" ) ;
-TOKEN PerlFileTestoToken        = FlagToken( "-o",  "@PO" ) ;
-TOKEN PerlFileTestRToken        = FlagToken( "-R",  "@PO" ) ;
-TOKEN PerlFileTestWToken        = FlagToken( "-W",  "@PO" ) ;
-TOKEN PerlFileTestXToken        = FlagToken( "-X",  "@PO" ) ;
-TOKEN PerlFileTestOToken        = FlagToken( "-O",  "@PO" ) ;
-TOKEN PerlFileTesteToken        = FlagToken( "-e",  "@PO" ) ;
-TOKEN PerlFileTestzToken        = FlagToken( "-z",  "@PO" ) ;
-TOKEN PerlFileTestsToken        = FlagToken( "-s",  "@PO" ) ;
-TOKEN PerlFileTestfToken        = FlagToken( "-f",  "@PO" ) ;
-TOKEN PerlFileTestdToken        = FlagToken( "-d",  "@PO" ) ;
-TOKEN PerlFileTestlToken        = FlagToken( "-l",  "@PO" ) ;
-TOKEN PerlFileTestpToken        = FlagToken( "-p",  "@PO" ) ;
-TOKEN PerlFileTestSToken        = FlagToken( "-S",  "@PO" ) ;
-TOKEN PerlFileTestbToken        = FlagToken( "-b",  "@PO" ) ;
-TOKEN PerlFileTestcToken        = FlagToken( "-c",  "@PO" ) ;
-TOKEN PerlFileTesttToken        = FlagToken( "-t",  "@PO" ) ;
-TOKEN PerlFileTestuToken        = FlagToken( "-u",  "@PO" ) ;
-TOKEN PerlFileTestgToken        = FlagToken( "-g",  "@PO" ) ;
-TOKEN PerlFileTestkToken        = FlagToken( "-k",  "@PO" ) ;
-TOKEN PerlFileTestTToken        = FlagToken( "-T",  "@PO" ) ;
-TOKEN PerlFileTestBToken        = FlagToken( "-B",  "@PO" ) ;
-TOKEN PerlFileTestMToken        = FlagToken( "-M",  "@PO" ) ;
-TOKEN PerlFileTestAToken        = FlagToken( "-A",  "@PO" ) ;
-TOKEN PerlFileTestCToken        = FlagToken( "-C",  "@PO" ) ;
+static TOKEN PerlFileTestrToken        = FlagToken( "-r",  "@PO" ) ;
+static TOKEN PerlFileTestwToken        = FlagToken( "-w",  "@PO" ) ;
+static TOKEN PerlFileTestxToken        = FlagToken( "-x",  "@PO" ) ;
+static TOKEN PerlFileTestoToken        = FlagToken( "-o",  "@PO" ) ;
+static TOKEN PerlFileTestRToken        = FlagToken( "-R",  "@PO" ) ;
+static TOKEN PerlFileTestWToken        = FlagToken( "-W",  "@PO" ) ;
+static TOKEN PerlFileTestXToken        = FlagToken( "-X",  "@PO" ) ;
+static TOKEN PerlFileTestOToken        = FlagToken( "-O",  "@PO" ) ;
+static TOKEN PerlFileTesteToken        = FlagToken( "-e",  "@PO" ) ;
+static TOKEN PerlFileTestzToken        = FlagToken( "-z",  "@PO" ) ;
+static TOKEN PerlFileTestsToken        = FlagToken( "-s",  "@PO" ) ;
+static TOKEN PerlFileTestfToken        = FlagToken( "-f",  "@PO" ) ;
+static TOKEN PerlFileTestdToken        = FlagToken( "-d",  "@PO" ) ;
+static TOKEN PerlFileTestlToken        = FlagToken( "-l",  "@PO" ) ;
+static TOKEN PerlFileTestpToken        = FlagToken( "-p",  "@PO" ) ;
+static TOKEN PerlFileTestSToken        = FlagToken( "-S",  "@PO" ) ;
+static TOKEN PerlFileTestbToken        = FlagToken( "-b",  "@PO" ) ;
+static TOKEN PerlFileTestcToken        = FlagToken( "-c",  "@PO" ) ;
+static TOKEN PerlFileTesttToken        = FlagToken( "-t",  "@PO" ) ;
+static TOKEN PerlFileTestuToken        = FlagToken( "-u",  "@PO" ) ;
+static TOKEN PerlFileTestgToken        = FlagToken( "-g",  "@PO" ) ;
+static TOKEN PerlFileTestkToken        = FlagToken( "-k",  "@PO" ) ;
+static TOKEN PerlFileTestTToken        = FlagToken( "-T",  "@PO" ) ;
+static TOKEN PerlFileTestBToken        = FlagToken( "-B",  "@PO" ) ;
+static TOKEN PerlFileTestMToken        = FlagToken( "-M",  "@PO" ) ;
+static TOKEN PerlFileTestAToken        = FlagToken( "-A",  "@PO" ) ;
+static TOKEN PerlFileTestCToken        = FlagToken( "-C",  "@PO" ) ;
 
 
 /*****************************************************************************/
@@ -2202,13 +2210,13 @@ TOKEN PerlFileTestCToken        = FlagToken( "-C",  "@PO" ) ;
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PodVerbatimLineToken = {
+static TOKEN PodVerbatimLineToken = {
   U "verbatim-para",	/* used by error messages involving this token      */
   PRINT_WHOLE_QUOTED,	/* printing the whole paragraph quoted		    */
   U "@PV ",		/* Lout command for formatting verbatim line        */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { U "\t", U " " },	/* command begins with this                   	    */
+  { U "\t", U " " },	/* command begins with this			    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
@@ -2221,13 +2229,13 @@ TOKEN PodVerbatimLineToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PodEmptyLineToken = {
+static TOKEN PodEmptyLineToken = {
   U "pod-empty-line",	/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
   U "@PPG\n",		/* Lout command for formatting Pod empty line       */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { U "\n" },		/* command begins with this                   	    */
+  { U "\n" },		/* command begins with this			    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
@@ -2263,14 +2271,14 @@ TOKEN PodEmptyLineToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PodIgnoreToken = {
+static TOKEN PodIgnoreToken = {
   U "pod-cut",		/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
   U "",			/* Lout command for formatting Pod cut (nothing)    */
   U "",			/* no alternate command                             */
   U "",			/* no following command                             */
   TRUE,			/* token allowed at start of line only              */
-  { U "=pod", U "=cut" }, /* command begins with this                  	    */
+  { U "=pod", U "=cut" }, /* command begins with this			    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
@@ -2280,7 +2288,7 @@ TOKEN PodIgnoreToken = {
   U "",			/* cut tokens do not permit "inner escapes"         */
   U "",			/* and so there is no end innner escape either      */
   U "",			/* no bracketing delimiter                          */
-  U "\n",			/* token will end with the end of the line          */
+  U "\n",		/* token will end with the end of the line	    */
   TRUE,			/* end delimiter (\n) has to be at a line start     */
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
@@ -2292,15 +2300,15 @@ TOKEN PodIgnoreToken = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PodHeading1Token = {
+static TOKEN PodHeading1Token = {
   U "=head1",		/* used by error messages involving this token      */
   PRINT_NODELIMS_INNER,	/* print without delimiters, formatting inner       */
   U "@PHA",		/* Lout command for formatting Pod heading          */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  {U "=head1", U "head1"}, /* command begins with this                 	    */
+  {U "=head1", U "head1"}, /* command begins with this			    */
   { U " ",  U "\t" },	/* helps to skip following white space		    */
-  { U "",   U ""   },	/* no bracket2                        		    */
+  { U "",   U ""   },	/* no bracket2					    */
   { U "\n", U "\n" },	/* token ends at end of line			    */
   AllCharacters,	/* anything in the heading			    */
   U "", U "",		/* no escape character; nothing legal after escape  */
@@ -2311,15 +2319,15 @@ TOKEN PodHeading1Token = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PodHeading2Token = {
+static TOKEN PodHeading2Token = {
   U "=head2",		/* used by error messages involving this token      */
   PRINT_NODELIMS_INNER,	/* print without delimiters, formatting inner       */
   U "@PHB",		/* Lout command for formatting Pod heading          */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { U "=head2" },	/* command begins with this                   	    */
+  { U "=head2" },	/* command begins with this			    */
   { U " ",  U "\t" },	/* helps to skip following white space		    */
-  { U "",   U ""   },	/* no bracket2                        		    */
+  { U "",   U ""   },	/* no bracket2					    */
   { U "\n", U "\n" },	/* token ends at end of line			    */
   AllCharacters,	/* anything in the heading			    */
   U "", U "",		/* no escape character; nothing legal after escape  */
@@ -2330,15 +2338,15 @@ TOKEN PodHeading2Token = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PodHeading3Token = {
+static TOKEN PodHeading3Token = {
   U "=head3",		/* used by error messages involving this token      */
   PRINT_NODELIMS_INNER,	/* print without delimiters, formatting inner       */
   U "@PHC",		/* Lout command for formatting Pod heading          */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { U "=head3" },	/* command begins with this                   	    */
+  { U "=head3" },	/* command begins with this			    */
   { U " ",  U "\t" },	/* helps to skip following white space		    */
-  { U "",   U ""   },	/* no bracket2                        		    */
+  { U "",   U ""   },	/* no bracket2					    */
   { U "\n", U "\n" },	/* token ends at end of line			    */
   AllCharacters,	/* anything in the heading			    */
   U "", U "",		/* no escape character; nothing legal after escape  */
@@ -2356,14 +2364,14 @@ TOKEN PodHeading3Token = {
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PodOverToken = {
+static TOKEN PodOverToken = {
   U "=over",		/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED, /* just a number after =over, so this is safe    */
   U "@RawTaggedList gap{@PLG}indent{@PLI}rightindent{@PLRI}labelwidth{@PLLW ",
   U "",			/* no alternate command                             */
   U "} // {",		/* open brace to match } at first item              */
   TRUE,			/* token allowed at start of line only              */
-  { U "=over" },	/* command begins with this                   	    */
+  { U "=over" },	/* command begins with this			    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
@@ -2376,16 +2384,16 @@ TOKEN PodOverToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PodItemToken = {
+static TOKEN PodItemToken = {
   U "=item",		/* used by error messages involving this token      */
   PRINT_NODELIMS_INNER,	/* printing just what follows =item on the line     */
   U "@Null //}\n@DTI {@PLL", /* Lout command for formatting Pod item        */
   U "",			/* no alternate command                             */
   U "} {",		/* open brace to enclose the item content           */
   TRUE,			/* token allowed at start of line only              */
-  { U "=item" },	/* command begins with this                   	    */
+  { U "=item" },	/* command begins with this			    */
   { U " ",    U "\t" },	/* helps to skip following white space		    */
-  { U "",     U ""   },	/* no bracket2                        		    */
+  { U "",     U ""   },	/* no bracket2					    */
   { U "\n\n", U "\n\n"},/* token will end at blank line			    */
   AllPrintableTabNL,	/* any printable inside				    */
   U "", U "",		/* no escape character; nothing legal after escape  */
@@ -2395,17 +2403,17 @@ TOKEN PodItemToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PodBackToken = {
+static TOKEN PodBackToken = {
   U "=back",		/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
   U "@Null // }\n@EndList\n", /* Lout command for formatting Pod back       */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { U "=back" },	/* command begins with this                   	    */
+  { U "=back" },	/* command begins with this			    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  AllCharacters,	/* anything inside (in principle)   		    */
+  AllCharacters,	/* anything inside (in principle)		    */
   U "", U "",		/* no escape character; nothing legal after escape  */
   U "", U "",		/* no inner escapes; no end inner escape            */
   U "",			/* no bracketing delimiter                          */
@@ -2431,8 +2439,8 @@ TOKEN PodBackToken = {
   TRUE,			/* token allowed at start of line only   */	\
   { U "=item", U "=item ", U "=item\t",	/* starts                */	\
     U "=item  ", U "=item \t", U "=item\t ", U "=item\t\t" }, /* */	\
-  { U tag },		/* the tag we recognize               	 */	\
-  { U "" },		/* no bracket2                        	 */	\
+  { U tag },		/* the tag we recognize			 */	\
+  { U "" },		/* no bracket2				 */	\
   { U "\n\n", U "\n\n"  },	/* token will end at blank line  */	\
   AllPrintableTabNL,	/* any printable inside			 */	\
   U "", U "",		/* no escape character                   */	\
@@ -2442,17 +2450,17 @@ TOKEN PodBackToken = {
   FALSE,		/* don't need to see end delimiter twice */	\
 }
 
-TOKEN PodItemBullet = PodNarrowItemToken("*", "@Null //}\n@TI {@PLL {*");
-TOKEN PodItem0      = PodNarrowItemToken("0", "@Null //}\n@TI {@PLL {0");
-TOKEN PodItem1      = PodNarrowItemToken("1", "@Null //}\n@TI {@PLL {1");
-TOKEN PodItem2      = PodNarrowItemToken("2", "@Null //}\n@TI {@PLL {2");
-TOKEN PodItem3      = PodNarrowItemToken("3", "@Null //}\n@TI {@PLL {3");
-TOKEN PodItem4      = PodNarrowItemToken("4", "@Null //}\n@TI {@PLL {4");
-TOKEN PodItem5      = PodNarrowItemToken("5", "@Null //}\n@TI {@PLL {5");
-TOKEN PodItem6      = PodNarrowItemToken("6", "@Null //}\n@TI {@PLL {6");
-TOKEN PodItem7      = PodNarrowItemToken("7", "@Null //}\n@TI {@PLL {7");
-TOKEN PodItem8      = PodNarrowItemToken("8", "@Null //}\n@TI {@PLL {8");
-TOKEN PodItem9      = PodNarrowItemToken("9", "@Null //}\n@TI {@PLL {9");
+static TOKEN PodItemBullet = PodNarrowItemToken("*", "@Null //}\n@TI {@PLL {*");
+static TOKEN PodItem0      = PodNarrowItemToken("0", "@Null //}\n@TI {@PLL {0");
+static TOKEN PodItem1      = PodNarrowItemToken("1", "@Null //}\n@TI {@PLL {1");
+static TOKEN PodItem2      = PodNarrowItemToken("2", "@Null //}\n@TI {@PLL {2");
+static TOKEN PodItem3      = PodNarrowItemToken("3", "@Null //}\n@TI {@PLL {3");
+static TOKEN PodItem4      = PodNarrowItemToken("4", "@Null //}\n@TI {@PLL {4");
+static TOKEN PodItem5      = PodNarrowItemToken("5", "@Null //}\n@TI {@PLL {5");
+static TOKEN PodItem6      = PodNarrowItemToken("6", "@Null //}\n@TI {@PLL {6");
+static TOKEN PodItem7      = PodNarrowItemToken("7", "@Null //}\n@TI {@PLL {7");
+static TOKEN PodItem8      = PodNarrowItemToken("8", "@Null //}\n@TI {@PLL {8");
+static TOKEN PodItem9      = PodNarrowItemToken("9", "@Null //}\n@TI {@PLL {9");
 
 
 /*****************************************************************************/
@@ -2465,16 +2473,16 @@ TOKEN PodItem9      = PodNarrowItemToken("9", "@Null //}\n@TI {@PLL {9");
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PodForToken = {
+static TOKEN PodForToken = {
   U "=for",		/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
   U "",			/* Lout command for formatting Pod for (nothing)    */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { U "=for" },		/* command begins with this                   	    */
+  { U "=for" },		/* command begins with this			    */
   { NULL }, { NULL },	/* no start2 needed; so no bracket2 either	    */
   { NULL },		/* so no end2 either				    */
-  AllCharacters,	/* anything inside 				    */
+  AllCharacters,	/* anything inside				    */
   U "", U "",		/* no escape character; nothing legal after escape  */
   U "", U "",		/* no inner escapes; no end inner escape            */
   U "",			/* no bracketing delimiter                          */
@@ -2483,16 +2491,16 @@ TOKEN PodForToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PodBeginToken = {
+static TOKEN PodBeginToken = {
   U "=begin",		/* used by error messages involving this token      */
   PRINT_COMMAND_ONLY,	/* printing just the command                        */
   U "",			/* Lout command for formatting Pod for (nothing)    */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { U "=begin" },	/* command begins with this                   	    */
+  { U "=begin" },	/* command begins with this			    */
   { NULL }, { NULL },	/* no start2 needed; so no bracket2 either	    */
   { NULL },		/* so no end2 either				    */
-  AllCharacters,	/* anything inside 				    */
+  AllCharacters,	/* anything inside				    */
   U "", U "",		/* no escape character; nothing legal after escape  */
   U "", U "",		/* no inner escapes; no end inner escape            */
   U "",			/* no bracketing delimiter                          */
@@ -2501,16 +2509,16 @@ TOKEN PodBeginToken = {
   FALSE,		/* don't need to see end delimiter twice to stop    */
 };
 
-TOKEN PodBeginLoutToken = {
+static TOKEN PodBeginLoutToken = {
   U "=begin lout",	/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,/* this is a Lout escape, no delims or quotes     */
   U "",			/* Lout command for formatting Pod for (nothing)    */
   U "", U "",		/* no alternate command; no following command       */
   TRUE,			/* token allowed at start of line only              */
-  { U "=begin lout", U "=begin Lout" },	/* command begins with this   	    */
+  { U "=begin lout", U "=begin Lout" },	/* command begins with this	    */
   { NULL }, { NULL },	/* no start2 needed; so no bracket2 either	    */
   { NULL },		/* so no end2 either				    */
-  AllCharacters,	/* anything inside 				    */
+  AllCharacters,	/* anything inside				    */
   U "", U "",		/* no escape character; nothing legal after escape  */
   U "", U "",		/* no inner escapes; no end inner escape            */
   U "",			/* no bracketing delimiter                          */
@@ -2549,7 +2557,7 @@ TOKEN PodBeginLoutToken = {
 
 #define RecursiveToken(str, command) /* Pod recursive token */		\
 {									\
-  U str,			/* name used for debugging only       */	\
+  U str,		/* name used for debugging only       */	\
   PRINT_NODELIMS_INNER,	/* recursively format the inside      */	\
   U command,		/* Lout command for formatting this   */	\
   U "", U "",		/* no alternate command; no following */	\
@@ -2567,10 +2575,10 @@ TOKEN PodBeginLoutToken = {
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
 
-TOKEN PodItalicToken	= RecursiveToken("I", "@PFI");
-TOKEN PodBoldToken	= RecursiveToken("B", "@PFB");
-TOKEN PodNoBreakToken	= RecursiveToken("S", "@OneCol");
-TOKEN PodCodeToken	= RecursiveToken("C", "@PFC");
+static TOKEN PodItalicToken	= RecursiveToken("I", "@PFI");
+static TOKEN PodBoldToken	= RecursiveToken("B", "@PFB");
+static TOKEN PodNoBreakToken	= RecursiveToken("S", "@OneCol");
+static TOKEN PodCodeToken	= RecursiveToken("C", "@PFC");
 
 
 /*****************************************************************************/
@@ -2607,10 +2615,10 @@ TOKEN PodCodeToken	= RecursiveToken("C", "@PFC");
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
 
-TOKEN PodFileToken	= InteriorToken("F", "@PFF",    PRINT_NODELIMS_QUOTED);
-TOKEN PodLinkToken	= InteriorToken("L", "@PFL",    PRINT_NODELIMS_QUOTED);
-TOKEN PodIndexToken	= InteriorToken("X", "@PFX",    PRINT_NODELIMS_QUOTED);
-TOKEN PodZeroToken	= InteriorToken("Z", "",        PRINT_COMMAND_ONLY);
+static TOKEN PodFileToken	= InteriorToken("F", "@PFF",    PRINT_NODELIMS_QUOTED);
+static TOKEN PodLinkToken	= InteriorToken("L", "@PFL",    PRINT_NODELIMS_QUOTED);
+static TOKEN PodIndexToken	= InteriorToken("X", "@PFX",    PRINT_NODELIMS_QUOTED);
+static TOKEN PodZeroToken	= InteriorToken("Z", "",        PRINT_COMMAND_ONLY);
 
 
 /*****************************************************************************/
@@ -2631,18 +2639,18 @@ TOKEN PodZeroToken	= InteriorToken("Z", "",        PRINT_COMMAND_ONLY);
 /*                                                                           */
 /*****************************************************************************/
 
-TOKEN PodNumCharToken = {
+static TOKEN PodNumCharToken = {
   U "E<>",		/* used by error messages involving this token      */
   PRINT_NODELIMS_UNQUOTED,/* we're doing these manually, since they're funny*/
   U "\"\\",		/* precede character number with \"                 */
   U "",			/* no alternate command                             */
   U "\"",		/* follow character number with "                   */
   FALSE,		/* token allowed at start of line only              */
-  { U "E<" },		/* command begins with this              	    */
+  { U "E<" },		/* command begins with this			    */
   { NULL },		/* no start2 needed				    */
   { NULL },		/* so no bracket2 either			    */
   { NULL },		/* so no end2 either				    */
-  U "0123456789",	/* digits inside 				    */
+  U "0123456789",	/* digits inside				    */
   U "", U "",		/* no escape character                              */
   U "", U "",		/* no "inner escapes"                               */
   U "",			/* no bracketing delimiter                          */
@@ -2672,10 +2680,10 @@ TOKEN PodNumCharToken = {
   FALSE,		/* don't end delimiter twice to stop  */	\
 }
 
-TOKEN PodLessThanToken = PodEscapeToken("E<lt>", "<");
-TOKEN PodGreaterThanToken = PodEscapeToken("E<gt>", ">");
-TOKEN PodSlashToken = PodEscapeToken("E<sol>", "/");
-TOKEN PodVerbarToken = PodEscapeToken("E<verbar>", "|");
+static TOKEN PodLessThanToken = PodEscapeToken("E<lt>", "<");
+static TOKEN PodGreaterThanToken = PodEscapeToken("E<gt>", ">");
+static TOKEN PodSlashToken = PodEscapeToken("E<sol>", "/");
+static TOKEN PodVerbarToken = PodEscapeToken("E<verbar>", "|");
 
 
 /*****************************************************************************/
@@ -2690,112 +2698,112 @@ TOKEN PodVerbarToken = PodEscapeToken("E<verbar>", "|");
 /*****************************************************************************/
 
 /* Some normal chars that have special meaning in SGML context */
-TOKEN PE00 = PodEscapeToken("E<amp>",		"&");
+static TOKEN PE00 = PodEscapeToken("E<amp>",		"&");
 /* already done above TOKEN PE01 = PodEscapeToken("E<gt>",	">"); */
 /* already done above TOKEN PE02 = PodEscapeToken("E<lt>",	"<"); */
-TOKEN PE03 = PodEscapeToken("E<quot>",	"\"\\\"\"");
+static TOKEN PE03 = PodEscapeToken("E<quot>",	"\"\\\"\"");
 
 /* PUBLIC ISO 8879-1986//ENTITIES Added Latin 1//EN//HTML */
-TOKEN PE04 = PodEscapeToken("E<AElig>",		"{@Char AE}");
-TOKEN PE05 = PodEscapeToken("E<Aacute>",	"{@Char Aacute}");
-TOKEN PE06 = PodEscapeToken("E<Acirc>",		"{@Char Acircumflex}");
-TOKEN PE07 = PodEscapeToken("E<Agrave>",	"{@Char Agrave}");
-TOKEN PE08 = PodEscapeToken("E<Aring>",		"{@Char Aring}");
-TOKEN PE09 = PodEscapeToken("E<Atilde>",	"{@Char Atilde}");
-TOKEN PE10 = PodEscapeToken("E<Auml>",		"{@Char Adieresis}");
-TOKEN PE11 = PodEscapeToken("E<Ccedil>",	"{@Char Ccedilla}");
-TOKEN PE12 = PodEscapeToken("E<ETH>",		"{@Char Eth}");
-TOKEN PE13 = PodEscapeToken("E<Eacute>",	"{@Char Eacute}");
-TOKEN PE14 = PodEscapeToken("E<Ecirc>",		"{@Char Ecircumflex}");
-TOKEN PE15 = PodEscapeToken("E<Egrave>",	"{@Char Egrave}");
-TOKEN PE16 = PodEscapeToken("E<Euml>",		"{@Char Edieresis}");
-TOKEN PE17 = PodEscapeToken("E<Iacute>",	"{@Char Iacute}");
-TOKEN PE18 = PodEscapeToken("E<Icirc>",		"{@Char Icircumflex}");
-TOKEN PE19 = PodEscapeToken("E<Igrave>",	"{@Char Igrave}");
-TOKEN PE20 = PodEscapeToken("E<Iuml>",		"{@Char Idieresis}");
-TOKEN PE21 = PodEscapeToken("E<Ntilde>",	"{@Char Ntilde}");
-TOKEN PE22 = PodEscapeToken("E<Oacute>",	"{@Char Oacute}");
-TOKEN PE23 = PodEscapeToken("E<Ocirc>",		"{@Char Ocircumflex}");
-TOKEN PE24 = PodEscapeToken("E<Ograve>",	"{@Char Ograve}");
-TOKEN PE25 = PodEscapeToken("E<Oslash>",	"{@Char Oslash}");
-TOKEN PE26 = PodEscapeToken("E<Otilde>",	"{@Char Otilde}");
-TOKEN PE27 = PodEscapeToken("E<Ouml>",		"{@Char Odieresis}");
-TOKEN PE28 = PodEscapeToken("E<THORN>",		"{@Char Thorn}");
-TOKEN PE29 = PodEscapeToken("E<Uacute>",	"{@Char Uacute}");
-TOKEN PE30 = PodEscapeToken("E<Ucirc>",		"{@Char Ucircumflex}");
-TOKEN PE31 = PodEscapeToken("E<Ugrave>",	"{@Char Ugrave}");
-TOKEN PE32 = PodEscapeToken("E<Uuml>",		"{@Char Udieresis}");
-TOKEN PE33 = PodEscapeToken("E<Yacute>",	"{@Char Yacute}");
-TOKEN PE34 = PodEscapeToken("E<aacute>",	"{@Char aacute}");
-TOKEN PE35 = PodEscapeToken("E<acirc>",		"{@Char acircumflex}");
-TOKEN PE36 = PodEscapeToken("E<aelig>",		"{@Char ae}");
-TOKEN PE37 = PodEscapeToken("E<agrave>",	"{@Char agrave}");
-TOKEN PE38 = PodEscapeToken("E<aring>",		"{@Char aring}");
-TOKEN PE39 = PodEscapeToken("E<atilde>",	"{@Char atilde}");
-TOKEN PE40 = PodEscapeToken("E<auml>",		"{@Char adieresis}");
-TOKEN PE41 = PodEscapeToken("E<ccedil>",	"{@Char ccedilla}");
-TOKEN PE42 = PodEscapeToken("E<eacute>",	"{@Char eacute}");
-TOKEN PE43 = PodEscapeToken("E<ecirc>",		"{@Char ecircumflex}");
-TOKEN PE44 = PodEscapeToken("E<egrave>",	"{@Char egrave}");
-TOKEN PE45 = PodEscapeToken("E<eth>",		"{@Char eth}");
-TOKEN PE46 = PodEscapeToken("E<euml>",		"{@Char edieresis}");
-TOKEN PE47 = PodEscapeToken("E<iacute>",	"{@Char iacute}");
-TOKEN PE48 = PodEscapeToken("E<icirc>",		"{@Char icircumflex}");
-TOKEN PE49 = PodEscapeToken("E<igrave>",	"{@Char igrave}");
-TOKEN PE50 = PodEscapeToken("E<iuml>",		"{@Char idieresis}");
-TOKEN PE51 = PodEscapeToken("E<ntilde>",	"{@Char ntilde}");
-TOKEN PE52 = PodEscapeToken("E<oacute>",	"{@Char oacute}");
-TOKEN PE53 = PodEscapeToken("E<ocirc>",		"{@Char ocircumflex}");
-TOKEN PE54 = PodEscapeToken("E<ograve>",	"{@Char ograve}");
-TOKEN PE55 = PodEscapeToken("E<oslash>",	"{@Char oslash}");
-TOKEN PE56 = PodEscapeToken("E<otilde>",	"{@Char otilde}");
-TOKEN PE57 = PodEscapeToken("E<ouml>",		"{@Char odieresis}");
-TOKEN PE58 = PodEscapeToken("E<szlig>",		"{@Char germandbls}");
-TOKEN PE59 = PodEscapeToken("E<thorn>",		"{@Char thorn}");
-TOKEN PE60 = PodEscapeToken("E<uacute>",	"{@Char uacute}");
-TOKEN PE61 = PodEscapeToken("E<ucirc>",		"{@Char ucircumflex}");
-TOKEN PE62 = PodEscapeToken("E<ugrave>",	"{@Char ugrave}");
-TOKEN PE63 = PodEscapeToken("E<uuml>",		"{@Char udieresis}");
-TOKEN PE64 = PodEscapeToken("E<yacute>",	"{@Char yacute}");
-TOKEN PE65 = PodEscapeToken("E<yuml>",		"{@Char ydieresis}");
+static TOKEN PE04 = PodEscapeToken("E<AElig>",	"{@Char AE}");
+static TOKEN PE05 = PodEscapeToken("E<Aacute>",	"{@Char Aacute}");
+static TOKEN PE06 = PodEscapeToken("E<Acirc>",	"{@Char Acircumflex}");
+static TOKEN PE07 = PodEscapeToken("E<Agrave>",	"{@Char Agrave}");
+static TOKEN PE08 = PodEscapeToken("E<Aring>",	"{@Char Aring}");
+static TOKEN PE09 = PodEscapeToken("E<Atilde>",	"{@Char Atilde}");
+static TOKEN PE10 = PodEscapeToken("E<Auml>",	"{@Char Adieresis}");
+static TOKEN PE11 = PodEscapeToken("E<Ccedil>",	"{@Char Ccedilla}");
+static TOKEN PE12 = PodEscapeToken("E<ETH>",	"{@Char Eth}");
+static TOKEN PE13 = PodEscapeToken("E<Eacute>",	"{@Char Eacute}");
+static TOKEN PE14 = PodEscapeToken("E<Ecirc>",	"{@Char Ecircumflex}");
+static TOKEN PE15 = PodEscapeToken("E<Egrave>",	"{@Char Egrave}");
+static TOKEN PE16 = PodEscapeToken("E<Euml>",	"{@Char Edieresis}");
+static TOKEN PE17 = PodEscapeToken("E<Iacute>",	"{@Char Iacute}");
+static TOKEN PE18 = PodEscapeToken("E<Icirc>",	"{@Char Icircumflex}");
+static TOKEN PE19 = PodEscapeToken("E<Igrave>",	"{@Char Igrave}");
+static TOKEN PE20 = PodEscapeToken("E<Iuml>",	"{@Char Idieresis}");
+static TOKEN PE21 = PodEscapeToken("E<Ntilde>",	"{@Char Ntilde}");
+static TOKEN PE22 = PodEscapeToken("E<Oacute>",	"{@Char Oacute}");
+static TOKEN PE23 = PodEscapeToken("E<Ocirc>",	"{@Char Ocircumflex}");
+static TOKEN PE24 = PodEscapeToken("E<Ograve>",	"{@Char Ograve}");
+static TOKEN PE25 = PodEscapeToken("E<Oslash>",	"{@Char Oslash}");
+static TOKEN PE26 = PodEscapeToken("E<Otilde>",	"{@Char Otilde}");
+static TOKEN PE27 = PodEscapeToken("E<Ouml>",	"{@Char Odieresis}");
+static TOKEN PE28 = PodEscapeToken("E<THORN>",	"{@Char Thorn}");
+static TOKEN PE29 = PodEscapeToken("E<Uacute>",	"{@Char Uacute}");
+static TOKEN PE30 = PodEscapeToken("E<Ucirc>",	"{@Char Ucircumflex}");
+static TOKEN PE31 = PodEscapeToken("E<Ugrave>",	"{@Char Ugrave}");
+static TOKEN PE32 = PodEscapeToken("E<Uuml>",	"{@Char Udieresis}");
+static TOKEN PE33 = PodEscapeToken("E<Yacute>",	"{@Char Yacute}");
+static TOKEN PE34 = PodEscapeToken("E<aacute>",	"{@Char aacute}");
+static TOKEN PE35 = PodEscapeToken("E<acirc>",	"{@Char acircumflex}");
+static TOKEN PE36 = PodEscapeToken("E<aelig>",	"{@Char ae}");
+static TOKEN PE37 = PodEscapeToken("E<agrave>",	"{@Char agrave}");
+static TOKEN PE38 = PodEscapeToken("E<aring>",	"{@Char aring}");
+static TOKEN PE39 = PodEscapeToken("E<atilde>",	"{@Char atilde}");
+static TOKEN PE40 = PodEscapeToken("E<auml>",	"{@Char adieresis}");
+static TOKEN PE41 = PodEscapeToken("E<ccedil>",	"{@Char ccedilla}");
+static TOKEN PE42 = PodEscapeToken("E<eacute>",	"{@Char eacute}");
+static TOKEN PE43 = PodEscapeToken("E<ecirc>",	"{@Char ecircumflex}");
+static TOKEN PE44 = PodEscapeToken("E<egrave>",	"{@Char egrave}");
+static TOKEN PE45 = PodEscapeToken("E<eth>",	"{@Char eth}");
+static TOKEN PE46 = PodEscapeToken("E<euml>",	"{@Char edieresis}");
+static TOKEN PE47 = PodEscapeToken("E<iacute>",	"{@Char iacute}");
+static TOKEN PE48 = PodEscapeToken("E<icirc>",	"{@Char icircumflex}");
+static TOKEN PE49 = PodEscapeToken("E<igrave>",	"{@Char igrave}");
+static TOKEN PE50 = PodEscapeToken("E<iuml>",	"{@Char idieresis}");
+static TOKEN PE51 = PodEscapeToken("E<ntilde>",	"{@Char ntilde}");
+static TOKEN PE52 = PodEscapeToken("E<oacute>",	"{@Char oacute}");
+static TOKEN PE53 = PodEscapeToken("E<ocirc>",	"{@Char ocircumflex}");
+static TOKEN PE54 = PodEscapeToken("E<ograve>",	"{@Char ograve}");
+static TOKEN PE55 = PodEscapeToken("E<oslash>",	"{@Char oslash}");
+static TOKEN PE56 = PodEscapeToken("E<otilde>",	"{@Char otilde}");
+static TOKEN PE57 = PodEscapeToken("E<ouml>",	"{@Char odieresis}");
+static TOKEN PE58 = PodEscapeToken("E<szlig>",	"{@Char germandbls}");
+static TOKEN PE59 = PodEscapeToken("E<thorn>",	"{@Char thorn}");
+static TOKEN PE60 = PodEscapeToken("E<uacute>",	"{@Char uacute}");
+static TOKEN PE61 = PodEscapeToken("E<ucirc>",	"{@Char ucircumflex}");
+static TOKEN PE62 = PodEscapeToken("E<ugrave>",	"{@Char ugrave}");
+static TOKEN PE63 = PodEscapeToken("E<uuml>",	"{@Char udieresis}");
+static TOKEN PE64 = PodEscapeToken("E<yacute>",	"{@Char yacute}");
+static TOKEN PE65 = PodEscapeToken("E<yuml>",	"{@Char ydieresis}");
 
 /* Some extra Latin 1 chars that are listed in the HTML3.2 draft 1996/05/21 */
-TOKEN PE66 = PodEscapeToken("E<copy>",		"{@CopyRight}");
-TOKEN PE67 = PodEscapeToken("E<reg>",		"{@Register}");
-TOKEN PE68 = PodEscapeToken("E<nbsp>",		"~");
+static TOKEN PE66 = PodEscapeToken("E<copy>",	"{@CopyRight}");
+static TOKEN PE67 = PodEscapeToken("E<reg>",	"{@Register}");
+static TOKEN PE68 = PodEscapeToken("E<nbsp>",	"~");
 
 /* Additional ISO-8859/1 entities listed in rfc1866 (section 14) */
-TOKEN PE69 = PodEscapeToken("E<iexcl>",		"{@Char exclamdown}");
-TOKEN PE70 = PodEscapeToken("E<cent>",		"{@Char cent}");
-TOKEN PE71 = PodEscapeToken("E<pound>",		"{@Sterling}");
-TOKEN PE72 = PodEscapeToken("E<curren>",	"{@Char currency}");
-TOKEN PE73 = PodEscapeToken("E<yen>",		"{@Yen}");
-TOKEN PE74 = PodEscapeToken("E<brvbar>",	"{@Char bar}");
-TOKEN PE75 = PodEscapeToken("E<sect>",		"{@SectSym}");
-TOKEN PE76 = PodEscapeToken("E<uml>",		"{@Char dieresis}");
-TOKEN PE77 = PodEscapeToken("E<ordf>",		"{@Char ordfeminine}");
-TOKEN PE78 = PodEscapeToken("E<laquo>",		"{@Char guillemotleft}");
-TOKEN PE79 = PodEscapeToken("E<not>",		"{@Char logicalnot}");
-TOKEN PE80 = PodEscapeToken("E<shy>",		"{@Char hyphen}");
-TOKEN PE81 = PodEscapeToken("E<macr>",		"{@Char macron}");
-TOKEN PE82 = PodEscapeToken("E<deg>",		"{@Char degree}");
-TOKEN PE83 = PodEscapeToken("E<plusmn>",	"{@Char plusminus}");
-TOKEN PE84 = PodEscapeToken("E<sup1>",		"{@Char onesuperior}");
-TOKEN PE85 = PodEscapeToken("E<sup2>",		"{@Char twosuperior}");
-TOKEN PE86 = PodEscapeToken("E<sup3>",		"{@Char threesuperior}");
-TOKEN PE87 = PodEscapeToken("E<acute>",		"{@Char acute}");
-TOKEN PE88 = PodEscapeToken("E<micro>",		"{@Char mu}");
-TOKEN PE89 = PodEscapeToken("E<para>",		"{@ParSym}");
-TOKEN PE90 = PodEscapeToken("E<middot>",	"{@Char periodcentered}");
-TOKEN PE91 = PodEscapeToken("E<cedil>",		"{@Char cedilla}");
-TOKEN PE92 = PodEscapeToken("E<ordm>",		"{@Char ordmasculine}");
-TOKEN PE93 = PodEscapeToken("E<raquo>",		"{@Char guillemotright}");
-TOKEN PE94 = PodEscapeToken("E<frac14>",	"{@Char onequarter}");
-TOKEN PE95 = PodEscapeToken("E<frac12>",	"{@Char onehalf}");
-TOKEN PE96 = PodEscapeToken("E<frac34>",	"{@Char threequarters}");
-TOKEN PE97 = PodEscapeToken("E<iquest>",	"{@Char questiondown}");
-TOKEN PE98 = PodEscapeToken("E<times>",		"{@Multiply}");
-TOKEN PE99 = PodEscapeToken("E<divide>",	"{@Divide}");
+static TOKEN PE69 = PodEscapeToken("E<iexcl>",	"{@Char exclamdown}");
+static TOKEN PE70 = PodEscapeToken("E<cent>",	"{@Char cent}");
+static TOKEN PE71 = PodEscapeToken("E<pound>",	"{@Sterling}");
+static TOKEN PE72 = PodEscapeToken("E<curren>",	"{@Char currency}");
+static TOKEN PE73 = PodEscapeToken("E<yen>",	"{@Yen}");
+static TOKEN PE74 = PodEscapeToken("E<brvbar>",	"{@Char bar}");
+static TOKEN PE75 = PodEscapeToken("E<sect>",	"{@SectSym}");
+static TOKEN PE76 = PodEscapeToken("E<uml>",	"{@Char dieresis}");
+static TOKEN PE77 = PodEscapeToken("E<ordf>",	"{@Char ordfeminine}");
+static TOKEN PE78 = PodEscapeToken("E<laquo>",	"{@Char guillemotleft}");
+static TOKEN PE79 = PodEscapeToken("E<not>",	"{@Char logicalnot}");
+static TOKEN PE80 = PodEscapeToken("E<shy>",	"{@Char hyphen}");
+static TOKEN PE81 = PodEscapeToken("E<macr>",	"{@Char macron}");
+static TOKEN PE82 = PodEscapeToken("E<deg>",	"{@Char degree}");
+static TOKEN PE83 = PodEscapeToken("E<plusmn>",	"{@Char plusminus}");
+static TOKEN PE84 = PodEscapeToken("E<sup1>",	"{@Char onesuperior}");
+static TOKEN PE85 = PodEscapeToken("E<sup2>",	"{@Char twosuperior}");
+static TOKEN PE86 = PodEscapeToken("E<sup3>",	"{@Char threesuperior}");
+static TOKEN PE87 = PodEscapeToken("E<acute>",	"{@Char acute}");
+static TOKEN PE88 = PodEscapeToken("E<micro>",	"{@Char mu}");
+static TOKEN PE89 = PodEscapeToken("E<para>",	"{@ParSym}");
+static TOKEN PE90 = PodEscapeToken("E<middot>",	"{@Char periodcentered}");
+static TOKEN PE91 = PodEscapeToken("E<cedil>",	"{@Char cedilla}");
+static TOKEN PE92 = PodEscapeToken("E<ordm>",	"{@Char ordmasculine}");
+static TOKEN PE93 = PodEscapeToken("E<raquo>",	"{@Char guillemotright}");
+static TOKEN PE94 = PodEscapeToken("E<frac14>",	"{@Char onequarter}");
+static TOKEN PE95 = PodEscapeToken("E<frac12>",	"{@Char onehalf}");
+static TOKEN PE96 = PodEscapeToken("E<frac34>",	"{@Char threequarters}");
+static TOKEN PE97 = PodEscapeToken("E<iquest>",	"{@Char questiondown}");
+static TOKEN PE98 = PodEscapeToken("E<times>",	"{@Multiply}");
+static TOKEN PE99 = PodEscapeToken("E<divide>",	"{@Divide}");
 
 
 /*****************************************************************************/
@@ -2834,7 +2842,7 @@ typedef struct lang_rec {
 } LANGUAGE;
 
 
-LANGUAGE CLanguage = {
+static LANGUAGE CLanguage = {
   { "C", "c", "C++", "c++"  },
   "cprint", "@CP",
   NO_MATCH_ERROR,
@@ -2851,13 +2859,13 @@ LANGUAGE CLanguage = {
     &ArrowToken, &LessEqualToken, &GreaterEqualToken, &CNotEqualToken
   },
 
-  { "asm", "auto", "break", "case", "catch", "char", "class", "const", 
+  { "asm", "auto", "break", "case", "catch", "char", "class", "const",
     "continue", "default", "delete", "do", "double", "else", "enum", "extern",
     "float", "for", "friend", "goto", "if", "inline", "int", "long", "new",
     "operator", "private", "protected", "public", "register", "return",
     "short", "signed", "sizeof", "static", "struct", "switch", "template",
     "this", "throw", "try", "typedef", "union", "unsigned", "virtual",
-    "void", "volatile", "while", 
+    "void", "volatile", "while",
 
     /* these contributed by Isaac To <kkto@csis.hku.hk> */
     "bool", "wchar_t", "typeid", "typename", "false", "true", "const_cast",
@@ -2871,7 +2879,7 @@ LANGUAGE CLanguage = {
 
 /* Tokens, keywords taken from the on-line documentation supplied with Python
  * 2.5 */
-LANGUAGE PythonLanguage = {
+static LANGUAGE PythonLanguage = {
   { "Python", "python"  },
   "python", "@Python",
   NO_MATCH_ERROR,
@@ -2951,7 +2959,7 @@ LANGUAGE PythonLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE RubyLanguage = {
+static LANGUAGE RubyLanguage = {
   { "Ruby", "ruby" },
   "ruby", "@Ruby",
   NO_MATCH_ERROR,
@@ -2991,7 +2999,7 @@ LANGUAGE RubyLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE EiffelLanguage = {
+static LANGUAGE EiffelLanguage = {
   { "Eiffel", "eiffel" },
   "eiffel", "@Eiffel",
   NO_MATCH_ERROR,
@@ -3017,7 +3025,7 @@ LANGUAGE EiffelLanguage = {
   }
 };
 
-LANGUAGE BlueLanguage = {
+static LANGUAGE BlueLanguage = {
   { "Blue", "blue" },
   "blue", "@Blue",
   NO_MATCH_ERROR,
@@ -3046,7 +3054,7 @@ LANGUAGE BlueLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE JavaLanguage = {
+static LANGUAGE JavaLanguage = {
   { "Java", "java"  },
   "java", "@Java",
   NO_MATCH_ERROR,
@@ -3080,7 +3088,7 @@ LANGUAGE JavaLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE NonpareilLanguage = {
+static LANGUAGE NonpareilLanguage = {
   { "Nonpareil", "nonpareil" },
   "nonpareil", "@Nonpareil",
   NO_MATCH_ERROR,
@@ -3130,18 +3138,18 @@ LANGUAGE NonpareilLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE HaskellLanguage = {
+static LANGUAGE HaskellLanguage = {
   { "Haskell", "haskell" },
   "haskell", "@Haskell",
   NO_MATCH_ERROR,
   {
 	/*&EqualToken, &PlusToken, &MinusToken, &DotToken,
-	  &StarToken, &HaskellColonToken, 
+	  &StarToken, &HaskellColonToken,
 	  &LessToken, &GreaterToken,
 	  these overlap with HaskellOperatorToken */
     &HaskellStringToken, &HaskellCharacterToken,
     &HaskellIdentifierToken, &NumberToken,
-    &HaskellLineCommentToken, &HaskellCommentToken, 
+    &HaskellLineCommentToken, &HaskellCommentToken,
     &HaskellCommentEscapeToken, &HaskellLineCommentEscapeToken,
     &SemicolonToken, &CommaToken, &DoubleColonToken,
     &HaskellEquivalenceToken, &FunctionCompositionToken,
@@ -3171,7 +3179,7 @@ LANGUAGE HaskellLanguage = {
 /*****************************************************************************/
 /* Tokens, keywords taken from UNU/IIST Report No. 249 */
 
-LANGUAGE RSLLanguage = {
+static LANGUAGE RSLLanguage = {
   { "RSL", "rsl" },
   "rsl", "@RSL",
   NO_MATCH_ERROR,
@@ -3218,7 +3226,7 @@ LANGUAGE RSLLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE PerlLanguage = {
+static LANGUAGE PerlLanguage = {
   { "Perl", "perl", },
   "perl", "@Perl",
   NO_MATCH_ERROR,
@@ -3237,76 +3245,76 @@ LANGUAGE PerlLanguage = {
     &PerlIdentifierToken, &PerlSpecialIdentifierToken,
     &PerlLiteralNumberToken, &PerlHexNumberToken, &PerlBinaryNumberToken,
     &PerlCommentToken, &PerlCommentEscapeToken, &PerlPodToken,
-    &ExclamationToken, &PercentToken, &HatToken, &AmpersandToken, 
-    &StarToken, &SlashToken, &ArrowToken, &BackSlashToken, 
-    &LeftParenToken, &RightParenToken, &MinusToken, &PlusToken, 
-    &LeftBraceToken, &RightBraceToken, &BarToken, &CircumToken, 
-    &LeftBracketToken, &RightBracketToken, &SemicolonToken, &ColonToken, 
-    &LessToken, &GreaterToken, &QuestionToken, &CommaToken, &DotToken, 
-    &LessEqualToken, &GreaterEqualToken, &CNotEqualToken, 
-    &PerlIncrementToken, &PerlDecrementToken, &PerlExponentiateToken, 
+    &ExclamationToken, &PercentToken, &HatToken, &AmpersandToken,
+    &StarToken, &SlashToken, &ArrowToken, &BackSlashToken,
+    &LeftParenToken, &RightParenToken, &MinusToken, &PlusToken,
+    &LeftBraceToken, &RightBraceToken, &BarToken, &CircumToken,
+    &LeftBracketToken, &RightBracketToken, &SemicolonToken, &ColonToken,
+    &LessToken, &GreaterToken, &QuestionToken, &CommaToken, &DotToken,
+    &LessEqualToken, &GreaterEqualToken, &CNotEqualToken,
+    &PerlIncrementToken, &PerlDecrementToken, &PerlExponentiateToken,
     &PerlMatchToken, &PerlNotMatchToken,
-    &PerlEqualToken, &PerlAssignToken, &PerlBitLeftShiftToken, 
-    &PerlBitRightShiftToken, &PerlSpaceshipToken, 
-    &PerlAndToken, &PerlOrToken, &PerlRange2Token, &PerlRange3Token, 
-    &PerlFileTestrToken, &PerlFileTestwToken, &PerlFileTestxToken, 
-    &PerlFileTestoToken, &PerlFileTestRToken, &PerlFileTestWToken, 
-    &PerlFileTestXToken, &PerlFileTestOToken, &PerlFileTesteToken, 
-    &PerlFileTestzToken, &PerlFileTestsToken, &PerlFileTestfToken, 
-    &PerlFileTestdToken, &PerlFileTestlToken, &PerlFileTestpToken, 
-    &PerlFileTestSToken, &PerlFileTestbToken, &PerlFileTestcToken, 
-    &PerlFileTesttToken, &PerlFileTestuToken, &PerlFileTestgToken, 
-    &PerlFileTestkToken, &PerlFileTestTToken, &PerlFileTestBToken, 
-    &PerlFileTestMToken, &PerlFileTestAToken, &PerlFileTestCToken, 
+    &PerlEqualToken, &PerlAssignToken, &PerlBitLeftShiftToken,
+    &PerlBitRightShiftToken, &PerlSpaceshipToken,
+    &PerlAndToken, &PerlOrToken, &PerlRange2Token, &PerlRange3Token,
+    &PerlFileTestrToken, &PerlFileTestwToken, &PerlFileTestxToken,
+    &PerlFileTestoToken, &PerlFileTestRToken, &PerlFileTestWToken,
+    &PerlFileTestXToken, &PerlFileTestOToken, &PerlFileTesteToken,
+    &PerlFileTestzToken, &PerlFileTestsToken, &PerlFileTestfToken,
+    &PerlFileTestdToken, &PerlFileTestlToken, &PerlFileTestpToken,
+    &PerlFileTestSToken, &PerlFileTestbToken, &PerlFileTestcToken,
+    &PerlFileTesttToken, &PerlFileTestuToken, &PerlFileTestgToken,
+    &PerlFileTestkToken, &PerlFileTestTToken, &PerlFileTestBToken,
+    &PerlFileTestMToken, &PerlFileTestAToken, &PerlFileTestCToken,
   },
 
-  { 
+  {
     /* Built-ins taken from WCS and on-line documentation for 5.6.0     */
     /* dbmopen and dbmclose are not included because they are obsolete. */
-    "abs", "accept", "alarm", "atan2", 
-    "bind", "binmode", "bless", 
-    "caller", "can", "chdir", "chmod", "chomp", "chop", "chown", "chr", "chroot", 
-    "close", "closedir", "connect", "continue", "cos", "crypt", 
-    "defined", "delete", "die", "do", "dump", 
-    "each", "endgrent", "endhostent", "endnetent", "endprotoent", 
-    "endpwent", "endservent", "eof", "eval", "exec", "exists", "exit", 
-    "exp", 
-    "fcntl", "fileno", "flock", "fork", "format", "formline", 
-    "getc", "getgrent", "getgrgid", "getgrnam", "gethostbyaddr", 
-    "gethostbyname", "gethostent", "getlogin", "getnetbyaddr", 
-    "getnetbyname", "getnetent", "getpeername", "getpgrp", "getppid", 
-    "getpriority", "getprotobyname", "getprotobynumber", "getprotoent", 
-    "getpwent", "getpwnam", "getpwuid", "getservbyname", "getservbyport", 
-    "getservent", "getsockname", "getsockopt", "glob", "gmtime", "goto", 
-    "grep", 
-    "hex", 
+    "abs", "accept", "alarm", "atan2",
+    "bind", "binmode", "bless",
+    "caller", "can", "chdir", "chmod", "chomp", "chop", "chown", "chr", "chroot",
+    "close", "closedir", "connect", "continue", "cos", "crypt",
+    "defined", "delete", "die", "do", "dump",
+    "each", "endgrent", "endhostent", "endnetent", "endprotoent",
+    "endpwent", "endservent", "eof", "eval", "exec", "exists", "exit",
+    "exp",
+    "fcntl", "fileno", "flock", "fork", "format", "formline",
+    "getc", "getgrent", "getgrgid", "getgrnam", "gethostbyaddr",
+    "gethostbyname", "gethostent", "getlogin", "getnetbyaddr",
+    "getnetbyname", "getnetent", "getpeername", "getpgrp", "getppid",
+    "getpriority", "getprotobyname", "getprotobynumber", "getprotoent",
+    "getpwent", "getpwnam", "getpwuid", "getservbyname", "getservbyport",
+    "getservent", "getsockname", "getsockopt", "glob", "gmtime", "goto",
+    "grep",
+    "hex",
     "import", "index", "int", "ioctl", "isa",
-    "join", 
-    "keys", "kill", 
-    "last", "lc", "lcfirst", "length", "link", "listen", "local", 
-    "localtime", "lock", "log", "lstat", 
-    "map", "mkdir", "msgctl", "msgget", "msgrcv", "msgsnd", "my", 
-    "next", "no", 
+    "join",
+    "keys", "kill",
+    "last", "lc", "lcfirst", "length", "link", "listen", "local",
+    "localtime", "lock", "log", "lstat",
+    "map", "mkdir", "msgctl", "msgget", "msgrcv", "msgsnd", "my",
+    "next", "no",
     "oct", "open", "opendir", "ord", "our",
-    "pack", "package", "pipe", "pop", "pos", "print", "printf", "prototype", "push", 
-    "quotemeta", 
-    "rand", "read", "readdir", "readline", "readlink", "readpipe", "recv", 
-    "redo", "ref", "rename", "require", "reset", "return", "reverse", 
-    "rewinddir", "rindex", "rmdir", 
-    "scalar", "seek", "seekdir", "select", "semctl", "semget", "semop", 
-    "send", "setgrent", "sethostent", "setnetent", "setpgrp", 
-    "setpriority", "setprotoent", "setpwent", "setservent", 
-    "setsockopt", "shift", "shmctl", "shmget", "shmread", "shmwrite", 
-    "shutdown", "sin", "sleep", "socket", "socketpair", "sort", 
-    "splice", "split", "sprintf", "sqrt", "srand", "stat", "study", 
+    "pack", "package", "pipe", "pop", "pos", "print", "printf", "prototype", "push",
+    "quotemeta",
+    "rand", "read", "readdir", "readline", "readlink", "readpipe", "recv",
+    "redo", "ref", "rename", "require", "reset", "return", "reverse",
+    "rewinddir", "rindex", "rmdir",
+    "scalar", "seek", "seekdir", "select", "semctl", "semget", "semop",
+    "send", "setgrent", "sethostent", "setnetent", "setpgrp",
+    "setpriority", "setprotoent", "setpwent", "setservent",
+    "setsockopt", "shift", "shmctl", "shmget", "shmread", "shmwrite",
+    "shutdown", "sin", "sleep", "socket", "socketpair", "sort",
+    "splice", "split", "sprintf", "sqrt", "srand", "stat", "study",
     "sub", "substr", "symlink", "syscall", "sysopen", "sysread", "sysseek",
-    "system", "syswrite", 
-    "tell", "telldir", "tie", "tied", "time", "times", "truncate", 
+    "system", "syswrite",
+    "tell", "telldir", "tie", "tied", "time", "times", "truncate",
     "unimport",
-    "uc", "ucfirst", "umask", "undef", "unlink", "unpack", "unshift", 
-    "untie", "use", "utime", 
+    "uc", "ucfirst", "umask", "undef", "unlink", "unpack", "unshift",
+    "untie", "use", "utime",
     "values", "vec", "VERSION",
-    "wait", "waitpid", "wantarray", "warn", "write", 
+    "wait", "waitpid", "wantarray", "warn", "write",
 
     /* Comparison operators */
     "lt", "gt", "eq", "ne", "cmp", "le", "ge",
@@ -3320,26 +3328,26 @@ LANGUAGE PerlLanguage = {
     /* Pragmas */
     "attributes", "autouse", "base", "blib", "bytes",
     "constant", "charnames", "diagnostics", "fields", "filetest",
-    "integer", "less", "lib", "locale", 
+    "integer", "less", "lib", "locale",
     /* "open", Not listed here since its also a function */
     "ops", "overload", "re", "sigtrap", "strict", "subs", "utf8",
     "vars", "warnings",
 
     /* Low-precedence logical operators */
-    "and", "or", "xor", "not", 
+    "and", "or", "xor", "not",
 
     /* The x keyword */
     "x",
 
     /* Control structures */
-    "if", "elsif", /* yes one e */ "else", "unless", 
+    "if", "elsif", /* yes one e */ "else", "unless",
     "while", "for", "foreach", "continue", "until",
 
     /* Special subroutines */
-    "AUTOLOAD", "BEGIN", "CHECK", "END", "DESTROY", "INIT", 
+    "AUTOLOAD", "BEGIN", "CHECK", "END", "DESTROY", "INIT",
 
     /* Predefined classes & namespaces */
-    "CORE", "GLOBAL", "UNIVERSAL", "SUPER", 
+    "CORE", "GLOBAL", "UNIVERSAL", "SUPER",
 
     /* Tie predefined subroutines */
     "TIESCALAR",
@@ -3356,7 +3364,7 @@ LANGUAGE PerlLanguage = {
 };
 
 
-LANGUAGE PodLanguage = {
+static LANGUAGE PodLanguage = {
   { "Pod", "pod", "POD" },
   "pod", "@Pod",
   NO_MATCH_PRINT,
@@ -3395,7 +3403,7 @@ LANGUAGE PodLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE JavaScriptLanguage = {
+static LANGUAGE JavaScriptLanguage = {
   { "JavaScript", "javascript"  },
   "javascript", "@JavaScript",
   NO_MATCH_ERROR,
@@ -3432,7 +3440,7 @@ LANGUAGE JavaScriptLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE TclLanguage = {
+static LANGUAGE TclLanguage = {
   { "Tcl", "tcl"  },
   "tcl", "@Tcl",
   NO_MATCH_ERROR,
@@ -3480,7 +3488,7 @@ LANGUAGE TclLanguage = {
 /*                                                                           */
 /*****************************************************************************/
 
-LANGUAGE *languages[] = {
+static LANGUAGE *languages[] = {
   & BlueLanguage,
   & CLanguage,
   & EiffelLanguage,
@@ -3556,14 +3564,14 @@ static char	*numbered_option;	/* value of -L option, else null     */
 static BOOLEAN	tab_by_spacing;		/* TRUE if using space chars to tab  */
 static int	tab_in;			/* tab interval, value of -t option  */
 static float	tab_out;		/* tab interval width (-T option)    */
-static char 	tab_unit;		/* unit of measurement for tab       */
-static BOOLEAN 	print_lines;		/* TRUE if we are printing line nums */
-BLANKNUMBERED_TYPE blanknumbered;	/* blank line numbering              */
-static int 	print_num;		/* current line num for printing     */
+static char	tab_unit;		/* unit of measurement for tab       */
+static BOOLEAN	print_lines;		/* TRUE if we are printing line nums */
+static BLANKNUMBERED_TYPE blanknumbered;/* blank line numbering              */
+static int	print_num;		/* current line num for printing     */
 
 static FILE	*in_fp;			/* where input comes from	     */
 static FILE	*out_fp;		/* where output goes		     */
-static FILE	*err_fp;		/* where error messages go 	     */
+static FILE	*err_fp;		/* where error messages go	     */
 
 
 /*****************************************************************************/
@@ -4477,8 +4485,8 @@ static TOKEN *ExpandToken(TOKEN *t, int starts_pos)
 #define LEGAL		1
 #define ESCAPE		2
 #define INNER_ESCAPE	3
-TRIE Trie = (TRIE) NULL;		/* these tokens allowed anywhere     */
-TRIE StartLineTrie = (TRIE) NULL;	/* these allowed at line start only  */
+static TRIE Trie = (TRIE) NULL;			/* these tokens allowed anywhere     */
+static TRIE StartLineTrie = (TRIE) NULL;	/* these allowed at line start only  */
 
 static void SetupOneToken(TOKEN *t)
 { int j;
@@ -4684,7 +4692,7 @@ static void Process(LANGUAGE *lang, TOKEN *outer_token,
 
   state = START;
   while( curr_line[line_pos] != '\0' && state != STOP )
-  { 
+  {
     if( DEBUG_PROCESS )
     {
       if( state >= IN_TOKEN )
@@ -4937,7 +4945,7 @@ static void Process(LANGUAGE *lang, TOKEN *outer_token,
 
 	}
 	break;
-      
+
 
       case IN_TOKEN_AFTER_ESCAPE:
 
@@ -4997,7 +5005,7 @@ static void Process(LANGUAGE *lang, TOKEN *outer_token,
       if( current_token->end_delimiter[0] != '\0' )
       {
 	if( outer_token == (TOKEN *) NULL )
-	  fprintf(err_fp, "%s: program text ended within %s\n", 
+	  fprintf(err_fp, "%s: program text ended within %s\n",
 	    ErrorHeader(), current_token->name);
 	else
 	  fprintf(err_fp, "%s: %s token ended within %s\n",
@@ -5011,7 +5019,7 @@ static void Process(LANGUAGE *lang, TOKEN *outer_token,
 
       /* we stopped in a token at a point where we were looking for a delim */
       if( outer_token == (TOKEN *) NULL )
-	fprintf(err_fp, "%s: program text ended within %s\n", 
+	fprintf(err_fp, "%s: program text ended within %s\n",
 	  ErrorHeader(), current_token->name);
       else
 	fprintf(err_fp, "%s: %s token ended within %s\n",
@@ -5035,7 +5043,7 @@ static void Process(LANGUAGE *lang, TOKEN *outer_token,
       if( current_token->end_delimiter[0] != '\0' )
       {
 	if( outer_token == (TOKEN *) NULL )
-	  fprintf(err_fp, "%s: program text ended within %s after escape\n", 
+	  fprintf(err_fp, "%s: program text ended within %s after escape\n",
 	    ErrorHeader(), current_token->name);
 	else
 	  fprintf(err_fp, "%s: %s token ended within %s after escape\n",
@@ -5159,7 +5167,7 @@ int main(int argc, char *argv[])
 
 
       case 'i':
-     
+
 	/* read name of input file */
 	if( !raw_seen )
 	{ fprintf(err_fp, "%s: -i illegal without -r\n", ErrorHeader());
@@ -5187,7 +5195,7 @@ int main(int argc, char *argv[])
 
 
       case 'o':
-     
+
 	/* read name of output file */
 	if( out_fp != NULL )
 	{ fprintf(err_fp, "%s: -o seen twice\n", ErrorHeader());
@@ -5204,7 +5212,7 @@ int main(int argc, char *argv[])
 
 
       case 'e':
-     
+
 	/* read name of error file */
 	GetArg(errfilename, "usage: -e<filename>", FALSE);
 	err_fp = fopen(errfilename, "w");
@@ -5217,7 +5225,7 @@ int main(int argc, char *argv[])
 
 
       case 'p':
-     
+
 	/* read print style */
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -p illegal with -r option\n", ErrorHeader());
@@ -5235,7 +5243,7 @@ int main(int argc, char *argv[])
 
 
       case 'f':
-     
+
 	/* read font family */
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -f illegal with -r option\n", ErrorHeader());
@@ -5246,7 +5254,7 @@ int main(int argc, char *argv[])
 
 
       case 's':
-     
+
 	/* read font size */
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -s illegal with -r option\n", ErrorHeader());
@@ -5257,7 +5265,7 @@ int main(int argc, char *argv[])
 
 
       case 'v':
-     
+
 	/* read line spacing */
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -v illegal with -r option\n", ErrorHeader());
@@ -5268,7 +5276,7 @@ int main(int argc, char *argv[])
 
 
       case 'b':
-     
+
 	/* read blanklinescale */
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -b illegal with -r option\n", ErrorHeader());
@@ -5279,7 +5287,7 @@ int main(int argc, char *argv[])
 
 
       case 't':
-     
+
 	/* read tab interval */
 	GetArg(tabin_option, "usage: -t<number>", TRUE);
 	if( tabin_option != NULL && sscanf(tabin_option,"%d",&tab_in) != 1 )
@@ -5295,7 +5303,7 @@ int main(int argc, char *argv[])
 
 
       case 'T':
-     
+
 	/* read tab_out and tab_unit */
 	GetArg(tabout_option, "usage: -T<number><unit>", TRUE);
 	if( tabout_option != NULL )
@@ -5321,7 +5329,7 @@ int main(int argc, char *argv[])
 
 
       case 'S':
-     
+
 	/* read alternative setup file */
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -S illegal with -r option\n", ErrorHeader());
@@ -5332,7 +5340,7 @@ int main(int argc, char *argv[])
 
 
       case 'L':
-     
+
 	/* read line numbering */
 	GetArg(numbered_option, "usage: -L<number>", TRUE);
 	print_lines = TRUE;
@@ -5345,21 +5353,21 @@ int main(int argc, char *argv[])
 
 
       case 'N':
-     
+
 	/* print numbers on non-blank lines only */
 	blanknumbered = BLANKNUMBERED_NOPRINT;
 	break;
 
 
       case 'M':
-     
+
 	/* like -N but do not assign line numbers to blank lines */
 	blanknumbered = BLANKNUMBERED_NO;
 	break;
 
 
       case 'n':
-     
+
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -n illegal with -r option\n", ErrorHeader());
 	  exit(1);
@@ -5369,7 +5377,7 @@ int main(int argc, char *argv[])
 
 
       case 'V':
-     
+
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -V illegal with -r option\n", ErrorHeader());
 	  exit(1);
@@ -5380,7 +5388,7 @@ int main(int argc, char *argv[])
 
 
       case 'u':
-     
+
 	if( raw_seen )
 	{ fprintf(err_fp, "%s: -u illegal with -r option\n", ErrorHeader());
 	  exit(1);
@@ -5391,7 +5399,7 @@ int main(int argc, char *argv[])
 
 
       case 'l':
-     
+
 	if( language_option != (char *) NULL )
 	{ fprintf(err_fp, "%s: -l seen twice\n", ErrorHeader());
 	  exit(1);
@@ -5417,7 +5425,7 @@ int main(int argc, char *argv[])
 
 
       default:
-     
+
 	fprintf(err_fp, "%s: unknown command line flag %s\n", ErrorHeader(),
 	  argv[arg_pos]);
 	exit(1);
@@ -5482,7 +5490,7 @@ int main(int argc, char *argv[])
     fprintf(out_fp, "    @InitialBreak { lines 1.2fx nohyphen }\n");
     fprintf(out_fp, "//\n");
     fprintf(out_fp, "%s%s\n", "@Text @Be", "gin");
- 
+
     /* print each file, possibly with a header */
     for( i = 0;  i < file_count;  i++ )
     {
