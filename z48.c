@@ -598,7 +598,11 @@ static PDF_OBJECT_NUM PDFObject_New(/* FILE* in_fp */)
 
   /* initialise the offset of this object to zero (it hasn't been written    */
   /* to the PDF file yet)                                                    */
-  the_block->m_block[block_pos] = 0;                  /* ftell(in_fp);       */
+  if (the_block == NULL) {
+    Error(48, 1, "PDFObject_New: run out of memory", FATAL, no_fpos);
+  } else {
+    the_block->m_block[block_pos] = 0;                  /* ftell(in_fp);     */
+  }
 
   return g_next_objnum++;
 }
@@ -733,6 +737,7 @@ void PDFFile_EndFontEncoding(FILE* in_fp)
 /*                                                                           */
 /*****************************************************************************/
 
+/* *** made redundant by other changes JeffK 17/6/23
 static t_font_list_entry_ptr
   PDFFont_FindListEntry(const FULL_CHAR* in_real_font_name)
 {
@@ -745,7 +750,7 @@ static t_font_list_entry_ptr
   }
   return entry;
 }
-
+*** */
 
 /*****************************************************************************/
 /*                                                                           */
@@ -1043,11 +1048,11 @@ void PDFFont_AddFont(FILE* in_fp, const FULL_CHAR* in_short_font_name,
   const FULL_CHAR* in_real_font_name, const FULL_CHAR* in_font_encoding_name)
 {
   /* t_font_list_entry_ptr entry; */
-  /* entry = */ PDFFont_FindListEntry(in_real_font_name);
-  debug4(DPD, D, "PDFFont_AddFont(-, %s, %s, %s) [new = %s]",
+  /* entry = PDFFont_FindListEntry(in_real_font_name); */
+  debug3(DPD, D, "PDFFont_AddFont(-, %s, %s) [new = %s]",
     in_short_font_name, in_real_font_name,
-    (in_font_encoding_name != (FULL_CHAR *) NULL ? in_font_encoding_name : (const FULL_CHAR*) ""),
-    0 /* bool_str(entry == NULL) */ );
+    (in_font_encoding_name != (FULL_CHAR *) NULL ? in_font_encoding_name : (const FULL_CHAR*) "")
+    /* , bool_str(entry == NULL) */ );
   /* *** this attempted bug fix by Jeff K. problem may be multiple font
 	 entries for the same font
   if (entry == NULL)
@@ -1501,6 +1506,7 @@ void PDFFont_Set(FILE* in_fp, FULL_LENGTH in_font_size,
   {
     Error(48, 42, "cannot find font entry for name %s", FATAL, no_fpos,
       in_short_font_name);
+    return;
   }
   /* Assert(entry != NULL, no_fpos); */
 #ifdef USE_MATRICES
@@ -2095,6 +2101,7 @@ static void PDFSourceAnnot_Write(FILE* in_fp, t_source_annot_entry_ptr in_entry)
 	  break;
 
 
+	case kNumberOfDestLinkOptions:
 	default:
 
 	  Error(48, 18, "PDFSourceAnnot_Write: invalid link dest option",

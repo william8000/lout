@@ -170,7 +170,7 @@ void EnvWriteInsert(OBJECT env, FILE_NUM fnum, int offset, int lnum)
 /*****************************************************************************/
 
 BOOLEAN EnvReadRetrieve(FILE_NUM fnum, int offset, OBJECT *env)
-{ int pos;  OBJECT link, y, z;
+{ int pos;  OBJECT link, y /* , z */;
   debug2(DET, DD, "EnvReadRetrieve(%s, %d)", FileName(fnum), offset);
   stat_reads++;
 
@@ -180,8 +180,7 @@ BOOLEAN EnvReadRetrieve(FILE_NUM fnum, int offset, OBJECT *env)
     for( link = Down(tab[pos]);  link != tab[pos];  link = NextDown(link) )
     { Child(y, link)
         ;
-      Child(z, Down(y))
-        ;
+      /* Child(z, Down(y)) ; */
       if( env_fnum(y) == fnum && env_offset(y) == offset && env_read(y) )
       { MoveLink(LastUp(y), env_cache, PARENT);
 	Child(*env, Down(y))

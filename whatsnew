@@ -692,4 +692,14 @@ Changes and new features introduced in Version 3.43 [Jan 2024]
      when catopen() can't find the locale's message catalog.
    Fix compile warnings for both gcc 13 and clang 17.
 
+Changes and new features introduced in Version 3.43.0 [Jan 2024]
+
+   Compare patches by Matěj Cepl https://git.cepl.eu/cgit/toys/lout/ and Edinson E. Padrón Urdaneta
+
+Changes and new features introduced in Version 3.43.1 [Feb 2025]
+
+   Fix compile warnings for both gcc 14 and clang 19 including
+     removing unused code and adding checks for NULL pointers.
+   Add "make test" and "make testclean" to test lout with the user manual.
+
    William Bader

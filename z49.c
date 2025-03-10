@@ -49,13 +49,13 @@
 #define MAX_GS		50		/* maximum depth of graphics states  */
 #define	STRING_SIZE	16000		/* used by forms code                */
 
-BOOLEAN			encapsulated;	/* TRUE if EPS file is wanted	     */
+static BOOLEAN		encapsulated;	/* TRUE if EPS file is wanted	     */
 static int		wordcount;	/* atoms printed since last newline  */
 static int		pagecount;	/* total number of pages printed     */
 static BOOLEAN		prologue_done;	/* TRUE after prologue is printed    */
 static OBJECT		needs;		/* Resource needs of included EPSFs  */
 static OBJECT		supplied;	/* Resources supplied by this file   */
-static OBJECT		incg_files;	 /* IncludeGraphicRepeated files */
+static OBJECT		incg_files;	/* IncludeGraphicRepeated files	     */
 static FILE		*out_fp;	/* file to print PostScript on       */
 
 

@@ -314,11 +314,31 @@ RCOPY	= cp -r
 MKDIR	= mkdir -p
 
 # Add WARN to CFLAGS for more checking
-WARN	= -Wpointer-arith -Wclobbered -Wempty-body -Wmissing-parameter-type -Wold-style-declaration -Wtype-limits -Wuninitialized -Winit-self -Wlogical-op -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Wbad-function-cast
+WARN	= -Wpointer-arith -Wempty-body -Wtype-limits -Wuninitialized -Winit-self \
+	-Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Wbad-function-cast
+
 # Add FED_WARN to CFLAGS for preview gcc 14 / fedora 40 warnings
 FED_WARN = -Werror=implicit-function-declaration -Werror=implicit-int -Werror=int-conversion -std=gnu2x -Werror=old-style-definition
 
-CFLAGS ?= -ansi -std=c99 -pedantic -Wall -O3 -pipe
+# Add WANR2 to CFLAGS for even more checking
+WARN2 = -Wmissing-variable-declarations -Wformat-security -Wformat-y2k -Wnull-dereference -Wswitch-enum \
+		-Wunused-const-variable -Wstrict-prototypes -Wundef -Wunused-macros -Wcast-align -Wpacked
+
+# Add GCC_WARN to CFLAGS for more warnings if using gcc (these are not supported by clang)
+GCC_WARN = -Wclobbered -Wmissing-parameter-type -Wold-style-declaration -Wlogical-op -Walloc-zero \
+		-Wcalloc-transposed-args -Wduplicated-branches -Wjump-misses-init -Wduplicated-cond
+
+# Add FORTIFY_WARN to enable stack protection
+FORTIFY_WARN = -g -D_FORTIFY_SOURCE=3 -fstack-protector-all
+
+# Enabling the sanitizer loses the last block of output
+SANITIZE_WARN = -g -fsanitize=address
+
+# Full warnings with gcc for development
+# CFLAGS ?= -ansi -std=c99 -pedantic -Wall -O3 -pipe $(WARN) $(FED_WARN) $(WARN2) $(GCC_WARN) $(FORTIFY_WARN)
+
+# For releases without debugging or stack protection overhead
+CFLAGS ?= -ansi -std=c99 -pedantic -Wall -O3 -pipe $(WARN) $(FED_WARN) $(WARN2)
 
 
 CFLAGS	+= -DOS_UNIX=$(OSUNIX)					\
@@ -352,7 +372,7 @@ OBJS	= z01.o z02.o z03.o z04.o z05.o z06.o z07.o z08.o	\
 	  z41.o z42.o z43.o z44.o z45.o z46.o z47.o z48.o	\
 	  z49.o z50.o z51.o z52.o
 
-.PHONY: all install installman installdoc allinstall installfr installde uninstall clean gitclean gitcleanforce restart
+.PHONY: all install installman installdoc allinstall installfr installde uninstall test testclean clean gitclean gitcleanforce restart
 
 lout:	$(OBJS)
 	$(CC) $(LDFLAGS) $(CFLAGS) -o lout $(OBJS) $(ZLIB) -lm
@@ -481,7 +501,24 @@ uninstall:
 		done ; \
 	}
 
-clean:	
+OLDVERSION = lout-3.40-18sep20
+test: lout doc/user/all
+	{ \
+		cd doc/user ; \
+		if [ ! -f user-$(OLDVERSION).ps ] ; \
+		then echo "Running old lout..." ; rm -f *.ld *.ldx *.li ; time /usr/local/bin/$(OLDVERSION) -r3 all -o user-$(OLDVERSION).ps 2>&1 ; echo ; fi ; \
+		echo "Running new lout..." ; \
+		rm -f -- *.ld *.ldx *.li user.ps ; \
+		time ../../lout -r3 all -o user.ps 2>&1 ; \
+		echo ; \
+		echo "Comparing new and old output" ; \
+		diff --text user.ps user-$(OLDVERSION).ps | less ; \
+	}
+
+testclean:
+	cd doc/user && rm -f -- *.ld *.ldx *.li user.ps
+
+clean: testclean
 	-rm -f lout prg2lout *.o
 
 gitclean:

@@ -1278,7 +1278,7 @@ void SetTarget(OBJECT hd)
   
   /* if cr is not a cross-reference, expand it until it is */
   copied = FALSE;
-  if( !is_cross(type(cr)) )
+  if( cr != NULL && !is_cross(type(cr)) )
   { OBJECT nbt[2], nft[2], ntarget, ncrs, nenclose;
     nbt[COLM] = nft[COLM] = nbt[ROWM] = nft[ROWM] = nilobj;
     ntarget = ncrs = nenclose = nilobj;
@@ -1292,9 +1292,9 @@ void SetTarget(OBJECT hd)
   /* check that cr is now a cross-reference object */
   debug1(DGS, DD, "SetTarget examining %s", EchoObject(cr));
   debug1(DGS, DD, "  type(cr) = %s", Image( (int) type(cr)) );
-  if( !is_cross(type(cr)) )
+  if( cr == NULL || !is_cross(type(cr)) )
     Error(22, 6, "target of %s is not a cross reference",
-      FATAL, &fpos(cr), SymName(actual(x)));
+      FATAL, (cr == NULL? no_fpos: &fpos(cr)), SymName(actual(x)));
 
   /* determine which symbol is the target of this galley */
   Child(lpar, Down(cr))

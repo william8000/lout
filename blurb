@@ -21,7 +21,7 @@ went back to the beginning.
 Lout is written in highly portable ANSI C.  It is distributed under the
 GNU public license and is obtainable from
 
-   ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.40.tar.gz
+   jeffreykingston.id.au/lout
 
 The distribution contains
 
@@ -35,9 +35,8 @@ The distribution contains
   *  Complete documentation for all these features consisting of a
      User's Guide plus an Expert's Guide
 
-A PostScript version of the User's Guide is available at:
-
-   ftp://ftp.it.usyd.edu.au/jeff/lout/lout-3.40-user.ps.gz
+A PostScript version of the User's Guide is available from
+jeffreykingston.id.au/lout.
 
 Lout was created by Jeffrey H. Kingston (jeff@it.usyd.edu.au) of the
 School of Information Technologies at the University of Sydney.

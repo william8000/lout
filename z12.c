@@ -30,11 +30,13 @@
 #include "externs.h"
 #define line_breaker(g)							\
   (vspace(g) > 0 || (units(gap(g)) == FRAME_UNIT && width(gap(g)) > FR))
+#if 0
 #define IG_LOOKING	0
 #define IG_NOFILE	1
 #define IG_BADFILE	2
 #define IG_BADSIZE	3
 #define	IG_OK		4
+#endif
 
 #if DEBUG_ON
 static int debug_depth = 1;

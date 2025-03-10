@@ -29,16 +29,16 @@
 /*****************************************************************************/
 #include "externs.h"
 #define TOO_TIGHT_BAD	1048576	/* 2^21; badness of a too tight line         */
-#define TOO_LOOSE_BAD	  65536	/* 2^16; the max badness of a too loose line */
-#define	TIGHT_BAD	   4096	/* 2^12; the max badness of a tight line     */
-#define	LOOSE_BAD	   4096	/* 2^12; the max badness of a loose line     */
+/* #define TOO_LOOSE_BAD  65536    2^16; the max badness of a too loose line */
+/* #define TIGHT_BAD	   4096    2^12; the max badness of a tight line     */
+/* #define LOOSE_BAD	   4096    2^12; the max badness of a loose line     */
 #define	HYPH_BAD	    128	/* 2^ 7; threshold for calling hyphenation   */
 #define	HYPH_BAD_INCR	     16	/* 2 ^4: the badness of one hyphen           */
 #define	WIDOW_BAD_INCR	    128	/* 2 ^7: the badness of one widow word       */
 #define SQRT_TOO_LOOSE	    512	/* 2^ 9; sqrt(TOO_LOOSE_BAD) (used to be)    */
 #define	SQRT_TIGHT_BAD	    128	/* 2^ 7; sqrt(TIGHT_BAD) (used to be)        */
 #define	SQRT_LOOSE_BAD	    128	/* 2^ 7; sqrt(LOOSE_BAD) (used to be)        */
-#define	SQRT_TOO_TIGHT	   8192	/* 2^13; sqrt(TOO_TIGHT_BAD) (used to be)    */
+/* #define SQRT_TOO_TIGHT  8192    2^13; sqrt(TOO_TIGHT_BAD) (used to be)    */
 #define MAX_EXPAND	1
 #define MAX_SHRINK	4
 
@@ -166,15 +166,17 @@ typedef struct {
 /*****************************************************************************/
 
 #define MoveRightToGap(I,x,rlink,right,max_width,etc_width,hyph_word)	\
-{ OBJECT newg, foll = nilobj, tmp;  int ch;				\
+{ OBJECT newg, foll = nilobj /* , tmp */;  int ch;			\
   BOOLEAN jn, unbreakable_at_right = FALSE;				\
   debug0(DOF, DDD, "MoveRightToGap(I, x, rlink, right, -, -, -)");	\
 									\
   /* search onwards to find newg, the next true breakpoint */		\
+  /* *** only for debugging						\
   Child(tmp, rlink)							\
     ;									\
   debug2(DOF, DDD, "NextDefiniteWithGap(%s, %s)", EchoObject(x),	\
     EchoObject(tmp));							\
+  *** */								\
   NextDefiniteWithGap(x, rlink, foll, newg, jn);			\
 									\
   /* set right link and calculate badness of the new interval */	\
@@ -584,7 +586,8 @@ static void KernWordLeftMargin(OBJECT first_on_line, OBJECT parent)
       kerned_glyphs[kerned_glyph_count] = *wordp;
     }
 
-    kerned_glyphs[kerned_glyph_count] = '\0';
+    if ( kerned_glyph_count <= MAX_KERNED_GLYPHS )
+      kerned_glyphs[kerned_glyph_count] = '\0';
   }
 
   if(kerned_glyph_count > 0)
@@ -666,7 +669,8 @@ static void KernWordRightMargin(OBJECT last_on_line, OBJECT parent)
 {
   FONT_NUM  font;
   FULL_CHAR *word_content, *wordp;
-  FULL_CHAR kerned_glyphs[20];
+  enum kerned_glyph_enum { MAX_KERNED_GLYPHS = 20 };
+  /* FULL_CHAR kerned_glyphs[ MAX_KERNED_GLYPHS + 1 ]; */
   FULL_LENGTH kerned_glyphs_width = 0;
   unsigned kerned_glyph_count = 0, word_len;
 
@@ -693,14 +697,14 @@ static void KernWordRightMargin(OBJECT last_on_line, OBJECT parent)
       glyph_width = FontGlyphWidth(font, *wordp);
       if(kerned_glyphs_width + glyph_width > x_width)
        break;
-      if(kerned_glyph_count >= sizeof(kerned_glyphs))
+      if(kerned_glyph_count >= MAX_KERNED_GLYPHS)
        break;
 
       kerned_glyphs_width += glyph_width;
-      kerned_glyphs[kerned_glyph_count] = *wordp;
+      /* kerned_glyphs[kerned_glyph_count] = *wordp; */
     }
 
-    kerned_glyphs[kerned_glyph_count] = '\0';
+    /* kerned_glyphs[kerned_glyph_count] = '\0'; */
   }
 
   if(kerned_glyph_count > 0)

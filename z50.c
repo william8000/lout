@@ -81,6 +81,7 @@ static OBJECT		supplied;	/* Resources supplied by this file   */
 /*                                                                           */
 /*****************************************************************************/
 
+#if 0
 #define printnum(x, fp)							\
 { char buff[20];  register int i, y;					\
   if( x >= 0 )  y = x;							\
@@ -91,6 +92,7 @@ static OBJECT		supplied;	/* Resources supplied by this file   */
   do { --i; putc(buff[i], fp);						\
      } while( i );							\
 }
+#endif
 
 
 /*****************************************************************************/

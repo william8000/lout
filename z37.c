@@ -1857,13 +1857,12 @@ FULL_CHAR *FontFamily(FONT_NUM fnum)
 
 
 FULL_CHAR *FontFace(FONT_NUM fnum)
-{ OBJECT face, family;
+{ OBJECT face /* , family */;
   debug1(DFT, D, "FontFacec( %d )", fnum);
   assert( fnum <= font_count, "FontFamiliy!" );
   Parent(face, Up(finfo[fnum].font_table))
     ;
-  Parent(family, Up(face))
-    ;
+  /* Parent(family, Up(face)) ; */
   debug1(DFT, D, "FontFace returning %s", string(face));
   return string(face);
 } /* end FontFamilyAndFace */

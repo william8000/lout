@@ -205,6 +205,7 @@ void HyphInit(void)
 /*  Compress value string p, placing the result in q.                        */
 /*                                                                           */
 /*****************************************************************************/
+#if 0
 #define FirstHalf(y)		( (y) >> 4 )
 #define LastHalf(y)		( (y) & 15 )
 #define AssignFirstHalf(x, y)	( (x) = ((y) << 4) )
@@ -252,6 +253,7 @@ void HyphInit(void)
   }									\
   *q = (FULL_CHAR) '\0';						\
 }
+#endif
 
 /*@::AltCompressValue(), AltUncompressValue()@********************************/
 /*                                                                           */

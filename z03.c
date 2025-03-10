@@ -857,7 +857,7 @@ static char *compress_suffixes[MAX_COMPRESSED]
 
 FILE *OpenIncGraphicFile(FULL_CHAR *str, unsigned char typ,
 OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
-{ FILE *fp = NULL;  int p, i;  BOOLEAN used_source_suffix;
+{ FILE *fp = NULL;  int p, i, res;  BOOLEAN used_source_suffix;
   FULL_CHAR sort_name[128];  int sort_start = 0, sort_end = 0;
   static FULL_CHAR last_sort_name[128];  static FILE *last_ceps_fp = NULL;
   debug2(DFS, DD, "OpenIncGraphicFile(%s, %s, -)", str, Image(typ));
@@ -1014,15 +1014,23 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
       sprintf(buff, UNCOMPRESS_COM, (char *) string(*full_name), LOUT_EPS);
       if( SafeExecution )
       {
-        Error(3, 17, "safe execution prohibiting command: %s", WARN, xfpos,buff);
+        Error(3, 17, "safe execution prohibiting command: %s", WARN, xfpos, buff);
         *compressed = FALSE;
         fp = null;
       }
       else
       {
-        system(buff);
-        fp = fopen(LOUT_EPS, READ_FILE);
-        *compressed = TRUE;
+        res = system(buff);
+	if( res != -1 )  /* junk code to keep the compiler happy */
+	{
+	  fp = fopen(LOUT_EPS, READ_FILE);
+	  *compressed = TRUE;
+	}
+	else
+	{
+	  *compressed = FALSE;
+	  fp = null;
+	}
       }
     }
     else

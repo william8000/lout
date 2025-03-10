@@ -15,10 +15,7 @@ simpler than the equivalent troff of TeX macros.
 Lout is written in highly portable ANSI C, runs on most platforms, and
 is distributed under the GNU public license.  Its primary web site is
 
-   ftp://ftp.it.usyd.edu.au/jeff/lout/
-
-Consult the README file in that directory for information about the
-latest version.
+   jeffreykingston.id.au/lout
 
 Lout was created by Jeffrey H. Kingston (jeff@it.usyd.edu.au) of the
 School of Information Technologies at the University of Sydney.
