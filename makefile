@@ -338,7 +338,7 @@ SANITIZE_WARN = -g -fsanitize=address
 # CFLAGS ?= -ansi -std=c99 -pedantic -Wall -O3 -pipe $(WARN) $(FED_WARN) $(WARN2) $(GCC_WARN) $(FORTIFY_WARN)
 
 # For releases without debugging or stack protection overhead
-CFLAGS ?= -ansi -std=c99 -pedantic -Wall -O3 -pipe $(WARN) $(FED_WARN) $(WARN2)
+CFLAGS ?= -ansi -std=c99 -pedantic -Wall -O3 -pipe
 
 
 CFLAGS	+= -DOS_UNIX=$(OSUNIX)					\
