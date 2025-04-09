@@ -101,8 +101,13 @@ void InitTime(void)
   dst       = load(KW_DAYLIGHTSAVING, NPAR,  MomentSym);
 
   /* get current time and convert to ASCII */
-  if( time(&raw_time) == -1 )
-    Error(35, 1, "unable to obtain the current time", WARN, no_fpos);
+  char *source_date_epoch;
+  /* This assumes that the SOURCE_DATE_EPOCH environment variable will contain
+   a correct, positive integer in the time_t range */
+  if ((source_date_epoch = getenv("SOURCE_DATE_EPOCH")) == NULL ||
+    (raw_time = (time_t)strtoll(source_date_epoch, NULL, 10)) <= 0)
+      if( time(&raw_time) == -1 )
+        Error(35, 1, "unable to obtain the current time", WARN, no_fpos);
   now = localtime(&raw_time);
   StringCopy(time_string, AsciiToFull(asctime(now)));
   time_string[StringLength(time_string) - 1] = '\0';
