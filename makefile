@@ -505,6 +505,7 @@ OLDVERSION = lout-3.40-18sep20
 test: lout doc/user/all
 	{ \
 		cd doc/user ; \
+		export SOURCE_DATE_EPOCH=1747772928 ; \
 		if [ ! -f user-$(OLDVERSION).ps ] ; \
 		then echo "Running old lout..." ; rm -f *.ld *.ldx *.li ; time /usr/local/bin/$(OLDVERSION) -r3 all -o user-$(OLDVERSION).ps 2>&1 ; echo ; fi ; \
 		echo "Running new lout..." ; \
