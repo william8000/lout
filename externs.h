@@ -173,6 +173,7 @@ extern nl_catd MsgCat;
 #define	UNCOMPRESS_COM	"gunzip -c %s > %s"
 #define PDFTOPS_COM	"pdftops -eps '%s' '%s'"
 #define CONVERT_COM	"convert '%s' 'eps2:%s'"
+#define MAGICK_COM	"magick '%s' 'eps2:%s'"
 #define	LOUT_EPS	"lout.eps"
 #else
 #if OS_DOS
@@ -184,6 +185,7 @@ extern nl_catd MsgCat;
 #define	UNCOMPRESS_COM	"gunzip -c %s > %s"
 #define PDFTOPS_COM	"pdftops -eps %s %s"
 #define CONVERT_COM	"convert %s eps2:%s"
+#define MAGICK_COM	"magick %s eps2:%s"
 #define	LOUT_EPS	"lout.eps"
 #else
 #if OS_MAC
@@ -195,6 +197,7 @@ extern nl_catd MsgCat;
 #define	UNCOMPRESS_COM	"gunzip -c %s > %s"
 #define PDFTOPS_COM	"pdftops -eps %s %s"
 #define CONVERT_COM	"convert %s eps2:%s"
+#define MAGICK_COM	"magick %s eps2:%s"
 #define	LOUT_EPS	"lout.eps"
 #else
 If you're compiling this, you've got the wrong settings in the makefile!

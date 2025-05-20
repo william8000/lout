@@ -35,6 +35,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #endif
+#if OS_UNIX
+#include <unistd.h>
+#endif
 
 #define	INIT_TAB 	  3			/* initial file table size   */
 
@@ -1057,22 +1060,33 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
         }
         else
         {
-          system(buff);
-          fp = fopen(LOUT_EPS, READ_FILE);
-          *compressed = TRUE;
+          res = system(buff);
+          if( res != -1 ) {
+            fp = fopen(LOUT_EPS, READ_FILE);
+            *compressed = TRUE;
+          } else {
+            *compressed = FALSE;
+            fp = null;
+          }
         }
       }
       else if (  have_magic &&
                  ((magic_buf[0] == 'I' && magic_buf[1] == 'I') || /* TIFF, Intel format */
                   (magic_buf[0] == 'M' && magic_buf[1] == 'M') || /* TIFF, Motorola format */
                   (magic_buf[0] == 'G' && magic_buf[1] == 'I' && magic_buf[2] == 'F') || /* GIF */
+                  (magic_buf[0] == 'R' && magic_buf[1] == 'I' && magic_buf[2] == 'F' && magic_buf[3] == 'F') || /* RIFF including WEBP */
                   ((magic_buf[0]&0xff) == 0xff && (magic_buf[1]&0xff) == 0xd8) || /* JPEG */
                   (magic_buf[1] == 'P' && magic_buf[2] == 'N' && magic_buf[3] == 'G') /* PNG */ ) )
       {
 	/* process bitmap files with ImageMagick convert */
         char buff[ MAX_BUFF ];
         fclose(fp);
-        sprintf(buff, CONVERT_COM, (char *) string(*full_name), LOUT_EPS);
+#if OS_UNIX
+        if( access("/usr/bin/magick", X_OK) == 0 )
+          sprintf(buff, MAGICK_COM, (char *) string(*full_name), LOUT_EPS);
+        else
+#endif
+          sprintf(buff, CONVERT_COM, (char *) string(*full_name), LOUT_EPS);
         if( SafeExecution )
         {
           Error(3, 17, "safe execution prohibiting command: %s", WARN, xfpos,buff);
@@ -1081,9 +1095,14 @@ OBJECT *full_name, FILE_POS *xfpos, BOOLEAN *compressed)
         }
         else
         {
-          system(buff);
-          fp = fopen(LOUT_EPS, READ_FILE);
-          *compressed = TRUE;
+          res = system(buff);
+          if( res != -1 ) {
+            fp = fopen(LOUT_EPS, READ_FILE);
+            *compressed = TRUE;
+          } else {
+            *compressed = FALSE;
+            fp = null;
+          }
         }	
       }
       else

@@ -702,4 +702,12 @@ Changes and new features introduced in Version 3.43.1 [Feb 2025]
      removing unused code and adding checks for NULL pointers.
    Add "make test" and "make testclean" to test lout with the user manual.
 
+Changes and new features introduced in Version 3.43.2 [May 2025]
+
+   Apply Bernhard M. Wiedemann's patch to check SOURCE_DATE_EPOCH for reproducible builds.
+     Merged from https://git.sr.ht/~mcepl/lout/commit/b0e88c5144677842e1c76e97870df6e4b1638f39
+     See https://reproducible-builds.org/docs/source-date-epoch
+   Add support for webp images.
+   Use magick instead of convert on Linux when present.
+
    William Bader
