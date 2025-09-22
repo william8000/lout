@@ -692,9 +692,10 @@ Changes and new features introduced in Version 3.42.1 [Dec 2021]
    Apply George Rawlinson's makefile change to add DESTDIR and
      to pass CFLAGS/LDFLAGS to the compiler.
 
-Changes and new features introduced in Version 3.42.2 [Dec 2021]
+Changes and new features introduced in Version 3.42.2 [Nov 2022]
 
-   Apply Jérémy Zurcher's fix for @PaintBox in the PDF backend.
+   Apply Jérémy Zurcher's fix for @PaintBox in tblf in the PDF backend.
+   Fix undefined __loutd reference in include/lengths in the PDF backend.
 
 Changes and new features introduced in Version 3.43 [Jan 2024]
 
