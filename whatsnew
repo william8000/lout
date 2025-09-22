@@ -626,7 +626,7 @@ Changes and new features introduced in Version 3.42 [Dec 2020]
    wget https://github.com/william8000/lout/archive/3.42.tar.gz
 
    Support for embedding PDF and bitmapped images in lout.
-     Embedding postscript requires pdftops, see PDFTOPS_COM
+     Embedding PDFs requires pdftops, see PDFTOPS_COM
      in externs.h.
      Embedding bitmapped images requires ImageMagick convert,
      see CONVERT_COM in externs.h.
