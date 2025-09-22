@@ -268,7 +268,7 @@ void DebugScope(void)
 /*                                                                           */
 /*****************************************************************************/
 
-OBJECT GetScopeSnapshot()
+OBJECT GetScopeSnapshot(void)
 { OBJECT ss, x;  int i;
   New(ss, ACAT);
   for( i = scope_top-1;  scope[i] != StartSym;  i-- )

@@ -51,7 +51,7 @@ static int	CurrentFileNum;
 /*                                                                           */
 /*****************************************************************************/
 
-void ErrorInit()
+void ErrorInit(void)
 {
   fp = NULL;
   error_seen = FALSE;

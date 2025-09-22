@@ -337,7 +337,7 @@ void MapEnsurePrinted(MAPPING m, int curr_page)
 /*                                                                           */
 /*****************************************************************************/
 
-void MapPrintEncodings()
+void MapPrintEncodings(void)
 { MAPPING m;  MAP_VEC map;
   for( m = 1;  m < maptop;  m++ )
   { if( MapTable[m]->seen_recoded )

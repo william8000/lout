@@ -566,7 +566,7 @@ static t_offset_block_ptr PDFObject_FindOffsetBlock(PDF_OBJECT_NUM in_obj_num,
 /*                                                                           */
 /*****************************************************************************/
 
-static PDF_OBJECT_NUM PDFObject_New(/* FILE* in_fp */)
+static PDF_OBJECT_NUM PDFObject_New(void /* FILE* in_fp */)
 {
   int wanted_block_num = (g_next_objnum - 1) / kNumberOfObjectsPerBlock;
   int block_pos = (g_next_objnum - 1) % kNumberOfObjectsPerBlock;

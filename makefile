@@ -18,10 +18,12 @@
 #     make installfr    Install French error messages (optional)              #
 #     make installde    Install German error messages (optional)              #
 #     make clean        Remove compilation temporaries                        #
+#     make gitclean     Remove all non-git files, use with caution            #
 #     make uninstall    Undo the effect of make install, installman,          #
 #                       installdoc, installfr, and installde                  #
 #     make restart      Undo everything except changes to this makefile,      #
 #                       ready for a fresh start.                              #
+#     make test         Test doc/user against an older version of lout        #
 #                                                                             #
 #  Most installations of Lout should require only the following steps.  If    #
 #  something goes wrong, you can start again with "make restart".  Please     #
@@ -507,7 +509,7 @@ test: lout doc/user/all
 		cd doc/user ; \
 		export SOURCE_DATE_EPOCH=1747772928 ; \
 		if [ ! -f user-$(OLDVERSION).ps ] ; \
-		then echo "Running old lout..." ; rm -f *.ld *.ldx *.li ; time /usr/local/bin/$(OLDVERSION) -r3 all -o user-$(OLDVERSION).ps 2>&1 ; echo ; fi ; \
+		then echo "Running old lout..." ; rm -f -- *.ld *.ldx *.li ; time /usr/local/bin/$(OLDVERSION) -r3 all -o user-$(OLDVERSION).ps 2>&1 ; echo ; fi ; \
 		echo "Running new lout..." ; \
 		rm -f -- *.ld *.ldx *.li user.ps ; \
 		time ../../lout -r3 all -o user.ps 2>&1 ; \
