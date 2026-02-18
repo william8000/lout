@@ -845,8 +845,8 @@ static OBJECT FontRead(FULL_CHAR *family_name, FULL_CHAR *face_name, OBJECT err)
 	  Child(y, Down(face))
 	    ;
 	  if( !StringEqual(command, string(y)) )
-	  Error(37, 31, "FontName in font file (%s) and %s (%s) disagree",
-	    WARN, &fpos(AFMfilename), command, KW_FONTDEF, string(y));
+	    Error(37, 31, "FontName in font file (%s) and %s (%s) disagree",
+	      WARN, &fpos(AFMfilename), command, KW_FONTDEF, string(y));
 	  font_name_found = TRUE;
 	}
 	else if( StringEqual(command, AsciiToFull("FontBBox")) )

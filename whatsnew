@@ -721,4 +721,9 @@ Changes and new features introduced in Version 3.43.2 [May 2025]
    Add support for webp images.
    Use magick instead of convert on Linux when present.
 
+Changes and new features introduced in Version 3.43.3 [Feb 2026]
+
+   Add printf-annotations to Error().
+   Fix compile warnings from gcc 15, clang 21, and smatch 0.6.4.
+
    William Bader

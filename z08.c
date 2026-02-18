@@ -148,8 +148,8 @@ OBJECT ReplaceWithTidy(OBJECT x, int spacing)
       	  ;
 	if( is_word(type(y)) )
 	{ if( buff_len + StringLength(string(y)) >= MAX_WORD )
-	    Error(8, 1, "word is too long (%d characters)", WARN, &fpos(y),
-	     buff_len + StringLength(string(y)));
+	    Error(8, 1, "word is too long (%ld characters)", WARN, &fpos(y),
+	     (long) (buff_len + StringLength(string(y))));
 	  else
 	  { if( buff_len == 0 )  FposCopy(buff_pos, fpos(y));
 	    StringCopy(&buff[buff_len], string(y));

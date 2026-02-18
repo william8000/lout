@@ -55,7 +55,7 @@
 static void Assert(BOOLEAN condition, FILE_POS *inFilePos)
 {
   if (!condition)		/* allows me to set a breakpoint here */
-  assert(condition, inFilePos);
+  assertAt(condition, inFilePos);
 }
 
 /* #define's and typedefs */

@@ -406,7 +406,7 @@ static OBJECT FindSplitInGalley(OBJECT hd)
 
       debug0(DGF, D, "FindSplitInGalley(hd) failing, hd =");
       ifdebug(DGF, D, DebugObject(hd));
-      Error(22, 2, "FindSplitInGalley failed", INTERN, &fpos(y),Image(type(y)));
+      Error(22, 2, "FindSplitInGalley failed, image %s", INTERN, &fpos(y), Image(type(y)));
       break;
 
 
@@ -1360,10 +1360,10 @@ int CheckComponentOrder(OBJECT preceder, OBJECT follower)
   if( prec_galley == foll_galley )
   { res = CLOSE;
     for( z = Up(follower);  z != foll_galley;  z = pred(z, CHILD) )
-    if( z == Up(preceder) )
-    { res = CLEAR;
-      break;
-    }
+      if( z == Up(preceder) )
+      { res = CLEAR;
+        break;
+      }
   }
   else
   { res = PROMOTE;

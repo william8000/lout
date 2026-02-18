@@ -114,7 +114,7 @@ static int crtab_getnext(OBJECT sym, FILE_NUM fnum, CROSSREF_TABLE *S)
   hash(pos, sym, fnum, *S);
   for( x = crtab_chain(*S, pos);  x != NULL;  x = x->crtab_next )
   { if( x->crtab_sym == sym && x->crtab_fnum == fnum )
-    return ++x->crtab_value;
+      return ++x->crtab_value;
   }
 
   /* if table is full, rehash */

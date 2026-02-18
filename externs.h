@@ -164,6 +164,10 @@ extern nl_catd MsgCat;
 /*                                                                           */
 /*****************************************************************************/
 
+#if !defined(OS_UNIX) && !defined(OS_DOS) && !defined(OS_MAC)
+#define OS_UNIX 1
+#endif
+
 #if OS_UNIX
 #define	READ_FILE	"r"
 #define	WRITE_FILE	"w"
@@ -203,6 +207,26 @@ extern nl_catd MsgCat;
 If you're compiling this, you've got the wrong settings in the makefile!
 #endif
 #endif
+#endif
+
+/*****************************************************************************/
+/*                                                                           */
+/*  Compiler system dependent things                                         */
+/*                                                                           */
+/*  PRINTF_LIKE         Annotate functions that take printf-like arguments.  */
+/*                                                                           */
+/*****************************************************************************/
+
+#if defined(__has_attribute)
+#  if __has_attribute(format)
+#    define PRINTF_LIKE(fmt, args) __attribute__((format(printf, fmt, args)))
+#  else
+#    define PRINTF_LIKE(fmt, args)
+#  endif
+#elif defined(__GNUC__)
+#  define PRINTF_LIKE(fmt, args) __attribute__((format(printf, fmt, args)))
+#else
+#  define PRINTF_LIKE(fmt, args)
 #endif
 
 /*@::Significant limits@******************************************************/
@@ -3499,7 +3523,7 @@ extern	void	  EnterErrorBlock(BOOLEAN ok_to_print);
 extern	void	  LeaveErrorBlock(BOOLEAN commit);
 extern	void	  CheckErrorBlocks(void);
 extern	POINTER	  Error(int set_num, int msg_num, char *str, int etype,
-		    FILE_POS *pos, ...);
+		    FILE_POS *pos, ...) PRINTF_LIKE(3, 6);
 
 /*****  z29.c	  Symbol Table		**************************************/
 extern	void	  InitSym(void);
@@ -3784,6 +3808,8 @@ extern	FULL_CHAR *TextureCommand(TEXTURE_NUM pnum);
 #if ASSERT_ON
 #define assert(c, m)							\
    { if( !(c) )  Error(1, 2, "assert failed in %s", INTERN, no_fpos, m); }
+#define assertAt(c, m)							\
+   { if( !(c) )  Error(1, 2, "assert failed at %p", INTERN, no_fpos, (void *)m); }
 #define assert1(c, m, p1)						\
    { if( !(c) )  Error(1, 3, "assert failed in %s %s", INTERN,no_fpos,m, p1); }
 #else

@@ -120,7 +120,7 @@ CONSTRAINT *c, FULL_LENGTH *res_back, FULL_LENGTH *res_fwd)
 
 static OBJECT BreakVcat(OBJECT x, CONSTRAINT *c)
 { OBJECT y, link, start_group, m = nilobj;
-  FULL_LENGTH b, f, dble_fwd;  CONSTRAINT tc;
+  FULL_LENGTH b = 0, f = 0, dble_fwd;  CONSTRAINT tc;
   BOOLEAN dble_found;
   debug1(DOB, DD, "[ BreakVcat(x, %s)", EchoConstraint(c));
   assert(Down(x) != x, "BreakVcat: Down(x) == x!" );
