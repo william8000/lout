@@ -726,4 +726,8 @@ Changes and new features introduced in Version 3.43.3 [Feb 2026]
    Add printf-annotations to Error().
    Fix compile warnings from gcc 15, clang 21, and smatch 0.6.4.
 
+Changes and new features introduced in Version 3.43.4 [Apr 2026]
+
+   Accept --help and --version by basile@starynkevitch.net
+
    William Bader

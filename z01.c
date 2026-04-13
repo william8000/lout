@@ -175,6 +175,8 @@ void PrintUsage(FILE *fp)
   lput0("  -x              initializing run, not for ordinary use"	    );
   lput0("  -Z              PDF (Adobe Portable Document Format) output"     );
   lput0("  --option{value} set option e.g. --'@InitialFont{Times Base 10p}'");
+  lput0("  --help          show this help"                                  );
+  lput0("  --version       show the version"                                );
   lput0("  -               a file name denoting standard input"		    );
   lputnl;
 } /* end PrintUsage */
@@ -568,8 +570,20 @@ static void run(int argc, char *argv[], int run_num, int *runs_to_do,
 	/* read command-line document option */
 	if( sscanf(argv[i]+2, "%[^{ ] { %[^}] }", oname, oval) != 2 ||
 	  StringLength(oname) == 0 || StringLength(oval) == 0 )
+	{
+	  if (strcmp(argv[i], "--help") == 0)
+	  {
+	    PrintUsage(stdout);
+	    exit(0);
+	  }
+	  if (strcmp(argv[i], "--version") == 0)
+	  {
+	    puts((const char*)LOUT_VERSION);
+	    exit(0);
+	  }
 	  Error(1, 24, "error in command-line option %s", FATAL, no_fpos,
 	    argv[i]+2);
+	}
 	debug2(DSP, D, "  command line option [%s] [%s]", oname, oval);
 	y = MakeWord(WORD, oname, no_fpos);
 	Link(CommandOptions, y);
